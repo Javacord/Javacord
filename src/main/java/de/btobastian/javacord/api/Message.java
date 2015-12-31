@@ -90,4 +90,19 @@ public interface Message {
      */
     public boolean isTts();
     
+    /**
+     * Deletes the message.
+     * 
+     * @return Whether the message could be deleted or not.
+     */
+    public boolean delete();
+    
+    /**
+     * Edits the current message.
+     * 
+     * @param message The new content.
+     * @return Whether the message could be edited or not. 
+     */
+    public boolean edit(String message);
+    
 }

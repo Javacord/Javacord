@@ -35,4 +35,26 @@ public interface Server {
      */
     public List<Channel> getChannels();
     
+    /**
+     * Creates a new channel.
+     * 
+     * @param name The name of the channel.
+     * @param voice Whether the channel should be voice or text.
+     * @return The created channel. <code>Null</code> if the channel couldn't be created.
+     */
+    public Channel createChannel(String name, boolean voice);
+    
+    /**
+     * Deletes or leaves the server.
+     */
+    public void deleteOrLeave();
+    
+    /**
+     * Kicks the given user.
+     * 
+     * @param user The user to kick.
+     * @return Whether the user could be kicked or not.
+     */
+    public boolean kick(User user);
+    
 }

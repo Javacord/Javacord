@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.api.DiscordAPI;
@@ -221,6 +222,40 @@ class ImplDiscordAPI implements DiscordAPI {
         } else if (listener instanceof TypingStartListener) {
             typingStartListeners.add((TypingStartListener) listener);
         }
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.DiscordAPI#acceptInvite(java.lang.String)
+     */
+    @Override
+    public Server acceptInvite(String inviteCode) {
+        String response;
+        try {
+            response = getRequestUtils().request("https://discordapp.com/api/invite/" + inviteCode, "", true, "POST");
+        } catch (IOException e) {
+            return null;
+        }
+        JSONObject invite = new JSONObject(response);
+        String serverId = invite.getJSONObject("guild").getString("id");
+        for (Server server : getServers()) {
+            if (server.getId().equals(serverId)) {
+                return server;
+            }
+        }
+        try {
+            response = getRequestUtils().request("https://discordapp.com/api/users/@me/guilds", "", true, "GET");
+        } catch (IOException e) {
+            return null;
+        }
+        JSONArray guilds = new JSONArray(response);
+        for (int i = 0; i < guilds.length(); i++) {
+            JSONObject guild = guilds.getJSONObject(i);
+            if (guild.getString("id").equals(serverId)) {
+                return new ImplServer(guild, this);
+            }
+        }
+        return null;
     }
 
     /* ==== protected and private methods ==== */

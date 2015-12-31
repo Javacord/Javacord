@@ -1,5 +1,6 @@
 package de.btobastian.javacord.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,6 +163,52 @@ class ImplMessage implements Message {
     @Override
     public boolean isTts() {
         return tts;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Message#delete()
+     */
+    @Override
+    public boolean delete() {
+        try {
+            if (isPrivateMessage()) {
+                api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
+                        + "/messages/" + id, "", true, "DELETE");
+            } else {
+                api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
+                        + "/messages/" + id, "", true, "DELETE");
+            }
+            
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Message#edit(java.lang.String)
+     */
+    @Override
+    public boolean edit(String message) {
+        String[] mentionsString = new String[0];
+        String json = new JSONObject().put("content", message).put("mentions", mentionsString).toString();
+        
+        try {
+            if (isPrivateMessage()) {
+                api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
+                        + "/messages/" + id, json, true, "PATCH");
+            } else {
+                api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
+                        + "/messages/" + id, json, true, "PATCH");
+            }
+            
+        } catch (IOException e) {
+            return false;
+        }
+        this.content = message;
+        return true;
     }
 
     protected void update(JSONObject data) {

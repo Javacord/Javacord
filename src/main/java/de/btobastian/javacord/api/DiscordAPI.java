@@ -120,4 +120,12 @@ public interface DiscordAPI {
      */
     public void registerListener(Listener listener);
     
+    /**
+     * Accepts an invite.
+     * 
+     * @param inviteCode The invite code.
+     * @return The server invited to. <code>Null</code> if the invite is invalid.
+     */
+    public Server acceptInvite(String inviteCode);
+    
 }

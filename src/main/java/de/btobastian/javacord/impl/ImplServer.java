@@ -1,5 +1,6 @@
 package de.btobastian.javacord.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,6 +96,57 @@ class ImplServer implements Server {
     @Override
     public List<Channel> getChannels() {
         return new ArrayList<Channel>(channels);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#createChannel(java.lang.String, boolean)
+     */
+    @Override
+    public Channel createChannel(String name, boolean voice) {
+        String json = new JSONObject().put("name", name).put("type", voice ? "voice" : "text").toString();
+        
+        String response;
+        try {
+            response = getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id + "/channels", json, true, "POST");
+        } catch (IOException e) {
+            if (getApi().debug()) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        return new ImplChannel(new JSONObject(response), this);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#deleteOrLeave()
+     */
+    @Override
+    public void deleteOrLeave() {
+        try {
+            api.getRequestUtils().request("https://discordapp.com/api/guilds/" + id, "", true, "DELETE");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        getApi().removeServer(this);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#kick(de.btobastian.javacord.api.User)
+     */
+    public boolean kick(User user) {
+        try {
+            getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id + "/members/" + user.getId(), "", true, "DELETE");
+        } catch (IOException e) {
+            if (getApi().debug()) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return true;
     }
     
     protected void addChannel(ImplChannel channel) {
