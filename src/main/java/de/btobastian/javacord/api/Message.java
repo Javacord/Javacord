@@ -42,7 +42,6 @@ public interface Message {
      * Could be a channel or a user.
      * 
      * @return The receiver of the message.
-     * @see {@link #getChannelReceiver()} and {@link #getUserReceiver()}.
      */
     public MessageReceiver getReceiver();
     

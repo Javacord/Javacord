@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>Javacord</name>
   <description>A simple to use API to create a discord bot</description>
   
@@ -26,7 +26,7 @@
     </repository>
   </repositories>
   
-    <dependencies>
+  <dependencies>
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
@@ -71,7 +71,20 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
+      </plugin>
     </plugins>
   </build>
+  
+  <distributionManagement>
+    <repository>
+      <id>de.btobastian.javacord</id>
+      <name>Javacord Repository</name>
+      <url>file:///Javacordrepo/</url>
+    </repository>
+  </distributionManagement>
   
 </project>
