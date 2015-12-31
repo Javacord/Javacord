@@ -3,6 +3,7 @@ package de.btobastian.javacord.api;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import de.btobastian.javacord.api.listener.Listener;
 import de.btobastian.javacord.api.listener.ReadyListener;
 
 /**
@@ -111,5 +112,12 @@ public interface DiscordAPI {
      * @return A list with all known servers.
      */
     public List<Server> getServers();
+    
+    /**
+     * Registers a listener.
+     * 
+     * @param listener The listener to register.
+     */
+    public void registerListener(Listener listener);
     
 }

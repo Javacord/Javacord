@@ -15,6 +15,7 @@ import de.btobastian.javacord.api.DiscordAPI;
 import de.btobastian.javacord.api.Message;
 import de.btobastian.javacord.api.Server;
 import de.btobastian.javacord.api.User;
+import de.btobastian.javacord.api.listener.Listener;
 import de.btobastian.javacord.api.listener.MessageCreateListener;
 import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.ReadyListener;
@@ -205,6 +206,21 @@ class ImplDiscordAPI implements DiscordAPI {
     @Override
     public List<Server> getServers() {
         return new ArrayList<Server>(servers);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.DiscordAPI#registerListener(de.btobastian.javacord.api.listener.Listener)
+     */
+    @Override
+    public void registerListener(Listener listener) {
+        if (listener instanceof MessageCreateListener) {
+            messageCreateListeners.add((MessageCreateListener) listener);
+        } else if (listener instanceof MessageEditListener) {
+            messageEditListeners.add((MessageEditListener) listener);
+        } else if (listener instanceof TypingStartListener) {
+            typingStartListeners.add((TypingStartListener) listener);
+        }
     }
 
     /* ==== protected and private methods ==== */
