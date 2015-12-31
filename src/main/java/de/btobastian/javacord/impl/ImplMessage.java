@@ -48,14 +48,14 @@ class ImplMessage implements Message {
             outer: for (Server server : api.getServers()) {
                 for (Channel c : server.getChannels()) {
                     if (c.getId().equals(channelId)) {
-                        receiver = c;
+                        this.receiver = c;
                         break outer;
                     }
                 }
             }
             for (User user : api.getUsers()) {
-                if ("channel_id".equals(((ImplUser) user).getUserChannelId())) {
-                    receiver = user;
+                if (channelId.equals(((ImplUser) user).getUserChannelId())) {
+                    this.receiver = user;
                     break;
                 }
             }
@@ -168,7 +168,6 @@ class ImplMessage implements Message {
         try {
             content = data.getString("content");
         } catch (JSONException e) { 
-            e.printStackTrace();
         }
     }
     

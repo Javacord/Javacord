@@ -73,7 +73,7 @@ class DiscordWebsocket extends WebSocketClient {
             JSONObject privateChannel = privateChannels.getJSONObject(i);
             String id = privateChannel.getString("id");
             String userId = privateChannel.getJSONObject("recipient").getString("id");
-            User user = api.getUserById(id);
+            User user = api.getUserById(userId);
             if (user != null) {
                 ((ImplUser) user).setUserChannelId(id);
             }

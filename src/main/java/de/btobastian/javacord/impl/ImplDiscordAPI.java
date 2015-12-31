@@ -31,7 +31,7 @@ class ImplDiscordAPI implements DiscordAPI {
     private String token;
     private String encoding = "UTF-8";
     private DiscordWebsocket socket;
-    private final boolean DEBUG = true;
+    private final boolean DEBUG = false;
     private String game = "";
     
     private final List<ImplServer> servers = new ArrayList<>();
