@@ -17,10 +17,12 @@ A simple to use API to create a discord bot
 
 #Download
 For those of you how don't use maven: http://ci.ketrwu.de/job/Javacord/
+
 Thanks to ketrwu (https://github.com/KennethWussmann).
 
 #Javadocs
 The javadocs can be found here: http://ci.ketrwu.de/job/Javacord/javadoc/
+
 Thanks to ketrwu, too.
 
 #How to connect
