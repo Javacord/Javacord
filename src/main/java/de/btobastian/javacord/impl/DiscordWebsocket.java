@@ -7,6 +7,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import de.btobastian.javacord.api.User;
 import de.btobastian.javacord.api.listener.ReadyListener;
 
 /**
@@ -72,7 +73,10 @@ class DiscordWebsocket extends WebSocketClient {
             JSONObject privateChannel = privateChannels.getJSONObject(i);
             String id = privateChannel.getString("id");
             String userId = privateChannel.getJSONObject("recipient").getString("id");
-            ((ImplUser) api.getUserById(userId)).setUserChannelId(id);
+            User user = api.getUserById(id);
+            if (user != null) {
+                ((ImplUser) user).setUserChannelId(id);
+            }
         }
         
         new Thread(new Runnable() {
