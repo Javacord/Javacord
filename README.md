@@ -16,7 +16,7 @@ A simple to use API to create a discord bot
 ```
 
 #Download
-For those of you how don't use maven: http://ci.ketrwu.de/job/Javacord/
+For those of you how don't use maven: http://ci.ketrwu.de/job/Javacord/lastSuccessfulBuild/
 
 Thanks to ketrwu (https://github.com/KennethWussmann).
 
@@ -73,7 +73,7 @@ api.connect(new ReadyListener() {
  
       @Override
       public void onMessageCreate(DiscordAPI api, Message message) {
-        if (message.getContent.equals("ping")) {
+        if (message.getContent().equals("ping")) {
           message.reply("pong");
         }
       }
