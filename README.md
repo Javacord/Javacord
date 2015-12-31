@@ -3,7 +3,9 @@ A simple to use API to create a discord bot
 
 #How to connect
 First of all you have to get an api instance:
-`java DiscordAPI api = Javacord.getApi();`
+```java
+DiscordAPI api = Javacord.getApi();
+```
 Now you have to set your email and password:
 ```java
 api.setEmail("your@mail.com");
