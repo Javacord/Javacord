@@ -313,12 +313,12 @@ class ImplDiscordAPI implements DiscordAPI {
     private String requestGateway() {
         String result;
         try {
-            result = requestUtils.request("https://discordapp.com/api/gateway", "", true, "GET");
+            result = requestUtils.getFromWebsite("https://discordapp.com/api/gateway?", "authorization", token);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        return new JSONObject(result).getString("url").replace("wws", "ws");
+        return new JSONObject(result).getString("url").replace("wss", "ws");
     }
 
 }

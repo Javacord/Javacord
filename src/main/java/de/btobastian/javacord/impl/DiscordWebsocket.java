@@ -14,6 +14,7 @@ import de.btobastian.javacord.api.listener.ReadyListener;
  */
 class DiscordWebsocket extends WebSocketClient {
 
+    private static final String CONNECT_JSON = "{\"op\":2,\"d\":{\"token\":\"%token%\",\"v\":3,\"properties\":{\"$os\":\"Windows\",\"$browser\":\"Chrome\",\"$device\":\"\",\"$referrer\":\" https://discordapp.com/@me\",\"$referring_domain\":\"discordapp.com\"}}}";
     private static final String UPDATE_STATUS_JSON = "{\"op\":3,\"d\":{\"game\":{\"name\":\"%game%\"},\"idle_since\":null}}";
     
     private ImplDiscordAPI api;
@@ -26,6 +27,7 @@ class DiscordWebsocket extends WebSocketClient {
         this.api = api;
         this.listener = listener;
         packetManager = new PacketManager(api);
+        this.connect();
     }
     
     public boolean isReady() {
@@ -95,20 +97,7 @@ class DiscordWebsocket extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-        JSONObject connectJSON = new JSONObject();
-        connectJSON.put("op", 2);
-        JSONObject dataJSON = new JSONObject();
-        dataJSON.put("token", api.getToken());
-        dataJSON.put("v", 3);
-        JSONObject propertiesJSON = new JSONObject();
-        propertiesJSON.put("$os", "Linux");
-        propertiesJSON.put("$browser", "Chrome");
-        propertiesJSON.put("$device", "");
-        propertiesJSON.put("$referrer", "https://discordapp.com/@me");
-        propertiesJSON.put("$referring_domain", "discordapp.com");
-        dataJSON.put("properties", propertiesJSON);
-        connectJSON.put("d", dataJSON);
-        send(connectJSON.toString());
+        send(CONNECT_JSON.replace("%token%", api.getToken()));
     }
     
 }
