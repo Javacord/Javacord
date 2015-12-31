@@ -1,6 +1,26 @@
 # Javacord
 A simple to use API to create a discord bot
 
+#Maven
+```
+<repository>
+  <id>javacord-repo</id>
+  <url>http://repo.bastian-oppermann.de</url>
+</repository>
+...
+<dependency>
+  <groupId>de.btobastian.javacord</groupId>
+  <artifactId>javacord</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+#Download
+For those of you how don't use maven: http://bastian-oppermann.de/downloads/javacord-latest.jar
+
+#Javadocs
+The javadocs can be found here: http://bastian-oppermann.de/docs/Javacord/
+
 #How to connect
 First of all you have to get an api instance:
 ```java
@@ -66,5 +86,3 @@ api.connect(new ReadyListener() {
 
 });
 ```
-
-
