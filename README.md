@@ -18,6 +18,9 @@ A simple to use API to create a discord bot
 #Download
 For those of you how don't use maven: http://bastian-oppermann.de/downloads/javacord-latest.jar
 
+#Javadocs
+The javadocs can be found here: http://bastian-oppermann.de/docs/Javacord/
+
 #How to connect
 First of all you have to get an api instance:
 ```java
