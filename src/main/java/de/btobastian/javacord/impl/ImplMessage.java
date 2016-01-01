@@ -26,9 +26,6 @@ class ImplMessage implements Message {
     private User author;
     private MessageReceiver receiver;
     
-    // workaround till i fixed the userReceiver bug.
-    private String channelId;
-    
     private final List<User> mentions = new ArrayList<>();
     
     protected ImplMessage(JSONObject message, ImplDiscordAPI api, MessageReceiver receiver) {
@@ -39,7 +36,7 @@ class ImplMessage implements Message {
         tts = message.getBoolean("tts");
         timestamp = message.getString("timestamp");
         content = message.getString("content");
-        channelId = message.getString("channel_id");
+        author = api.getUserById(message.getJSONObject("author").getString("id"));
         this.receiver = receiver;
         
         JSONArray mentionsArray = message.getJSONArray("mentions");
@@ -48,7 +45,8 @@ class ImplMessage implements Message {
             User user = api.getUserById(userId);
             mentions.add(user);
         }
-        
+
+        String channelId = message.getString("channel_id");
         if (receiver == null) {
             outer: for (Server server : api.getServers()) {
                 for (Channel c : server.getChannels()) {
@@ -60,16 +58,17 @@ class ImplMessage implements Message {
             }
             for (User user : api.getUsers()) {
                 if (channelId.equals(((ImplUser) user).getUserChannelId())) {
-                    this.receiver = user;
-                    break;
+                    if (user != author) {
+                        this.receiver = user;
+                        break;
+                    } else {
+                        this.receiver = api.getYourself();
+                        break;
+                    }
                 }
-            }
-            if (this.receiver == null) {
-                this.receiver = author;
             }
         }
         
-        author = api.getUserById(message.getJSONObject("author").getString("id"));
         api.addMessage(this);
     }
 
@@ -106,7 +105,7 @@ class ImplMessage implements Message {
      */
     @Override
     public User getUserReceiver() {
-        return (User) (receiver instanceof Channel ? receiver : null);
+        return (User) (receiver instanceof User ? receiver : null);
     }
 
     /*
@@ -179,7 +178,6 @@ class ImplMessage implements Message {
     @Override
     public boolean delete() {
         try {
-            /* there are some problems with private messages atm
             if (isPrivateMessage()) {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
                         + "/messages/" + id, "", true, "DELETE");
@@ -187,9 +185,6 @@ class ImplMessage implements Message {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
                         + "/messages/" + id, "", true, "DELETE");
             }
-            */
-            api.getRequestUtils().request("https://discordapp.com/api/channels/" + channelId
-                    + "/messages/" + id, "", true, "DELETE");
         } catch (IOException e) {
             return false;
         }
@@ -206,7 +201,6 @@ class ImplMessage implements Message {
         String json = new JSONObject().put("content", message).put("mentions", mentionsString).toString();
         
         try {
-            /* there are some problems with private messages atm
             if (isPrivateMessage()) {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
                         + "/messages/" + id, json, true, "PATCH");
@@ -214,9 +208,6 @@ class ImplMessage implements Message {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
                         + "/messages/" + id, json, true, "PATCH");
             }
-            */
-            api.getRequestUtils().request("https://discordapp.com/api/channels/" + channelId
-                    + "/messages/" + id, json, true, "PATCH");
         } catch (IOException e) {
             return false;
         }

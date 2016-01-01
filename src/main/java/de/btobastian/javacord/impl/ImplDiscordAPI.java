@@ -36,6 +36,8 @@ class ImplDiscordAPI implements DiscordAPI {
     private final boolean DEBUG = false;
     private String game = "";
     
+    private User yourself = null;
+    
     private final List<ImplServer> servers = new ArrayList<>();
     private final List<User> users = new ArrayList<>();
     private final List<ImplMessage> messages = new ArrayList<>();
@@ -261,6 +263,15 @@ class ImplDiscordAPI implements DiscordAPI {
         }
         return null;
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.DiscordAPI#getSelf()
+     */
+    @Override
+    public User getYourself() {
+        return yourself;
+    }
 
     /* ==== protected and private methods ==== */
     
@@ -319,6 +330,10 @@ class ImplDiscordAPI implements DiscordAPI {
         if (messages.size() > 1000) { // only cache the last 1000 messages.
             messages.remove(0);
         }
+    }
+    
+    protected void setYourself(User you) {
+        yourself = you;
     }
     
     protected List<MessageCreateListener> getMessageCreateListeners() {

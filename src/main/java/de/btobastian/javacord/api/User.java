@@ -23,5 +23,12 @@ public interface User extends MessageReceiver {
      * Shows the "is typing.." status for 5 seconds.
      */
     public void type();
+    
+    /**
+     * Checks if the user is yourself.
+     * 
+     * @return Whether the user is you or not.
+     */
+    public boolean isYourself();
 
 }

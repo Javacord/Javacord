@@ -103,6 +103,15 @@ class ImplUser implements User {
             e.printStackTrace();
         }
     }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.User#isYourself()
+     */
+    @Override
+    public boolean isYourself() {
+        return api.getYourself() == this;
+    }
     
     protected void setUserChannelId(String channelId) {
         this.userChannelId = channelId;

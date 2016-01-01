@@ -79,6 +79,9 @@ class DiscordWebsocket extends WebSocketClient {
             }
         }
         
+        User you = api.getUserById(data.getJSONObject("user").getString("id"));
+        api.setYourself(you);
+        
         new Thread(new Runnable() {
             
             @Override

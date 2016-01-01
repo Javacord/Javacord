@@ -128,4 +128,12 @@ public interface DiscordAPI {
      */
     public Server acceptInvite(String inviteCode);
     
+    /**
+     * Gets the user object of yourself.
+     * Sending yourself messages and doing other strange stuff can cause some errors, so don't do it.
+     * 
+     * @return Yourself.
+     */
+    public User getYourself();
+    
 }
