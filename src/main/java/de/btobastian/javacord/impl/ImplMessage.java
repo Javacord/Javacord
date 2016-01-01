@@ -26,6 +26,8 @@ class ImplMessage implements Message {
     private User author;
     private MessageReceiver receiver;
     
+    private String channelId;
+    
     private final List<User> mentions = new ArrayList<>();
     
     protected ImplMessage(JSONObject message, ImplDiscordAPI api, MessageReceiver receiver) {
@@ -46,7 +48,7 @@ class ImplMessage implements Message {
             mentions.add(user);
         }
 
-        String channelId = message.getString("channel_id");
+        channelId = message.getString("channel_id");
         if (receiver == null) {
             outer: for (Server server : api.getServers()) {
                 for (Channel c : server.getChannels()) {
@@ -150,7 +152,7 @@ class ImplMessage implements Message {
      */
     @Override
     public Message reply(String message) {
-        return receiver.sendMessage(message);
+        return reply(message, false);
     }
 
     /*
@@ -159,7 +161,11 @@ class ImplMessage implements Message {
      */
     @Override
     public Message reply(String message, boolean tts) {
-        return receiver.sendMessage(message, tts);
+        if (receiver == api.getYourself()) {
+            return author.sendMessage(message, tts);
+        } else {
+            return receiver.sendMessage(message, tts);
+        }
     }
 
     /*
@@ -176,15 +182,10 @@ class ImplMessage implements Message {
      * @see de.btobastian.javacord.api.Message#delete()
      */
     @Override
-    public boolean delete() {
+    public boolean delete() {        
         try {
-            if (isPrivateMessage()) {
-                api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
-                        + "/messages/" + id, "", true, "DELETE");
-            } else {
-                api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
-                        + "/messages/" + id, "", true, "DELETE");
-            }
+            api.getRequestUtils().request("https://discordapp.com/api/channels/" + channelId
+                    + "/messages/" + id, "", true, "DELETE");
         } catch (IOException e) {
             return false;
         }
@@ -201,13 +202,8 @@ class ImplMessage implements Message {
         String json = new JSONObject().put("content", message).put("mentions", mentionsString).toString();
         
         try {
-            if (isPrivateMessage()) {
-                api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
-                        + "/messages/" + id, json, true, "PATCH");
-            } else {
-                api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
-                        + "/messages/" + id, json, true, "PATCH");
-            }
+            api.getRequestUtils().request("https://discordapp.com/api/channels/" + channelId
+                    + "/messages/" + id, json, true, "PATCH");
         } catch (IOException e) {
             return false;
         }

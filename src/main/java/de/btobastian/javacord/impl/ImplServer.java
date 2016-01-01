@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.api.Channel;
+import de.btobastian.javacord.api.Role;
 import de.btobastian.javacord.api.Server;
 import de.btobastian.javacord.api.User;
 import de.btobastian.javacord.api.VoiceChannel;
@@ -20,6 +21,7 @@ class ImplServer implements Server {
     private final ArrayList<Channel> channels = new ArrayList<>();
     private final ArrayList<VoiceChannel> voicechannels = new ArrayList<>();      
     private final ArrayList<User> users = new ArrayList<>();
+    private final ArrayList<Role> roles = new ArrayList<>();
     
     private String name;
     private String id;
@@ -37,6 +39,12 @@ class ImplServer implements Server {
         name = guild.getString("name");
         id = guild.getString("id");
         String ownerId = guild.getString("owner_id");
+        
+        JSONArray roles = guild.getJSONArray("roles");
+        for (int i = 0; i < roles.length(); i++) {
+            JSONObject role = roles.getJSONObject(i);
+            new ImplRole(role, this);
+        }
         
         JSONArray channels = guild.getJSONArray("channels");        
         for (int i = 0; i < channels.length(); i++) {
@@ -58,6 +66,16 @@ class ImplServer implements Server {
             users.add(user);
             if (user.getId().equals(ownerId)) {
                 owner = user;
+            }
+            
+            JSONArray memberRoles = member.getJSONArray("roles");
+            for (int j = 0; j < memberRoles.length(); j++) {
+                String id = memberRoles.getString(j);
+                for (Role role : this.roles) {
+                    if (role.getId().equals(id)) {
+                        ((ImplRole) role).addUser(user);
+                    }
+                }
             }
         }
         
@@ -167,6 +185,15 @@ class ImplServer implements Server {
     public List<VoiceChannel> getVoiceChannels() {
         return new ArrayList<>(voicechannels);
     }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#getRoles()
+     */
+    @Override
+    public List<Role> getRoles() {
+        return new ArrayList<>(roles);
+    }
     
     private Object createChannel(String name, boolean voice) {
         String json = new JSONObject().put("name", name).put("type", voice ? "voice" : "text").toString();
@@ -201,6 +228,14 @@ class ImplServer implements Server {
     
     protected void removeVoiceChannel(ImplVoiceChannel channel) {
         voicechannels.remove(channel);
+    }
+    
+    protected void addRole(ImplRole role) {
+        roles.add(role);
+    }
+    
+    protected void removeRole(ImplRole role) {
+        roles.remove(role);
     }
     
     protected ImplDiscordAPI getApi() {

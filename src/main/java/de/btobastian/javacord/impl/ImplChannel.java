@@ -1,24 +1,33 @@
 package de.btobastian.javacord.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.api.Channel;
 import de.btobastian.javacord.api.Message;
+import de.btobastian.javacord.api.Role;
 import de.btobastian.javacord.api.Server;
+import de.btobastian.javacord.api.User;
+import de.btobastian.javacord.api.permissions.Permissions;
 
 /**
  * The implementation of {@link Channel}.
  */
 class ImplChannel implements Channel {
 
+    private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
+    
     private ImplServer server;
     private String id;
     private String name;
     private String topic;
     private int position;
+    
+    private HashMap<String, Permissions> overriddenPermissions = new HashMap<>();
     
     protected ImplChannel(JSONObject channel, ImplServer server) {
         this.server = server;
@@ -30,6 +39,28 @@ class ImplChannel implements Channel {
             topic = null;
         }
         position = channel.getInt("position");
+        
+        JSONArray permissionOverwrites = channel.getJSONArray("permission_overwrites");
+        for (int i = 0; i < permissionOverwrites.length(); i++) {
+            JSONObject permissionOverrite = permissionOverwrites.getJSONObject(i);
+            String id = permissionOverrite.getString("id");
+            int allow = permissionOverrite.getInt("allow");
+            int deny = permissionOverrite.getInt("deny");
+            String type = permissionOverrite.getString("type");
+            if (type.equals("role")) {
+                for (Role role : server.getRoles()) {
+                    if (role.getId().equals(id)) {
+                        ((ImplRole) role).setOverriddenPermissions(this, new ImplPermissions(allow, deny));
+                    }
+                }
+            }
+            if (type.equals("member")) {
+                User user = server.getApi().getUserById(id);
+                if (user != null) {
+                    overriddenPermissions.put(user.getId(), new ImplPermissions(allow, deny));
+                }
+            }
+        }
         
         server.addChannel(this);
     }
@@ -143,6 +174,31 @@ class ImplChannel implements Channel {
             e.printStackTrace();
         }
     }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Channel#createInvite()
+     */
+    @Override
+    public String createInvite() {
+        String respone;
+        try {
+            respone = server.getApi().getRequestUtils().request("https://discordapp.com/api/channels/" + id + "/invites", "", true, "POST");
+        } catch (IOException e) {
+            return null;
+        }
+        return new JSONObject(respone).getString("code");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Channel#getOverriddenPermissions(de.btobastian.javacord.api.User)
+     */
+    @Override
+    public Permissions getOverriddenPermissions(User user) {
+        Permissions permissions = overriddenPermissions.get(user.getId());
+        return permissions == null ? emptyPermissions : permissions;
+    }
     
     /**
      * Updates the position if an other channel was moved.
@@ -158,5 +214,4 @@ class ImplChannel implements Channel {
             position--;
         }
     }
-
 }

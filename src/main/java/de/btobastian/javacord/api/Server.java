@@ -71,4 +71,11 @@ public interface Server {
      */
     public List<VoiceChannel> getVoiceChannels();
     
+    /**
+     * Gets a list with all roles.
+     * 
+     * @return A list with all roles.
+     */
+    public List<Role> getRoles();
+    
 }

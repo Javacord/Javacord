@@ -11,7 +11,7 @@ A simple to use API to create a discord bot
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
 </dependency>
 ```
 
@@ -99,6 +99,5 @@ api.connect(new ReadyListener() {
 #Comming soon
 
 - File Upload
-- Permissions
 - Voice Support
 - Tons of new Listeners

@@ -1,5 +1,7 @@
 package de.btobastian.javacord.api;
 
+import de.btobastian.javacord.api.permissions.Permissions;
+
 /**
  * A discord channel.
  */
@@ -51,5 +53,20 @@ public interface Channel extends MessageReceiver {
      * Shows the "is typing.." status for 5 seconds.
      */
     public void type();
+    
+    /**
+     * Creates an invite to join this channel.
+     * 
+     * @return The invite code.
+     */
+    public String createInvite();
+    
+    /**
+     * Gets the overridden permissions of the user.
+     * 
+     * @param user The user to check.
+     * @return The overridden permissions.
+     */
+    public Permissions getOverriddenPermissions(User user);
     
 }
