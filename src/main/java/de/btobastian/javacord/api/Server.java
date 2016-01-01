@@ -78,4 +78,11 @@ public interface Server {
      */
     public List<Role> getRoles();
     
+    /**
+     * Gets the region of the bot.
+     * 
+     * @return The region of the bot.
+     */
+    public String getRegion();
+    
 }

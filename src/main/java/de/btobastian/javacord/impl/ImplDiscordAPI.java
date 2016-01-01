@@ -21,6 +21,8 @@ import de.btobastian.javacord.api.listener.MessageCreateListener;
 import de.btobastian.javacord.api.listener.MessageDeleteListener;
 import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.ReadyListener;
+import de.btobastian.javacord.api.listener.RoleChangeNameListener;
+import de.btobastian.javacord.api.listener.RoleCreateListener;
 import de.btobastian.javacord.api.listener.TypingStartListener;
 import de.btobastian.javacord.api.listener.UserChangeNameListener;
 
@@ -50,6 +52,8 @@ class ImplDiscordAPI implements DiscordAPI {
     private final List<TypingStartListener> typingStartListeners = new ArrayList<>();
     private final List<MessageDeleteListener> messageDeleteListeners = new ArrayList<>();
     private final List<UserChangeNameListener> userChangeNameListeners = new ArrayList<>();
+    private final List<RoleCreateListener> roleCreateListeners = new ArrayList<>();
+    private final List<RoleChangeNameListener> roleChangeNameListeners = new ArrayList<>();
     
     /*
      * (non-Javadoc)
@@ -231,6 +235,10 @@ class ImplDiscordAPI implements DiscordAPI {
             messageDeleteListeners.add((MessageDeleteListener) listener);
         } else if (listener instanceof UserChangeNameListener) {
             userChangeNameListeners.add((UserChangeNameListener) listener);
+        } else if (listener instanceof RoleCreateListener) {
+            roleCreateListeners.add((RoleCreateListener) listener);
+        } else if (listener instanceof RoleChangeNameListener) {
+            roleChangeNameListeners.add((RoleChangeNameListener) listener);
         }
     }
     
@@ -360,6 +368,14 @@ class ImplDiscordAPI implements DiscordAPI {
     
     protected List<UserChangeNameListener> getUserChangeNameListeners() {
         return userChangeNameListeners;
+    }
+    
+    protected List<RoleCreateListener> getRoleCreateListeners() {
+        return roleCreateListeners;
+    }
+    
+    protected List<RoleChangeNameListener> getRoleChangeNameListeners() {
+        return roleChangeNameListeners;
     }
     
     private String requestToken(String email, String password) {

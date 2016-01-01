@@ -27,6 +27,8 @@ class ImplServer implements Server {
     private String name;
     private String id;
     private User owner;
+    private String region;
+    
     private ImplDiscordAPI api;
     
     /**
@@ -39,6 +41,7 @@ class ImplServer implements Server {
         this.api = api;
         name = guild.getString("name");
         id = guild.getString("id");
+        region = guild.getString("region");
         String ownerId = guild.getString("owner_id");
         
         JSONArray roles = guild.getJSONArray("roles");
@@ -204,6 +207,15 @@ class ImplServer implements Server {
     @Override
     public List<Role> getRoles() {
         return new ArrayList<>(roles);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#getRegion()
+     */
+    @Override
+    public String getRegion() {
+        return region;
     }
     
     private Object createChannel(String name, boolean voice) {

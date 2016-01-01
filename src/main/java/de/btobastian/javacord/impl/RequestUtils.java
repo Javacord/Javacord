@@ -70,7 +70,6 @@ class RequestUtils {
         conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
         conn.setRequestProperty("User-Agent", "discordApi");
         
-        
         if (sendToken) {
             conn.setRequestProperty("authorization", api.getToken());
         }

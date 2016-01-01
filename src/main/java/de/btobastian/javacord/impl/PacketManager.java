@@ -5,11 +5,14 @@ import org.json.JSONObject;
 
 import de.btobastian.javacord.api.Channel;
 import de.btobastian.javacord.api.Message;
+import de.btobastian.javacord.api.Role;
 import de.btobastian.javacord.api.Server;
 import de.btobastian.javacord.api.User;
 import de.btobastian.javacord.api.listener.MessageCreateListener;
 import de.btobastian.javacord.api.listener.MessageDeleteListener;
 import de.btobastian.javacord.api.listener.MessageEditListener;
+import de.btobastian.javacord.api.listener.RoleChangeNameListener;
+import de.btobastian.javacord.api.listener.RoleCreateListener;
 import de.btobastian.javacord.api.listener.TypingStartListener;
 import de.btobastian.javacord.api.listener.UserChangeNameListener;
 
@@ -49,11 +52,63 @@ class PacketManager {
             case "PRESENCE_UPDATE":
                 onPresenceUpdate(json);
                 break;
+            case "GUILD_ROLE_CREATE":
+                onGuildRoleCreate(json);
+                break;
+            case "GUILD_ROLE_UPDATE":
+                onGuildRoleUpdate(json);
             default:
                 if (api.debug()) {
                     System.out.println("Received unknown packet: " + type);
                 }
                 break;
+        }
+    }
+    
+    private void onGuildRoleUpdate(JSONObject packet) {
+        JSONObject data = packet.getJSONObject("d");
+        
+        String guildId = data.getString("guild_id");
+        JSONObject roleJson = data.getJSONObject("role");
+        
+        String roleId = roleJson.getString("id");
+        Role role = null;
+        for (Server server : api.getServers()) {
+            if (server.getId().equals(guildId)) {
+                for (Role r : server.getRoles()) {
+                    if (r.getId().equals(roleId)) {
+                        role = r;
+                    }
+                }
+            }
+        }
+        if (role == null) {
+            return;
+        }
+        
+        String roleName = roleJson.getString("name");
+        if (!roleName.equals(role.getName())) {
+            String oldName = role.getName();
+            ((ImplRole) role).setName(roleName);
+            for (RoleChangeNameListener listener : api.getRoleChangeNameListeners()) {
+                listener.onRoleChangeName(api, role, oldName);
+            }
+        }
+    }
+    
+    private void onGuildRoleCreate(JSONObject packet) {
+        JSONObject data = packet.getJSONObject("d");
+        
+        String guildId = data.getString("guild_id");
+        JSONObject roleJson = data.getJSONObject("role");
+        
+        for (Server server : api.getServers()) {
+            if (server.getId().equals(guildId)) {
+                Role role = new ImplRole(roleJson, (ImplServer) server);
+                for (RoleCreateListener listener : api.getRoleCreateListeners()) {
+                    listener.onRoleCreate(api, role);
+                }
+            }
         }
     }
     
@@ -64,21 +119,15 @@ class PacketManager {
         try {
             String userName = data.getJSONObject("user").getString("username");
             User user = api.getUserById(userId);
+            String oldName = user.getName();
             if (!user.getName().equals(userName)) {
-                for (UserChangeNameListener listener : api.getUserChangeNameListeners()) {
-                    listener.onUserChangeName(api, user, userName);
-                }
                 ((ImplUser) user).setName(userName);
+                for (UserChangeNameListener listener : api.getUserChangeNameListeners()) {
+                    listener.onUserChangeName(api, user, oldName);
+                }
             }
         } catch (JSONException e) {
         }
-        /*
-        try {
-            JSONArray roles = data.getJSONArray("roles");
-        } catch (JSONException e) {
-            
-        }
-        */
     }
     
     private void onMessageCreate(JSONObject packet) {

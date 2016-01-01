@@ -105,5 +105,9 @@ public class ImplRole implements Role {
     protected void removeUser(User user) {
         users.remove(user);
     }
+    
+    protected void setName(String name) {
+        this.name = name;
+    }
 
 }
