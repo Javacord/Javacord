@@ -54,6 +54,11 @@ api.connect(new ReadyListener() {
 ```
 Now you're connected. :)
 
+#Listeners
+- MessageCreateListener
+- MessageEditListener
+- TypingStartListener
+
 #Examples
 
 Creating a simple ping-pong bot:
@@ -90,3 +95,10 @@ api.connect(new ReadyListener() {
 
 });
 ```
+
+#Comming soon
+
+- File Upload
+- Permissions
+- Voice Support
+- Tons of new Listeners
