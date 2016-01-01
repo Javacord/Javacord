@@ -40,6 +40,7 @@ class ImplMessage implements Message {
         timestamp = message.getString("timestamp");
         content = message.getString("content");
         channelId = message.getString("channel_id");
+        this.receiver = receiver;
         
         JSONArray mentionsArray = message.getJSONArray("mentions");
         for (int i = 0; i < mentionsArray.length(); i++) {
@@ -63,8 +64,7 @@ class ImplMessage implements Message {
                     break;
                 }
             }
-            if (receiver == null) {
-                // doesn't make sense, but at least it prevents NPEs
+            if (this.receiver == null) {
                 this.receiver = author;
             }
         }
