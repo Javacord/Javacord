@@ -124,5 +124,9 @@ class ImplUser implements User {
     protected ImplDiscordAPI getApi() {
         return api;
     }
+    
+    protected void setName(String name) {
+        this.name = name;
+    }
 
 }

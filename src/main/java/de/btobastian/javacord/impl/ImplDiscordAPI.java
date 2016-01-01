@@ -22,6 +22,7 @@ import de.btobastian.javacord.api.listener.MessageDeleteListener;
 import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.ReadyListener;
 import de.btobastian.javacord.api.listener.TypingStartListener;
+import de.btobastian.javacord.api.listener.UserChangeNameListener;
 
 /**
  * The implementation of {@link DiscordAPI}.
@@ -48,6 +49,7 @@ class ImplDiscordAPI implements DiscordAPI {
     private final List<MessageEditListener> messageEditListeners = new ArrayList<>();
     private final List<TypingStartListener> typingStartListeners = new ArrayList<>();
     private final List<MessageDeleteListener> messageDeleteListeners = new ArrayList<>();
+    private final List<UserChangeNameListener> userChangeNameListeners = new ArrayList<>();
     
     /*
      * (non-Javadoc)
@@ -227,6 +229,8 @@ class ImplDiscordAPI implements DiscordAPI {
             typingStartListeners.add((TypingStartListener) listener);
         } else if (listener instanceof MessageDeleteListener) {
             messageDeleteListeners.add((MessageDeleteListener) listener);
+        } else if (listener instanceof UserChangeNameListener) {
+            userChangeNameListeners.add((UserChangeNameListener) listener);
         }
     }
     
@@ -250,8 +254,10 @@ class ImplDiscordAPI implements DiscordAPI {
             }
         }
         try {
-            response = getRequestUtils().request("https://discordapp.com/api/users/@me/guilds", "", true, "GET");
+            response = getRequestUtils().getFromWebsite("https://discordapp.com/api/users/@me/guilds", "authorization", token);
+            //response = getRequestUtils().request("https://discordapp.com/api/users/@me/guilds", "", true, "GET");
         } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
         JSONArray guilds = new JSONArray(response);
@@ -351,7 +357,11 @@ class ImplDiscordAPI implements DiscordAPI {
     protected List<MessageDeleteListener> getMessageDeleteListeners() {
         return messageDeleteListeners;
     }
-
+    
+    protected List<UserChangeNameListener> getUserChangeNameListeners() {
+        return userChangeNameListeners;
+    }
+    
     private String requestToken(String email, String password) {
         Map<String,Object> params = new LinkedHashMap<>();
         params.put("password", password);

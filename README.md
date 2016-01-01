@@ -11,7 +11,7 @@ A simple to use API to create a discord bot
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
 </dependency>
 ```
 
@@ -58,6 +58,8 @@ Now you're connected. :)
 - MessageCreateListener
 - MessageEditListener
 - TypingStartListener
+- MessageDeleteListener
+- UserChangeNameListener
 
 #Examples
 

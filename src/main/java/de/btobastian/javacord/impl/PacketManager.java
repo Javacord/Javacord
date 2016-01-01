@@ -1,14 +1,17 @@
 package de.btobastian.javacord.impl;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.api.Channel;
 import de.btobastian.javacord.api.Message;
 import de.btobastian.javacord.api.Server;
+import de.btobastian.javacord.api.User;
 import de.btobastian.javacord.api.listener.MessageCreateListener;
 import de.btobastian.javacord.api.listener.MessageDeleteListener;
 import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.TypingStartListener;
+import de.btobastian.javacord.api.listener.UserChangeNameListener;
 
 class PacketManager {
 
@@ -43,12 +46,39 @@ class PacketManager {
             case "MESSAGE_UPDATE":
                 onMessageUpdate(json);
                 break;
+            case "PRESENCE_UPDATE":
+                onPresenceUpdate(json);
+                break;
             default:
                 if (api.debug()) {
                     System.out.println("Received unknown packet: " + type);
                 }
                 break;
         }
+    }
+    
+    private void onPresenceUpdate(JSONObject packet) {
+        JSONObject data = packet.getJSONObject("d");
+        
+        String userId = data.getJSONObject("user").getString("id");
+        try {
+            String userName = data.getJSONObject("user").getString("username");
+            User user = api.getUserById(userId);
+            if (!user.getName().equals(userName)) {
+                for (UserChangeNameListener listener : api.getUserChangeNameListeners()) {
+                    listener.onUserChangeName(api, user, userName);
+                }
+                ((ImplUser) user).setName(userName);
+            }
+        } catch (JSONException e) {
+        }
+        /*
+        try {
+            JSONArray roles = data.getJSONArray("roles");
+        } catch (JSONException e) {
+            
+        }
+        */
     }
     
     private void onMessageCreate(JSONObject packet) {

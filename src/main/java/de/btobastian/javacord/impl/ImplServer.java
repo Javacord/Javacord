@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.api.Channel;
@@ -46,7 +47,12 @@ class ImplServer implements Server {
             new ImplRole(role, this);
         }
         
-        JSONArray channels = guild.getJSONArray("channels");        
+        JSONArray channels;
+        try {
+            channels = guild.getJSONArray("channels");
+        } catch (JSONException e) {
+            channels = new JSONArray();
+        }
         for (int i = 0; i < channels.length(); i++) {
             JSONObject channel = channels.getJSONObject(i);
             String type = channel.getString("type");
@@ -58,7 +64,12 @@ class ImplServer implements Server {
             }
         }
 
-        JSONArray members = guild.getJSONArray("members");
+        JSONArray members;
+        try {
+            members = guild.getJSONArray("members");
+        } catch (JSONException e) {
+            members = new JSONArray();
+        }
         for (int i = 0; i < members.length(); i++) {
             JSONObject member = members.getJSONObject(i);
             JSONObject userJson = member.getJSONObject("user");
