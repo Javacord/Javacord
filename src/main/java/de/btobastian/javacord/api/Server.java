@@ -39,10 +39,17 @@ public interface Server {
      * Creates a new channel.
      * 
      * @param name The name of the channel.
-     * @param voice Whether the channel should be voice or text.
      * @return The created channel. <code>Null</code> if the channel couldn't be created.
      */
-    public Channel createChannel(String name, boolean voice);
+    public Channel createChannel(String name);
+    
+    /**
+     * Creates a new voice channel.
+     * 
+     * @param name The name of the channel.
+     * @return The created channel. <code>Null</code> if the channel couldn't be created.
+     */
+    public VoiceChannel createVoiceChannel(String name);
     
     /**
      * Deletes or leaves the server.
@@ -56,5 +63,12 @@ public interface Server {
      * @return Whether the user could be kicked or not.
      */
     public boolean kick(User user);
+    
+    /**
+     * Gets a list with all voice channels.
+     * 
+     * @return A list with all voice channels.
+     */
+    public List<VoiceChannel> getVoiceChannels();
     
 }

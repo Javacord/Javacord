@@ -18,6 +18,7 @@ import de.btobastian.javacord.api.Server;
 import de.btobastian.javacord.api.User;
 import de.btobastian.javacord.api.listener.Listener;
 import de.btobastian.javacord.api.listener.MessageCreateListener;
+import de.btobastian.javacord.api.listener.MessageDeleteListener;
 import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.ReadyListener;
 import de.btobastian.javacord.api.listener.TypingStartListener;
@@ -44,6 +45,7 @@ class ImplDiscordAPI implements DiscordAPI {
     private final List<MessageCreateListener> messageCreateListeners = new ArrayList<>();
     private final List<MessageEditListener> messageEditListeners = new ArrayList<>();
     private final List<TypingStartListener> typingStartListeners = new ArrayList<>();
+    private final List<MessageDeleteListener> messageDeleteListeners = new ArrayList<>();
     
     /*
      * (non-Javadoc)
@@ -221,6 +223,8 @@ class ImplDiscordAPI implements DiscordAPI {
             messageEditListeners.add((MessageEditListener) listener);
         } else if (listener instanceof TypingStartListener) {
             typingStartListeners.add((TypingStartListener) listener);
+        } else if (listener instanceof MessageDeleteListener) {
+            messageDeleteListeners.add((MessageDeleteListener) listener);
         }
     }
     
@@ -327,6 +331,10 @@ class ImplDiscordAPI implements DiscordAPI {
 
     protected List<TypingStartListener> getTypingStartListeners() {
         return typingStartListeners;
+    }
+    
+    protected List<MessageDeleteListener> getMessageDeleteListeners() {
+        return messageDeleteListeners;
     }
 
     private String requestToken(String email, String password) {

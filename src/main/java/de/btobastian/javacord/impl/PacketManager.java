@@ -6,6 +6,7 @@ import de.btobastian.javacord.api.Channel;
 import de.btobastian.javacord.api.Message;
 import de.btobastian.javacord.api.Server;
 import de.btobastian.javacord.api.listener.MessageCreateListener;
+import de.btobastian.javacord.api.listener.MessageDeleteListener;
 import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.TypingStartListener;
 
@@ -71,11 +72,9 @@ class PacketManager {
         if (message == null) {
             return; // no cached version available
         }
-        /*
-        for (MessageListener listener : api.getMessageListener()) {
+        for (MessageDeleteListener listener : api.getMessageDeleteListeners()) {
             listener.onMessageDelete(api, message);
         }
-        */
     }
     
     private void onTypingStart(JSONObject packet) {

@@ -26,6 +26,9 @@ class ImplMessage implements Message {
     private User author;
     private MessageReceiver receiver;
     
+    // workaround till i fixed the userReceiver bug.
+    private String channelId;
+    
     private final List<User> mentions = new ArrayList<>();
     
     protected ImplMessage(JSONObject message, ImplDiscordAPI api, MessageReceiver receiver) {
@@ -36,6 +39,7 @@ class ImplMessage implements Message {
         tts = message.getBoolean("tts");
         timestamp = message.getString("timestamp");
         content = message.getString("content");
+        channelId = message.getString("channel_id");
         
         JSONArray mentionsArray = message.getJSONArray("mentions");
         for (int i = 0; i < mentionsArray.length(); i++) {
@@ -45,7 +49,6 @@ class ImplMessage implements Message {
         }
         
         if (receiver == null) {
-            String channelId = message.getString("channel_id");
             outer: for (Server server : api.getServers()) {
                 for (Channel c : server.getChannels()) {
                     if (c.getId().equals(channelId)) {
@@ -59,6 +62,10 @@ class ImplMessage implements Message {
                     this.receiver = user;
                     break;
                 }
+            }
+            if (receiver == null) {
+                // doesn't make sense, but at least it prevents NPEs
+                this.receiver = author;
             }
         }
         
@@ -172,6 +179,7 @@ class ImplMessage implements Message {
     @Override
     public boolean delete() {
         try {
+            /* there are some problems with private messages atm
             if (isPrivateMessage()) {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
                         + "/messages/" + id, "", true, "DELETE");
@@ -179,7 +187,9 @@ class ImplMessage implements Message {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
                         + "/messages/" + id, "", true, "DELETE");
             }
-            
+            */
+            api.getRequestUtils().request("https://discordapp.com/api/channels/" + channelId
+                    + "/messages/" + id, "", true, "DELETE");
         } catch (IOException e) {
             return false;
         }
@@ -196,6 +206,7 @@ class ImplMessage implements Message {
         String json = new JSONObject().put("content", message).put("mentions", mentionsString).toString();
         
         try {
+            /* there are some problems with private messages atm
             if (isPrivateMessage()) {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + ((ImplUser) getUserReceiver()).getUserChannelId()
                         + "/messages/" + id, json, true, "PATCH");
@@ -203,7 +214,9 @@ class ImplMessage implements Message {
                 api.getRequestUtils().request("https://discordapp.com/api/channels/" + getChannelReceiver().getId()
                         + "/messages/" + id, json, true, "PATCH");
             }
-            
+            */
+            api.getRequestUtils().request("https://discordapp.com/api/channels/" + channelId
+                    + "/messages/" + id, json, true, "PATCH");
         } catch (IOException e) {
             return false;
         }
