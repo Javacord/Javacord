@@ -96,6 +96,17 @@ api.connect(new ReadyListener() {
 });
 ```
 
+Using the MessageBuilder:
+```java
+channel.sendMessage(new MessageBuilder()
+  .appendCode("java", "System.out.println(\"Hi\");")
+  .appendDecoration(MessageDecoration.UNDERLINE_BOLD, "That's a test!\n")
+  .appendMention(api.getUserById("98487852668563456"))
+  .build());
+```
+will result in something like this:
+![alt tag](http://screenshots.bastian-oppermann.de/01.01.2016-15-44-23.png)
+
 #Comming soon
 
 - File Upload
