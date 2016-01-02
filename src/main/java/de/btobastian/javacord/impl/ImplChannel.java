@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.api.Channel;
+import de.btobastian.javacord.api.InviteBuilder;
 import de.btobastian.javacord.api.Message;
 import de.btobastian.javacord.api.Role;
 import de.btobastian.javacord.api.Server;
@@ -174,21 +175,6 @@ class ImplChannel implements Channel {
             e.printStackTrace();
         }
     }
-
-    /*
-     * (non-Javadoc)
-     * @see de.btobastian.javacord.api.Channel#createInvite()
-     */
-    @Override
-    public String createInvite() {
-        String respone;
-        try {
-            respone = server.getApi().getRequestUtils().request("https://discordapp.com/api/channels/" + id + "/invites", "", true, "POST");
-        } catch (IOException e) {
-            return null;
-        }
-        return new JSONObject(respone).getString("code");
-    }
     
     /*
      * (non-Javadoc)
@@ -198,6 +184,15 @@ class ImplChannel implements Channel {
     public Permissions getOverriddenPermissions(User user) {
         Permissions permissions = overriddenPermissions.get(user.getId());
         return permissions == null ? emptyPermissions : permissions;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Channel#getInviteBuilder()
+     */
+    @Override
+    public InviteBuilder getInviteBuilder() {
+        return new ImplInviteBuilder(this);
     }
     
     /**

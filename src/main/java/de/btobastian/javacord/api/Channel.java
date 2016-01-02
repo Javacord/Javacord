@@ -55,18 +55,18 @@ public interface Channel extends MessageReceiver {
     public void type();
     
     /**
-     * Creates an invite to join this channel.
-     * 
-     * @return The invite code.
-     */
-    public String createInvite();
-    
-    /**
      * Gets the overridden permissions of the user.
      * 
      * @param user The user to check.
      * @return The overridden permissions.
      */
     public Permissions getOverriddenPermissions(User user);
+    
+    /**
+     * Gets an invite builder.
+     * 
+     * @return An invite builder.
+     */
+    public InviteBuilder getInviteBuilder();
     
 }
