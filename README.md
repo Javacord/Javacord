@@ -11,7 +11,7 @@ A simple library to create a discord bot.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
 </dependency>
 ```
 
@@ -66,6 +66,7 @@ Now you're connected. :)
 - ServerMemberAddListener
 - ServerMemberRemoveListener
 - UserChangeRoleListener
+- ServerJoinListener
 
 #Examples
 

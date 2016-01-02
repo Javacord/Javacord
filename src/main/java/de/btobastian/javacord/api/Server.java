@@ -79,10 +79,34 @@ public interface Server {
     public List<Role> getRoles();
     
     /**
-     * Gets the region of the bot.
+     * Gets the region of the server.
      * 
-     * @return The region of the bot.
+     * @return The region of the server.
      */
     public String getRegion();
+    
+    /**
+     * Unbans the user with the given id.
+     * 
+     * @param user The id of the user to unban.
+     */
+    public void unban(String userId);
+    
+    /**
+     * Bans the user.
+     * 
+     * @param user The user to ban.
+     */
+    public void ban(User user);
+    
+    /**
+     * Bans the user.
+     * 
+     * @param user The user to ban.
+     * @param deleteDays Deletes all messages of the user which are younger than <code>deleteDays</code> days.
+     */
+    public void ban(User user, int deleteDays);
+    
+    
     
 }

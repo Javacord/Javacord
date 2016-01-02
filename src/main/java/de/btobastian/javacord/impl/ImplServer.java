@@ -218,6 +218,48 @@ class ImplServer implements Server {
         return region;
     }
     
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#unban(java.lang.String)
+     */
+    @Override
+    public void unban(String userId) {
+        try {
+            getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id + "/bans/" + userId, "", true, "DELETE");
+        } catch (IOException e) {
+            if (getApi().debug()) {
+                e.printStackTrace();
+            }
+            return;
+        }
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#ban(de.btobastian.javacord.api.User)
+     */
+    @Override
+    public void ban(User user) {
+        ban(user, 0);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#ban(de.btobastian.javacord.api.User, int)
+     */
+    @Override
+    public void ban(User user, int deleteDays) {
+        try {
+            getApi().getRequestUtils().request(
+                    "https://discordapp.com/api/guilds/:guild_id/bans/" + user.getId() + "?delete-message-days=" + deleteDays, "", true, "PUT");
+        } catch (IOException e) {
+            if (getApi().debug()) {
+                e.printStackTrace();
+            }
+            return;
+        }
+    }
+    
     private Object createChannel(String name, boolean voice) {
         String json = new JSONObject().put("name", name).put("type", voice ? "voice" : "text").toString();
         

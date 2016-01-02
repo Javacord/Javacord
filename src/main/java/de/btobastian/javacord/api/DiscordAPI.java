@@ -126,7 +126,7 @@ public interface DiscordAPI {
      * @param inviteCode The invite code.
      * @return The server invited to. <code>Null</code> if the invite is invalid.
      */
-    public Server acceptInvite(String inviteCode);
+    public boolean acceptInvite(String inviteCode);
     
     /**
      * Gets the user object of yourself.

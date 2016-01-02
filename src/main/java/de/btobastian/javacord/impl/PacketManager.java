@@ -19,6 +19,7 @@ import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.RoleChangeNameListener;
 import de.btobastian.javacord.api.listener.RoleChangePermissionsListener;
 import de.btobastian.javacord.api.listener.RoleCreateListener;
+import de.btobastian.javacord.api.listener.ServerJoinListener;
 import de.btobastian.javacord.api.listener.ServerMemberAddListener;
 import de.btobastian.javacord.api.listener.ServerMemberRemoveListener;
 import de.btobastian.javacord.api.listener.TypingStartListener;
@@ -77,11 +78,22 @@ class PacketManager {
             case "GUILD_MEMBER_REMOVE":
                 onGuildMemberRemove(json);
                 break;
+            case "GUILD_CREATE":
+                onGuildCreate(json);
+                break;
             default:
                 if (api.debug()) {
                     System.out.println("Received unknown packet: " + type);
                 }
                 break;
+        }
+    }
+    
+    private void onGuildCreate(JSONObject packet) {
+        JSONObject data = packet.getJSONObject("d");
+        Server server = new ImplServer(data, api);
+        for (Listener listener : api.getListeners(ServerJoinListener.class)) {
+            ((ServerJoinListener) listener).onServerJoin(api, server);
         }
     }
     
