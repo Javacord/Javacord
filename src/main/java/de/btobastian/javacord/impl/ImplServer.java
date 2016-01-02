@@ -261,6 +261,14 @@ class ImplServer implements Server {
         roles.remove(role);
     }
     
+    protected void addUser(User user) {
+        users.add(user);
+    }
+    
+    protected void removeUser(User user) {
+        users.remove(user);
+    }
+    
     protected ImplDiscordAPI getApi() {
         return api;
     }

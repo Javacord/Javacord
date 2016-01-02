@@ -20,10 +20,10 @@ class ImplUser implements User {
     
     protected ImplUser(JSONObject user, ImplDiscordAPI api) {
         this.api = api;
-        api.addUser(this);
         
         id = user.getString("id");
         name = user.getString("username");
+        api.addUser(this);
     }
     
     /*

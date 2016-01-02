@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,14 +19,7 @@ import de.btobastian.javacord.api.Message;
 import de.btobastian.javacord.api.Server;
 import de.btobastian.javacord.api.User;
 import de.btobastian.javacord.api.listener.Listener;
-import de.btobastian.javacord.api.listener.MessageCreateListener;
-import de.btobastian.javacord.api.listener.MessageDeleteListener;
-import de.btobastian.javacord.api.listener.MessageEditListener;
 import de.btobastian.javacord.api.listener.ReadyListener;
-import de.btobastian.javacord.api.listener.RoleChangeNameListener;
-import de.btobastian.javacord.api.listener.RoleCreateListener;
-import de.btobastian.javacord.api.listener.TypingStartListener;
-import de.btobastian.javacord.api.listener.UserChangeNameListener;
 
 /**
  * The implementation of {@link DiscordAPI}.
@@ -41,19 +36,13 @@ class ImplDiscordAPI implements DiscordAPI {
     
     private User yourself = null;
     
-    private final List<ImplServer> servers = new ArrayList<>();
-    private final List<User> users = new ArrayList<>();
+    private final HashMap<String, Server> servers = new HashMap<>(); // key = id
+    private final HashMap<String, User> users = new HashMap<>(); // key = id
     private final List<ImplMessage> messages = new ArrayList<>();
     
     private RequestUtils requestUtils = new RequestUtils(this);
     
-    private final List<MessageCreateListener> messageCreateListeners = new ArrayList<>();
-    private final List<MessageEditListener> messageEditListeners = new ArrayList<>();
-    private final List<TypingStartListener> typingStartListeners = new ArrayList<>();
-    private final List<MessageDeleteListener> messageDeleteListeners = new ArrayList<>();
-    private final List<UserChangeNameListener> userChangeNameListeners = new ArrayList<>();
-    private final List<RoleCreateListener> roleCreateListeners = new ArrayList<>();
-    private final List<RoleChangeNameListener> roleChangeNameListeners = new ArrayList<>();
+    private final HashMap<Class<?>, List<Listener>> listeners = new HashMap<>();
     
     /*
      * (non-Javadoc)
@@ -179,12 +168,7 @@ class ImplDiscordAPI implements DiscordAPI {
      */
     @Override
     public User getUserById(String id) {
-        for (User user : users) {
-            if (user.getId().equals(id)) {
-                return user;
-            }
-        }
-        return null;
+        return users.get(id);
     }
     
     /*
@@ -206,8 +190,8 @@ class ImplDiscordAPI implements DiscordAPI {
      * @see de.btobastian.javacord.api.DiscordAPI#getUsers()
      */
     @Override
-    public List<User> getUsers() {
-        return new ArrayList<User>(users);
+    public Collection<User> getUsers() {
+        return users.values();
     }
 
     /*
@@ -215,8 +199,8 @@ class ImplDiscordAPI implements DiscordAPI {
      * @see de.btobastian.javacord.api.DiscordAPI#getServers()
      */
     @Override
-    public List<Server> getServers() {
-        return new ArrayList<Server>(servers);
+    public Collection<Server> getServers() {
+        return servers.values();
     }
 
     /*
@@ -225,20 +209,15 @@ class ImplDiscordAPI implements DiscordAPI {
      */
     @Override
     public void registerListener(Listener listener) {
-        if (listener instanceof MessageCreateListener) {
-            messageCreateListeners.add((MessageCreateListener) listener);
-        } else if (listener instanceof MessageEditListener) {
-            messageEditListeners.add((MessageEditListener) listener);
-        } else if (listener instanceof TypingStartListener) {
-            typingStartListeners.add((TypingStartListener) listener);
-        } else if (listener instanceof MessageDeleteListener) {
-            messageDeleteListeners.add((MessageDeleteListener) listener);
-        } else if (listener instanceof UserChangeNameListener) {
-            userChangeNameListeners.add((UserChangeNameListener) listener);
-        } else if (listener instanceof RoleCreateListener) {
-            roleCreateListeners.add((RoleCreateListener) listener);
-        } else if (listener instanceof RoleChangeNameListener) {
-            roleChangeNameListeners.add((RoleChangeNameListener) listener);
+        for (Class<?> iface : listener.getClass().getInterfaces()) {
+            if (Listener.class.isAssignableFrom(iface)) {
+                List<Listener> listenersList = listeners.get(iface);
+                if (listenersList == null) {
+                    listenersList = new ArrayList<Listener>();
+                    listeners.put(iface, listenersList);
+                }
+                listenersList.add(listener);
+            }
         }
     }
     
@@ -287,6 +266,15 @@ class ImplDiscordAPI implements DiscordAPI {
         return yourself;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.DiscordAPI#getServerById(java.lang.String)
+     */
+    @Override
+    public Server getServerById(String id) {
+        return servers.get(id);
+    }
+
     /* ==== protected and private methods ==== */
     
     /**
@@ -303,11 +291,11 @@ class ImplDiscordAPI implements DiscordAPI {
     }
     
     protected void addUser(ImplUser user) {
-        users.add(user);
+        users.put(user.getId(), user);
     }
     
     protected void addServer(ImplServer server) {
-        servers.add(server);
+        servers.put(server.getId(), server);
     }
     
     protected void removeServer(ImplServer server) {
@@ -322,10 +310,9 @@ class ImplDiscordAPI implements DiscordAPI {
      */
     protected User getUser(JSONObject user) {
         String userId = user.getString("id");
-        for (User u : users) {
-            if (u.getId().equals(userId)) {
-                return u;
-            }
+        User u = users.get(userId);
+        if (u != null) {
+            return u;
         }
         return new ImplUser(user, this);
     }
@@ -350,32 +337,9 @@ class ImplDiscordAPI implements DiscordAPI {
         yourself = you;
     }
     
-    protected List<MessageCreateListener> getMessageCreateListeners() {
-        return messageCreateListeners;
-    }
-
-    protected List<MessageEditListener> getMessageEditListeners() {
-        return messageEditListeners;
-    }
-
-    protected List<TypingStartListener> getTypingStartListeners() {
-        return typingStartListeners;
-    }
-    
-    protected List<MessageDeleteListener> getMessageDeleteListeners() {
-        return messageDeleteListeners;
-    }
-    
-    protected List<UserChangeNameListener> getUserChangeNameListeners() {
-        return userChangeNameListeners;
-    }
-    
-    protected List<RoleCreateListener> getRoleCreateListeners() {
-        return roleCreateListeners;
-    }
-    
-    protected List<RoleChangeNameListener> getRoleChangeNameListeners() {
-        return roleChangeNameListeners;
+    protected List<Listener> getListeners(Class<?> listenerClass) {
+        List<Listener> listenersList = listeners.get(listenerClass);
+        return listenersList == null ? new ArrayList<Listener>() : listenersList;
     }
     
     private String requestToken(String email, String password) {

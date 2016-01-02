@@ -7,7 +7,7 @@ import de.btobastian.javacord.api.permissions.Permissions;
 import de.btobastian.javacord.api.permissions.PermissionState;
 import de.btobastian.javacord.api.permissions.PermissionType;
 
-public class ImplPermissions implements Permissions {
+class ImplPermissions implements Permissions {
     
     private List<PermissionType> allowed = new ArrayList<>();
     private List<PermissionType> denied = new ArrayList<>();
@@ -48,6 +48,24 @@ public class ImplPermissions implements Permissions {
         return PermissionState.NONE;
     }
     
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ImplPermissions)) {
+            return false;
+        }
+        ImplPermissions other = (ImplPermissions) obj;
+        for (PermissionType type : PermissionType.values()) {
+            if (other.getState(type) != this.getState(type)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected boolean isSet(int i, PermissionType type) {
         return (i & (1 << type.getOffset())) != 0;
     }

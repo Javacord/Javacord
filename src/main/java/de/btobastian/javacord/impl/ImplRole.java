@@ -12,7 +12,7 @@ import de.btobastian.javacord.api.Server;
 import de.btobastian.javacord.api.User;
 import de.btobastian.javacord.api.permissions.Permissions;
 
-public class ImplRole implements Role {
+class ImplRole implements Role {
 
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
     
@@ -108,6 +108,10 @@ public class ImplRole implements Role {
     
     protected void setName(String name) {
         this.name = name;
+    }
+    
+    protected void setPermissions(Permissions permissions) {
+        this.permissions = permissions;
     }
 
 }

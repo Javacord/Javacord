@@ -1,7 +1,7 @@
 package de.btobastian.javacord.api;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
+import java.util.Collection;
 
 import de.btobastian.javacord.api.listener.Listener;
 import de.btobastian.javacord.api.listener.ReadyListener;
@@ -100,18 +100,18 @@ public interface DiscordAPI {
     public Message getMessageById(String messageId);
     
     /**
-     * Gets a list with all known users.
+     * Gets a collection with all known users.
      * 
-     * @return A list with all known users.
+     * @return A collection with all known users.
      */
-    public List<User> getUsers();
+    public Collection<User> getUsers();
     
     /**
-     * Gets a list with all known servers.
+     * Gets a collection with all known servers.
      * 
-     * @return A list with all known servers.
+     * @return A collection with all known servers.
      */
-    public List<Server> getServers();
+    public Collection<Server> getServers();
     
     /**
      * Registers a listener.
@@ -135,5 +135,13 @@ public interface DiscordAPI {
      * @return Yourself.
      */
     public User getYourself();
+    
+    /**
+     * Gets a server by its id.
+     * 
+     * @param id The id of the server.
+     * @return The server with the given id.
+     */
+    public Server getServerById(String id);
     
 }
