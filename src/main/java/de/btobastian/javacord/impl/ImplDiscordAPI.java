@@ -13,12 +13,12 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.DiscordAPI;
-import de.btobastian.javacord.api.Message;
-import de.btobastian.javacord.api.Server;
-import de.btobastian.javacord.api.User;
-import de.btobastian.javacord.api.listener.Listener;
-import de.btobastian.javacord.api.listener.ReadyListener;
+import de.btobastian.javacord.DiscordAPI;
+import de.btobastian.javacord.Server;
+import de.btobastian.javacord.User;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.ReadyListener;
+import de.btobastian.javacord.message.Message;
 
 /**
  * The implementation of {@link DiscordAPI}.

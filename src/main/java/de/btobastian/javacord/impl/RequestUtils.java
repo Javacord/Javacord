@@ -25,7 +25,7 @@ class RequestUtils {
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-        conn.setRequestProperty("User-Agent", "discordApi");
+        conn.setRequestProperty("User-Agent", "Javacord");
         for (int i = 0; i < properties.length / 2; i++) {
             conn.setRequestProperty(properties[i*2], properties[i*2 + 1]);
         }
@@ -68,7 +68,7 @@ class RequestUtils {
         ((HttpURLConnection) conn).setRequestMethod(method);
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
-        conn.setRequestProperty("User-Agent", "discordApi");
+        conn.setRequestProperty("User-Agent", "Javacord");
         
         if (sendToken) {
             conn.setRequestProperty("authorization", api.getToken());

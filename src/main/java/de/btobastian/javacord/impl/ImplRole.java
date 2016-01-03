@@ -6,11 +6,11 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.Channel;
-import de.btobastian.javacord.api.Role;
-import de.btobastian.javacord.api.Server;
-import de.btobastian.javacord.api.User;
-import de.btobastian.javacord.api.permissions.Permissions;
+import de.btobastian.javacord.Channel;
+import de.btobastian.javacord.Role;
+import de.btobastian.javacord.Server;
+import de.btobastian.javacord.User;
+import de.btobastian.javacord.permissions.Permissions;
 
 class ImplRole implements Role {
 

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.Server;
-import de.btobastian.javacord.api.VoiceChannel;
+import de.btobastian.javacord.Server;
+import de.btobastian.javacord.VoiceChannel;
 
 /**
  * The implementation of {@link VoiceChannel}.

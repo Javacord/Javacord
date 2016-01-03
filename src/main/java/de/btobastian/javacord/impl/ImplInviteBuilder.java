@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.InviteBuilder;
+import de.btobastian.javacord.InviteBuilder;
 
 /**
  * The implementation of {@link InviteBuilder}.
@@ -66,14 +66,14 @@ class ImplInviteBuilder implements InviteBuilder {
         if (maxAge > 0) {
             jsonParam.put("max_age", maxAge);
         }
-        String respone;
+        String response;
         try {
-            respone = ((ImplServer) channel.getServer()).getApi().getRequestUtils().request(
+            response = ((ImplServer) channel.getServer()).getApi().getRequestUtils().request(
                     "https://discordapp.com/api/channels/" + channel.getId() + "/invites", jsonParam.toString(), true, "POST");
         } catch (IOException e) {
             return null;
         }
-        return new JSONObject(respone).getString("code");
+        return new JSONObject(response).getString("code");
     }
 
 }

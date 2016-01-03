@@ -8,11 +8,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.Channel;
-import de.btobastian.javacord.api.Message;
-import de.btobastian.javacord.api.MessageReceiver;
-import de.btobastian.javacord.api.Server;
-import de.btobastian.javacord.api.User;
+import de.btobastian.javacord.Channel;
+import de.btobastian.javacord.Server;
+import de.btobastian.javacord.User;
+import de.btobastian.javacord.message.Message;
+import de.btobastian.javacord.message.MessageReceiver;
 
 class ImplMessage implements Message {
 

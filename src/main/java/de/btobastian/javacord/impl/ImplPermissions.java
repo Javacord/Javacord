@@ -3,9 +3,9 @@ package de.btobastian.javacord.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.btobastian.javacord.api.permissions.Permissions;
-import de.btobastian.javacord.api.permissions.PermissionState;
-import de.btobastian.javacord.api.permissions.PermissionType;
+import de.btobastian.javacord.permissions.PermissionState;
+import de.btobastian.javacord.permissions.PermissionType;
+import de.btobastian.javacord.permissions.Permissions;
 
 class ImplPermissions implements Permissions {
     

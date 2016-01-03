@@ -7,25 +7,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.Channel;
-import de.btobastian.javacord.api.Message;
-import de.btobastian.javacord.api.Role;
-import de.btobastian.javacord.api.Server;
-import de.btobastian.javacord.api.User;
-import de.btobastian.javacord.api.listener.Listener;
-import de.btobastian.javacord.api.listener.MessageCreateListener;
-import de.btobastian.javacord.api.listener.MessageDeleteListener;
-import de.btobastian.javacord.api.listener.MessageEditListener;
-import de.btobastian.javacord.api.listener.RoleChangeNameListener;
-import de.btobastian.javacord.api.listener.RoleChangePermissionsListener;
-import de.btobastian.javacord.api.listener.RoleCreateListener;
-import de.btobastian.javacord.api.listener.ServerJoinListener;
-import de.btobastian.javacord.api.listener.ServerMemberAddListener;
-import de.btobastian.javacord.api.listener.ServerMemberRemoveListener;
-import de.btobastian.javacord.api.listener.TypingStartListener;
-import de.btobastian.javacord.api.listener.UserChangeNameListener;
-import de.btobastian.javacord.api.listener.UserChangeRoleListener;
-import de.btobastian.javacord.api.permissions.Permissions;
+import de.btobastian.javacord.Channel;
+import de.btobastian.javacord.Role;
+import de.btobastian.javacord.Server;
+import de.btobastian.javacord.User;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.message.MessageCreateListener;
+import de.btobastian.javacord.listener.message.MessageDeleteListener;
+import de.btobastian.javacord.listener.message.MessageEditListener;
+import de.btobastian.javacord.listener.message.TypingStartListener;
+import de.btobastian.javacord.listener.role.RoleChangeNameListener;
+import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listener.role.RoleCreateListener;
+import de.btobastian.javacord.listener.server.ServerJoinListener;
+import de.btobastian.javacord.listener.server.ServerMemberAddListener;
+import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listener.user.UserChangeNameListener;
+import de.btobastian.javacord.listener.user.UserChangeRoleListener;
+import de.btobastian.javacord.message.Message;
+import de.btobastian.javacord.permissions.Permissions;
 
 class PacketManager {
 

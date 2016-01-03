@@ -1,6 +1,6 @@
 package de.btobastian.javacord.impl;
 
-import de.btobastian.javacord.api.DiscordAPI;
+import de.btobastian.javacord.DiscordAPI;
 
 /**
  * The main class used to get an api instance.

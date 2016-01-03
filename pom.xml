@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.0.10</version>
+  <version>1.1.0</version>
   <name>Javacord</name>
   <description>A simple to use API to create a discord bot</description>
   
@@ -75,6 +75,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.3</version>
+        <configuration>
+          <excludePackageNames>com.mycompany.myapp.package1.*:com.mycompany.myapp.package2:*.util.*</excludePackageNames>
+        </configuration>
       </plugin>
     </plugins>
   </build>

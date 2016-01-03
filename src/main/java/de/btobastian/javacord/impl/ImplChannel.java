@@ -7,13 +7,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.Channel;
-import de.btobastian.javacord.api.InviteBuilder;
-import de.btobastian.javacord.api.Message;
-import de.btobastian.javacord.api.Role;
-import de.btobastian.javacord.api.Server;
-import de.btobastian.javacord.api.User;
-import de.btobastian.javacord.api.permissions.Permissions;
+import de.btobastian.javacord.Channel;
+import de.btobastian.javacord.InviteBuilder;
+import de.btobastian.javacord.Role;
+import de.btobastian.javacord.Server;
+import de.btobastian.javacord.User;
+import de.btobastian.javacord.message.Message;
+import de.btobastian.javacord.permissions.Permissions;
 
 /**
  * The implementation of {@link Channel}.

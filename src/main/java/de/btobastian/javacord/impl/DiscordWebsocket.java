@@ -7,8 +7,8 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.User;
-import de.btobastian.javacord.api.listener.ReadyListener;
+import de.btobastian.javacord.User;
+import de.btobastian.javacord.listener.ReadyListener;
 
 /**
  * Class for internal purposes!

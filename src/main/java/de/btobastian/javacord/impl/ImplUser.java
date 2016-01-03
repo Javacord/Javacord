@@ -1,11 +1,18 @@
 package de.btobastian.javacord.impl;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.btobastian.javacord.api.Message;
-import de.btobastian.javacord.api.User;
+import de.btobastian.javacord.User;
+import de.btobastian.javacord.message.Message;
 
 /**
  * The implementation of {@link User}.
@@ -17,12 +24,18 @@ class ImplUser implements User {
     private String id;
     private String name;
     private String userChannelId;
+    private String avatarId;
     
     protected ImplUser(JSONObject user, ImplDiscordAPI api) {
         this.api = api;
         
         id = user.getString("id");
         name = user.getString("username");
+        try {
+            avatarId = user.getString("avatar");
+        } catch (JSONException e) {
+            avatarId = null;
+        }
         api.addUser(this);
     }
     
@@ -111,6 +124,39 @@ class ImplUser implements User {
     @Override
     public boolean isYourself() {
         return api.getYourself() == this;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.User#getAvatar()
+     */
+    @Override
+    public byte[] getAvatar() {
+        if (avatarId == null) {
+            return null;
+        }
+        try {
+            URL url = new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            conn.setRequestProperty("User-Agent", "Javacord");
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int n = 0;
+            while (-1 != (n = in.read(buf))) {
+               out.write(buf, 0, n);
+            }
+            out.close();
+            in.close();
+            return out.toByteArray();
+        } catch (IOException e) {
+            if (api.debug()) {
+                e.printStackTrace();
+            }
+            return new byte[0];
+        }
     }
     
     protected void setUserChannelId(String channelId) {
