@@ -4,14 +4,14 @@ import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.permissions.Role;
 
-public interface RoleCreateListener extends Listener {
+public interface RoleDeleteListener extends Listener {
     
     /**
-     * Called when a new role was created.
+     * Called when a new role was deleted.
      * 
      * @param api The api.
-     * @param role The role.
+     * @param role The deleted role.
      */
-    public void onRoleCreate(DiscordAPI api, Role role);
+    public void onRoleDelete(DiscordAPI api, Role role);
 
 }

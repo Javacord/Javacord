@@ -2,6 +2,8 @@ package de.btobastian.javacord;
 
 import java.util.List;
 
+import de.btobastian.javacord.permissions.Role;
+
 /**
  * A discord server. Also called a guild.
  */
@@ -107,6 +109,11 @@ public interface Server {
      */
     public void ban(User user, int deleteDays);
     
-    
+    /**
+     * Creates a new role.
+     * 
+     * @return The created role. <code>Null</code> if the role couldn't be created.
+     */
+    public Role createRole();
     
 }

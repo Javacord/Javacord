@@ -19,6 +19,8 @@ import de.btobastian.javacord.User;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.ReadyListener;
 import de.btobastian.javacord.message.Message;
+import de.btobastian.javacord.permissions.Permissions;
+import de.btobastian.javacord.permissions.PermissionsBuilder;
 
 /**
  * The implementation of {@link DiscordAPI}.
@@ -250,6 +252,24 @@ class ImplDiscordAPI implements DiscordAPI {
     @Override
     public Server getServerById(String id) {
         return servers.get(id);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.DiscordAPI#getPermissionsBuilder()
+     */
+    @Override
+    public PermissionsBuilder getPermissionsBuilder() {
+        return new ImplPermissionsBuilder();
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.DiscordAPI#getPermissionsBuilder(de.btobastian.javacord.permissions.Permissions)
+     */
+    @Override
+    public PermissionsBuilder getPermissionsBuilder(Permissions permissions) {
+        return new ImplPermissionsBuilder(permissions);
     }
 
     /* ==== protected and private methods ==== */

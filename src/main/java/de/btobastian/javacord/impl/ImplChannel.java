@@ -9,11 +9,11 @@ import org.json.JSONObject;
 
 import de.btobastian.javacord.Channel;
 import de.btobastian.javacord.InviteBuilder;
-import de.btobastian.javacord.Role;
 import de.btobastian.javacord.Server;
 import de.btobastian.javacord.User;
 import de.btobastian.javacord.message.Message;
 import de.btobastian.javacord.permissions.Permissions;
+import de.btobastian.javacord.permissions.Role;
 
 /**
  * The implementation of {@link Channel}.
@@ -192,20 +192,50 @@ class ImplChannel implements Channel {
      */
     @Override
     public InviteBuilder getInviteBuilder() {
-        return new ImplInviteBuilder(this);
+        return new ImplInviteBuilder(this); 
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.Channel#updateOverriddenPermissions(de.btobastian.javacord.User, de.btobastian.javacord.permissions.Permissions)
+     */
+    @Override
+    public boolean updateOverriddenPermissions(User user, Permissions permissions) {
+        JSONObject jsonParam = new JSONObject()
+            .put("allow", ((ImplPermissions) permissions).getAllow())
+            .put("deny", ((ImplPermissions) permissions).getDeny())
+            .put("type", "member")
+            .put("id", user.getId());
+        try {
+            server.getApi().getRequestUtils().request("https://discordapp.com/api/channels/" + id + "/permissions/" + user.getId(), jsonParam.toString(), true, "PUT");
+        } catch (IOException e) {
+            if (server.getApi().debug()) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        overriddenPermissions.put(user.getId(), permissions);
+        return true;
+    }
+    
+    protected void setOverriddenPermissions(User user, Permissions permissions) {
+        overriddenPermissions.put(user.getId(), permissions);
     }
     
     /**
      * Updates the position if an other channel was moved.
      * 
      * @param from The old position of the moved channel.
-     * @param to The new postion of the moved channel.
+     * @param to The new position of the moved channel.
      */
     private void updatePosition(int from, int to) {
         if (from > position && to < position) {
             position++;
         }
         if (from < position && to > position) {
+            position--;
+        }
+        if (to == position) {
             position--;
         }
     }

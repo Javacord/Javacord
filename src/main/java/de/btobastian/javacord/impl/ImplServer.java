@@ -9,10 +9,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.Channel;
-import de.btobastian.javacord.Role;
 import de.btobastian.javacord.Server;
 import de.btobastian.javacord.User;
 import de.btobastian.javacord.VoiceChannel;
+import de.btobastian.javacord.permissions.Role;
 
 /**
  * The implementation of {@link Server}.
@@ -87,7 +87,7 @@ class ImplServer implements Server {
                 String id = memberRoles.getString(j);
                 for (Role role : this.roles) {
                     if (role.getId().equals(id)) {
-                        ((ImplRole) role).addUser(user);
+                        ((ImplRole) role).addUserWithoutUpdate(user);
                     }
                 }
             }
@@ -259,6 +259,25 @@ class ImplServer implements Server {
             return;
         }
     }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.Server#createRole()
+     */
+    @Override
+    public Role createRole() {
+        String response;
+        try {
+            response = getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id + "/roles", "", true, "POST");
+        } catch (IOException e) {
+            if (getApi().debug()) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        return new ImplRole(new JSONObject(response), this);
+    }
+
     
     private Object createChannel(String name, boolean voice) {
         String json = new JSONObject().put("name", name).put("type", voice ? "voice" : "text").toString();
@@ -314,5 +333,4 @@ class ImplServer implements Server {
     protected ImplDiscordAPI getApi() {
         return api;
     }
-
 }

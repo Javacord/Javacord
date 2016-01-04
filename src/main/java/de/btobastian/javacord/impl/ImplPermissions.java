@@ -65,7 +65,41 @@ class ImplPermissions implements Permissions {
         }
         return true;
     }
+    
+    protected void setState(PermissionType type, PermissionState state) {
+        switch (state) {
+            case ALLOWED:
+                allowed.add(type);
+                denied.remove(type);
+                break;
+            case DENIED:
+                allowed.remove(type);
+                denied.add(type);
+                break;
+            case NONE:
+                allowed.remove(type);
+                denied.remove(type);
+            default:
+                break;
+        }
+    }
 
+    protected int getAllow() {
+        int allow = 0;
+        for (PermissionType type : allowed) {
+            allow += Math.pow(2, type.getOffset());
+        }
+        return allow;
+    }
+    
+    protected int getDeny() {
+        int deny = 0;
+        for (PermissionType type : denied) {
+            deny += Math.pow(2, type.getOffset());
+        }
+        return deny;
+    }
+    
     protected boolean isSet(int i, PermissionType type) {
         return (i & (1 << type.getOffset())) != 0;
     }

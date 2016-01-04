@@ -1,9 +1,9 @@
 package de.btobastian.javacord.listener.user;
 
 import de.btobastian.javacord.DiscordAPI;
-import de.btobastian.javacord.Role;
 import de.btobastian.javacord.User;
 import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.permissions.Role;
 
 public interface UserChangeRoleListener extends Listener {
 

@@ -42,27 +42,51 @@ class RequestUtils {
     }
     
     protected String request(String urlToRead, String jsonParam, boolean sendToken, String method, String... properties) throws IOException {
-        URL url = new URL(urlToRead);
+        return request(urlToRead, jsonParam, sendToken, method, true, properties);
+    }
         
+    
+    protected String request(String urlToRead, String jsonParam, boolean sendToken, String method, boolean expectAnswer, String... properties) throws IOException {
+        URL url = new URL(urlToRead);
         byte[] postDataBytes = jsonParam.toString().getBytes(api.getEncoding());
 
         URLConnection conn = url.openConnection();
-        if (method.equalsIgnoreCase("PATCH")) { // some trick to support patch ( stolen from jDiscord :( )
+        if (method.equalsIgnoreCase("PATCH")) {
             ((HttpURLConnection) conn).setRequestMethod("POST");
             Socket clientSocket = new Socket("discordapp.com", 80);
             DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-            out.writeBytes("PATCH " + url + " HTTP/1.1\n" +
-                    "Host: discordapp.com\n" +
-                    "Connection: keep-alive\n" +
-                    "Content-Length: " + postDataBytes.length + "\n" +
-                    "Origin: http://discordapp.com\n" +
-                    "User-Agent: discordApi\n" +
-                    "Content-Type: application/json\n" +
-                    "Accept: */*\n" +
-                    "authorization: " + api.getToken() + "\n\n" + jsonParam);
-            out.close();
+            out.writeBytes("PATCH " + url + " HTTP/1.1\n" + // see https://www.mnot.net/blog/2012/09/05/patch
+                    "Host: discordapp.com\r\n" +
+                    "Content-Length: " + postDataBytes.length + "\r\n" +
+                    "User-Agent: Javacord\r\n" +
+                    "Content-Type: application/json\r\n" +
+                    "authorization: " + api.getToken() + "\r\n\r\n" + jsonParam);
+            out.flush();
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), api.getEncoding()));
+            
+            String jsonResult = "";
+            String line;
+            boolean expectData = expectAnswer;
+            byte counterSinceFirstEmptyLine = 0;
+            while ((line = in.readLine()) != null) {
+                if (line.equalsIgnoreCase("Content-Length: 0")) {
+                    expectData = false;
+                }
+                if (counterSinceFirstEmptyLine != 0) {
+                    counterSinceFirstEmptyLine++;
+                }
+                if (line.length() == 0) {
+                    if (counterSinceFirstEmptyLine >= 3 || !expectData) {
+                        break;
+                    }
+                    counterSinceFirstEmptyLine++;
+                }
+                if (counterSinceFirstEmptyLine == 3) {
+                    jsonResult = line;
+                }
+            }
             clientSocket.close();
-            return null;
+            return jsonResult;
         }
         
         ((HttpURLConnection) conn).setRequestMethod(method);

@@ -8,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.Channel;
-import de.btobastian.javacord.Role;
 import de.btobastian.javacord.Server;
 import de.btobastian.javacord.User;
 import de.btobastian.javacord.listener.Listener;
@@ -17,15 +16,20 @@ import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.listener.message.TypingStartListener;
 import de.btobastian.javacord.listener.role.RoleChangeNameListener;
+import de.btobastian.javacord.listener.role.RoleChangeOverriddenPermissionsListener;
 import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listener.role.RoleChangePositionListener;
 import de.btobastian.javacord.listener.role.RoleCreateListener;
+import de.btobastian.javacord.listener.role.RoleDeleteListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.server.ServerMemberAddListener;
 import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
+import de.btobastian.javacord.listener.user.UserChangeOverriddenPermissionsListener;
 import de.btobastian.javacord.listener.user.UserChangeRoleListener;
 import de.btobastian.javacord.message.Message;
 import de.btobastian.javacord.permissions.Permissions;
+import de.btobastian.javacord.permissions.Role;
 
 class PacketManager {
 
@@ -69,6 +73,9 @@ class PacketManager {
             case "GUILD_ROLE_UPDATE":
                 onGuildRoleUpdate(json);
                 break;
+            case "GUILD_ROLE_DELETE":
+                onGuildRoleDelete(json);
+                break;
             case "GUILD_MEMBER_UPDATE":
                 onGuildMemberUpdate(json);
                 break;
@@ -81,11 +88,62 @@ class PacketManager {
             case "GUILD_CREATE":
                 onGuildCreate(json);
                 break;
+            case "CHANNEL_UPDATE":
+                onChannelUpdate(json);
+                break;
             default:
                 if (api.debug()) {
                     System.out.println("Received unknown packet: " + type);
                 }
                 break;
+        }
+    }
+    
+    private void onChannelUpdate(JSONObject packet) {
+        JSONObject data = packet.getJSONObject("d");
+        Server server = api.getServerById(data.getString("guild_id"));
+        ImplChannel channel = null;
+        for (Channel c : server.getChannels()) {
+            if (c.getId().equals(data.getString("id"))) {
+                channel = (ImplChannel) c;
+                break;
+            }
+        }
+        if (channel == null) {
+            return;
+        }
+        JSONArray permissionOverrites = data.getJSONArray("permission_overwrites");
+        for (int i = 0; i < permissionOverrites.length(); i++) { // iterate throw all overridden permissions
+            JSONObject permissionOverrite = permissionOverrites.getJSONObject(i);
+            int allow = permissionOverrite.getInt("allow");
+            int deny = permissionOverrite.getInt("deny");
+            String id = permissionOverrite.getString("id");
+            String type = permissionOverrite.getString("type");
+            if (type.equals("member")) {
+                User user = api.getUserById(id);
+                ImplPermissions oldPermissions = (ImplPermissions) channel.getOverriddenPermissions(user);
+                if (oldPermissions.getAllow() != allow || oldPermissions.getDeny() != deny) { // if some permissions changed
+                    channel.setOverriddenPermissions(user, new ImplPermissions(allow, deny));
+                    for (Listener listener : api.getListeners(UserChangeOverriddenPermissionsListener.class)) {
+                        ((UserChangeOverriddenPermissionsListener) listener).onUserChangeOverriddenPermissions(api, user, channel, oldPermissions);
+                    }
+                }
+            }
+            if (type.equals("role")) {
+                ImplRole role = null;
+                for (Role r : channel.getServer().getRoles()) {
+                    if (r.getId().equals(id)) {
+                        role = (ImplRole) r;
+                    }
+                }
+                ImplPermissions oldPermissions = (ImplPermissions) role.getOverriddenPermissions(channel);
+                if (oldPermissions.getAllow() != allow || oldPermissions.getDeny() != deny) { // if some permissions changed
+                    role.setOverriddenPermissions(channel, new ImplPermissions(allow, deny));
+                    for (Listener listener : api.getListeners(RoleChangeOverriddenPermissionsListener.class)) {
+                        ((RoleChangeOverriddenPermissionsListener) listener).onRoleChangeOverriddenPermissions(api, role, channel, oldPermissions);
+                    }
+                }
+            }
         }
     }
     
@@ -149,16 +207,41 @@ class PacketManager {
         List<Role> removedRoles = rolesBefore;
         removedRoles.removeAll(rolesNow);
         if (!newRoles.isEmpty()) {
-            ((ImplRole) newRoles.get(0)).addUser(user);
+            ((ImplRole) newRoles.get(0)).addUserWithoutUpdate(user);
             for (Listener listener : api.getListeners(UserChangeRoleListener.class)) {
                 ((UserChangeRoleListener) listener).onUserChangeRole(api, user, newRoles.get(0), true);
             }
         }
         if (!removedRoles.isEmpty()) {
-            ((ImplRole) removedRoles.get(0)).removeUser(user);
+            ((ImplRole) removedRoles.get(0)).removeUserWithoutUpdate(user);
             for (Listener listener : api.getListeners(UserChangeRoleListener.class)) {
                 ((UserChangeRoleListener) listener).onUserChangeRole(api, user, removedRoles.get(0), false);
             }
+        }
+    }
+    
+    private void onGuildRoleDelete(JSONObject packet) {
+        JSONObject data = packet.getJSONObject("d");
+        
+        String guildId = data.getString("guild_id");
+        String roleId = data.getString("role_id");
+        
+        Role role = null;
+        Server server = api.getServerById(guildId);
+        for (Role r : server.getRoles()) {
+            if (r.getId().equals(roleId)) {
+                role = r;
+            }
+        }
+        if (role == null) {
+            return;
+        }
+        
+        ((ImplRole) role).setPosition(-100);
+        ((ImplServer) server).removeRole((ImplRole) role);
+        
+        for (Listener listener : api.getListeners(RoleDeleteListener.class)) {
+            ((RoleDeleteListener) listener).onRoleDelete(api, role);
         }
     }
     
@@ -170,13 +253,9 @@ class PacketManager {
         
         String roleId = roleJson.getString("id");
         Role role = null;
-        for (Server server : api.getServers()) {
-            if (server.getId().equals(guildId)) {
-                for (Role r : server.getRoles()) {
-                    if (r.getId().equals(roleId)) {
-                        role = r;
-                    }
-                }
+        for (Role r : api.getServerById(guildId).getRoles()) {
+            if (r.getId().equals(roleId)) {
+                role = r;
             }
         }
         if (role == null) {
@@ -198,6 +277,17 @@ class PacketManager {
             ((ImplRole) role).setPermissions(permissions);
             for (Listener listener : api.getListeners(RoleChangePermissionsListener.class)) {
                 ((RoleChangePermissionsListener) listener).onRoleChangePermissions(api, role, oldPermissions);
+            }
+        }
+        
+        synchronized (Role.class) {
+            int position = roleJson.getInt("position");
+            if (role.getPosition() != position) {
+                int oldPosition = role.getPosition();
+                ((ImplRole) role).setPosition(position);
+                for (Listener listener : api.getListeners(RoleChangePositionListener.class)) {
+                    ((RoleChangePositionListener) listener).onRoleChangePosition(api, role, oldPosition);
+                }
             }
         }
     }

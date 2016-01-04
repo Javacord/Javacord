@@ -6,6 +6,9 @@ import java.util.Collection;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.ReadyListener;
 import de.btobastian.javacord.message.Message;
+import de.btobastian.javacord.permissions.PermissionState;
+import de.btobastian.javacord.permissions.Permissions;
+import de.btobastian.javacord.permissions.PermissionsBuilder;
 
 /**
  * The discord api.
@@ -144,5 +147,20 @@ public interface DiscordAPI {
      * @return The server with the given id.
      */
     public Server getServerById(String id);
+    
+    /**
+     * Gets a new permissions builder with every type set to {@link PermissionState#NONE}
+     * 
+     * @return A new permissions builder.
+     */
+    public PermissionsBuilder getPermissionsBuilder();
+    
+    /**
+     * Gets a new permissions builder.
+     * 
+     * @param The permissions which should be copied.
+     * @return A new permissions builder.
+     */
+    public PermissionsBuilder getPermissionsBuilder(Permissions permissions);
     
 }

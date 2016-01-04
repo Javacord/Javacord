@@ -70,4 +70,13 @@ public interface Channel extends MessageReceiver {
      */
     public InviteBuilder getInviteBuilder();
     
+    /**
+     * Updates the overridden permissions.
+     * 
+     * @param channel The user.
+     * @param permissions The permissions to set.
+     * @return Whether the role could be updated or not.
+     */
+    public boolean updateOverriddenPermissions(User user, Permissions permissions);
+    
 }
