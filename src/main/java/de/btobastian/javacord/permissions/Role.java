@@ -71,14 +71,14 @@ public interface Role {
     public boolean updateName(String name);
     
     /**
-     * Gets if the role’s users should be displayed separately.
+     * Gets if the role's users should be displayed separately.
      * 
-     * @return Whether to display the role’s users separately or not.
+     * @return Whether to display the role's users separately or not.
      */
     public boolean getHoist();
     
     /**
-     * Update the hoist (Whether to display the role’s users separately or not).
+     * Update the hoist (Whether to display the role's users separately or not).
      * 
      * @param hoist The new hoist.
      * @return Whether the role could be updated or not.

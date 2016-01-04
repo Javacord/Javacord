@@ -77,6 +77,11 @@ Now you're connected. :)
 - RoleCreateListener
 - RoleDeleteListener
 - UserChangeOverriddenPermissionsListener
+- ChannelChangeNameListener
+- ChannelChangePositionListener
+- ChannelChangeTopicListener
+- VoiceChannelChangeNameListener
+- VoiceChannelChangePositionListener
 
 #Examples
 
@@ -125,6 +130,24 @@ channel.sendMessage(new MessageBuilder()
 ```
 will result in something like this:
 ![alt tag](http://screenshots.bastian-oppermann.de/01.01.2016-15-44-23.png)
+
+Create a new channel and change its name:
+```java
+Server server; // a server instance (e.g. from a listener)
+Channel channel = server.createChannel();
+channel.updateName("My awsome new channel");
+```
+
+Create a new role and change its permissions:
+```java
+Server server; // a server instance (e.g. from a listener)
+Role role = server.createRole();
+role.updateName("Bot");
+role.updateColor(Color.GREEN);
+PermissionsBuilder permissionsBuilder = Main.getApi().getPermissionsBuilder(role.getPermission());
+permissionsBuilder.setState(PermissionType.KICK_MEMBERS, PermissionState.ALLOWED);
+role.updatePermissions(permissionsBuilder.build())
+```
 
 #Comming soon
 
