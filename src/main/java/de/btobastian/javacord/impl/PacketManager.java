@@ -10,7 +10,11 @@ import org.json.JSONObject;
 import de.btobastian.javacord.Channel;
 import de.btobastian.javacord.Server;
 import de.btobastian.javacord.User;
+import de.btobastian.javacord.VoiceChannel;
 import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
+import de.btobastian.javacord.listener.channel.ChannelChangePositionListener;
+import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
@@ -27,6 +31,8 @@ import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.listener.user.UserChangeOverriddenPermissionsListener;
 import de.btobastian.javacord.listener.user.UserChangeRoleListener;
+import de.btobastian.javacord.listener.voice.VoiceChannelChangeNameListener;
+import de.btobastian.javacord.listener.voice.VoiceChannelChangePositionListener;
 import de.btobastian.javacord.message.Message;
 import de.btobastian.javacord.permissions.Permissions;
 import de.btobastian.javacord.permissions.Role;
@@ -90,6 +96,7 @@ class PacketManager {
                 break;
             case "CHANNEL_UPDATE":
                 onChannelUpdate(json);
+                onVoiceChannelUpdate(json);
                 break;
             default:
                 if (api.debug()) {
@@ -99,8 +106,48 @@ class PacketManager {
         }
     }
     
+    private void onVoiceChannelUpdate(JSONObject packet) {
+        JSONObject data = packet.getJSONObject("d");
+        if (!data.getString("type").equals("voice")) {
+            return;
+        }
+        Server server = api.getServerById(data.getString("guild_id"));
+        ImplVoiceChannel channel = null;
+        for (VoiceChannel c : server.getVoiceChannels()) {
+            if (c.getId().equals(data.getString("id"))) {
+                channel = (ImplVoiceChannel) c;
+                break;
+            }
+        }
+        if (channel == null) {
+            return;
+        }
+        // check if name was changed
+        String name = data.getString("name");
+        if (!channel.getName().equals(name)) {
+            String oldName = channel.getName();
+            channel.setName(name);
+            for (Listener listener : api.getListeners(VoiceChannelChangeNameListener.class)) {
+                ((VoiceChannelChangeNameListener) listener).onVoiceChannelChangeName(api, channel, oldName);
+            }
+        }
+        
+        // check if position was changed
+        int position = data.getInt("position");
+        if (channel.getPosition() != position) {
+            int oldPosition = channel.getPosition();
+            channel.setPosition(position);
+            for (Listener listener : api.getListeners(VoiceChannelChangePositionListener.class)) {
+                ((VoiceChannelChangePositionListener) listener).onVoiceChannelChangePosition(api, channel, oldPosition);
+            }
+        }
+    }
+    
     private void onChannelUpdate(JSONObject packet) {
         JSONObject data = packet.getJSONObject("d");
+        if (!data.getString("type").equals("text")) {
+            return;
+        }
         Server server = api.getServerById(data.getString("guild_id"));
         ImplChannel channel = null;
         for (Channel c : server.getChannels()) {
@@ -112,6 +159,38 @@ class PacketManager {
         if (channel == null) {
             return;
         }
+        // check if name was changed
+        String name = data.getString("name");
+        if (!channel.getName().equals(name)) {
+            String oldName = channel.getName();
+            channel.setName(name);
+            for (Listener listener : api.getListeners(ChannelChangeNameListener.class)) {
+                ((ChannelChangeNameListener) listener).onChannelChangeName(api, channel, oldName);
+            }
+        }
+        
+        // check if position was changed
+        int position = data.getInt("position");
+        if (channel.getPosition() != position) {
+            int oldPosition = channel.getPosition();
+            channel.setPosition(position);
+            for (Listener listener : api.getListeners(ChannelChangePositionListener.class)) {
+                ((ChannelChangePositionListener) listener).onChannelChangePosition(api, channel, oldPosition);
+            }
+        }
+        
+        // check if topic was changed
+        String topic = data.getString("topic");
+        topic = topic == null ? "" : topic;
+        if (!channel.getTopic().equals(topic)) {
+            String oldTopic = channel.getTopic();
+            channel.setTopic(topic);
+            for (Listener listener : api.getListeners(ChannelChangeTopicListener.class)) {
+                ((ChannelChangeTopicListener) listener).onChannelChangeTopic(api, channel, oldTopic);
+            }
+        }
+        
+        // check if overridden permissions were changed
         JSONArray permissionOverrites = data.getJSONArray("permission_overwrites");
         for (int i = 0; i < permissionOverrites.length(); i++) { // iterate throw all overridden permissions
             JSONObject permissionOverrite = permissionOverrites.getJSONObject(i);

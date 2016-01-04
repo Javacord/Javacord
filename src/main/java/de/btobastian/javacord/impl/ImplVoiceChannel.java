@@ -6,6 +6,9 @@ import org.json.JSONObject;
 
 import de.btobastian.javacord.Server;
 import de.btobastian.javacord.VoiceChannel;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.voice.VoiceChannelChangeNameListener;
+import de.btobastian.javacord.listener.voice.VoiceChannelChangePositionListener;
 
 /**
  * The implementation of {@link VoiceChannel}.
@@ -74,29 +77,63 @@ class ImplVoiceChannel implements VoiceChannel {
             e.printStackTrace();
             return false;
         }
-        for (VoiceChannel channel : getServer().getVoiceChannels()) {
-            if (channel != this) {
-                // inform the other channels
-                ((ImplVoiceChannel) channel).updatePosition(position, Integer.MAX_VALUE);
-            }
-        }
         server.removeVoiceChannel(this);
         return true;
     }
-    
-    /**
-     * Updates the position if an other channel was moved.
-     * 
-     * @param from The old position of the moved channel.
-     * @param to The new postion of the moved channel.
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.VoiceChannel#updateName(java.lang.String)
      */
-    private void updatePosition(int from, int to) {
-        if (from > position && to < position) {
-            position++;
+    @Override
+    public boolean updateName(String name) {
+        return update(name, position);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.VoiceChannel#updatePosition(int)
+     */
+    @Override
+    public boolean updatePosition(int position) {
+        return update(name, position);
+    }
+    
+    protected void setName(String name) {
+        this.name = name;
+    }
+    
+    protected void setPosition(int position) {
+        this.position = position;
+    }
+    
+    private boolean update(String name, int position) {
+        JSONObject jsonParam = new JSONObject()
+            .put("name", name)
+            .put("position", position);
+        try {
+            server.getApi().getRequestUtils().request("https://discordapp.com/api/channels/" + id, jsonParam.toString(), true, "PATCH");
+        } catch (IOException e) {
+            if (server.getApi().debug()) {
+                e.printStackTrace();
+            }
+            return false;
         }
-        if (from < position && to > position) {
-            position--;
+        if (!this.name.equals(name)) {
+            String oldName = this.name;
+            this.name = name;
+            for (Listener listener : server.getApi().getListeners(VoiceChannelChangeNameListener.class)) {
+                ((VoiceChannelChangeNameListener) listener).onVoiceChannelChangeName(server.getApi(), this, oldName);
+            }
         }
+        if (this.position != position) {
+            int oldPosition = this.position;
+            this.position = position;
+            for (Listener listener : server.getApi().getListeners(VoiceChannelChangePositionListener.class)) {
+                ((VoiceChannelChangePositionListener) listener).onVoiceChannelChangePosition(server.getApi(), this, oldPosition);
+            }
+        }
+        return true;
     }
 
 }

@@ -11,6 +11,10 @@ import de.btobastian.javacord.Channel;
 import de.btobastian.javacord.InviteBuilder;
 import de.btobastian.javacord.Server;
 import de.btobastian.javacord.User;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
+import de.btobastian.javacord.listener.channel.ChannelChangePositionListener;
+import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.message.Message;
 import de.btobastian.javacord.permissions.Permissions;
 import de.btobastian.javacord.permissions.Role;
@@ -37,7 +41,7 @@ class ImplChannel implements Channel {
         try {
             topic = channel.getString("topic");
         } catch (JSONException e) {
-            topic = null;
+            topic = "";
         }
         position = channel.getInt("position");
         
@@ -153,12 +157,6 @@ class ImplChannel implements Channel {
             e.printStackTrace();
             return false;
         }
-        for (Channel channel : getServer().getChannels()) {
-            if (channel != this) {
-                // inform the other channels
-                ((ImplChannel) channel).updatePosition(position, Integer.MAX_VALUE);
-            }
-        }
         server.removeChannel(this);
         return true;
     }
@@ -217,26 +215,90 @@ class ImplChannel implements Channel {
         overriddenPermissions.put(user.getId(), permissions);
         return true;
     }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.Channel#updateName(java.lang.String)
+     */
+    @Override
+    public boolean updateName(String name) {
+        return update(name, position, topic);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.Channel#updatePosition(int)
+     */
+    @Override
+    public boolean updatePosition(int position) {
+        if (position < 0) {
+            throw new IllegalArgumentException("The position cannot be less than 0!");
+        }
+        if (position > server.getChannels().size() - 1) {
+            throw new IllegalArgumentException("The position cannot be greater than the amount of channels - 1!");
+        }
+        return update(name, position, topic);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.Channel#updateTopic(java.lang.String)
+     */
+    @Override
+    public boolean updateTopic(String topic) {
+        return update(name, position, topic);
+    }
     
     protected void setOverriddenPermissions(User user, Permissions permissions) {
         overriddenPermissions.put(user.getId(), permissions);
     }
     
-    /**
-     * Updates the position if an other channel was moved.
-     * 
-     * @param from The old position of the moved channel.
-     * @param to The new position of the moved channel.
-     */
-    private void updatePosition(int from, int to) {
-        if (from > position && to < position) {
-            position++;
+    protected void setName(String name) {
+        this.name = name;
+    }
+    
+    protected void setPosition(int position) {
+        this.position = position;
+    }
+    
+    protected void setTopic(String topic) {
+        this.topic = topic;
+    }
+    
+    private boolean update(String name, int position, String topic) {
+        JSONObject jsonParam = new JSONObject()
+            .put("name", name)
+            .put("position", position)
+            .put("topic", topic);
+        try {
+            server.getApi().getRequestUtils().request("https://discordapp.com/api/channels/" + id, jsonParam.toString(), true, "PATCH");
+        } catch (IOException e) {
+            if (server.getApi().debug()) {
+                e.printStackTrace();
+            }
+            return false;
         }
-        if (from < position && to > position) {
-            position--;
+        if (!this.name.equals(name)) {
+            String oldName = this.name;
+            this.name = name;
+            for (Listener listener : server.getApi().getListeners(ChannelChangeNameListener.class)) {
+                ((ChannelChangeNameListener) listener).onChannelChangeName(server.getApi(), this, oldName);
+            }
         }
-        if (to == position) {
-            position--;
+        if (this.position != position) {
+            int oldPosition = this.position;
+            this.position = position;
+            for (Listener listener : server.getApi().getListeners(ChannelChangePositionListener.class)) {
+                ((ChannelChangePositionListener) listener).onChannelChangePosition(server.getApi(), this, oldPosition);
+            }
         }
+        if (!this.topic.equals(topic)) {
+            String oldTopic = this.topic;
+            this.topic = topic;
+            for (Listener listener : server.getApi().getListeners(ChannelChangeTopicListener.class)) {
+                ((ChannelChangeTopicListener) listener).onChannelChangeTopic(server.getApi(), this, oldTopic);
+            }
+        }
+        return true;
     }
 }

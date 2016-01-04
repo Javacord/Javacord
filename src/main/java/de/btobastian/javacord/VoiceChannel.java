@@ -40,4 +40,20 @@ public interface VoiceChannel {
      */
     public boolean delete();
     
+    /**
+     * Updates the name of the channel.
+     * 
+     * @param name The new name of the channel.
+     * @return Whether the channel could be updated or not.
+     */
+    public boolean updateName(String name);
+    
+    /**
+     * Updates the position of the channel.
+     * 
+     * @param position The new position of the channel.
+     * @return Whether the channel could be updated or not.
+     */
+    public boolean updatePosition(int position);
+    
 }

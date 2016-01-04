@@ -75,8 +75,32 @@ public interface Channel extends MessageReceiver {
      * 
      * @param channel The user.
      * @param permissions The permissions to set.
-     * @return Whether the role could be updated or not.
+     * @return Whether the channel could be updated or not.
      */
     public boolean updateOverriddenPermissions(User user, Permissions permissions);
+    
+    /**
+     * Updates the name of the channel.
+     * 
+     * @param name The new name of the channel.
+     * @return Whether the channel could be updated or not.
+     */
+    public boolean updateName(String name);
+    
+    /**
+     * Updates the position of the channel.
+     * 
+     * @param position The new position of the channel.
+     * @return Whether the channel could be updated or not.
+     */
+    public boolean updatePosition(int position);
+    
+    /**
+     * Updates the topic of the channel.
+     * 
+     * @param topic The new topic of the channel.
+     * @return Whether the channel could be updated or not.
+     */
+    public boolean updateTopic(String topic);
     
 }
