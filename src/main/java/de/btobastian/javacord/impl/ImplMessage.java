@@ -205,10 +205,27 @@ class ImplMessage implements Message {
             api.getRequestUtils().request("https://discordapp.com/api/channels/" + channelId
                     + "/messages/" + id, json, true, "PATCH");
         } catch (IOException e) {
+            if (api.debug()) {
+                e.printStackTrace();
+            }
             return false;
         }
         this.content = message;
         return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.message.Message#acknowledge()
+     */
+    @Override
+    public void acknowledge() {
+        try {
+            api.getRequestUtils().request(
+                    "https://discordapp.com/api/channels/:channel_id/messages/" + id + "/ack", null, true, "POST");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void update(JSONObject data) {

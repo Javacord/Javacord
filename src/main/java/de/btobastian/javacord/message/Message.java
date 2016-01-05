@@ -108,4 +108,9 @@ public interface Message {
      */
     public boolean edit(String message);
     
+    /**
+     * Marks the message as read.
+     */
+    public void acknowledge();
+    
 }
