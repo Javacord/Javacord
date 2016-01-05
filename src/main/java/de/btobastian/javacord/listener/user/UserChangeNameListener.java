@@ -7,7 +7,7 @@ import de.btobastian.javacord.listener.Listener;
 public interface UserChangeNameListener extends Listener {
     
     /**
-     * Called when a user changed his name.
+     * Called when an user changed his name.
      * 
      * @param api The api.
      * @param user The user with the updated name.

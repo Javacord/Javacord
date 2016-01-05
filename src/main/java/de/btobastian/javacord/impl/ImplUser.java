@@ -1,11 +1,15 @@
 package de.btobastian.javacord.impl;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONException;
@@ -128,10 +132,10 @@ class ImplUser implements User {
     
     /*
      * (non-Javadoc)
-     * @see de.btobastian.javacord.api.User#getAvatar()
+     * @see de.btobastian.javacord.User#getAvatarAsBytearray()
      */
     @Override
-    public byte[] getAvatar() {
+    public byte[] getAvatarAsBytearray() {
         if (avatarId == null) {
             return null;
         }
@@ -156,6 +160,42 @@ class ImplUser implements User {
                 e.printStackTrace();
             }
             return new byte[0];
+        }
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.User#getAvatar()
+     */
+    @Override
+    public BufferedImage getAvatar() {
+        byte[] imageAsBytes = getAvatarAsBytearray();
+        if (imageAsBytes.length == 0) {
+            return null;
+        }
+        InputStream in = new ByteArrayInputStream(imageAsBytes);
+        try {
+            return ImageIO.read(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.User#getAvatarUrl()
+     */
+    @Override
+    public URL getAvatarUrl() {
+        if (avatarId == null) {
+            return null;
+        }
+        try {
+            return new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
     

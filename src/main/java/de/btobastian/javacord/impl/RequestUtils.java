@@ -48,10 +48,10 @@ class RequestUtils {
     
     protected String request(String urlToRead, String jsonParam, boolean sendToken, String method, boolean expectAnswer, String... properties) throws IOException {
         URL url = new URL(urlToRead);
-        byte[] postDataBytes = jsonParam.toString().getBytes(api.getEncoding());
 
         URLConnection conn = url.openConnection();
         if (method.equalsIgnoreCase("PATCH")) {
+            byte[] postDataBytes = jsonParam.toString().getBytes(api.getEncoding());
             ((HttpURLConnection) conn).setRequestMethod("POST");
             Socket clientSocket = new Socket("discordapp.com", 80);
             DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
@@ -91,7 +91,6 @@ class RequestUtils {
         
         ((HttpURLConnection) conn).setRequestMethod(method);
         conn.setRequestProperty("Content-Type", "application/json");
-        conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
         conn.setRequestProperty("User-Agent", "Javacord");
         
         if (sendToken) {
@@ -100,8 +99,12 @@ class RequestUtils {
         for (int i = 0; i < properties.length / 2; i++) {
             conn.setRequestProperty(properties[i*2], properties[i*2 + 1]);
         }
-        conn.setDoOutput(true);
-        conn.getOutputStream().write(postDataBytes);
+        if (jsonParam != null && !jsonParam.equals("")) {
+            byte[] postDataBytes = jsonParam.toString().getBytes(api.getEncoding());
+            conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+            conn.setDoOutput(true);
+            conn.getOutputStream().write(postDataBytes);
+        }
 
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), api.getEncoding()));
         StringBuilder builder = new StringBuilder();

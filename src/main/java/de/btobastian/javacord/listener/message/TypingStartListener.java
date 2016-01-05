@@ -8,7 +8,7 @@ import de.btobastian.javacord.listener.Listener;
 public interface TypingStartListener extends Listener {
     
     /**
-     * Called when a user starts typing.
+     * Called when an user starts typing.
      * 
      * @param api The api.
      * @param user The user who starts typing.

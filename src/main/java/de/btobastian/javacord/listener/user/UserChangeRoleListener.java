@@ -8,7 +8,7 @@ import de.btobastian.javacord.permissions.Role;
 public interface UserChangeRoleListener extends Listener {
 
     /**
-     * Called when the role of a user was changed (added or removed).
+     * Called when the role of an user was changed (added or removed).
      * 
      * @param api The api.
      * @param user The affected user.

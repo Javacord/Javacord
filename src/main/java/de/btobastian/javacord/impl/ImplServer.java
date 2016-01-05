@@ -1,5 +1,6 @@
 package de.btobastian.javacord.impl;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,13 @@ class ImplServer implements Server {
         try {
             channels = guild.getJSONArray("channels");
         } catch (JSONException e) {
-            channels = new JSONArray();
+            try {
+                channels = new JSONArray(
+                        api.getRequestUtils().request("https://discordapp.com/api/guilds/" + id + "/channels", null, true, "GET"));
+            } catch (IOException e2) {
+                e2.printStackTrace();
+                channels = new JSONArray();
+            }
         }
         for (int i = 0; i < channels.length(); i++) {
             JSONObject channel = channels.getJSONObject(i);
@@ -181,7 +188,8 @@ class ImplServer implements Server {
      */
     public boolean kick(User user) {
         try {
-            getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id + "/members/" + user.getId(), "", true, "DELETE");
+            getApi().getRequestUtils().request(
+                    "https://discordapp.com/api/guilds/" + id + "/members/" + user.getId(), "", true, "DELETE");
         } catch (IOException e) {
             if (getApi().debug()) {
                 e.printStackTrace();
@@ -277,14 +285,57 @@ class ImplServer implements Server {
         }
         return new ImplRole(new JSONObject(response), this);
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.api.Server#updateName(java.lang.String)
+     */
+    @Override
+    public boolean updateName(String name) {
+        JSONObject jsonParam = new JSONObject().put("name", name);
+        try {
+            getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id, jsonParam.toString(), true, "PATCH");
+        } catch (IOException e) {
+            if (getApi().debug()) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        this.name = name;
+        return true;
+    }
 
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.Server#updateIcon(java.awt.image.BufferedImage)
+     */
+    @Override
+    public boolean updateIcon(BufferedImage icon) {
+        JSONObject jsonParam = new JSONObject().put("name", name);
+        if (icon.getHeight() != 128 || icon.getWidth() != 128) {
+            throw new IllegalArgumentException("Icon must be 128*128px!");
+        }
+        BufferedImage convertedImg = new BufferedImage(icon.getWidth(), icon.getHeight(), BufferedImage.TYPE_INT_RGB);
+        convertedImg.getGraphics().drawImage(icon, 0, 0, null);
+        jsonParam.put("icon", "data:image/jpg;base64," + api.imgToBase64String(icon));
+        try {
+            getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id, jsonParam.toString(), true, "PATCH");
+        } catch (IOException e) {
+            if (getApi().debug()) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return true;
+    }
     
     private Object createChannel(String name, boolean voice) {
         String json = new JSONObject().put("name", name).put("type", voice ? "voice" : "text").toString();
         
         String response;
         try {
-            response = getApi().getRequestUtils().request("https://discordapp.com/api/guilds/" + id + "/channels", json, true, "POST");
+            response = getApi().getRequestUtils().request(
+                    "https://discordapp.com/api/guilds/" + id + "/channels", json, true, "POST");
         } catch (IOException e) {
             if (getApi().debug()) {
                 e.printStackTrace();
@@ -328,6 +379,10 @@ class ImplServer implements Server {
     
     protected void removeUser(User user) {
         users.remove(user);
+    }
+    
+    protected void setName(String name) {
+        this.name = name;
     }
     
     protected ImplDiscordAPI getApi() {

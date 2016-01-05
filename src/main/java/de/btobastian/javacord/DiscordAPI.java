@@ -1,5 +1,6 @@
 package de.btobastian.javacord;
 
+import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 
@@ -162,5 +163,22 @@ public interface DiscordAPI {
      * @return A new permissions builder.
      */
     public PermissionsBuilder getPermissionsBuilder(Permissions permissions);
+    
+    /**
+     * Creates a new server.
+     * 
+     * @param name The name of the server.
+     * @return The created server.
+     */
+    public Server createServer(String name);
+    
+    /**
+     * Creates a new server.
+     * 
+     * @param name The name of the server.
+     * @param icon The icon. Can by null. Must be 128*128px.
+     * @return The created server.
+     */
+    public Server createServer(String name, BufferedImage icon);
     
 }

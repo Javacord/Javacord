@@ -1,5 +1,8 @@
 package de.btobastian.javacord.impl;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -11,6 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import org.java_websocket.util.Base64;
 import org.json.JSONObject;
 
 import de.btobastian.javacord.DiscordAPI;
@@ -272,6 +278,45 @@ class ImplDiscordAPI implements DiscordAPI {
         return new ImplPermissionsBuilder(permissions);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.DiscordAPI#createServer(java.lang.String)
+     */
+    @Override
+    public Server createServer(String name) {
+        return createServer(name, null);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.DiscordAPI#createServer(java.lang.String, java.awt.image.BufferedImage)
+     */
+    @Override
+    public Server createServer(String name, BufferedImage icon) {
+        if (name == null || name.length() < 2 || name.length() > 100) {
+            throw new IllegalArgumentException("Name must be 2-100 characters long!");
+        }
+        JSONObject jsonParam = new JSONObject().put("name", name);
+        if (icon != null) {
+            if (icon.getHeight() != 128 || icon.getWidth() != 128) {
+                throw new IllegalArgumentException("Icon must be 128*128px!");
+            }
+            BufferedImage convertedImg = new BufferedImage(icon.getWidth(), icon.getHeight(), BufferedImage.TYPE_INT_RGB);
+            convertedImg.getGraphics().drawImage(icon, 0, 0, null);
+            jsonParam.put("icon", "data:image/jpg;base64," + imgToBase64String(icon));
+        }
+        String response;
+        try {
+            response = getRequestUtils().request("https://discordapp.com/api/guilds", jsonParam.toString(), true, "POST");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        ImplServer server = new ImplServer(new JSONObject(response), this);
+        server.addUser(getYourself());
+        return server;
+    }
+
     /* ==== protected and private methods ==== */
     
     /**
@@ -337,6 +382,17 @@ class ImplDiscordAPI implements DiscordAPI {
     protected List<Listener> getListeners(Class<?> listenerClass) {
         List<Listener> listenersList = listeners.get(listenerClass);
         return listenersList == null ? new ArrayList<Listener>() : listenersList;
+    }
+    
+    protected String imgToBase64String(RenderedImage img) {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(img, "jpg", os);
+            return Base64.encodeBytes(os.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
     
     private String requestToken(String email, String password) {

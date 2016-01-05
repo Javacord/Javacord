@@ -1,5 +1,6 @@
 package de.btobastian.javacord;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 import de.btobastian.javacord.permissions.Role;
@@ -115,5 +116,21 @@ public interface Server {
      * @return The created role. <code>Null</code> if the role couldn't be created.
      */
     public Role createRole();
+    
+    /**
+     * Updates the name of the server.
+     * 
+     * @param name The new name.
+     * @return Whether the server could be updated or not.
+     */
+    public boolean updateName(String name);
+    
+    /**
+     * Updates the icon of the server.
+     * 
+     * @param icon The new icon. Must be 128*128px.
+     * @return Whether the server could be updated or not.
+     */
+    public boolean updateIcon(BufferedImage icon);
     
 }

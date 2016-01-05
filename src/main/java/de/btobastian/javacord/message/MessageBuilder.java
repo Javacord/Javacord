@@ -17,6 +17,17 @@ public class MessageBuilder {
     }
     
     /**
+     * Appends the given message to the text (without decorations).
+     * 
+     * @param message The message.
+     * @return This object to reuse it.
+     */
+    public MessageBuilder append(String message) {
+        strBuilder.append(message);
+        return this;
+    }
+    
+    /**
      * Appends the decoration to the text.
      * 
      * @param decoration The decoration/style.
@@ -42,9 +53,9 @@ public class MessageBuilder {
     }
     
     /**
-     * Appends a user (@user).
+     * Appends an user (@user).
      * 
-     * @param user The user so append.
+     * @param user The user to append.
      * @return This object to reuse it.
      */
     public MessageBuilder appendMention(User user) {

@@ -1,5 +1,8 @@
 package de.btobastian.javacord;
 
+import java.awt.image.BufferedImage;
+import java.net.URL;
+
 import de.btobastian.javacord.message.MessageReceiver;
 
 /**
@@ -38,6 +41,20 @@ public interface User extends MessageReceiver {
      * 
      * @return The jpg-avatar of the user. The array is empty if the user has no avatar.
      */
-    public byte[] getAvatar();
+    public byte[] getAvatarAsBytearray();
+    
+    /**
+     * Gets the avatar of the user.
+     * 
+     * @return The jpg-avatar of the user. <code>Null</code> if the user has no avatar.
+     */
+    public BufferedImage getAvatar();
+    
+    /**
+     * Gets the url of the users avatar.
+     * 
+     * @return The url of the users avatar. <code>Null</code> if the user has no avatar.
+     */
+    public URL getAvatarUrl();
 
 }
