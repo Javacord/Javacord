@@ -110,7 +110,9 @@ public interface Message {
     
     /**
      * Marks the message as read.
+     * <b>Will be removed in the next version</b>
      */
+    @Deprecated
     public void acknowledge();
     
 }

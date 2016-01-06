@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -197,6 +198,25 @@ class ImplUser implements User {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.message.MessageReceiver#sendFile(java.io.File)
+     */
+    @Override
+    public Message sendFile(File file) {
+        try {
+            MultipartUtility multipart = new MultipartUtility(
+                    "https://discordapp.com/api/channels/" + userChannelId + "/messages", "UTF-8", api);
+            multipart.addFilePart("file", file);
+            return new ImplMessage(new JSONObject(multipart.finish().get(0)), api, this);
+        } catch (IOException e) {
+            if (api.debug()) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
     
     protected void setUserChannelId(String channelId) {

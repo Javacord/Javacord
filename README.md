@@ -11,7 +11,7 @@ A simple library to create a discord bot.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
 </dependency>
 ```
 
@@ -151,6 +151,5 @@ role.updatePermissions(permissionsBuilder.build())
 
 #Comming soon
 
-- File Upload
 - Voice Support
 - Tons of new Listeners

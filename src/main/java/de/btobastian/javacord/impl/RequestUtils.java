@@ -44,7 +44,6 @@ class RequestUtils {
     protected String request(String urlToRead, String jsonParam, boolean sendToken, String method, String... properties) throws IOException {
         return request(urlToRead, jsonParam, sendToken, method, true, properties);
     }
-        
     
     protected String request(String urlToRead, String jsonParam, boolean sendToken, String method, boolean expectAnswer, String... properties) throws IOException {
         URL url = new URL(urlToRead);

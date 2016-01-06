@@ -1,5 +1,6 @@
 package de.btobastian.javacord.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -247,6 +248,24 @@ class ImplChannel implements Channel {
     @Override
     public boolean updateTopic(String topic) {
         return update(name, position, topic);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.btobastian.javacord.message.MessageReceiver#sendFile(java.io.File)
+     */
+    @Override
+    public Message sendFile(File file) {
+        try {
+            MultipartUtility multipart = new MultipartUtility("https://discordapp.com/api/channels/" + id + "/messages", "UTF-8", server.getApi());
+            multipart.addFilePart("file", file);
+            return new ImplMessage(new JSONObject(multipart.finish().get(0)), server.getApi(), this);
+        } catch (IOException e) {
+            if (server.getApi().debug()) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
     
     protected void setOverriddenPermissions(User user, Permissions permissions) {

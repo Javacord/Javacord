@@ -12,6 +12,7 @@ import de.btobastian.javacord.Channel;
 import de.btobastian.javacord.Server;
 import de.btobastian.javacord.User;
 import de.btobastian.javacord.message.Message;
+import de.btobastian.javacord.message.MessageAttachment;
 import de.btobastian.javacord.message.MessageReceiver;
 
 class ImplMessage implements Message {
@@ -25,6 +26,8 @@ class ImplMessage implements Message {
     private String content;
     private User author;
     private MessageReceiver receiver;
+    
+    private final List<MessageAttachment> attachments = new ArrayList<>();
     
     private String channelId;
     
@@ -40,6 +43,19 @@ class ImplMessage implements Message {
         content = message.getString("content");
         author = api.getUserById(message.getJSONObject("author").getString("id"));
         this.receiver = receiver;
+        
+        try {
+            JSONArray attachments = message.getJSONArray("attachments");
+            for (int i = 0; i < attachments.length(); i++) {
+                JSONObject attachment = attachments.getJSONObject(i);
+                String url = attachment.getString("url");
+                String proxyUrl = attachment.getString("proxy_url");
+                int size = attachment.getInt("size");
+                String id = attachment.getString("id");
+                String name = attachment.getString("filename");
+                this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
+            }
+        } catch (JSONException e) { }
         
         JSONArray mentionsArray = message.getJSONArray("mentions");
         for (int i = 0; i < mentionsArray.length(); i++) {
