@@ -2,10 +2,8 @@ package de.btobastian.javacord.impl;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -120,20 +118,9 @@ class ImplDiscordAPI implements DiscordAPI {
                 SSLContext sslContext = null;
                 sslContext = SSLContext.getInstance( "TLS" );
                 sslContext.init(null, null, null);
-                
                 socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(sslContext));
                 socket.connect();
-    
-                BufferedReader reader = new BufferedReader( new InputStreamReader( System.in ) );
-                while ( true ) {
-                    String line = reader.readLine();
-                    if( line.equals( "close" ) ) {
-                        socket.close();
-                    } else {
-                        socket.send( line );
-                    }
-                }
-            } catch (KeyManagementException | NoSuchAlgorithmException | IOException e) {
+            } catch (KeyManagementException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
         } catch (URISyntaxException e) {
