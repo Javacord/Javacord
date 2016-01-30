@@ -28,7 +28,6 @@ class DiscordWebsocket extends WebSocketClient {
         this.api = api;
         this.listener = listener;
         packetManager = new PacketManager(api);
-        this.connect();
     }
     
     public boolean isReady() {

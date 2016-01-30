@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.1.5</version>
+  <version>1.1.6</version>
   <name>Javacord</name>
   <description>A simple to use API to create a discord bot</description>
   

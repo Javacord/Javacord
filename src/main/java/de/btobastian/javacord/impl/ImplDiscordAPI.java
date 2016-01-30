@@ -2,11 +2,15 @@ package de.btobastian.javacord.impl;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,7 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.SSLContext;
 
+import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.java_websocket.util.Base64;
 import org.json.JSONObject;
 
@@ -110,6 +116,26 @@ class ImplDiscordAPI implements DiscordAPI {
         
         try {
             socket = new DiscordWebsocket(new URI(gateway), this, listener);
+            try {
+                SSLContext sslContext = null;
+                sslContext = SSLContext.getInstance( "TLS" );
+                sslContext.init(null, null, null);
+                
+                socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(sslContext));
+                socket.connect();
+    
+                BufferedReader reader = new BufferedReader( new InputStreamReader( System.in ) );
+                while ( true ) {
+                    String line = reader.readLine();
+                    if( line.equals( "close" ) ) {
+                        socket.close();
+                    } else {
+                        socket.send( line );
+                    }
+                }
+            } catch (KeyManagementException | NoSuchAlgorithmException | IOException e) {
+                e.printStackTrace();
+            }
         } catch (URISyntaxException e) {
             e.printStackTrace();
             listener.onFail();
@@ -419,7 +445,7 @@ class ImplDiscordAPI implements DiscordAPI {
             e.printStackTrace();
             return null;
         }
-        return new JSONObject(result).getString("url").replace("wss", "ws");
+        return new JSONObject(result).getString("url");
     }
 
 }
