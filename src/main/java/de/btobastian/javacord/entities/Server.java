@@ -16,30 +16,35 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.listener;
+package de.btobastian.javacord.entities;
+
+import java.util.concurrent.Future;
 
 /**
- * This listener informs you whether your connection failed or succeeded.
- *
- * You must use it if you want to connection non-blocking.
+ * This interface represents a discord server (also known as guild).
  */
-public interface ReadyListener extends Listener {
+public interface Server {
 
     /**
-     * Called when the connection is ready.
+     * Gets the name of the server.
      *
-     * Discord sends a packet telling us the connection is ready for use.
-     * This method is called when the packed was received.
+     * @return The name of the server.
      */
-    public void onReady();
+    public String getName();
 
     /**
-     * Called when the connection failed.
+     * Gets the unique id of the server.
      *
-     * This could have several reasons, e.g. a wrong password.
-     *
-     * @param exception The error which caused the connection to fail.
+     * @return The unique id of the server.
      */
-    public void onFail(Exception exception);
+    public String getId();
+
+    /**
+     * Deletes the server.
+     *
+     * @return A future which tells us if the deletion was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> delete();
 
 }

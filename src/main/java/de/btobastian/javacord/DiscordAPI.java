@@ -18,7 +18,7 @@
  */
 package de.btobastian.javacord;
 
-import de.btobastian.javacord.listener.ReadyListener;
+import com.google.common.util.concurrent.FutureCallback;
 
 /**
  * This is the most important class of the api.
@@ -33,9 +33,10 @@ public interface DiscordAPI {
      *
      * This method is non-blocking.
      *
-     * @param readyListener The listener which informs you whether the connection succeeded or failed.
+     * @param callback The callback will inform you when the connection is ready.
+     *                 The connection is ready as soon as the ready packet was received.
      */
-    public void connect(ReadyListener readyListener);
+    public void connect(FutureCallback<DiscordAPI> callback);
 
     /**
      * Connects to the account with the given email and password.

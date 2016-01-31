@@ -31,7 +31,7 @@ import java.util.concurrent.*;
 /**
  * The websocket which is used to connect to discord.
  */
-public class ImplDiscordWebsocket extends WebSocketClient {
+public class DiscordWebsocket extends WebSocketClient {
 
     private CompletableFuture<Boolean> ready = null;
     private ImplDiscordAPI api = null;
@@ -43,7 +43,7 @@ public class ImplDiscordWebsocket extends WebSocketClient {
      * @param serverURI The uri of the gateway the socket should connect to.
      * @param api The api.
      */
-    public ImplDiscordWebsocket(URI serverURI, ImplDiscordAPI api) {
+    public DiscordWebsocket(URI serverURI, ImplDiscordAPI api) {
         super(serverURI);
         this.api = api;
         ready = new CompletableFuture<>();

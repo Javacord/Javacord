@@ -18,12 +18,13 @@
  */
 package de.btobastian.javacord;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import de.btobastian.javacord.listener.ReadyListener;
-import de.btobastian.javacord.utils.ImplDiscordWebsocket;
+import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.json.JSONObject;
@@ -33,6 +34,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -47,7 +49,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String token = null;
     private String game = "";
 
-    private ImplDiscordWebsocket socket = null;
+    private DiscordWebsocket socket = null;
 
     /**
      * Creates a new instance of this class.
@@ -59,19 +61,15 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void connect(final ReadyListener readyListener) {
-        pool.getExecutorService().submit(new Runnable() {
+    public void connect(FutureCallback<DiscordAPI> callback) {
+        final DiscordAPI api = this;
+        Futures.addCallback(pool.getListeningExecutorService().submit(new Callable<DiscordAPI>() {
             @Override
-            public void run() {
-                try {
-                    connectBlocking();
-                } catch (Exception e) {
-                    readyListener.onFail(e);
-                    return;
-                }
-                readyListener.onReady();
+            public DiscordAPI call() throws Exception {
+                connectBlocking();
+                return api;
             }
-        });
+        }), callback);
     }
 
     @Override
@@ -79,7 +77,7 @@ public class ImplDiscordAPI implements DiscordAPI {
         token = requestTokenBlocking();
         String gateway = requestGatewayBlocking();
         try {
-            socket = new ImplDiscordWebsocket(new URI(gateway), this);
+            socket = new DiscordWebsocket(new URI(gateway), this);
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, null, null); // using defaults
             socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(sslContext));
@@ -140,7 +138,7 @@ public class ImplDiscordAPI implements DiscordAPI {
      *
      * @return The websocket.
      */
-    public ImplDiscordWebsocket getSocket() {
+    public DiscordWebsocket getSocket() {
         return socket;
     }
 
