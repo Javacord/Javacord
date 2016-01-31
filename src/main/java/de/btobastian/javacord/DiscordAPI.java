@@ -1,184 +1,76 @@
+/*
+ * Copyright (C) 2016 Bastian Oppermann
+ * 
+ * This file is part of Javacord.
+ * 
+ * Javacord is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser general Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ * 
+ * Javacord is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
+ */
 package de.btobastian.javacord;
 
-import java.awt.image.BufferedImage;
-import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.ReadyListener;
-import de.btobastian.javacord.message.Message;
-import de.btobastian.javacord.permissions.PermissionState;
-import de.btobastian.javacord.permissions.Permissions;
-import de.btobastian.javacord.permissions.PermissionsBuilder;
 
 /**
- * The discord api.
+ * This is the most important class of the api.
+ *
+ * Every instance represents an account.
+ * If you want to connect to more than one discord account you have to use more instances.
  */
 public interface DiscordAPI {
 
     /**
-     * Sets the email address to login.
-     * 
-     * @param email The email.
+     * Connects to the account with the given email and password.
+     *
+     * This method is non-blocking.
+     *
+     * @param readyListener The listener which informs you whether the connection succeeded or failed.
+     */
+    public void connect(ReadyListener readyListener);
+
+    /**
+     * Connects to the account with the given email and password.
+     *
+     * This method is blocking! It's recommended to use the non-blocking version which
+     * uses a thread from the internal used thread pool to connect.
+     */
+    public void connectBlocking();
+
+    /**
+     * Sets the email address which should be used to connect to the account.
+     *
+     * @param email The email address to set.
      */
     public void setEmail(String email);
-    
+
     /**
-     * Sets the password.
-     * 
-     * @param password The password.
+     * Sets the password which should be used to connect to the account.
+     *
+     * @param password The password to set.
      */
     public void setPassword(String password);
-    
+
     /**
-     * Gets the email used to connect.
-     * 
-     * @return The email.
-     */
-    public String getEmail();
-    
-    /**
-     * Gets the password used to connect.
-     * 
-     * @return The password.
-     */
-    public String getPassword();
-    
-    /**
-     * Attempts to login.
-     * 
-     * @param listener The listener informs you whether the connection was successful or not.
-     */
-    public void connect(ReadyListener listener);
-    
-    /**
-     * Checks if the connection if ready.
-     * 
-     * @return Whether the connection if ready or not.
-     */
-    public boolean isReady();
-    
-    /**
-     * Sets the encoding (default: UTF-8).
-     * 
-     * @param encoding The encoding to set.
-     * @throws UnsupportedEncodingException if it's an unknown encoding.
-     */
-    public void setEncoding(String encoding) throws UnsupportedEncodingException;
-    
-    /**
-     * Gets the used encoding.
-     * 
-     * @return The used encoding.
-     */
-    public String getEncoding();
-    
-    /**
-     * Sets the current game.
-     * This may have a short delay.
-     * 
+     * Sets the game shown in the user list.
+     *
      * @param game The game to set.
      */
     public void setGame(String game);
-    
+
     /**
-     * Gets the current game.
-     * 
-     * @return The current game.
+     * Gets the game shown in the user list.
+     *
+     * @return The game.
      */
     public String getGame();
-    
-    /**
-     * Gets an user by it's id.
-     * 
-     * @param id The is of the user.
-     * @return The user with the given id. <code>Null</code> if no user with the given id is known.
-     */
-    public User getUserById(String id);
-    
-    /**
-     * Gets a message by its id.
-     * 
-     * @param messageId The id of the message.
-     * @return The message. May be <code>null</code>, even if a message with the given id exists!
-     */
-    public Message getMessageById(String messageId);
-    
-    /**
-     * Gets a collection with all known users.
-     * 
-     * @return A collection with all known users.
-     */
-    public Collection<User> getUsers();
-    
-    /**
-     * Gets a collection with all known servers.
-     * 
-     * @return A collection with all known servers.
-     */
-    public Collection<Server> getServers();
-    
-    /**
-     * Registers a listener.
-     * 
-     * @param listener The listener to register.
-     */
-    public void registerListener(Listener listener);
-    
-    /**
-     * Accepts an invite.
-     * 
-     * @param inviteCode The invite code.
-     * @return Whether you were able to join or not.
-     */
-    public boolean acceptInvite(String inviteCode);
-    
-    /**
-     * Gets the user object of yourself.
-     * Sending yourself messages and doing other strange stuff can cause some errors, so don't do it.
-     * 
-     * @return Yourself.
-     */
-    public User getYourself();
-    
-    /**
-     * Gets a server by its id.
-     * 
-     * @param id The id of the server.
-     * @return The server with the given id.
-     */
-    public Server getServerById(String id);
-    
-    /**
-     * Gets a new permissions builder with every type set to {@link PermissionState#NONE}
-     * 
-     * @return A new permissions builder.
-     */
-    public PermissionsBuilder getPermissionsBuilder();
-    
-    /**
-     * Gets a new permissions builder.
-     * 
-     * @param The permissions which should be copied.
-     * @return A new permissions builder.
-     */
-    public PermissionsBuilder getPermissionsBuilder(Permissions permissions);
-    
-    /**
-     * Creates a new server.
-     * 
-     * @param name The name of the server.
-     * @return The created server.
-     */
-    public Server createServer(String name);
-    
-    /**
-     * Creates a new server.
-     * 
-     * @param name The name of the server.
-     * @param icon The icon. Can by null. Must be 128*128px.
-     * @return The created server.
-     */
-    public Server createServer(String name, BufferedImage icon);
-    
+
 }

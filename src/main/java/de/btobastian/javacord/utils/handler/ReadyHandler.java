@@ -16,30 +16,30 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.listener;
+package de.btobastian.javacord.utils.handler;
+
+import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.utils.PacketHandler;
+import org.json.JSONObject;
 
 /**
- * This listener informs you whether your connection failed or succeeded.
- *
- * You must use it if you want to connection non-blocking.
+ * This class handles the ready packet.
  */
-public interface ReadyListener extends Listener {
+public class ReadyHandler extends PacketHandler {
 
     /**
-     * Called when the connection is ready.
+     * Creates a new instance of this class.
      *
-     * Discord sends a packet telling us the connection is ready for use.
-     * This method is called when the packed was received.
+     * @param api The api.
      */
-    public void onReady();
+    public ReadyHandler(ImplDiscordAPI api) {
+        super(api, "READY");
+    }
 
-    /**
-     * Called when the connection failed.
-     *
-     * This could have several reasons, e.g. a wrong password.
-     *
-     * @param exception The error which caused the connection to fail.
-     */
-    public void onFail(Exception exception);
+    @Override
+    public void handlePacket(JSONObject packet) {
+        long heartbeatInterval = packet.getLong("heartbeat_interval");
+        api.getSocket().startHeartbeat(heartbeatInterval);
+    }
 
 }
