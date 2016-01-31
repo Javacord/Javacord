@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities;
 
+import java.util.Collection;
 import java.util.concurrent.Future;
 
 /**
@@ -46,5 +47,21 @@ public interface Server {
      *         If the exception is <code>null</code> the deletion was successful.
      */
     public Future<Exception> deleteOrLeave();
+
+    /**
+     * Gets a channel by its id.
+     *
+     * @param id The id of the channel.
+     * @return The channel with the given id.
+     *         <code>Null</code> if the server has no channel with the given id.
+     */
+    public Channel getChannelById(String id);
+
+    /**
+     * Gets a list with all channels of the server.
+     *
+     * @return A list with all channels of the server.
+     */
+    public Collection<Channel> getChannels();
 
 }

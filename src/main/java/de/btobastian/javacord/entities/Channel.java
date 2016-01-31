@@ -28,18 +28,18 @@ import java.util.concurrent.Future;
 public interface Channel {
 
     /**
-     * Gets the name of the channel.
-     *
-     * @return The name of the channel.
-     */
-    public String getName();
-
-    /**
      * Gets the id of the channel.
      *
      * @return The id of the channel.
      */
     public String getId();
+
+    /**
+     * Gets the name of the channel.
+     *
+     * @return The name of the channel.
+     */
+    public String getName();
 
     /**
      * Gets the topic of the channel.

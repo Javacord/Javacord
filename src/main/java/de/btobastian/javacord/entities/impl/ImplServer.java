@@ -23,12 +23,15 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -37,6 +40,8 @@ import java.util.concurrent.Future;
 public class ImplServer implements Server {
 
     private ImplDiscordAPI api;
+
+    private ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
 
     private String id;
     private String name;
@@ -55,7 +60,8 @@ public class ImplServer implements Server {
 
         JSONArray channels = data.getJSONArray("channels");
         for (int i = 0; i < channels.length(); i++) {
-
+            Channel channel = new ImplChannel(channels.getJSONObject(i), this, api);
+            this.channels.put(channel.getId(), channel);
         }
 
         api.getServerMap().put(id, this);
@@ -96,4 +102,20 @@ public class ImplServer implements Server {
         });
         return future;
     }
+
+    @Override
+    public Channel getChannelById(String id) {
+        return channels.get(id);
+    }
+
+    @Override
+    public Collection<Channel> getChannels() {
+        return channels.values();
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
 }
