@@ -19,13 +19,14 @@
 package de.btobastian.javacord.entities;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.message.MessageReceiver;
 
 import java.util.concurrent.Future;
 
 /**
  * This interface represents a channel.
  */
-public interface Channel {
+public interface Channel extends MessageReceiver {
 
     /**
      * Gets the id of the channel.

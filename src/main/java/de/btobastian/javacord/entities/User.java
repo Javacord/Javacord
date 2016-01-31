@@ -19,6 +19,7 @@
 package de.btobastian.javacord.entities;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.message.MessageReceiver;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -27,7 +28,7 @@ import java.util.concurrent.Future;
 /**
  * This interface represents an user.
  */
-public interface User {
+public interface User extends MessageReceiver {
 
     /**
      * Gets the id of the user.

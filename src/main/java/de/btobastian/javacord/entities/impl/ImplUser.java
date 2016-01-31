@@ -20,11 +20,17 @@ package de.btobastian.javacord.entities.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.sun.deploy.util.ArrayUtil;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.exceptions.PermissionsException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
@@ -60,9 +66,9 @@ public class ImplUser implements User {
 
         id = data.getString("id");
         name = data.getString("username");
-        if (data.has("avatar")) {
+        try {
             avatarId = data.getString("avatar");
-        }
+        } catch (JSONException e) { }
 
         api.getUserMap().put(id, this);
     }
@@ -185,6 +191,57 @@ public class ImplUser implements User {
         }
     }
 
+    @Override
+    public Future<Message> sendMessage(String content) {
+        return sendMessage(content, false);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts) {
+        final CompletableFuture<Message> future = new CompletableFuture<>();
+        sendMessage(content, tts, new FutureCallback<Message>() {
+            @Override
+            public void onSuccess(Message message) {
+                future.complete(message);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                future.complete(null);
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public void sendMessage(String content, FutureCallback<Message> callback) {
+        sendMessage(content, false, callback);
+    }
+
+    @Override
+    public void sendMessage(final String content, final boolean tts, FutureCallback<Message> callback) {
+        final MessageReceiver receiver = this;
+        Futures.addCallback(api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+            @Override
+            public Message call() throws Exception {
+                HttpResponse<JsonNode> response =
+                        Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("content", content)
+                                .field("tts", tts)
+                                .field("mentions", new String[0])
+                                .asJson();
+                if (response.getStatus() == 403) {
+                    throw new PermissionsException("Missing permissions!");
+                }
+                if (response.getStatus() != 200) {
+                    throw new Exception("Received http status code " + response.getStatus());
+                }
+                return new ImplMessage(response.getBody().getObject(), api, receiver);
+            }
+        }), callback);
+    }
+
     /**
      * Sets the channel id of the user.
      *
@@ -192,6 +249,15 @@ public class ImplUser implements User {
      */
     public void setUserChannelId(String userChannelId) {
         this.userChannelId = userChannelId;
+    }
+
+    /**
+     * Gets the channel id of the user.
+     *
+     * @return The channel id of the user.
+     */
+    public String getUserChannelId() {
+        return userChannelId;
     }
 
 }

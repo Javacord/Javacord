@@ -71,7 +71,7 @@ public class ImplServer implements Server {
             members = data.getJSONArray("members");
         }
         for (int i = 0; i < members.length(); i++) {
-            User member = api.getOrCreateUser(members.getJSONObject(i));
+            User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
             this.members.put(member.getId(), member);
         }
 
