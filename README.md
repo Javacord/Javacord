@@ -11,12 +11,12 @@ A simple library to create a discord bot.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.1.6</version>
+  <version>1.1.7</version>
 </dependency>
 ```
 
 #My bot doesn't work anymore! Help me!
-On Feb 1, 2016 Discord will no longer support Non-SSL Websocket Connections. Make sure your bot uses version 1.1.6 or newer!
+On Feb 1, 2016 Discord will no longer support Non-SSL Websocket Connections. Make sure your bot uses version 1.1.7 or newer!
 
 #Download
 For those of you how don't use maven: http://ci.ketrwu.de/job/Javacord/lastSuccessfulBuild/
