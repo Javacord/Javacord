@@ -19,7 +19,9 @@
 package de.btobastian.javacord.utils.handler;
 
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,6 +49,17 @@ public class ReadyHandler extends PacketHandler {
         for (int i = 0; i < guilds.length(); i++) {
             JSONObject guild = guilds.getJSONObject(i);
             new ImplServer(guild, api);
+        }
+
+        JSONArray privateChannels = packet.getJSONArray("private_channels");
+        for (int i = 0; i < privateChannels.length(); i++) {
+            JSONObject privateChannel = privateChannels.getJSONObject(i);
+            String id = privateChannel.getString("id");
+            String userId = privateChannel.getJSONObject("recipient").getString("id");
+            User user = api.getUserById(userId);
+            if (user != null) {
+                ((ImplUser) user).setUserChannelId(id);
+            }
         }
     }
 

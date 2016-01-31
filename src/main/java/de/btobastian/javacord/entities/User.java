@@ -30,18 +30,18 @@ import java.util.concurrent.Future;
 public interface User {
 
     /**
-     * Gets the name of the user.
-     *
-     * @return The name of the user.
-     */
-    public String getName();
-
-    /**
      * Gets the id of the user.
      *
      * @return The id of the user.
      */
     public String getId();
+
+    /**
+     * Gets the name of the user.
+     *
+     * @return The name of the user.
+     */
+    public String getName();
 
     /**
      * Shows the "is typing.." status for 5 seconds.
@@ -60,7 +60,7 @@ public interface User {
      *
      * @return The jpg-avatar of the user. The array is empty if the user has no avatar.
      */
-    public Future<Byte[]> getAvatarAsBytearray();
+    public Future<byte[]> getAvatarAsBytearray();
 
     /**
      * Gets the avatar of the user as byte array.
@@ -68,7 +68,7 @@ public interface User {
      * @param callback The callback which will be informed when the avatar was downloaded.
      *                 The array is the jpg-avatar of the user. The array is empty if the user has no avatar.
      */
-    public void getAvatarAsBytearray(FutureCallback<Byte[]> callback);
+    public void getAvatarAsBytearray(FutureCallback<byte[]> callback);
 
     /**
      * Gets the avatar of the user.

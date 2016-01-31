@@ -25,7 +25,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
@@ -57,6 +59,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     private DiscordWebsocket socket = null;
 
     private ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -132,6 +135,31 @@ public class ImplDiscordAPI implements DiscordAPI {
         return servers.values();
     }
 
+    @Override
+    public User getUserById(String id) {
+        return users.get(id);
+    }
+
+    @Override
+    public Collection<User> getUsers() {
+        return users.values();
+    }
+
+    /**
+     * Gets or creates a user based on the given data.
+     *
+     * @param data The JSONObject containing the data.
+     * @return The user.
+     */
+    public User getOrCreateUser(JSONObject data) {
+        String id = data.getString("id");
+        User user = getUserById(id);
+        if (user == null) {
+            user = new ImplUser(data, this);
+        }
+        return user;
+    }
+
     /**
      * Gets the map which contains all known servers.
      *
@@ -140,6 +168,16 @@ public class ImplDiscordAPI implements DiscordAPI {
     public ConcurrentHashMap<String, Server> getServerMap() {
         return servers;
     }
+
+    /**
+     * Gets the map which contains all known users.
+     *
+     * @return The map which contains all known users.
+     */
+    public ConcurrentHashMap<String, User> getUserMap() {
+        return users;
+    }
+
 
     /**
      * Gets the token. May be null if not connected.

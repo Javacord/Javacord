@@ -25,6 +25,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,6 +43,7 @@ public class ImplServer implements Server {
     private ImplDiscordAPI api;
 
     private ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
 
     private String id;
     private String name;
@@ -62,6 +64,15 @@ public class ImplServer implements Server {
         for (int i = 0; i < channels.length(); i++) {
             Channel channel = new ImplChannel(channels.getJSONObject(i), this, api);
             this.channels.put(channel.getId(), channel);
+        }
+
+        JSONArray members = new JSONArray();
+        if (data.has("members")) {
+            members = data.getJSONArray("members");
+        }
+        for (int i = 0; i < members.length(); i++) {
+            User member = api.getOrCreateUser(members.getJSONObject(i));
+            this.members.put(member.getId(), member);
         }
 
         api.getServerMap().put(id, this);
