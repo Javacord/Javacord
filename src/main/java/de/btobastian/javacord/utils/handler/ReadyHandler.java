@@ -19,7 +19,9 @@
 package de.btobastian.javacord.utils.handler;
 
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.utils.PacketHandler;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -40,6 +42,12 @@ public class ReadyHandler extends PacketHandler {
     public void handlePacket(JSONObject packet) {
         long heartbeatInterval = packet.getLong("heartbeat_interval");
         api.getSocket().startHeartbeat(heartbeatInterval);
+
+        JSONArray guilds = packet.getJSONArray("guilds"); // guild = server
+        for (int i = 0; i < guilds.length(); i++) {
+            JSONObject guild = guilds.getJSONObject(i);
+            new ImplServer(guild, api);
+        }
     }
 
 }

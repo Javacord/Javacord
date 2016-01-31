@@ -19,6 +19,9 @@
 package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.Server;
+
+import java.util.Collection;
 
 /**
  * This is the most important class of the api.
@@ -73,5 +76,20 @@ public interface DiscordAPI {
      * @return The game.
      */
     public String getGame();
+
+    /**
+     * Gets a server by its id.
+     *
+     * @param id The id of the server.
+     * @return The server with the given id. <code>Null</code> if no server with the id was found.
+     */
+    public Server getServerById(String id);
+
+    /**
+     * Gets a collection with all servers.
+     *
+     * @return A collection with all known servers.
+     */
+    public Collection<Server> getServers();
 
 }

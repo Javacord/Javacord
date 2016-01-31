@@ -114,11 +114,9 @@ public class DiscordWebsocket extends WebSocketClient {
         api.getThreadPool().getExecutorService().submit(new Runnable() {
             @Override
             public void run() {
-                System.out.println("My heart start to beat!");
                 long timer = System.currentTimeMillis();
                 for (;;) {
                     if ((System.currentTimeMillis() - timer) >= heartbeatInterval - 10) {
-                        System.out.println("It's still beating!");
                         Object nullObject = null;
                         JSONObject heartbeat = new JSONObject()
                                 .put("op", 3)

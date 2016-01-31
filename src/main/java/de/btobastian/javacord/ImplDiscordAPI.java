@@ -24,6 +24,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
@@ -34,7 +36,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -50,6 +55,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String game = "";
 
     private DiscordWebsocket socket = null;
+
+    private ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -113,6 +120,25 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public String getGame() {
         return game;
+    }
+
+    @Override
+    public Server getServerById(String id) {
+        return servers.get(id);
+    }
+
+    @Override
+    public Collection<Server> getServers() {
+        return servers.values();
+    }
+
+    /**
+     * Gets the map which contains all known servers.
+     *
+     * @return The map which contains all known servers.
+     */
+    public ConcurrentHashMap<String, Server> getServerMap() {
+        return servers;
     }
 
     /**

@@ -16,35 +16,20 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.entities;
-
-import java.util.concurrent.Future;
+package de.btobastian.javacord.exceptions;
 
 /**
- * This interface represents a discord server (also known as guild).
+ * This exception is always thrown if the user hasn't enough permissions to do something.
  */
-public interface Server {
+public class PermissionsException extends Exception {
 
     /**
-     * Gets the unique id of the server.
+     * Creates a new instance of this class.
      *
-     * @return The unique id of the server.
+     * @param message The message of the exception.
      */
-    public String getId();
-
-    /**
-     * Gets the name of the server.
-     *
-     * @return The name of the server.
-     */
-    public String getName();
-
-    /**
-     * Deletes or leaves the server.
-     *
-     * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
-     */
-    public Future<Exception> deleteOrLeave();
+    public PermissionsException(String message) {
+        super(message);
+    }
 
 }
