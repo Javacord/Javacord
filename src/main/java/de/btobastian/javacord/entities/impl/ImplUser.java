@@ -227,15 +227,18 @@ public class ImplUser implements User {
                 HttpResponse<JsonNode> response =
                         Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
-                                .field("content", content)
-                                .field("tts", tts)
-                                .field("mentions", new String[0])
+                                .header("content-type", "application/json")
+                                .body(new JSONObject()
+                                        .put("content", content)
+                                        .put("tts", tts)
+                                        .put("mentions", new String[0]).toString())
                                 .asJson();
                 if (response.getStatus() == 403) {
                     throw new PermissionsException("Missing permissions!");
                 }
-                if (response.getStatus() != 200) {
-                    throw new Exception("Received http status code " + response.getStatus());
+                if (response.getStatus() > 199 && response.getStatus() < 300) {
+                    throw new Exception("Received http status code " + response.getStatus()
+                            + " with message " + response.getStatusText());
                 }
                 return new ImplMessage(response.getBody().getObject(), api, receiver);
             }

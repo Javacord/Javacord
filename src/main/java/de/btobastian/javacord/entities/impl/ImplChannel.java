@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.Futures;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.InviteBuilder;
@@ -102,7 +103,13 @@ public class ImplChannel implements Channel {
 
     @Override
     public void type() {
-
+        try {
+            Unirest.post("https://discordapp.com/api/channels/" + id + "/typing")
+                    .header("authorization", api.getToken())
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -146,15 +153,18 @@ public class ImplChannel implements Channel {
                 HttpResponse<JsonNode> response =
                         Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
-                                .field("content", content)
-                                .field("tts", tts)
-                                .field("mentions", new String[0])
+                                .header("content-type", "application/json")
+                                .body(new JSONObject()
+                                    .put("content", content)
+                                    .put("tts", tts)
+                                    .put("mentions", new String[0]).toString())
                                 .asJson();
                 if (response.getStatus() == 403) {
                     throw new PermissionsException("Missing permissions!");
                 }
-                if (response.getStatus() != 200) {
-                    throw new Exception("Received http status code " + response.getStatus());
+                if (response.getStatus() > 199 && response.getStatus() < 300) {
+                    throw new Exception("Received http status code " + response.getStatus()
+                            + " with message " + response.getStatusText());
                 }
                 return new ImplMessage(response.getBody().getObject(), api, receiver);
             }

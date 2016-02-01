@@ -18,9 +18,7 @@
  */
 package de.btobastian.javacord;
 
-import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.utils.ThreadPool;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
  * This class is used to get a new api instance.
@@ -40,7 +38,6 @@ public class Javacord {
      * @see #getApi(String, String)
      */
     public static DiscordAPI getApi() {
-        Unirest.setHttpClient(HttpClientBuilder.create().setUserAgent("Javacord").build());
         if (pool == null) {
             pool = new ThreadPool();
         }

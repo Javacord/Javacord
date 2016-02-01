@@ -21,7 +21,6 @@ package de.btobastian.javacord.entities.impl;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
@@ -31,7 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
@@ -90,28 +89,27 @@ public class ImplServer implements Server {
 
     @Override
     public Future<Exception> deleteOrLeave() {
-        final CompletableFuture<Exception> future = new CompletableFuture<>();
-        api.getThreadPool().getExecutorService().submit(new Runnable() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
-            public void run() {
+            public Exception call() throws Exception {
                 try {
                     HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     if (response.getStatus() == 403) {
-                        future.complete(new PermissionsException("Missing permissions!"));
+                        throw new PermissionsException("Missing permissions!");
                     }
-                    if (response.getStatus() != 200) {
-                        future.complete(new Exception("Received http status code " + response.getStatus()));
+                    if (response.getStatus() > 199 && response.getStatus() < 300) {
+                        throw new Exception("Received http status code " + response.getStatus()
+                                + " with message " + response.getStatusText());
                     }
                     api.getServerMap().remove(id);
-                    future.complete(null);
-                } catch (UnirestException e) {
-                    future.complete(e);
+                    return null;
+                } catch (Exception e) {
+                    return e;
                 }
             }
         });
-        return future;
     }
 
     @Override

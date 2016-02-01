@@ -18,6 +18,9 @@
  */
 package de.btobastian.javacord.entities.message.impl;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
@@ -25,11 +28,13 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
@@ -145,6 +150,26 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Exception> delete() {
-        return null;
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest.delete
+                            ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    if (response.getStatus() == 403) {
+                        throw new PermissionsException("Missing permissions!");
+                    }
+                    if (response.getStatus() > 199 && response.getStatus() < 300) {
+                        throw new Exception("Received http status code " + response.getStatus()
+                                + " with message " + response.getStatusText());
+                    }
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        });
     }
 }

@@ -26,7 +26,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -36,10 +35,8 @@ import org.json.JSONObject;
 import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -88,11 +85,9 @@ public class ImplDiscordAPI implements DiscordAPI {
         String gateway = requestGatewayBlocking();
         try {
             socket = new DiscordWebsocket(new URI(gateway), this);
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, null, null); // using defaults
-            socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(sslContext));
+            socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
             socket.connect();
-        } catch (URISyntaxException | KeyManagementException | NoSuchAlgorithmException e) {
+        } catch (URISyntaxException | NoSuchAlgorithmException e) {
             e.printStackTrace();
             return;
         }
@@ -218,6 +213,10 @@ public class ImplDiscordAPI implements DiscordAPI {
                     .field("password", password)
                     .asJson();
             JSONObject jsonResponse = response.getBody().getObject();
+            if (response.getStatus() > 199 && response.getStatus() < 300) {
+                throw new IllegalStateException("Received http status code " + response.getStatus()
+                        + " with message " + response.getStatusText());
+            }
             if (jsonResponse.has("password") || jsonResponse.has("email")) {
                 throw new IllegalArgumentException("Wrong email or password!");
             }
@@ -240,6 +239,10 @@ public class ImplDiscordAPI implements DiscordAPI {
                     .asJson();
             if (response.getStatus() == 401) {
                 throw new IllegalStateException("Cannot request gateway! Invalid token?");
+            }
+            if (response.getStatus() > 199 && response.getStatus() < 300) {
+                throw new IllegalStateException("Received http status code " + response.getStatus()
+                        + " with message " + response.getStatusText());
             }
             return response.getBody().getObject().getString("url");
         } catch (UnirestException e) {
