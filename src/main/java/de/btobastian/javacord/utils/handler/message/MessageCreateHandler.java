@@ -16,47 +16,39 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.utils.handler;
+package de.btobastian.javacord.utils.handler.message;
 
 import de.btobastian.javacord.ImplDiscordAPI;
-import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.message.TypingStartListener;
+import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
-import java.util.Iterator;
-
 /**
- * Handles the typing start packet.
+ * Handles the message create packet.
  */
-public class TypingStartHandler extends PacketHandler {
+public class MessageCreateHandler extends PacketHandler {
 
     /**
      * Creates a new instance of this class.
      *
      * @param api The api.
      */
-    public TypingStartHandler(ImplDiscordAPI api) {
-        super(api, true, "TYPING_START");
+    public MessageCreateHandler(ImplDiscordAPI api) {
+        super(api, true, "MESSAGE_CREATE");
     }
 
     @Override
     public void handle(final JSONObject packet) {
-        Channel channel = null;
-        String channelId = packet.getString("channel_id");
-        Iterator<Server> serverIterator = api.getServers().iterator();
-        while (serverIterator.hasNext()) {
-            channel = serverIterator.next().getChannelById(channelId);
-            if (channel != null) {
-                break;
-            }
+        String messageId = packet.getString("id");
+        Message message = api.getMessageById(messageId);
+        if (message == null) {
+            message = new ImplMessage(packet, api, null);
         }
-
-        String userId = packet.getString("user_id");
-        for (Listener listener : api.getListeners(TypingStartListener.class)) {
-            ((TypingStartListener) listener).onTypingStart(api, api.getUserById(userId), channel);
+        for (Listener listener : api.getListeners(MessageCreateListener.class)) {
+            ((MessageCreateListener) listener).onMessageCreate(api, message);
         }
     }
 

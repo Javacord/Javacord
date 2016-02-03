@@ -16,28 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.utils.handler;
+package de.btobastian.javacord.utils.handler.message;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
+import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
 /**
- * Handles the message create packet.
+ * Handles the message update packet.
  */
-public class MessageCreateHandler extends PacketHandler {
+public class MessageUpdateHandler extends PacketHandler {
 
     /**
      * Creates a new instance of this class.
      *
      * @param api The api.
      */
-    public MessageCreateHandler(ImplDiscordAPI api) {
-        super(api, true, "MESSAGE_CREATE");
+    public MessageUpdateHandler(ImplDiscordAPI api) {
+        super(api, true, "MESSAGE_UPDATE");
     }
 
     @Override
@@ -45,10 +46,13 @@ public class MessageCreateHandler extends PacketHandler {
         String messageId = packet.getString("id");
         Message message = api.getMessageById(messageId);
         if (message == null) {
-            message = new ImplMessage(packet, api, null);
+            return;
         }
-        for (Listener listener : api.getListeners(MessageCreateListener.class)) {
-            ((MessageCreateListener) listener).onMessageCreate(api, message);
+        String oldContent = message.getContent();
+        ((ImplMessage) message).setContent(packet.getString("content"));
+
+        for (Listener listener : api.getListeners(MessageEditListener.class)) {
+            ((MessageEditListener) listener).onMessageEdit(api, message, oldContent);
         }
     }
 
