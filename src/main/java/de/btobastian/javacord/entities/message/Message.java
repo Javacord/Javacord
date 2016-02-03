@@ -21,6 +21,7 @@ package de.btobastian.javacord.entities.message;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -102,5 +103,12 @@ public interface Message {
      *         If the exception is <code>null</code> the deletion was successful.
      */
     public Future<Exception> delete();
+
+    /**
+     * Gets the attachments of a message.
+     *
+     * @return The attachments of the message.
+     */
+    public ArrayList<MessageAttachment> getAttachments();
 
 }

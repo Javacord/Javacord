@@ -27,11 +27,13 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class ImplMessage implements Message {
     private final List<User> mentions = new ArrayList<>();
     private final MessageReceiver receiver;
     private final String channelId;
+    private final List<MessageAttachment> attachments = new ArrayList<>();
 
     /**
      * Creates a new instance of this class.
@@ -69,6 +72,19 @@ public class ImplMessage implements Message {
         }
         tts = data.getBoolean("tts");
         author = api.getUserById(data.getJSONObject("author").getString("id"));
+
+        try {
+            JSONArray attachments = data.getJSONArray("attachments");
+            for (int i = 0; i < attachments.length(); i++) {
+                JSONObject attachment = attachments.getJSONObject(i);
+                String url = attachment.getString("url");
+                String proxyUrl = attachment.getString("proxy_url");
+                int size = attachment.getInt("size");
+                String id = attachment.getString("id");
+                String name = attachment.getString("filename");
+                this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
+            }
+        } catch (JSONException e) { }
 
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
@@ -175,6 +191,11 @@ public class ImplMessage implements Message {
                 }
             }
         });
+    }
+
+    @Override
+    public ArrayList<MessageAttachment> getAttachments() {
+        return new ArrayList<>(attachments);
     }
 
     /**
