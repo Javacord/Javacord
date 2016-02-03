@@ -21,6 +21,7 @@ package de.btobastian.javacord.utils;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.utils.handler.MessageCreateHandler;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
+import de.btobastian.javacord.utils.handler.TypingStartHandler;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -51,6 +52,7 @@ public class DiscordWebsocket extends WebSocketClient {
 
         addHandler(new ReadyHandler(api));
         addHandler(new MessageCreateHandler(api));
+        addHandler(new TypingStartHandler(api));
     }
 
     @Override
