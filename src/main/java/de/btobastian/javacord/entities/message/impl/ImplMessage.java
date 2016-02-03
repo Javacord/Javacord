@@ -162,6 +162,15 @@ public class ImplMessage implements Message {
     }
 
     /**
+     * Updates the content of the message.
+     *
+     * @param content The new content of the message.
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
      * Tries to find the message receiver based on its channel id.
      *
      * @param channelId The channel id of the receiver.
