@@ -44,7 +44,7 @@ public class MessageUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(final JSONObject packet) {
+    public void handle(JSONObject packet) {
         String messageId = packet.getString("id");
         Message message = api.getMessageById(messageId);
         if (message == null) {

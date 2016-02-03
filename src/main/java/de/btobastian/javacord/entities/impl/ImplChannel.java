@@ -212,6 +212,24 @@ public class ImplChannel implements Channel {
         }), callback);
     }
 
+    /**
+     * Sets the name of the channel (no update!).
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Sets the topic of the channel (no update!).
+     *
+     * @param topic The topic to set.
+     */
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
     @Override
     public int hashCode() {
         return getId().hashCode();

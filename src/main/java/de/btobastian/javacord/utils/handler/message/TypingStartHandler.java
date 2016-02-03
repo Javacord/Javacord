@@ -44,7 +44,7 @@ public class TypingStartHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(final JSONObject packet) {
+    public void handle(JSONObject packet) {
         Channel channel = null;
         String channelId = packet.getString("channel_id");
         Iterator<Server> serverIterator = api.getServers().iterator();
