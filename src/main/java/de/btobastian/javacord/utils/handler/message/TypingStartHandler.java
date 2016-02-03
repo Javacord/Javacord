@@ -27,6 +27,7 @@ import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Handles the typing start packet.
@@ -55,8 +56,11 @@ public class TypingStartHandler extends PacketHandler {
         }
 
         String userId = packet.getString("user_id");
-        for (Listener listener : api.getListeners(TypingStartListener.class)) {
-            ((TypingStartListener) listener).onTypingStart(api, api.getUserById(userId), channel);
+        List<Listener> listeners =  api.getListeners(TypingStartListener.class);
+        synchronized (listeners) {
+            for (Listener listener : listeners) {
+                ((TypingStartListener) listener).onTypingStart(api, api.getUserById(userId), channel);
+            }
         }
     }
 

@@ -26,6 +26,8 @@ import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
+import java.util.List;
+
 /**
  * Handles the message create packet.
  */
@@ -47,8 +49,11 @@ public class MessageCreateHandler extends PacketHandler {
         if (message == null) {
             message = new ImplMessage(packet, api, null);
         }
-        for (Listener listener : api.getListeners(MessageCreateListener.class)) {
-            ((MessageCreateListener) listener).onMessageCreate(api, message);
+        List<Listener> listeners =  api.getListeners(MessageCreateListener.class);
+        synchronized (listeners) {
+            for (Listener listener : listeners) {
+                ((MessageCreateListener) listener).onMessageCreate(api, message);
+            }
         }
     }
 

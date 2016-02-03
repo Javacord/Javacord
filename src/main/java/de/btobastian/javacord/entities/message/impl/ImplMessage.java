@@ -29,6 +29,8 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.exceptions.PermissionsException;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -138,6 +140,7 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Exception> delete() {
+        final Message message = this;
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
@@ -153,6 +156,19 @@ public class ImplMessage implements Message {
                         throw new Exception("Received http status code " + response.getStatus()
                                 + " with message " + response.getStatusText());
                     }
+                    api.removeMessage(message);
+                    // call listener
+                    api.getThreadPool().getExecutorService().submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((MessageDeleteListener) listener).onMessageDelete(api, message);
+                                }
+                            }
+                        }
+                    });
                     return null;
                 } catch (Exception e) {
                     return e;

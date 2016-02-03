@@ -20,27 +20,25 @@ package de.btobastian.javacord.utils.handler.message;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.message.MessageCreateListener;
-import de.btobastian.javacord.listener.message.MessageEditListener;
+import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
 import java.util.List;
 
 /**
- * Handles the message update packet.
+ * Handles the message delete packet.
  */
-public class MessageUpdateHandler extends PacketHandler {
+public class MessageDeleteHandler extends PacketHandler {
 
     /**
      * Creates a new instance of this class.
      *
      * @param api The api.
      */
-    public MessageUpdateHandler(ImplDiscordAPI api) {
-        super(api, true, "MESSAGE_UPDATE");
+    public MessageDeleteHandler(ImplDiscordAPI api) {
+        super(api, true, "MESSAGE_DELETE");
     }
 
     @Override
@@ -48,15 +46,12 @@ public class MessageUpdateHandler extends PacketHandler {
         String messageId = packet.getString("id");
         Message message = api.getMessageById(messageId);
         if (message == null) {
-            return;
+            return; // no cached version available
         }
-        String oldContent = message.getContent();
-        ((ImplMessage) message).setContent(packet.getString("content"));
-
-        List<Listener> listeners =  api.getListeners(MessageEditListener.class);
+        List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);
         synchronized (listeners) {
             for (Listener listener : listeners) {
-                ((MessageEditListener) listener).onMessageEdit(api, message, oldContent);
+                ((MessageDeleteListener) listener).onMessageDelete(api, message);
             }
         }
     }

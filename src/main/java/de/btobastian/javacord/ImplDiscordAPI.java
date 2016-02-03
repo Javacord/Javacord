@@ -157,7 +157,9 @@ public class ImplDiscordAPI implements DiscordAPI {
                     listenersList = new ArrayList<>();
                     listeners.put(implementedInterface, listenersList);
                 }
-                listenersList.add(listener);
+                synchronized (listenersList) {
+                    listenersList.add(listener);
+                }
             }
         }
     }
@@ -287,6 +289,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     /**
      * Gets a list with all registers listeners of the given class.
+     *
      * @param listenerClass The type of the listener.
      * @return A list with all registers listeners of the given class.
      */
@@ -297,6 +300,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     /**
      * Adds a message to the message cache.
+     *
      * @param message The message to add.
      */
     public void addMessage(Message message) {
@@ -305,6 +309,17 @@ public class ImplDiscordAPI implements DiscordAPI {
                 messages.remove(0);
             }
             messages.add(message);
+        }
+    }
+
+    /**
+     * Removes a message from the cache.
+     *
+     * @param message The message to remove.
+     */
+    public void removeMessage(Message message) {
+        synchronized (messages) {
+            messages.remove(message);
         }
     }
 
