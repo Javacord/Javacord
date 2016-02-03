@@ -27,6 +27,8 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
@@ -36,7 +38,9 @@ import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -57,6 +61,10 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
+
+    private final ArrayList<Message> messages = new ArrayList<>();
+
+    private final ConcurrentHashMap<Class<?>, List<Listener>> listeners = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -138,6 +146,32 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public Collection<User> getUsers() {
         return users.values();
+    }
+
+    @Override
+    public void registerListener(Listener listener) {
+        for (Class<?> implementedInterface : listener.getClass().getInterfaces()) {
+            if (Listener.class.isAssignableFrom(implementedInterface)) {
+                List<Listener> listenersList = listeners.get(implementedInterface);
+                if (listenersList == null) {
+                    listenersList = new ArrayList<>();
+                    listeners.put(implementedInterface, listenersList);
+                }
+                listenersList.add(listener);
+            }
+        }
+    }
+
+    @Override
+    public Message getMessageById(String id) {
+        synchronized (messages) {
+            for (Message message : messages) {
+                if (message.getId().equals(id)) {
+                    return message;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -248,6 +282,29 @@ public class ImplDiscordAPI implements DiscordAPI {
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Gets a list with all registers listeners of the given class.
+     * @param listenerClass The type of the listener.
+     * @return A list with all registers listeners of the given class.
+     */
+    public List<Listener> getListeners(Class<?> listenerClass) {
+        List<Listener> listenersList = listeners.get(listenerClass);
+        return listenersList == null ? new ArrayList<Listener>() : listenersList;
+    }
+
+    /**
+     * Adds a message to the message cache.
+     * @param message The message to add.
+     */
+    public void addMessage(Message message) {
+        synchronized (messages) {
+            if (messages.size() > 200) { // only cache the last 200 messages
+                messages.remove(0);
+            }
+            messages.add(message);
         }
     }
 

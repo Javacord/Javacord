@@ -28,6 +28,7 @@ public abstract class PacketHandler {
 
     protected final ImplDiscordAPI api;
     private final String type;
+    private boolean async;
 
     /**
      * Creates a new instance of this class.
@@ -35,8 +36,9 @@ public abstract class PacketHandler {
      * @param api The api.
      * @param type The type of packet the class handles.
      */
-    public PacketHandler(ImplDiscordAPI api, String type) {
+    public PacketHandler(ImplDiscordAPI api, boolean async, String type) {
         this.api = api;
+        this.async = async;
         this.type = type;
     }
 
@@ -45,7 +47,25 @@ public abstract class PacketHandler {
      *
      * @param packet The packet (the "d"-object).
      */
-    public abstract void handlePacket(JSONObject packet);
+    public void handlePacket(final JSONObject packet) {
+        if (async) {
+            api.getThreadPool().getExecutorService().submit(new Runnable() {
+                @Override
+                public void run() {
+                    handle(packet);
+                }
+            });
+        } else {
+            handle(packet);
+        }
+    }
+
+    /**
+     * This method is called by the super class to handle the packet.
+     *
+     * @param packet The packet (the "d"-object).
+     */
+    protected abstract void handle(JSONObject packet);
 
     /**
      * Gets the type of packet the handler handles.

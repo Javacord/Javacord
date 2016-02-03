@@ -37,11 +37,11 @@ public class ReadyHandler extends PacketHandler {
      * @param api The api.
      */
     public ReadyHandler(ImplDiscordAPI api) {
-        super(api, "READY");
+        super(api, false, "READY");
     }
 
     @Override
-    public void handlePacket(JSONObject packet) {
+    public void handle(JSONObject packet) {
         long heartbeatInterval = packet.getLong("heartbeat_interval");
         api.getSocket().startHeartbeat(heartbeatInterval);
 

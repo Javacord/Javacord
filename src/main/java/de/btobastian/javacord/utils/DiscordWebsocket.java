@@ -19,6 +19,7 @@
 package de.btobastian.javacord.utils;
 
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.utils.handler.MessageCreateHandler;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -48,7 +49,8 @@ public class DiscordWebsocket extends WebSocketClient {
         this.api = api;
         ready = new CompletableFuture<>();
 
-        handlers.put("READY", new ReadyHandler(api));
+        addHandler(new ReadyHandler(api));
+        addHandler(new MessageCreateHandler(api));
     }
 
     @Override
@@ -135,6 +137,15 @@ public class DiscordWebsocket extends WebSocketClient {
                 }
             }
         });
+    }
+
+    /**
+     * Adds a packet handler.
+     *
+     * @param handler The handler to add.
+     */
+    private void addHandler(PacketHandler handler) {
+        handlers.put(handler.getType(), handler);
     }
 
 }

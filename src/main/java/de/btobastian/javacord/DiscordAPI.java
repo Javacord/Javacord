@@ -21,6 +21,8 @@ package de.btobastian.javacord;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.listener.Listener;
 
 import java.util.Collection;
 
@@ -107,5 +109,21 @@ public interface DiscordAPI {
      * @return A collection with all known users.
      */
     public Collection<User> getUsers();
+
+    /**
+     * Registers a listener.
+     *
+     * @param listener The listener to register.
+     */
+    public void registerListener(Listener listener);
+
+    /**
+     * Gets a message by its id.
+     * This method may return <ocde>null</ocde> even if the message exists!
+     *
+     * @param id The id of the message.
+     * @return The message with the given id or <code>null</code> no message was found.
+     */
+    public Message getMessageById(String id);
 
 }

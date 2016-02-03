@@ -81,6 +81,8 @@ public class ImplMessage implements Message {
         } else {
             this.receiver = receiver;
         }
+
+        api.addMessage(this);
     }
 
     @Override
