@@ -48,9 +48,9 @@ import java.util.concurrent.Future;
  */
 public class ImplUser implements User {
 
-    private ImplDiscordAPI api;
+    private final ImplDiscordAPI api;
 
-    private String id;
+    private final String id;
     private String name;
     private String avatarId = null;
     private String userChannelId = null;
@@ -89,10 +89,10 @@ public class ImplUser implements User {
             return;
         }
         try {
-            Unirest.post("https://discordapp.com/api/channels/" + userChannelId + "/typing")
+            Unirest.post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/typing")
                     .header("authorization", api.getToken())
                     .asJson();
-        } catch (UnirestException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -225,7 +225,7 @@ public class ImplUser implements User {
             @Override
             public Message call() throws Exception {
                 HttpResponse<JsonNode> response =
-                        Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
+                        Unirest.post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
                                 .header("authorization", api.getToken())
                                 .header("content-type", "application/json")
                                 .body(new JSONObject()
@@ -236,7 +236,47 @@ public class ImplUser implements User {
                 if (response.getStatus() == 403) {
                     throw new PermissionsException("Missing permissions!");
                 }
-                if (response.getStatus() > 199 && response.getStatus() < 300) {
+                if (response.getStatus() < 200 || response.getStatus() > 299) {
+                    throw new Exception("Received http status code " + response.getStatus()
+                            + " with message " + response.getStatusText());
+                }
+                return new ImplMessage(response.getBody().getObject(), api, receiver);
+            }
+        }), callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(final File file) {
+        final CompletableFuture<Message> future = new CompletableFuture<>();
+        sendFile(file, new FutureCallback<Message>() {
+            @Override
+            public void onSuccess(Message message) {
+                future.complete(message);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                future.complete(null);
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public void sendFile(final File file, FutureCallback<Message> callback) {
+        final MessageReceiver receiver = this;
+        Futures.addCallback(api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+            @Override
+            public Message call() throws Exception {
+                HttpResponse<JsonNode> response =
+                        Unirest.post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", file)
+                                .asJson();
+                if (response.getStatus() == 403) {
+                    throw new PermissionsException("Missing permissions!");
+                }
+                if (response.getStatus() < 200 || response.getStatus() > 299) {
                     throw new Exception("Received http status code " + response.getStatus()
                             + " with message " + response.getStatusText());
                 }
@@ -256,11 +296,39 @@ public class ImplUser implements User {
 
     /**
      * Gets the channel id of the user.
+     * Requests it if there was no communication before.
+     *
+     * @return The channel id of the user.
+     * @throws Exception If can not request channel id.
+     */
+    public String getUserChannelIdBlocking() throws Exception {
+        synchronized (userChannelId) {
+            if (userChannelId != null) {
+                return userChannelId;
+            }
+            HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/users/" + id + "/channels")
+                    .header("authorization", api.getToken())
+                    .body(new JSONObject().put("recipient_id", id))
+                    .asJson();
+            if (response.getStatus() < 200 || response.getStatus() > 299) {
+                throw new Exception("Received http status code " + response.getStatus()
+                        + " with message " + response.getStatusText());
+            }
+            userChannelId = response.getBody().getObject().getString("id");
+            return userChannelId;
+        }
+    }
+
+    /**
+     * Gets the channel id of the user.
+     * Will be null if there was no communication before.
      *
      * @return The channel id of the user.
      */
     public String getUserChannelId() {
-        return userChannelId;
+        synchronized (userChannelId) {
+            return userChannelId;
+        }
     }
 
 }

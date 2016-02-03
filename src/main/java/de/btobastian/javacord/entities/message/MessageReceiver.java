@@ -20,6 +20,7 @@ package de.btobastian.javacord.entities.message;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.io.File;
 import java.util.concurrent.Future;
 
 /**
@@ -62,5 +63,21 @@ public interface MessageReceiver {
      * @param callback The callback which will be informed when the message was sent or sending failed.
      */
     public void sendMessage(String content, boolean tts, FutureCallback<Message> callback);
+
+    /**
+     * Uploads a file.
+     *
+     * @param file The file to upload.
+     * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendFile(File file);
+
+    /**
+     * Uploads a file.
+     *
+     * @param file The file to upload.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     */
+    public void sendFile(File file, FutureCallback<Message> callback);
 
 }

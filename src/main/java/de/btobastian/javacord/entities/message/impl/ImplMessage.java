@@ -42,15 +42,15 @@ import java.util.concurrent.Future;
  */
 public class ImplMessage implements Message {
 
-    private ImplDiscordAPI api;
+    private final ImplDiscordAPI api;
 
-    private String id;
+    private final String id;
     private String content = null;
-    private boolean tts;
-    private User author;
+    private final boolean tts;
+    private final User author;
     private final List<User> mentions = new ArrayList<>();
-    private MessageReceiver receiver;
-    private String channelId;
+    private final MessageReceiver receiver;
+    private final String channelId;
 
     /**
      * Creates a new instance of this class.
@@ -60,7 +60,6 @@ public class ImplMessage implements Message {
      */
     public ImplMessage(JSONObject data, ImplDiscordAPI api, MessageReceiver receiver) {
         this.api = api;
-        this.receiver = receiver;
 
         id = data.getString("id");
         if (data.has("content")) {
@@ -78,22 +77,9 @@ public class ImplMessage implements Message {
 
         channelId = data.getString("channel_id");
         if (receiver == null) {
-            outer: for (Server server : api.getServers()) {
-                for (Channel c : server.getChannels()) {
-                    if (c.getId().equals(channelId)) {
-                        this.receiver = c;
-                        break outer;
-                    }
-                }
-            }
-            for (User user : api.getUsers()) {
-                if (channelId.equals(((ImplUser) user).getUserChannelId())) {
-                    if (user != author) {
-                        this.receiver = user;
-                        break;
-                    }
-                }
-            }
+            this.receiver = findReceiver(channelId);
+        } else {
+            this.receiver = receiver;
         }
     }
 
@@ -161,7 +147,7 @@ public class ImplMessage implements Message {
                     if (response.getStatus() == 403) {
                         throw new PermissionsException("Missing permissions!");
                     }
-                    if (response.getStatus() > 199 && response.getStatus() < 300) {
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
                         throw new Exception("Received http status code " + response.getStatus()
                                 + " with message " + response.getStatusText());
                     }
@@ -171,5 +157,29 @@ public class ImplMessage implements Message {
                 }
             }
         });
+    }
+
+    /**
+     * Tries to find the message receiver based on its channel id.
+     *
+     * @param channelId The channel id of the receiver.
+     * @return The receiver with the given id.
+     */
+    private MessageReceiver findReceiver(String channelId) {
+        for (Server server : api.getServers()) {
+            for (Channel c : server.getChannels()) {
+                if (c.getId().equals(channelId)) {
+                    return c;
+                }
+            }
+        }
+        for (User user : api.getUsers()) {
+            if (channelId.equals(((ImplUser) user).getUserChannelId())) {
+                if (user != author) {
+                    return user;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -27,11 +27,11 @@ import java.net.URL;
  */
 public class ImplMessageAttachment implements MessageAttachment {
 
-    private String url = null;
-    private String proxyUrl = null;
-    private int size = -1;
-    private String id = null;
-    private String name = null;
+    private final String url;
+    private final String proxyUrl;
+    private final int size;
+    private final String id;
+    private final String name;
 
     /**
      * Creates a new instance of this class.

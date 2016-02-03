@@ -35,6 +35,7 @@ import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -44,13 +45,13 @@ import java.util.concurrent.Future;
  */
 public class ImplChannel implements Channel {
 
-    private ImplDiscordAPI api;
+    private final ImplDiscordAPI api;
 
-    private String id;
+    private final String id;
     private String name;
     private String topic = null;
     private int position;
-    private ImplServer server;
+    private final ImplServer server;
 
     /**
      * Creates a new instance of this class.
@@ -162,7 +163,47 @@ public class ImplChannel implements Channel {
                 if (response.getStatus() == 403) {
                     throw new PermissionsException("Missing permissions!");
                 }
-                if (response.getStatus() > 199 && response.getStatus() < 300) {
+                if (response.getStatus() < 200 || response.getStatus() > 299) {
+                    throw new Exception("Received http status code " + response.getStatus()
+                            + " with message " + response.getStatusText());
+                }
+                return new ImplMessage(response.getBody().getObject(), api, receiver);
+            }
+        }), callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(final File file) {
+        final CompletableFuture<Message> future = new CompletableFuture<>();
+        sendFile(file, new FutureCallback<Message>() {
+            @Override
+            public void onSuccess(Message message) {
+                future.complete(message);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                future.complete(null);
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public void sendFile(final File file, FutureCallback<Message> callback) {
+        final MessageReceiver receiver = this;
+        Futures.addCallback(api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+            @Override
+            public Message call() throws Exception {
+                HttpResponse<JsonNode> response =
+                        Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", file)
+                                .asJson();
+                if (response.getStatus() == 403) {
+                    throw new PermissionsException("Missing permissions!");
+                }
+                if (response.getStatus() < 200 || response.getStatus() > 299) {
                     throw new Exception("Received http status code " + response.getStatus()
                             + " with message " + response.getStatusText());
                 }

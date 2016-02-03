@@ -55,8 +55,8 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private DiscordWebsocket socket = null;
 
-    private ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -213,7 +213,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     .field("password", password)
                     .asJson();
             JSONObject jsonResponse = response.getBody().getObject();
-            if (response.getStatus() > 199 && response.getStatus() < 300) {
+            if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
                         + " with message " + response.getStatusText());
             }
@@ -240,7 +240,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             if (response.getStatus() == 401) {
                 throw new IllegalStateException("Cannot request gateway! Invalid token?");
             }
-            if (response.getStatus() > 199 && response.getStatus() < 300) {
+            if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
                         + " with message " + response.getStatusText());
             }

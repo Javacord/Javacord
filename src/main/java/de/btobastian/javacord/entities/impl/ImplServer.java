@@ -39,12 +39,12 @@ import java.util.concurrent.Future;
  */
 public class ImplServer implements Server {
 
-    private ImplDiscordAPI api;
+    private final ImplDiscordAPI api;
 
-    private ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
 
-    private String id;
+    private final String id;
     private String name;
 
     /**
@@ -99,7 +99,7 @@ public class ImplServer implements Server {
                     if (response.getStatus() == 403) {
                         throw new PermissionsException("Missing permissions!");
                     }
-                    if (response.getStatus() > 199 && response.getStatus() < 300) {
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
                         throw new Exception("Received http status code " + response.getStatus()
                                 + " with message " + response.getStatusText());
                     }
