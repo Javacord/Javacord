@@ -131,6 +131,15 @@ public class ImplServer implements Server {
         members.put(user.getId(), user);
     }
 
+    /**
+     * Removes a user from the server.
+     *
+     * @param user The user to remove.
+     */
+    public void removeMember(User user) {
+        members.remove(user.getId());
+    }
+
     @Override
     public int hashCode() {
         return getId().hashCode();
