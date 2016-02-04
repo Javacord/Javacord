@@ -58,10 +58,42 @@ public interface Server {
     public Channel getChannelById(String id);
 
     /**
-     * Gets a list with all channels of the server.
+     * Gets a collection with all channels of the server.
      *
-     * @return A list with all channels of the server.
+     * @return A collection with all channels of the server.
      */
     public Collection<Channel> getChannels();
+
+    /**
+     * Gets a User by its id.
+     *
+     * @param id The id of the user.
+     * @return The user with the given id.
+     *         <code>Null</code> if the user is no member of this server.
+     */
+    public User getMemberById(String id);
+
+    /**
+     * Gets a collection with all members on this server.
+     *
+     * @return A collection with all members on this server.
+     */
+    public Collection<User> getMembers();
+
+    /**
+     * Checks if an user is a member of this server.
+     *
+     * @param user The user to check.
+     * @return Whether the user is a member or not.
+     */
+    public boolean isMember(User user);
+
+    /**
+     * Checks if an user is a member of this server.
+     *
+     * @param userId The id of the user to check.
+     * @return Whether the user is a member or not.
+     */
+    public boolean isMember(String userId);
 
 }

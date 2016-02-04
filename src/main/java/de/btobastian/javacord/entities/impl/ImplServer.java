@@ -122,6 +122,26 @@ public class ImplServer implements Server {
         return channels.values();
     }
 
+    @Override
+    public User getMemberById(String id) {
+        return members.get(id);
+    }
+
+    @Override
+    public Collection<User> getMembers() {
+        return members.values();
+    }
+
+    @Override
+    public boolean isMember(User user) {
+        return isMember(user.getId());
+    }
+
+    @Override
+    public boolean isMember(String userId) {
+        return members.containsKey(userId);
+    }
+
     /**
      * Adds a user to the server.
      *
