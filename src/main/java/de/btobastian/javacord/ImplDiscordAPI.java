@@ -55,7 +55,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String email =  null;
     private String password = null;
     private String token = null;
-    private String game = "";
+    private String game = null;
+    private boolean idle = false;
 
     private DiscordWebsocket socket = null;
 
@@ -121,6 +122,13 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public void setGame(String game) {
         this.game = game;
+        try {
+            if (socket != null && socket.isReady().isDone() && socket.isReady().get()) {
+                socket.updateStatus();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -179,6 +187,23 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public ThreadPool getThreadPool() {
         return pool;
+    }
+
+    @Override
+    public void setIdle(boolean idle) {
+        this.idle = idle;
+        try {
+            if (socket != null && socket.isReady().isDone() && socket.isReady().get()) {
+                socket.updateStatus();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isIdle() {
+        return idle;
     }
 
     /**

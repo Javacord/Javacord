@@ -59,6 +59,7 @@ public class DiscordWebsocket extends WebSocketClient {
 
     @Override
     public void onClose(int i, String s, boolean b) {
+        System.out.println("Websocket closed with reason " + s + " and code " + i);
         if (!ready.isDone()) {
             ready.complete(false);
         }
@@ -81,7 +82,7 @@ public class DiscordWebsocket extends WebSocketClient {
         }
         if (type.equals("READY")) {
             ready.complete(true);
-            return;
+            updateStatus();
         }
     }
 
@@ -125,11 +126,8 @@ public class DiscordWebsocket extends WebSocketClient {
                     if ((System.currentTimeMillis() - timer) >= heartbeatInterval - 10) {
                         Object nullObject = null;
                         JSONObject heartbeat = new JSONObject()
-                                .put("op", 3)
-                                .put("d", new JSONObject()
-                                    .put("game", new JSONObject()
-                                        .put("name", api.getGame() == null ? "" : api.getGame()))
-                                    .put("idle_since", nullObject));
+                                .put("op", 1)
+                                .put("d", System.currentTimeMillis());
                         send(heartbeat.toString());
                         timer = System.currentTimeMillis();
                     }
@@ -141,6 +139,16 @@ public class DiscordWebsocket extends WebSocketClient {
                 }
             }
         });
+    }
+
+    public void updateStatus() {
+        JSONObject updateStatus = new JSONObject()
+                .put("op", 3)
+                .put("d", new JSONObject()
+                        .put("game", new JSONObject()
+                                .put("name", api.getGame() == null ? JSONObject.NULL : api.getGame()))
+                        .put("idle_since", api.isIdle() ? 1 : JSONObject.NULL));
+        send(updateStatus.toString());
     }
 
     /**

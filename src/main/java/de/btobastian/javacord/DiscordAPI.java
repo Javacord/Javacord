@@ -138,4 +138,18 @@ public interface DiscordAPI {
      */
     public ThreadPool getThreadPool();
 
+    /**
+     * Sets the idle state of the bot.
+     *
+     * @param idle Whether the bot is idle or not.
+     */
+    public void setIdle(boolean idle);
+
+    /**
+     * Checks if the bot is idle.
+     *
+     * @return Whether the bot is idle or not.
+     */
+    public boolean isIdle();
+
 }
