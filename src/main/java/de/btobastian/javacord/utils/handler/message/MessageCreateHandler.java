@@ -43,7 +43,7 @@ public class MessageCreateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
+    public boolean handle(JSONObject packet) {
         String messageId = packet.getString("id");
         Message message = api.getMessageById(messageId);
         if (message == null) {
@@ -55,6 +55,7 @@ public class MessageCreateHandler extends PacketHandler {
                 ((MessageCreateListener) listener).onMessageCreate(api, message);
             }
         }
+        return false;
     }
 
 }

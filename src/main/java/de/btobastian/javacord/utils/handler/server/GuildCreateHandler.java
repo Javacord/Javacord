@@ -21,10 +21,7 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -46,7 +43,7 @@ public class GuildCreateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
+    public boolean handle(JSONObject packet) {
         Server server = new ImplServer(packet, api);
         List<Listener> listeners =  api.getListeners(ServerJoinListener.class);
         synchronized (listeners) {
@@ -54,6 +51,7 @@ public class GuildCreateHandler extends PacketHandler {
                 ((ServerJoinListener) listener).onServerJoin(api, server);
             }
         }
+        return false;
     }
 
 }

@@ -42,11 +42,11 @@ public class MessageDeleteHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
+    public boolean handle(JSONObject packet) {
         String messageId = packet.getString("id");
         Message message = api.getMessageById(messageId);
         if (message == null) {
-            return; // no cached version available
+            return true; // no cached version available
         }
         List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);
         synchronized (listeners) {
@@ -54,6 +54,7 @@ public class MessageDeleteHandler extends PacketHandler {
                 ((MessageDeleteListener) listener).onMessageDelete(api, message);
             }
         }
+        return false;
     }
 
 }
