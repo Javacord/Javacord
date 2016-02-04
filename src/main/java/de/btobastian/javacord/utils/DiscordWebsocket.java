@@ -130,6 +130,12 @@ public class DiscordWebsocket extends WebSocketClient {
                                 .put("d", System.currentTimeMillis());
                         send(heartbeat.toString());
                         timer = System.currentTimeMillis();
+                        if (Math.random() > 0.1) {
+                            // some random status updates to ensure the game and idle status is updated correctly
+                            // (discord only accept 5 of these packets per minute and ignores more
+                            //  so some might get lost).
+                            updateStatus();
+                        }
                     }
                     try {
                         Thread.sleep(10);
@@ -141,6 +147,9 @@ public class DiscordWebsocket extends WebSocketClient {
         });
     }
 
+    /**
+     * Sens the update status packet
+     */
     public void updateStatus() {
         JSONObject updateStatus = new JSONObject()
                 .put("op", 3)
