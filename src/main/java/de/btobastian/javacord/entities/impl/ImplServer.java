@@ -122,6 +122,15 @@ public class ImplServer implements Server {
         return channels.values();
     }
 
+    /**
+     * Adds a user to the server.
+     *
+     * @param user The user to add.
+     */
+    public void addMember(User user) {
+        members.put(user.getId(), user);
+    }
+
     @Override
     public int hashCode() {
         return getId().hashCode();
