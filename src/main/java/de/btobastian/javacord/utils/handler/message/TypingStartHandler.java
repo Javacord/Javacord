@@ -44,7 +44,7 @@ public class TypingStartHandler extends PacketHandler {
     }
 
     @Override
-    public boolean handle(JSONObject packet) {
+    public void handle(JSONObject packet) {
         Channel channel = null;
         String channelId = packet.getString("channel_id");
         Iterator<Server> serverIterator = api.getServers().iterator();
@@ -62,7 +62,6 @@ public class TypingStartHandler extends PacketHandler {
                 ((TypingStartListener) listener).onTypingStart(api, api.getUserById(userId), channel);
             }
         }
-        return false;
     }
 
 }

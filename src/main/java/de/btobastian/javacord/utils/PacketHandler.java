@@ -21,6 +21,8 @@ package de.btobastian.javacord.utils;
 import de.btobastian.javacord.ImplDiscordAPI;
 import org.json.JSONObject;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  * This class is extended by all PacketHandlers.
  */
@@ -29,6 +31,7 @@ public abstract class PacketHandler {
     protected final ImplDiscordAPI api;
     private final String type;
     private boolean async;
+    private ExecutorService executorService;
 
     /**
      * Creates a new instance of this class.
@@ -41,6 +44,9 @@ public abstract class PacketHandler {
         this.api = api;
         this.async = async;
         this.type = type;
+        if (async) {
+            executorService = api.getThreadPool().getSingleThreadExecutorService("handlers");
+        }
     }
 
     /**
@@ -50,21 +56,10 @@ public abstract class PacketHandler {
      */
     public void handlePacket(final JSONObject packet) {
         if (async) {
-            api.getThreadPool().getExecutorService().submit(new Runnable() {
+            executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    if (handle(packet)) { // retry
-                        try {
-                            // Wait two secs. This should be more than enough to receive and handle a create packet
-                            Thread.sleep(2000);
-                        } catch (InterruptedException ignored) { }
-                        api.getThreadPool().getExecutorService().submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                handle(packet);
-                            }
-                        });
-                    }
+                    handle(packet);
                 }
             });
         } else {
@@ -76,11 +71,8 @@ public abstract class PacketHandler {
      * This method is called by the super class to handle the packet.
      *
      * @param packet The packet (the "d"-object).
-     * @return Whether it should try again after a short delay or not.
-     *         Sometimes an update packet is handled before a create packet and cannot be handled the wright way.
-     *         A retry after a short delay will ensure that no create packet was missed.
      */
-    protected abstract boolean handle(JSONObject packet);
+    protected abstract void handle(JSONObject packet);
 
     /**
      * Gets the type of packet the handler handles.

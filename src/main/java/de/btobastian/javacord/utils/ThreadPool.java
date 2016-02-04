@@ -21,10 +21,7 @@ package de.btobastian.javacord.utils;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * This class creates and contains a new thread pool which is used by this plugin.
@@ -38,6 +35,7 @@ public class ThreadPool {
 
     private ExecutorService executorService = null;
     private ListeningExecutorService listeningExecutorService = null;
+    private ConcurrentHashMap<String, ExecutorService> executorServiceSingeThreads = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -55,6 +53,23 @@ public class ThreadPool {
      */
     public ExecutorService getExecutorService() {
         return executorService;
+    }
+
+    /**
+     * Gets an executor service which only uses a single thread.
+     *
+     * @param id The id of the executor service. Will create a new one if the id is used the first time.
+     * @return The executor service with the given id. Never <code>null</code>!
+     */
+    public ExecutorService getSingleThreadExecutorService(String id) {
+        synchronized (executorServiceSingeThreads) {
+            ExecutorService service = executorServiceSingeThreads.get(id);
+            if (service == null) {
+                service = Executors.newSingleThreadExecutor();
+                executorServiceSingeThreads.put(id, service);
+            }
+            return service;
+        }
     }
 
     /**
