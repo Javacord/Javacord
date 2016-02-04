@@ -34,6 +34,7 @@ public abstract class PacketHandler {
      * Creates a new instance of this class.
      *
      * @param api The api.
+     * @param async Whether the packet should be handled in a new thread or in the websocket thread.
      * @param type The type of packet the class handles.
      */
     public PacketHandler(ImplDiscordAPI api, boolean async, String type) {

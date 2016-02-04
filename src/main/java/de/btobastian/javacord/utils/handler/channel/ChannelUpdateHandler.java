@@ -24,6 +24,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplChannel;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
+import de.btobastian.javacord.listener.channel.ChannelChangePositionListener;
 import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -94,6 +95,18 @@ public class ChannelUpdateHandler extends PacketHandler {
             synchronized (listeners) {
                 for (Listener listener : listeners) {
                     ((ChannelChangeTopicListener) listener).onChannelChangeTopic(api, channel, oldTopic);
+                }
+            }
+        }
+
+        int position = packet.getInt("position");
+        if (channel.getPosition() != position) {
+            int oldPosition = channel.getPosition();
+            channel.setPosition(position);
+            List<Listener> listeners =  api.getListeners(ChannelChangePositionListener.class);
+            synchronized (listeners) {
+                for (Listener listener : listeners) {
+                    ((ChannelChangePositionListener) listener).onChannelChangePosition(api, channel, oldPosition);
                 }
             }
         }

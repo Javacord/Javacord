@@ -230,6 +230,15 @@ public class ImplChannel implements Channel {
         this.topic = topic;
     }
 
+    /**
+     * Sets the position of the channel (no update!).
+     *
+     * @param position The position to set.
+     */
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
     @Override
     public int hashCode() {
         return getId().hashCode();
