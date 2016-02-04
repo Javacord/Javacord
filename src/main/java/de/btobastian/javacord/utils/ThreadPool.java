@@ -24,7 +24,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.*;
 
 /**
- * This class creates and contains a new thread pool which is used by this plugin.
+ * This class creates and contains thread pools which are used by this plugin.
  */
 public class ThreadPool {
 
@@ -35,7 +35,7 @@ public class ThreadPool {
 
     private ExecutorService executorService = null;
     private ListeningExecutorService listeningExecutorService = null;
-    private ConcurrentHashMap<String, ExecutorService> executorServiceSingeThreads = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ExecutorService> executorServiceSingeThreads = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -47,9 +47,9 @@ public class ThreadPool {
     }
 
     /**
-     * Gets the used ExecutorService instance.
+     * Gets the used executor service instance.
      *
-     * @return The used ExecutorService instance.
+     * @return The used executor service instance.
      */
     public ExecutorService getExecutorService() {
         return executorService;
@@ -73,9 +73,9 @@ public class ThreadPool {
     }
 
     /**
-     * Gets the used ListeningExecutorService instance.
+     * Gets the used listening executor service instance.
      *
-     * @return The used ListeningExecutorService instance.
+     * @return The used listening executor service instance.
      */
     public ListeningExecutorService getListeningExecutorService() {
         return listeningExecutorService;

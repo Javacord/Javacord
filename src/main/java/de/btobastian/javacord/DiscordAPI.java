@@ -23,6 +23,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.utils.ThreadPool;
 
 import java.util.Collection;
 
@@ -125,5 +126,16 @@ public interface DiscordAPI {
      * @return The message with the given id or <code>null</code> no message was found.
      */
     public Message getMessageById(String id);
+
+    /**
+     * Gets the used thread pool of this plugin.
+     *
+     * The {@link ThreadPool} contains the used thread pool(s) of this api.
+     * Don't use multi-threading if you don't known how to made things thread-safe
+     * or how to prevent stuff like deadlocks!
+     *
+     * @return The used thread pool.
+     */
+    public ThreadPool getThreadPool();
 
 }

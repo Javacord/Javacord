@@ -176,6 +176,11 @@ public class ImplDiscordAPI implements DiscordAPI {
         return null;
     }
 
+    @Override
+    public ThreadPool getThreadPool() {
+        return pool;
+    }
+
     /**
      * Gets or creates a user based on the given data.
      *
@@ -217,15 +222,6 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public String getToken() {
         return token;
-    }
-
-    /**
-     * Gets the ThreadPool used by this api.
-     *
-     * @return The used ThreadPool.
-     */
-    public ThreadPool getThreadPool() {
-        return pool;
     }
 
     /**
