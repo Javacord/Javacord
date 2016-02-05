@@ -132,7 +132,7 @@ public class DiscordWebsocket extends WebSocketClient {
                                 .put("d", System.currentTimeMillis());
                         send(heartbeat.toString());
                         timer = System.currentTimeMillis();
-                        if (Math.random() > 0.1) {
+                        if (Math.random() < 0.1) {
                             // some random status updates to ensure the game and idle status is updated correctly
                             // (discord only accept 5 of these packets per minute and ignores more
                             //  so some might get lost).
