@@ -19,10 +19,16 @@
 package de.btobastian.javacord.utils;
 
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
+import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
+import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.message.TypingStartHandler;
+import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
+import de.btobastian.javacord.utils.handler.server.GuildMemberAddHandler;
+import de.btobastian.javacord.utils.handler.server.GuildMemberRemoveHandler;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -50,11 +56,7 @@ public class DiscordWebsocket extends WebSocketClient {
         super(serverURI);
         this.api = api;
         ready = new CompletableFuture<>();
-
-        addHandler(new ReadyHandler(api));
-        addHandler(new MessageCreateHandler(api));
-        addHandler(new TypingStartHandler(api));
-        addHandler(new MessageUpdateHandler(api));
+        registerHandlers();
     }
 
     @Override
@@ -158,6 +160,29 @@ public class DiscordWebsocket extends WebSocketClient {
                                 .put("name", api.getGame() == null ? JSONObject.NULL : api.getGame()))
                         .put("idle_since", api.isIdle() ? 1 : JSONObject.NULL));
         send(updateStatus.toString());
+    }
+
+    /**
+     * Registers all handlers.
+     */
+    private void registerHandlers() {
+        // general
+        addHandler(new ReadyHandler(api));
+
+        // channel
+        addHandler(new ChannelCreateHandler(api));
+        addHandler(new ChannelUpdateHandler(api));
+
+        // message
+        addHandler(new MessageCreateHandler(api));
+        addHandler(new MessageDeleteHandler(api));
+        addHandler(new MessageUpdateHandler(api));
+        addHandler(new TypingStartHandler(api));
+
+        // server
+        addHandler(new GuildCreateHandler(api));
+        addHandler(new GuildMemberAddHandler(api));
+        addHandler(new GuildMemberRemoveHandler(api));
     }
 
     /**

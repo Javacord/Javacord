@@ -70,6 +70,8 @@ public class ImplChannel implements Channel {
             topic = data.getString("topic");
         } catch (JSONException e) { }
         position = data.getInt("position");
+
+        server.addChannel(this);
     }
 
     @Override

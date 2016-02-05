@@ -61,8 +61,7 @@ public class ImplServer implements Server {
 
         JSONArray channels = data.getJSONArray("channels");
         for (int i = 0; i < channels.length(); i++) {
-            Channel channel = new ImplChannel(channels.getJSONObject(i), this, api);
-            this.channels.put(channel.getId(), channel);
+            new ImplChannel(channels.getJSONObject(i), this, api);
         }
 
         JSONArray members = new JSONArray();
@@ -158,6 +157,15 @@ public class ImplServer implements Server {
      */
     public void removeMember(User user) {
         members.remove(user.getId());
+    }
+
+    /**
+     * Adds a channel to the server.
+     *
+     * @param channel The channel to add.
+     */
+    public void addChannel(Channel channel) {
+        channels.put(channel.getId(), channel);
     }
 
     @Override
