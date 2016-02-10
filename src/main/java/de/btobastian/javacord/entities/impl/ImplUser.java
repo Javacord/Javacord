@@ -23,12 +23,13 @@ import com.google.common.util.concurrent.Futures;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +40,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -53,6 +57,7 @@ public class ImplUser implements User {
     private final String id;
     private String name;
     private String avatarId = null;
+    private Object userChannelIdLock = new Object();
     private String userChannelId = null;
 
     /**
@@ -285,13 +290,28 @@ public class ImplUser implements User {
         }), callback);
     }
 
+    @Override
+    public Collection<Role> getRoles(Server server) {
+        Collection<Role> userRoles = new ArrayList<>();
+        Iterator<Role> rolesIterator = server.getRoles().iterator();
+        while (rolesIterator.hasNext()) {
+            Role role = rolesIterator.next();
+            if (role.getUsers().contains(this)) {
+                userRoles.add(role);
+            }
+        }
+        return userRoles;
+    }
+
     /**
      * Sets the channel id of the user.
      *
      * @param userChannelId The channel id of the user.
      */
     public void setUserChannelId(String userChannelId) {
-        this.userChannelId = userChannelId;
+        synchronized (userChannelIdLock) {
+            this.userChannelId = userChannelId;
+        }
     }
 
     /**
@@ -302,7 +322,7 @@ public class ImplUser implements User {
      * @throws Exception If can not request channel id.
      */
     public String getUserChannelIdBlocking() throws Exception {
-        synchronized (userChannelId) {
+        synchronized (userChannelIdLock) {
             if (userChannelId != null) {
                 return userChannelId;
             }
@@ -326,7 +346,7 @@ public class ImplUser implements User {
      * @return The channel id of the user.
      */
     public String getUserChannelId() {
-        synchronized (userChannelId) {
+        synchronized (userChannelIdLock) {
             return userChannelId;
         }
     }

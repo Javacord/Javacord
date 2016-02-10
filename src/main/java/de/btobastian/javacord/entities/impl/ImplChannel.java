@@ -32,6 +32,8 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.entities.permissions.PermissionState;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
@@ -250,6 +252,11 @@ public class ImplChannel implements Channel {
     public Permissions getOverwrittenPermissions(User user) {
         Permissions permissions = overwrittenPermissions.get(user.getId());
         return permissions == null ? emptyPermissions : permissions;
+    }
+
+    @Override
+    public Permissions getOverwrittenPermissions(Role role) {
+        return role.getOverwrittenPermissions(this);
     }
 
     /**

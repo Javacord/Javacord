@@ -20,9 +20,11 @@ package de.btobastian.javacord.entities;
 
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.permissions.Role;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.Collection;
 import java.util.concurrent.Future;
 
 /**
@@ -92,5 +94,13 @@ public interface User extends MessageReceiver {
      * @return The url of the users avatar. <code>Null</code> if the user has no avatar.
      */
     public URL getAvatarUrl();
+
+    /**
+     * Gets the roles of the user on the given server.
+     *
+     * @param server The server.
+     * @return The roles of the user on the given server.
+     */
+    public Collection<Role> getRoles(Server server);
 
 }

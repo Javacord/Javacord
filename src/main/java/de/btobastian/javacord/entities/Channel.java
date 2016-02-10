@@ -20,6 +20,7 @@ package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.Role;
 
 import java.util.concurrent.Future;
 
@@ -91,5 +92,13 @@ public interface Channel extends MessageReceiver {
      * @return The overwritten permissions of the user.
      */
     public Permissions getOverwrittenPermissions(User user);
+
+    /**
+     * Gets the overwritten permissions of a role in this channel.
+     *
+     * @param role The role which overwrites the permissions.
+     * @return The overwritten permissions of the role.
+     */
+    public Permissions getOverwrittenPermissions(Role role);
 
 }

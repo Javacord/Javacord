@@ -120,7 +120,7 @@ public interface DiscordAPI {
 
     /**
      * Gets a message by its id.
-     * This method may return <ocde>null</ocde> even if the message exists!
+     * This method may return <code>null</code> even if the message exists!
      *
      * @param id The id of the message.
      * @return The message with the given id or <code>null</code> no message was found.

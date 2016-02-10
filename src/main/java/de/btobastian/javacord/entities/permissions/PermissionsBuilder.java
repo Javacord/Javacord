@@ -28,7 +28,7 @@ public interface PermissionsBuilder {
      *
      * @param type The type to change.
      * @param state The state to set.
-     * @return @return This object.
+     * @return This object.
      */
     public PermissionsBuilder setState(PermissionType type, PermissionState state);
 
