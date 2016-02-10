@@ -19,6 +19,7 @@
 package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.permissions.Permissions;
 
 import java.util.concurrent.Future;
 
@@ -82,5 +83,13 @@ public interface Channel extends MessageReceiver {
      * @return An invite builder.
      */
     public InviteBuilder getInviteBuilder();
+
+    /**
+     * Gets the overridden permissions of an user in this channel.
+     *
+     * @param user The user which overrides the permissions.
+     * @return The overridden permissions of the user.
+     */
+    public Permissions getOverriddenPermissions(User user);
 
 }

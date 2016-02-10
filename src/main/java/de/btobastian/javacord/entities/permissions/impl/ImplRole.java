@@ -28,8 +28,8 @@ import org.json.JSONObject;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The implementation of the role interface.
@@ -39,7 +39,7 @@ public class ImplRole implements Role {
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 
     // key = channelId
-    private final HashMap<String, Permissions> overriddenPermissions = new HashMap<>();
+    private final ConcurrentHashMap<String, Permissions> overriddenPermissions = new ConcurrentHashMap<>();
 
     private final String id;
     private String name;
@@ -49,7 +49,7 @@ public class ImplRole implements Role {
     private Color color;
     private boolean hoist;
 
-    private List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
 
     /**
      * Creates a new instance of this class.
@@ -92,12 +92,9 @@ public class ImplRole implements Role {
 
     @Override
     public Permissions getOverriddenPermissions(Channel channel) {
-        Permissions overriddenPermissions;
-        synchronized (this.overriddenPermissions) {
-            overriddenPermissions = this.overriddenPermissions.get(channel.getId());
-            if (overriddenPermissions == null) {
-                overriddenPermissions = emptyPermissions;
-            }
+        Permissions overriddenPermissions = this.overriddenPermissions.get(channel.getId());
+        if (overriddenPermissions == null) {
+            overriddenPermissions = emptyPermissions;
         }
         return overriddenPermissions;
     }
@@ -131,6 +128,16 @@ public class ImplRole implements Role {
         synchronized (users) {
             users.add(user);
         }
+    }
+
+    /**
+     * Adds overridden permissions.
+     *
+     * @param channel The channel which overrides the permissions.
+     * @param permissions The overridden permissions.
+     */
+    public void addOverriddenPermissions(Channel channel, Permissions permissions) {
+        overriddenPermissions.put(channel.getId(), permissions);
     }
 
 }

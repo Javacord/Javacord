@@ -28,22 +28,31 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
+import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.PermissionsException;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
  * The implementation of the channel interface.
  */
 public class ImplChannel implements Channel {
+
+    private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 
     private final ImplDiscordAPI api;
 
@@ -52,6 +61,8 @@ public class ImplChannel implements Channel {
     private String topic = null;
     private int position;
     private final ImplServer server;
+
+    private ConcurrentHashMap<String, Permissions> overriddenPermissions = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -68,8 +79,29 @@ public class ImplChannel implements Channel {
         name = data.getString("name");
         try {
             topic = data.getString("topic");
-        } catch (JSONException e) { }
+        } catch (JSONException ignored) { }
         position = data.getInt("position");
+
+        JSONArray permissionOverwrites = data.getJSONArray("permission_overwrites");
+        for (int i = 0; i < permissionOverwrites.length(); i++) {
+            JSONObject permissionOverride = permissionOverwrites.getJSONObject(i);
+            String id = permissionOverride.getString("id");
+            int allow = permissionOverride.getInt("allow");
+            int deny = permissionOverride.getInt("deny");
+            String type = permissionOverride.getString("type");
+            if (type.equals("role")) {
+                Role role = server.getRoleById(id);
+                if (role != null) {
+                    ((ImplRole) role).addOverriddenPermissions(this, new ImplPermissions(allow, deny));
+                }
+            }
+            if (type.equals("member")) {
+                User user = api.getUserById(id);
+                if (user != null) {
+                    overriddenPermissions.put(user.getId(), new ImplPermissions(allow, deny));
+                }
+            }
+        }
 
         server.addChannel(this);
     }
@@ -212,6 +244,12 @@ public class ImplChannel implements Channel {
                 return new ImplMessage(response.getBody().getObject(), api, receiver);
             }
         }), callback);
+    }
+
+    @Override
+    public Permissions getOverriddenPermissions(User user) {
+        Permissions permissions = overriddenPermissions.get(user.getId());
+        return permissions == null ? emptyPermissions : permissions;
     }
 
     /**
