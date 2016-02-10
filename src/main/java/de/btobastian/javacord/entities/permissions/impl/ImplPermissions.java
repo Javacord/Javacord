@@ -86,4 +86,13 @@ public class ImplPermissions implements Permissions {
         return denied;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ImplPermissions)) {
+            return false;
+        }
+        ImplPermissions other = (ImplPermissions) obj;
+        return other.allowed == allowed && other.denied == denied;
+    }
+
 }

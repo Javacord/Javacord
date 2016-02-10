@@ -20,9 +20,12 @@ package de.btobastian.javacord.utils.handler.server.role;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.RoleChangeNameListener;
+import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -58,6 +61,18 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             synchronized (listeners) {
                 for (Listener listener : listeners) {
                     ((RoleChangeNameListener) listener).onRoleChangeName(api, role, oldName);
+                }
+            }
+        }
+
+        Permissions permissions = new ImplPermissions(roleJson.getInt("permissions"));
+        if (!role.getPermission().equals(permissions)) {
+            Permissions oldPermissions = role.getPermission();
+            role.setPermissions(permissions);
+            List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
+            synchronized (listeners) {
+                for (Listener listener : listeners) {
+                    ((RoleChangePermissionsListener) listener).onRoleChangePermissions(api, role, oldPermissions);
                 }
             }
         }

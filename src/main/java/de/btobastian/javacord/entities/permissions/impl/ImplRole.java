@@ -44,7 +44,7 @@ public class ImplRole implements Role {
     private final String id;
     private String name;
     private final ImplServer server;
-    private ImplPermissions permissions;
+    private Permissions permissions;
     private int position;
     private Color color;
     private boolean hoist;
@@ -137,6 +137,15 @@ public class ImplRole implements Role {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the permissions of the channel.
+     *
+     * @param permissions The permissions to set.
+     */
+    public void setPermissions(Permissions permissions) {
+        this.permissions = permissions;
     }
 
     /**
