@@ -18,7 +18,10 @@
  */
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.entities.permissions.Role;
+
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -65,7 +68,7 @@ public interface Server {
     public Collection<Channel> getChannels();
 
     /**
-     * Gets a User by its id.
+     * Gets an user by its id.
      *
      * @param id The id of the user.
      * @return The user with the given id.
@@ -95,5 +98,21 @@ public interface Server {
      * @return Whether the user is a member or not.
      */
     public boolean isMember(String userId);
+
+    /**
+     * Gets a collection with all roles of this server.
+     *
+     * @return A collection with all roles of this server.
+     */
+    public Collection<Role> getRoles();
+
+    /**
+     * Gets a role by its id.
+     *
+     * @param id The id of the role.
+     * @return The role with the given id.
+     *         <code>Null</code> if the role does not exist on this server.
+     */
+    public Role getRoleById(String id);
 
 }

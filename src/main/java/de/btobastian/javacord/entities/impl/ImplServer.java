@@ -25,6 +25,8 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +45,7 @@ public class ImplServer implements Server {
 
     private final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Role> roles = new ConcurrentHashMap<>();
 
     private final String id;
     private String name;
@@ -58,6 +61,11 @@ public class ImplServer implements Server {
 
         name = data.getString("name");
         id = data.getString("id");
+
+        JSONArray roles = data.getJSONArray("roles");
+        for (int i = 0; i < roles.length(); i++) {
+            new ImplRole(roles.getJSONObject(i), this);
+        }
 
         JSONArray channels = data.getJSONArray("channels");
         for (int i = 0; i < channels.length(); i++) {
@@ -141,6 +149,16 @@ public class ImplServer implements Server {
         return members.containsKey(userId);
     }
 
+    @Override
+    public Collection<Role> getRoles() {
+        return roles.values();
+    }
+
+    @Override
+    public Role getRoleById(String id) {
+        return roles.get(id);
+    }
+
     /**
      * Adds a user to the server.
      *
@@ -166,6 +184,15 @@ public class ImplServer implements Server {
      */
     public void addChannel(Channel channel) {
         channels.put(channel.getId(), channel);
+    }
+
+    /**
+     * Adds a role to the server.
+     *
+     * @param role The role to add.
+     */
+    public void addRole(Role role) {
+        roles.put(role.getId(), role);
     }
 
     @Override
