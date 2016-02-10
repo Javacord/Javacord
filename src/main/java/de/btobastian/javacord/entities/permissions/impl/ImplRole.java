@@ -131,6 +131,15 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Sets the name of the channel.
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Adds overridden permissions.
      *
      * @param channel The channel which overrides the permissions.
