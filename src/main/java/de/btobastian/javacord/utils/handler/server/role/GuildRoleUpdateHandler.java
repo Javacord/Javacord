@@ -21,11 +21,13 @@ package de.btobastian.javacord.utils.handler.server.role;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.RoleChangeNameListener;
 import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listener.role.RoleChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -73,6 +75,20 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             synchronized (listeners) {
                 for (Listener listener : listeners) {
                     ((RoleChangePermissionsListener) listener).onRoleChangePermissions(api, role, oldPermissions);
+                }
+            }
+        }
+
+        synchronized (Role.class) { // we don't want strange positions
+            int position = roleJson.getInt("position");
+            if (role.getPosition() != position) {
+                int oldPosition = role.getPosition();
+                role.setPosition(position);
+                List<Listener> listeners =  api.getListeners(RoleChangePositionListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((RoleChangePositionListener) listener).onRoleChangePosition(api, role, oldPosition);
+                    }
                 }
             }
         }

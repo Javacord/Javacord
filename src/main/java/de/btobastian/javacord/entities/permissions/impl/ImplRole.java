@@ -149,6 +149,15 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Sets the position of the channel.
+     *
+     * @param position The position to set.
+     */
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    /**
      * Adds overridden permissions.
      *
      * @param channel The channel which overrides the permissions.
