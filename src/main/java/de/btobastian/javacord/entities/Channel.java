@@ -85,11 +85,11 @@ public interface Channel extends MessageReceiver {
     public InviteBuilder getInviteBuilder();
 
     /**
-     * Gets the overridden permissions of an user in this channel.
+     * Gets the overwritten permissions of an user in this channel.
      *
-     * @param user The user which overrides the permissions.
-     * @return The overridden permissions of the user.
+     * @param user The user which overwrites the permissions.
+     * @return The overwritten permissions of the user.
      */
-    public Permissions getOverriddenPermissions(User user);
+    public Permissions getOverwrittenPermissions(User user);
 
 }

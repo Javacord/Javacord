@@ -39,7 +39,7 @@ public class ImplRole implements Role {
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 
     // key = channelId
-    private final ConcurrentHashMap<String, Permissions> overriddenPermissions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
     private final String id;
     private String name;
@@ -91,12 +91,12 @@ public class ImplRole implements Role {
     }
 
     @Override
-    public Permissions getOverriddenPermissions(Channel channel) {
-        Permissions overriddenPermissions = this.overriddenPermissions.get(channel.getId());
-        if (overriddenPermissions == null) {
-            overriddenPermissions = emptyPermissions;
+    public Permissions getOverwrittenPermissions(Channel channel) {
+        Permissions overwrittenPermissions = this.overwrittenPermissions.get(channel.getId());
+        if (overwrittenPermissions == null) {
+            overwrittenPermissions = emptyPermissions;
         }
-        return overriddenPermissions;
+        return overwrittenPermissions;
     }
 
     @Override
@@ -158,13 +158,13 @@ public class ImplRole implements Role {
     }
 
     /**
-     * Adds overridden permissions.
+     * Adds overwritten permissions.
      *
-     * @param channel The channel which overrides the permissions.
-     * @param permissions The overridden permissions.
+     * @param channel The channel which overwrites the permissions.
+     * @param permissions The overwritten permissions.
      */
-    public void addOverriddenPermissions(Channel channel, Permissions permissions) {
-        overriddenPermissions.put(channel.getId(), permissions);
+    public void addOverwrittenPermissions(Channel channel, Permissions permissions) {
+        overwrittenPermissions.put(channel.getId(), permissions);
     }
 
 }

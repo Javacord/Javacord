@@ -62,7 +62,7 @@ public class ImplChannel implements Channel {
     private int position;
     private final ImplServer server;
 
-    private ConcurrentHashMap<String, Permissions> overriddenPermissions = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -84,21 +84,21 @@ public class ImplChannel implements Channel {
 
         JSONArray permissionOverwrites = data.getJSONArray("permission_overwrites");
         for (int i = 0; i < permissionOverwrites.length(); i++) {
-            JSONObject permissionOverride = permissionOverwrites.getJSONObject(i);
-            String id = permissionOverride.getString("id");
-            int allow = permissionOverride.getInt("allow");
-            int deny = permissionOverride.getInt("deny");
-            String type = permissionOverride.getString("type");
+            JSONObject permissionOverwrite = permissionOverwrites.getJSONObject(i);
+            String id = permissionOverwrite.getString("id");
+            int allow = permissionOverwrite.getInt("allow");
+            int deny = permissionOverwrite.getInt("deny");
+            String type = permissionOverwrite.getString("type");
             if (type.equals("role")) {
                 Role role = server.getRoleById(id);
                 if (role != null) {
-                    ((ImplRole) role).addOverriddenPermissions(this, new ImplPermissions(allow, deny));
+                    ((ImplRole) role).addOverwrittenPermissions(this, new ImplPermissions(allow, deny));
                 }
             }
             if (type.equals("member")) {
                 User user = api.getUserById(id);
                 if (user != null) {
-                    overriddenPermissions.put(user.getId(), new ImplPermissions(allow, deny));
+                    overwrittenPermissions.put(user.getId(), new ImplPermissions(allow, deny));
                 }
             }
         }
@@ -247,8 +247,8 @@ public class ImplChannel implements Channel {
     }
 
     @Override
-    public Permissions getOverriddenPermissions(User user) {
-        Permissions permissions = overriddenPermissions.get(user.getId());
+    public Permissions getOverwrittenPermissions(User user) {
+        Permissions permissions = overwrittenPermissions.get(user.getId());
         return permissions == null ? emptyPermissions : permissions;
     }
 

@@ -59,12 +59,12 @@ public interface Role {
     public Permissions getPermission();
 
     /**
-     * Gets the overridden permissions in the given channel.
+     * Gets the overwritten permissions in the given channel.
      *
      * @param channel The channel to check.
-     * @return The overridden permissions.
+     * @return The overwritten permissions.
      */
-    public Permissions getOverriddenPermissions(Channel channel);
+    public Permissions getOverwrittenPermissions(Channel channel);
 
     /**
      * Gets all users with this role.
