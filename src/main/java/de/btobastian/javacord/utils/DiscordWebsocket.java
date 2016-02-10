@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.utils;
 
+import com.google.common.util.concurrent.SettableFuture;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
@@ -45,7 +46,7 @@ import java.util.concurrent.*;
  */
 public class DiscordWebsocket extends WebSocketClient {
 
-    private CompletableFuture<Boolean> ready = null;
+    private SettableFuture<Boolean> ready = null;
     private ImplDiscordAPI api = null;
     private HashMap<String, PacketHandler> handlers = new HashMap<>();
 
@@ -58,7 +59,7 @@ public class DiscordWebsocket extends WebSocketClient {
     public DiscordWebsocket(URI serverURI, ImplDiscordAPI api) {
         super(serverURI);
         this.api = api;
-        ready = new CompletableFuture<>();
+        ready = SettableFuture.create();
         registerHandlers();
     }
 
@@ -66,7 +67,7 @@ public class DiscordWebsocket extends WebSocketClient {
     public void onClose(int i, String s, boolean b) {
         System.out.println("Websocket closed with reason " + s + " and code " + i);
         if (!ready.isDone()) {
-            ready.complete(false);
+            ready.set(false);
         }
     }
 
@@ -86,7 +87,7 @@ public class DiscordWebsocket extends WebSocketClient {
             handler.handlePacket(packet);
         }
         if (type.equals("READY")) {
-            ready.complete(true);
+            ready.set(true);
             updateStatus();
         }
     }

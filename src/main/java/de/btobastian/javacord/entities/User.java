@@ -63,15 +63,16 @@ public interface User extends MessageReceiver {
      *
      * @return The jpg-avatar of the user. The array is empty if the user has no avatar.
      */
-    public Future<byte[]> getAvatarAsBytearray();
+    public Future<byte[]> getAvatarAsByteArray();
 
     /**
      * Gets the avatar of the user as byte array.
      *
      * @param callback The callback which will be informed when the avatar was downloaded.
      *                 The array is the jpg-avatar of the user. The array is empty if the user has no avatar.
+     * @return The jpg-avatar of the user. The array is empty if the user has no avatar.
      */
-    public void getAvatarAsBytearray(FutureCallback<byte[]> callback);
+    public Future<byte[]> getAvatarAsByteArray(FutureCallback<byte[]> callback);
 
     /**
      * Gets the avatar of the user.
@@ -85,8 +86,9 @@ public interface User extends MessageReceiver {
      *
      * @param callback The callback which will be informed when the avatar was downloaded.
      *                 The image will be <code>null</code> if the user has no avatar.
+     * @return The jpg-avatar of the user. Canceled if the user has no avatar.
      */
-    public void getAvatar(FutureCallback<BufferedImage> callback);
+    public Future<BufferedImage> getAvatar(FutureCallback<BufferedImage> callback);
 
     /**
      * Gets the url of the users avatar.

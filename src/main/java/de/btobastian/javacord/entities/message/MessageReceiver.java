@@ -52,8 +52,9 @@ public interface MessageReceiver {
      *
      * @param content The content of the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
      */
-    public void sendMessage(String content, FutureCallback<Message> callback);
+    public Future<Message> sendMessage(String content, FutureCallback<Message> callback);
 
     /**
      * Sends a message with the given content.
@@ -61,8 +62,9 @@ public interface MessageReceiver {
      * @param content The content of the message.
      * @param tts Whether the message should be tts or not.
      * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
      */
-    public void sendMessage(String content, boolean tts, FutureCallback<Message> callback);
+    public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback);
 
     /**
      * Uploads a file.
@@ -77,7 +79,8 @@ public interface MessageReceiver {
      *
      * @param file The file to upload.
      * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
      */
-    public void sendFile(File file, FutureCallback<Message> callback);
+    public Future<Message> sendFile(File file, FutureCallback<Message> callback);
 
 }

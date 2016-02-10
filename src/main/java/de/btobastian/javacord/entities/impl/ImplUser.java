@@ -20,6 +20,7 @@ package de.btobastian.javacord.entities.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -44,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -57,7 +57,7 @@ public class ImplUser implements User {
     private final String id;
     private String name;
     private String avatarId = null;
-    private Object userChannelIdLock = new Object();
+    private final Object userChannelIdLock = new Object();
     private String userChannelId = null;
 
     /**
@@ -73,7 +73,7 @@ public class ImplUser implements User {
         name = data.getString("username");
         try {
             avatarId = data.getString("avatar");
-        } catch (JSONException e) { }
+        } catch (JSONException ignored) { }
 
         api.getUserMap().put(id, this);
     }
@@ -108,25 +108,14 @@ public class ImplUser implements User {
     }
 
     @Override
-    public Future<byte[]> getAvatarAsBytearray() {
-        final CompletableFuture<byte[]> future = new CompletableFuture<>();
-        getAvatarAsBytearray(new FutureCallback<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                future.complete(bytes);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                future.complete(new byte[0]);
-            }
-        });
-        return future;
+    public Future<byte[]> getAvatarAsByteArray() {
+        return getAvatarAsByteArray(null);
     }
 
     @Override
-    public void getAvatarAsBytearray(FutureCallback<byte[]> callback) {
-        Futures.addCallback(api.getThreadPool().getListeningExecutorService().submit(new Callable<byte[]>() {
+    public Future<byte[]> getAvatarAsByteArray(FutureCallback<byte[]> callback) {
+        ListenableFuture<byte[]> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<byte[]>() {
             @Override
             public byte[] call() throws Exception {
                 if (avatarId == null) {
@@ -140,7 +129,7 @@ public class ImplUser implements User {
                 InputStream in = new BufferedInputStream(conn.getInputStream());
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 byte[] buf = new byte[1024];
-                int n = 0;
+                int n;
                 while (-1 != (n = in.read(buf))) {
                     out.write(buf, 0, n);
                 }
@@ -148,39 +137,36 @@ public class ImplUser implements User {
                 in.close();
                 return out.toByteArray();
             }
-        }), callback);
-    }
-
-    @Override
-    public Future<BufferedImage> getAvatar() {
-        final CompletableFuture<BufferedImage> future = new CompletableFuture<>();
-        getAvatar(new FutureCallback<BufferedImage>() {
-            @Override
-            public void onSuccess(BufferedImage bufferedImage) {
-                future.complete(bufferedImage);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                future.complete(null);
-            }
         });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
         return future;
     }
 
     @Override
-    public void getAvatar(FutureCallback<BufferedImage> callback) {
-        Futures.addCallback(api.getThreadPool().getListeningExecutorService().submit(new Callable<BufferedImage>() {
+    public Future<BufferedImage> getAvatar() {
+        return getAvatar(null);
+    }
+
+    @Override
+    public Future<BufferedImage> getAvatar(FutureCallback<BufferedImage> callback) {
+        ListenableFuture<BufferedImage> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<BufferedImage>() {
             @Override
             public BufferedImage call() throws Exception {
-                byte[] imageAsBytes = getAvatarAsBytearray().get();
+                byte[] imageAsBytes = getAvatarAsByteArray().get();
                 if (imageAsBytes.length == 0) {
                     return null;
                 }
                 InputStream in = new ByteArrayInputStream(imageAsBytes);
                 return ImageIO.read(in);
             }
-        }), callback);
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     @Override
@@ -203,91 +189,79 @@ public class ImplUser implements User {
 
     @Override
     public Future<Message> sendMessage(String content, boolean tts) {
-        final CompletableFuture<Message> future = new CompletableFuture<>();
-        sendMessage(content, tts, new FutureCallback<Message>() {
-            @Override
-            public void onSuccess(Message message) {
-                future.complete(message);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                future.complete(null);
-            }
-        });
-        return future;
+        return sendMessage(content, tts, null);
     }
 
     @Override
-    public void sendMessage(String content, FutureCallback<Message> callback) {
-        sendMessage(content, false, callback);
+    public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
+        return sendMessage(content, false, callback);
     }
 
     @Override
-    public void sendMessage(final String content, final boolean tts, FutureCallback<Message> callback) {
+    public Future<Message> sendMessage(final String content, final boolean tts, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
-        Futures.addCallback(api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
-            @Override
-            public Message call() throws Exception {
-                HttpResponse<JsonNode> response =
-                        Unirest.post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
-                                .header("authorization", api.getToken())
-                                .header("content-type", "application/json")
-                                .body(new JSONObject()
-                                        .put("content", content)
-                                        .put("tts", tts)
-                                        .put("mentions", new String[0]).toString())
-                                .asJson();
-                if (response.getStatus() == 403) {
-                    throw new PermissionsException("Missing permissions!");
-                }
-                if (response.getStatus() < 200 || response.getStatus() > 299) {
-                    throw new Exception("Received http status code " + response.getStatus()
-                            + " with message " + response.getStatusText());
-                }
-                return new ImplMessage(response.getBody().getObject(), api, receiver);
-            }
-        }), callback);
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        HttpResponse<JsonNode> response =
+                                Unirest.post("https://discordapp.com/api/channels/"
+                                        + getUserChannelIdBlocking() + "/messages")
+                                        .header("authorization", api.getToken())
+                                        .header("content-type", "application/json")
+                                        .body(new JSONObject()
+                                                .put("content", content)
+                                                .put("tts", tts)
+                                                .put("mentions", new String[0]).toString())
+                                        .asJson();
+                        if (response.getStatus() == 403) {
+                            throw new PermissionsException("Missing permissions!");
+                        }
+                        if (response.getStatus() < 200 || response.getStatus() > 299) {
+                            throw new Exception("Received http status code " + response.getStatus()
+                                    + " with message " + response.getStatusText());
+                        }
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     @Override
     public Future<Message> sendFile(final File file) {
-        final CompletableFuture<Message> future = new CompletableFuture<>();
-        sendFile(file, new FutureCallback<Message>() {
-            @Override
-            public void onSuccess(Message message) {
-                future.complete(message);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                future.complete(null);
-            }
-        });
-        return future;
+        return sendFile(file, null);
     }
 
     @Override
-    public void sendFile(final File file, FutureCallback<Message> callback) {
+    public Future<Message> sendFile(final File file, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
-        Futures.addCallback(api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
-            @Override
-            public Message call() throws Exception {
-                HttpResponse<JsonNode> response =
-                        Unirest.post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
-                                .header("authorization", api.getToken())
-                                .field("file", file)
-                                .asJson();
-                if (response.getStatus() == 403) {
-                    throw new PermissionsException("Missing permissions!");
-                }
-                if (response.getStatus() < 200 || response.getStatus() > 299) {
-                    throw new Exception("Received http status code " + response.getStatus()
-                            + " with message " + response.getStatusText());
-                }
-                return new ImplMessage(response.getBody().getObject(), api, receiver);
-            }
-        }), callback);
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        HttpResponse<JsonNode> response =
+                                Unirest.post("https://discordapp.com/api/channels/"
+                                        + getUserChannelIdBlocking() + "/messages")
+                                        .header("authorization", api.getToken())
+                                        .field("file", file)
+                                        .asJson();
+                        if (response.getStatus() == 403) {
+                            throw new PermissionsException("Missing permissions!");
+                        }
+                        if (response.getStatus() < 200 || response.getStatus() > 299) {
+                            throw new Exception("Received http status code " + response.getStatus()
+                                    + " with message " + response.getStatusText());
+                        }
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     @Override
