@@ -122,4 +122,15 @@ public class ImplRole implements Role {
         return color;
     }
 
+    /**
+     * Adds an user.
+     *
+     * @param user The user to add.
+     */
+    public void addUser(User user) {
+        synchronized (users) {
+            users.add(user);
+        }
+    }
+
 }

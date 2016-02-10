@@ -79,6 +79,14 @@ public class ImplServer implements Server {
         for (int i = 0; i < members.length(); i++) {
             User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
             this.members.put(member.getId(), member);
+
+            JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
+            for (int j = 0; j < memberRoles.length(); j++) {
+                Role role = getRoleById(memberRoles.getString(j));
+                if (role != null) {
+                    ((ImplRole) role).addUser(member);
+                }
+            }
         }
 
         api.getServerMap().put(id, this);
