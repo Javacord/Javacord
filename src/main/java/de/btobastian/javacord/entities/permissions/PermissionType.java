@@ -76,4 +76,20 @@ public enum PermissionType {
         return (i & (1 << offset)) != 0;
     }
 
+    /**
+     * Sets or unsets the type for the given integer.
+     *
+     * @param i The integer to change.
+     * @param set Whether the type should be set or not.
+     * @return The changed integer.
+     */
+    public int set(int i, boolean set) {
+        if (!set && isSet(i)) {
+            i -= Math.pow(2, getOffset());
+        } else if (set && !isSet(i)) {
+            i += Math.pow(2, getOffset());
+        }
+        return i;
+    }
+
 }
