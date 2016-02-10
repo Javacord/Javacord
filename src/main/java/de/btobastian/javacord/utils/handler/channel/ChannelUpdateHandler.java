@@ -21,12 +21,20 @@ package de.btobastian.javacord.utils.handler.channel;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplChannel;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
+import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
 import de.btobastian.javacord.listener.channel.ChannelChangePositionListener;
 import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
+import de.btobastian.javacord.listener.role.RoleChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listener.user.UserChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.utils.PacketHandler;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -107,6 +115,50 @@ public class ChannelUpdateHandler extends PacketHandler {
             synchronized (listeners) {
                 for (Listener listener : listeners) {
                     ((ChannelChangePositionListener) listener).onChannelChangePosition(api, channel, oldPosition);
+                }
+            }
+        }
+
+        JSONArray permissionOverwrites = packet.getJSONArray("permission_overwrites");
+        for (int i = 0; i < permissionOverwrites.length(); i++) {
+            JSONObject permissionOverwrite = permissionOverwrites.getJSONObject(i);
+            int allow = permissionOverwrite.getInt("allow");
+            int deny = permissionOverwrite.getInt("deny");
+            String id = permissionOverwrite.getString("id");
+            String type = permissionOverwrite.getString("type");
+
+            // permissions overwritten by users
+            if (type.equals("member")) {
+                User user = api.getUserById(id);
+                ImplPermissions permissions = new ImplPermissions(allow, deny);
+                Permissions oldPermissions = channel.getOverwrittenPermissions(user);
+                if (!oldPermissions.equals(permissions)) {
+                    channel.setOverwrittenPermissions(user, permissions);
+                    List<Listener> listeners =  api.getListeners(UserChangeOverwrittenPermissionsListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((UserChangeOverwrittenPermissionsListener) listener).onUserChangeOverwrittenPermissions(
+                                    api, user, channel, oldPermissions);
+                        }
+                    }
+                }
+
+            }
+
+            // permissions overwritten by roles
+            if (type.equals("role")) {
+                Role role = channel.getServer().getRoleById(id);
+                ImplPermissions permissions = new ImplPermissions(allow, deny);
+                Permissions oldPermissions = role.getOverwrittenPermissions(channel);
+                if (!permissions.equals(oldPermissions)) {
+                    ((ImplRole) role).setOverwrittenPermissions(channel, permissions);
+                    List<Listener> listeners =  api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((RoleChangeOverwrittenPermissionsListener) listener).onRoleChangeOverwrittenPermissions(
+                                    api, role, channel, oldPermissions);
+                        }
+                    }
                 }
             }
         }

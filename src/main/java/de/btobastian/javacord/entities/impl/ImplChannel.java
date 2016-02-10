@@ -92,7 +92,7 @@ public class ImplChannel implements Channel {
             if (type.equals("role")) {
                 Role role = server.getRoleById(id);
                 if (role != null) {
-                    ((ImplRole) role).addOverwrittenPermissions(this, new ImplPermissions(allow, deny));
+                    ((ImplRole) role).setOverwrittenPermissions(this, new ImplPermissions(allow, deny));
                 }
             }
             if (type.equals("member")) {
@@ -277,6 +277,16 @@ public class ImplChannel implements Channel {
      */
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    /**
+     * Sets the overwritten permissions of an user.
+     *
+     * @param user The user which overwrites the permissions.
+     * @param permissions The overwritten permissions.
+     */
+    public void setOverwrittenPermissions(User user, Permissions permissions) {
+        overwrittenPermissions.put(user.getId(), permissions);
     }
 
     @Override

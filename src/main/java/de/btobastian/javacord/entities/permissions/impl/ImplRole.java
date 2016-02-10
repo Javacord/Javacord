@@ -158,12 +158,12 @@ public class ImplRole implements Role {
     }
 
     /**
-     * Adds overwritten permissions.
+     * Sets overwritten permissions.
      *
      * @param channel The channel which overwrites the permissions.
-     * @param permissions The overwritten permissions.
+     * @param permissions The overwritten permissions to set.
      */
-    public void addOverwrittenPermissions(Channel channel, Permissions permissions) {
+    public void setOverwrittenPermissions(Channel channel, Permissions permissions) {
         overwrittenPermissions.put(channel.getId(), permissions);
     }
 
