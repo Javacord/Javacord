@@ -203,6 +203,15 @@ public class ImplServer implements Server {
         roles.put(role.getId(), role);
     }
 
+    /**
+     * Removes a role from the server.
+     *
+     * @param role The role to remove.
+     */
+    public void removeRole(Role role) {
+        roles.remove(role);
+    }
+
     @Override
     public int hashCode() {
         return getId().hashCode();
