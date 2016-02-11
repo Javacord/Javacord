@@ -89,6 +89,20 @@ public class ImplServer implements Server {
             }
         }
 
+        JSONArray presences = new JSONArray();
+        if (data.has("presences")) {
+            presences = data.getJSONArray("presences");
+        }
+        for (int i = 0; i < presences.length(); i++) {
+            JSONObject presence = presences.getJSONObject(i);
+            User user = api.getUserById(presence.getJSONObject("user").getString("id"));
+            if (presence.has("game") && !presence.isNull("game")) {
+                if (presence.getJSONObject("game").has("name") && !presence.getJSONObject("game").isNull("name")) {
+                    ((ImplUser) user).setGame(presence.getJSONObject("game").getString("name"));
+                }
+            }
+        }
+
         api.getServerMap().put(id, this);
     }
 

@@ -105,4 +105,11 @@ public interface User extends MessageReceiver {
      */
     public Collection<Role> getRoles(Server server);
 
+    /**
+     * Gets the game the user is currently playing.
+     *
+     * @return The game the user is currently playing. May be <code>null</code>.
+     */
+    public String getGame();
+
 }

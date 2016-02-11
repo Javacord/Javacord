@@ -59,6 +59,7 @@ public class ImplUser implements User {
     private String avatarId = null;
     private final Object userChannelIdLock = new Object();
     private String userChannelId = null;
+    private String game = null;
 
     /**
      * Creates a new instance of this class.
@@ -277,6 +278,11 @@ public class ImplUser implements User {
         return userRoles;
     }
 
+    @Override
+    public String getGame() {
+        return game;
+    }
+
     /**
      * Sets the channel id of the user.
      *
@@ -332,6 +338,15 @@ public class ImplUser implements User {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the game of the user.
+     *
+     * @param game The game to set.
+     */
+    public void setGame(String game) {
+        this.game = game;
     }
 
 }
