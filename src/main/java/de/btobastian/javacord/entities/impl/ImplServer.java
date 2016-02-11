@@ -209,7 +209,16 @@ public class ImplServer implements Server {
      * @param role The role to remove.
      */
     public void removeRole(Role role) {
-        roles.remove(role);
+        roles.remove(role.getId());
+    }
+
+    /**
+     * Removes a channel from the server.
+     *
+     * @param channel The channel to remove.
+     */
+    public void removeChannel(Channel channel) {
+        channels.remove(channel.getId());
     }
 
     @Override

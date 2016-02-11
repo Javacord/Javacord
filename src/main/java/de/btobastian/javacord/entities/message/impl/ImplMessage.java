@@ -88,7 +88,7 @@ public class ImplMessage implements Message {
                 String name = attachment.getString("filename");
                 this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
             }
-        } catch (JSONException e) { }
+        } catch (JSONException ignored) { }
 
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
@@ -178,7 +178,7 @@ public class ImplMessage implements Message {
                     }
                     api.removeMessage(message);
                     // call listener
-                    api.getThreadPool().getExecutorService().submit(new Runnable() {
+                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
                         @Override
                         public void run() {
                             List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);

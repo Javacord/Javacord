@@ -38,11 +38,14 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.PermissionsException;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -133,7 +136,40 @@ public class ImplChannel implements Channel {
 
     @Override
     public Future<Exception> delete() {
-        return null;
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/channels/:id" + id)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    if (response.getStatus() == 403) {
+                        throw new PermissionsException("Missing permissions!");
+                    }
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
+                        throw new Exception("Received http status code " + response.getStatus()
+                                + " with message " + response.getStatusText());
+                    }
+                    server.removeChannel(ImplChannel.this);
+                    // call listener
+                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ChannelDeleteListener) listener).onChannelDelete(api, ImplChannel.this);
+                                }
+                            }
+                        }
+                    });
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        });
     }
 
     @Override

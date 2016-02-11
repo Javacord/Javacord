@@ -55,21 +55,25 @@ public class ChannelUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
+        boolean isPrivate = packet.getBoolean("is_private");
+        if (isPrivate) {
+            return; // TODO ignored atm
+        }
         Server server = api.getServerById(packet.getString("guild_id"));
         if (packet.getString("type").equals("text")) {
-            handleTextChannel(packet, server);
+            handleServerTextChannel(packet, server);
         } else {
-            handleVoiceChannel(packet, server);
+            handleServerVoiceChannel(packet, server);
         }
     }
 
     /**
-     * Handles text channels.
+     * Handles the server text channels.
      *
      * @param packet The packet (the "d"-object).
      * @param server The server of the channel.
      */
-    private void handleTextChannel(JSONObject packet, Server server) {
+    private void handleServerTextChannel(JSONObject packet, Server server) {
         ImplChannel channel = null;
         for (Channel c : server.getChannels()) {
             if (c.getId().equals(packet.getString("id"))) {
@@ -165,12 +169,12 @@ public class ChannelUpdateHandler extends PacketHandler {
     }
 
     /**
-     * Handles voice channels.
+     * Handles the server voice channels.
      *
      * @param packet The packet (the "d"-object).
      * @param server The server of the channel.
      */
-    private void handleVoiceChannel(JSONObject packet, Server server) {
+    private void handleServerVoiceChannel(JSONObject packet, Server server) {
 
     }
 

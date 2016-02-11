@@ -21,6 +21,7 @@ package de.btobastian.javacord.utils;
 import com.google.common.util.concurrent.SettableFuture;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
+import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
 import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
@@ -175,6 +176,7 @@ public class DiscordWebsocket extends WebSocketClient {
 
         // channel
         addHandler(new ChannelCreateHandler(api));
+        addHandler(new ChannelDeleteHandler(api));
         addHandler(new ChannelUpdateHandler(api));
 
         // message
