@@ -28,10 +28,13 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.PermissionsException;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.server.ServerLeaveListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -133,6 +136,17 @@ public class ImplServer implements Server {
                                 + " with message " + response.getStatusText());
                     }
                     api.getServerMap().remove(id);
+                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
                     return null;
                 } catch (Exception e) {
                     return e;
