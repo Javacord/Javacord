@@ -325,4 +325,13 @@ public class ImplUser implements User {
         }
     }
 
+    /**
+     * Sets the name of the user.
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }
