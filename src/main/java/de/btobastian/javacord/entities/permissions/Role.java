@@ -24,6 +24,7 @@ import de.btobastian.javacord.entities.User;
 
 import java.awt.*;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * This class represents a discord role, e.g. "moderator".
@@ -56,7 +57,7 @@ public interface Role {
      *
      * @return The permissions of this role.
      */
-    public Permissions getPermission();
+    public Permissions getPermissions();
 
     /**
      * Gets the overwritten permissions in the given channel.

@@ -86,7 +86,7 @@ public class ImplRole implements Role {
     }
 
     @Override
-    public Permissions getPermission() {
+    public Permissions getPermissions() {
         return permissions;
     }
 
