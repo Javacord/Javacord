@@ -70,7 +70,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
         Permissions permissions = new ImplPermissions(roleJson.getInt("permissions"));
         if (!role.getPermissions().equals(permissions)) {
             Permissions oldPermissions = role.getPermissions();
-            role.setPermissions(permissions);
+            role.setPermissions((ImplPermissions) permissions);
             List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
             synchronized (listeners) {
                 for (Listener listener : listeners) {

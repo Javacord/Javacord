@@ -95,4 +95,23 @@ public interface Role {
      */
     public Color getColor();
 
+    /**
+     * Updates the permissions of this role.
+     *
+     * @param permissions The permissions to set. Roles don't have the {@link PermissionState#NONE} so every
+     *                    permission with this state will be replaced with {@link PermissionState#DENIED}.
+     * @return A future which tells us if the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updatePermissions(Permissions permissions);
+
+    /**
+     * Updates the name of this role.
+     *
+     * @param name The name to set.
+     * @return A future which tells us if the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateName(String name);
+
 }

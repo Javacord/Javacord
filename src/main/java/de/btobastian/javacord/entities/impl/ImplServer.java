@@ -64,7 +64,7 @@ public class ImplServer implements Server {
 
         JSONArray roles = data.getJSONArray("roles");
         for (int i = 0; i < roles.length(); i++) {
-            new ImplRole(roles.getJSONObject(i), this);
+            new ImplRole(roles.getJSONObject(i), this, api);
         }
 
         JSONArray channels = data.getJSONArray("channels");

@@ -18,18 +18,28 @@
  */
 package de.btobastian.javacord.entities.permissions.impl;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.exceptions.PermissionsException;
+import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.role.RoleChangeNameListener;
+import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
 import org.json.JSONObject;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 /**
  * The implementation of the role interface.
@@ -41,10 +51,12 @@ public class ImplRole implements Role {
     // key = channelId
     private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
+    private final ImplDiscordAPI api;
+
     private final String id;
     private String name;
     private final ImplServer server;
-    private Permissions permissions;
+    private ImplPermissions permissions;
     private int position;
     private Color color;
     private boolean hoist;
@@ -56,9 +68,11 @@ public class ImplRole implements Role {
      *
      * @param data A JSONObject containing all necessary data.
      * @param server The server of the role.
+     * @param api The api of this server.
      */
-    public ImplRole(JSONObject data, ImplServer server) {
+    public ImplRole(JSONObject data, ImplServer server, ImplDiscordAPI api) {
         this.server = server;
+        this.api = api;
 
         id = data.getString("id");
         name = data.getString("name");
@@ -119,6 +133,96 @@ public class ImplRole implements Role {
         return color;
     }
 
+    @Override
+    public Future<Exception> updatePermissions(Permissions permissions) {
+        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed());
+    }
+
+    @Override
+    public Future<Exception> updateName(String name) {
+        return update(name, color.getRGB(), hoist, permissions.getAllowed());
+    }
+
+    /**
+     * Updates the role.
+     *
+     * @param name The new name of the role.
+     * @param color The new color of the role.
+     * @param hoist The new hoist of the role.
+     * @param allow The new permissions of the role.
+     * @return A future.
+     */
+    private Future<Exception> update(final String name, final int color, final boolean hoist, final int allow) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest.put
+                            ("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
+                            .header("authorization", api.getToken())
+                            .body(new JSONObject()
+                                    .put("name", name)
+                                    .put("color", color)
+                                    .put("hoist", hoist)
+                                    .put("permissions", allow))
+                            .asJson();
+                    if (response.getStatus() == 403) {
+                        throw new PermissionsException("Missing permissions!");
+                    }
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
+                        throw new Exception("Received http status code " + response.getStatus()
+                                + " with message " + response.getStatusText());
+                    }
+
+                    // update permissions
+                    if (ImplRole.this.permissions.getAllowed() != allow) {
+                        final ImplPermissions oldPermissions = ImplRole.this.permissions;
+                        ImplRole.this.permissions = new ImplPermissions(allow);
+                        // call listener
+                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((RoleChangePermissionsListener) listener)
+                                                .onRoleChangePermissions(api, ImplRole.this, oldPermissions);
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // update name
+                    if (ImplRole.this.name != name) {
+                        final String oldName = ImplRole.this.name;
+                        ImplRole.this.name = name;
+                        // call listener
+                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((RoleChangeNameListener) listener)
+                                                .onRoleChangeName(api, ImplRole.this, oldName);
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // TODO no listeners for color and hoist atm
+                    ImplRole.this.color = new Color(color);
+                    ImplRole.this.hoist = hoist;
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        });
+    }
+
     /**
      * Adds an user.
      *
@@ -144,7 +248,7 @@ public class ImplRole implements Role {
      *
      * @param permissions The permissions to set.
      */
-    public void setPermissions(Permissions permissions) {
+    public void setPermissions(ImplPermissions permissions) {
         this.permissions = permissions;
     }
 
