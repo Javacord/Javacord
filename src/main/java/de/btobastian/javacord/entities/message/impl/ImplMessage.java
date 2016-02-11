@@ -18,6 +18,9 @@
  */
 package de.btobastian.javacord.entities.message.impl;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -36,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -196,6 +200,88 @@ public class ImplMessage implements Message {
     @Override
     public ArrayList<MessageAttachment> getAttachments() {
         return new ArrayList<>(attachments);
+    }
+
+    @Override
+    public Future<Message> reply(String content) {
+        return reply(content, false);
+    }
+
+    @Override
+    public Future<Message> reply(String content, boolean tts) {
+        return reply(content, tts, null);
+    }
+
+    @Override
+    public Future<Message> reply(String content, FutureCallback<Message> callback) {
+        return reply(content, false, callback);
+    }
+
+    @Override
+    public Future<Message> reply(final String content, final boolean tts, FutureCallback<Message> callback) {
+        final MessageReceiver receiver = findReceiver(channelId);
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        HttpResponse<JsonNode> response =
+                                Unirest.post("https://discordapp.com/api/channels/"
+                                        + channelId + "/messages")
+                                        .header("authorization", api.getToken())
+                                        .header("content-type", "application/json")
+                                        .body(new JSONObject()
+                                                .put("content", content)
+                                                .put("tts", tts)
+                                                .put("mentions", new String[0]).toString())
+                                        .asJson();
+                        if (response.getStatus() == 403) {
+                            throw new PermissionsException("Missing permissions!");
+                        }
+                        if (response.getStatus() < 200 || response.getStatus() > 299) {
+                            throw new Exception("Received http status code " + response.getStatus()
+                                    + " with message " + response.getStatusText());
+                        }
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Message> replyFile(final File file) {
+        return replyFile(file, null);
+    }
+
+    @Override
+    public Future<Message> replyFile(final File file, FutureCallback<Message> callback) {
+        final MessageReceiver receiver = findReceiver(channelId);
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        HttpResponse<JsonNode> response =
+                                Unirest.post("https://discordapp.com/api/channels/"
+                                        + channelId + "/messages")
+                                        .header("authorization", api.getToken())
+                                        .field("file", file)
+                                        .asJson();
+                        if (response.getStatus() == 403) {
+                            throw new PermissionsException("Missing permissions!");
+                        }
+                        if (response.getStatus() < 200 || response.getStatus() > 299) {
+                            throw new Exception("Received http status code " + response.getStatus()
+                                    + " with message " + response.getStatusText());
+                        }
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     /**

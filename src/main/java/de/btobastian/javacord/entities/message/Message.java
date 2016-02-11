@@ -18,9 +18,11 @@
  */
 package de.btobastian.javacord.entities.message;
 
+import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -62,9 +64,9 @@ public interface Message {
 
     /**
      * Gets the {@link MessageReceiver receiver} of the message.
-     * Could be a channel or a user.
+     * Could be a channel or a user. If you are the receiver the author of the message will be returned.
      *
-     * @return The receiver of the message.
+     * @return The receiver of the message. If you are the receiver the author of the message will be returned.
      */
     public MessageReceiver getReceiver();
 
@@ -110,5 +112,58 @@ public interface Message {
      * @return The attachments of the message.
      */
     public ArrayList<MessageAttachment> getAttachments();
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> reply(String content);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param tts Whether the message should be tts or not.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> reply(String content, boolean tts);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> reply(String content, FutureCallback<Message> callback);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param tts Whether the message should be tts or not.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback);
+
+    /**
+     * Replies with a file.
+     *
+     * @param file The file to upload.
+     * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> replyFile(File file);
+
+    /**
+     * Replies with a file.
+     *
+     * @param file The file to upload.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> replyFile(File file, FutureCallback<Message> callback);
 
 }
