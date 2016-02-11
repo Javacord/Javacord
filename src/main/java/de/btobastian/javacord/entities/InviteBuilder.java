@@ -54,7 +54,7 @@ public interface InviteBuilder {
     /**
      * Creates the invite.
      *
-     * @return The invite code. Canceled if something didn't work (e.g. missing permissions).
+     * @return The invite code.
      */
     public Future<String> create();
 
@@ -62,7 +62,8 @@ public interface InviteBuilder {
      * Creates the invite.
      *
      * @param callback The callback which will be informed when the invite was created or creating failed.
+     * @return The invite code.
      */
-    public void create(FutureCallback<String> callback);
+    public Future<String> create(FutureCallback<String> callback);
 
 }

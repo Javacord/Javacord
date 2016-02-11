@@ -149,7 +149,7 @@ public class ImplChannel implements Channel {
 
     @Override
     public InviteBuilder getInviteBuilder() {
-        return null;
+        return new ImplInviteBuilder(this, api);
     }
 
     @Override
