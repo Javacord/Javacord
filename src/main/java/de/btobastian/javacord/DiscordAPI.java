@@ -152,4 +152,30 @@ public interface DiscordAPI {
      */
     public boolean isIdle();
 
+    /**
+     * Gets the token of the current connection.
+     * It's recommended to store this token somewhere and use it to login instead of always connecting using
+     * email and password. Discord will block too many token requests.
+     *
+     * @return The token of the current connection. <code>Null</code> if the bot isn't connected.
+     */
+    public String getToken();
+
+    /**
+     * Sets the token which is used to connect. You don't need email and password if you have a token, but it's
+     * recommended to set email and password, too. The api will try to connect using the token first. If this
+     * fails (e.g. if the token is expired) it will use the email and password.
+     *
+     * @param token The token to set.
+     */
+    public void setToken(String token);
+
+    /**
+     * Checks if the token is valid.
+     *
+     * @param token The token to check.
+     * @return Whether the token is valid or not.
+     */
+    public boolean checkTokenBlocking(String token);
+
 }

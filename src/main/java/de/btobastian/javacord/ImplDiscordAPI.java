@@ -90,7 +90,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void connectBlocking() {
-        token = requestTokenBlocking();
+        if (token == null || !checkTokenBlocking(token)) {
+            token = requestTokenBlocking();
+        }
         String gateway = requestGatewayBlocking();
         try {
             socket = new DiscordWebsocket(new URI(gateway), this);
@@ -206,6 +208,31 @@ public class ImplDiscordAPI implements DiscordAPI {
         return idle;
     }
 
+    @Override
+    public String getToken() {
+        return token;
+    }
+
+    @Override
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Override
+    public boolean checkTokenBlocking(String token) {
+        try {
+            HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/users/@me/guilds")
+                    .header("authorization", token)
+                    .asJson();
+            if (response.getStatus() < 200 || response.getStatus() > 299) {
+                return false;
+            }
+            return true;
+        } catch (UnirestException e) {
+            return false;
+        }
+    }
+
     /**
      * Gets or creates a user based on the given data.
      *
@@ -239,16 +266,6 @@ public class ImplDiscordAPI implements DiscordAPI {
         return users;
     }
 
-
-    /**
-     * Gets the token. May be null if not connected.
-     *
-     * @return The token.
-     */
-    public String getToken() {
-        return token;
-    }
-
     /**
      * Gets the used websocket.
      *
@@ -270,6 +287,9 @@ public class ImplDiscordAPI implements DiscordAPI {
                     .field("password", password)
                     .asJson();
             JSONObject jsonResponse = response.getBody().getObject();
+            if (response.getStatus() == 400) {
+                throw new IllegalArgumentException("400 Bad request! Maybe wrong email or password?");
+            }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
                         + " with message " + response.getStatusText());
