@@ -20,6 +20,8 @@ package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -28,7 +30,9 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
@@ -44,6 +48,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * The implementation of {@link DiscordAPI}.
@@ -66,6 +71,22 @@ public class ImplDiscordAPI implements DiscordAPI {
     private final ArrayList<Message> messages = new ArrayList<>();
 
     private final ConcurrentHashMap<Class<?>, List<Listener>> listeners = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, SettableFuture<Server>> waitingForListener = new ConcurrentHashMap<>();
+
+    private final Object listenerLock = new Object();
+
+    private final ServerJoinListener listener = new ServerJoinListener() {
+        @Override
+        public void onServerJoin(DiscordAPI api, Server server) {
+            synchronized (listenerLock) { // be sure to read the guild id before trying to check for waiting listeners
+                SettableFuture<Server> future = waitingForListener.get(server.getId());
+                if (future != null) {
+                    waitingForListener.remove(server.getId());
+                    future.set(server);
+                }
+            }
+        }
+    };
 
     /**
      * Creates a new instance of this class.
@@ -109,6 +130,8 @@ public class ImplDiscordAPI implements DiscordAPI {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        // register listener for server joins
+        registerListener(listener);
     }
 
     @Override
@@ -231,6 +254,44 @@ public class ImplDiscordAPI implements DiscordAPI {
         } catch (UnirestException e) {
             return false;
         }
+    }
+
+    @Override
+    public Future<Server> acceptInvite(String inviteCode) {
+        return acceptInvite(inviteCode, null);
+    }
+
+    @Override
+    public Future<Server> acceptInvite(final String inviteCode, FutureCallback<Server> callback) {
+        ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
+            @Override
+            public Server call() throws Exception {
+                final SettableFuture<Server> settableFuture;
+                synchronized (listenerLock) {
+                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/invite/" + inviteCode)
+                            .header("authorization", token)
+                            .asJson();
+                    if (response.getStatus() == 403) {
+                        throw new PermissionsException("Missing permissions!");
+                    }
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
+                        throw new Exception("Received http status code " + response.getStatus()
+                                + " with message " + response.getStatusText());
+                    }
+                    String guildId = response.getBody().getObject().getJSONObject("guild").getString("id");
+                    if (getServerById(guildId) != null) {
+                        throw new IllegalStateException("Already member of this server!");
+                    }
+                    settableFuture = SettableFuture.create();
+                    waitingForListener.put(guildId, settableFuture);
+                }
+                return settableFuture.get();
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     /**

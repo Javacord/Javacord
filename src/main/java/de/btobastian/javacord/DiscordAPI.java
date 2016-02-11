@@ -26,6 +26,7 @@ import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
 
 import java.util.Collection;
+import java.util.concurrent.Future;
 
 /**
  * This is the most important class of the api.
@@ -177,5 +178,22 @@ public interface DiscordAPI {
      * @return Whether the token is valid or not.
      */
     public boolean checkTokenBlocking(String token);
+
+    /**
+     * Accepts an invite.
+     *
+     * @param inviteCode The invite code.
+     * @return The server.
+     */
+    public Future<Server> acceptInvite(String inviteCode);
+
+    /**
+     * Accepts an invite.
+     *
+     * @param inviteCode The invite code.
+     * @param callback The callback which will be informed when you joined the server or joining failed.
+     * @return The server.
+     */
+    public Future<Server> acceptInvite(String inviteCode, FutureCallback<Server> callback);
 
 }
