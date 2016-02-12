@@ -72,7 +72,11 @@ public class ImplServer implements Server {
 
         JSONArray channels = data.getJSONArray("channels");
         for (int i = 0; i < channels.length(); i++) {
-            new ImplChannel(channels.getJSONObject(i), this, api);
+            JSONObject channelJson = channels.getJSONObject(i);
+            String type = channelJson.getString("type");
+            if (type.equals("text")) {
+                new ImplChannel(channels.getJSONObject(i), this, api);
+            }
         }
 
         JSONArray members = new JSONArray();
