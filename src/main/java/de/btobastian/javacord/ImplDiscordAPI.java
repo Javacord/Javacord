@@ -38,9 +38,13 @@ import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
+import org.java_websocket.util.Base64;
 import org.json.JSONObject;
 
+import javax.imageio.ImageIO;
 import javax.net.ssl.SSLContext;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
@@ -290,6 +294,64 @@ public class ImplDiscordAPI implements DiscordAPI {
                     if (getServerById(guildId) != null) {
                         throw new IllegalStateException("Already member of this server!");
                     }
+                    settableFuture = SettableFuture.create();
+                    waitingForListener.put(guildId, settableFuture);
+                }
+                return settableFuture.get();
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Server> createServer(String name) {
+        return createServer(name, null, null);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, FutureCallback<Server> callback) {
+        return createServer(name, null, callback);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, BufferedImage icon) {
+        return createServer(name, icon, null);
+    }
+
+    @Override
+    public Future<Server> createServer(final String name, final BufferedImage icon, FutureCallback<Server> callback) {
+        ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
+            @Override
+            public Server call() throws Exception {
+                if (name == null || name.length() < 2 || name.length() > 100) {
+                    throw new IllegalArgumentException("Name must be 2-100 characters long!");
+                }
+                JSONObject params = new JSONObject();
+                if (icon != null) {
+                    if (icon.getHeight() != 128 || icon.getWidth() != 128) {
+                        throw new IllegalArgumentException("Icon must be 128*128px!");
+                    }
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    ImageIO.write(icon, "jpg", os);
+                    params.put("icon", "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray()));
+                }
+                params.put("name", name);
+                params.put("region", "us-west");
+                final SettableFuture<Server> settableFuture;
+                synchronized (listenerLock) {
+                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds")
+                            .header("authorization", token)
+                            .header("Content-Type", "application/json")
+                            .body(params.toString())
+                            .asJson();
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
+                        throw new IllegalStateException("Received http status code " + response.getStatus()
+                                + " with message " + response.getStatusText());
+                    }
+                    String guildId = response.getBody().getObject().getString("id");
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
                 }

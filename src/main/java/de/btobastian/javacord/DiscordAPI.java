@@ -25,6 +25,7 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
 
+import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.concurrent.Future;
 
@@ -195,5 +196,41 @@ public interface DiscordAPI {
      * @return The server.
      */
     public Future<Server> acceptInvite(String inviteCode, FutureCallback<Server> callback);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param callback The callback which will be informed when you created the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, FutureCallback<Server> callback);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param icon The icon of the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, BufferedImage icon);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param icon The icon of the server.
+     * @param callback The callback which will be informed when you created the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, BufferedImage icon, FutureCallback<Server> callback);
 
 }
