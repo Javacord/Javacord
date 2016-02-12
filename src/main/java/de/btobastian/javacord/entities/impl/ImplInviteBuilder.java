@@ -91,7 +91,8 @@ public class ImplInviteBuilder implements InviteBuilder {
                         HttpResponse<JsonNode> response = Unirest
                                 .post("https://discordapp.com/api/channels/" + channel.getId() + "/invites")
                                 .header("authorization", api.getToken())
-                                .body(jsonParam)
+                                .header("Content-Type", "application/json")
+                                .body(jsonParam.toString())
                                 .asJson();
                         if (response.getStatus() == 403) {
                             throw new PermissionsException("Missing permissions!");

@@ -391,7 +391,8 @@ public class ImplUser implements User {
             }
             HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/users/" + id + "/channels")
                     .header("authorization", api.getToken())
-                    .body(new JSONObject().put("recipient_id", id))
+                    .header("Content-Type", "application/json")
+                    .body(new JSONObject().put("recipient_id", id).toString())
                     .asJson();
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new Exception("Received http status code " + response.getStatus()
