@@ -65,7 +65,7 @@ public class PresenceUpdateHandler extends PacketHandler {
         // check game
         if (packet.has("game") && !packet.isNull("game")) {
             if (packet.getJSONObject("game").has("name")) {
-                String game = packet.getJSONObject("game").getString("name");
+                String game = packet.getJSONObject("game").get("name").toString();
                 String oldGame = user.getGame();
                 if ((game == null && oldGame != null) || (game != null && oldGame == null) || !game.equals(oldGame)) {
                     ((ImplUser) user).setGame(game);
