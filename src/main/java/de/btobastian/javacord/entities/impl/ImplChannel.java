@@ -31,8 +31,10 @@ import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
@@ -277,6 +279,78 @@ public class ImplChannel implements Channel {
     @Override
     public Permissions getOverwrittenPermissions(Role role) {
         return role.getOverwrittenPermissions(this);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistory(int limit) {
+        return getMessageHistory(null, false, limit, null);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistory(int limit, FutureCallback<MessageHistory> callback) {
+        return getMessageHistory(null, false, limit, callback);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryBefore(Message before, int limit) {
+        return getMessageHistory(before.getId(), true, limit, null);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryBefore(
+            Message before, int limit, FutureCallback<MessageHistory> callback) {
+        return getMessageHistory(before.getId(), true, limit, callback);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryBefore(String beforeId, int limit) {
+        return getMessageHistory(beforeId, true, limit, null);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryBefore(
+            String beforeId, int limit, FutureCallback<MessageHistory> callback) {
+        return getMessageHistory(beforeId, true, limit, callback);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryAfter(Message after, int limit) {
+        return getMessageHistory(after.getId(), false, limit, null);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryAfter(
+            Message after, int limit, FutureCallback<MessageHistory> callback) {
+        return getMessageHistory(after.getId(), false, limit, callback);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryAfter(String afterId, int limit) {
+        return getMessageHistory(afterId, false, limit, null);
+    }
+
+    @Override
+    public Future<MessageHistory> getMessageHistoryAfter(
+            String afterId, int limit, FutureCallback<MessageHistory> callback) {
+        return getMessageHistory(afterId, false, limit, callback);
+    }
+
+    private Future<MessageHistory> getMessageHistory(
+            final String messageId, final boolean before, final int limit, FutureCallback<MessageHistory> callback) {
+        ListenableFuture<MessageHistory> future = api.getThreadPool().getListeningExecutorService().submit(
+                new Callable<MessageHistory>() {
+                    @Override
+                    public MessageHistory call() throws Exception {
+                        MessageHistory history =
+                                new ImplMessageHistory(api, ImplChannel.this, messageId, before, limit);
+                        api.addHistory(history);
+                        return history;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     /**

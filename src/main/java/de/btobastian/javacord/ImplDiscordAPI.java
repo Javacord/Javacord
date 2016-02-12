@@ -30,6 +30,8 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageHistory;
+import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
@@ -42,9 +44,7 @@ import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -73,8 +73,11 @@ public class ImplDiscordAPI implements DiscordAPI {
     private final ConcurrentHashMap<Class<?>, List<Listener>> listeners = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, SettableFuture<Server>> waitingForListener = new ConcurrentHashMap<>();
 
-    private final Object listenerLock = new Object();
+    // let the garbage collector delete old histories
+    private final Set<MessageHistory> messageHistories =
+            Collections.newSetFromMap(new WeakHashMap<MessageHistory, Boolean>());
 
+    private final Object listenerLock = new Object();
     private final ServerJoinListener listener = new ServerJoinListener() {
         @Override
         public void onServerJoin(DiscordAPI api, Server server) {
@@ -204,6 +207,11 @@ public class ImplDiscordAPI implements DiscordAPI {
                 if (message.getId().equals(id)) {
                     return message;
                 }
+            }
+        }
+        synchronized (messageHistories) {
+            for (MessageHistory history : messageHistories) {
+                history.getMessageById(id);
             }
         }
         return null;
@@ -423,6 +431,31 @@ public class ImplDiscordAPI implements DiscordAPI {
         synchronized (messages) {
             messages.remove(message);
         }
+        synchronized (messageHistories) {
+            for (MessageHistory history : messageHistories) {
+                ((ImplMessageHistory) history).removeMessage(message.getId());
+            }
+        }
+    }
+
+    /**
+     * Adds a history to the history list.
+     *
+     * @param history The history to add.
+     */
+    public void addHistory(MessageHistory history) {
+        synchronized (messageHistories) {
+            messageHistories.add(history);
+        }
+    }
+
+    /**
+     * Gets a set with all message histories.
+     *
+     * @return A set with all message histories.
+     */
+    public Set<MessageHistory> getMessageHistories() {
+        return messageHistories;
     }
 
 }
