@@ -66,7 +66,7 @@ public interface Message {
      * Gets the {@link MessageReceiver receiver} of the message.
      * Could be a channel or a user. If you are the receiver the author of the message will be returned.
      *
-     * @return The receiver of the message. If you are the receiver the author of the message will be returned.
+     * @return The receiver of the message. If you are the receiver, the author of the message will be returned.
      */
     public MessageReceiver getReceiver();
 

@@ -43,28 +43,29 @@ public class ImplMessageHistory implements MessageHistory {
      * Creates a new instance of this class.
      *
      * @param api The used api.
-     * @param channel The channel of the messages.
+     * @param channelId The id of the channel.
      * @param limit The maximum number of messages.
      * @throws Exception if something went wrong.
      */
-    public ImplMessageHistory(ImplDiscordAPI api, Channel channel, int limit) throws Exception {
-        this(api, channel, null, false, limit);
+    public ImplMessageHistory(ImplDiscordAPI api, String channelId, int limit) throws Exception {
+        this(api, channelId, null, false, limit);
     }
 
     /**
      * Creates a new instance of this class.
      *
      * @param api The used api.
+     * @param channelId The id of the channel.
      * @param messageId Gets the messages before or after the message with the given id.
      * @param before Whether it should get the messages before or after the given message.
      * @param limit The maximum number of messages.
      * @throws Exception if something went wrong.
      */
-    public ImplMessageHistory(ImplDiscordAPI api, Channel channel, String messageId, boolean before, int limit)
+    public ImplMessageHistory(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
             throws Exception {
         String link = messageId == null ?
-                "https://discordapp.com/api/channels/" + channel.getId() + "/messages?&limit=" + limit
-                : "https://discordapp.com/api/channels/" + channel.getId() + "/messages?&"
+                "https://discordapp.com/api/channels/" + channelId + "/messages?&limit=" + limit
+                : "https://discordapp.com/api/channels/" + channelId + "/messages?&"
                 + (before ? "before" : "after") + "=" + messageId + "&limit=" + limit;
         HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
         if (response.getStatus() == 403) {

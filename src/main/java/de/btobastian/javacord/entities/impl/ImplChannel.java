@@ -335,6 +335,15 @@ public class ImplChannel implements Channel {
         return getMessageHistory(afterId, false, limit, callback);
     }
 
+    /**
+     * Gets the message history.
+     *
+     * @param messageId Gets the messages before or after the message with the given id.
+     * @param before Whether it should get the messages before or after the given message.
+     * @param limit The maximum number of messages.
+     * @param callback The callback.
+     * @return The history.
+     */
     private Future<MessageHistory> getMessageHistory(
             final String messageId, final boolean before, final int limit, FutureCallback<MessageHistory> callback) {
         ListenableFuture<MessageHistory> future = api.getThreadPool().getListeningExecutorService().submit(
@@ -342,7 +351,7 @@ public class ImplChannel implements Channel {
                     @Override
                     public MessageHistory call() throws Exception {
                         MessageHistory history =
-                                new ImplMessageHistory(api, ImplChannel.this, messageId, before, limit);
+                                new ImplMessageHistory(api, id, messageId, before, limit);
                         api.addHistory(history);
                         return history;
                     }

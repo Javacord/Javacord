@@ -225,8 +225,7 @@ public class ImplMessage implements Message {
                     @Override
                     public Message call() throws Exception {
                         HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/"
-                                        + channelId + "/messages")
+                                Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
                                         .header("authorization", api.getToken())
                                         .header("content-type", "application/json")
                                         .body(new JSONObject()
@@ -263,8 +262,7 @@ public class ImplMessage implements Message {
                     @Override
                     public Message call() throws Exception {
                         HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/"
-                                        + channelId + "/messages")
+                                Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
                                         .header("authorization", api.getToken())
                                         .field("file", file)
                                         .asJson();
@@ -301,17 +299,13 @@ public class ImplMessage implements Message {
      */
     private MessageReceiver findReceiver(String channelId) {
         for (Server server : api.getServers()) {
-            for (Channel c : server.getChannels()) {
-                if (c.getId().equals(channelId)) {
-                    return c;
-                }
+            if (server.getChannelById(channelId) != null) {
+                return server.getChannelById(channelId);
             }
         }
         for (User user : api.getUsers()) {
             if (channelId.equals(((ImplUser) user).getUserChannelId())) {
-                if (user != author) {
-                    return user;
-                }
+                return user;
             }
         }
         return null;
