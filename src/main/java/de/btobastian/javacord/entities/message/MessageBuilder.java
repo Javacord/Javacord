@@ -82,6 +82,16 @@ public class MessageBuilder {
     }
 
     /**
+     * Appends a new line.
+     *
+     * @return This object to reuse it.
+     */
+    public MessageBuilder appendNewLine() {
+        strBuilder.append("\n");
+        return this;
+    }
+
+    /**
      * Generates the String to send.
      *
      * @return The String to send.
