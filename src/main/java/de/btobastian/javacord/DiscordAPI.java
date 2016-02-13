@@ -234,4 +234,11 @@ public interface DiscordAPI {
      */
     public Future<Server> createServer(String name, BufferedImage icon, FutureCallback<Server> callback);
 
+    /**
+     * Gets yourself (the user with which you logged in).
+     *
+     * @return Yourself.
+     */
+    public User getYourself();
+
 }

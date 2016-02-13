@@ -64,7 +64,6 @@ public abstract class PacketHandler {
                     } catch (Exception e) {
                         System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
                         e.printStackTrace();
-
                     }
                 }
             });
@@ -74,7 +73,6 @@ public abstract class PacketHandler {
             } catch (Exception e) {
                 System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
                 e.printStackTrace();
-
             }
         }
     }

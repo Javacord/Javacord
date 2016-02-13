@@ -67,6 +67,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String game = null;
     private boolean idle = false;
 
+    private User you = null;
+
     private DiscordWebsocket socket = null;
 
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
@@ -372,6 +374,20 @@ public class ImplDiscordAPI implements DiscordAPI {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public User getYourself() {
+        return you;
+    }
+
+    /**
+     * Sets yourself.
+     *
+     * @param user You.
+     */
+    public void setYourself(User user) {
+        this.you = user;
     }
 
     /**

@@ -71,6 +71,8 @@ public class ReadyHandler extends PacketHandler {
                 ((ImplUser) user).setUserChannelId(id);
             }
         }
+
+        api.setYourself(api.getOrCreateUser(packet.getJSONObject("user")));
     }
 
 }
