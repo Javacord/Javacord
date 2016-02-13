@@ -43,6 +43,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -75,7 +76,14 @@ public class ImplMessage implements Message {
             content = data.getString("content");
         }
         tts = data.getBoolean("tts");
-        author = api.getUserById(data.getJSONObject("author").getString("id"));
+
+        User authorTemp = null;
+        try {
+            authorTemp = api.getUserById(data.getJSONObject("author").getString("id")).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        author = authorTemp;
 
         try {
             JSONArray attachments = data.getJSONArray("attachments");
@@ -93,7 +101,12 @@ public class ImplMessage implements Message {
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
             String userId = mentions.getJSONObject(i).getString("id");
-            User user = api.getUserById(userId);
+            User user;
+            try {
+                user = api.getUserById(userId).get();
+            } catch (InterruptedException | ExecutionException e) {
+                continue;
+            }
             this.mentions.add(user);
         }
 

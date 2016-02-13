@@ -99,12 +99,13 @@ public interface DiscordAPI {
     public Collection<Server> getServers();
 
     /**
-     * Gets an user by its id.
+     * Gets an user by its id. It first will check if the user is in the cache. If no user was found in the cache it
+     * tries to request it from the api.
      *
      * @param id The id of the user.
      * @return The user with the given id. <code>Null</code> if no user with the id was found.
      */
-    public User getUserById(String id);
+    public Future<User> getUserById(String id);
 
     /**
      * Gets a collection with all known users.

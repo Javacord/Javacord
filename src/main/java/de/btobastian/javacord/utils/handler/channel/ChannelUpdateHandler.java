@@ -38,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Handles the channel update packet.
@@ -133,7 +134,12 @@ public class ChannelUpdateHandler extends PacketHandler {
 
             // permissions overwritten by users
             if (type.equals("member")) {
-                User user = api.getUserById(id);
+                User user;
+                try {
+                    user = api.getUserById(id).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    continue;
+                }
                 ImplPermissions permissions = new ImplPermissions(allow, deny);
                 Permissions oldPermissions = channel.getOverwrittenPermissions(user);
                 if (!oldPermissions.equals(permissions)) {

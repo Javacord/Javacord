@@ -26,6 +26,8 @@ import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * This class handles the ready packet.
  */
@@ -48,6 +50,9 @@ public class ReadyHandler extends PacketHandler {
         JSONArray guilds = packet.getJSONArray("guilds"); // guild = server
         for (int i = 0; i < guilds.length(); i++) {
             JSONObject guild = guilds.getJSONObject(i);
+            if (guild.has("unavailable") && guild.getBoolean("unavailable")) {
+                continue;
+            }
             new ImplServer(guild, api);
         }
 
@@ -56,7 +61,12 @@ public class ReadyHandler extends PacketHandler {
             JSONObject privateChannel = privateChannels.getJSONObject(i);
             String id = privateChannel.getString("id");
             String userId = privateChannel.getJSONObject("recipient").getString("id");
-            User user = api.getUserById(userId);
+            User user;
+            try {
+                user = api.getUserById(userId).get();
+            } catch (InterruptedException | ExecutionException e) {
+                continue;
+            }
             if (user != null) {
                 ((ImplUser) user).setUserChannelId(id);
             }

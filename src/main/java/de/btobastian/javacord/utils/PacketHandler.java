@@ -59,11 +59,23 @@ public abstract class PacketHandler {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    handle(packet);
+                    try {
+                        handle(packet);
+                    } catch (Exception e) {
+                        System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
+                        e.printStackTrace();
+
+                    }
                 }
             });
         } else {
-            handle(packet);
+            try {
+                handle(packet);
+            } catch (Exception e) {
+                System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
+                e.printStackTrace();
+
+            }
         }
     }
 

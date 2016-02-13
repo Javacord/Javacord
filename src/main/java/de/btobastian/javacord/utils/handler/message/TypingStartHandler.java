@@ -21,6 +21,7 @@ package de.btobastian.javacord.utils.handler.message;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.TypingStartListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Handles the typing start packet.
@@ -57,9 +59,15 @@ public class TypingStartHandler extends PacketHandler {
 
         String userId = packet.getString("user_id");
         List<Listener> listeners =  api.getListeners(TypingStartListener.class);
+        User user;
+        try {
+            user = api.getUserById(userId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            return;
+        }
         synchronized (listeners) {
             for (Listener listener : listeners) {
-                ((TypingStartListener) listener).onTypingStart(api, api.getUserById(userId), channel);
+                ((TypingStartListener) listener).onTypingStart(api, user, channel);
             }
         }
     }

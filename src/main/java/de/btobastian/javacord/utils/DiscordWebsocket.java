@@ -108,6 +108,7 @@ public class DiscordWebsocket extends WebSocketClient {
                         .put("$device", "")
                         .put("$referrer", "https://discordapp.com/@me")
                         .put("$referring_domain", "discordapp.com"))
+                    .put("large_threshold", 250)
                     .put("compress", false));
         send(connectPacket.toString());
     }

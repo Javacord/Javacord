@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -102,7 +103,13 @@ public class ImplServer implements Server {
         }
         for (int i = 0; i < presences.length(); i++) {
             JSONObject presence = presences.getJSONObject(i);
-            User user = api.getUserById(presence.getJSONObject("user").getString("id"));
+            User user;
+            try {
+                user = api.getUserById(presence.getJSONObject("user").getString("id")).get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                continue;
+            }
             if (presence.has("game") && !presence.isNull("game")) {
                 if (presence.getJSONObject("game").has("name") && !presence.getJSONObject("game").isNull("name")) {
                     ((ImplUser) user).setGame(presence.getJSONObject("game").getString("name"));

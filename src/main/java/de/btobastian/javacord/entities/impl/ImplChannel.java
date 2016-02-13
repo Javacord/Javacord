@@ -50,6 +50,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -101,7 +102,12 @@ public class ImplChannel implements Channel {
                 }
             }
             if (type.equals("member")) {
-                User user = api.getUserById(id);
+                User user;
+                try {
+                    user = api.getUserById(id).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    continue;
+                }
                 if (user != null) {
                     overwrittenPermissions.put(user.getId(), new ImplPermissions(allow, deny));
                 }

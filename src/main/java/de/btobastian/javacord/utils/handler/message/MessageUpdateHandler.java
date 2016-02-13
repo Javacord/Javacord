@@ -51,6 +51,9 @@ public class MessageUpdateHandler extends PacketHandler {
             return;
         }
         String oldContent = message.getContent();
+        if (!packet.has("content")) {
+            return;
+        }
         ((ImplMessage) message).setContent(packet.getString("content"));
 
         List<Listener> listeners =  api.getListeners(MessageEditListener.class);

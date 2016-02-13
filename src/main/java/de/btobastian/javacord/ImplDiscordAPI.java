@@ -179,8 +179,18 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public User getUserById(String id) {
-        return users.get(id);
+    public Future<User> getUserById(String id) {
+        User user = users.get(id);
+        if (user != null) {
+            return Futures.immediateFuture(user);
+        }
+        return getThreadPool().getListeningExecutorService().submit(new Callable<User>() {
+            @Override
+            public User call() throws Exception {
+                // TODO make request (GET /api/:guild_id/members/:user_id)
+                return null;
+            }
+        });
     }
 
     @Override
@@ -372,7 +382,7 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public User getOrCreateUser(JSONObject data) {
         String id = data.getString("id");
-        User user = getUserById(id);
+        User user = users.get(id);
         if (user == null) {
             user = new ImplUser(data, this);
         }

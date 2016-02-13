@@ -40,12 +40,12 @@ public class PresenceUpdateHandler extends PacketHandler {
      * @param api The api.
      */
     public PresenceUpdateHandler(ImplDiscordAPI api) {
-        super(api, false, "PRESENCE_UPDATE");
+        super(api, true, "PRESENCE_UPDATE");
     }
 
     @Override
     public void handle(JSONObject packet) {
-        User user = api.getUserById(packet.getJSONObject("user").getString("id"));
+        User user = api.getOrCreateUser(packet.getJSONObject("user"));
 
         // check username
         if (packet.getJSONObject("user").has("username")) {
@@ -67,7 +67,9 @@ public class PresenceUpdateHandler extends PacketHandler {
             if (packet.getJSONObject("game").has("name")) {
                 String game = packet.getJSONObject("game").get("name").toString();
                 String oldGame = user.getGame();
-                if ((game == null && oldGame != null) || (game != null && oldGame == null) || !game.equals(oldGame)) {
+                if ((game == null && oldGame != null)
+                        || (game != null && oldGame == null)
+                        || (game != null && !game.equals(oldGame))) {
                     ((ImplUser) user).setGame(game);
                     List<Listener> listeners = api.getListeners(UserChangeGameListener.class);
                     synchronized (listeners) {
