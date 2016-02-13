@@ -32,6 +32,7 @@ public abstract class PacketHandler {
     private final String type;
     private boolean async;
     private ExecutorService executorService;
+    protected final ExecutorService listenerExecutorService;
 
     /**
      * Creates a new instance of this class.
@@ -47,6 +48,7 @@ public abstract class PacketHandler {
         if (async) {
             executorService = api.getThreadPool().getSingleThreadExecutorService("handlers");
         }
+        listenerExecutorService = api.getThreadPool().getSingleThreadExecutorService("listeners");
     }
 
     /**

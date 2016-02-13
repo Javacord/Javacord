@@ -139,8 +139,6 @@ public class ImplDiscordAPI implements DiscordAPI {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        // register listener for server joins
-        registerListener(listener);
     }
 
     @Override
@@ -544,6 +542,15 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public Set<MessageHistory> getMessageHistories() {
         return messageHistories;
+    }
+
+    /**
+     * Gets the internal used server join listener (for server creations and invite accepts).
+     *
+     * @return The internal used server join listener.
+     */
+    public ServerJoinListener getInternalServerJoinListener() {
+        return listener;
     }
 
 }

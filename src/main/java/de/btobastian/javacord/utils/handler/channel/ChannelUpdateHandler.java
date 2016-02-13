@@ -75,53 +75,70 @@ public class ChannelUpdateHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerTextChannel(JSONObject packet, Server server) {
-        ImplChannel channel = null;
+        ImplChannel channelTemp = null;
         for (Channel c : server.getChannels()) {
             if (c.getId().equals(packet.getString("id"))) {
-                channel = (ImplChannel) c;
+                channelTemp = (ImplChannel) c;
                 break;
             }
         }
-        if (channel == null) {
+        if (channelTemp == null) {
             return; // no channel with the given id was found
         }
+        final ImplChannel channel = channelTemp;
 
         String name = packet.getString("name");
         if (!channel.getName().equals(name)) {
-            String oldName = channel.getName();
+            final String oldName = channel.getName();
             channel.setName(name);
-            List<Listener> listeners =  api.getListeners(ChannelChangeNameListener.class);
-            synchronized (listeners) {
-                for (Listener listener : listeners) {
-                    ((ChannelChangeNameListener) listener).onChannelChangeName(api, channel, oldName);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(ChannelChangeNameListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((ChannelChangeNameListener) listener).onChannelChangeName(api, channel, oldName);
+                        }
+                    }
                 }
-            }
+            });
         }
 
         String topic = packet.getString("topic");
         if ((channel.getTopic() != null && topic == null)
                 || (channel.getTopic() == null && topic != null)
                 || (channel.getTopic() != null && !channel.getTopic().equals(topic))) {
-            String oldTopic = channel.getTopic();
+            final String oldTopic = channel.getTopic();
             channel.setTopic(topic);
-            List<Listener> listeners =  api.getListeners(ChannelChangeTopicListener.class);
-            synchronized (listeners) {
-                for (Listener listener : listeners) {
-                    ((ChannelChangeTopicListener) listener).onChannelChangeTopic(api, channel, oldTopic);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(ChannelChangeTopicListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((ChannelChangeTopicListener) listener).onChannelChangeTopic(api, channel, oldTopic);
+                        }
+                    }
                 }
-            }
+            });
         }
 
         int position = packet.getInt("position");
         if (channel.getPosition() != position) {
-            int oldPosition = channel.getPosition();
+            final int oldPosition = channel.getPosition();
             channel.setPosition(position);
-            List<Listener> listeners =  api.getListeners(ChannelChangePositionListener.class);
-            synchronized (listeners) {
-                for (Listener listener : listeners) {
-                    ((ChannelChangePositionListener) listener).onChannelChangePosition(api, channel, oldPosition);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(ChannelChangePositionListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((ChannelChangePositionListener) listener)
+                                    .onChannelChangePosition(api, channel, oldPosition);
+                        }
+                    }
                 }
-            }
+            });
         }
 
         JSONArray permissionOverwrites = packet.getJSONArray("permission_overwrites");
@@ -134,41 +151,51 @@ public class ChannelUpdateHandler extends PacketHandler {
 
             // permissions overwritten by users
             if (type.equals("member")) {
-                User user;
+                final User user;
                 try {
                     user = api.getUserById(id).get();
                 } catch (InterruptedException | ExecutionException e) {
                     continue;
                 }
                 ImplPermissions permissions = new ImplPermissions(allow, deny);
-                Permissions oldPermissions = channel.getOverwrittenPermissions(user);
+                final Permissions oldPermissions = channel.getOverwrittenPermissions(user);
                 if (!oldPermissions.equals(permissions)) {
                     channel.setOverwrittenPermissions(user, permissions);
-                    List<Listener> listeners =  api.getListeners(UserChangeOverwrittenPermissionsListener.class);
-                    synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((UserChangeOverwrittenPermissionsListener) listener).onUserChangeOverwrittenPermissions(
-                                    api, user, channel, oldPermissions);
+                    listenerExecutorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(UserChangeOverwrittenPermissionsListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((UserChangeOverwrittenPermissionsListener) listener)
+                                            .onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                }
+                            }
                         }
-                    }
+                    });
                 }
 
             }
 
             // permissions overwritten by roles
             if (type.equals("role")) {
-                Role role = channel.getServer().getRoleById(id);
+                final Role role = channel.getServer().getRoleById(id);
                 ImplPermissions permissions = new ImplPermissions(allow, deny);
-                Permissions oldPermissions = role.getOverwrittenPermissions(channel);
+                final Permissions oldPermissions = role.getOverwrittenPermissions(channel);
                 if (!permissions.equals(oldPermissions)) {
                     ((ImplRole) role).setOverwrittenPermissions(channel, permissions);
-                    List<Listener> listeners =  api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
-                    synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((RoleChangeOverwrittenPermissionsListener) listener).onRoleChangeOverwrittenPermissions(
-                                    api, role, channel, oldPermissions);
+                    listenerExecutorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners = api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((RoleChangeOverwrittenPermissionsListener) listener)
+                                            .onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                }
+                            }
                         }
-                    }
+                    });
                 }
             }
         }

@@ -161,7 +161,7 @@ public class ImplChannel implements Channel {
                     }
                     server.removeChannel(ImplChannel.this);
                     // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
                             List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);

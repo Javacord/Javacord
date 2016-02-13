@@ -147,7 +147,7 @@ public class ImplServer implements Server {
                                 + " with message " + response.getStatusText());
                     }
                     api.getServerMap().remove(id);
-                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
                             List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);

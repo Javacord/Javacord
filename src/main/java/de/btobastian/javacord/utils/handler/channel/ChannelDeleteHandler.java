@@ -21,10 +21,8 @@ package de.btobastian.javacord.utils.handler.channel;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.impl.ImplChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -66,14 +64,19 @@ public class ChannelDeleteHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerTextChannel(JSONObject packet, Server server) {
-        Channel channel = server.getChannelById(packet.getString("id"));
+        final Channel channel = server.getChannelById(packet.getString("id"));
         ((ImplServer) server).removeChannel(channel);
-        List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((ChannelDeleteListener) listener).onChannelDelete(api, channel);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((ChannelDeleteListener) listener).onChannelDelete(api, channel);
+                    }
+                }
             }
-        }
+        });
     }
 
     /**

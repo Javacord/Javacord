@@ -43,14 +43,22 @@ public class GuildDeleteHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        Server server = api.getServerById(packet.getString("id"));
-        api.getServerMap().remove(server.getId());
-        List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((ServerLeaveListener) listener).onServerLeave(api, server);
-            }
+        final Server server = api.getServerById(packet.getString("id"));
+        if (server == null) {
+            return;
         }
+        api.getServerMap().remove(server.getId());
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((ServerLeaveListener) listener).onServerLeave(api, server);
+                    }
+                }
+            }
+        });
     }
 
 }

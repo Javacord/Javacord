@@ -53,43 +53,59 @@ public class GuildRoleUpdateHandler extends PacketHandler {
         JSONObject roleJson = packet.getJSONObject("role");
 
         Server server = api.getServerById(guildId);
-        ImplRole role = (ImplRole) server.getRoleById(roleJson.getString("id"));
+        final ImplRole role = (ImplRole) server.getRoleById(roleJson.getString("id"));
 
         String name = roleJson.getString("name");
         if (!role.getName().equals(name)) {
-            String oldName = role.getName();
+            final String oldName = role.getName();
             role.setName(name);
-            List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
-            synchronized (listeners) {
-                for (Listener listener : listeners) {
-                    ((RoleChangeNameListener) listener).onRoleChangeName(api, role, oldName);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((RoleChangeNameListener) listener).onRoleChangeName(api, role, oldName);
+                        }
+                    }
                 }
-            }
+            });
         }
 
         Permissions permissions = new ImplPermissions(roleJson.getInt("permissions"));
         if (!role.getPermissions().equals(permissions)) {
-            Permissions oldPermissions = role.getPermissions();
+            final Permissions oldPermissions = role.getPermissions();
             role.setPermissions((ImplPermissions) permissions);
-            List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
-            synchronized (listeners) {
-                for (Listener listener : listeners) {
-                    ((RoleChangePermissionsListener) listener).onRoleChangePermissions(api, role, oldPermissions);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((RoleChangePermissionsListener) listener)
+                                    .onRoleChangePermissions(api, role, oldPermissions);
+                        }
+                    }
                 }
-            }
+            });
         }
 
         synchronized (Role.class) { // we don't want strange positions
             int position = roleJson.getInt("position");
             if (role.getPosition() != position) {
-                int oldPosition = role.getPosition();
+                final int oldPosition = role.getPosition();
                 role.setPosition(position);
-                List<Listener> listeners =  api.getListeners(RoleChangePositionListener.class);
-                synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((RoleChangePositionListener) listener).onRoleChangePosition(api, role, oldPosition);
+                listenerExecutorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<Listener> listeners =  api.getListeners(RoleChangePositionListener.class);
+                        synchronized (listeners) {
+                            for (Listener listener : listeners) {
+                                ((RoleChangePositionListener) listener).onRoleChangePosition(api, role, oldPosition);
+                            }
+                        }
                     }
-                }
+                });
             }
         }
     }

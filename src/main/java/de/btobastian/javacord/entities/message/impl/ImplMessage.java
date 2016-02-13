@@ -191,7 +191,7 @@ public class ImplMessage implements Message {
                     }
                     api.removeMessage(message);
                     // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
                             List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);

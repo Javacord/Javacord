@@ -49,7 +49,7 @@ public class GuildRoleDeleteHandler extends PacketHandler {
         String roleId = packet.getString("role_id");
 
         Server server = api.getServerById(guildId);
-        Role role = server.getRoleById(roleId);
+        final Role role = server.getRoleById(roleId);
 
         if (role == null) {
             return;
@@ -57,12 +57,17 @@ public class GuildRoleDeleteHandler extends PacketHandler {
 
         ((ImplServer) server).removeRole(role);
 
-        List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((RoleDeleteListener) listener).onRoleDelete(api, role);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((RoleDeleteListener) listener).onRoleDelete(api, role);
+                    }
+                }
             }
-        }
+        });
     }
 
 }

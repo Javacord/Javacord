@@ -179,7 +179,7 @@ public class ImplRole implements Role {
                         final ImplPermissions oldPermissions = ImplRole.this.permissions;
                         ImplRole.this.permissions = new ImplPermissions(allow);
                         // call listener
-                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
                                 List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
@@ -198,7 +198,7 @@ public class ImplRole implements Role {
                         final String oldName = ImplRole.this.name;
                         ImplRole.this.name = name;
                         // call listener
-                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
                                 List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
