@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>1.1.6</version>
+  <version>2.0.0</version>
   <name>Javacord</name>
   <description>A simple to use API to create a discord bot</description>
   
@@ -20,10 +20,6 @@
       <id>ASC</id>
       <url>https://maven.java.net/content/repositories/snapshots/</url>
     </repository>
-    <repository>
-      <id>tomp2p.net</id>
-      <url>http://tomp2p.net/dev/mvn/</url>
-    </repository>
   </repositories>
   
   <dependencies>
@@ -35,7 +31,17 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20150729</version>
+      <version>20140107</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>19.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.mashape.unirest</groupId>
+      <artifactId>unirest-java</artifactId>
+      <version>1.4.7</version>
     </dependency>
     <dependency>
       <groupId>org.java-websocket</groupId>
@@ -60,10 +66,13 @@
               <minimizeJar>true</minimizeJar>
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <artifactSet>
-                <!-- Include stuff -->
                 <includes>
+                  <!-- Include JSON stuff -->
                   <include>org.jsoup:jsoup</include>
                   <include>org.json:json</include>
+                  <!-- Include Unirest -->
+                  <inclide>com.mashape.unirest:unirest-java</inclide>
+                  <!-- Include Websocket -->
                   <include>org.java-websocket:Java-WebSocket</include>
                 </includes>
               </artifactSet>
@@ -76,7 +85,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.3</version>
         <configuration>
-          <excludePackageNames>com.mycompany.myapp.package1.*:com.mycompany.myapp.package2:*.util.*</excludePackageNames>
+          <excludePackageNames>*.impl*</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
