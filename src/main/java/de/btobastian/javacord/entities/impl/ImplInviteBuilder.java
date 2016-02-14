@@ -94,13 +94,7 @@ public class ImplInviteBuilder implements InviteBuilder {
                                 .header("Content-Type", "application/json")
                                 .body(jsonParam.toString())
                                 .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return response.getBody().getObject().getString("code");
                     }
                 });

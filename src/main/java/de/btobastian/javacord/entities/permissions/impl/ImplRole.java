@@ -166,13 +166,7 @@ public class ImplRole implements Role {
                                     .put("hoist", hoist)
                                     .put("permissions", allow))
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
 
                     // update permissions
                     if (ImplRole.this.permissions.getAllowed() != allow) {

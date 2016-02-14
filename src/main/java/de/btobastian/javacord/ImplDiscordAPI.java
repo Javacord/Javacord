@@ -293,13 +293,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/invite/" + inviteCode)
                             .header("authorization", token)
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    checkResponse(response);
                     String guildId = response.getBody().getObject().getJSONObject("guild").getString("id");
                     if (getServerById(guildId) != null) {
                         throw new IllegalStateException("Already member of this server!");
@@ -357,10 +351,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                             .header("Content-Type", "application/json")
                             .body(params.toString())
                             .asJson();
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new IllegalStateException("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    checkResponse(response);
                     String guildId = response.getBody().getObject().getString("id");
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
@@ -447,7 +438,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
-                        + " with message " + response.getStatusText());
+                        + " with message " + response.getStatusText() + " and body " + response.getBody());
             }
             if (jsonResponse.has("password") || jsonResponse.has("email")) {
                 throw new IllegalArgumentException("Wrong email or password!");
@@ -474,7 +465,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
-                        + " with message " + response.getStatusText());
+                        + " with message " + response.getStatusText() + " and body " + response.getBody());
             }
             return response.getBody().getObject().getString("url");
         } catch (UnirestException e) {

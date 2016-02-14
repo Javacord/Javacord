@@ -68,13 +68,7 @@ public class ImplMessageHistory implements MessageHistory {
                 : "https://discordapp.com/api/channels/" + channelId + "/messages?&"
                 + (before ? "before" : "after") + "=" + messageId + "&limit=" + limit;
         HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
-        if (response.getStatus() == 403) {
-            throw new PermissionsException("Missing permissions!");
-        }
-        if (response.getStatus() < 200 || response.getStatus() > 299) {
-            throw new Exception("Received http status code " + response.getStatus()
-                    + " with message " + response.getStatusText());
-        }
+        api.checkResponse(response);
         JSONArray messages = response.getBody().getArray();
         for (int i = 0; i < messages.length(); i++) {
             JSONObject messageJson = messages.getJSONObject(i);

@@ -152,13 +152,7 @@ public class ImplChannel implements Channel {
                             .delete("https://discordapp.com/api/channels/:id" + id)
                             .header("authorization", api.getToken())
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
                     server.removeChannel(ImplChannel.this);
                     // call listener
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
@@ -227,13 +221,7 @@ public class ImplChannel implements Channel {
                                                 .put("tts", tts)
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -260,13 +248,7 @@ public class ImplChannel implements Channel {
                                         .header("authorization", api.getToken())
                                         .field("file", file)
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });

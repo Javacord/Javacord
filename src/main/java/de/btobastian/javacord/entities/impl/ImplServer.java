@@ -143,13 +143,7 @@ public class ImplServer implements Server {
                     HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
                     api.getServerMap().remove(id);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
