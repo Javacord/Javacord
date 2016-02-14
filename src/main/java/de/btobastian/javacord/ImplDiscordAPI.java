@@ -26,8 +26,10 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
@@ -451,6 +453,31 @@ public class ImplDiscordAPI implements DiscordAPI {
                 return null;
             }
         });
+    }
+
+    @Override
+    public Future<Invite> parseInvite(String invite) {
+        return parseInvite(invite, null);
+    }
+
+    @Override
+    public Future<Invite> parseInvite(String invite, FutureCallback<Invite> callback) {
+        final String inviteCode = invite.replace("https://discord.gg/", "").replace("http://discord.gg/", "");
+        ListenableFuture<Invite> future = getThreadPool().getListeningExecutorService().submit(new Callable<Invite>() {
+            @Override
+            public Invite call() throws Exception {
+                HttpResponse<JsonNode> response = Unirest
+                        .get("https://discordapp.com/api/invite/" + inviteCode)
+                        .header("authorization", token)
+                        .asJson();
+                checkResponse(response);
+                return new ImplInvite(ImplDiscordAPI.this, response.getBody().getObject());
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     /**

@@ -25,6 +25,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.InviteBuilder;
 import org.json.JSONObject;
 
@@ -67,16 +68,16 @@ public class ImplInviteBuilder implements InviteBuilder {
     }
 
     @Override
-    public Future<String> create() {
+    public Future<Invite> create() {
         return create(null);
     }
 
     @Override
-    public Future<String> create(FutureCallback<String> callback) {
-        ListenableFuture<String> future =
-                api.getThreadPool().getListeningExecutorService().submit(new Callable<String>() {
+    public Future<Invite> create(FutureCallback<Invite> callback) {
+        ListenableFuture<Invite> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Invite>() {
                     @Override
-                    public String call() throws Exception {
+                    public Invite call() throws Exception {
                         JSONObject jsonParam = new JSONObject();
                         if (maxUses > 0) {
                             jsonParam.put("max_uses", maxUses);
@@ -94,7 +95,7 @@ public class ImplInviteBuilder implements InviteBuilder {
                                 .body(jsonParam.toString())
                                 .asJson();
                         api.checkResponse(response);
-                        return response.getBody().getObject().getString("code");
+                        return new ImplInvite(api, response.getBody().getObject());
                     }
                 });
         if (callback != null) {

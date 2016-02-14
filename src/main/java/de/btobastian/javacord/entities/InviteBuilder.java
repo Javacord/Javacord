@@ -54,16 +54,16 @@ public interface InviteBuilder {
     /**
      * Creates the invite.
      *
-     * @return The invite code.
+     * @return The invite.
      */
-    public Future<String> create();
+    public Future<Invite> create();
 
     /**
      * Creates the invite.
      *
-     * @param callback The callback which will be informed when the invite was created or creating failed.
-     * @return The invite code.
+     * @param callback The callback which will be informed when the invite was created or creation failed.
+     * @return The invite.
      */
-    public Future<String> create(FutureCallback<String> callback);
+    public Future<Invite> create(FutureCallback<Invite> callback);
 
 }

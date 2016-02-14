@@ -19,6 +19,7 @@
 package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
@@ -303,5 +304,22 @@ public interface DiscordAPI {
      */
     public Future<Exception> updateProfile(
             String newUsername, String newEmail, String newPassword, BufferedImage newAvatar);
+
+    /**
+     * Tries to parse the given invite.
+     *
+     * @param invite The invite code or the invite url.
+     * @return The parsed invite.
+     */
+    public Future<Invite> parseInvite(String invite);
+
+    /**
+     * Tries to parse the given invite.
+     *
+     * @param invite The invite code or the invite url.
+     * @param callback The callback which will be informed when the invite has been parsed.
+     * @return The parsed invite.
+     */
+    public Future<Invite> parseInvite(String invite, FutureCallback<Invite> callback);
 
 }

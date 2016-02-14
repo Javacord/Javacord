@@ -26,6 +26,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -227,6 +228,35 @@ public class ImplServer implements Server {
                             }
                         });
                         return channel;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Invite[]> getInvites() {
+        return getInvites(null);
+    }
+
+    @Override
+    public Future<Invite[]> getInvites(FutureCallback<Invite[]> callback) {
+        ListenableFuture<Invite[]> future = api.getThreadPool().getListeningExecutorService().submit(
+                new Callable<Invite[]>() {
+                    @Override
+                    public Invite[] call() throws Exception {
+                        HttpResponse<JsonNode> response = Unirest
+                                .get("https://discordapp.com/api/guilds/" + getId() + "/invites")
+                                .header("authorization", api.getToken())
+                                .asJson();
+                        api.checkResponse(response);
+                        Invite[] invites = new Invite[response.getBody().getArray().length()];
+                        for (int i = 0; i < response.getBody().getArray().length(); i++) {
+                            invites[i] = new ImplInvite(api, response.getBody().getArray().getJSONObject(i));
+                        }
+                        return invites;
                     }
                 });
         if (callback != null) {
