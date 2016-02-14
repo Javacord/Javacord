@@ -65,6 +65,9 @@ public class ChannelCreateHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerTextChannel(JSONObject packet, Server server) {
+        if (server.getChannelById(packet.getString("id")) != null) {
+            return;
+        }
         final Channel channel = new ImplChannel(packet, (ImplServer) server, api);
         listenerExecutorService.submit(new Runnable() {
             @Override

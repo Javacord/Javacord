@@ -536,6 +536,22 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     /**
+     * Checks the response.
+     *
+     * @param response The response to check.
+     * @throws Exception If the response has problems (status code not between 200 and 300).
+     */
+    public void checkResponse(HttpResponse<JsonNode> response) throws Exception {
+        if (response.getStatus() == 403) {
+            throw new PermissionsException("Missing permissions!");
+        }
+        if (response.getStatus() < 200 || response.getStatus() > 299) {
+            throw new Exception("Received http status code " + response.getStatus()
+                    + " with message " + response.getStatusText() + " and body " + response.getBody());
+        }
+    }
+
+    /**
      * Gets a set with all message histories.
      *
      * @return A set with all message histories.

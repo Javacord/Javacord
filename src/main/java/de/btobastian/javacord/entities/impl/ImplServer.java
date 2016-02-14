@@ -18,6 +18,9 @@
  */
 package de.btobastian.javacord.entities.impl;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -29,6 +32,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -206,6 +210,38 @@ public class ImplServer implements Server {
         return roles.get(id);
     }
 
+    @Override
+    public Future<Channel> createChannel(String name) {
+        return createChannel(name, null);
+    }
+
+    @Override
+    public Future<Channel> createChannel(final String name, FutureCallback<Channel> callback) {
+        ListenableFuture<Channel> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Channel>() {
+                    @Override
+                    public Channel call() throws Exception {
+                        final Channel channel = (Channel) createChannelBlocking(name, false);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                                    }
+                                }
+                            }
+                        });
+                        return channel;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
     /**
      * Adds a user to the server.
      *
@@ -258,6 +294,30 @@ public class ImplServer implements Server {
      */
     public void removeChannel(Channel channel) {
         channels.remove(channel.getId());
+    }
+
+    /**
+     * Creates a new channel.
+     *
+     * @param name The name of the channel.
+     * @param voice Whether the channel should be voice or text.
+     * @return The created channel.
+     * @throws Exception If something went wrong.
+     */
+    private Object createChannelBlocking(String name, boolean voice) throws Exception {
+        JSONObject param = new JSONObject().put("name", name).put("type", voice ? "voice" : "text");
+        HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds/" + id + "/channels")
+                .header("authorization", api.getToken())
+                .header("Content-Type", "application/json")
+                .body(param.toString())
+                .asJson();
+        api.checkResponse(response);
+        if (voice) {
+            // TODO voice channels
+            return null;
+        } else {
+            return new ImplChannel(response.getBody().getObject(), this, api);
+        }
     }
 
     @Override
