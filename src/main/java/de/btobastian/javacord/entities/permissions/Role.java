@@ -114,4 +114,12 @@ public interface Role {
      */
     public Future<Exception> updateName(String name);
 
+    /**
+     * Deletes the role.
+     *
+     * @return A future which tells us if the update was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> delete();
+
 }

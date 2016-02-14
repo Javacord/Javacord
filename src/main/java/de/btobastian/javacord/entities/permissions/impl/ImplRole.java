@@ -28,10 +28,10 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.RoleChangeNameListener;
 import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listener.role.RoleDeleteListener;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -265,4 +265,34 @@ public class ImplRole implements Role {
         overwrittenPermissions.put(channel.getId(), permissions);
     }
 
+    @Override
+    public Future<Exception> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    server.removeRole(ImplRole.this);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((RoleDeleteListener) listener).onRoleDelete(api, ImplRole.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
 }
