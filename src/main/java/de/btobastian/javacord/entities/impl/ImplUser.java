@@ -187,6 +187,11 @@ public class ImplUser implements User {
     }
 
     @Override
+    public String getAvatarId() {
+        return avatarId;
+    }
+
+    @Override
     public Future<Message> sendMessage(String content) {
         return sendMessage(content, false);
     }
@@ -417,6 +422,15 @@ public class ImplUser implements User {
      */
     public void setGame(String game) {
         this.game = game;
+    }
+
+    /**
+     * Sets the avatar id of the user.
+     *
+     * @param avatarId The avatar id of the user.
+     */
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
     }
 
 }

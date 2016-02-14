@@ -26,8 +26,10 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
@@ -35,6 +37,7 @@ import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
+import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
@@ -45,6 +48,7 @@ import javax.imageio.ImageIO;
 import javax.net.ssl.SSLContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
@@ -368,6 +372,112 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public User getYourself() {
         return you;
+    }
+
+    @Override
+    public Future<Exception> updateUsername(String newUsername) {
+        return updateProfile(newUsername, null, null, null);
+    }
+
+    @Override
+    public Future<Exception> updateEmail(String newEmail) {
+        return updateProfile(null, newEmail, null, null);
+    }
+
+    @Override
+    public Future<Exception> updatePassword(String newPassword) {
+        return updateProfile(null, null, newPassword, null);
+    }
+
+    @Override
+    public Future<Exception> updateAvatar(BufferedImage newAvatar) {
+        return updateProfile(null, null, null, newAvatar);
+    }
+
+    @Override
+    public Future<Exception> updateProfile(
+            String newUsername, String newEmail, final String newPassword, BufferedImage newAvatar) {
+        String avatarString = getYourself().getAvatarId();
+        if (newAvatar != null) {
+            try {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                ImageIO.write(newAvatar, "jpg", os);
+                avatarString = "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray());
+            } catch (IOException ignored) { }
+        }
+        final JSONObject params = new JSONObject()
+                .put("username", newUsername == null ? getYourself().getName() : newUsername)
+                .put("email", newEmail == null ? email : newEmail)
+                .put("avatar", avatarString == null ? JSONObject.NULL : avatarString)
+                .put("password", password);
+        if (newPassword != null) {
+            params.put("new_password", newPassword);
+        }
+        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/users/@me")
+                            .header("authorization", token)
+                            .header("Content-Type", "application/json")
+                            .body(params.toString())
+                            .asJson();
+                    checkResponse(response);
+                    ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
+                    setEmail(response.getBody().getObject().getString("email"));
+                    setToken(response.getBody().getObject().getString("token"));
+                    final String oldName = getYourself().getName();
+                    ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
+                    if (newPassword != null) {
+                        password = newPassword;
+                    }
+
+                    if (!getYourself().getName().equals(oldName)) {
+                        getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners = getListeners(UserChangeNameListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((UserChangeNameListener) listener)
+                                                .onUserChangeName(ImplDiscordAPI.this, getYourself(), oldName);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Invite> parseInvite(String invite) {
+        return parseInvite(invite, null);
+    }
+
+    @Override
+    public Future<Invite> parseInvite(String invite, FutureCallback<Invite> callback) {
+        final String inviteCode = invite.replace("https://discord.gg/", "").replace("http://discord.gg/", "");
+        ListenableFuture<Invite> future = getThreadPool().getListeningExecutorService().submit(new Callable<Invite>() {
+            @Override
+            public Invite call() throws Exception {
+                HttpResponse<JsonNode> response = Unirest
+                        .get("https://discordapp.com/api/invite/" + inviteCode)
+                        .header("authorization", token)
+                        .asJson();
+                checkResponse(response);
+                return new ImplInvite(ImplDiscordAPI.this, response.getBody().getObject());
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     /**

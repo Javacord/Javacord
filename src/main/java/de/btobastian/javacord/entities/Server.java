@@ -132,4 +132,19 @@ public interface Server {
      */
     public Future<Channel> createChannel(String name, FutureCallback<Channel> callback);
 
+    /**
+     * Gets an array with all invites.
+     *
+     * @return An array with all invites.
+     */
+    public Future<Invite[]> getInvites();
+
+    /**
+     * Gets an array with all invites.
+     *
+     * @param callback The callback which will be informed when the request has finished.
+     * @return An array with all invites.
+     */
+    public Future<Invite[]> getInvites(FutureCallback<Invite[]> callback);
+
 }
