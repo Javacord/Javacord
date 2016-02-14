@@ -22,10 +22,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
-import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

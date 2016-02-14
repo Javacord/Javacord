@@ -18,9 +18,6 @@
  */
 package de.btobastian.javacord.entities;
 
-import com.google.common.util.concurrent.FutureCallback;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;

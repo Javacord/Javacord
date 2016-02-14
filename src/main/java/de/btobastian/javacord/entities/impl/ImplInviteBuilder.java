@@ -26,7 +26,6 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.InviteBuilder;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONObject;
 
 import java.util.concurrent.Callable;

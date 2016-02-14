@@ -33,7 +33,6 @@ import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -22,7 +22,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.permissions.Role;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Future;
 
 /**
