@@ -47,29 +47,35 @@ public class TypingStartHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        Channel channel = null;
+        Channel channelTemp = null;
         String channelId = packet.getString("channel_id");
         Iterator<Server> serverIterator = api.getServers().iterator();
         while (serverIterator.hasNext()) {
-            channel = serverIterator.next().getChannelById(channelId);
-            if (channel != null) {
+            channelTemp = serverIterator.next().getChannelById(channelId);
+            if (channelTemp != null) {
                 break;
             }
         }
+        final Channel channel = channelTemp;
 
         String userId = packet.getString("user_id");
-        List<Listener> listeners =  api.getListeners(TypingStartListener.class);
-        User user;
+        final User user;
         try {
             user = api.getUserById(userId).get();
         } catch (InterruptedException | ExecutionException e) {
             return;
         }
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((TypingStartListener) listener).onTypingStart(api, user, channel);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(TypingStartListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((TypingStartListener) listener).onTypingStart(api, user, channel);
+                    }
+                }
             }
-        }
+        });
     }
 
 }

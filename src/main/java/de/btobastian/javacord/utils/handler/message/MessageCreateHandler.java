@@ -45,16 +45,22 @@ public class MessageCreateHandler extends PacketHandler {
     @Override
     public void handle(JSONObject packet) {
         String messageId = packet.getString("id");
-        Message message = api.getMessageById(messageId);
-        if (message == null) {
-            message = new ImplMessage(packet, api, null);
+        Message messageTemp = api.getMessageById(messageId);
+        if (messageTemp == null) {
+            messageTemp = new ImplMessage(packet, api, null);
         }
-        List<Listener> listeners =  api.getListeners(MessageCreateListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((MessageCreateListener) listener).onMessageCreate(api, message);
+        final Message message = messageTemp;
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(MessageCreateListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((MessageCreateListener) listener).onMessageCreate(api, message);
+                    }
+                }
             }
-        }
+        });
     }
 
 }

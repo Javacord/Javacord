@@ -2,9 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.1</version>
   <name>Javacord</name>
-  <description>A simple to use API to create a discord bot</description>
+  <description>A multithreaded but simple to use discord java api.</description>
 
   <properties>
     <maven.compiler.target>1.7</maven.compiler.target>

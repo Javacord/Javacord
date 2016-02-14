@@ -28,10 +28,10 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.RoleChangeNameListener;
 import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listener.role.RoleDeleteListener;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -166,20 +166,14 @@ public class ImplRole implements Role {
                                     .put("hoist", hoist)
                                     .put("permissions", allow))
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
 
                     // update permissions
                     if (ImplRole.this.permissions.getAllowed() != allow) {
                         final ImplPermissions oldPermissions = ImplRole.this.permissions;
                         ImplRole.this.permissions = new ImplPermissions(allow);
                         // call listener
-                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
                                 List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
@@ -198,7 +192,7 @@ public class ImplRole implements Role {
                         final String oldName = ImplRole.this.name;
                         ImplRole.this.name = name;
                         // call listener
-                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
                                 List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
@@ -271,4 +265,34 @@ public class ImplRole implements Role {
         overwrittenPermissions.put(channel.getId(), permissions);
     }
 
+    @Override
+    public Future<Exception> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    server.removeRole(ImplRole.this);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((RoleDeleteListener) listener).onRoleDelete(api, ImplRole.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
 }

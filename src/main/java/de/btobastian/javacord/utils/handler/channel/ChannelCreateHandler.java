@@ -65,14 +65,21 @@ public class ChannelCreateHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerTextChannel(JSONObject packet, Server server) {
-        Channel channel = new ImplChannel(packet, (ImplServer) server, api);
-
-        List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((ChannelCreateListener) listener).onChannelCreate(api, channel);
-            }
+        if (server.getChannelById(packet.getString("id")) != null) {
+            return;
         }
+        final Channel channel = new ImplChannel(packet, (ImplServer) server, api);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                    }
+                }
+            }
+        });
     }
 
     /**

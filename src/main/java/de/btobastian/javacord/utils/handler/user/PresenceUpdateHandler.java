@@ -45,20 +45,25 @@ public class PresenceUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        User user = api.getOrCreateUser(packet.getJSONObject("user"));
+        final User user = api.getOrCreateUser(packet.getJSONObject("user"));
 
         // check username
         if (packet.getJSONObject("user").has("username")) {
             String name = packet.getJSONObject("user").getString("username");
             if (!user.getName().equals(name)) {
-                String oldName = user.getName();
+                final String oldName = user.getName();
                 ((ImplUser) user).setName(name);
-                List<Listener> listeners = api.getListeners(UserChangeNameListener.class);
-                synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((UserChangeNameListener) listener).onUserChangeName(api, user, oldName);
+                listenerExecutorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<Listener> listeners = api.getListeners(UserChangeNameListener.class);
+                        synchronized (listeners) {
+                            for (Listener listener : listeners) {
+                                ((UserChangeNameListener) listener).onUserChangeName(api, user, oldName);
+                            }
+                        }
                     }
-                }
+                });
             }
         }
 

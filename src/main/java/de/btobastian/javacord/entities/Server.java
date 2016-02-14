@@ -18,10 +18,10 @@
  */
 package de.btobastian.javacord.entities;
 
+import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.permissions.Role;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -114,5 +114,22 @@ public interface Server {
      *         <code>Null</code> if the role does not exist on this server.
      */
     public Role getRoleById(String id);
+
+    /**
+     * Creates a new channel.
+     *
+     * @param name The name of the channel.
+     * @return The created channel.
+     */
+    public Future<Channel> createChannel(String name);
+
+    /**
+     * Creates a new channel.
+     *
+     * @param name The name of the channel.
+     * @param callback The callback which will be informed when the server was created.
+     * @return The created channel.
+     */
+    public Future<Channel> createChannel(String name, FutureCallback<Channel> callback);
 
 }

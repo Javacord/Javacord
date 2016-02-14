@@ -22,10 +22,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
-import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -68,13 +66,7 @@ public class ImplMessageHistory implements MessageHistory {
                 : "https://discordapp.com/api/channels/" + channelId + "/messages?&"
                 + (before ? "before" : "after") + "=" + messageId + "&limit=" + limit;
         HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
-        if (response.getStatus() == 403) {
-            throw new PermissionsException("Missing permissions!");
-        }
-        if (response.getStatus() < 200 || response.getStatus() > 299) {
-            throw new Exception("Received http status code " + response.getStatus()
-                    + " with message " + response.getStatusText());
-        }
+        api.checkResponse(response);
         JSONArray messages = response.getBody().getArray();
         for (int i = 0; i < messages.length(); i++) {
             JSONObject messageJson = messages.getJSONObject(i);

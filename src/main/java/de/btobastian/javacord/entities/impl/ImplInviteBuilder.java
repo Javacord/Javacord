@@ -26,7 +26,6 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.InviteBuilder;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
@@ -94,13 +93,7 @@ public class ImplInviteBuilder implements InviteBuilder {
                                 .header("Content-Type", "application/json")
                                 .body(jsonParam.toString())
                                 .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return response.getBody().getObject().getString("code");
                     }
                 });

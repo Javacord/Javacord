@@ -18,9 +18,6 @@
  */
 package de.btobastian.javacord.entities;
 
-import com.google.common.util.concurrent.FutureCallback;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -103,5 +100,37 @@ public interface Channel extends MessageReceiver {
      * @return The overwritten permissions of the role.
      */
     public Permissions getOverwrittenPermissions(Role role);
+
+    /**
+     * Updates the name of the channel.
+     * If you want to update the topic, too, use {@link #update(String, String)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newName The new name of the channel.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateName(String newName);
+
+    /**
+     * Updates the topic of the channel.
+     * If you want to update the name, too, use {@link #update(String, String)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newTopic The new topic of the channel.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateTopic(String newTopic);
+
+    /**
+     * Updates the channel.
+     *
+     * @param newName The new name of the channel.
+     * @param newTopic The new topic of the channel.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> update(String newName, String newTopic);
 
 }

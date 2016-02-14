@@ -22,7 +22,6 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -46,22 +45,26 @@ public class MessageUpdateHandler extends PacketHandler {
     @Override
     public void handle(JSONObject packet) {
         String messageId = packet.getString("id");
-        Message message = api.getMessageById(messageId);
+        final Message message = api.getMessageById(messageId);
         if (message == null) {
             return;
         }
-        String oldContent = message.getContent();
+        final String oldContent = message.getContent();
         if (!packet.has("content")) {
             return;
         }
         ((ImplMessage) message).setContent(packet.getString("content"));
-
-        List<Listener> listeners =  api.getListeners(MessageEditListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((MessageEditListener) listener).onMessageEdit(api, message, oldContent);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(MessageEditListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((MessageEditListener) listener).onMessageEdit(api, message, oldContent);
+                    }
+                }
             }
-        }
+        });
     }
 
 }

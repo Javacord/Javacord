@@ -67,6 +67,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String game = null;
     private boolean idle = false;
 
+    private User you = null;
+
     private DiscordWebsocket socket = null;
 
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
@@ -137,8 +139,6 @@ public class ImplDiscordAPI implements DiscordAPI {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        // register listener for server joins
-        registerListener(listener);
     }
 
     @Override
@@ -293,13 +293,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/invite/" + inviteCode)
                             .header("authorization", token)
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    checkResponse(response);
                     String guildId = response.getBody().getObject().getJSONObject("guild").getString("id");
                     if (getServerById(guildId) != null) {
                         throw new IllegalStateException("Already member of this server!");
@@ -357,10 +351,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                             .header("Content-Type", "application/json")
                             .body(params.toString())
                             .asJson();
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new IllegalStateException("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    checkResponse(response);
                     String guildId = response.getBody().getObject().getString("id");
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
@@ -372,6 +363,20 @@ public class ImplDiscordAPI implements DiscordAPI {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public User getYourself() {
+        return you;
+    }
+
+    /**
+     * Sets yourself.
+     *
+     * @param user You.
+     */
+    public void setYourself(User user) {
+        this.you = user;
     }
 
     /**
@@ -433,7 +438,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
-                        + " with message " + response.getStatusText());
+                        + " with message " + response.getStatusText() + " and body " + response.getBody());
             }
             if (jsonResponse.has("password") || jsonResponse.has("email")) {
                 throw new IllegalArgumentException("Wrong email or password!");
@@ -460,7 +465,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
-                        + " with message " + response.getStatusText());
+                        + " with message " + response.getStatusText() + " and body " + response.getBody());
             }
             return response.getBody().getObject().getString("url");
         } catch (UnirestException e) {
@@ -522,12 +527,37 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     /**
+     * Checks the response.
+     *
+     * @param response The response to check.
+     * @throws Exception If the response has problems (status code not between 200 and 300).
+     */
+    public void checkResponse(HttpResponse<JsonNode> response) throws Exception {
+        if (response.getStatus() == 403) {
+            throw new PermissionsException("Missing permissions!");
+        }
+        if (response.getStatus() < 200 || response.getStatus() > 299) {
+            throw new Exception("Received http status code " + response.getStatus()
+                    + " with message " + response.getStatusText() + " and body " + response.getBody());
+        }
+    }
+
+    /**
      * Gets a set with all message histories.
      *
      * @return A set with all message histories.
      */
     public Set<MessageHistory> getMessageHistories() {
         return messageHistories;
+    }
+
+    /**
+     * Gets the internal used server join listener (for server creations and invite accepts).
+     *
+     * @return The internal used server join listener.
+     */
+    public ServerJoinListener getInternalServerJoinListener() {
+        return listener;
     }
 
 }

@@ -45,16 +45,21 @@ public class GuildMemberRemoveHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        Server server = api.getServerById(packet.getString("guild_id"));
-        User user = api.getOrCreateUser(packet.getJSONObject("user"));
+        final Server server = api.getServerById(packet.getString("guild_id"));
+        final User user = api.getOrCreateUser(packet.getJSONObject("user"));
         if (server != null) {
             ((ImplServer) server).removeMember(user);
-            List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
-            synchronized (listeners) {
-                for (Listener listener : listeners) {
-                    ((ServerMemberRemoveListener) listener).onServerMemberRemove(api, user, server);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((ServerMemberRemoveListener) listener).onServerMemberRemove(api, user, server);
+                        }
+                    }
                 }
-            }
+            });
         }
     }
 

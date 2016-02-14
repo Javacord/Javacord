@@ -44,13 +44,29 @@ public class GuildCreateHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        Server server = new ImplServer(packet, api);
-        List<Listener> listeners =  api.getListeners(ServerJoinListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((ServerJoinListener) listener).onServerJoin(api, server);
-            }
+        if (packet.has("unavailable") && packet.getBoolean("unavailable")) {
+            return;
         }
+        final Server server = new ImplServer(packet, api);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(ServerJoinListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((ServerJoinListener) listener).onServerJoin(api, server);
+                    }
+                }
+            }
+        });
+        api.getThreadPool().getExecutorService().submit(new Runnable() {
+            @Override
+            public void run() {
+                // can cause a deadlock if someone blocks a listener
+                // with the #createServer or #acceptInvite method + #get
+                api.getInternalServerJoinListener().onServerJoin(api, server);
+            }
+        });
     }
 
 }
