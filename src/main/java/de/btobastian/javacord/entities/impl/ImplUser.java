@@ -108,7 +108,7 @@ public class ImplUser implements User {
 
     @Override
     public boolean isYourself() {
-        return false; // TODO
+        return api.getYourself() == this;
     }
 
     @Override

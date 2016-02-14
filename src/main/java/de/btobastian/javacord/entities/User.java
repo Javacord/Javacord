@@ -52,7 +52,7 @@ public interface User extends MessageReceiver {
     public void type();
 
     /**
-     * Checks if the user is yourself.
+     * Checks if the user is the account you logged in.
      *
      * @return Whether the user is you or not.
      */

@@ -11,13 +11,13 @@ A simple library to create a discord bot.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.1</version>
 </dependency>
 ```
 
 #Wiki
 
-For detailed information take a look at the wiki: https://github.com/BtoBastian/Javacord/wiki/Logging-in
+For detailed information take a look at the wiki: https://github.com/BtoBastian/Javacord/wiki
 
 #Download
 For those of you how don't use maven: http://ci.ketrwu.de/job/Javacord/lastSuccessfulBuild/
