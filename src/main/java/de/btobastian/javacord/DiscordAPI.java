@@ -241,4 +241,67 @@ public interface DiscordAPI {
      */
     public User getYourself();
 
+    /**
+     * Updates the username.
+     * If you want to update the email or password, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newUsername The new username.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateUsername(String newUsername);
+
+    /**
+     * Updates the email address.
+     * Attention: Do not mix up with {@link #setEmail(String)}! This method changes the account settings!
+     * If you want to update the username or password, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newEmail The new email.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateEmail(String newEmail);
+
+    /**
+     * Updates the password.
+     * Attention: Do not mix up with {@link #setPassword(String)}! This method changes the account settings!
+     * If you want to update the username or email, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newPassword The new password.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updatePassword(String newPassword);
+
+    /**
+     * Updates the avatar.
+     * If you want to update the username, password or email, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newAvatar The new avatar.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateAvatar(BufferedImage newAvatar);
+
+    /**
+     * Updates the profile.
+     *
+     * @param newUsername The new username. Set to <code>null</code> to keep the current name.
+     * @param newEmail The new email. Set to <code>null</code> to keep the current email.
+     * @param newPassword The new password. Set to <code>null</code> to keep the current password.
+     * @param newAvatar The new avatar. Set to <code>null</code> to keep the current avatar.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateProfile(
+            String newUsername, String newEmail, String newPassword, BufferedImage newAvatar);
+
 }

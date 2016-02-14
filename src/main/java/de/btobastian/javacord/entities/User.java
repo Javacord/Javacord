@@ -98,6 +98,13 @@ public interface User extends MessageReceiver {
     public URL getAvatarUrl();
 
     /**
+     * Gets the id of the users avatar.
+     *
+     * @return The id of the users avatar. <code>Null</code> if the user has no avatar.
+     */
+    public String getAvatarId();
+
+    /**
      * Gets the roles of the user on the given server.
      *
      * @param server The server.
