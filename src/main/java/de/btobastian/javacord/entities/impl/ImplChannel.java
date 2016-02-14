@@ -40,6 +40,9 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
+import de.btobastian.javacord.listener.channel.ChannelChangePositionListener;
+import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -320,6 +323,83 @@ public class ImplChannel implements Channel {
     public Future<MessageHistory> getMessageHistoryAfter(
             String afterId, int limit, FutureCallback<MessageHistory> callback) {
         return getMessageHistory(afterId, false, limit, callback);
+    }
+
+    @Override
+    public Future<Exception> updateName(String newName) {
+        return update(newName, getTopic());
+    }
+
+    @Override
+    public Future<Exception> updateTopic(String newTopic) {
+        return update(getName(), newTopic);
+    }
+
+    @Override
+    public Future<Exception> update(String newName, String newTopic) {
+        final JSONObject params = new JSONObject()
+                .put("name", newName)
+                .put("topic", newTopic);
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/channels/" + getId())
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(params.toString())
+                            .asJson();
+                    api.checkResponse(response);
+                    String updatedName = response.getBody().getObject().getString("name");
+                    String updatedTopic = null;
+                    if (response.getBody().getObject().has("topic")
+                            && !response.getBody().getObject().isNull("topic")) {
+                        updatedTopic = response.getBody().getObject().getString("topic");
+                    }
+
+                    // check name
+                    if (!updatedName.equals(getName())) {
+                        final String oldName = getName();
+                        setName(updatedName);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ChannelChangeNameListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ChannelChangeNameListener) listener)
+                                                .onChannelChangeName(api, ImplChannel.this, oldName);
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // check topic
+                    if ((getTopic() != null && updatedTopic == null) || (getTopic() == null && updatedTopic != null)
+                            || (getTopic() != null && !getTopic().equals(updatedTopic))) {
+                        final String oldTopic = getTopic();
+                        setTopic(updatedTopic);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ChannelChangeTopicListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ChannelChangeTopicListener) listener)
+                                                .onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**
