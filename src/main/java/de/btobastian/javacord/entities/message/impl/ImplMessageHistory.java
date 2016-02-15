@@ -27,7 +27,7 @@ import de.btobastian.javacord.entities.message.MessageHistory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -61,6 +61,9 @@ public class ImplMessageHistory implements MessageHistory {
      */
     public ImplMessageHistory(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
             throws Exception {
+        if (limit > 100) {
+            limit = 100;
+        }
         String link = messageId == null ?
                 "https://discordapp.com/api/channels/" + channelId + "/messages?&limit=" + limit
                 : "https://discordapp.com/api/channels/" + channelId + "/messages?&"
@@ -86,7 +89,45 @@ public class ImplMessageHistory implements MessageHistory {
 
     @Override
     public Iterator<Message> iterator() {
-        return messages.values().iterator();
+        return getMessages().iterator();
+    }
+
+    @Override
+    public Collection<Message> getMessages() {
+        return Collections.unmodifiableCollection(messages.values());
+    }
+
+    @Override
+    public Message getNewestMessage() {
+        Message newestMessage = null;
+        for (Message message : messages.values()) {
+            if (newestMessage == null) {
+                newestMessage = message;
+            } else if (message.compareTo(newestMessage) > 0) {
+                newestMessage = message;
+            }
+        }
+        return newestMessage;
+    }
+
+    @Override
+    public Message getOldestMessage() {
+        Message oldestMessage = null;
+        for (Message message : messages.values()) {
+            if (oldestMessage == null) {
+                oldestMessage = message;
+            } else if (message.compareTo(oldestMessage) < 0) {
+                oldestMessage = message;
+            }
+        }
+        return oldestMessage;
+    }
+
+    @Override
+    public List<Message> getMessagesSorted() {
+        List<Message> messages = new ArrayList<>(this.messages.values());
+        Collections.sort(messages);
+        return messages;
     }
 
     /**

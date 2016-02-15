@@ -49,7 +49,7 @@ import java.util.concurrent.Future;
 /**
  * The implementation of the user interface.
  */
-public class ImplMessage implements Message, Comparable<Message> {
+public class ImplMessage implements Message {
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 

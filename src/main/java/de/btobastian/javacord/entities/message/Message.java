@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 /**
  * This interface represents a message.
  */
-public interface Message {
+public interface Message extends Comparable<Message> {
 
     /**
      * Gets the id of the message.
