@@ -414,6 +414,36 @@ public class ImplServer implements Server {
         });
     }
 
+    @Override
+    public Future<User[]> getBans() {
+        return getBans(null);
+    }
+
+    @Override
+    public Future<User[]> getBans(FutureCallback<User[]> callback) {
+        ListenableFuture<User[]> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<User[]>() {
+                    @Override
+                    public User[] call() throws Exception {
+                        HttpResponse<JsonNode> response = Unirest
+                                .get("https://discordapp.com/api/guilds/" + getId() + "/bans")
+                                .header("authorization", api.getToken())
+                                .asJson();
+                        api.checkResponse(response);
+                        JSONArray bannedUsersJson = response.getBody().getArray();
+                        User[] bannedUsers = new User[bannedUsersJson.length()];
+                        for (int i = 0; i < bannedUsersJson.length(); i++) {
+                            bannedUsers[i] = api.getOrCreateUser(bannedUsersJson.getJSONObject(i));
+                        }
+                        return bannedUsers;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
     /**
      * Adds a user to the server.
      *

@@ -204,4 +204,19 @@ public interface Server {
      */
     public Future<Exception> unbanUser(String userId);
 
+    /**
+     * Gets an array with all banned users.
+     *
+     * @return An array with all banned users.
+     */
+    public Future<User[]> getBans();
+
+    /**
+     * Gets an array with all banned users.
+     *
+     * @param callback The callback which will be informed when the request finished.
+     * @return An array with all banned users.
+     */
+    public Future<User[]> getBans(FutureCallback<User[]> callback);
+
 }
