@@ -39,7 +39,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -48,7 +51,9 @@ import java.util.concurrent.Future;
 /**
  * The implementation of the user interface.
  */
-public class ImplMessage implements Message {
+public class ImplMessage implements Message, Comparable<Message> {
+
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     private final ImplDiscordAPI api;
 
@@ -60,6 +65,7 @@ public class ImplMessage implements Message {
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
+    private Calendar creationDate = Calendar.getInstance();
 
     /**
      * Creates a new instance of this class.
@@ -75,6 +81,17 @@ public class ImplMessage implements Message {
             content = data.getString("content");
         }
         tts = data.getBoolean("tts");
+
+        if (data.has("timestamp")) {
+            String time = data.getString("timestamp");
+            try {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(FORMAT.parse(time.substring(0, time.length() - 9)));
+                creationDate = calendar;
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
 
         User authorTemp = null;
         try {
@@ -274,6 +291,18 @@ public class ImplMessage implements Message {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public Calendar getCreationDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(creationDate.getTime());
+        return calendar;
+    }
+
+    @Override
+    public int compareTo(Message other) {
+        return this.creationDate.compareTo(other.getCreationDate());
     }
 
     /**

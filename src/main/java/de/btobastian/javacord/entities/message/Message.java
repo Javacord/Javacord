@@ -24,6 +24,7 @@ import de.btobastian.javacord.entities.User;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -165,5 +166,12 @@ public interface Message {
      * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
      */
     public Future<Message> replyFile(File file, FutureCallback<Message> callback);
+
+    /**
+     * Gets the date of creation.
+     *
+     * @return The date of creation.
+     */
+    public Calendar getCreationDate();
 
 }
