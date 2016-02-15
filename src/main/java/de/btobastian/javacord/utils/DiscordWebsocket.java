@@ -186,6 +186,8 @@ public class DiscordWebsocket extends WebSocketClient {
         addHandler(new TypingStartHandler(api));
 
         // server
+        addHandler(new GuildBanAddHandler(api));
+        addHandler(new GuildBanRemoveHandler(api));
         addHandler(new GuildCreateHandler(api));
         addHandler(new GuildDeleteHandler(api));
         addHandler(new GuildMemberAddHandler(api));
