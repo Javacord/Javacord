@@ -25,12 +25,11 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.role.RoleChangeNameListener;
-import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
-import de.btobastian.javacord.listener.role.RoleChangePositionListener;
+import de.btobastian.javacord.listener.role.*;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -84,6 +83,38 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                         for (Listener listener : listeners) {
                             ((RoleChangePermissionsListener) listener)
                                     .onRoleChangePermissions(api, role, oldPermissions);
+                        }
+                    }
+                }
+            });
+        }
+
+        Color color = new Color(packet.getInt("color"));
+        if (role.getColor().getRGB() != color.getRGB()) {
+            final Color oldColor = role.getColor();
+            role.setColor(color);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(RoleChangeColorListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((RoleChangeColorListener) listener).onRoleChangeColor(api, role, oldColor);
+                        }
+                    }
+                }
+            });
+        }
+
+        if (role.getHoist() != packet.getBoolean("hoist")) {
+            role.setHoist(!role.getHoist());
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(RoleChangeHoistListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((RoleChangeHoistListener) listener).onRoleChangeHoist(api, role, !role.getHoist());
                         }
                     }
                 }

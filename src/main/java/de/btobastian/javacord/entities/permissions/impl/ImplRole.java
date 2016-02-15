@@ -29,9 +29,7 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.role.RoleChangeNameListener;
-import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
-import de.btobastian.javacord.listener.role.RoleDeleteListener;
+import de.btobastian.javacord.listener.role.*;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -231,9 +229,42 @@ public class ImplRole implements Role {
                         });
                     }
 
-                    // TODO no listeners for color and hoist atm
-                    ImplRole.this.color = new Color(color);
-                    ImplRole.this.hoist = hoist;
+                    // update color
+                    if (ImplRole.this.color.getRGB() != new Color(color).getRGB()) {
+                        final Color oldColor = ImplRole.this.color;
+                        ImplRole.this.color = new Color(color);
+                        // call listener
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(RoleChangeColorListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((RoleChangeColorListener) listener)
+                                                .onRoleChangeColor(api, ImplRole.this, oldColor);
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // update hoist
+                    if (ImplRole.this.hoist != hoist) {
+                        ImplRole.this.hoist = hoist;
+                        // call listener
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(RoleChangeHoistListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((RoleChangeHoistListener) listener)
+                                                .onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
+                                    }
+                                }
+                            }
+                        });
+                    }
                     return null;
                 } catch (Exception e) {
                     return e;
@@ -345,4 +376,23 @@ public class ImplRole implements Role {
     public void setOverwrittenPermissions(Channel channel, Permissions permissions) {
         overwrittenPermissions.put(channel.getId(), permissions);
     }
+
+    /**
+     * Sets the color of the channel.
+     *
+     * @param color The color to set.
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    /**
+     * Sets the hoist of the channel.
+     *
+     * @param hoist The hoist to set.
+     */
+    public void setHoist(boolean hoist) {
+        this.hoist = hoist;
+    }
+
 }

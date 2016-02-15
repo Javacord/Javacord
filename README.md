@@ -11,7 +11,7 @@ A simple library to create a discord bot.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.3</version>
+  <version>2.0.4</version>
 </dependency>
 ```
 
@@ -33,24 +33,42 @@ Thanks to ketrwu, too.
 
 Creating a simple ping-pong bot:
 ```java
-DiscordAPI api = Javacord.getApi("your@mail.com", "creativePassword");
-api.connect(new FutureCallback<DiscordAPI>() {
-    @Override
-    public void onSuccess(DiscordAPI api) {
-        api.registerListener(new MessageCreateListener() {
+package <package>;
+
+import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.listener.message.MessageCreateListener;
+
+/**
+ * A simple ping-pong bot.
+ */
+public class MyPingPongBot {
+
+    public MyPingPongBot(String email, String password) {
+        DiscordAPI api = Javacord.getApi(email, password);
+        // connect
+        api.connect(new FutureCallback<DiscordAPI>() {
             @Override
-            public void onMessageCreate(DiscordAPI api, Message message) {
-                if (message.getContent().equalsIgnoreCase("ping")) {
-                    message.reply("pong");
-                }
+            public void onSuccess(DiscordAPI api) {
+                // register listener
+                api.registerListener(new MessageCreateListener() {
+                    @Override
+                    public void onMessageCreate(DiscordAPI api, Message message) {
+                        // check the content of the message
+                        if (message.getContent().equalsIgnoreCase("ping")) {
+                            // reply to the message
+                            message.reply("pong");
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
             }
         });
     }
 
-    @Override
-    public void onFailure(Throwable t) {
-        // login failed
-        t.printStackTrace();
-    }
-});
+}
 ```
