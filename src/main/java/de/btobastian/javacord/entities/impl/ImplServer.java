@@ -34,6 +34,8 @@ import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
+import de.btobastian.javacord.listener.server.ServerMemberBanListener;
+import de.btobastian.javacord.listener.server.ServerMemberUnbanListener;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import org.json.JSONArray;
@@ -323,6 +325,87 @@ public class ImplServer implements Server {
                             });
                         }
                     }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> banUser(User user) {
+        return banUser(user.getId(), 0);
+    }
+
+    @Override
+    public Future<Exception> banUser(String userId) {
+        return banUser(userId, 0);
+    }
+
+    @Override
+    public Future<Exception> banUser(User user, int deleteDays) {
+        return banUser(user.getId(), deleteDays);
+    }
+
+    @Override
+    public Future<Exception> banUser(final String userId, final int deleteDays) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .put("https://discordapp.com/api/guilds/:guild_id/bans/" + userId
+                                    + "?delete-message-days=" + deleteDays)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    final User user = api.getUserById(userId).get();
+                    if (user != null) {
+                        removeMember(user);
+                    }
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerMemberBanListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerMemberBanListener) listener).onServerMemberBan(api, user, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> unbanUser(final String userId) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/" + getId() + "/bans/" + userId)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerMemberUnbanListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerMemberUnbanListener) listener)
+                                            .onServerMemberUnban(api, userId, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
                 } catch (Exception e) {
                     return e;
                 }

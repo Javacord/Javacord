@@ -157,4 +157,51 @@ public interface Server {
      */
     public Future<Exception> updateRoles(User user, Role[] roles);
 
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user The user to ban.
+     * @return A future which tells us whether the ban was successful or not.
+     *         If the exception is <code>null</code> the ban was successful.
+     */
+    public Future<Exception> banUser(User user);
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId The id of the user to ban.
+     * @return A future which tells us whether the ban was successful or not.
+     *         If the exception is <code>null</code> the ban was successful.
+     */
+    public Future<Exception> banUser(String userId);
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user The user to ban.
+     * @param deleteDays Deletes all messages of the user which are younger than <code>deleteDays</code> days.
+     * @return A future which tells us whether the ban was successful or not.
+     *         If the exception is <code>null</code> the ban was successful.
+     */
+    public Future<Exception> banUser(User user, int deleteDays);
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId The id of the user to ban.
+     * @param deleteDays Deletes all messages of the user which are younger than <code>deleteDays</code> days.
+     * @return A future which tells us whether the ban was successful or not.
+     *         If the exception is <code>null</code> the ban was successful.
+     */
+    public Future<Exception> banUser(String userId, int deleteDays);
+
+    /**
+     * Unbans the user from the server.
+     *
+     * @param userId The id of the user to unban.
+     * @return A future which tells us whether the unban was successful or not.
+     *         If the exception is <code>null</code> the unban was successful.
+     */
+    public Future<Exception> unbanUser(String userId);
+
 }
