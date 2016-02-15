@@ -35,7 +35,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 /**
- * Handles the guild member add packet.
+ * Handles the guild member update packet.
  */
 public class GuildMemberUpdateHandler extends PacketHandler {
 
