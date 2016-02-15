@@ -219,4 +219,22 @@ public interface Server {
      */
     public Future<User[]> getBans(FutureCallback<User[]> callback);
 
+    /**
+     * Kicks the given user from the server.
+     *
+     * @param user The user to kick.
+     * @return A future which tells us whether the kick was successful or not.
+     *         If the exception is <code>null</code> the kick was successful.
+     */
+    public Future<Exception> kickUser(User user);
+
+    /**
+     * Kicks the given user from the server.
+     *
+     * @param userId The id of the user to kick.
+     * @return A future which tells us whether the kick was successful or not.
+     *         If the exception is <code>null</code> the kick was successful.
+     */
+    public Future<Exception> kickUser(String userId);
+
 }

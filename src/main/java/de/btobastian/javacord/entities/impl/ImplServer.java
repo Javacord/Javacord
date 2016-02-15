@@ -35,6 +35,7 @@ import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
 import de.btobastian.javacord.listener.server.ServerMemberBanListener;
+import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listener.server.ServerMemberUnbanListener;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
@@ -442,6 +443,46 @@ public class ImplServer implements Server {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public Future<Exception> kickUser(User user) {
+        return kickUser(user.getId());
+    }
+
+    @Override
+    public Future<Exception> kickUser(final String userId) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/"+ getId() + "/members/" + userId)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    final User user = api.getUserById(userId).get();
+                    if (user != null) {
+                        removeMember(user);
+                    }
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerMemberRemoveListener) listener)
+                                            .onServerMemberRemove(api, user, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**
