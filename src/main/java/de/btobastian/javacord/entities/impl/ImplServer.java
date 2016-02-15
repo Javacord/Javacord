@@ -33,6 +33,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
+import de.btobastian.javacord.listener.role.RoleCreateListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
 import de.btobastian.javacord.listener.server.ServerMemberBanListener;
 import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
@@ -483,6 +484,42 @@ public class ImplServer implements Server {
                 return null;
             }
         });
+    }
+
+    @Override
+    public Future<Role> createRole() {
+        return createRole(null);
+    }
+
+    @Override
+    public Future<Role> createRole(FutureCallback<Role> callback) {
+        ListenableFuture<Role> future = api.getThreadPool().getListeningExecutorService().submit(new Callable<Role>() {
+            @Override
+            public Role call() throws Exception {
+                HttpResponse<JsonNode> response = Unirest
+                        .post("https://discordapp.com/api/guilds/" + getId() + "/roles")
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                final Role role = new ImplRole(response.getBody().getObject(), ImplServer.this, api);
+                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<Listener> listeners =  api.getListeners(RoleCreateListener.class);
+                        synchronized (listeners) {
+                            for (Listener listener : listeners) {
+                                ((RoleCreateListener) listener).onRoleCreate(api, role);
+                            }
+                        }
+                    }
+                });
+                return role;
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
     }
 
     /**

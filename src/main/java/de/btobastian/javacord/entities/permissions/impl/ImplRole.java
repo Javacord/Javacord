@@ -157,14 +157,15 @@ public class ImplRole implements Role {
             @Override
             public Exception call() throws Exception {
                 try {
-                    HttpResponse<JsonNode> response = Unirest.put
-                            ("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
                             .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
                             .body(new JSONObject()
                                     .put("name", name)
                                     .put("color", color)
                                     .put("hoist", hoist)
-                                    .put("permissions", allow))
+                                    .put("permissions", allow).toString())
                             .asJson();
                     api.checkResponse(response);
 

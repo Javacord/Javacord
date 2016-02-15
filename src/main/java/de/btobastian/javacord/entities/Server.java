@@ -237,4 +237,19 @@ public interface Server {
      */
     public Future<Exception> kickUser(String userId);
 
+    /**
+     * Creates a new role.
+     *
+     * @return The created role.
+     */
+    public Future<Role> createRole();
+
+    /**
+     * Creates a new role.
+     *
+     * @param callback The callback which will be informed when the role was created.
+     * @return The created role.
+     */
+    public Future<Role> createRole(FutureCallback<Role> callback);
+
 }
