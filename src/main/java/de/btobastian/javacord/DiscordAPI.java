@@ -322,4 +322,13 @@ public interface DiscordAPI {
      */
     public Future<Invite> parseInvite(String invite, FutureCallback<Invite> callback);
 
+    /**
+     * Deletes the invite with the given code.
+     *
+     * @param inviteCode The invite code.
+     * @return A future which tells us whether the deletion was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> deleteInvite(String inviteCode);
+
 }

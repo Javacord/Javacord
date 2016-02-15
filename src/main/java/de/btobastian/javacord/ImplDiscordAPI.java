@@ -480,6 +480,25 @@ public class ImplDiscordAPI implements DiscordAPI {
         return future;
     }
 
+    @Override
+    public Future<Exception> deleteInvite(final String inviteCode) {
+        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/invite/" + inviteCode)
+                            .header("authorization", token)
+                            .asJson();
+                    checkResponse(response);
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
     /**
      * Sets yourself.
      *

@@ -204,4 +204,8 @@ public class ImplInvite implements Invite {
         return api.acceptInvite(getCode(), callback);
     }
 
+    @Override
+    public Future<Exception> delete() {
+        return api.deleteInvite(getCode());
+    }
 }
