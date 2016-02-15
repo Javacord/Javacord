@@ -135,12 +135,36 @@ public class ImplRole implements Role {
 
     @Override
     public Future<Exception> updatePermissions(Permissions permissions) {
-        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed());
+        return update(name, color, hoist, permissions);
     }
 
     @Override
     public Future<Exception> updateName(String name) {
-        return update(name, color.getRGB(), hoist, permissions.getAllowed());
+        return update(name, color, hoist, permissions);
+    }
+
+    @Override
+    public Future<Exception> updateColor(Color color) {
+        return update(name, color, hoist, permissions);
+    }
+
+    @Override
+    public Future<Exception> updateHoist(boolean hoist) {
+        return update(name, color, hoist, permissions);
+    }
+
+    @Override
+    public Future<Exception> update(String name, Color color, boolean hoist, Permissions permissions) {
+        if (name == null) {
+            name = getName();
+        }
+        if (color == null) {
+            color = getColor();
+        }
+        if (permissions == null) {
+            permissions = getPermissions();
+        }
+        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed());
     }
 
     /**
