@@ -188,7 +188,7 @@ public class ImplRole implements Role {
                     }
 
                     // update name
-                    if (ImplRole.this.name != name) {
+                    if (ImplRole.this.name.equals(name)) {
                         final String oldName = ImplRole.this.name;
                         ImplRole.this.name = name;
                         // call listener
@@ -217,14 +217,70 @@ public class ImplRole implements Role {
         });
     }
 
+    @Override
+    public Future<Exception> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    server.removeRole(ImplRole.this);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((RoleDeleteListener) listener).onRoleDelete(api, ImplRole.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> removeUser(User user) {
+        List<Role> roles = new ArrayList<>(user.getRoles(getServer()));
+        roles.remove(this);
+        return getServer().updateRoles(user, roles.toArray(new Role[roles.size()]));
+    }
+
+    @Override
+    public Future<Exception> addUser(User user) {
+        List<Role> roles = new ArrayList<>(user.getRoles(getServer()));
+        roles.add(this);
+        return getServer().updateRoles(user, roles.toArray(new Role[roles.size()]));
+    }
+
     /**
      * Adds an user.
      *
      * @param user The user to add.
      */
-    public void addUser(User user) {
+    public void addUserNoUpdate(User user) {
         synchronized (users) {
             users.add(user);
+        }
+    }
+
+    /**
+     * Removes an user.
+     *
+     * @param user The user to remove.
+     */
+    public void removeUserNoUpdate(User user) {
+        synchronized (users) {
+            users.remove(user);
         }
     }
 
@@ -263,36 +319,5 @@ public class ImplRole implements Role {
      */
     public void setOverwrittenPermissions(Channel channel, Permissions permissions) {
         overwrittenPermissions.put(channel.getId(), permissions);
-    }
-
-    @Override
-    public Future<Exception> delete() {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
-            @Override
-            public Exception call() throws Exception {
-                try {
-                    HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
-                            .header("authorization", api.getToken())
-                            .asJson();
-                    api.checkResponse(response);
-                    server.removeRole(ImplRole.this);
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
-                            synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((RoleDeleteListener) listener).onRoleDelete(api, ImplRole.this);
-                                }
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    return e;
-                }
-                return null;
-            }
-        });
     }
 }

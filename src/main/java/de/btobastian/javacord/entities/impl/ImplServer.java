@@ -34,6 +34,8 @@ import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
+import de.btobastian.javacord.listener.user.UserRoleAddListener;
+import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -96,7 +98,7 @@ public class ImplServer implements Server {
             for (int j = 0; j < memberRoles.length(); j++) {
                 Role role = getRoleById(memberRoles.getString(j));
                 if (role != null) {
-                    ((ImplRole) role).addUser(member);
+                    ((ImplRole) role).addUserNoUpdate(member);
                 }
             }
         }
@@ -263,6 +265,70 @@ public class ImplServer implements Server {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public Future<Exception> updateRoles(final User user, final Role[] roles) {
+        final String[] roleIds = new String[roles.length];
+        for (int i = 0; i < roles.length; i++) {
+            roleIds[i] = roles[i].getId();
+        }
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" +user.getId())
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(new JSONObject().put("roles", roleIds).toString())
+                            .asJson();
+                    api.checkResponse(response);
+                    for (final Role role : user.getRoles(ImplServer.this)) {
+                        boolean contains = false;
+                        for (Role r : roles) {
+                            if (role == r) {
+                                contains = true;
+                                break;
+                            }
+                        }
+                        if (!contains) {
+                            ((ImplRole) role).removeUserNoUpdate(user);
+                            api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    List<Listener> listeners =  api.getListeners(UserRoleRemoveListener.class);
+                                    synchronized (listeners) {
+                                        for (Listener listener : listeners) {
+                                            ((UserRoleRemoveListener) listener).onUserRoleRemove(api, user, role);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    for (final Role role : roles) {
+                        if (!user.getRoles(ImplServer.this).contains(role)) {
+                            ((ImplRole) role).addUserNoUpdate(user);
+                            api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    List<Listener> listeners =  api.getListeners(UserRoleAddListener.class);
+                                    synchronized (listeners) {
+                                        for (Listener listener : listeners) {
+                                            ((UserRoleAddListener) listener).onUserRoleAdd(api, user, role);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**

@@ -147,4 +147,14 @@ public interface Server {
      */
     public Future<Invite[]> getInvites(FutureCallback<Invite[]> callback);
 
+    /**
+     * Updates the roles of a user.
+     *
+     * @param user The user.
+     * @param roles The roles to set. This will override the existing roles of the user.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateRoles(User user, Role[] roles);
+
 }
