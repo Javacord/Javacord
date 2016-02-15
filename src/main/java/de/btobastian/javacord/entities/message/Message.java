@@ -25,6 +25,7 @@ import de.btobastian.javacord.entities.User;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -112,7 +113,7 @@ public interface Message {
      *
      * @return The attachments of the message.
      */
-    public ArrayList<MessageAttachment> getAttachments();
+    public Collection<MessageAttachment> getAttachments();
 
     /**
      * Replies to the message with the given content.

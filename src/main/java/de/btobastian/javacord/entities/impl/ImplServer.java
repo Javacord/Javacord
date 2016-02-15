@@ -44,6 +44,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -177,7 +178,7 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<Channel> getChannels() {
-        return channels.values();
+        return Collections.unmodifiableCollection(channels.values());
     }
 
     @Override
@@ -187,7 +188,7 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<User> getMembers() {
-        return members.values();
+        return Collections.unmodifiableCollection(members.values());
     }
 
     @Override
@@ -202,7 +203,7 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<Role> getRoles() {
-        return roles.values();
+        return Collections.unmodifiableCollection(roles.values());
     }
 
     @Override

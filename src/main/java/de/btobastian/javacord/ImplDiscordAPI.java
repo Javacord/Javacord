@@ -179,7 +179,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Collection<Server> getServers() {
-        return servers.values();
+        return Collections.unmodifiableCollection(servers.values());
     }
 
     @Override
@@ -199,7 +199,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Collection<User> getUsers() {
-        return users.values();
+        return Collections.unmodifiableCollection(users.values());
     }
 
     @Override

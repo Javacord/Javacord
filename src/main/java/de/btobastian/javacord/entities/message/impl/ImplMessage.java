@@ -41,9 +41,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -221,8 +219,8 @@ public class ImplMessage implements Message, Comparable<Message> {
     }
 
     @Override
-    public ArrayList<MessageAttachment> getAttachments() {
-        return new ArrayList<>(attachments);
+    public Collection<MessageAttachment> getAttachments() {
+        return Collections.unmodifiableCollection(attachments);
     }
 
     @Override
