@@ -28,10 +28,7 @@ import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
 import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.TypingStartHandler;
-import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
-import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMemberAddHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMemberRemoveHandler;
+import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
@@ -193,6 +190,7 @@ public class DiscordWebsocket extends WebSocketClient {
         addHandler(new GuildDeleteHandler(api));
         addHandler(new GuildMemberAddHandler(api));
         addHandler(new GuildMemberRemoveHandler(api));
+        addHandler(new GuildMemberUpdateHandler(api));
 
         // role
         addHandler(new GuildRoleCreateHandler(api));

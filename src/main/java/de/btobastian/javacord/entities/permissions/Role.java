@@ -122,4 +122,23 @@ public interface Role {
      */
     public Future<Exception> delete();
 
+    /**
+     * Adds the user to the role.
+     * If you want to set more than one role use {@link Server#updateRoles(User, Role[])} or
+     *
+     * @param user The user to add.
+     * @return A future which tells us if the update was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> addUser(User user);
+
+    /**
+     * Removes the user from the role.
+     *
+     * @param user The user to remove.
+     * @return A future which tells us if the update was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> removeUser(User user);
+
 }

@@ -19,12 +19,15 @@
 package de.btobastian.javacord.utils.handler.user;
 
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.user.UserChangeGameListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.PacketHandler;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -46,6 +49,26 @@ public class PresenceUpdateHandler extends PacketHandler {
     @Override
     public void handle(JSONObject packet) {
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
+        try {
+            if (user.getName().equalsIgnoreCase("Bastian")) {
+                System.out.println(packet.toString(2));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Server server = null;
+        if (packet.has("guild_id")) {
+            server = api.getServerById(packet.getString("guild_id"));
+        }
+        if (server != null && packet.has("roles")) {
+            JSONArray roleIds = packet.getJSONArray("roles");
+            for (int i = 0; i < roleIds.length(); i++) {
+                // add user to the role
+                ((ImplRole) server.getRoleById(roleIds.getString(i))).addUserNoUpdate(user);
+            }
+        }
+
 
         // check username
         if (packet.getJSONObject("user").has("username")) {
