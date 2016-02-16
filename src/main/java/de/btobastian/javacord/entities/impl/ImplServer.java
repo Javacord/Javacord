@@ -44,6 +44,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -141,12 +142,42 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Future<Exception> deleteOrLeave() {
+    public Future<Exception> delete() {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
                 try {
                     HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/guilds/" + id)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    api.getServerMap().remove(id);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> leave() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/users/@me/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
@@ -177,7 +208,7 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<Channel> getChannels() {
-        return channels.values();
+        return Collections.unmodifiableCollection(channels.values());
     }
 
     @Override
@@ -187,7 +218,7 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<User> getMembers() {
-        return members.values();
+        return Collections.unmodifiableCollection(members.values());
     }
 
     @Override
@@ -202,7 +233,7 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<Role> getRoles() {
-        return roles.values();
+        return Collections.unmodifiableCollection(roles.values());
     }
 
     @Override

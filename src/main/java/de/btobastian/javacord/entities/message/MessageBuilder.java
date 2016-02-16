@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities.message;
 
+import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
 
 /**
@@ -75,10 +76,22 @@ public class MessageBuilder {
      *
      * @param user The user to append.
      * @return This object to reuse it.
+     * @see #appendUser(User)
      */
     public MessageBuilder appendMention(User user) {
         strBuilder.append("<@").append(user.getId()).append(">");
         return this;
+    }
+
+    /**
+     * Appends an user (@user).
+     *
+     * @param user The user to append.
+     * @return This object to reuse it.
+     * @see #appendMention(User)
+     */
+    public MessageBuilder appendUser(User user) {
+        return appendMention(user);
     }
 
     /**
@@ -92,6 +105,17 @@ public class MessageBuilder {
     }
 
     /**
+     * Appends a channel (@user).
+     *
+     * @param channel The channel to append.
+     * @return This object to reuse it.
+     */
+    public MessageBuilder appendChannel(Channel channel) {
+        strBuilder.append("<#" + channel.getId() + ">");
+        return this;
+    }
+
+    /**
      * Generates the String to send.
      *
      * @return The String to send.
@@ -100,4 +124,13 @@ public class MessageBuilder {
         return strBuilder.toString();
     }
 
+    /**
+     * Generates the String to send.
+     *
+     * @return The String to send.
+     */
+    @Override
+    public String toString() {
+        return build();
+    }
 }

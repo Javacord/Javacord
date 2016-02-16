@@ -104,7 +104,8 @@ public class ChannelUpdateHandler extends PacketHandler {
             });
         }
 
-        String topic = packet.getString("topic");
+
+        String topic = packet.get("topic") == null ? null : packet.get("topic").toString();
         if ((channel.getTopic() != null && topic == null)
                 || (channel.getTopic() == null && topic != null)
                 || (channel.getTopic() != null && !channel.getTopic().equals(topic))) {

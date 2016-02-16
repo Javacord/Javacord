@@ -44,12 +44,20 @@ public interface Server {
     public String getName();
 
     /**
-     * Deletes or leaves the server.
+     * Deletes the server.
      *
      * @return A future which tells us if the deletion was successful or not.
      *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> deleteOrLeave();
+    public Future<Exception> delete();
+
+    /**
+     * Leaves the server.
+     *
+     * @return A future which tells us if the deletion was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> leave();
 
     /**
      * Gets a channel by its id.

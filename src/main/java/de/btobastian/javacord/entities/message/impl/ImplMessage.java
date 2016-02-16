@@ -28,6 +28,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
@@ -39,8 +40,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -49,6 +51,8 @@ import java.util.concurrent.Future;
  * The implementation of the user interface.
  */
 public class ImplMessage implements Message {
+
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     private final ImplDiscordAPI api;
 
@@ -60,6 +64,7 @@ public class ImplMessage implements Message {
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
+    private Calendar creationDate = Calendar.getInstance();
 
     /**
      * Creates a new instance of this class.
@@ -76,13 +81,17 @@ public class ImplMessage implements Message {
         }
         tts = data.getBoolean("tts");
 
-        User authorTemp = null;
-        try {
-            authorTemp = api.getUserById(data.getJSONObject("author").getString("id")).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        if (data.has("timestamp")) {
+            String time = data.getString("timestamp");
+            try {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(FORMAT.parse(time.substring(0, time.length() - 9)));
+                creationDate = calendar;
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
-        author = authorTemp;
+        author = api.getOrCreateUser(data.getJSONObject("author"));
 
         try {
             JSONArray attachments = data.getJSONArray("attachments");
@@ -114,6 +123,10 @@ public class ImplMessage implements Message {
             this.receiver = findReceiver(channelId);
         } else {
             this.receiver = receiver;
+        }
+
+        if (getChannelReceiver() != null) {
+            ((ImplServer) getChannelReceiver().getServer()).addMember(author);
         }
 
         api.addMessage(this);
@@ -204,8 +217,8 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public ArrayList<MessageAttachment> getAttachments() {
-        return new ArrayList<>(attachments);
+    public Collection<MessageAttachment> getAttachments() {
+        return Collections.unmodifiableCollection(attachments);
     }
 
     @Override
@@ -274,6 +287,18 @@ public class ImplMessage implements Message {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public Calendar getCreationDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(creationDate.getTime());
+        return calendar;
+    }
+
+    @Override
+    public int compareTo(Message other) {
+        return this.creationDate.compareTo(other.getCreationDate());
     }
 
     /**

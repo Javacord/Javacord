@@ -23,14 +23,15 @@ import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
 
 /**
  * This interface represents a message.
  */
-public interface Message {
+public interface Message extends Comparable<Message> {
 
     /**
      * Gets the id of the message.
@@ -111,7 +112,7 @@ public interface Message {
      *
      * @return The attachments of the message.
      */
-    public ArrayList<MessageAttachment> getAttachments();
+    public Collection<MessageAttachment> getAttachments();
 
     /**
      * Replies to the message with the given content.
@@ -165,5 +166,12 @@ public interface Message {
      * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
      */
     public Future<Message> replyFile(File file, FutureCallback<Message> callback);
+
+    /**
+     * Gets the date of creation.
+     *
+     * @return The date of creation.
+     */
+    public Calendar getCreationDate();
 
 }
