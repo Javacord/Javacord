@@ -142,12 +142,42 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Future<Exception> deleteOrLeave() {
+    public Future<Exception> delete() {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
                 try {
                     HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/guilds/" + id)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    api.getServerMap().remove(id);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> leave() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/users/@me/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
