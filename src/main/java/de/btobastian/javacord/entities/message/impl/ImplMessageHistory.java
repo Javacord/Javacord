@@ -69,11 +69,15 @@ public class ImplMessageHistory implements MessageHistory {
             before = true;
         }
         for (int i = limit / 100; i > 0; i--) {
+            int receivedMessages;
             if (step++ == 0) { // if it's the first iteration step use the normal parameters
-                request(api, channelId, messageId, before, 100);
+                receivedMessages = request(api, channelId, messageId, before, 100);
             } else {
                 // now use the oldest/newest message
-                request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, 100);
+                receivedMessages = request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, 100);
+            }
+            if (receivedMessages == 0) {
+                return; // stop requesting
             }
         }
         if (step == 0) { // step == 0 means a limit less than 100
@@ -91,12 +95,13 @@ public class ImplMessageHistory implements MessageHistory {
      * @param messageId Gets the messages before or after the message with the given id.
      * @param before Whether it should get the messages before or after the given message.
      * @param limit The maximum number of messages.
+     * @return The amount of requested messages.
      * @throws Exception if something went wrong.
      */
-    private void request(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
+    private int request(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
             throws Exception {
         if (limit <= 0) {
-            return;
+            return 0;
         }
         String link = messageId == null ?
                 "https://discordapp.com/api/channels/" + channelId + "/messages?&limit=" + limit
@@ -120,6 +125,7 @@ public class ImplMessageHistory implements MessageHistory {
             }
             this.messages.put(id, message);
         }
+        return messages.length();
     }
 
     @Override
