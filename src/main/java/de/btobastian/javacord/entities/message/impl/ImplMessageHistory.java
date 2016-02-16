@@ -37,6 +37,9 @@ public class ImplMessageHistory implements MessageHistory {
 
     private final ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
 
+    private Message oldestMessage = null;
+    private Message newestMessage = null;
+
     /**
      * Creates a new instance of this class.
      *
@@ -61,8 +64,39 @@ public class ImplMessageHistory implements MessageHistory {
      */
     public ImplMessageHistory(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
             throws Exception {
-        if (limit > 100) {
-            limit = 100;
+        int step = 0;
+        if (messageId == null) {
+            before = true;
+        }
+        for (int i = limit / 100; i > 0; i--) {
+            if (step++ == 0) { // if it's the first iteration step use the normal parameters
+                request(api, channelId, messageId, before, 100);
+            } else {
+                // now use the oldest/newest message
+                request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, 100);
+            }
+        }
+        if (step == 0) { // step == 0 means a limit less than 100
+            request(api, channelId, messageId, before, limit % 100);
+        } else { // request the rest
+            request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, limit % 100);
+        }
+    }
+
+    /**
+     * Requests messages.
+     *
+     * @param api The used api.
+     * @param channelId The id of the channel.
+     * @param messageId Gets the messages before or after the message with the given id.
+     * @param before Whether it should get the messages before or after the given message.
+     * @param limit The maximum number of messages.
+     * @throws Exception if something went wrong.
+     */
+    private void request(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
+            throws Exception {
+        if (limit <= 0) {
+            return;
         }
         String link = messageId == null ?
                 "https://discordapp.com/api/channels/" + channelId + "/messages?&limit=" + limit
@@ -77,6 +111,12 @@ public class ImplMessageHistory implements MessageHistory {
             Message message = api.getMessageById(id);
             if (message == null) {
                 message = new ImplMessage(messageJson, api, null);
+            }
+            if (newestMessage == null || message.compareTo(newestMessage) > 0) {
+                newestMessage = message;
+            }
+            if (oldestMessage == null || message.compareTo(oldestMessage) < 0) {
+                oldestMessage = message;
             }
             this.messages.put(id, message);
         }
@@ -99,6 +139,9 @@ public class ImplMessageHistory implements MessageHistory {
 
     @Override
     public Message getNewestMessage() {
+        if (this.newestMessage != null) {
+            return this.newestMessage;
+        }
         Message newestMessage = null;
         for (Message message : messages.values()) {
             if (newestMessage == null) {
@@ -112,6 +155,9 @@ public class ImplMessageHistory implements MessageHistory {
 
     @Override
     public Message getOldestMessage() {
+        if (this.oldestMessage != null) {
+            return this.oldestMessage;
+        }
         Message oldestMessage = null;
         for (Message message : messages.values()) {
             if (oldestMessage == null) {
@@ -137,6 +183,12 @@ public class ImplMessageHistory implements MessageHistory {
      */
     public void removeMessage(String id) {
         messages.remove(id);
+        if (newestMessage != null && newestMessage.getId().equals(id)) {
+            newestMessage = null;
+        }
+        if (oldestMessage != null && oldestMessage.getId().equals(id)) {
+            oldestMessage = null;
+        }
     }
 
 }
