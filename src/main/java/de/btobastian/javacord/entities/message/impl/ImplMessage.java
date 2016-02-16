@@ -28,6 +28,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
@@ -90,14 +91,7 @@ public class ImplMessage implements Message {
                 e.printStackTrace();
             }
         }
-
-        User authorTemp = null;
-        try {
-            authorTemp = api.getUserById(data.getJSONObject("author").getString("id")).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        author = authorTemp;
+        author = api.getOrCreateUser(data.getJSONObject("author"));
 
         try {
             JSONArray attachments = data.getJSONArray("attachments");
@@ -129,6 +123,10 @@ public class ImplMessage implements Message {
             this.receiver = findReceiver(channelId);
         } else {
             this.receiver = receiver;
+        }
+
+        if (getChannelReceiver() != null) {
+            ((ImplServer) getChannelReceiver().getServer()).addMember(author);
         }
 
         api.addMessage(this);
