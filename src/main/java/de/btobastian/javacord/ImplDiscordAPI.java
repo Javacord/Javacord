@@ -27,6 +27,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.Invite;
+import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplInvite;
@@ -316,21 +317,42 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Server> createServer(String name) {
-        return createServer(name, null, null);
+        return createServer(name, Region.US_WEST, null, null);
     }
 
     @Override
     public Future<Server> createServer(String name, FutureCallback<Server> callback) {
-        return createServer(name, null, callback);
+        return createServer(name, Region.US_WEST, null, callback);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region) {
+        return createServer(name, region, null, null);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region, FutureCallback<Server> callback) {
+        return createServer(name, region, null, callback);
     }
 
     @Override
     public Future<Server> createServer(String name, BufferedImage icon) {
-        return createServer(name, icon, null);
+        return createServer(name, Region.US_WEST, icon, null);
     }
 
     @Override
-    public Future<Server> createServer(final String name, final BufferedImage icon, FutureCallback<Server> callback) {
+    public Future<Server> createServer(String name, BufferedImage icon, FutureCallback<Server> callback) {
+        return createServer(name, Region.US_WEST, icon, callback);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region, BufferedImage icon) {
+        return createServer(name, region, icon, null);
+    }
+
+    @Override
+    public Future<Server> createServer(
+            final String name, final Region region, final BufferedImage icon, FutureCallback<Server> callback) {
         ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
             @Override
             public Server call() throws Exception {
@@ -347,7 +369,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     params.put("icon", "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray()));
                 }
                 params.put("name", name);
-                params.put("region", "us-west");
+                params.put("region", region == null ? Region.US_WEST : region);
                 final SettableFuture<Server> settableFuture;
                 synchronized (listenerLock) {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds")
