@@ -31,7 +31,11 @@ public enum Region {
     US_CENTRAL("us-central", "US Central"),
     US_EAST("us-east", "US East"),
     US_SOUTH("us-south", "US South"),
-    US_WEST("us-west", "US West");
+    US_WEST("us-west", "US West"),
+    /**
+     * An unknown region, most likely because discord added new regions.
+     */
+    UNKNOWN("us-west", "Unknown");
 
     private final String key;
     private final String name;
@@ -63,6 +67,21 @@ public enum Region {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Gets a region by its key.
+     *
+     * @param key The key of the region.
+     * @return The region with the given key. {@link Region#UNKNOWN} if no region for the given key was found.
+     */
+    public static Region getRegionByKey(String key) {
+        for (Region region : values()) {
+            if (region.getKey().equalsIgnoreCase(key) && region != UNKNOWN) {
+                return region;
+            }
+        }
+        return UNKNOWN;
     }
 
 }

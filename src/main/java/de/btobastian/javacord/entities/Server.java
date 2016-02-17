@@ -305,4 +305,11 @@ public interface Server {
      */
     public Future<Exception> update(String newName, Region newRegion, BufferedImage newIcon);
 
+    /**
+     * Gets the region of the server.
+     *
+     * @return The region of the server.
+     */
+    public Region getRegion();
+
 }

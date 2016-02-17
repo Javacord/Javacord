@@ -62,6 +62,7 @@ public class ImplServer implements Server {
 
     private final String id;
     private String name;
+    private Region region;
 
     /**
      * Creates a new instance of this class.
@@ -74,6 +75,7 @@ public class ImplServer implements Server {
 
         name = data.getString("name");
         id = data.getString("id");
+        region = Region.getRegionByKey(data.getString("region"));
 
         JSONArray roles = data.getJSONArray("roles");
         for (int i = 0; i < roles.length(); i++) {
@@ -601,6 +603,11 @@ public class ImplServer implements Server {
                 return null;
             }
         });
+    }
+
+    @Override
+    public Region getRegion() {
+        return region;
     }
 
     /**
