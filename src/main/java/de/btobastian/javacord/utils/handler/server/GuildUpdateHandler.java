@@ -19,9 +19,11 @@
 package de.btobastian.javacord.utils.handler.server;
 
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerChangeNameListener;
+import de.btobastian.javacord.listener.server.ServerChangeRegionListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -59,6 +61,23 @@ public class GuildUpdateHandler extends PacketHandler {
                     synchronized (listeners) {
                         for (Listener listener : listeners) {
                             ((ServerChangeNameListener) listener).onServerChangeName(api, server, oldName);
+                        }
+                    }
+                }
+            });
+        }
+
+        Region region = Region.getRegionByKey(packet.getString("region"));
+        if (server.getRegion() != region) {
+            final Region oldRegion = server.getRegion();
+            server.setRegion(region);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(ServerChangeRegionListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((ServerChangeRegionListener) listener).onServerChangeRegion(api, server, oldRegion);
                         }
                     }
                 }

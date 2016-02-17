@@ -620,6 +620,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the region of the server.
+     *
+     * @param region The region to set.
+     */
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    /**
      * Adds a user to the server.
      *
      * @param user The user to add.
