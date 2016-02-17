@@ -89,7 +89,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             });
         }
 
-        Color color = new Color(packet.getInt("color"));
+        Color color = new Color(roleJson.getInt("color"));
         if (role.getColor().getRGB() != color.getRGB()) {
             final Color oldColor = role.getColor();
             role.setColor(color);
