@@ -39,6 +39,8 @@ import java.util.concurrent.Future;
 public class ImplInvite implements Invite {
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final SimpleDateFormat FORMAT_ALTERNATIVE_TWO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     private final ImplDiscordAPI api;
 
@@ -78,13 +80,21 @@ public class ImplInvite implements Invite {
         }
         if (data.has("created_at")) {
             String time = data.getString("created_at");
+            Calendar calendar = Calendar.getInstance();
             try {
-                Calendar calendar = Calendar.getInstance();
                 calendar.setTime(FORMAT.parse(time.substring(0, time.length() - 9)));
-                creationDate = calendar;
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (ParseException ignored) {
+                try {
+                    calendar.setTime(FORMAT_ALTERNATIVE.parse(time.substring(0, time.length() - 9)));
+                } catch (ParseException ignored2) {
+                    try {
+                        calendar.setTime(FORMAT_ALTERNATIVE_TWO.parse(time.substring(0, time.length() - 9)));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
+            creationDate = calendar;
         }
         if (data.has("temporary")) {
             this.temporary = data.getBoolean("temporary");
