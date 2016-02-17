@@ -193,6 +193,7 @@ public class DiscordWebsocket extends WebSocketClient {
         addHandler(new GuildMemberAddHandler(api));
         addHandler(new GuildMemberRemoveHandler(api));
         addHandler(new GuildMemberUpdateHandler(api));
+        addHandler(new GuildUpdateHandler(api));
 
         // role
         addHandler(new GuildRoleCreateHandler(api));

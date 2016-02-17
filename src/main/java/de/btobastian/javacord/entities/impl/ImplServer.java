@@ -611,6 +611,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the name of the server.
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Adds a user to the server.
      *
      * @param user The user to add.
