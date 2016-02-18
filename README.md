@@ -2,7 +2,7 @@
 A simple library to create a discord bot.
 
 #Maven
-```
+```xml
 <repository>
   <id>javacord-repo</id>
   <url>http://repo.bastian-oppermann.de</url>
