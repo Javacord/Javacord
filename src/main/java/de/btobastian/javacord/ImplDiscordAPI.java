@@ -27,6 +27,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.Invite;
+import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplInvite;
@@ -34,7 +35,9 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.exceptions.BadResponseException;
 import de.btobastian.javacord.exceptions.PermissionsException;
+import de.btobastian.javacord.exceptions.RateLimitedException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
@@ -74,6 +77,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     private User you = null;
 
     private DiscordWebsocket socket = null;
+
+    private RateLimitedException lastRateLimitedException = null;
 
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
@@ -316,21 +321,42 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Server> createServer(String name) {
-        return createServer(name, null, null);
+        return createServer(name, Region.US_WEST, null, null);
     }
 
     @Override
     public Future<Server> createServer(String name, FutureCallback<Server> callback) {
-        return createServer(name, null, callback);
+        return createServer(name, Region.US_WEST, null, callback);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region) {
+        return createServer(name, region, null, null);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region, FutureCallback<Server> callback) {
+        return createServer(name, region, null, callback);
     }
 
     @Override
     public Future<Server> createServer(String name, BufferedImage icon) {
-        return createServer(name, icon, null);
+        return createServer(name, Region.US_WEST, icon, null);
     }
 
     @Override
-    public Future<Server> createServer(final String name, final BufferedImage icon, FutureCallback<Server> callback) {
+    public Future<Server> createServer(String name, BufferedImage icon, FutureCallback<Server> callback) {
+        return createServer(name, Region.US_WEST, icon, callback);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region, BufferedImage icon) {
+        return createServer(name, region, icon, null);
+    }
+
+    @Override
+    public Future<Server> createServer(
+            final String name, final Region region, final BufferedImage icon, FutureCallback<Server> callback) {
         ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
             @Override
             public Server call() throws Exception {
@@ -347,7 +373,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     params.put("icon", "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray()));
                 }
                 params.put("name", name);
-                params.put("region", "us-west");
+                params.put("region", region == null ? Region.US_WEST : region);
                 final SettableFuture<Server> settableFuture;
                 synchronized (listenerLock) {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds")
@@ -497,6 +523,19 @@ public class ImplDiscordAPI implements DiscordAPI {
                 return null;
             }
         });
+    }
+
+    /**
+     * Checks if we are still rate limited.
+     *
+     * @throws RateLimitedException If we are rate limited.
+     */
+    public void checkRateLimit() throws RateLimitedException {
+        long retryAt = lastRateLimitedException == null ? 0L : lastRateLimitedException.getRetryAfter();
+        long retryAfter = retryAt - System.currentTimeMillis();
+        if (retryAfter > 0) {
+            throw new RateLimitedException("We are still rate limited for " + retryAfter + " ms!", retryAfter);
+        }
     }
 
     /**
@@ -665,9 +704,17 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!");
         }
+        if (!response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
+            long retryAfter = response.getBody().getObject().getLong("retry_after");
+            RateLimitedException exception =
+                    new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
+            lastRateLimitedException = exception;
+            throw exception;
+        }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
-            throw new Exception("Received http status code " + response.getStatus()
-                    + " with message " + response.getStatusText() + " and body " + response.getBody());
+            throw new BadResponseException("Received http status code " + response.getStatus() + " with message "
+                    + response.getStatusText() + " and body " + response.getBody(), response.getStatus(),
+                    response.getStatusText(), response);
         }
     }
 

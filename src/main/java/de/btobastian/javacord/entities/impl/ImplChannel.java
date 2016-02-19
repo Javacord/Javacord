@@ -213,6 +213,7 @@ public class ImplChannel implements Channel {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
                                         .header("authorization", api.getToken())
@@ -244,6 +245,7 @@ public class ImplChannel implements Channel {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
                                         .header("authorization", api.getToken())
@@ -399,6 +401,11 @@ public class ImplChannel implements Channel {
                 return null;
             }
         });
+    }
+
+    @Override
+    public String getMentionTag() {
+        return "<#" + getId() + ">";
     }
 
     /**

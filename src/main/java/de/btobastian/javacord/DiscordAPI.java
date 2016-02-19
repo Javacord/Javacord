@@ -20,6 +20,7 @@ package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Invite;
+import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
@@ -220,6 +221,25 @@ public interface DiscordAPI {
      * Creates a new server.
      *
      * @param name The name of the new server.
+     * @param region The region of the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param region The region of the server.
+     * @param callback The callback which will be informed when you created the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region, FutureCallback<Server> callback);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
      * @param icon The icon of the server.
      * @return The created server.
      */
@@ -234,6 +254,27 @@ public interface DiscordAPI {
      * @return The created server.
      */
     public Future<Server> createServer(String name, BufferedImage icon, FutureCallback<Server> callback);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param region The region of the server.
+     * @param icon The icon of the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region, BufferedImage icon);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param region The region of the server.
+     * @param icon The icon of the server.
+     * @param callback The callback which will be informed when you created the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region, BufferedImage icon, FutureCallback<Server> callback);
 
     /**
      * Gets yourself (the user with which you logged in).

@@ -213,6 +213,7 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
@@ -245,6 +246,7 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
@@ -331,6 +333,11 @@ public class ImplUser implements User {
     public Future<MessageHistory> getMessageHistoryAfter(
             String afterId, int limit, FutureCallback<MessageHistory> callback) {
         return getMessageHistory(afterId, false, limit, callback);
+    }
+
+    @Override
+    public String getMentionTag() {
+        return "<@" + getId() + ">";
     }
 
     /**

@@ -53,6 +53,8 @@ import java.util.concurrent.Future;
 public class ImplMessage implements Message {
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final SimpleDateFormat FORMAT_ALTERNATIVE_TWO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     private final ImplDiscordAPI api;
 
@@ -83,13 +85,23 @@ public class ImplMessage implements Message {
 
         if (data.has("timestamp")) {
             String time = data.getString("timestamp");
-            try {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(FORMAT.parse(time.substring(0, time.length() - 9)));
-                creationDate = calendar;
-            } catch (ParseException e) {
-                e.printStackTrace();
+            Calendar calendar = Calendar.getInstance();
+            synchronized (FORMAT) { // SimpleDateFormat#parse() isn't thread safe...
+                try {
+                    calendar.setTime(FORMAT.parse(time.substring(0, time.length() - 9)));
+                } catch (ParseException ignored) {
+                    try {
+                        calendar.setTime(FORMAT_ALTERNATIVE.parse(time.substring(0, time.length() - 9)));
+                    } catch (ParseException ignored2) {
+                        try {
+                            calendar.setTime(FORMAT_ALTERNATIVE_TWO.parse(time.substring(0, time.length() - 9)));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
+            creationDate = calendar;
         }
         author = api.getOrCreateUser(data.getJSONObject("author"));
 
@@ -243,6 +255,7 @@ public class ImplMessage implements Message {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
                                         .header("authorization", api.getToken())
@@ -274,6 +287,7 @@ public class ImplMessage implements Message {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
                                         .header("authorization", api.getToken())

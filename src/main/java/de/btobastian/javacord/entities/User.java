@@ -119,4 +119,11 @@ public interface User extends MessageReceiver {
      */
     public String getGame();
 
+    /**
+     * Gets the tag which is used to mention the user.
+     *
+     * @return Gets the tag which is used to mention the user.
+     */
+    public String getMentionTag();
+
 }

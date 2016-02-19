@@ -21,6 +21,7 @@ package de.btobastian.javacord.entities;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.permissions.Role;
 
+import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.concurrent.Future;
 
@@ -259,5 +260,56 @@ public interface Server {
      * @return The created role.
      */
     public Future<Role> createRole(FutureCallback<Role> callback);
+
+    /**
+     * Updates the name of the server.
+     * Use {@link #update(String, Region, BufferedImage)} if you want to change region or/and icon, too
+     * or your changes may be overwritten.
+     *
+     * @param newName The new name of the server.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateName(String newName);
+
+    /**
+     * Updates the region of the server.
+     * Use {@link #update(String, Region, BufferedImage)} if you want to change the name, too
+     * or your changes may be overwritten.
+     *
+     * @param newRegion The new region of the server.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateRegion(Region newRegion);
+
+    /**
+     * Updates the icon of the server.
+     * Use {@link #update(String, Region, BufferedImage)} if you want to change the name, too
+     * or your changes may be overwritten.
+     *
+     * @param newIcon The new icon of the server.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateIcon(BufferedImage newIcon);
+
+    /**
+     * Updates the server.
+     *
+     * @param newName The name of the server. Set it to <code>null</code> if you don't want to change the name.
+     * @param newRegion The region of the server. Set it to <code>null</code> if you don't want to change the region.
+     * @param newIcon The icon of the server. Set it to <code>null</code> if you don't want to change the icon.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> update(String newName, Region newRegion, BufferedImage newIcon);
+
+    /**
+     * Gets the region of the server.
+     *
+     * @return The region of the server.
+     */
+    public Region getRegion();
 
 }

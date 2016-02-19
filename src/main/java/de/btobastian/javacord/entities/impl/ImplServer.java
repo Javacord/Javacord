@@ -25,10 +25,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
-import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.Invite;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
@@ -43,6 +40,7 @@ import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -64,6 +62,7 @@ public class ImplServer implements Server {
 
     private final String id;
     private String name;
+    private Region region;
 
     /**
      * Creates a new instance of this class.
@@ -76,6 +75,7 @@ public class ImplServer implements Server {
 
         name = data.getString("name");
         id = data.getString("id");
+        region = Region.getRegionByKey(data.getString("region"));
 
         JSONArray roles = data.getJSONArray("roles");
         for (int i = 0; i < roles.length(); i++) {
@@ -551,6 +551,81 @@ public class ImplServer implements Server {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public Future<Exception> updateName(String newName) {
+        return update(newName, null, null);
+    }
+
+    @Override
+    public Future<Exception> updateRegion(Region newRegion) {
+        return update(null, newRegion, null);
+    }
+
+    @Override
+    public Future<Exception> updateIcon(BufferedImage newIcon) {
+        return update(null, null, newIcon);
+    }
+
+    @Override
+    public Future<Exception> update(String newName, Region newRegion, BufferedImage newIcon) {
+        final JSONObject params = new JSONObject();
+        if (newName == null) {
+            params.put("name", getName());
+        } else {
+            params.put("name", newName);
+        }
+        if (newRegion != null) {
+            params.put("region", newRegion.getKey());
+        }
+
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/guilds/" + getId())
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(params.toString())
+                            .asJson();
+                    api.checkResponse(response);
+
+                    String name = response.getBody().getObject().getString("name");
+                    if (!getName().equals(name)) {
+                        final String oldName = getName();
+                        // TODO add ServerChangeName listener
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Region getRegion() {
+        return region;
+    }
+
+    /**
+     * Sets the name of the server.
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Sets the region of the server.
+     *
+     * @param region The region to set.
+     */
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     /**
