@@ -78,6 +78,8 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private DiscordWebsocket socket = null;
 
+    private RateLimitedException lastRateLimitedException = null;
+
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
@@ -524,6 +526,19 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     /**
+     * Checks if we are still rate limited.
+     *
+     * @throws RateLimitedException If we are rate limited.
+     */
+    public void checkRateLimit() throws RateLimitedException {
+        long retryAt = lastRateLimitedException == null ? 0L : lastRateLimitedException.getRetryAfter();
+        long retryAfter = retryAt - System.currentTimeMillis();
+        if (retryAfter > 0) {
+            throw new RateLimitedException("We are still rate limited for " + retryAfter + " ms!", retryAfter);
+        }
+    }
+
+    /**
      * Sets yourself.
      *
      * @param user You.
@@ -691,7 +706,10 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         if (!response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");
-            throw new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
+            RateLimitedException exception =
+                    new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
+            lastRateLimitedException = exception;
+            throw exception;
         }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
             throw new BadResponseException("Received http status code " + response.getStatus() + " with message "

@@ -213,6 +213,7 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
@@ -245,6 +246,7 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
