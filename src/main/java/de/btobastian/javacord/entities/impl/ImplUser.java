@@ -335,6 +335,11 @@ public class ImplUser implements User {
         return getMessageHistory(afterId, false, limit, callback);
     }
 
+    @Override
+    public String getMentionTag() {
+        return "<@" + getId() + ">";
+    }
+
     /**
      * Gets the message history.
      *

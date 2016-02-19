@@ -133,4 +133,11 @@ public interface Channel extends MessageReceiver {
      */
     public Future<Exception> update(String newName, String newTopic);
 
+    /**
+     * Gets the tag which is used to mention the channel.
+     *
+     * @return Gets the tag which is used to mention the channel.
+     */
+    public String getMentionTag();
+
 }

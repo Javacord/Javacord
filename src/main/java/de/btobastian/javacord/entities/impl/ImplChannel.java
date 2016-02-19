@@ -403,6 +403,11 @@ public class ImplChannel implements Channel {
         });
     }
 
+    @Override
+    public String getMentionTag() {
+        return "<#" + getId() + ">";
+    }
+
     /**
      * Gets the message history.
      *
