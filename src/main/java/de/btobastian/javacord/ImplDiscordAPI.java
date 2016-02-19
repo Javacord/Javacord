@@ -35,7 +35,9 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.exceptions.BadResponseException;
 import de.btobastian.javacord.exceptions.PermissionsException;
+import de.btobastian.javacord.exceptions.RateLimitedException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
@@ -687,9 +689,14 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!");
         }
+        if (!response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
+            long retryAfter = response.getBody().getObject().getLong("retry_after");
+            throw new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
+        }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
-            throw new Exception("Received http status code " + response.getStatus()
-                    + " with message " + response.getStatusText() + " and body " + response.getBody());
+            throw new BadResponseException("Received http status code " + response.getStatus() + " with message "
+                    + response.getStatusText() + " and body " + response.getBody(), response.getStatus(),
+                    response.getStatusText(), response);
         }
     }
 
