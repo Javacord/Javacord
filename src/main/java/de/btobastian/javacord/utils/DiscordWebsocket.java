@@ -37,9 +37,15 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.Future;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 /**
  * The websocket which is used to connect to discord.
@@ -106,8 +112,38 @@ public class DiscordWebsocket extends WebSocketClient {
                         .put("$referrer", "https://discordapp.com/@me")
                         .put("$referring_domain", "discordapp.com"))
                     .put("large_threshold", 250)
-                    .put("compress", false));
+                    .put("compress", true));
         send(connectPacket.toString());
+    }
+
+    @Override
+    public void onMessage(ByteBuffer bytes) {
+        byte[] compressedData = bytes.array();
+        Inflater decompressor = new Inflater();
+        decompressor.setInput(compressedData);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
+        byte[] buf = new byte[1024];
+        while (!decompressor.finished()) {
+            int count;
+            try {
+                count = decompressor.inflate(buf);
+            } catch (DataFormatException e) {
+                e.printStackTrace();
+                System.exit(-1);
+                return;
+            }
+            bos.write(buf, 0, count);
+
+        }
+        try {
+            bos.close();
+        } catch (IOException ignored) { }
+        byte[] decompressedData = bos.toByteArray();
+        try {
+            onMessage(new String(decompressedData, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
