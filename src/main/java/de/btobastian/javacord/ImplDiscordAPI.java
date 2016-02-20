@@ -190,6 +190,15 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
+    public Collection<Channel> getChannels() {
+        Collection<Channel> channels = new ArrayList<>();
+        for (Server server : getServers()) {
+            channels.addAll(server.getChannels());
+        }
+        return Collections.unmodifiableCollection(channels);
+    }
+
+    @Override
     public Channel getChannelById(String id) {
         Iterator<Server> serverIterator = getServers().iterator();
         while (serverIterator.hasNext()) {

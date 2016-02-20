@@ -98,6 +98,13 @@ public interface DiscordAPI {
     public Collection<Server> getServers();
 
     /**
+     * Gets a collection with all known channels.
+     *
+     * @return A collection with all known channels.
+     */
+    public Collection<Channel> getChannels();
+
+    /**
      * Gets a channel by its id.
      *
      * @param id The id of the channel.
