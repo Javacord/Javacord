@@ -19,10 +19,7 @@
 package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
-import de.btobastian.javacord.entities.Invite;
-import de.btobastian.javacord.entities.Region;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -99,6 +96,14 @@ public interface DiscordAPI {
      * @return A collection with all known servers.
      */
     public Collection<Server> getServers();
+
+    /**
+     * Gets a channel by its id.
+     *
+     * @param id The id of the channel.
+     * @return The channel with the given id. <code>Null</code> if no channel with the id was found.
+     */
+    public Channel getChannelById(String id);
 
     /**
      * Gets an user by its id. It first will check if the user is in the cache. If no user was found in the cache it

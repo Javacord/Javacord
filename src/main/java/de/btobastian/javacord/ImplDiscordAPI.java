@@ -26,10 +26,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import de.btobastian.javacord.entities.Invite;
-import de.btobastian.javacord.entities.Region;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
@@ -68,7 +65,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private final ThreadPool pool;
 
-    private String email =  null;
+    private String email = null;
     private String password = null;
     private String token = null;
     private String game = null;
@@ -185,6 +182,18 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public Collection<Server> getServers() {
         return Collections.unmodifiableCollection(servers.values());
+    }
+
+    @Override
+    public Channel getChannelById(String id) {
+        Iterator<Server> serverIterator = getServers().iterator();
+        while (serverIterator.hasNext()) {
+            Channel channel = serverIterator.next().getChannelById(id);
+            if (channel != null) {
+                return channel;
+            }
+        }
+        return null;
     }
 
     @Override
