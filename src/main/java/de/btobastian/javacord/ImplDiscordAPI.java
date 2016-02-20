@@ -238,6 +238,11 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
+    public User getCachedUserById(String id) {
+        return users.get(id);
+    }
+
+    @Override
     public Collection<User> getUsers() {
         return Collections.unmodifiableCollection(users.values());
     }

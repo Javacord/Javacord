@@ -115,6 +115,16 @@ public interface DiscordAPI {
     public Future<User> getUserById(String id);
 
     /**
+     * Gets an user by its id. Unlike {@link #getUserById(String)} this method only search for the user in the cache.
+     * Some members of bigger servers may not be in the cache cause discord only sends the online users for servers
+     * with more than 250 members.
+     *
+     * @param id The id of the user.
+     * @return The user with the given id. <code>Null</code> if no user with the id is in the cache.
+     */
+    public User getCachedUserById(String id);
+
+    /**
      * Gets a collection with all known users.
      *
      * @return A collection with all known users.
