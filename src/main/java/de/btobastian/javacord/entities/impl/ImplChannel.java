@@ -103,15 +103,7 @@ public class ImplChannel implements Channel {
                 }
             }
             if (type.equals("member")) {
-                User user;
-                try {
-                    user = api.getUserById(id).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    continue;
-                }
-                if (user != null) {
-                    overwrittenPermissions.put(user.getId(), new ImplPermissions(allow, deny));
-                }
+                overwrittenPermissions.put(id, new ImplPermissions(allow, deny));
             }
         }
 

@@ -55,9 +55,11 @@ public class PresenceUpdateHandler extends PacketHandler {
         if (packet.has("guild_id")) {
             server = api.getServerById(packet.getString("guild_id"));
         }
-        if (server != null && packet.has("roles")) {
+        if (server != null) {
             // add user to server
             ((ImplServer) server).addMember(user);
+        }
+        if (server != null && packet.has("roles")) {
             JSONArray roleIds = packet.getJSONArray("roles");
             for (int i = 0; i < roleIds.length(); i++) {
                 // add user to the role

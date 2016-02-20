@@ -28,10 +28,12 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.impl.ImplInvite;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.BadResponseException;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.exceptions.RateLimitedException;
@@ -42,6 +44,7 @@ import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.java_websocket.util.Base64;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
@@ -197,7 +200,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public Future<User> getUserById(String id) {
+    public Future<User> getUserById(final String id) {
         User user = users.get(id);
         if (user != null) {
             return Futures.immediateFuture(user);
@@ -205,8 +208,31 @@ public class ImplDiscordAPI implements DiscordAPI {
         return getThreadPool().getListeningExecutorService().submit(new Callable<User>() {
             @Override
             public User call() throws Exception {
-                // TODO make request (GET /api/:guild_id/members/:user_id)
-                return null;
+                User user = null;
+                Iterator<Server> serverIterator = getServers().iterator();
+                while (serverIterator.hasNext()) {
+                    Server server = serverIterator.next();
+                    HttpResponse<JsonNode> response = Unirest
+                            .get("https://discordapp.com/api/guilds/" + server.getId() + "/members/" + id)
+                            .header("authorization", token)
+                            .asJson();
+                    // user does not exist
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
+                        continue;
+                    }
+                    user = getOrCreateUser(response.getBody().getObject().getJSONObject("user"));
+                    // add user to server
+                    ((ImplServer) server).addMember(user);
+                    // assign user roles
+                    if (response.getBody().getObject().has("roles")) {
+                        JSONArray roleIds = response.getBody().getObject().getJSONArray("roles");
+                        for (int i = 0; i < roleIds.length(); i++) {
+                            // add user to the role
+                            ((ImplRole) server.getRoleById(roleIds.getString(i))).addUserNoUpdate(user);
+                        }
+                    }
+                }
+                return user;
             }
         });
     }
