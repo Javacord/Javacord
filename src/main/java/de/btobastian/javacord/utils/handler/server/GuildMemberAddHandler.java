@@ -49,6 +49,7 @@ public class GuildMemberAddHandler extends PacketHandler {
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
         if (server != null) {
             ((ImplServer) server).addMember(user);
+            ((ImplServer) server).incrementMemberCount();
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {

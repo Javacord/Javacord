@@ -63,6 +63,8 @@ public class ImplServer implements Server {
     private final String id;
     private String name;
     private Region region;
+    private int memberCount;
+    private boolean large;
 
     /**
      * Creates a new instance of this class.
@@ -76,6 +78,8 @@ public class ImplServer implements Server {
         name = data.getString("name");
         id = data.getString("id");
         region = Region.getRegionByKey(data.getString("region"));
+        memberCount = data.getInt("member_count");
+        large = data.getBoolean("large");
 
         JSONArray roles = data.getJSONArray("roles");
         for (int i = 0; i < roles.length(); i++) {
@@ -610,6 +614,16 @@ public class ImplServer implements Server {
         return region;
     }
 
+    @Override
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    @Override
+    public boolean isLarge() {
+        return large;
+    }
+
     /**
      * Sets the name of the server.
      *
@@ -644,6 +658,20 @@ public class ImplServer implements Server {
      */
     public void removeMember(User user) {
         members.remove(user.getId());
+    }
+
+    /**
+     * Increments the member count.
+     */
+    public void incrementMemberCount() {
+        memberCount++;
+    }
+
+    /**
+     * Decrement the member count.
+     */
+    public void decrementMemberCount() {
+        memberCount--;
     }
 
     /**

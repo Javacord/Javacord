@@ -86,9 +86,10 @@ public interface Server {
     public User getMemberById(String id);
 
     /**
-     * Gets a collection with all members on this server.
+     * Gets a collection with all known members on this server.
+     * For large servers some members might not be included in this collection because they are offline.
      *
-     * @return A collection with all members on this server.
+     * @return A collection with all known members on this server.
      */
     public Collection<User> getMembers();
 
@@ -311,5 +312,21 @@ public interface Server {
      * @return The region of the server.
      */
     public Region getRegion();
+
+    /**
+     * Gets the amount of members on this server.
+     *
+     * @return The amount of members on this server.
+     */
+    public int getMemberCount();
+
+    /**
+     * Checks whether the server is large or not.
+     * A large server has more than 250 members. Discord don't send offline users for large servers so
+     * {@link #getMemberCount()} might be greater than the size of {@link #getMembers()}.
+     *
+     * @return Whether the server is large or not.
+     */
+    public boolean isLarge();
 
 }

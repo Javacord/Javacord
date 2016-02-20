@@ -49,6 +49,7 @@ public class GuildMemberRemoveHandler extends PacketHandler {
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
         if (server != null) {
             ((ImplServer) server).removeMember(user);
+            ((ImplServer) server).decrementMemberCount();
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
