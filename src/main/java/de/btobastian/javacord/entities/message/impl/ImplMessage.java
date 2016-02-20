@@ -343,4 +343,15 @@ public class ImplMessage implements Message {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return getAuthor().getName() + ": " + getContent() + " (id: " + getId() + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
 }

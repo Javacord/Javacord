@@ -735,6 +735,11 @@ public class ImplServer implements Server {
     }
 
     @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
+    }
+
+    @Override
     public int hashCode() {
         return getId().hashCode();
     }

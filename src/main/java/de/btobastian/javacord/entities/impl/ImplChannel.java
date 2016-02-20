@@ -51,7 +51,6 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -462,6 +461,11 @@ public class ImplChannel implements Channel {
      */
     public void setOverwrittenPermissions(User user, Permissions permissions) {
         overwrittenPermissions.put(user.getId(), permissions);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
     }
 
     @Override

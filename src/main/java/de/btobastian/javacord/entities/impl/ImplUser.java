@@ -440,4 +440,14 @@ public class ImplUser implements User {
         this.avatarId = avatarId;
     }
 
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
 }

@@ -220,4 +220,15 @@ public class ImplInvite implements Invite {
     public Future<Exception> delete() {
         return api.deleteInvite(getCode());
     }
+
+    @Override
+    public String toString() {
+        return getCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return getCode().hashCode();
+    }
+
 }
