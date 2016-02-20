@@ -76,6 +76,8 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private User you = null;
 
+    private volatile int messageCacheSize = 200;
+
     private DiscordWebsocket socket = null;
 
     private RateLimitedException lastRateLimitedException = null;
@@ -565,6 +567,21 @@ public class ImplDiscordAPI implements DiscordAPI {
         });
     }
 
+    @Override
+    public void setMessageCacheSize(int size) {
+        this.messageCacheSize = size < 0 ? 0 : size;
+        synchronized (messages) {
+            while (messages.size() > messageCacheSize) {
+                messages.remove(0);
+            }
+        }
+    }
+
+    @Override
+    public int getMessageCacheSize() {
+        return messageCacheSize;
+    }
+
     /**
      * Checks if we are still rate limited.
      *
@@ -700,7 +717,7 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public void addMessage(Message message) {
         synchronized (messages) {
-            if (messages.size() > 200) { // only cache the last 200 messages
+            if (messages.size() > messageCacheSize) { // only cache the last 200 messages
                 messages.remove(0);
             }
             messages.add(message);

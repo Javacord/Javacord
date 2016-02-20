@@ -387,4 +387,20 @@ public interface DiscordAPI {
      */
     public Future<Exception> deleteInvite(String inviteCode);
 
+    /**
+     * Sets the size of message cache.
+     * If the cache is full the oldest message in the cache will be removed.
+     *
+     * @param size The size of the cache.
+     */
+    public void setMessageCacheSize(int size);
+
+    /**
+     * Gets the size of the message cache.
+     * If the cache is full the oldest message in the cache will be removed.
+     *
+     * @return The size of the cache.
+     */
+    public int getMessageCacheSize();
+
 }
