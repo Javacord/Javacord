@@ -37,6 +37,7 @@ import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listener.server.ServerMemberUnbanListener;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
+import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -57,6 +58,7 @@ public class ImplServer implements Server {
     private final ImplDiscordAPI api;
 
     private final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, VoiceChannel> voiceChannels = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Role> roles = new ConcurrentHashMap<>();
 
@@ -92,6 +94,9 @@ public class ImplServer implements Server {
             String type = channelJson.getString("type");
             if (type.equals("text")) {
                 new ImplChannel(channels.getJSONObject(i), this, api);
+            }
+            if (type.equals("voice")) {
+                new ImplVoiceChannel(channels.getJSONObject(i), this, api);
             }
         }
 
@@ -216,6 +221,16 @@ public class ImplServer implements Server {
     }
 
     @Override
+    public VoiceChannel getVoiceChannelById(String id) {
+        return voiceChannels.get(id);
+    }
+
+    @Override
+    public Collection<VoiceChannel> getVoiceChannels() {
+        return Collections.unmodifiableCollection(voiceChannels.values());
+    }
+
+    @Override
     public User getMemberById(String id) {
         return members.get(id);
     }
@@ -264,6 +279,38 @@ public class ImplServer implements Server {
                                 synchronized (listeners) {
                                     for (Listener listener : listeners) {
                                         ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                                    }
+                                }
+                            }
+                        });
+                        return channel;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<VoiceChannel> createVoiceChannel(String name) {
+        return createVoiceChannel(name, null);
+    }
+
+    @Override
+    public Future<VoiceChannel> createVoiceChannel(final String name, FutureCallback<VoiceChannel> callback) {
+        ListenableFuture<VoiceChannel> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<VoiceChannel>() {
+                    @Override
+                    public VoiceChannel call() throws Exception {
+                        final VoiceChannel channel = (VoiceChannel) createChannelBlocking(name, true);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(VoiceChannelCreateListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((VoiceChannelCreateListener) listener).onVoiceChannelCreate(api, channel);
                                     }
                                 }
                             }
@@ -684,6 +731,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Adds a voice channel to the server.
+     *
+     * @param channel The voice channel to add.
+     */
+    public void addVoiceChannel(VoiceChannel channel) {
+        voiceChannels.put(channel.getId(), channel);
+    }
+
+    /**
      * Adds a role to the server.
      *
      * @param role The role to add.
@@ -708,6 +764,15 @@ public class ImplServer implements Server {
      */
     public void removeChannel(Channel channel) {
         channels.remove(channel.getId());
+    }
+
+    /**
+     * Removes a voice channel from the server.
+     *
+     * @param channel The voice channel to remove.
+     */
+    public void removeVoiceChannel(VoiceChannel channel) {
+        voiceChannels.remove(channel.getId());
     }
 
     /**

@@ -20,6 +20,7 @@ package de.btobastian.javacord.listener.role;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.Listener;
@@ -39,5 +40,16 @@ public interface RoleChangeOverwrittenPermissionsListener extends Listener {
      */
     public void onRoleChangeOverwrittenPermissions(
             DiscordAPI api, Role role, Channel channel, Permissions oldPermissions);
+
+    /**
+     * This method is called every time a role changed its overwritten permissions.
+     *
+     * @param api The api.
+     * @param role The role with the updated permissions.
+     * @param channel The voice channel with the updated permissions.
+     * @param oldPermissions The old overwritten permissions of the role.
+     */
+    public void onRoleChangeOverwrittenPermissions(
+            DiscordAPI api, Role role, VoiceChannel channel, Permissions oldPermissions);
 
 }

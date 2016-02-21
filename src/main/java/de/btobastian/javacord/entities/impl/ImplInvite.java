@@ -20,10 +20,7 @@ package de.btobastian.javacord.entities.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.ImplDiscordAPI;
-import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.Invite;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
@@ -159,6 +156,12 @@ public class ImplInvite implements Invite {
     public Channel getChannel() {
         Server server = getServer();
         return server == null ? null : server.getChannelById(channelId);
+    }
+
+    @Override
+    public VoiceChannel getVoiceChannel() {
+        Server server = getServer();
+        return server == null ? null : server.getVoiceChannelById(channelId);
     }
 
     @Override

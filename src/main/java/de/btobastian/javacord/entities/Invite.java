@@ -90,6 +90,14 @@ public interface Invite {
     public Channel getChannel();
 
     /**
+     * Gets the voice channel of the invite. May be <code>null</code>!
+     *
+     * @return Get's the voice channel of the invite.
+     * <code>Null</code> if you are not member of the invite's server or it's a text channel.
+     */
+    public VoiceChannel getVoiceChannel();
+
+    /**
      * Checks whether the channel is a voice or text channel.
      *
      * @return Whether the channel is a voice channel or not.

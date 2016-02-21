@@ -21,9 +21,11 @@ package de.btobastian.javacord.utils.handler.channel;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
+import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -86,7 +88,19 @@ public class ChannelDeleteHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerVoiceChannel(JSONObject packet, Server server) {
-
+        final VoiceChannel channel = server.getVoiceChannelById(packet.getString("id"));
+        ((ImplServer) server).removeVoiceChannel(channel);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(VoiceChannelDeleteListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((VoiceChannelDeleteListener) listener).onVoiceChannelDelete(api, channel);
+                    }
+                }
+            }
+        });
     }
 
 }

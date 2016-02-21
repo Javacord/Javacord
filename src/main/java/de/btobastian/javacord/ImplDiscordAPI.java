@@ -211,6 +211,27 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
+    public Collection<VoiceChannel> getVoiceChannels() {
+        Collection<VoiceChannel> channels = new ArrayList<>();
+        for (Server server : getServers()) {
+            channels.addAll(server.getVoiceChannels());
+        }
+        return Collections.unmodifiableCollection(channels);
+    }
+
+    @Override
+    public VoiceChannel getVoiceChannelById(String id) {
+        Iterator<Server> serverIterator = getServers().iterator();
+        while (serverIterator.hasNext()) {
+            VoiceChannel channel = serverIterator.next().getVoiceChannelById(id);
+            if (channel != null) {
+                return channel;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public Future<User> getUserById(final String id) {
         User user = users.get(id);
         if (user != null) {
@@ -802,4 +823,12 @@ public class ImplDiscordAPI implements DiscordAPI {
         return listener;
     }
 
+    /**
+     * Sets the socket.
+     *
+     * @param socket The socket to set.
+     */
+    public void setSocket(DiscordWebsocket socket) {
+        this.socket = socket;
+    }
 }

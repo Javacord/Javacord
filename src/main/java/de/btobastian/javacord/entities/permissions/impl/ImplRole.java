@@ -25,6 +25,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -104,6 +105,15 @@ public class ImplRole implements Role {
 
     @Override
     public Permissions getOverwrittenPermissions(Channel channel) {
+        Permissions overwrittenPermissions = this.overwrittenPermissions.get(channel.getId());
+        if (overwrittenPermissions == null) {
+            overwrittenPermissions = emptyPermissions;
+        }
+        return overwrittenPermissions;
+    }
+
+    @Override
+    public Permissions getOverwrittenPermissions(VoiceChannel channel) {
         Permissions overwrittenPermissions = this.overwrittenPermissions.get(channel.getId());
         if (overwrittenPermissions == null) {
             overwrittenPermissions = emptyPermissions;
@@ -374,6 +384,16 @@ public class ImplRole implements Role {
      * @param permissions The overwritten permissions to set.
      */
     public void setOverwrittenPermissions(Channel channel, Permissions permissions) {
+        overwrittenPermissions.put(channel.getId(), permissions);
+    }
+
+    /**
+     * Sets overwritten permissions.
+     *
+     * @param channel The voice channel which overwrites the permissions.
+     * @param permissions The overwritten permissions to set.
+     */
+    public void setOverwrittenPermissions(VoiceChannel channel, Permissions permissions) {
         overwrittenPermissions.put(channel.getId(), permissions);
     }
 

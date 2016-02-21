@@ -22,7 +22,9 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplChannel;
+import de.btobastian.javacord.entities.impl.ImplVoiceChannel;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
@@ -33,6 +35,8 @@ import de.btobastian.javacord.listener.channel.ChannelChangePositionListener;
 import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.role.RoleChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listener.user.UserChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListener;
+import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -75,22 +79,15 @@ public class ChannelUpdateHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerTextChannel(JSONObject packet, Server server) {
-        ImplChannel channelTemp = null;
-        for (Channel c : server.getChannels()) {
-            if (c.getId().equals(packet.getString("id"))) {
-                channelTemp = (ImplChannel) c;
-                break;
-            }
-        }
-        if (channelTemp == null) {
+        final Channel channel = server.getChannelById(packet.getString("id"));
+        if (channel == null) {
             return; // no channel with the given id was found
         }
-        final ImplChannel channel = channelTemp;
 
         String name = packet.getString("name");
         if (!channel.getName().equals(name)) {
             final String oldName = channel.getName();
-            channel.setName(name);
+            ((ImplChannel) channel).setName(name);
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
@@ -110,7 +107,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 || (channel.getTopic() == null && topic != null)
                 || (channel.getTopic() != null && !channel.getTopic().equals(topic))) {
             final String oldTopic = channel.getTopic();
-            channel.setTopic(topic);
+            ((ImplChannel) channel).setTopic(topic);
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
@@ -127,7 +124,7 @@ public class ChannelUpdateHandler extends PacketHandler {
         int position = packet.getInt("position");
         if (channel.getPosition() != position) {
             final int oldPosition = channel.getPosition();
-            channel.setPosition(position);
+            ((ImplChannel) channel).setPosition(position);
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
@@ -161,7 +158,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ImplPermissions permissions = new ImplPermissions(allow, deny);
                 final Permissions oldPermissions = channel.getOverwrittenPermissions(user);
                 if (!oldPermissions.equals(permissions)) {
-                    channel.setOverwrittenPermissions(user, permissions);
+                    ((ImplChannel) channel).setOverwrittenPermissions(user, permissions);
                     listenerExecutorService.submit(new Runnable() {
                         @Override
                         public void run() {
@@ -209,7 +206,104 @@ public class ChannelUpdateHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerVoiceChannel(JSONObject packet, Server server) {
+        final VoiceChannel channel = server.getVoiceChannelById(packet.getString("id"));
+        if (channel == null) {
+            return; // no channel with the given id was found
+        }
 
+        String name = packet.getString("name");
+        if (!channel.getName().equals(name)) {
+            final String oldName = channel.getName();
+            ((ImplVoiceChannel) channel).setName(name);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(VoiceChannelChangeNameListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((VoiceChannelChangeNameListener) listener).onVoiceChannelChangeName(api, channel, oldName);
+                        }
+                    }
+                }
+            });
+        }
+
+        int position = packet.getInt("position");
+        if (channel.getPosition() != position) {
+            final int oldPosition = channel.getPosition();
+            ((ImplVoiceChannel) channel).setPosition(position);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<Listener> listeners =  api.getListeners(VoiceChannelChangePositionListener.class);
+                    synchronized (listeners) {
+                        for (Listener listener : listeners) {
+                            ((VoiceChannelChangePositionListener) listener)
+                                    .onVoiceChannelChangePosition(api, channel, oldPosition);
+                        }
+                    }
+                }
+            });
+        }
+
+        JSONArray permissionOverwrites = packet.getJSONArray("permission_overwrites");
+        for (int i = 0; i < permissionOverwrites.length(); i++) {
+            JSONObject permissionOverwrite = permissionOverwrites.getJSONObject(i);
+            int allow = permissionOverwrite.getInt("allow");
+            int deny = permissionOverwrite.getInt("deny");
+            String id = permissionOverwrite.getString("id");
+            String type = permissionOverwrite.getString("type");
+
+            // permissions overwritten by users
+            if (type.equals("member")) {
+                final User user;
+                try {
+                    user = api.getUserById(id).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    continue;
+                }
+                ImplPermissions permissions = new ImplPermissions(allow, deny);
+                final Permissions oldPermissions = channel.getOverwrittenPermissions(user);
+                if (!oldPermissions.equals(permissions)) {
+                    ((ImplVoiceChannel) channel).setOverwrittenPermissions(user, permissions);
+                    listenerExecutorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(UserChangeOverwrittenPermissionsListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((UserChangeOverwrittenPermissionsListener) listener)
+                                            .onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                }
+                            }
+                        }
+                    });
+                }
+
+            }
+
+            // permissions overwritten by roles
+            if (type.equals("role")) {
+                final Role role = channel.getServer().getRoleById(id);
+                ImplPermissions permissions = new ImplPermissions(allow, deny);
+                final Permissions oldPermissions = role.getOverwrittenPermissions(channel);
+                if (!permissions.equals(oldPermissions)) {
+                    ((ImplRole) role).setOverwrittenPermissions(channel, permissions);
+                    listenerExecutorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners = api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((RoleChangeOverwrittenPermissionsListener) listener)
+                                            .onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
     }
 
 }

@@ -38,14 +38,22 @@ import java.util.concurrent.Future;
 public class ImplInviteBuilder implements InviteBuilder {
 
     private final ImplDiscordAPI api;
-    private final ImplChannel channel;
+    private final ImplChannel textChannel;
+    private final ImplVoiceChannel voiceChannel;
 
     private int maxUses = -1;
     private byte temporary = -1;
     private int maxAge = -1;
 
-    public ImplInviteBuilder(ImplChannel channel, ImplDiscordAPI api) {
-        this.channel = channel;
+    public ImplInviteBuilder(ImplChannel textChannel, ImplDiscordAPI api) {
+        this.textChannel = textChannel;
+        this.voiceChannel = null;
+        this.api = api;
+    }
+
+    public ImplInviteBuilder(ImplVoiceChannel voiceChannel, ImplDiscordAPI api) {
+        this.textChannel = null;
+        this.voiceChannel = voiceChannel;
         this.api = api;
     }
 
@@ -88,8 +96,9 @@ public class ImplInviteBuilder implements InviteBuilder {
                         if (maxAge > 0) {
                             jsonParam.put("max_age", maxAge);
                         }
+                        String channelId = textChannel == null ? voiceChannel.getId() : textChannel.getId();
                         HttpResponse<JsonNode> response = Unirest
-                                .post("https://discordapp.com/api/channels/" + channel.getId() + "/invites")
+                                .post("https://discordapp.com/api/channels/" + channelId + "/invites")
                                 .header("authorization", api.getToken())
                                 .header("Content-Type", "application/json")
                                 .body(jsonParam.toString())

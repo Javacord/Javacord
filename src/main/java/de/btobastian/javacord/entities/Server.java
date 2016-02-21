@@ -77,6 +77,22 @@ public interface Server {
     public Collection<Channel> getChannels();
 
     /**
+     * Gets a voice channel by its id.
+     *
+     * @param id The id of the voice channel.
+     * @return The voice channel with the given id.
+     *         <code>Null</code> if the server has no channel with the given id.
+     */
+    public VoiceChannel getVoiceChannelById(String id);
+
+    /**
+     * Gets a collection with all voice channels of the server.
+     *
+     * @return A collection with all voice channels of the server.
+     */
+    public Collection<VoiceChannel> getVoiceChannels();
+
+    /**
      * Gets an user by its id.
      *
      * @param id The id of the user.
@@ -137,10 +153,27 @@ public interface Server {
      * Creates a new channel.
      *
      * @param name The name of the channel.
-     * @param callback The callback which will be informed when the server was created.
+     * @param callback The callback which will be informed when the channel was created.
      * @return The created channel.
      */
     public Future<Channel> createChannel(String name, FutureCallback<Channel> callback);
+
+    /**
+     * Creates a new voice channel.
+     *
+     * @param name The name of the voice channel.
+     * @return The created voice channel.
+     */
+    public Future<VoiceChannel> createVoiceChannel(String name);
+
+    /**
+     * Creates a new voice channel.
+     *
+     * @param name The name of the voice channel.
+     * @param callback The callback which will be informed when the channel was created.
+     * @return The created voice channel.
+     */
+    public Future<VoiceChannel> createVoiceChannel(String name, FutureCallback<VoiceChannel> callback);
 
     /**
      * Gets an array with all invites.

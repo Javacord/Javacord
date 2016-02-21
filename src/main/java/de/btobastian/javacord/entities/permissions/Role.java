@@ -21,6 +21,7 @@ package de.btobastian.javacord.entities.permissions;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.VoiceChannel;
 
 import java.awt.*;
 import java.util.List;
@@ -66,6 +67,14 @@ public interface Role {
      * @return The overwritten permissions.
      */
     public Permissions getOverwrittenPermissions(Channel channel);
+
+    /**
+     * Gets the overwritten permissions in the given voice channel.
+     *
+     * @param channel The voice channel to check.
+     * @return The overwritten permissions.
+     */
+    public Permissions getOverwrittenPermissions(VoiceChannel channel);
 
     /**
      * Gets all users with this role.

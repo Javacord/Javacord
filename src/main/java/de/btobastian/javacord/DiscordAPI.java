@@ -113,6 +113,21 @@ public interface DiscordAPI {
     public Channel getChannelById(String id);
 
     /**
+     * Gets a collection with all known voice channels.
+     *
+     * @return A collection with all known voice channels.
+     */
+    public Collection<VoiceChannel> getVoiceChannels();
+
+    /**
+     * Gets a voice channel by its id.
+     *
+     * @param id The id of the voice channel.
+     * @return The voice channel with the given id. <code>Null</code> if no channel with the id was found.
+     */
+    public VoiceChannel getVoiceChannelById(String id);
+
+    /**
      * Gets an user by its id. It first will check if the user is in the cache. If no user was found in the cache it
      * tries to request it from the api.
      *
