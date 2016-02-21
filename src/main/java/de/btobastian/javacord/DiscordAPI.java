@@ -425,4 +425,30 @@ public interface DiscordAPI {
      */
     public int getMessageCacheSize();
 
+    /**
+     * Tries to close the current connection and connect again.
+     *
+     * @param callback The callback which will be informed when we receive the ready packet (again).
+     */
+    public void reconnect(FutureCallback<DiscordAPI> callback);
+
+    /**
+     * Tries to close the current connection and connect again.
+     */
+    public void reconnectBlocking();
+
+    /**
+     * Sets whether the api should try to auto-reconnect or not.
+     *
+     * @param autoReconnect Whether the api should try to auto-reconnect or not.
+     */
+    public void setAutoReconnect(boolean autoReconnect);
+
+    /**
+     * Gets whether the api should try to auto-reconnect or not.
+     *
+     * @return Whether the api should try to auto-reconnect or not.
+     */
+    public boolean isAutoReconnectEnabled();
+
 }

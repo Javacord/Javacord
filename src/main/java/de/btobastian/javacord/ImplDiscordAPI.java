@@ -74,6 +74,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String game = null;
     private boolean idle = false;
 
+    private boolean autoReconnect = true;
+
     private User you = null;
 
     private volatile int messageCacheSize = 200;
@@ -136,7 +138,7 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         String gateway = requestGatewayBlocking();
         try {
-            socket = new DiscordWebsocket(new URI(gateway), this);
+            socket = new DiscordWebsocket(new URI(gateway), this, false);
             socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
             socket.connect();
         } catch (URISyntaxException | NoSuchAlgorithmException e) {
@@ -610,6 +612,63 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public int getMessageCacheSize() {
         return messageCacheSize;
+    }
+
+    @Override
+    public void reconnect(FutureCallback<DiscordAPI> callback) {
+        Futures.addCallback(getThreadPool().getListeningExecutorService().submit(new Callable<DiscordAPI>() {
+            @Override
+            public DiscordAPI call() throws Exception {
+                reconnectBlocking();
+                return ImplDiscordAPI.this;
+            }
+        }), callback);
+    }
+
+    @Override
+    public void reconnectBlocking() {
+        reconnectBlocking(requestGatewayBlocking());
+    }
+
+    @Override
+    public void setAutoReconnect(boolean autoReconnect) {
+        this.autoReconnect = autoReconnect;
+    }
+
+    @Override
+    public boolean isAutoReconnectEnabled() {
+        return autoReconnect;
+    }
+
+    /**
+     * Tries to reconnect to the given gateway.
+     *
+     * @param gateway The gateway to reconnect to.
+     */
+    public void reconnectBlocking(String gateway) {
+        try {
+            socket.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (token == null || !checkTokenBlocking(token)) {
+            token = requestTokenBlocking();
+        }
+        try {
+            socket = new DiscordWebsocket(new URI(gateway), this, true);
+            socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
+            socket.connect();
+        } catch (URISyntaxException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return;
+        }
+        try {
+            if (!socket.isReady().get()) {
+                throw new IllegalStateException("Socket closed before ready packet was received!");
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

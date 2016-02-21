@@ -52,26 +52,50 @@ import java.util.zip.Inflater;
  */
 public class DiscordWebsocket extends WebSocketClient {
 
-    private SettableFuture<Boolean> ready = null;
-    private ImplDiscordAPI api = null;
-    private HashMap<String, PacketHandler> handlers = new HashMap<>();
+    private final SettableFuture<Boolean> ready;
+    private final ImplDiscordAPI api;
+    private final HashMap<String, PacketHandler> handlers = new HashMap<>();
+    private final boolean isReconnect;
+    private volatile boolean isClosed = false;
+
+    // received in packet with op = 7
+    private String urlForReconnect = null;
 
     /**
      * Creates a new instance of this class.
      *
      * @param serverURI The uri of the gateway the socket should connect to.
      * @param api The api.
+     * @param reconnect Whether it's a reconnect or not.
      */
-    public DiscordWebsocket(URI serverURI, ImplDiscordAPI api) {
+    public DiscordWebsocket(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
         super(serverURI);
         this.api = api;
-        ready = SettableFuture.create();
+        this.ready = SettableFuture.create();
         registerHandlers();
+        this.isReconnect = reconnect;
     }
 
     @Override
-    public void onClose(int i, String s, boolean b) {
-        System.out.println("Websocket closed with reason " + s + " and code " + i);
+    public void onClose(int code, String reason, boolean remote) {
+        // I don't know why, but sometimes we get an error with close code 1006 (connection closed abnormally (locally))
+        // The really strange thing is: Everything works fine after this error. The socket is still connected
+        // TODO find the reason for this behaviour
+        if (code == 1006 && reason == null) {
+            System.out.println("Received close code 1006. That's strange cause the socket is still connected...");
+            return;
+        }
+        System.out.println("Websocket closed with reason " + reason + " and code " + code);
+        isClosed = true;
+        if (remote && urlForReconnect != null) {
+            System.out.println("Trying to reconnect (we received op 7 before)...");
+            api.reconnectBlocking(urlForReconnect);
+            System.out.println("Reconnected!");
+        } else if (remote && api.isAutoReconnectEnabled()) {
+            System.out.println("Trying to auto-reconnect...");
+            api.reconnectBlocking();
+            System.out.println("Reconnected!");
+        }
         if (!ready.isDone()) {
             ready.set(false);
         }
@@ -85,8 +109,22 @@ public class DiscordWebsocket extends WebSocketClient {
     @Override
     public void onMessage(String message) {
         JSONObject obj = new JSONObject(message);
+
+        int op = obj.getInt("op");
+        if (op == 7) {
+            String url = obj.getJSONObject("d").getString("url");
+        }
+
         JSONObject packet = obj.getJSONObject("d");
         String type = obj.getString("t");
+
+        if (type.equals("READY") && isReconnect) {
+            long heartbeatInterval = packet.getLong("heartbeat_interval");
+            startHeartbeat(heartbeatInterval);
+            ready.set(true);
+            updateStatus();
+            return; // do not handle the ready packet twice
+        }
 
         PacketHandler handler = handlers.get(type);
         if (handler != null) {
@@ -146,6 +184,18 @@ public class DiscordWebsocket extends WebSocketClient {
         }
     }
 
+    @Override
+    public void close() {
+        isClosed = true;
+        super.close();
+    }
+
+    @Override
+    public void closeBlocking() throws InterruptedException {
+        isClosed = true;
+        super.closeBlocking();
+    }
+
     /**
      * Gets the Future which tells whether the connection is ready or failed.
      *
@@ -165,7 +215,7 @@ public class DiscordWebsocket extends WebSocketClient {
             @Override
             public void run() {
                 long timer = System.currentTimeMillis();
-                for (;;) {
+                while (!isClosed) {
                     if ((System.currentTimeMillis() - timer) >= heartbeatInterval - 10) {
                         Object nullObject = null;
                         JSONObject heartbeat = new JSONObject()
