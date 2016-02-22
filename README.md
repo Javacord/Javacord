@@ -11,21 +11,27 @@ A simple library to create a discord bot.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.6</version>
+  <version>2.0.7</version>
 </dependency>
 ```
 
+## IDE Setup (for beginners)
+
+If you never used maven before you should take a look at the setup tutorial:
+* [Eclipse Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))
+* [IntelliJ Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
+
 #Wiki
 
-For detailed information take a look at the wiki: https://github.com/BtoBastian/Javacord/wiki
+For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord/wiki)
 
 #Download
-For those of you how don't use maven: http://ci.ketrwu.de/job/Javacord/lastSuccessfulBuild/
+For those of you how don't use maven: [Jenkins](http://ci.ketrwu.de/job/Javacord/lastSuccessfulBuild/)
 
 Thanks to ketrwu (https://github.com/KennethWussmann).
 
 #Javadocs
-The javadocs can be found here: http://ci.ketrwu.de/job/Javacord/javadoc/
+The javadocs can be found here: [JavaDocs](http://ci.ketrwu.de/job/Javacord/javadoc/)
 
 Thanks to ketrwu, too.
 
@@ -72,3 +78,4 @@ public class MyPingPongBot {
 
 }
 ```
+More examples can be found in the wiki: [Examples](https://github.com/BtoBastian/Javacord/wiki/Examples)
