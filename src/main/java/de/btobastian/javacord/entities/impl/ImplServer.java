@@ -31,10 +31,7 @@ import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.role.RoleCreateListener;
-import de.btobastian.javacord.listener.server.ServerLeaveListener;
-import de.btobastian.javacord.listener.server.ServerMemberBanListener;
-import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
-import de.btobastian.javacord.listener.server.ServerMemberUnbanListener;
+import de.btobastian.javacord.listener.server.*;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
@@ -646,7 +643,18 @@ public class ImplServer implements Server {
                     String name = response.getBody().getObject().getString("name");
                     if (!getName().equals(name)) {
                         final String oldName = getName();
-                        // TODO add ServerChangeName listener
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ServerChangeNameListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ServerChangeNameListener) listener)
+                                                .onServerChangeName(api, ImplServer.this, oldName);
+                                    }
+                                }
+                            }
+                        });
                     }
                 } catch (Exception e) {
                     return e;
