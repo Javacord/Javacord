@@ -800,8 +800,7 @@ public class ImplServer implements Server {
                 .asJson();
         api.checkResponse(response);
         if (voice) {
-            // TODO voice channels
-            return null;
+            return new ImplVoiceChannel(response.getBody().getObject(), this, api);
         } else {
             return new ImplChannel(response.getBody().getObject(), this, api);
         }
