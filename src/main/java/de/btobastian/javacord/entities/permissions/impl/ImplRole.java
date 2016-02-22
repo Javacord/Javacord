@@ -25,13 +25,12 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.role.RoleChangeNameListener;
-import de.btobastian.javacord.listener.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listener.role.*;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -114,6 +113,15 @@ public class ImplRole implements Role {
     }
 
     @Override
+    public Permissions getOverwrittenPermissions(VoiceChannel channel) {
+        Permissions overwrittenPermissions = this.overwrittenPermissions.get(channel.getId());
+        if (overwrittenPermissions == null) {
+            overwrittenPermissions = emptyPermissions;
+        }
+        return overwrittenPermissions;
+    }
+
+    @Override
     public List<User> getUsers() {
         return new ArrayList<>(users);
     }
@@ -135,12 +143,36 @@ public class ImplRole implements Role {
 
     @Override
     public Future<Exception> updatePermissions(Permissions permissions) {
-        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed());
+        return update(name, color, hoist, permissions);
     }
 
     @Override
     public Future<Exception> updateName(String name) {
-        return update(name, color.getRGB(), hoist, permissions.getAllowed());
+        return update(name, color, hoist, permissions);
+    }
+
+    @Override
+    public Future<Exception> updateColor(Color color) {
+        return update(name, color, hoist, permissions);
+    }
+
+    @Override
+    public Future<Exception> updateHoist(boolean hoist) {
+        return update(name, color, hoist, permissions);
+    }
+
+    @Override
+    public Future<Exception> update(String name, Color color, boolean hoist, Permissions permissions) {
+        if (name == null) {
+            name = getName();
+        }
+        if (color == null) {
+            color = getColor();
+        }
+        if (permissions == null) {
+            permissions = getPermissions();
+        }
+        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed());
     }
 
     /**
@@ -157,29 +189,24 @@ public class ImplRole implements Role {
             @Override
             public Exception call() throws Exception {
                 try {
-                    HttpResponse<JsonNode> response = Unirest.put
-                            ("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
                             .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
                             .body(new JSONObject()
                                     .put("name", name)
                                     .put("color", color)
                                     .put("hoist", hoist)
-                                    .put("permissions", allow))
+                                    .put("permissions", allow).toString())
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
 
                     // update permissions
                     if (ImplRole.this.permissions.getAllowed() != allow) {
                         final ImplPermissions oldPermissions = ImplRole.this.permissions;
                         ImplRole.this.permissions = new ImplPermissions(allow);
                         // call listener
-                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
                                 List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
@@ -194,11 +221,11 @@ public class ImplRole implements Role {
                     }
 
                     // update name
-                    if (ImplRole.this.name != name) {
+                    if (ImplRole.this.name.equals(name)) {
                         final String oldName = ImplRole.this.name;
                         ImplRole.this.name = name;
                         // call listener
-                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
                                 List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
@@ -212,9 +239,42 @@ public class ImplRole implements Role {
                         });
                     }
 
-                    // TODO no listeners for color and hoist atm
-                    ImplRole.this.color = new Color(color);
-                    ImplRole.this.hoist = hoist;
+                    // update color
+                    if (ImplRole.this.color.getRGB() != new Color(color).getRGB()) {
+                        final Color oldColor = ImplRole.this.color;
+                        ImplRole.this.color = new Color(color);
+                        // call listener
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(RoleChangeColorListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((RoleChangeColorListener) listener)
+                                                .onRoleChangeColor(api, ImplRole.this, oldColor);
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // update hoist
+                    if (ImplRole.this.hoist != hoist) {
+                        ImplRole.this.hoist = hoist;
+                        // call listener
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(RoleChangeHoistListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((RoleChangeHoistListener) listener)
+                                                .onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
+                                    }
+                                }
+                            }
+                        });
+                    }
                     return null;
                 } catch (Exception e) {
                     return e;
@@ -223,14 +283,70 @@ public class ImplRole implements Role {
         });
     }
 
+    @Override
+    public Future<Exception> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    server.removeRole(ImplRole.this);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((RoleDeleteListener) listener).onRoleDelete(api, ImplRole.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> removeUser(User user) {
+        List<Role> roles = new ArrayList<>(user.getRoles(getServer()));
+        roles.remove(this);
+        return getServer().updateRoles(user, roles.toArray(new Role[roles.size()]));
+    }
+
+    @Override
+    public Future<Exception> addUser(User user) {
+        List<Role> roles = new ArrayList<>(user.getRoles(getServer()));
+        roles.add(this);
+        return getServer().updateRoles(user, roles.toArray(new Role[roles.size()]));
+    }
+
     /**
      * Adds an user.
      *
      * @param user The user to add.
      */
-    public void addUser(User user) {
+    public void addUserNoUpdate(User user) {
         synchronized (users) {
             users.add(user);
+        }
+    }
+
+    /**
+     * Removes an user.
+     *
+     * @param user The user to remove.
+     */
+    public void removeUserNoUpdate(User user) {
+        synchronized (users) {
+            users.remove(user);
         }
     }
 
@@ -269,6 +385,34 @@ public class ImplRole implements Role {
      */
     public void setOverwrittenPermissions(Channel channel, Permissions permissions) {
         overwrittenPermissions.put(channel.getId(), permissions);
+    }
+
+    /**
+     * Sets overwritten permissions.
+     *
+     * @param channel The voice channel which overwrites the permissions.
+     * @param permissions The overwritten permissions to set.
+     */
+    public void setOverwrittenPermissions(VoiceChannel channel, Permissions permissions) {
+        overwrittenPermissions.put(channel.getId(), permissions);
+    }
+
+    /**
+     * Sets the color of the channel.
+     *
+     * @param color The color to set.
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    /**
+     * Sets the hoist of the channel.
+     *
+     * @param hoist The hoist to set.
+     */
+    public void setHoist(boolean hoist) {
+        this.hoist = hoist;
     }
 
 }

@@ -20,6 +20,7 @@ package de.btobastian.javacord.entities.message.impl;
 
 import de.btobastian.javacord.entities.message.MessageAttachment;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -52,27 +53,47 @@ public class ImplMessageAttachment implements MessageAttachment {
 
     @Override
     public URL getUrl() {
+        try {
+            return url == null ? null : new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
     public URL getProxyUrl() {
+        try {
+            return proxyUrl == null ? null : new URL(proxyUrl);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
     }
 
     @Override
     public String getId() {
-        return null;
+        return id;
     }
 
     @Override
     public String getFileName() {
-        return null;
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return getFileName() + " (id: " + getId() + ", url: " + getUrl() + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 
 }

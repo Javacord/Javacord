@@ -18,7 +18,9 @@
  */
 package de.btobastian.javacord.entities.message;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This interface represents a message history.
@@ -39,5 +41,33 @@ public interface MessageHistory {
      * @return The iterator for the messages.
      */
     public Iterator<Message> iterator();
+
+    /**
+     * Gets a collection with all fetched messages.
+     *
+     * @return A collection with all fetched messages.
+     */
+    public Collection<Message> getMessages();
+
+    /**
+     * Gets the newest message in the history.
+     *
+     * @return The newest message in the history.
+     */
+    public Message getNewestMessage();
+
+    /**
+     * Gets the oldest message in the history.
+     *
+     * @return The oldest message in the history.
+     */
+    public Message getOldestMessage();
+
+    /**
+     * Gets a sorted list with all fetched messages.
+     *
+     * @return A sorted list with all fetched messages.
+     */
+    public List<Message> getMessagesSorted();
 
 }

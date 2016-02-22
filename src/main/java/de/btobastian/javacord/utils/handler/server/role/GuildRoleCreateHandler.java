@@ -50,14 +50,19 @@ public class GuildRoleCreateHandler extends PacketHandler {
         JSONObject roleJson = packet.getJSONObject("role");
 
         Server server = api.getServerById(guildId);
-        Role role = new ImplRole(roleJson, (ImplServer) server, api);
+        final Role role = new ImplRole(roleJson, (ImplServer) server, api);
 
-        List<Listener> listeners =  api.getListeners(RoleCreateListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((RoleCreateListener) listener).onRoleCreate(api, role);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(RoleCreateListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((RoleCreateListener) listener).onRoleCreate(api, role);
+                    }
+                }
             }
-        }
+        });
     }
 
 }

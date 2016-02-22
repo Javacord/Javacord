@@ -20,18 +20,15 @@ package de.btobastian.javacord.utils;
 
 import com.google.common.util.concurrent.SettableFuture;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
 import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
-import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.message.TypingStartHandler;
-import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
-import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMemberAddHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMemberRemoveHandler;
+import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
@@ -40,35 +37,65 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 /**
  * The websocket which is used to connect to discord.
  */
 public class DiscordWebsocket extends WebSocketClient {
 
-    private SettableFuture<Boolean> ready = null;
-    private ImplDiscordAPI api = null;
-    private HashMap<String, PacketHandler> handlers = new HashMap<>();
+    private final SettableFuture<Boolean> ready;
+    private final ImplDiscordAPI api;
+    private final HashMap<String, PacketHandler> handlers = new HashMap<>();
+    private final boolean isReconnect;
+    private volatile boolean isClosed = false;
+
+    // received in packet with op = 7
+    private String urlForReconnect = null;
 
     /**
      * Creates a new instance of this class.
      *
      * @param serverURI The uri of the gateway the socket should connect to.
      * @param api The api.
+     * @param reconnect Whether it's a reconnect or not.
      */
-    public DiscordWebsocket(URI serverURI, ImplDiscordAPI api) {
+    public DiscordWebsocket(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
         super(serverURI);
         this.api = api;
-        ready = SettableFuture.create();
+        this.ready = SettableFuture.create();
         registerHandlers();
+        this.isReconnect = reconnect;
     }
 
     @Override
-    public void onClose(int i, String s, boolean b) {
-        System.out.println("Websocket closed with reason " + s + " and code " + i);
+    public void onClose(int code, String reason, boolean remote) {
+        // I don't know why, but sometimes we get an error with close code 1006 (connection closed abnormally (locally))
+        // The really strange thing is: Everything works fine after this error. The socket is still connected
+        // TODO find the reason for this behaviour
+        if (code == 1006 && reason == null) {
+            System.out.println("Received close code 1006. That's strange cause the socket is still connected...");
+            return;
+        }
+        System.out.println("Websocket closed with reason " + reason + " and code " + code);
+        isClosed = true;
+        if (remote && urlForReconnect != null) {
+            System.out.println("Trying to reconnect (we received op 7 before)...");
+            api.reconnectBlocking(urlForReconnect);
+            System.out.println("Reconnected!");
+        } else if (remote && api.isAutoReconnectEnabled()) {
+            System.out.println("Trying to auto-reconnect...");
+            api.reconnectBlocking();
+            System.out.println("Reconnected!");
+        }
         if (!ready.isDone()) {
             ready.set(false);
         }
@@ -82,8 +109,22 @@ public class DiscordWebsocket extends WebSocketClient {
     @Override
     public void onMessage(String message) {
         JSONObject obj = new JSONObject(message);
+
+        int op = obj.getInt("op");
+        if (op == 7) {
+            String url = obj.getJSONObject("d").getString("url");
+        }
+
         JSONObject packet = obj.getJSONObject("d");
         String type = obj.getString("t");
+
+        if (type.equals("READY") && isReconnect) {
+            long heartbeatInterval = packet.getLong("heartbeat_interval");
+            startHeartbeat(heartbeatInterval);
+            ready.set(true);
+            updateStatus();
+            return; // do not handle the ready packet twice
+        }
 
         PacketHandler handler = handlers.get(type);
         if (handler != null) {
@@ -109,8 +150,50 @@ public class DiscordWebsocket extends WebSocketClient {
                         .put("$referrer", "https://discordapp.com/@me")
                         .put("$referring_domain", "discordapp.com"))
                     .put("large_threshold", 250)
-                    .put("compress", false));
+                    .put("compress", true));
         send(connectPacket.toString());
+    }
+
+    @Override
+    public void onMessage(ByteBuffer bytes) {
+        byte[] compressedData = bytes.array();
+        Inflater decompressor = new Inflater();
+        decompressor.setInput(compressedData);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
+        byte[] buf = new byte[1024];
+        while (!decompressor.finished()) {
+            int count;
+            try {
+                count = decompressor.inflate(buf);
+            } catch (DataFormatException e) {
+                e.printStackTrace();
+                System.exit(-1);
+                return;
+            }
+            bos.write(buf, 0, count);
+
+        }
+        try {
+            bos.close();
+        } catch (IOException ignored) { }
+        byte[] decompressedData = bos.toByteArray();
+        try {
+            onMessage(new String(decompressedData, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void close() {
+        isClosed = true;
+        super.close();
+    }
+
+    @Override
+    public void closeBlocking() throws InterruptedException {
+        isClosed = true;
+        super.closeBlocking();
     }
 
     /**
@@ -132,7 +215,7 @@ public class DiscordWebsocket extends WebSocketClient {
             @Override
             public void run() {
                 long timer = System.currentTimeMillis();
-                for (;;) {
+                while (!isClosed) {
                     if ((System.currentTimeMillis() - timer) >= heartbeatInterval - 10) {
                         Object nullObject = null;
                         JSONObject heartbeat = new JSONObject()
@@ -189,10 +272,14 @@ public class DiscordWebsocket extends WebSocketClient {
         addHandler(new TypingStartHandler(api));
 
         // server
+        addHandler(new GuildBanAddHandler(api));
+        addHandler(new GuildBanRemoveHandler(api));
         addHandler(new GuildCreateHandler(api));
         addHandler(new GuildDeleteHandler(api));
         addHandler(new GuildMemberAddHandler(api));
         addHandler(new GuildMemberRemoveHandler(api));
+        addHandler(new GuildMemberUpdateHandler(api));
+        addHandler(new GuildUpdateHandler(api));
 
         // role
         addHandler(new GuildRoleCreateHandler(api));

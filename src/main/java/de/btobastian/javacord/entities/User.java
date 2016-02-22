@@ -52,7 +52,7 @@ public interface User extends MessageReceiver {
     public void type();
 
     /**
-     * Checks if the user is yourself.
+     * Checks if the user is the account you logged in.
      *
      * @return Whether the user is you or not.
      */
@@ -98,6 +98,13 @@ public interface User extends MessageReceiver {
     public URL getAvatarUrl();
 
     /**
+     * Gets the id of the users avatar.
+     *
+     * @return The id of the users avatar. <code>Null</code> if the user has no avatar.
+     */
+    public String getAvatarId();
+
+    /**
      * Gets the roles of the user on the given server.
      *
      * @param server The server.
@@ -111,5 +118,12 @@ public interface User extends MessageReceiver {
      * @return The game the user is currently playing. May be <code>null</code>.
      */
     public String getGame();
+
+    /**
+     * Gets the tag which is used to mention the user.
+     *
+     * @return Gets the tag which is used to mention the user.
+     */
+    public String getMentionTag();
 
 }

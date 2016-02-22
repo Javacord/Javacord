@@ -21,10 +21,13 @@ package de.btobastian.javacord.utils.handler.channel;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplVoiceChannel;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
+import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -65,14 +68,21 @@ public class ChannelCreateHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerTextChannel(JSONObject packet, Server server) {
-        Channel channel = new ImplChannel(packet, (ImplServer) server, api);
-
-        List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
-        synchronized (listeners) {
-            for (Listener listener : listeners) {
-                ((ChannelCreateListener) listener).onChannelCreate(api, channel);
-            }
+        if (server.getChannelById(packet.getString("id")) != null) {
+            return;
         }
+        final Channel channel = new ImplChannel(packet, (ImplServer) server, api);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -82,7 +92,21 @@ public class ChannelCreateHandler extends PacketHandler {
      * @param server The server of the channel.
      */
     private void handleServerVoiceChannel(JSONObject packet, Server server) {
-
+        if (server.getVoiceChannelById(packet.getString("id")) != null) {
+            return;
+        }
+        final VoiceChannel channel = new ImplVoiceChannel(packet, (ImplServer) server, api);
+        listenerExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Listener> listeners =  api.getListeners(VoiceChannelCreateListener.class);
+                synchronized (listeners) {
+                    for (Listener listener : listeners) {
+                        ((VoiceChannelCreateListener) listener).onVoiceChannelCreate(api, channel);
+                    }
+                }
+            }
+        });
     }
 
 }

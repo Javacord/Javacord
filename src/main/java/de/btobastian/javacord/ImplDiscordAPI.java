@@ -26,25 +26,32 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.impl.ImplInvite;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.permissions.impl.ImplRole;
+import de.btobastian.javacord.exceptions.BadResponseException;
 import de.btobastian.javacord.exceptions.PermissionsException;
+import de.btobastian.javacord.exceptions.RateLimitedException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
+import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.DiscordWebsocket;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.java_websocket.util.Base64;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import javax.net.ssl.SSLContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
@@ -61,13 +68,21 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private final ThreadPool pool;
 
-    private String email =  null;
+    private String email = null;
     private String password = null;
     private String token = null;
     private String game = null;
     private boolean idle = false;
 
+    private boolean autoReconnect = true;
+
+    private User you = null;
+
+    private volatile int messageCacheSize = 200;
+
     private DiscordWebsocket socket = null;
+
+    private RateLimitedException lastRateLimitedException = null;
 
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
@@ -123,7 +138,7 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         String gateway = requestGatewayBlocking();
         try {
-            socket = new DiscordWebsocket(new URI(gateway), this);
+            socket = new DiscordWebsocket(new URI(gateway), this, false);
             socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
             socket.connect();
         } catch (URISyntaxException | NoSuchAlgorithmException e) {
@@ -137,8 +152,6 @@ public class ImplDiscordAPI implements DiscordAPI {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        // register listener for server joins
-        registerListener(listener);
     }
 
     @Override
@@ -175,11 +188,53 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Collection<Server> getServers() {
-        return servers.values();
+        return Collections.unmodifiableCollection(servers.values());
     }
 
     @Override
-    public Future<User> getUserById(String id) {
+    public Collection<Channel> getChannels() {
+        Collection<Channel> channels = new ArrayList<>();
+        for (Server server : getServers()) {
+            channels.addAll(server.getChannels());
+        }
+        return Collections.unmodifiableCollection(channels);
+    }
+
+    @Override
+    public Channel getChannelById(String id) {
+        Iterator<Server> serverIterator = getServers().iterator();
+        while (serverIterator.hasNext()) {
+            Channel channel = serverIterator.next().getChannelById(id);
+            if (channel != null) {
+                return channel;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Collection<VoiceChannel> getVoiceChannels() {
+        Collection<VoiceChannel> channels = new ArrayList<>();
+        for (Server server : getServers()) {
+            channels.addAll(server.getVoiceChannels());
+        }
+        return Collections.unmodifiableCollection(channels);
+    }
+
+    @Override
+    public VoiceChannel getVoiceChannelById(String id) {
+        Iterator<Server> serverIterator = getServers().iterator();
+        while (serverIterator.hasNext()) {
+            VoiceChannel channel = serverIterator.next().getVoiceChannelById(id);
+            if (channel != null) {
+                return channel;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Future<User> getUserById(final String id) {
         User user = users.get(id);
         if (user != null) {
             return Futures.immediateFuture(user);
@@ -187,15 +242,43 @@ public class ImplDiscordAPI implements DiscordAPI {
         return getThreadPool().getListeningExecutorService().submit(new Callable<User>() {
             @Override
             public User call() throws Exception {
-                // TODO make request (GET /api/:guild_id/members/:user_id)
-                return null;
+                User user = null;
+                Iterator<Server> serverIterator = getServers().iterator();
+                while (serverIterator.hasNext()) {
+                    Server server = serverIterator.next();
+                    HttpResponse<JsonNode> response = Unirest
+                            .get("https://discordapp.com/api/guilds/" + server.getId() + "/members/" + id)
+                            .header("authorization", token)
+                            .asJson();
+                    // user does not exist
+                    if (response.getStatus() < 200 || response.getStatus() > 299) {
+                        continue;
+                    }
+                    user = getOrCreateUser(response.getBody().getObject().getJSONObject("user"));
+                    // add user to server
+                    ((ImplServer) server).addMember(user);
+                    // assign user roles
+                    if (response.getBody().getObject().has("roles")) {
+                        JSONArray roleIds = response.getBody().getObject().getJSONArray("roles");
+                        for (int i = 0; i < roleIds.length(); i++) {
+                            // add user to the role
+                            ((ImplRole) server.getRoleById(roleIds.getString(i))).addUserNoUpdate(user);
+                        }
+                    }
+                }
+                return user;
             }
         });
     }
 
     @Override
+    public User getCachedUserById(String id) {
+        return users.get(id);
+    }
+
+    @Override
     public Collection<User> getUsers() {
-        return users.values();
+        return Collections.unmodifiableCollection(users.values());
     }
 
     @Override
@@ -293,13 +376,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/invite/" + inviteCode)
                             .header("authorization", token)
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    checkResponse(response);
                     String guildId = response.getBody().getObject().getJSONObject("guild").getString("id");
                     if (getServerById(guildId) != null) {
                         throw new IllegalStateException("Already member of this server!");
@@ -318,21 +395,42 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Server> createServer(String name) {
-        return createServer(name, null, null);
+        return createServer(name, Region.US_WEST, null, null);
     }
 
     @Override
     public Future<Server> createServer(String name, FutureCallback<Server> callback) {
-        return createServer(name, null, callback);
+        return createServer(name, Region.US_WEST, null, callback);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region) {
+        return createServer(name, region, null, null);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region, FutureCallback<Server> callback) {
+        return createServer(name, region, null, callback);
     }
 
     @Override
     public Future<Server> createServer(String name, BufferedImage icon) {
-        return createServer(name, icon, null);
+        return createServer(name, Region.US_WEST, icon, null);
     }
 
     @Override
-    public Future<Server> createServer(final String name, final BufferedImage icon, FutureCallback<Server> callback) {
+    public Future<Server> createServer(String name, BufferedImage icon, FutureCallback<Server> callback) {
+        return createServer(name, Region.US_WEST, icon, callback);
+    }
+
+    @Override
+    public Future<Server> createServer(String name, Region region, BufferedImage icon) {
+        return createServer(name, region, icon, null);
+    }
+
+    @Override
+    public Future<Server> createServer(
+            final String name, final Region region, final BufferedImage icon, FutureCallback<Server> callback) {
         ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
             @Override
             public Server call() throws Exception {
@@ -349,7 +447,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     params.put("icon", "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray()));
                 }
                 params.put("name", name);
-                params.put("region", "us-west");
+                params.put("region", region == null ? Region.US_WEST : region);
                 final SettableFuture<Server> settableFuture;
                 synchronized (listenerLock) {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds")
@@ -357,10 +455,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                             .header("Content-Type", "application/json")
                             .body(params.toString())
                             .asJson();
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new IllegalStateException("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    checkResponse(response);
                     String guildId = response.getBody().getObject().getString("id");
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
@@ -372,6 +467,230 @@ public class ImplDiscordAPI implements DiscordAPI {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public User getYourself() {
+        return you;
+    }
+
+    @Override
+    public Future<Exception> updateUsername(String newUsername) {
+        return updateProfile(newUsername, null, null, null);
+    }
+
+    @Override
+    public Future<Exception> updateEmail(String newEmail) {
+        return updateProfile(null, newEmail, null, null);
+    }
+
+    @Override
+    public Future<Exception> updatePassword(String newPassword) {
+        return updateProfile(null, null, newPassword, null);
+    }
+
+    @Override
+    public Future<Exception> updateAvatar(BufferedImage newAvatar) {
+        return updateProfile(null, null, null, newAvatar);
+    }
+
+    @Override
+    public Future<Exception> updateProfile(
+            String newUsername, String newEmail, final String newPassword, BufferedImage newAvatar) {
+        String avatarString = getYourself().getAvatarId();
+        if (newAvatar != null) {
+            try {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                ImageIO.write(newAvatar, "jpg", os);
+                avatarString = "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray());
+            } catch (IOException ignored) { }
+        }
+        final JSONObject params = new JSONObject()
+                .put("username", newUsername == null ? getYourself().getName() : newUsername)
+                .put("email", newEmail == null ? email : newEmail)
+                .put("avatar", avatarString == null ? JSONObject.NULL : avatarString)
+                .put("password", password);
+        if (newPassword != null) {
+            params.put("new_password", newPassword);
+        }
+        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/users/@me")
+                            .header("authorization", token)
+                            .header("Content-Type", "application/json")
+                            .body(params.toString())
+                            .asJson();
+                    checkResponse(response);
+                    ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
+                    setEmail(response.getBody().getObject().getString("email"));
+                    setToken(response.getBody().getObject().getString("token"));
+                    final String oldName = getYourself().getName();
+                    ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
+                    if (newPassword != null) {
+                        password = newPassword;
+                    }
+
+                    if (!getYourself().getName().equals(oldName)) {
+                        getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners = getListeners(UserChangeNameListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((UserChangeNameListener) listener)
+                                                .onUserChangeName(ImplDiscordAPI.this, getYourself(), oldName);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Invite> parseInvite(String invite) {
+        return parseInvite(invite, null);
+    }
+
+    @Override
+    public Future<Invite> parseInvite(String invite, FutureCallback<Invite> callback) {
+        final String inviteCode = invite.replace("https://discord.gg/", "").replace("http://discord.gg/", "");
+        ListenableFuture<Invite> future = getThreadPool().getListeningExecutorService().submit(new Callable<Invite>() {
+            @Override
+            public Invite call() throws Exception {
+                HttpResponse<JsonNode> response = Unirest
+                        .get("https://discordapp.com/api/invite/" + inviteCode)
+                        .header("authorization", token)
+                        .asJson();
+                checkResponse(response);
+                return new ImplInvite(ImplDiscordAPI.this, response.getBody().getObject());
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Exception> deleteInvite(final String inviteCode) {
+        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/invite/" + inviteCode)
+                            .header("authorization", token)
+                            .asJson();
+                    checkResponse(response);
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void setMessageCacheSize(int size) {
+        this.messageCacheSize = size < 0 ? 0 : size;
+        synchronized (messages) {
+            while (messages.size() > messageCacheSize) {
+                messages.remove(0);
+            }
+        }
+    }
+
+    @Override
+    public int getMessageCacheSize() {
+        return messageCacheSize;
+    }
+
+    @Override
+    public void reconnect(FutureCallback<DiscordAPI> callback) {
+        Futures.addCallback(getThreadPool().getListeningExecutorService().submit(new Callable<DiscordAPI>() {
+            @Override
+            public DiscordAPI call() throws Exception {
+                reconnectBlocking();
+                return ImplDiscordAPI.this;
+            }
+        }), callback);
+    }
+
+    @Override
+    public void reconnectBlocking() {
+        reconnectBlocking(requestGatewayBlocking());
+    }
+
+    @Override
+    public void setAutoReconnect(boolean autoReconnect) {
+        this.autoReconnect = autoReconnect;
+    }
+
+    @Override
+    public boolean isAutoReconnectEnabled() {
+        return autoReconnect;
+    }
+
+    /**
+     * Tries to reconnect to the given gateway.
+     *
+     * @param gateway The gateway to reconnect to.
+     */
+    public void reconnectBlocking(String gateway) {
+        try {
+            socket.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (token == null || !checkTokenBlocking(token)) {
+            token = requestTokenBlocking();
+        }
+        try {
+            socket = new DiscordWebsocket(new URI(gateway), this, true);
+            socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
+            socket.connect();
+        } catch (URISyntaxException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return;
+        }
+        try {
+            if (!socket.isReady().get()) {
+                throw new IllegalStateException("Socket closed before ready packet was received!");
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Checks if we are still rate limited.
+     *
+     * @throws RateLimitedException If we are rate limited.
+     */
+    public void checkRateLimit() throws RateLimitedException {
+        long retryAt = lastRateLimitedException == null ? 0L : lastRateLimitedException.getRetryAfter();
+        long retryAfter = retryAt - System.currentTimeMillis();
+        if (retryAfter > 0) {
+            throw new RateLimitedException("We are still rate limited for " + retryAfter + " ms!", retryAfter);
+        }
+    }
+
+    /**
+     * Sets yourself.
+     *
+     * @param user You.
+     */
+    public void setYourself(User user) {
+        this.you = user;
     }
 
     /**
@@ -433,7 +752,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
-                        + " with message " + response.getStatusText());
+                        + " with message " + response.getStatusText() + " and body " + response.getBody());
             }
             if (jsonResponse.has("password") || jsonResponse.has("email")) {
                 throw new IllegalArgumentException("Wrong email or password!");
@@ -460,7 +779,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
-                        + " with message " + response.getStatusText());
+                        + " with message " + response.getStatusText() + " and body " + response.getBody());
             }
             return response.getBody().getObject().getString("url");
         } catch (UnirestException e) {
@@ -487,7 +806,7 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public void addMessage(Message message) {
         synchronized (messages) {
-            if (messages.size() > 200) { // only cache the last 200 messages
+            if (messages.size() > messageCacheSize) { // only cache the last 200 messages
                 messages.remove(0);
             }
             messages.add(message);
@@ -522,6 +841,30 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     /**
+     * Checks the response.
+     *
+     * @param response The response to check.
+     * @throws Exception If the response has problems (status code not between 200 and 300).
+     */
+    public void checkResponse(HttpResponse<JsonNode> response) throws Exception {
+        if (response.getStatus() == 403) {
+            throw new PermissionsException("Missing permissions!");
+        }
+        if (!response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
+            long retryAfter = response.getBody().getObject().getLong("retry_after");
+            RateLimitedException exception =
+                    new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
+            lastRateLimitedException = exception;
+            throw exception;
+        }
+        if (response.getStatus() < 200 || response.getStatus() > 299) {
+            throw new BadResponseException("Received http status code " + response.getStatus() + " with message "
+                    + response.getStatusText() + " and body " + response.getBody(), response.getStatus(),
+                    response.getStatusText(), response);
+        }
+    }
+
+    /**
      * Gets a set with all message histories.
      *
      * @return A set with all message histories.
@@ -530,4 +873,21 @@ public class ImplDiscordAPI implements DiscordAPI {
         return messageHistories;
     }
 
+    /**
+     * Gets the internal used server join listener (for server creations and invite accepts).
+     *
+     * @return The internal used server join listener.
+     */
+    public ServerJoinListener getInternalServerJoinListener() {
+        return listener;
+    }
+
+    /**
+     * Sets the socket.
+     *
+     * @param socket The socket to set.
+     */
+    public void setSocket(DiscordWebsocket socket) {
+        this.socket = socket;
+    }
 }

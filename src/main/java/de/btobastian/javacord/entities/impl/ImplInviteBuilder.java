@@ -25,8 +25,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.InviteBuilder;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
@@ -38,14 +38,22 @@ import java.util.concurrent.Future;
 public class ImplInviteBuilder implements InviteBuilder {
 
     private final ImplDiscordAPI api;
-    private final ImplChannel channel;
+    private final ImplChannel textChannel;
+    private final ImplVoiceChannel voiceChannel;
 
     private int maxUses = -1;
     private byte temporary = -1;
     private int maxAge = -1;
 
-    public ImplInviteBuilder(ImplChannel channel, ImplDiscordAPI api) {
-        this.channel = channel;
+    public ImplInviteBuilder(ImplChannel textChannel, ImplDiscordAPI api) {
+        this.textChannel = textChannel;
+        this.voiceChannel = null;
+        this.api = api;
+    }
+
+    public ImplInviteBuilder(ImplVoiceChannel voiceChannel, ImplDiscordAPI api) {
+        this.textChannel = null;
+        this.voiceChannel = voiceChannel;
         this.api = api;
     }
 
@@ -68,16 +76,16 @@ public class ImplInviteBuilder implements InviteBuilder {
     }
 
     @Override
-    public Future<String> create() {
+    public Future<Invite> create() {
         return create(null);
     }
 
     @Override
-    public Future<String> create(FutureCallback<String> callback) {
-        ListenableFuture<String> future =
-                api.getThreadPool().getListeningExecutorService().submit(new Callable<String>() {
+    public Future<Invite> create(FutureCallback<Invite> callback) {
+        ListenableFuture<Invite> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Invite>() {
                     @Override
-                    public String call() throws Exception {
+                    public Invite call() throws Exception {
                         JSONObject jsonParam = new JSONObject();
                         if (maxUses > 0) {
                             jsonParam.put("max_uses", maxUses);
@@ -88,20 +96,15 @@ public class ImplInviteBuilder implements InviteBuilder {
                         if (maxAge > 0) {
                             jsonParam.put("max_age", maxAge);
                         }
+                        String channelId = textChannel == null ? voiceChannel.getId() : textChannel.getId();
                         HttpResponse<JsonNode> response = Unirest
-                                .post("https://discordapp.com/api/channels/" + channel.getId() + "/invites")
+                                .post("https://discordapp.com/api/channels/" + channelId + "/invites")
                                 .header("authorization", api.getToken())
                                 .header("Content-Type", "application/json")
                                 .body(jsonParam.toString())
                                 .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
-                        return response.getBody().getObject().getString("code");
+                        api.checkResponse(response);
+                        return new ImplInvite(api, response.getBody().getObject());
                     }
                 });
         if (callback != null) {

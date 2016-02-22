@@ -22,14 +22,12 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
-import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -38,6 +36,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ImplMessageHistory implements MessageHistory {
 
     private final ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
+
+    private Message oldestMessage = null;
+    private Message newestMessage = null;
 
     /**
      * Creates a new instance of this class.
@@ -63,18 +64,51 @@ public class ImplMessageHistory implements MessageHistory {
      */
     public ImplMessageHistory(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
             throws Exception {
+        int step = 0;
+        if (messageId == null) {
+            before = true;
+        }
+        for (int i = limit / 100; i > 0; i--) {
+            int receivedMessages;
+            if (step++ == 0) { // if it's the first iteration step use the normal parameters
+                receivedMessages = request(api, channelId, messageId, before, 100);
+            } else {
+                // now use the oldest/newest message
+                receivedMessages = request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, 100);
+            }
+            if (receivedMessages == 0) {
+                return; // stop requesting
+            }
+        }
+        if (step == 0) { // step == 0 means a limit less than 100
+            request(api, channelId, messageId, before, limit % 100);
+        } else { // request the rest
+            request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, limit % 100);
+        }
+    }
+
+    /**
+     * Requests messages.
+     *
+     * @param api The used api.
+     * @param channelId The id of the channel.
+     * @param messageId Gets the messages before or after the message with the given id.
+     * @param before Whether it should get the messages before or after the given message.
+     * @param limit The maximum number of messages.
+     * @return The amount of requested messages.
+     * @throws Exception if something went wrong.
+     */
+    private int request(ImplDiscordAPI api, String channelId, String messageId, boolean before, int limit)
+            throws Exception {
+        if (limit <= 0) {
+            return 0;
+        }
         String link = messageId == null ?
                 "https://discordapp.com/api/channels/" + channelId + "/messages?&limit=" + limit
                 : "https://discordapp.com/api/channels/" + channelId + "/messages?&"
                 + (before ? "before" : "after") + "=" + messageId + "&limit=" + limit;
         HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
-        if (response.getStatus() == 403) {
-            throw new PermissionsException("Missing permissions!");
-        }
-        if (response.getStatus() < 200 || response.getStatus() > 299) {
-            throw new Exception("Received http status code " + response.getStatus()
-                    + " with message " + response.getStatusText());
-        }
+        api.checkResponse(response);
         JSONArray messages = response.getBody().getArray();
         for (int i = 0; i < messages.length(); i++) {
             JSONObject messageJson = messages.getJSONObject(i);
@@ -83,8 +117,15 @@ public class ImplMessageHistory implements MessageHistory {
             if (message == null) {
                 message = new ImplMessage(messageJson, api, null);
             }
+            if (newestMessage == null || message.compareTo(newestMessage) > 0) {
+                newestMessage = message;
+            }
+            if (oldestMessage == null || message.compareTo(oldestMessage) < 0) {
+                oldestMessage = message;
+            }
             this.messages.put(id, message);
         }
+        return messages.length();
     }
 
     @Override
@@ -94,7 +135,51 @@ public class ImplMessageHistory implements MessageHistory {
 
     @Override
     public Iterator<Message> iterator() {
-        return messages.values().iterator();
+        return getMessages().iterator();
+    }
+
+    @Override
+    public Collection<Message> getMessages() {
+        return Collections.unmodifiableCollection(messages.values());
+    }
+
+    @Override
+    public Message getNewestMessage() {
+        if (this.newestMessage != null) {
+            return this.newestMessage;
+        }
+        Message newestMessage = null;
+        for (Message message : messages.values()) {
+            if (newestMessage == null) {
+                newestMessage = message;
+            } else if (message.compareTo(newestMessage) > 0) {
+                newestMessage = message;
+            }
+        }
+        return newestMessage;
+    }
+
+    @Override
+    public Message getOldestMessage() {
+        if (this.oldestMessage != null) {
+            return this.oldestMessage;
+        }
+        Message oldestMessage = null;
+        for (Message message : messages.values()) {
+            if (oldestMessage == null) {
+                oldestMessage = message;
+            } else if (message.compareTo(oldestMessage) < 0) {
+                oldestMessage = message;
+            }
+        }
+        return oldestMessage;
+    }
+
+    @Override
+    public List<Message> getMessagesSorted() {
+        List<Message> messages = new ArrayList<>(this.messages.values());
+        Collections.sort(messages);
+        return messages;
     }
 
     /**
@@ -104,6 +189,12 @@ public class ImplMessageHistory implements MessageHistory {
      */
     public void removeMessage(String id) {
         messages.remove(id);
+        if (newestMessage != null && newestMessage.getId().equals(id)) {
+            newestMessage = null;
+        }
+        if (oldestMessage != null && oldestMessage.getId().equals(id)) {
+            oldestMessage = null;
+        }
     }
 
 }

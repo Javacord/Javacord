@@ -18,22 +18,29 @@
  */
 package de.btobastian.javacord.entities.impl;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
-import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.server.ServerLeaveListener;
+import de.btobastian.javacord.listener.channel.ChannelCreateListener;
+import de.btobastian.javacord.listener.role.RoleCreateListener;
+import de.btobastian.javacord.listener.server.*;
+import de.btobastian.javacord.listener.user.UserRoleAddListener;
+import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
+import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,11 +55,15 @@ public class ImplServer implements Server {
     private final ImplDiscordAPI api;
 
     private final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, VoiceChannel> voiceChannels = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Role> roles = new ConcurrentHashMap<>();
 
     private final String id;
     private String name;
+    private Region region;
+    private int memberCount;
+    private boolean large;
 
     /**
      * Creates a new instance of this class.
@@ -65,6 +76,9 @@ public class ImplServer implements Server {
 
         name = data.getString("name");
         id = data.getString("id");
+        region = Region.getRegionByKey(data.getString("region"));
+        memberCount = data.getInt("member_count");
+        large = data.getBoolean("large");
 
         JSONArray roles = data.getJSONArray("roles");
         for (int i = 0; i < roles.length(); i++) {
@@ -77,6 +91,9 @@ public class ImplServer implements Server {
             String type = channelJson.getString("type");
             if (type.equals("text")) {
                 new ImplChannel(channels.getJSONObject(i), this, api);
+            }
+            if (type.equals("voice")) {
+                new ImplVoiceChannel(channels.getJSONObject(i), this, api);
             }
         }
 
@@ -92,7 +109,7 @@ public class ImplServer implements Server {
             for (int j = 0; j < memberRoles.length(); j++) {
                 Role role = getRoleById(memberRoles.getString(j));
                 if (role != null) {
-                    ((ImplRole) role).addUser(member);
+                    ((ImplRole) role).addUserNoUpdate(member);
                 }
             }
         }
@@ -131,7 +148,7 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Future<Exception> deleteOrLeave() {
+    public Future<Exception> delete() {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
@@ -139,15 +156,39 @@ public class ImplServer implements Server {
                     HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
                     api.getServerMap().remove(id);
-                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> leave() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/users/@me/guilds/" + id)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    api.getServerMap().remove(id);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
                             List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
@@ -173,7 +214,17 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<Channel> getChannels() {
-        return channels.values();
+        return Collections.unmodifiableCollection(channels.values());
+    }
+
+    @Override
+    public VoiceChannel getVoiceChannelById(String id) {
+        return voiceChannels.get(id);
+    }
+
+    @Override
+    public Collection<VoiceChannel> getVoiceChannels() {
+        return Collections.unmodifiableCollection(voiceChannels.values());
     }
 
     @Override
@@ -183,7 +234,7 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<User> getMembers() {
-        return members.values();
+        return Collections.unmodifiableCollection(members.values());
     }
 
     @Override
@@ -198,12 +249,452 @@ public class ImplServer implements Server {
 
     @Override
     public Collection<Role> getRoles() {
-        return roles.values();
+        return Collections.unmodifiableCollection(roles.values());
     }
 
     @Override
     public Role getRoleById(String id) {
         return roles.get(id);
+    }
+
+    @Override
+    public Future<Channel> createChannel(String name) {
+        return createChannel(name, null);
+    }
+
+    @Override
+    public Future<Channel> createChannel(final String name, FutureCallback<Channel> callback) {
+        ListenableFuture<Channel> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Channel>() {
+                    @Override
+                    public Channel call() throws Exception {
+                        final Channel channel = (Channel) createChannelBlocking(name, false);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                                    }
+                                }
+                            }
+                        });
+                        return channel;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<VoiceChannel> createVoiceChannel(String name) {
+        return createVoiceChannel(name, null);
+    }
+
+    @Override
+    public Future<VoiceChannel> createVoiceChannel(final String name, FutureCallback<VoiceChannel> callback) {
+        ListenableFuture<VoiceChannel> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<VoiceChannel>() {
+                    @Override
+                    public VoiceChannel call() throws Exception {
+                        final VoiceChannel channel = (VoiceChannel) createChannelBlocking(name, true);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(VoiceChannelCreateListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((VoiceChannelCreateListener) listener).onVoiceChannelCreate(api, channel);
+                                    }
+                                }
+                            }
+                        });
+                        return channel;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Invite[]> getInvites() {
+        return getInvites(null);
+    }
+
+    @Override
+    public Future<Invite[]> getInvites(FutureCallback<Invite[]> callback) {
+        ListenableFuture<Invite[]> future = api.getThreadPool().getListeningExecutorService().submit(
+                new Callable<Invite[]>() {
+                    @Override
+                    public Invite[] call() throws Exception {
+                        HttpResponse<JsonNode> response = Unirest
+                                .get("https://discordapp.com/api/guilds/" + getId() + "/invites")
+                                .header("authorization", api.getToken())
+                                .asJson();
+                        api.checkResponse(response);
+                        Invite[] invites = new Invite[response.getBody().getArray().length()];
+                        for (int i = 0; i < response.getBody().getArray().length(); i++) {
+                            invites[i] = new ImplInvite(api, response.getBody().getArray().getJSONObject(i));
+                        }
+                        return invites;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Exception> updateRoles(final User user, final Role[] roles) {
+        final String[] roleIds = new String[roles.length];
+        for (int i = 0; i < roles.length; i++) {
+            roleIds[i] = roles[i].getId();
+        }
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" +user.getId())
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(new JSONObject().put("roles", roleIds).toString())
+                            .asJson();
+                    api.checkResponse(response);
+                    for (final Role role : user.getRoles(ImplServer.this)) {
+                        boolean contains = false;
+                        for (Role r : roles) {
+                            if (role == r) {
+                                contains = true;
+                                break;
+                            }
+                        }
+                        if (!contains) {
+                            ((ImplRole) role).removeUserNoUpdate(user);
+                            api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    List<Listener> listeners =  api.getListeners(UserRoleRemoveListener.class);
+                                    synchronized (listeners) {
+                                        for (Listener listener : listeners) {
+                                            ((UserRoleRemoveListener) listener).onUserRoleRemove(api, user, role);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    for (final Role role : roles) {
+                        if (!user.getRoles(ImplServer.this).contains(role)) {
+                            ((ImplRole) role).addUserNoUpdate(user);
+                            api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    List<Listener> listeners =  api.getListeners(UserRoleAddListener.class);
+                                    synchronized (listeners) {
+                                        for (Listener listener : listeners) {
+                                            ((UserRoleAddListener) listener).onUserRoleAdd(api, user, role);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> banUser(User user) {
+        return banUser(user.getId(), 0);
+    }
+
+    @Override
+    public Future<Exception> banUser(String userId) {
+        return banUser(userId, 0);
+    }
+
+    @Override
+    public Future<Exception> banUser(User user, int deleteDays) {
+        return banUser(user.getId(), deleteDays);
+    }
+
+    @Override
+    public Future<Exception> banUser(final String userId, final int deleteDays) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .put("https://discordapp.com/api/guilds/:guild_id/bans/" + userId
+                                    + "?delete-message-days=" + deleteDays)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    final User user = api.getUserById(userId).get();
+                    if (user != null) {
+                        removeMember(user);
+                    }
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerMemberBanListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerMemberBanListener) listener).onServerMemberBan(api, user, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Exception> unbanUser(final String userId) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/" + getId() + "/bans/" + userId)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerMemberUnbanListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerMemberUnbanListener) listener)
+                                            .onServerMemberUnban(api, userId, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<User[]> getBans() {
+        return getBans(null);
+    }
+
+    @Override
+    public Future<User[]> getBans(FutureCallback<User[]> callback) {
+        ListenableFuture<User[]> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<User[]>() {
+                    @Override
+                    public User[] call() throws Exception {
+                        HttpResponse<JsonNode> response = Unirest
+                                .get("https://discordapp.com/api/guilds/" + getId() + "/bans")
+                                .header("authorization", api.getToken())
+                                .asJson();
+                        api.checkResponse(response);
+                        JSONArray bannedUsersJson = response.getBody().getArray();
+                        User[] bannedUsers = new User[bannedUsersJson.length()];
+                        for (int i = 0; i < bannedUsersJson.length(); i++) {
+                            bannedUsers[i] = api.getOrCreateUser(bannedUsersJson.getJSONObject(i));
+                        }
+                        return bannedUsers;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Exception> kickUser(User user) {
+        return kickUser(user.getId());
+    }
+
+    @Override
+    public Future<Exception> kickUser(final String userId) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/guilds/"+ getId() + "/members/" + userId)
+                            .header("authorization", api.getToken())
+                            .asJson();
+                    api.checkResponse(response);
+                    final User user = api.getUserById(userId).get();
+                    if (user != null) {
+                        removeMember(user);
+                    }
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                            synchronized (listeners) {
+                                for (Listener listener : listeners) {
+                                    ((ServerMemberRemoveListener) listener)
+                                            .onServerMemberRemove(api, user, ImplServer.this);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Role> createRole() {
+        return createRole(null);
+    }
+
+    @Override
+    public Future<Role> createRole(FutureCallback<Role> callback) {
+        ListenableFuture<Role> future = api.getThreadPool().getListeningExecutorService().submit(new Callable<Role>() {
+            @Override
+            public Role call() throws Exception {
+                HttpResponse<JsonNode> response = Unirest
+                        .post("https://discordapp.com/api/guilds/" + getId() + "/roles")
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                final Role role = new ImplRole(response.getBody().getObject(), ImplServer.this, api);
+                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<Listener> listeners =  api.getListeners(RoleCreateListener.class);
+                        synchronized (listeners) {
+                            for (Listener listener : listeners) {
+                                ((RoleCreateListener) listener).onRoleCreate(api, role);
+                            }
+                        }
+                    }
+                });
+                return role;
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Exception> updateName(String newName) {
+        return update(newName, null, null);
+    }
+
+    @Override
+    public Future<Exception> updateRegion(Region newRegion) {
+        return update(null, newRegion, null);
+    }
+
+    @Override
+    public Future<Exception> updateIcon(BufferedImage newIcon) {
+        return update(null, null, newIcon);
+    }
+
+    @Override
+    public Future<Exception> update(String newName, Region newRegion, BufferedImage newIcon) {
+        final JSONObject params = new JSONObject();
+        if (newName == null) {
+            params.put("name", getName());
+        } else {
+            params.put("name", newName);
+        }
+        if (newRegion != null) {
+            params.put("region", newRegion.getKey());
+        }
+
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/guilds/" + getId())
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(params.toString())
+                            .asJson();
+                    api.checkResponse(response);
+
+                    String name = response.getBody().getObject().getString("name");
+                    if (!getName().equals(name)) {
+                        final String oldName = getName();
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ServerChangeNameListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ServerChangeNameListener) listener)
+                                                .onServerChangeName(api, ImplServer.this, oldName);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Region getRegion() {
+        return region;
+    }
+
+    @Override
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    @Override
+    public boolean isLarge() {
+        return large;
+    }
+
+    /**
+     * Sets the name of the server.
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Sets the region of the server.
+     *
+     * @param region The region to set.
+     */
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     /**
@@ -225,12 +716,35 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Increments the member count.
+     */
+    public void incrementMemberCount() {
+        memberCount++;
+    }
+
+    /**
+     * Decrement the member count.
+     */
+    public void decrementMemberCount() {
+        memberCount--;
+    }
+
+    /**
      * Adds a channel to the server.
      *
      * @param channel The channel to add.
      */
     public void addChannel(Channel channel) {
         channels.put(channel.getId(), channel);
+    }
+
+    /**
+     * Adds a voice channel to the server.
+     *
+     * @param channel The voice channel to add.
+     */
+    public void addVoiceChannel(VoiceChannel channel) {
+        voiceChannels.put(channel.getId(), channel);
     }
 
     /**
@@ -258,6 +772,43 @@ public class ImplServer implements Server {
      */
     public void removeChannel(Channel channel) {
         channels.remove(channel.getId());
+    }
+
+    /**
+     * Removes a voice channel from the server.
+     *
+     * @param channel The voice channel to remove.
+     */
+    public void removeVoiceChannel(VoiceChannel channel) {
+        voiceChannels.remove(channel.getId());
+    }
+
+    /**
+     * Creates a new channel.
+     *
+     * @param name The name of the channel.
+     * @param voice Whether the channel should be voice or text.
+     * @return The created channel.
+     * @throws Exception If something went wrong.
+     */
+    private Object createChannelBlocking(String name, boolean voice) throws Exception {
+        JSONObject param = new JSONObject().put("name", name).put("type", voice ? "voice" : "text");
+        HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds/" + id + "/channels")
+                .header("authorization", api.getToken())
+                .header("Content-Type", "application/json")
+                .body(param.toString())
+                .asJson();
+        api.checkResponse(response);
+        if (voice) {
+            return new ImplVoiceChannel(response.getBody().getObject(), this, api);
+        } else {
+            return new ImplChannel(response.getBody().getObject(), this, api);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
     }
 
     @Override

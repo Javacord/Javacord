@@ -23,24 +23,25 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listener.server.ServerMemberBanListener;
+import de.btobastian.javacord.listener.server.ServerMemberUnbanListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
 import java.util.List;
 
 /**
- * Handles the guild member remove packet.
+ * Handles the guild ban remove packet.
  */
-public class GuildMemberRemoveHandler extends PacketHandler {
+public class GuildBanRemoveHandler extends PacketHandler {
 
     /**
      * Creates a new instance of this class.
      *
      * @param api The api.
      */
-    public GuildMemberRemoveHandler(ImplDiscordAPI api) {
-        super(api, true, "GUILD_MEMBER_REMOVE");
+    public GuildBanRemoveHandler(ImplDiscordAPI api) {
+        super(api, true, "GUILD_BAN_REMOVE");
     }
 
     @Override
@@ -49,14 +50,13 @@ public class GuildMemberRemoveHandler extends PacketHandler {
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
         if (server != null) {
             ((ImplServer) server).removeMember(user);
-            ((ImplServer) server).decrementMemberCount();
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                    List<Listener> listeners =  api.getListeners(ServerMemberUnbanListener.class);
                     synchronized (listeners) {
                         for (Listener listener : listeners) {
-                            ((ServerMemberRemoveListener) listener).onServerMemberRemove(api, user, server);
+                            ((ServerMemberUnbanListener) listener).onServerMemberUnban(api, user.getId(), server);
                         }
                     }
                 }

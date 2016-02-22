@@ -33,7 +33,6 @@ import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,9 +96,11 @@ public class ImplUser implements User {
             return;
         }
         try {
-            Unirest.post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/typing")
+            HttpResponse<JsonNode> response = Unirest
+                    .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/typing")
                     .header("authorization", api.getToken())
                     .asJson();
+            api.checkResponse(response);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,7 +108,7 @@ public class ImplUser implements User {
 
     @Override
     public boolean isYourself() {
-        return false; // TODO
+        return api.getYourself() == this;
     }
 
     @Override
@@ -186,6 +187,11 @@ public class ImplUser implements User {
     }
 
     @Override
+    public String getAvatarId() {
+        return avatarId;
+    }
+
+    @Override
     public Future<Message> sendMessage(String content) {
         return sendMessage(content, false);
     }
@@ -207,6 +213,7 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
@@ -217,13 +224,7 @@ public class ImplUser implements User {
                                                 .put("tts", tts)
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -245,19 +246,14 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
                                         .header("authorization", api.getToken())
                                         .field("file", file)
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -339,6 +335,11 @@ public class ImplUser implements User {
         return getMessageHistory(afterId, false, limit, callback);
     }
 
+    @Override
+    public String getMentionTag() {
+        return "<@" + getId() + ">";
+    }
+
     /**
      * Gets the message history.
      *
@@ -394,10 +395,7 @@ public class ImplUser implements User {
                     .header("Content-Type", "application/json")
                     .body(new JSONObject().put("recipient_id", id).toString())
                     .asJson();
-            if (response.getStatus() < 200 || response.getStatus() > 299) {
-                throw new Exception("Received http status code " + response.getStatus()
-                        + " with message " + response.getStatusText());
-            }
+            api.checkResponse(response);
             userChannelId = response.getBody().getObject().getString("id");
             return userChannelId;
         }
@@ -431,6 +429,25 @@ public class ImplUser implements User {
      */
     public void setGame(String game) {
         this.game = game;
+    }
+
+    /**
+     * Sets the avatar id of the user.
+     *
+     * @param avatarId The avatar id of the user.
+     */
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 
 }

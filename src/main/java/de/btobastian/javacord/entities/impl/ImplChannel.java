@@ -39,8 +39,9 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
+import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +51,6 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -102,15 +102,7 @@ public class ImplChannel implements Channel {
                 }
             }
             if (type.equals("member")) {
-                User user;
-                try {
-                    user = api.getUserById(id).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    continue;
-                }
-                if (user != null) {
-                    overwrittenPermissions.put(user.getId(), new ImplPermissions(allow, deny));
-                }
+                overwrittenPermissions.put(id, new ImplPermissions(allow, deny));
             }
         }
 
@@ -152,16 +144,10 @@ public class ImplChannel implements Channel {
                             .delete("https://discordapp.com/api/channels/:id" + id)
                             .header("authorization", api.getToken())
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
                     server.removeChannel(ImplChannel.this);
                     // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
                             List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
@@ -218,6 +204,7 @@ public class ImplChannel implements Channel {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
                                         .header("authorization", api.getToken())
@@ -227,13 +214,7 @@ public class ImplChannel implements Channel {
                                                 .put("tts", tts)
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -255,18 +236,13 @@ public class ImplChannel implements Channel {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
                                         .header("authorization", api.getToken())
                                         .field("file", file)
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -341,6 +317,88 @@ public class ImplChannel implements Channel {
         return getMessageHistory(afterId, false, limit, callback);
     }
 
+    @Override
+    public Future<Exception> updateName(String newName) {
+        return update(newName, getTopic());
+    }
+
+    @Override
+    public Future<Exception> updateTopic(String newTopic) {
+        return update(getName(), newTopic);
+    }
+
+    @Override
+    public Future<Exception> update(String newName, String newTopic) {
+        final JSONObject params = new JSONObject()
+                .put("name", newName)
+                .put("topic", newTopic);
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/channels/" + getId())
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(params.toString())
+                            .asJson();
+                    api.checkResponse(response);
+                    String updatedName = response.getBody().getObject().getString("name");
+                    String updatedTopic = null;
+                    if (response.getBody().getObject().has("topic")
+                            && !response.getBody().getObject().isNull("topic")) {
+                        updatedTopic = response.getBody().getObject().getString("topic");
+                    }
+
+                    // check name
+                    if (!updatedName.equals(getName())) {
+                        final String oldName = getName();
+                        setName(updatedName);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ChannelChangeNameListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ChannelChangeNameListener) listener)
+                                                .onChannelChangeName(api, ImplChannel.this, oldName);
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // check topic
+                    if ((getTopic() != null && updatedTopic == null) || (getTopic() == null && updatedTopic != null)
+                            || (getTopic() != null && !getTopic().equals(updatedTopic))) {
+                        final String oldTopic = getTopic();
+                        setTopic(updatedTopic);
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(ChannelChangeTopicListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((ChannelChangeTopicListener) listener)
+                                                .onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public String getMentionTag() {
+        return "<#" + getId() + ">";
+    }
+
     /**
      * Gets the message history.
      *
@@ -403,6 +461,11 @@ public class ImplChannel implements Channel {
      */
     public void setOverwrittenPermissions(User user, Permissions permissions) {
         overwrittenPermissions.put(user.getId(), permissions);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
     }
 
     @Override

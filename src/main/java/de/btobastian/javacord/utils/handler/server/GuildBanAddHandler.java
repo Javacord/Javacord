@@ -23,24 +23,25 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.Listener;
-import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listener.server.ServerMemberAddListener;
+import de.btobastian.javacord.listener.server.ServerMemberBanListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
 import java.util.List;
 
 /**
- * Handles the guild member remove packet.
+ * Handles the guild ban add packet.
  */
-public class GuildMemberRemoveHandler extends PacketHandler {
+public class GuildBanAddHandler extends PacketHandler {
 
     /**
      * Creates a new instance of this class.
      *
      * @param api The api.
      */
-    public GuildMemberRemoveHandler(ImplDiscordAPI api) {
-        super(api, true, "GUILD_MEMBER_REMOVE");
+    public GuildBanAddHandler(ImplDiscordAPI api) {
+        super(api, true, "GUILD_BAN_ADD");
     }
 
     @Override
@@ -48,15 +49,13 @@ public class GuildMemberRemoveHandler extends PacketHandler {
         final Server server = api.getServerById(packet.getString("guild_id"));
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
         if (server != null) {
-            ((ImplServer) server).removeMember(user);
-            ((ImplServer) server).decrementMemberCount();
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                    List<Listener> listeners =  api.getListeners(ServerMemberBanListener.class);
                     synchronized (listeners) {
                         for (Listener listener : listeners) {
-                            ((ServerMemberRemoveListener) listener).onServerMemberRemove(api, user, server);
+                            ((ServerMemberBanListener) listener).onServerMemberBan(api, user, server);
                         }
                     }
                 }

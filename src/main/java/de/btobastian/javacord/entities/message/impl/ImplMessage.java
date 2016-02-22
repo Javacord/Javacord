@@ -28,11 +28,11 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
-import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import org.json.JSONArray;
@@ -40,8 +40,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -50,6 +51,10 @@ import java.util.concurrent.Future;
  * The implementation of the user interface.
  */
 public class ImplMessage implements Message {
+
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final SimpleDateFormat FORMAT_ALTERNATIVE_TWO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     private final ImplDiscordAPI api;
 
@@ -61,6 +66,7 @@ public class ImplMessage implements Message {
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
+    private Calendar creationDate = Calendar.getInstance();
 
     /**
      * Creates a new instance of this class.
@@ -77,13 +83,27 @@ public class ImplMessage implements Message {
         }
         tts = data.getBoolean("tts");
 
-        User authorTemp = null;
-        try {
-            authorTemp = api.getUserById(data.getJSONObject("author").getString("id")).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        if (data.has("timestamp")) {
+            String time = data.getString("timestamp");
+            Calendar calendar = Calendar.getInstance();
+            synchronized (FORMAT) { // SimpleDateFormat#parse() isn't thread safe...
+                try {
+                    calendar.setTime(FORMAT.parse(time.substring(0, time.length() - 9)));
+                } catch (ParseException ignored) {
+                    try {
+                        calendar.setTime(FORMAT_ALTERNATIVE.parse(time.substring(0, time.length() - 9)));
+                    } catch (ParseException ignored2) {
+                        try {
+                            calendar.setTime(FORMAT_ALTERNATIVE_TWO.parse(time.substring(0, time.length() - 9)));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            creationDate = calendar;
         }
-        author = authorTemp;
+        author = api.getOrCreateUser(data.getJSONObject("author"));
 
         try {
             JSONArray attachments = data.getJSONArray("attachments");
@@ -115,6 +135,10 @@ public class ImplMessage implements Message {
             this.receiver = findReceiver(channelId);
         } else {
             this.receiver = receiver;
+        }
+
+        if (getChannelReceiver() != null) {
+            ((ImplServer) getChannelReceiver().getServer()).addMember(author);
         }
 
         api.addMessage(this);
@@ -182,16 +206,10 @@ public class ImplMessage implements Message {
                             ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
                             .header("authorization", api.getToken())
                             .asJson();
-                    if (response.getStatus() == 403) {
-                        throw new PermissionsException("Missing permissions!");
-                    }
-                    if (response.getStatus() < 200 || response.getStatus() > 299) {
-                        throw new Exception("Received http status code " + response.getStatus()
-                                + " with message " + response.getStatusText());
-                    }
+                    api.checkResponse(response);
                     api.removeMessage(message);
                     // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("handlers").submit(new Runnable() {
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
                             List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);
@@ -211,8 +229,8 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public ArrayList<MessageAttachment> getAttachments() {
-        return new ArrayList<>(attachments);
+    public Collection<MessageAttachment> getAttachments() {
+        return Collections.unmodifiableCollection(attachments);
     }
 
     @Override
@@ -237,6 +255,7 @@ public class ImplMessage implements Message {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
                                         .header("authorization", api.getToken())
@@ -246,13 +265,7 @@ public class ImplMessage implements Message {
                                                 .put("tts", tts)
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -274,18 +287,13 @@ public class ImplMessage implements Message {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
                                         .header("authorization", api.getToken())
                                         .field("file", file)
                                         .asJson();
-                        if (response.getStatus() == 403) {
-                            throw new PermissionsException("Missing permissions!");
-                        }
-                        if (response.getStatus() < 200 || response.getStatus() > 299) {
-                            throw new Exception("Received http status code " + response.getStatus()
-                                    + " with message " + response.getStatusText());
-                        }
+                        api.checkResponse(response);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -293,6 +301,18 @@ public class ImplMessage implements Message {
             Futures.addCallback(future, callback);
         }
         return future;
+    }
+
+    @Override
+    public Calendar getCreationDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(creationDate.getTime());
+        return calendar;
+    }
+
+    @Override
+    public int compareTo(Message other) {
+        return this.creationDate.compareTo(other.getCreationDate());
     }
 
     /**
@@ -323,4 +343,15 @@ public class ImplMessage implements Message {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return getAuthor().getName() + ": " + getContent() + " (id: " + getId() + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
 }

@@ -19,8 +19,7 @@
 package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -99,6 +98,36 @@ public interface DiscordAPI {
     public Collection<Server> getServers();
 
     /**
+     * Gets a collection with all known channels.
+     *
+     * @return A collection with all known channels.
+     */
+    public Collection<Channel> getChannels();
+
+    /**
+     * Gets a channel by its id.
+     *
+     * @param id The id of the channel.
+     * @return The channel with the given id. <code>Null</code> if no channel with the id was found.
+     */
+    public Channel getChannelById(String id);
+
+    /**
+     * Gets a collection with all known voice channels.
+     *
+     * @return A collection with all known voice channels.
+     */
+    public Collection<VoiceChannel> getVoiceChannels();
+
+    /**
+     * Gets a voice channel by its id.
+     *
+     * @param id The id of the voice channel.
+     * @return The voice channel with the given id. <code>Null</code> if no channel with the id was found.
+     */
+    public VoiceChannel getVoiceChannelById(String id);
+
+    /**
      * Gets an user by its id. It first will check if the user is in the cache. If no user was found in the cache it
      * tries to request it from the api.
      *
@@ -106,6 +135,16 @@ public interface DiscordAPI {
      * @return The user with the given id. <code>Null</code> if no user with the id was found.
      */
     public Future<User> getUserById(String id);
+
+    /**
+     * Gets an user by its id. Unlike {@link #getUserById(String)} this method only search for the user in the cache.
+     * Some members of bigger servers may not be in the cache cause discord only sends the online users for servers
+     * with more than 250 members.
+     *
+     * @param id The id of the user.
+     * @return The user with the given id. <code>Null</code> if no user with the id is in the cache.
+     */
+    public User getCachedUserById(String id);
 
     /**
      * Gets a collection with all known users.
@@ -219,6 +258,25 @@ public interface DiscordAPI {
      * Creates a new server.
      *
      * @param name The name of the new server.
+     * @param region The region of the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param region The region of the server.
+     * @param callback The callback which will be informed when you created the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region, FutureCallback<Server> callback);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
      * @param icon The icon of the server.
      * @return The created server.
      */
@@ -233,5 +291,164 @@ public interface DiscordAPI {
      * @return The created server.
      */
     public Future<Server> createServer(String name, BufferedImage icon, FutureCallback<Server> callback);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param region The region of the server.
+     * @param icon The icon of the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region, BufferedImage icon);
+
+    /**
+     * Creates a new server.
+     *
+     * @param name The name of the new server.
+     * @param region The region of the server.
+     * @param icon The icon of the server.
+     * @param callback The callback which will be informed when you created the server.
+     * @return The created server.
+     */
+    public Future<Server> createServer(String name, Region region, BufferedImage icon, FutureCallback<Server> callback);
+
+    /**
+     * Gets yourself (the user with which you logged in).
+     *
+     * @return Yourself.
+     */
+    public User getYourself();
+
+    /**
+     * Updates the username.
+     * If you want to update the email or password, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newUsername The new username.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateUsername(String newUsername);
+
+    /**
+     * Updates the email address.
+     * Attention: Do not mix up with {@link #setEmail(String)}! This method changes the account settings!
+     * If you want to update the username or password, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newEmail The new email.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateEmail(String newEmail);
+
+    /**
+     * Updates the password.
+     * Attention: Do not mix up with {@link #setPassword(String)}! This method changes the account settings!
+     * If you want to update the username or email, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newPassword The new password.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updatePassword(String newPassword);
+
+    /**
+     * Updates the avatar.
+     * If you want to update the username, password or email, too, use
+     * {@link #updateProfile(String, String, String, BufferedImage)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newAvatar The new avatar.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateAvatar(BufferedImage newAvatar);
+
+    /**
+     * Updates the profile.
+     *
+     * @param newUsername The new username. Set to <code>null</code> to keep the current name.
+     * @param newEmail The new email. Set to <code>null</code> to keep the current email.
+     * @param newPassword The new password. Set to <code>null</code> to keep the current password.
+     * @param newAvatar The new avatar. Set to <code>null</code> to keep the current avatar.
+     * @return A future which tells us whether the update was successful or not.
+     *         If the exception is <code>null</code> the update was successful.
+     */
+    public Future<Exception> updateProfile(
+            String newUsername, String newEmail, String newPassword, BufferedImage newAvatar);
+
+    /**
+     * Tries to parse the given invite.
+     *
+     * @param invite The invite code or the invite url.
+     * @return The parsed invite.
+     */
+    public Future<Invite> parseInvite(String invite);
+
+    /**
+     * Tries to parse the given invite.
+     *
+     * @param invite The invite code or the invite url.
+     * @param callback The callback which will be informed when the invite has been parsed.
+     * @return The parsed invite.
+     */
+    public Future<Invite> parseInvite(String invite, FutureCallback<Invite> callback);
+
+    /**
+     * Deletes the invite with the given code.
+     *
+     * @param inviteCode The invite code.
+     * @return A future which tells us whether the deletion was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> deleteInvite(String inviteCode);
+
+    /**
+     * Sets the size of message cache.
+     * If the cache is full the oldest message in the cache will be removed.
+     *
+     * @param size The size of the cache.
+     */
+    public void setMessageCacheSize(int size);
+
+    /**
+     * Gets the size of the message cache.
+     * If the cache is full the oldest message in the cache will be removed.
+     *
+     * @return The size of the cache.
+     */
+    public int getMessageCacheSize();
+
+    /**
+     * Tries to close the current connection and connect again.
+     *
+     * @param callback The callback which will be informed when we receive the ready packet (again).
+     */
+    public void reconnect(FutureCallback<DiscordAPI> callback);
+
+    /**
+     * Tries to close the current connection and connect again.
+     */
+    public void reconnectBlocking();
+
+    /**
+     * Sets whether the api should try to auto-reconnect or not.
+     *
+     * @param autoReconnect Whether the api should try to auto-reconnect or not.
+     */
+    public void setAutoReconnect(boolean autoReconnect);
+
+    /**
+     * Gets whether the api should try to auto-reconnect or not.
+     *
+     * @return Whether the api should try to auto-reconnect or not.
+     */
+    public boolean isAutoReconnectEnabled();
 
 }
