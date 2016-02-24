@@ -850,7 +850,7 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!");
         }
-        if (!response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
+        if (response.getBody() != null && !response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");
             RateLimitedException exception =
                     new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
