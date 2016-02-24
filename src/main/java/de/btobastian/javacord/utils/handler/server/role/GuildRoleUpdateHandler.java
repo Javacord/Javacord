@@ -106,7 +106,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             });
         }
 
-        if (role.getHoist() != packet.getBoolean("hoist")) {
+        if (role.getHoist() != roleJson.getBoolean("hoist")) {
             role.setHoist(!role.getHoist());
             listenerExecutorService.submit(new Runnable() {
                 @Override
