@@ -21,9 +21,10 @@ If you never used maven before you should take a look at the setup tutorial:
 * [Eclipse Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))
 * [IntelliJ Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
 
-## Official Javacord Discord server
+## Support
  
-* [Invite link](https://discord.gg/0qJ2jjyneLEgG7y3)
+* [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3)
+* [DiscordAPI #java_javacord channel](https://discord.gg/0SBTUU1wZTVXVKEo)
 
 #Wiki
 
