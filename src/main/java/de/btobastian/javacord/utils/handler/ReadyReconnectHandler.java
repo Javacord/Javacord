@@ -76,7 +76,7 @@ public class ReadyReconnectHandler extends PacketHandler {
                 User member = api.getOrCreateUser(members.getJSONObject(j).getJSONObject("user"));
                 ((ImplServer) server).addMember(member);
 
-                JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
+                JSONArray memberRoles = members.getJSONObject(j).getJSONArray("roles");
                 for (int k = 0; k < memberRoles.length(); k++) {
                     Role role = server.getRoleById(memberRoles.getString(k));
                     if (role != null) {
