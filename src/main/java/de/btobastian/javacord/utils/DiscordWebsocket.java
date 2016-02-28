@@ -79,12 +79,8 @@ public class DiscordWebsocket extends WebSocketClient {
     @Override
     public void onClose(int code, String reason, boolean remote) {
         // I don't know why, but sometimes we get an error with close code 1006 (connection closed abnormally (locally))
-        // The really strange thing is: Everything works fine after this error. The socket is still connected
+        // The really strange thing is: Everything works fine after this error. The socket sometimes is still connected
         // TODO find the reason for this behaviour
-        if (code == 1006 && reason == null) {
-            System.out.println("Received close code 1006. That's strange cause the socket is still connected...");
-            return;
-        }
         System.out.println("Websocket closed with reason " + reason + " and code " + code);
         isClosed = true;
         if (remote && urlForReconnect != null) {
