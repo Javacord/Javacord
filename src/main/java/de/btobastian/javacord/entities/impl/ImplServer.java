@@ -730,6 +730,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the member count.
+     *
+     * @param memberCount The member count to set.
+     */
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    /**
      * Adds a channel to the server.
      *
      * @param channel The channel to add.

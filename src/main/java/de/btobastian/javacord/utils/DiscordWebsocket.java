@@ -21,6 +21,7 @@ package de.btobastian.javacord.utils;
 import com.google.common.util.concurrent.SettableFuture;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
+import de.btobastian.javacord.utils.handler.ReadyReconnectHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
@@ -115,8 +116,8 @@ public class DiscordWebsocket extends WebSocketClient {
         String type = obj.getString("t");
 
         if (type.equals("READY") && isReconnect) {
-            long heartbeatInterval = packet.getLong("heartbeat_interval");
-            startHeartbeat(heartbeatInterval);
+            // we would get some errors if we do not handle the missed data
+            handlers.get("READY_RECONNECT").handlePacket(packet);
             ready.set(true);
             updateStatus();
             return; // do not handle the ready packet twice
@@ -255,6 +256,7 @@ public class DiscordWebsocket extends WebSocketClient {
     private void registerHandlers() {
         // general
         addHandler(new ReadyHandler(api));
+        addHandler(new ReadyReconnectHandler(api));
 
         // channel
         addHandler(new ChannelCreateHandler(api));
