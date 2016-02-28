@@ -447,7 +447,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     params.put("icon", "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray()));
                 }
                 params.put("name", name);
-                params.put("region", region == null ? Region.US_WEST : region);
+                params.put("region", region == null ? Region.US_WEST.getKey() : region.getKey());
                 final SettableFuture<Server> settableFuture;
                 synchronized (listenerLock) {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds")
