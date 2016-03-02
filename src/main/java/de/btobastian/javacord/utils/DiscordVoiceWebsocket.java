@@ -28,13 +28,20 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 /**
- * The websocket which is used to connect to discord.
+ * The websocket which is used for voice connections.
+ *
+ * The code of the python discord lib discord.py was a great help:
+ * https://github.com/Rapptz/discord.py/blob/async/discord/voice_client.py
  */
 public class DiscordVoiceWebsocket extends WebSocketClient {
 
@@ -44,6 +51,8 @@ public class DiscordVoiceWebsocket extends WebSocketClient {
     private final VoiceChannel channel;
     private final String token;
     private final String sessionId;
+
+    private DatagramSocket udpSocket;
 
     /**
      * Creates a new instance of this class.
@@ -78,18 +87,41 @@ public class DiscordVoiceWebsocket extends WebSocketClient {
         JSONObject obj = new JSONObject(message);
 
         int op = obj.getInt("op");
-        if (op == 2) {
-            JSONObject data = obj.getJSONObject("d");
-            int port = data.getInt("port");
-            int ssrc = data.getInt("ssrc");
-            int heartbeatInterval = data.getInt("heartbeat_interval");
-            JSONArray jsonModes = data.getJSONArray("modes");
-            String[] modes = new String[jsonModes.length()];
-            for (int i = 0; i < jsonModes.length(); i++) {
-                modes[i] = jsonModes.getString(i);
-            }
-            
-            startHeartbeat(heartbeatInterval);
+        JSONObject data;
+        int ssrc;
+        switch (op) {
+            case 2: // this is the first packet we receive from the websocket
+                data = obj.getJSONObject("d");
+                int port = data.getInt("port");
+                ssrc = data.getInt("ssrc");
+                int heartbeatInterval = data.getInt("heartbeat_interval");
+                JSONArray jsonModes = data.getJSONArray("modes");
+                String[] modes = new String[jsonModes.length()];
+                for (int i = 0; i < jsonModes.length(); i++) {
+                    modes[i] = jsonModes.getString(i);
+                }
+
+                // starts the heartbeat of the websocket
+                startHeartbeat(heartbeatInterval);
+                // https://en.wikipedia.org/wiki/UDP_hole_punching
+                sendDiscovery(new InetSocketAddress(getURI().getHost(), port), ssrc);
+                break;
+            case 3: // I have no clue what's the reason for this packet
+                int d = obj.getInt("d");
+                break;
+            case 4: // I have no clue what's the reason for this packet
+                data = obj.getJSONObject("d");
+                String mode = data.getString("mode");
+                break;
+            case 5: // if someone starts or stops speaking
+                data = obj.getJSONObject("d");
+                ssrc = data.getInt("ssrc");
+                String userId = data.getString("user_id");
+                boolean speaking = data.getBoolean("speaking");
+                break;
+            default:
+                System.out.println("Unknown packet:" + obj.toString(2));
+                break;
         }
     }
 
@@ -145,6 +177,56 @@ public class DiscordVoiceWebsocket extends WebSocketClient {
     public void closeBlocking() throws InterruptedException {
         isClosed = true;
         super.closeBlocking();
+    }
+
+    public void sendDiscovery(InetSocketAddress address, int ssrc) {
+        String ip;
+        int port;
+        try {
+            DatagramSocket socket = new DatagramSocket();
+            byte[] buffer = new byte[70];
+            ByteBuffer.wrap(buffer).putInt(0, ssrc);
+            // send the byte array which contains the ssrc
+            socket.send(new DatagramPacket(buffer, buffer.length, address));
+            // create a new buffer which is used to receive data from discord
+            buffer = new byte[70];
+            socket.receive(new DatagramPacket(buffer, buffer.length));
+            // gets the ip of the packet
+            ip = new String(Arrays.copyOfRange(buffer, 2, buffer.length - 3)).replace("\0", "");
+            // gets the port (last two bytes) which is a little endian unsigned short
+            port = ByteBuffer.wrap(new byte[]{buffer[69], buffer[68]}).getShort() & 0xffff;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // start the heartbeat of the udp socket
+        startUdpHeartbeat(address);
+
+        // initialize voice connection
+        JSONObject payload = new JSONObject()
+                .put("op", 1)
+                .put("d", new JSONObject()
+                        .put("protocol", "udp")
+                        .put("data", new JSONObject()
+                                .put("address", ip)
+                                .put("port", port)
+                                .put("mode", "plain")
+                        )
+                );
+        send(payload.toString());
+        System.out.println("S:" + payload.toString(2));
+    }
+
+    public void startUdpHeartbeat(InetSocketAddress address) {
+        api.getThreadPool().getExecutorService().submit(new Runnable() {
+            @Override
+            public void run() {
+                while (!isClosed) {
+                    // TODO
+                }
+            }
+        });
     }
 
     /**
