@@ -88,6 +88,8 @@ public class DiscordVoiceWebsocket extends WebSocketClient {
             for (int i = 0; i < jsonModes.length(); i++) {
                 modes[i] = jsonModes.getString(i);
             }
+            
+            startHeartbeat(heartbeatInterval);
         }
     }
 
