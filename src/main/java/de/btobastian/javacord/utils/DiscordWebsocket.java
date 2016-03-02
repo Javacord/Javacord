@@ -20,6 +20,7 @@ package de.btobastian.javacord.utils;
 
 import com.google.common.util.concurrent.SettableFuture;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.ReadyReconnectHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
@@ -34,6 +35,8 @@ import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
+import de.btobastian.javacord.utils.handler.voice.VoiceServerUpdateHandler;
+import de.btobastian.javacord.utils.handler.voice.VoiceStateUpdateHandler;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -42,9 +45,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -58,6 +63,16 @@ public class DiscordWebsocket extends WebSocketClient {
     private final HashMap<String, PacketHandler> handlers = new HashMap<>();
     private final boolean isReconnect;
     private volatile boolean isClosed = false;
+
+    // the voice websocket
+    private DiscordVoiceWebsocket voiceWebsocket = null;
+    // params needed for voice
+    private ReentrantLock voiceLock = new ReentrantLock();
+    private String voiceToken;
+    private String voiceEndpoint;
+    private String voiceSessionId;
+    private VoiceChannel voiceChannel;
+
 
     // received in packet with op = 7
     private String urlForReconnect = null;
@@ -251,6 +266,89 @@ public class DiscordWebsocket extends WebSocketClient {
     }
 
     /**
+     * Sends the payload which is the first step of connecting to a voice channel.
+     *
+     * @param channel The channel the bot should connect to.
+     */
+    public void payloadVoice(VoiceChannel channel) {
+        JSONObject payload = new JSONObject()
+                .put("op", 4)
+                .put("d", new JSONObject()
+                        .put("guild_id", channel.getServer().getId())
+                        .put("channel_id", channel.getId())
+                        .put("self_mute", false)
+                        .put("self_deaf", false)
+                );
+        voiceChannel = channel;
+        voiceWebsocket = null;
+        voiceEndpoint = null;
+        voiceToken = null;
+        voiceSessionId = null;
+        send(payload.toString());
+    }
+
+    /**
+     * Sets the voice token and connects the voice socket if the session id was set, too.
+     *
+     * @param token The voice token to set.
+     * @return Whether the socket connects now or not.
+     */
+    public boolean setVoiceTokenAndEndpoint(String token, String endpoint) {
+        try {
+            // #setToken and #setSessionId should be called sync, but this may change in the future
+            // so this method is thread safe even if it's not necessary atm
+            voiceLock.lock();
+            this.voiceToken = token;
+            this.voiceEndpoint = endpoint;
+            if (voiceSessionId != null && voiceWebsocket == null) {
+                voiceWebsocket = connectVoice();
+                return true;
+            }
+        } finally {
+            voiceLock.unlock();
+        }
+        return false;
+    }
+
+    /**
+     * Sets the voice session id and connects the socket if the token was set, too.
+     *
+     * @param sessionId The voice session id to set.
+     */
+    public boolean setVoiceSessionId(String sessionId) {
+        try {
+            // #setToken and #setSessionId should be called sync, but this may change in the future
+            // so this method is thread safe even if it's not necessary atm
+            voiceLock.lock();
+            this.voiceSessionId = sessionId;
+            if (voiceToken != null && voiceWebsocket == null) {
+                voiceWebsocket = connectVoice();
+                return true;
+            }
+        } finally {
+            voiceLock.unlock();
+        }
+        return false;
+    }
+
+    /**
+     * Creates a new voice websocket and connects.
+     *
+     * @return The voice websocket and connects.
+     */
+    private DiscordVoiceWebsocket connectVoice() {
+        try {
+            DiscordVoiceWebsocket socket = new DiscordVoiceWebsocket(
+                    new URI(voiceEndpoint), api, voiceChannel, voiceToken, voiceSessionId);
+            socket.connect();
+            return socket;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Registers all handlers.
      */
     private void registerHandlers() {
@@ -286,6 +384,10 @@ public class DiscordWebsocket extends WebSocketClient {
 
         // user
         addHandler(new PresenceUpdateHandler(api));
+
+        // voice
+        addHandler(new VoiceServerUpdateHandler(api));
+        addHandler(new VoiceStateUpdateHandler(api));
     }
 
     /**
