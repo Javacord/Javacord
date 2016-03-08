@@ -35,6 +35,8 @@ import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListen
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -45,6 +47,11 @@ import java.util.concurrent.Future;
  * The implementation of the voice channel interface.
  */
 public class ImplVoiceChannel implements VoiceChannel {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(ImplVoiceChannel.class);
 
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 
@@ -118,6 +125,7 @@ public class ImplVoiceChannel implements VoiceChannel {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to delete voice channel {}", ImplVoiceChannel.this);
                 try {
                     HttpResponse<JsonNode> response = Unirest
                             .delete("https://discordapp.com/api/channels/:id" + id)
@@ -125,6 +133,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                             .asJson();
                     api.checkResponse(response);
                     server.removeVoiceChannel(ImplVoiceChannel.this);
+                    logger.info("Deleted voice channel {}", ImplVoiceChannel.this);
                     // call listener
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
@@ -163,12 +172,14 @@ public class ImplVoiceChannel implements VoiceChannel {
     }
 
     @Override
-    public Future<Exception> updateName(String newName) {
+    public Future<Exception> updateName(final String newName) {
         final JSONObject params = new JSONObject()
                 .put("name", newName);
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to update voice channel {} (new name: {}, old name: {})",
+                        ImplVoiceChannel.this, newName, getName());
                 try {
                     HttpResponse<JsonNode> response = Unirest
                             .patch("https://discordapp.com/api/channels/" + getId())
@@ -178,7 +189,8 @@ public class ImplVoiceChannel implements VoiceChannel {
                             .asJson();
                     api.checkResponse(response);
                     String updatedName = response.getBody().getObject().getString("name");
-
+                    logger.debug("Updated voice channel {} (new name: {}, old name: {})",
+                            ImplVoiceChannel.this, updatedName, getName());
                     // check name
                     if (!updatedName.equals(getName())) {
                         final String oldName = getName();

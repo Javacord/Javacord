@@ -35,6 +35,8 @@ import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
@@ -52,6 +54,11 @@ import java.util.concurrent.Future;
  * The implementation of the user interface.
  */
 public class ImplUser implements User {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(ImplUser.class);
 
     private final ImplDiscordAPI api;
 
@@ -96,11 +103,13 @@ public class ImplUser implements User {
             return;
         }
         try {
+            logger.debug("Sending typing state to user {}", this);
             HttpResponse<JsonNode> response = Unirest
                     .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/typing")
                     .header("authorization", api.getToken())
                     .asJson();
             api.checkResponse(response);
+            logger.debug("Sent typing state to user {}", this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,7 +131,9 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<byte[]>() {
             @Override
             public byte[] call() throws Exception {
+                logger.debug("Trying to get avatar from user {}", ImplUser.this);
                 if (avatarId == null) {
+                    logger.debug("User {} seems to have no avatar. Returning empty array!", ImplUser.this);
                     return new byte[0];
                 }
                 URL url = new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
@@ -139,7 +150,9 @@ public class ImplUser implements User {
                 }
                 out.close();
                 in.close();
-                return out.toByteArray();
+                byte[] avatar = out.toByteArray();
+                logger.debug("Got avatar from user {} (size: {})", ImplUser.this, avatar.length);
+                return avatar;
             }
         });
         if (callback != null) {
@@ -181,7 +194,7 @@ public class ImplUser implements User {
         try {
             return new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
             return null;
         }
     }
@@ -213,6 +226,8 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        logger.debug("Trying to send message to user {} (content: \"{}\", tts: {})",
+                                ImplUser.this, content, tts);
                         api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
@@ -225,6 +240,7 @@ public class ImplUser implements User {
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
                         api.checkResponse(response);
+                        logger.debug("Sent message to user {} (content: \"{}\", tts: {})", ImplUser.this, content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -246,6 +262,7 @@ public class ImplUser implements User {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        logger.debug("Trying to send file to user {} (name: {})", ImplUser.this, file.getName());
                         api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
@@ -254,6 +271,7 @@ public class ImplUser implements User {
                                         .field("file", file)
                                         .asJson();
                         api.checkResponse(response);
+                        logger.debug("Sent file to user {} (name: {})", ImplUser.this, file.getName());
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -390,6 +408,7 @@ public class ImplUser implements User {
             if (userChannelId != null) {
                 return userChannelId;
             }
+            logger.debug("Trying to get channel id of user {}", ImplUser.this);
             HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/users/" + id + "/channels")
                     .header("authorization", api.getToken())
                     .header("Content-Type", "application/json")
@@ -397,6 +416,7 @@ public class ImplUser implements User {
                     .asJson();
             api.checkResponse(response);
             userChannelId = response.getBody().getObject().getString("id");
+            logger.debug("Got channel id of user {} (channel id: {})", ImplUser.this, userChannelId);
             return userChannelId;
         }
     }

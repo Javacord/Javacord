@@ -26,6 +26,8 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +36,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * The implementation of the message history interface.
  */
 public class ImplMessageHistory implements MessageHistory {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(ImplMessageHistory.class);
 
     private final ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
 
@@ -68,6 +75,8 @@ public class ImplMessageHistory implements MessageHistory {
         if (messageId == null) {
             before = true;
         }
+        logger.debug("Trying to get message history (channel id: {}, message id: {}, before: {}, limit: {}",
+                channelId, messageId == null ? "none" : messageId, before, limit);
         for (int i = limit / 100; i > 0; i--) {
             int receivedMessages;
             if (step++ == 0) { // if it's the first iteration step use the normal parameters
@@ -85,6 +94,8 @@ public class ImplMessageHistory implements MessageHistory {
         } else { // request the rest
             request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, limit % 100);
         }
+        logger.debug("Got message history (channel id: {}, message id: {}, before: {}, limit: {}, amount: {}",
+                channelId, messageId == null ? "none" : messageId, before, limit, messages.size());
     }
 
     /**
@@ -103,6 +114,8 @@ public class ImplMessageHistory implements MessageHistory {
         if (limit <= 0) {
             return 0;
         }
+        logger.debug("Requesting part of message history (channel id: {}, message id: {}, before: {}, limit: {}",
+                channelId, messageId == null ? "none" : messageId, before, limit);
         String link = messageId == null ?
                 "https://discordapp.com/api/channels/" + channelId + "/messages?&limit=" + limit
                 : "https://discordapp.com/api/channels/" + channelId + "/messages?&"
