@@ -20,6 +20,8 @@ package de.btobastian.javacord.utils;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 
@@ -27,6 +29,11 @@ import java.util.concurrent.ExecutorService;
  * This class is extended by all PacketHandlers.
  */
 public abstract class PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(PacketHandler.class);
 
     protected final ImplDiscordAPI api;
     private final String type;
@@ -64,8 +71,8 @@ public abstract class PacketHandler {
                     try {
                         handle(packet);
                     } catch (Exception e) {
-                        System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
-                        e.printStackTrace();
+                        logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
+                                getType(), packet.toString(), e);
                     }
                 }
             });
@@ -73,8 +80,8 @@ public abstract class PacketHandler {
             try {
                 handle(packet);
             } catch (Exception e) {
-                System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
-                e.printStackTrace();
+                logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
+                        getType(), packet.toString(), e);
             }
         }
     }
