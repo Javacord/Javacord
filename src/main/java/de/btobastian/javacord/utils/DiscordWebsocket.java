@@ -38,7 +38,6 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,7 +57,7 @@ public class DiscordWebsocket extends WebSocketClient {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(DiscordWebsocket.class);
+    private static final Logger logger = LoggerUtil.getLogger(DiscordWebsocket.class);
 
     private final SettableFuture<Boolean> ready;
     private final ImplDiscordAPI api;

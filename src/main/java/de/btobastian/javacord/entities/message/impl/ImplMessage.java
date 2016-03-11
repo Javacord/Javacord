@@ -35,11 +35,11 @@ import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.ParseException;
@@ -57,7 +57,7 @@ public class ImplMessage implements Message {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplMessage.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplMessage.class);
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

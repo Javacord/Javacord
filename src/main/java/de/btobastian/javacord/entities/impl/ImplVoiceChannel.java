@@ -33,10 +33,10 @@ import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -51,7 +51,7 @@ public class ImplVoiceChannel implements VoiceChannel {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplVoiceChannel.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplVoiceChannel.class);
 
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 

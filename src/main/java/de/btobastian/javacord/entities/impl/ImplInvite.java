@@ -21,9 +21,9 @@ package de.btobastian.javacord.entities.impl;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,7 +40,7 @@ public class ImplInvite implements Invite {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplInvite.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplInvite.class);
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

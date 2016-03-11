@@ -19,8 +19,8 @@
 package de.btobastian.javacord.entities.message.impl;
 
 import de.btobastian.javacord.entities.message.MessageAttachment;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,7 +33,7 @@ public class ImplMessageAttachment implements MessageAttachment {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplMessageAttachment.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplMessageAttachment.class);
 
     private final String url;
     private final String proxyUrl;

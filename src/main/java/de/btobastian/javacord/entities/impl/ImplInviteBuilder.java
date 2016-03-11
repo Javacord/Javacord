@@ -27,9 +27,9 @@ import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.InviteBuilder;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -42,7 +42,7 @@ public class ImplInviteBuilder implements InviteBuilder {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplInviteBuilder.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplInviteBuilder.class);
 
     private final ImplDiscordAPI api;
     private final ImplChannel textChannel;

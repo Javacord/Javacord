@@ -41,13 +41,13 @@ import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.DiscordWebsocket;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.java_websocket.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.net.ssl.SSLContext;
@@ -71,7 +71,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplDiscordAPI.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplDiscordAPI.class);
 
     private final ThreadPool pool;
 
