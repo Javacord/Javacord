@@ -31,8 +31,13 @@ public class Javacord {
      */
     public static final String VERSION = "2.0.8";
 
+    /**
+     * The github url of javacord.
+     */
+    public static final String GITHUB_URL = "https://github.com/BtoBastian/Javacord";
+
     static {
-        Unirest.setDefaultHeader("User-Agent", "Javacord " + VERSION);
+        Unirest.setDefaultHeader("User-Agent", "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")");
     }
 
     private Javacord() { }
