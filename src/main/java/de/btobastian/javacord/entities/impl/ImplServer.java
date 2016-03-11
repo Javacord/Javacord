@@ -35,10 +35,10 @@ import de.btobastian.javacord.listener.server.*;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -57,7 +57,7 @@ public class ImplServer implements Server {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplServer.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplServer.class);
 
     private final ImplDiscordAPI api;
 

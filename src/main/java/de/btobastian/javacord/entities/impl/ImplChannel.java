@@ -43,11 +43,11 @@ import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
 import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -63,7 +63,7 @@ public class ImplChannel implements Channel {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplChannel.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplChannel.class);
 
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 

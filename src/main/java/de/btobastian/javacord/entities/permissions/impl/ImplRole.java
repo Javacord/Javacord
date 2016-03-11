@@ -31,9 +31,9 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.*;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class ImplRole implements Role {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplRole.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplRole.class);
 
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 

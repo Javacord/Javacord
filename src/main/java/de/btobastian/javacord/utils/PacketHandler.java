@@ -21,7 +21,6 @@ package de.btobastian.javacord.utils;
 import de.btobastian.javacord.ImplDiscordAPI;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 
@@ -33,7 +32,7 @@ public abstract class PacketHandler {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(PacketHandler.class);
+    private static final Logger logger = LoggerUtil.getLogger(PacketHandler.class);
 
     protected final ImplDiscordAPI api;
     private final String type;

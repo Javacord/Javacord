@@ -33,10 +33,10 @@ import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
@@ -58,7 +58,7 @@ public class ImplUser implements User {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplUser.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplUser.class);
 
     private final ImplDiscordAPI api;
 

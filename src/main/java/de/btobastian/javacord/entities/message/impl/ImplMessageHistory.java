@@ -24,10 +24,10 @@ import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +40,7 @@ public class ImplMessageHistory implements MessageHistory {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ImplMessageHistory.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplMessageHistory.class);
 
     private final ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
 
