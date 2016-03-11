@@ -81,6 +81,7 @@
                             <exclude>ch.qos.logback:logback-classic</exclude>
                         </excludes>
                     </artifactSet>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
                 </configuration>
                 <executions>
                     <execution>
