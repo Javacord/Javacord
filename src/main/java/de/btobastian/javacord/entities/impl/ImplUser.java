@@ -68,8 +68,8 @@ public class ImplUser implements User {
     private final Object userChannelIdLock = new Object();
     private String userChannelId = null;
     private String game = null;
-    private String discriminator;
-    private boolean bot;
+    private final String discriminator;
+    private final boolean bot;
 
     /**
      * Creates a new instance of this class.

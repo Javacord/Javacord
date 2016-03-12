@@ -31,7 +31,7 @@ public class LoggerUtil {
 
     private static volatile boolean initialized = false;
     // we cannot use a boolean as lock so we need an extra lock object
-    private static Object initLock = new Object();
+    private static final Object initLock = new Object();
 
     private static final HashMap<String, Logger> loggers = new HashMap<>();
     private static volatile boolean noLogger = false;

@@ -36,7 +36,7 @@ public abstract class PacketHandler {
 
     protected final ImplDiscordAPI api;
     private final String type;
-    private boolean async;
+    private final boolean async;
     private ExecutorService executorService;
     protected final ExecutorService listenerExecutorService;
 
@@ -108,10 +108,7 @@ public abstract class PacketHandler {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof  PacketHandler) {
-            return ((PacketHandler) obj).getType().equals(getType());
-        }
-        return false;
+        return obj instanceof PacketHandler && ((PacketHandler) obj).getType().equals(getType());
     }
 
 }

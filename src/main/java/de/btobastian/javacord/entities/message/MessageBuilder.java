@@ -26,7 +26,7 @@ import de.btobastian.javacord.entities.User;
  */
 public class MessageBuilder {
 
-    private StringBuilder strBuilder;
+    private final StringBuilder strBuilder;
 
     /**
      * Creates a new instance of this class.
@@ -111,7 +111,7 @@ public class MessageBuilder {
      * @return This object to reuse it.
      */
     public MessageBuilder appendChannel(Channel channel) {
-        strBuilder.append("<#" + channel.getId() + ">");
+        strBuilder.append("<#").append(channel.getId()).append(">");
         return this;
     }
 

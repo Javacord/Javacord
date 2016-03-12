@@ -70,7 +70,7 @@ public class ImplServer implements Server {
     private String name;
     private Region region;
     private int memberCount;
-    private boolean large;
+    private final boolean large;
 
     /**
      * Creates a new instance of this class.
@@ -666,7 +666,8 @@ public class ImplServer implements Server {
                 try {
                     logger.debug(
                             "Trying to update server {} (new name: {}, old name: {}, new region: {}, old region: {}",
-                            ImplServer.this, newName, getName(), newRegion.getKey(), getRegion().getKey());
+                            ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
+                            getRegion().getKey());
                     HttpResponse<JsonNode> response = Unirest
                             .patch("https://discordapp.com/api/guilds/" + getId())
                             .header("authorization", api.getToken())
@@ -675,7 +676,8 @@ public class ImplServer implements Server {
                             .asJson();
                     api.checkResponse(response);
                     logger.debug("Updated server {} (new name: {}, old name: {}, new region: {}, old region: {}",
-                            ImplServer.this, newName, getName(), newRegion.getKey(), getRegion().getKey());
+                            ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
+                            getRegion().getKey());
 
                     String name = response.getBody().getObject().getString("name");
                     if (!getName().equals(name)) {
