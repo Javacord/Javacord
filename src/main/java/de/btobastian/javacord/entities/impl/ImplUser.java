@@ -423,7 +423,7 @@ public class ImplUser implements User {
                 return userChannelId;
             }
             logger.debug("Trying to get channel id of user {}", ImplUser.this);
-            HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/users/" + id + "/channels")
+            HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/users/" + api.getYourself().getId() + "/channels")
                     .header("authorization", api.getToken())
                     .header("Content-Type", "application/json")
                     .body(new JSONObject().put("recipient_id", id).toString())
