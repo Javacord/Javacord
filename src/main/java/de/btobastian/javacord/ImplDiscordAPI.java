@@ -692,7 +692,10 @@ public class ImplDiscordAPI implements DiscordAPI {
             @Override
             public String call() throws Exception {
                 String id = applicationId;
+                logger.debug("Trying to convert account to bot account (application id: {}, owner token: {}",
+                        id, ownerToken.replaceAll(".{10}", "**********"));
                 if (applicationId == null) {
+                    logger.debug("Trying to create application for owner");
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
                             .header("content-type", "application/json")
                             .header("authorization", ownerToken)
@@ -701,15 +704,19 @@ public class ImplDiscordAPI implements DiscordAPI {
                                     .toString())
                             .asJson();
                     checkResponse(response);
-                    id = response.getBody().getObject().getString("id");
+                    Application application = new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
+                    logger.debug("Created application for owner (application: {})", application);
+                    id = application.getId();
                 }
                 HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/oauth2/applications/" + applicationId + "/bot")
+                        .post("https://discordapp.com/api/oauth2/applications/" + id + "/bot")
                         .header("content-type", "application/json")
                         .header("authorization", ownerToken)
                         .body(new JSONObject().put("token", getToken()).toString())
                         .asJson();
                 setToken(response.getBody().getObject().getString("token"), true);
+                logger.info("Converted account into bot account (id: {}, new token: {})",
+                        id, getToken().replaceAll(".{10}", "**********"));
                 return id;
             }
         });
@@ -724,20 +731,23 @@ public class ImplDiscordAPI implements DiscordAPI {
     public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback) {
         ListenableFuture<Collection<Application>> future =
                 getThreadPool().getListeningExecutorService().submit(new Callable<Collection<Application>>() {
-            @Override
-            public Collection<Application> call() throws Exception {
-                HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/oauth2/applications")
-                        .header("Authorization", token)
-                        .asJson();
-                checkResponse(response);
-                JSONArray jsonApplications = response.getBody().getArray();
-                Set<Application> applications = new HashSet<>();
-                for (int i = 0; i < jsonApplications.length(); i++) {
-                    applications.add(new ImplApplication(ImplDiscordAPI.this, jsonApplications.getJSONObject(i)));
-                }
-                return applications;
-            }
-        });
+                    @Override
+                    public Collection<Application> call() throws Exception {
+                        logger.debug("Trying to get applications");
+                        HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/oauth2/applications")
+                                .header("authorization", token)
+                                .asJson();
+                        checkResponse(response);
+                        JSONArray jsonApplications = response.getBody().getArray();
+                        Set<Application> applications = new HashSet<>();
+                        for (int i = 0; i < jsonApplications.length(); i++) {
+                            applications.add(
+                                    new ImplApplication(ImplDiscordAPI.this, jsonApplications.getJSONObject(i)));
+                        }
+                        logger.debug("Got applications (amount: {})", applications.size());
+                        return applications;
+                    }
+                });
         if (callback != null) {
             Futures.addCallback(future, callback);
         }
@@ -746,12 +756,85 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Application> createApplication(String name) {
-        return null;
+        return createApplication(name, null);
     }
 
     @Override
-    public Future<Application> createApplication(String name, FutureCallback<Application> callback) {
-        return null;
+    public Future<Application> createApplication(final String name, FutureCallback<Application> callback) {
+        ListenableFuture<Application> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
+                    @Override
+                    public Application call() throws Exception {
+                        logger.debug("Trying to create application with name {}", name);
+                        HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
+                                .header("content-type", "application/json")
+                                .header("authorization", getToken())
+                                .body(new JSONObject()
+                                        .put("name", name)
+                                        .toString())
+                                .asJson();
+                        checkResponse(response);
+                        Application application =
+                                new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
+                        logger.debug("Created application {}", application);
+                        return application;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Application> getApplication(String id) {
+        return getApplication(id, null);
+    }
+
+    @Override
+    public Future<Application> getApplication(final String id, FutureCallback<Application> callback) {
+        ListenableFuture<Application> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
+                    @Override
+                    public Application call() throws Exception {
+                        logger.debug("Trying to get application with id {}", id);
+                        HttpResponse<JsonNode> response = Unirest
+                                .get("https://discordapp.com/api/oauth2/applications/" + id)
+                                .header("Authorization", token)
+                                .asJson();
+                        checkResponse(response);
+                        Application application =
+                                new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
+                        logger.debug("Got application {}", application);
+                        return application;
+
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Exception> deleteApplication(final String id) {
+        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    logger.debug("Trying to delete application with id {}", id);
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/oauth2/applications/" + id)
+                            .header("Authorization", getToken())
+                            .asJson();
+                    checkResponse(response);
+                    logger.debug("Deleted application with id {}", id);
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**
@@ -971,8 +1054,12 @@ public class ImplDiscordAPI implements DiscordAPI {
      * @throws Exception If the response has problems (status code not between 200 and 300).
      */
     public void checkResponse(HttpResponse<JsonNode> response) throws Exception {
+        String message = "";
+        if (response.getBody() != null && !response.getBody().isArray() && response.getBody().getObject().has("message")) {
+            message = " " + response.getBody().getObject().getString("message");
+        }
         if (response.getStatus() == 403) {
-            throw new PermissionsException("Missing permissions!");
+            throw new PermissionsException("Missing permissions!" + message);
         }
         if (response.getBody() != null && !response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");

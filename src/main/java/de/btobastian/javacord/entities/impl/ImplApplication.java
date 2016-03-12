@@ -26,6 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import java.util.concurrent.Future;
+
 /**
  * The implementation of the Application interface.
  */
@@ -35,6 +37,8 @@ public class ImplApplication implements Application {
      * The logger of this class.
      */
     private static final Logger logger = LoggerUtil.getLogger(ImplApplication.class);
+
+    private final ImplDiscordAPI api;
 
     private final String id;
     private final String description;
@@ -51,6 +55,8 @@ public class ImplApplication implements Application {
      * @param data The data of the application.
      */
     public ImplApplication(ImplDiscordAPI api, JSONObject data) {
+        this.api = api;
+
         id = data.getString("id");
         description = data.getString("description");
         JSONArray jsonRedirectUris = data.getJSONArray("redirect_uris");
@@ -102,5 +108,15 @@ public class ImplApplication implements Application {
     @Override
     public User getBot() {
         return bot;
+    }
+
+    @Override
+    public Future<Exception> delete() {
+        return api.deleteApplication(getId());
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
     }
 }
