@@ -209,8 +209,9 @@ public interface DiscordAPI {
      * fails (e.g. if the token is expired) it will use the email and password.
      *
      * @param token The token to set.
+     * @param bot Whether the token is the token of a bot account or a normal account.
      */
-    public void setToken(String token);
+    public void setToken(String token, boolean bot);
 
     /**
      * Checks if the token is valid.
@@ -450,5 +451,71 @@ public interface DiscordAPI {
      * @return Whether the api should try to auto-reconnect or not.
      */
     public boolean isAutoReconnectEnabled();
+
+    /**
+     * Sets the client secret required for oAuth2.
+     *
+     * @param secret The client secret.
+     */
+    public void setSecret(String secret);
+
+    /**
+     * Sets the client id required for oAuth2.
+     *
+     * @param id The client id.
+     */
+    public void setId(String id);
+
+    /**
+     * Converts the current account to a bot account.
+     * Converting a user account to a bot account is irreversible. USE CAUTION!
+     * This will create a new application for the bot.
+     *
+     * @param ownerToken The token of the owner of the bot.
+     * @return The id of the application.
+     */
+    public Future<String> convertToBotAccount(String ownerToken);
+
+    /**
+     * Converts the current account to a bot account.
+     * Converting a user account to a bot account is irreversible. USE CAUTION!
+     *
+     * @param applicationId The od of the application the bot should belong to.
+     * @param ownerToken The token of the owner of the bot.
+     * @return The id of the application.
+     */
+    public Future<String> convertToBotAccount(String applicationId, String ownerToken);
+
+    /**
+     * Gets a collection with all applications you own.
+     *
+     * @return A collection with all applications you own.
+     */
+    public Future<Collection<Application>> getApplications();
+
+    /**
+     * Gets a collection with all applications you own.
+     *
+     * @param callback The callback which will be informed when the request finished.
+     * @return A collection with all applications you own.
+     */
+    public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback);
+
+    /**
+     * Create a new application.
+     *
+     * @param name The name of the application.
+     * @return The created application.
+     */
+    public Future<Application> createApplication(String name);
+
+    /**
+     * Create a new application.
+     *
+     * @param name The name of the application.
+     * @param callback The callback which will be informed when the application was created.
+     * @return The created application.
+     */
+    public Future<Application> createApplication(String name, FutureCallback<Application> callback);
 
 }

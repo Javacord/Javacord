@@ -68,6 +68,8 @@ public class ImplUser implements User {
     private final Object userChannelIdLock = new Object();
     private String userChannelId = null;
     private String game = null;
+    private String discriminator;
+    private boolean bot;
 
     /**
      * Creates a new instance of this class.
@@ -83,6 +85,8 @@ public class ImplUser implements User {
         try {
             avatarId = data.getString("avatar");
         } catch (JSONException ignored) { }
+        discriminator = data.getString("discriminator");
+        bot = data.has("bot") && data.getBoolean("bot");
 
         api.getUserMap().put(id, this);
     }
@@ -356,6 +360,16 @@ public class ImplUser implements User {
     @Override
     public String getMentionTag() {
         return "<@" + getId() + ">";
+    }
+
+    @Override
+    public String getDiscriminator() {
+        return discriminator;
+    }
+
+    @Override
+    public boolean isBot() {
+        return bot;
     }
 
     /**
