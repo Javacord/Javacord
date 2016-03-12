@@ -27,6 +27,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.impl.ImplApplication;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
@@ -142,6 +143,10 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public void connectBlocking() {
         if (token == null || !checkTokenBlocking(token)) {
+            if (email == null || password == null) {
+                logger.warn("No valid token provided AND missing email or password. Connecting not possible!");
+                return;
+            }
             token = requestTokenBlocking();
         }
         String gateway = requestGatewayBlocking();
@@ -356,8 +361,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void setToken(String token) {
-        this.token = token;
+    public void setToken(String token, boolean bot) {
+        this.token = bot ? "Bot " + token : token;
     }
 
     @Override
@@ -406,8 +411,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
                 }
-                Server server = settableFuture.get();
-                return server;
+                return settableFuture.get();
             }
         });
         if (callback != null) {
@@ -458,7 +462,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             @Override
             public Server call() throws Exception {
                 logger.debug("Trying to create server (name: {}, region: {}, icon: {}",
-                        name, region.getKey(), icon != null);
+                        name, region == null ? "null" : region.getKey(), icon != null);
                 if (name == null || name.length() < 2 || name.length() > 100) {
                     throw new IllegalArgumentException("Name must be 2-100 characters long!");
                 }
@@ -484,7 +488,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     String guildId = response.getBody().getObject().getString("id");
                     logger.info("Created server and waiting for listener to be called " +
                             "(name: {}, region: {}, icon: {}, server id: {})"
-                            , name, region.getKey(), icon != null, guildId);
+                            , name, region == null ? "null" : region.getKey(), icon != null, guildId);
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
                 }
@@ -526,7 +530,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     public Future<Exception> updateProfile(
             final String newUsername, String newEmail, final String newPassword, final BufferedImage newAvatar) {
         logger.debug("Trying to update profile (username: {}, email: {}, password: {}, change avatar: {}",
-                newUsername, email, newPassword.replaceAll(".", "*"), newAvatar != null);
+                newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"), newAvatar != null);
         String avatarString = getYourself().getAvatarId();
         if (newAvatar != null) {
             try {
@@ -555,10 +559,11 @@ public class ImplDiscordAPI implements DiscordAPI {
                             .asJson();
                     checkResponse(response);
                     logger.info("Updated profile (username: {}, email: {}, password: {}, change avatar: {}",
-                            newUsername, email, newPassword.replaceAll(".", "*"), newAvatar != null);
+                            newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"),
+                            newAvatar != null);
                     ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
                     setEmail(response.getBody().getObject().getString("email"));
-                    setToken(response.getBody().getObject().getString("token"));
+                    setToken(response.getBody().getObject().getString("token"), token.startsWith("Bot "));
                     final String oldName = getYourself().getName();
                     ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
                     if (newPassword != null) {
@@ -674,6 +679,89 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public boolean isAutoReconnectEnabled() {
         return autoReconnect;
+    }
+
+    @Override
+    public void setSecret(String secret) {
+
+    }
+
+    @Override
+    public void setId(String id) {
+
+    }
+
+    @Override
+    public Future<String> convertToBotAccount(String ownerToken) {
+        return convertToBotAccount(null, ownerToken);
+    }
+
+    @Override
+    public Future<String> convertToBotAccount(final String applicationId, final String ownerToken) {
+        return getThreadPool().getExecutorService().submit(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                String id = applicationId;
+                if (applicationId == null) {
+                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
+                            .header("content-type", "application/json")
+                            .header("authorization", ownerToken)
+                            .body(new JSONObject()
+                                    .put("name", getYourself().getName())
+                                    .toString())
+                            .asJson();
+                    checkResponse(response);
+                    id = response.getBody().getObject().getString("id");
+                }
+                HttpResponse<JsonNode> response = Unirest
+                        .post("https://discordapp.com/api/oauth2/applications/" + applicationId + "/bot")
+                        .header("content-type", "application/json")
+                        .header("authorization", ownerToken)
+                        .body(new JSONObject().put("token", getToken()).toString())
+                        .asJson();
+                setToken(response.getBody().getObject().getString("token"), true);
+                return id;
+            }
+        });
+    }
+
+    @Override
+    public Future<Collection<Application>> getApplications() {
+        return getApplications(null);
+    }
+
+    @Override
+    public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback) {
+        ListenableFuture<Collection<Application>> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Collection<Application>>() {
+            @Override
+            public Collection<Application> call() throws Exception {
+                HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/oauth2/applications")
+                        .header("Authorization", token)
+                        .asJson();
+                checkResponse(response);
+                JSONArray jsonApplications = response.getBody().getArray();
+                Set<Application> applications = new HashSet<>();
+                for (int i = 0; i < jsonApplications.length(); i++) {
+                    applications.add(new ImplApplication(ImplDiscordAPI.this, jsonApplications.getJSONObject(i)));
+                }
+                return applications;
+            }
+        });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Application> createApplication(String name) {
+        return null;
+    }
+
+    @Override
+    public Future<Application> createApplication(String name, FutureCallback<Application> callback) {
+        return null;
     }
 
     /**
@@ -936,4 +1024,5 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void setSocket(DiscordWebsocket socket) {
         this.socket = socket;
     }
+
 }
