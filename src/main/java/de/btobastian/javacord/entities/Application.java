@@ -18,6 +18,8 @@
  */
 package de.btobastian.javacord.entities;
 
+import java.util.concurrent.Future;
+
 /**
  * This interface represents an application.
  *
@@ -74,5 +76,14 @@ public interface Application {
      * @return The bot user. May be <code>null</code>.
      */
     public User getBot();
+
+    /**
+     * Deletes the application.
+     *
+     * @return A future which tells us whether the deletion was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     * @see de.btobastian.javacord.DiscordAPI#deleteApplication(String)
+     */
+    public Future<Exception> delete();
 
 }

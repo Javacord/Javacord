@@ -504,4 +504,30 @@ public interface DiscordAPI {
      */
     public Future<Application> createApplication(String name, FutureCallback<Application> callback);
 
+    /**
+     * Gets an application by its id.
+     *
+     * @param id The id of the application.
+     * @return The application with the given id.
+     */
+    public Future<Application> getApplication(String id);
+
+    /**
+     * Gets an application by its id.
+     *
+     * @param id The id of the application.
+     * @param callback The callback which will be informed when the request finished.
+     * @return The application with the given id.
+     */
+    public Future<Application> getApplication(String id, FutureCallback<Application> callback);
+
+    /**
+     * Deletes an application.
+     *
+     * @param id The id of the application.
+     * @return A future which tells us whether the deletion was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> deleteApplication(String id);
+
 }
