@@ -682,16 +682,6 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void setSecret(String secret) {
-
-    }
-
-    @Override
-    public void setId(String id) {
-
-    }
-
-    @Override
     public Future<String> convertToBotAccount(String ownerToken) {
         return convertToBotAccount(null, ownerToken);
     }

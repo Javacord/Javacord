@@ -62,7 +62,7 @@ public class ImplVoiceChannel implements VoiceChannel {
     private int position;
     private final ImplServer server;
 
-    private ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.

@@ -27,7 +27,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
  */
 public class ImplPermissions implements Permissions {
 
-    private int allowed;
+    private final int allowed;
     private int denied;
 
     /**

@@ -130,7 +130,7 @@ public class DiscordWebsocket extends WebSocketClient {
 
         int op = obj.getInt("op");
         if (op == 7) {
-            String url = obj.getJSONObject("d").getString("url");
+            urlForReconnect = obj.getJSONObject("d").getString("url");
             return;
         }
 
@@ -198,7 +198,7 @@ public class DiscordWebsocket extends WebSocketClient {
         }
         try {
             bos.close();
-        } catch (IOException e) { }
+        } catch (IOException ignored) { }
         byte[] decompressedData = bos.toByteArray();
         try {
             onMessage(new String(decompressedData, "UTF-8"));
@@ -240,7 +240,6 @@ public class DiscordWebsocket extends WebSocketClient {
                 long timer = System.currentTimeMillis();
                 while (!isClosed) {
                     if ((System.currentTimeMillis() - timer) >= heartbeatInterval - 10) {
-                        Object nullObject = null;
                         JSONObject heartbeat = new JSONObject()
                                 .put("op", 1)
                                 .put("d", System.currentTimeMillis());

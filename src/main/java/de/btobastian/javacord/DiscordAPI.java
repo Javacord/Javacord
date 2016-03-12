@@ -453,20 +453,6 @@ public interface DiscordAPI {
     public boolean isAutoReconnectEnabled();
 
     /**
-     * Sets the client secret required for oAuth2.
-     *
-     * @param secret The client secret.
-     */
-    public void setSecret(String secret);
-
-    /**
-     * Sets the client id required for oAuth2.
-     *
-     * @param id The client id.
-     */
-    public void setId(String id);
-
-    /**
      * Converts the current account to a bot account.
      * Converting a user account to a bot account is irreversible. USE CAUTION!
      * This will create a new application for the bot.

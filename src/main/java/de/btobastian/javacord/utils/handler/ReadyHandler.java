@@ -26,8 +26,6 @@ import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.concurrent.ExecutionException;
-
 /**
  * This class handles the ready packet.
  */
