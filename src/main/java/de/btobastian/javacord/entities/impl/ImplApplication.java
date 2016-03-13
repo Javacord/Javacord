@@ -45,8 +45,8 @@ public class ImplApplication implements Application {
     private final String[] redirectUris;
     private final String name;
     private final String secret;
-    private final String botToken;
-    private final User bot;
+    private String botToken;
+    private User bot;
 
     /**
      * Creates a new instance of this class.
@@ -113,6 +113,24 @@ public class ImplApplication implements Application {
     @Override
     public Future<Exception> delete() {
         return api.deleteApplication(getId());
+    }
+
+    /**
+     * Sets the bot of the application.
+     *
+     * @param bot The bot to set.
+     */
+    public void setBot(User bot) {
+        this.bot = bot;
+    }
+
+    /**
+     * Sets the token of the application's bot.
+     *
+     * @param botToken The token of the application's bot.
+     */
+    public void setBotToken(String botToken) {
+        this.botToken = botToken;
     }
 
     @Override

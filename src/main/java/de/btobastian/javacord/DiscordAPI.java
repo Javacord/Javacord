@@ -19,6 +19,8 @@
 package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
@@ -26,6 +28,7 @@ import de.btobastian.javacord.utils.ThreadPool;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
@@ -529,5 +532,41 @@ public interface DiscordAPI {
      *         If the exception is <code>null</code> the deletion was successful.
      */
     public Future<Exception> deleteApplication(String id);
+
+    /**
+     * Creates a new bot and an application for this bot.
+     *
+     * @param name The name of the bot and application.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name);
+
+    /**
+     * Creates a new bot and an application for this bot.
+     *
+     * @param name The name of the bot and application.
+     * @param callback The callback which will be informed when the bot was created.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name, FutureCallback<Application> callback);
+
+    /**
+     * Creates a new bot for an application.
+     *
+     * @param name The name of the bot.
+     * @param applicationId The id of the application.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name, String applicationId);
+
+    /**
+     * Creates a new bot for an application.
+     *
+     * @param name The name of the bot.
+     * @param applicationId The id of the application.
+     * @param callback The callback which will be informed when the bot was created.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name, String applicationId, FutureCallback<Application> callback);
 
 }

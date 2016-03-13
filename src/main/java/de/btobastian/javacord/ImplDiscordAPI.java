@@ -837,6 +837,54 @@ public class ImplDiscordAPI implements DiscordAPI {
         });
     }
 
+    @Override
+    public Future<Application> createBot(String name) {
+        return createBot(name, null, null);
+    }
+
+    @Override
+    public Future<Application> createBot(String name, FutureCallback<Application> callback) {
+        return createBot(name, null, callback);
+    }
+
+    @Override
+    public Future<Application> createBot(String name, String applicationId) {
+        return createBot(name, applicationId, null);
+    }
+
+    @Override
+    public Future<Application> createBot(
+            final String name, final String applicationId, FutureCallback<Application> callback) {
+        ListenableFuture<Application> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
+                    @Override
+                    public Application call() throws Exception {
+                        ImplApplication application;
+                        if (applicationId == null) {
+                            application = (ImplApplication) createApplication(name).get();
+                        } else {
+                            application = (ImplApplication) getApplication(applicationId).get();
+                        }
+                        HttpResponse<JsonNode> response = Unirest
+                                .post("https://discordapp.com/api/oauth2/applications/" + application.getId() + "/bot")
+                                .header("Authorization", getToken())
+                                .header("content-type", "application/json")
+                                .body(new JSONObject().toString())
+                                .asJson();
+                        checkResponse(response);
+                        User bot = getOrCreateUser(response.getBody().getObject());
+                        String botToken = response.getBody().getObject().getString("token");
+                        application.setBot(bot);
+                        application.setBotToken(botToken);
+                        return application;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
     /**
      * Tries to reconnect to the given gateway.
      *
