@@ -38,6 +38,7 @@ import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.BadResponseException;
 import de.btobastian.javacord.exceptions.PermissionsException;
 import de.btobastian.javacord.exceptions.RateLimitedException;
+import de.btobastian.javacord.exceptions.NotSupportedForBotsException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
@@ -392,6 +393,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Server> acceptInvite(final String inviteCode, FutureCallback<Server> callback) {
+        if (getYourself().isBot()) {
+            throw new NotSupportedForBotsException();
+        }
         ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
             @Override
             public Server call() throws Exception {
@@ -688,6 +692,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<String> convertToBotAccount(final String applicationId, final String ownerToken) {
+        if (getYourself().isBot()) {
+            throw new NotSupportedForBotsException();
+        }
         return getThreadPool().getExecutorService().submit(new Callable<String>() {
             @Override
             public String call() throws Exception {
@@ -729,6 +736,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback) {
+        if (getYourself().isBot()) {
+            throw new NotSupportedForBotsException();
+        }
         ListenableFuture<Collection<Application>> future =
                 getThreadPool().getListeningExecutorService().submit(new Callable<Collection<Application>>() {
                     @Override
@@ -761,6 +771,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Application> createApplication(final String name, FutureCallback<Application> callback) {
+        if (getYourself().isBot()) {
+            throw new NotSupportedForBotsException();
+        }
         ListenableFuture<Application> future =
                 getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
                     @Override
@@ -793,6 +806,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Application> getApplication(final String id, FutureCallback<Application> callback) {
+        if (getYourself().isBot()) {
+            throw new NotSupportedForBotsException();
+        }
         ListenableFuture<Application> future =
                 getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
                     @Override
@@ -818,6 +834,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Exception> deleteApplication(final String id) {
+        if (getYourself().isBot()) {
+            throw new NotSupportedForBotsException();
+        }
         return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
@@ -855,6 +874,9 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public Future<Application> createBot(
             final String name, final String applicationId, FutureCallback<Application> callback) {
+        if (getYourself().isBot()) {
+            throw new NotSupportedForBotsException();
+        }
         ListenableFuture<Application> future =
                 getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
                     @Override
