@@ -53,11 +53,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.18</version>
         </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.0.13</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -75,12 +70,6 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.4.3</version>
                 <configuration>
-                    <artifactSet>
-                        <excludes>
-                            <!-- Do not include logback. The users of the lib should be able to choose their own implementation -->
-                            <exclude>ch.qos.logback:logback-classic</exclude>
-                        </excludes>
-                    </artifactSet>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                 </configuration>
                 <executions>

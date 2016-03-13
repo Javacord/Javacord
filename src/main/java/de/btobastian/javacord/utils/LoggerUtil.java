@@ -20,7 +20,6 @@ package de.btobastian.javacord.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.StaticLoggerBinder;
 
 import java.util.HashMap;
 
@@ -100,9 +99,9 @@ public class LoggerUtil {
     private static void init() {
         initialized = true;
         try {
-            // if there's no library this would cause a NoClassDefFoundError
-            StaticLoggerBinder.class.getName();
-        } catch (NoClassDefFoundError ignored) {
+            // if there's no library this would cause a ClassNotFoundException
+            Class.forName("org.slf4j.impl.StaticLoggerBinder");
+        } catch (ClassNotFoundException e) {
             noLogger = true;
             getLogger(LoggerUtil.class)
                     .info("No SLF4J compatible logger was found. Using default javacord implementation!");
