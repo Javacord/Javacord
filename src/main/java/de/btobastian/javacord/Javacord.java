@@ -80,8 +80,6 @@ public class Javacord {
      * @param token The token which is required to login.
      * @param bot Whether the token is the token of a bot account or a normal account.
      * @return A new instance of DiscordAPI.
-     * @see DiscordAPI#setSecret(String)
-     * @see DiscordAPI#setId(String)
      */
     public static DiscordAPI getApi(String token, boolean bot) {
         DiscordAPI api = getApi();
