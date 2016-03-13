@@ -25,15 +25,13 @@ import de.btobastian.javacord.utils.handler.ReadyReconnectHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
-import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
-import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
-import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
-import de.btobastian.javacord.utils.handler.message.TypingStartHandler;
+import de.btobastian.javacord.utils.handler.message.*;
 import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
+import de.btobastian.javacord.utils.handler.user.UserGuildSettingsUpdateHandler;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -277,6 +275,7 @@ public class DiscordWebsocket extends WebSocketClient {
         addHandler(new ChannelUpdateHandler(api));
 
         // message
+        addHandler(new MessageAckHandler(api));
         addHandler(new MessageCreateHandler(api));
         addHandler(new MessageDeleteHandler(api));
         addHandler(new MessageUpdateHandler(api));
@@ -299,6 +298,7 @@ public class DiscordWebsocket extends WebSocketClient {
 
         // user
         addHandler(new PresenceUpdateHandler(api));
+        addHandler(new UserGuildSettingsUpdateHandler(api));
     }
 
     /**
