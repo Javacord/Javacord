@@ -175,7 +175,7 @@ public interface Invite {
     public Future<Server> acceptInvite(FutureCallback<Server> callback);
 
     /**
-     * Delets the invite.
+     * Deletes the invite.
      *
      * @return A future which tells us whether the deletion was successful or not.
      *         If the exception is <code>null</code> the deletion was successful.

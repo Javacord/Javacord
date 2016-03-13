@@ -21,7 +21,9 @@ package de.btobastian.javacord.entities.impl;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,6 +36,11 @@ import java.util.concurrent.Future;
  * The implementation of the invite interface.
  */
 public class ImplInvite implements Invite {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplInvite.class);
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -88,7 +95,7 @@ public class ImplInvite implements Invite {
                         try {
                             calendar.setTime(FORMAT_ALTERNATIVE_TWO.parse(time.substring(0, time.length() - 9)));
                         } catch (ParseException e) {
-                            e.printStackTrace();
+                            logger.warn("Could not parse timestamp {}. Please contact the developer!", time, e);
                         }
                     }
                 }
@@ -122,7 +129,7 @@ public class ImplInvite implements Invite {
         try {
             return new URL("https://discord.gg/" + code);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.warn("Malformed invite url of invite code {}! Please contact the developer!", code, e);
             return null;
         }
     }

@@ -19,6 +19,8 @@
 package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
@@ -26,6 +28,7 @@ import de.btobastian.javacord.utils.ThreadPool;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
@@ -209,8 +212,9 @@ public interface DiscordAPI {
      * fails (e.g. if the token is expired) it will use the email and password.
      *
      * @param token The token to set.
+     * @param bot Whether the token is the token of a bot account or a normal account.
      */
-    public void setToken(String token);
+    public void setToken(String token, boolean bot);
 
     /**
      * Checks if the token is valid.
@@ -450,5 +454,119 @@ public interface DiscordAPI {
      * @return Whether the api should try to auto-reconnect or not.
      */
     public boolean isAutoReconnectEnabled();
+
+    /**
+     * Converts the current account to a bot account.
+     * Converting a user account to a bot account is irreversible. USE CAUTION!
+     * This will create a new application for the bot.
+     *
+     * @param ownerToken The token of the owner of the bot.
+     * @return The id of the application.
+     */
+    public Future<String> convertToBotAccount(String ownerToken);
+
+    /**
+     * Converts the current account to a bot account.
+     * Converting a user account to a bot account is irreversible. USE CAUTION!
+     *
+     * @param applicationId The od of the application the bot should belong to.
+     * @param ownerToken The token of the owner of the bot.
+     * @return The id of the application.
+     */
+    public Future<String> convertToBotAccount(String applicationId, String ownerToken);
+
+    /**
+     * Gets a collection with all applications you own.
+     *
+     * @return A collection with all applications you own.
+     */
+    public Future<Collection<Application>> getApplications();
+
+    /**
+     * Gets a collection with all applications you own.
+     *
+     * @param callback The callback which will be informed when the request finished.
+     * @return A collection with all applications you own.
+     */
+    public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback);
+
+    /**
+     * Create a new application.
+     *
+     * @param name The name of the application.
+     * @return The created application.
+     */
+    public Future<Application> createApplication(String name);
+
+    /**
+     * Create a new application.
+     *
+     * @param name The name of the application.
+     * @param callback The callback which will be informed when the application was created.
+     * @return The created application.
+     */
+    public Future<Application> createApplication(String name, FutureCallback<Application> callback);
+
+    /**
+     * Gets an application by its id.
+     *
+     * @param id The id of the application.
+     * @return The application with the given id.
+     */
+    public Future<Application> getApplication(String id);
+
+    /**
+     * Gets an application by its id.
+     *
+     * @param id The id of the application.
+     * @param callback The callback which will be informed when the request finished.
+     * @return The application with the given id.
+     */
+    public Future<Application> getApplication(String id, FutureCallback<Application> callback);
+
+    /**
+     * Deletes an application.
+     *
+     * @param id The id of the application.
+     * @return A future which tells us whether the deletion was successful or not.
+     *         If the exception is <code>null</code> the deletion was successful.
+     */
+    public Future<Exception> deleteApplication(String id);
+
+    /**
+     * Creates a new bot and an application for this bot.
+     *
+     * @param name The name of the bot and application.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name);
+
+    /**
+     * Creates a new bot and an application for this bot.
+     *
+     * @param name The name of the bot and application.
+     * @param callback The callback which will be informed when the bot was created.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name, FutureCallback<Application> callback);
+
+    /**
+     * Creates a new bot for an application.
+     *
+     * @param name The name of the bot.
+     * @param applicationId The id of the application.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name, String applicationId);
+
+    /**
+     * Creates a new bot for an application.
+     *
+     * @param name The name of the bot.
+     * @param applicationId The id of the application.
+     * @param callback The callback which will be informed when the bot was created.
+     * @return The application which owns the bot.
+     */
+    public Future<Application> createBot(String name, String applicationId, FutureCallback<Application> callback);
 
 }

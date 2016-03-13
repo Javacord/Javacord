@@ -16,25 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.listener.user;
+package de.btobastian.javacord.utils.handler.user;
 
-import de.btobastian.javacord.DiscordAPI;
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.listener.Listener;
+import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.utils.PacketHandler;
+import org.json.JSONObject;
 
 /**
- * This listener listens to role user adds.
+ * This class handles the user guild settings update packet.
  */
-public interface UserRoleAddListener extends Listener {
+public class UserGuildSettingsUpdateHandler extends PacketHandler {
 
     /**
-     * This method is called every time a user was added to a role.
+     * Creates a new instance of this class.
      *
      * @param api The api.
-     * @param user The user who was added to the role.
-     * @param role The role the user was added to.
      */
-    public void onUserRoleAdd(DiscordAPI api, User user, Role role);
+    public UserGuildSettingsUpdateHandler(ImplDiscordAPI api) {
+        super(api, true, "USER_GUILD_SETTINGS_UPDATE");
+    }
+
+    @Override
+    public void handle(JSONObject packet) {
+        // NOP
+    }
 
 }

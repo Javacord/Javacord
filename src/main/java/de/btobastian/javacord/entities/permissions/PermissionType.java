@@ -51,7 +51,7 @@ public enum PermissionType {
     VOICE_MOVE_MEMBERS(24),
     VOICE_USE_VAD(25);
 
-    private int offset;
+    private final int offset;
 
     private PermissionType(int offset) {
         this.offset = offset;

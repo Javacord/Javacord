@@ -1,5 +1,6 @@
 # Javacord
 A simple library to create a discord bot.
+Supports the new application system!
 
 #Maven
 ```xml
@@ -11,7 +12,15 @@ A simple library to create a discord bot.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.8</version>
+  <version>2.0.9</version>
+   <!-- This will use the shaded javacord which contains all required dependencies -->
+  <classifier>shaded</classifier>
+</dependency>
+<!-- A SLF4J comaptible logging framework. I would recommend to use logback -->
+<dependency>
+  <groupId>ch.qos.logback</groupId>
+  <artifactId>logback-classic</artifactId>
+  <version>1.0.13</version>
 </dependency>
 ```
 

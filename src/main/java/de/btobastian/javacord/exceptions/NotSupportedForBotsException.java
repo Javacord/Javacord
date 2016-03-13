@@ -16,25 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.listener.user;
-
-import de.btobastian.javacord.DiscordAPI;
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.listener.Listener;
+package de.btobastian.javacord.exceptions;
 
 /**
- * This listener listens to role user adds.
+ * This exception is always thrown when you try to access a method which
+ * bots are not able to use (e.g. joining an invite).
  */
-public interface UserRoleAddListener extends Listener {
+public class NotSupportedForBotsException extends IllegalStateException {
 
     /**
-     * This method is called every time a user was added to a role.
-     *
-     * @param api The api.
-     * @param user The user who was added to the role.
-     * @param role The role the user was added to.
+     * Creates a new instance of this class.
      */
-    public void onUserRoleAdd(DiscordAPI api, User user, Role role);
+    public NotSupportedForBotsException() {
+        super("Bots are not able to use this method!");
+    }
+
+
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param message The message of the exception.
+     */
+    public NotSupportedForBotsException(String message) {
+        super(message);
+    }
 
 }

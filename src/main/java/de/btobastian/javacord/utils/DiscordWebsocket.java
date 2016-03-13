@@ -25,18 +25,17 @@ import de.btobastian.javacord.utils.handler.ReadyReconnectHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
-import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
-import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
-import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
-import de.btobastian.javacord.utils.handler.message.TypingStartHandler;
+import de.btobastian.javacord.utils.handler.message.*;
 import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
+import de.btobastian.javacord.utils.handler.user.UserGuildSettingsUpdateHandler;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,6 +51,11 @@ import java.util.zip.Inflater;
  * The websocket which is used to connect to discord.
  */
 public class DiscordWebsocket extends WebSocketClient {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(DiscordWebsocket.class);
 
     private final SettableFuture<Boolean> ready;
     private final ImplDiscordAPI api;
@@ -82,16 +86,16 @@ public class DiscordWebsocket extends WebSocketClient {
         // I don't know why, but sometimes we get an error with close code 1006 (connection closed abnormally (locally))
         // The really strange thing is: Everything works fine after this error. The socket sometimes is still connected
         // TODO find the reason for this behaviour
-        System.out.println("Websocket closed with reason " + reason + " and code " + code);
+        logger.info("Websocket closed with reason {} and code {}", reason, code);
         isClosed = true;
         if (remote && urlForReconnect != null) {
-            System.out.println("Trying to reconnect (we received op 7 before)...");
+            logger.info("Trying to reconnect (we received op 7 before)...");
             api.reconnectBlocking(urlForReconnect);
-            System.out.println("Reconnected!");
+            logger.info("Reconnected!");
         } else if (remote && api.isAutoReconnectEnabled()) {
-            System.out.println("Trying to auto-reconnect...");
+            logger.info("Trying to auto-reconnect...");
             api.reconnectBlocking();
-            System.out.println("Reconnected!");
+            logger.info("Reconnected!");
         }
         if (!ready.isDone()) {
             ready.set(false);
@@ -109,7 +113,8 @@ public class DiscordWebsocket extends WebSocketClient {
 
         int op = obj.getInt("op");
         if (op == 7) {
-            String url = obj.getJSONObject("d").getString("url");
+            urlForReconnect = obj.getJSONObject("d").getString("url");
+            return;
         }
 
         JSONObject packet = obj.getJSONObject("d");
@@ -126,15 +131,19 @@ public class DiscordWebsocket extends WebSocketClient {
         PacketHandler handler = handlers.get(type);
         if (handler != null) {
             handler.handlePacket(packet);
+        } else {
+            logger.debug("Received unknown packet of type {} (packet: {})", type, obj.toString());
         }
         if (type.equals("READY")) {
             ready.set(true);
+            logger.debug("Received READY-packet!");
             updateStatus();
         }
     }
 
     @Override
     public void onOpen(ServerHandshake handshake) {
+        Thread.currentThread().setName("Websocket");
         JSONObject connectPacket = new JSONObject()
                 .put("op", 2)
                 .put("d", new JSONObject()
@@ -148,6 +157,7 @@ public class DiscordWebsocket extends WebSocketClient {
                         .put("$referring_domain", "discordapp.com"))
                     .put("large_threshold", 250)
                     .put("compress", true));
+        logger.debug("Sending connect packet");
         send(connectPacket.toString());
     }
 
@@ -163,8 +173,7 @@ public class DiscordWebsocket extends WebSocketClient {
             try {
                 count = decompressor.inflate(buf);
             } catch (DataFormatException e) {
-                e.printStackTrace();
-                System.exit(-1);
+                logger.warn("An error occurred while decompressing data", e);
                 return;
             }
             bos.write(buf, 0, count);
@@ -177,7 +186,7 @@ public class DiscordWebsocket extends WebSocketClient {
         try {
             onMessage(new String(decompressedData, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.warn("An error occurred while decompressing data", e);
         }
     }
 
@@ -214,12 +223,12 @@ public class DiscordWebsocket extends WebSocketClient {
                 long timer = System.currentTimeMillis();
                 while (!isClosed) {
                     if ((System.currentTimeMillis() - timer) >= heartbeatInterval - 10) {
-                        Object nullObject = null;
                         JSONObject heartbeat = new JSONObject()
                                 .put("op", 1)
                                 .put("d", System.currentTimeMillis());
                         send(heartbeat.toString());
                         timer = System.currentTimeMillis();
+                        logger.debug("Sending heartbeat (interval: {})", heartbeatInterval);
                         if (Math.random() < 0.1) {
                             // some random status updates to ensure the game and idle status is updated correctly
                             // (discord only accept 5 of these packets per minute and ignores more
@@ -230,7 +239,7 @@ public class DiscordWebsocket extends WebSocketClient {
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        logger.warn("An error occurred while sending heartbeat", e);
                     }
                 }
             }
@@ -241,6 +250,8 @@ public class DiscordWebsocket extends WebSocketClient {
      * Sens the update status packet
      */
     public void updateStatus() {
+        logger.debug(
+                "Updating status (game: {}, idle: {})", api.getGame() == null ? "none" : api.getGame(), api.isIdle());
         JSONObject updateStatus = new JSONObject()
                 .put("op", 3)
                 .put("d", new JSONObject()
@@ -264,6 +275,7 @@ public class DiscordWebsocket extends WebSocketClient {
         addHandler(new ChannelUpdateHandler(api));
 
         // message
+        addHandler(new MessageAckHandler(api));
         addHandler(new MessageCreateHandler(api));
         addHandler(new MessageDeleteHandler(api));
         addHandler(new MessageUpdateHandler(api));
@@ -286,6 +298,7 @@ public class DiscordWebsocket extends WebSocketClient {
 
         // user
         addHandler(new PresenceUpdateHandler(api));
+        addHandler(new UserGuildSettingsUpdateHandler(api));
     }
 
     /**

@@ -31,7 +31,9 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.*;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -44,6 +46,11 @@ import java.util.concurrent.Future;
  * The implementation of the role interface.
  */
 public class ImplRole implements Role {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplRole.class);
 
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 
@@ -188,6 +195,10 @@ public class ImplRole implements Role {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to update role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
+                        " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
+                        ImplRole.this, name, getName(), color, getColor().getRGB(),
+                        hoist, getHoist(), allow, permissions.getAllowed());
                 try {
                     HttpResponse<JsonNode> response = Unirest
                             .patch("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
@@ -201,6 +212,10 @@ public class ImplRole implements Role {
                             .asJson();
                     api.checkResponse(response);
 
+                    logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
+                            " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
+                            ImplRole.this, name, getName(), color, getColor().getRGB(),
+                            hoist, getHoist(), allow, permissions.getAllowed());
                     // update permissions
                     if (ImplRole.this.permissions.getAllowed() != allow) {
                         final ImplPermissions oldPermissions = ImplRole.this.permissions;
@@ -289,12 +304,14 @@ public class ImplRole implements Role {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug("Trying to delete role {}", ImplRole.this);
                     HttpResponse<JsonNode> response = Unirest
                             .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
                     server.removeRole(ImplRole.this);
+                    logger.info("Deleted role {}", ImplRole.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
@@ -415,4 +432,8 @@ public class ImplRole implements Role {
         this.hoist = hoist;
     }
 
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
+    }
 }
