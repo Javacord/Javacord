@@ -51,10 +51,10 @@ public class GuildDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((ServerLeaveListener) listener).onServerLeave(api, server);
+                    for (ServerLeaveListener listener : listeners) {
+                        listener.onServerLeave(api, server);
                     }
                 }
             }

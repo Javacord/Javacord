@@ -578,11 +578,10 @@ public class ImplDiscordAPI implements DiscordAPI {
                         getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners = getListeners(UserChangeNameListener.class);
+                                List<UserChangeNameListener> listeners = getListeners(UserChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((UserChangeNameListener) listener)
-                                                .onUserChangeName(ImplDiscordAPI.this, getYourself(), oldName);
+                                    for (UserChangeNameListener listener : listeners) {
+                                        listener.onUserChangeName(ImplDiscordAPI.this, getYourself(), oldName);
                                     }
                                 }
                             }
@@ -1068,12 +1067,29 @@ public class ImplDiscordAPI implements DiscordAPI {
     /**
      * Gets a list with all registers listeners of the given class.
      *
+     * @param <T> The type of the listener.
      * @param listenerClass The type of the listener.
-     * @return A list with all registers listeners of the given class.
+     * @return A list with all registers listeners of the given type.
      */
-    public List<Listener> getListeners(Class<?> listenerClass) {
-        List<Listener> listenersList = listeners.get(listenerClass);
-        return listenersList == null ? new ArrayList<Listener>() : listenersList;
+    public <T extends Listener> List<T> getListeners(Class<T> listenerClass) {
+        List<T> listenersList = (List<T>) listeners.get(listenerClass);
+        return listenersList == null ? new ArrayList<T>() : listenersList;
+    }
+
+    /**
+     * Gets a list with all registers listeners of the given generic type.
+     * This method hasn't the extra listenerClass-parameter of {@link #getListeners(Class)} but is a little bot slower.
+     *
+     * @param <T> The type of the listener.
+     * @return A list with all registers listeners of the given type.
+     */
+    public <T extends Listener> List<T> getListeners() {
+        for (List<Listener> list : listeners.values()) {
+            try {
+                return (List<T>) list;
+            } catch (ClassCastException ignored) {}
+        }
+        return new ArrayList<>();
     }
 
     /**

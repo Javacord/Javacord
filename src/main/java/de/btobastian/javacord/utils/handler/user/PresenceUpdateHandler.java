@@ -77,10 +77,10 @@ public class PresenceUpdateHandler extends PacketHandler {
                 listenerExecutorService.submit(new Runnable() {
                     @Override
                     public void run() {
-                        List<Listener> listeners = api.getListeners(UserChangeNameListener.class);
+                        List<UserChangeNameListener> listeners = api.getListeners(UserChangeNameListener.class);
                         synchronized (listeners) {
-                            for (Listener listener : listeners) {
-                                ((UserChangeNameListener) listener).onUserChangeName(api, user, oldName);
+                            for (UserChangeNameListener listener : listeners) {
+                                listener.onUserChangeName(api, user, oldName);
                             }
                         }
                     }
@@ -97,10 +97,10 @@ public class PresenceUpdateHandler extends PacketHandler {
                         || (game != null && oldGame == null)
                         || (game != null && !game.equals(oldGame))) {
                     ((ImplUser) user).setGame(game);
-                    List<Listener> listeners = api.getListeners(UserChangeGameListener.class);
+                    List<UserChangeGameListener> listeners = api.getListeners(UserChangeGameListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((UserChangeGameListener) listener).onUserChangeGame(api, user, oldGame);
+                        for (UserChangeGameListener listener : listeners) {
+                            listener.onUserChangeGame(api, user, oldGame);
                         }
                     }
                 }

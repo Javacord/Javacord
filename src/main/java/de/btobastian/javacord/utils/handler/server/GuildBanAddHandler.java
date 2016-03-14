@@ -50,10 +50,10 @@ public class GuildBanAddHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberBanListener.class);
+                    List<ServerMemberBanListener> listeners = api.getListeners(ServerMemberBanListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberBanListener) listener).onServerMemberBan(api, user, server);
+                        for (ServerMemberBanListener listener : listeners) {
+                            listener.onServerMemberBan(api, user, server);
                         }
                     }
                 }

@@ -52,10 +52,10 @@ public class GuildBanRemoveHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberUnbanListener.class);
+                    List<ServerMemberUnbanListener> listeners = api.getListeners(ServerMemberUnbanListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberUnbanListener) listener).onServerMemberUnban(api, user.getId(), server);
+                        for (ServerMemberUnbanListener listener : listeners) {
+                            listener.onServerMemberUnban(api, user.getId(), server);
                         }
                     }
                 }

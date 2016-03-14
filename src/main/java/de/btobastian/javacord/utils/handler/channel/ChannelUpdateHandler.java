@@ -91,10 +91,10 @@ public class ChannelUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ChannelChangeNameListener.class);
+                    List<ChannelChangeNameListener> listeners = api.getListeners(ChannelChangeNameListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ChannelChangeNameListener) listener).onChannelChangeName(api, channel, oldName);
+                        for (ChannelChangeNameListener listener : listeners) {
+                            listener.onChannelChangeName(api, channel, oldName);
                         }
                     }
                 }
@@ -111,10 +111,10 @@ public class ChannelUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ChannelChangeTopicListener.class);
+                    List<ChannelChangeTopicListener> listeners = api.getListeners(ChannelChangeTopicListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ChannelChangeTopicListener) listener).onChannelChangeTopic(api, channel, oldTopic);
+                        for (ChannelChangeTopicListener listener : listeners) {
+                            listener.onChannelChangeTopic(api, channel, oldTopic);
                         }
                     }
                 }
@@ -128,11 +128,11 @@ public class ChannelUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ChannelChangePositionListener.class);
+                    List<ChannelChangePositionListener> listeners =
+                            api.getListeners(ChannelChangePositionListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ChannelChangePositionListener) listener)
-                                    .onChannelChangePosition(api, channel, oldPosition);
+                        for (ChannelChangePositionListener listener : listeners) {
+                            listener.onChannelChangePosition(api, channel, oldPosition);
                         }
                     }
                 }
@@ -162,11 +162,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                     listenerExecutorService.submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(UserChangeOverwrittenPermissionsListener.class);
+                            List<UserChangeOverwrittenPermissionsListener> listeners =
+                                    api.getListeners(UserChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((UserChangeOverwrittenPermissionsListener) listener)
-                                            .onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                for (UserChangeOverwrittenPermissionsListener listener : listeners) {
+                                    listener.onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
                                 }
                             }
                         }
@@ -185,11 +185,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                     listenerExecutorService.submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners = api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
+                            List<RoleChangeOverwrittenPermissionsListener> listeners =
+                                    api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((RoleChangeOverwrittenPermissionsListener) listener)
-                                            .onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                for (RoleChangeOverwrittenPermissionsListener listener : listeners) {
+                                    listener.onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
                                 }
                             }
                         }
@@ -218,10 +218,11 @@ public class ChannelUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(VoiceChannelChangeNameListener.class);
+                    List<VoiceChannelChangeNameListener> listeners =
+                            api.getListeners(VoiceChannelChangeNameListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((VoiceChannelChangeNameListener) listener).onVoiceChannelChangeName(api, channel, oldName);
+                        for (VoiceChannelChangeNameListener listener : listeners) {
+                            listener.onVoiceChannelChangeName(api, channel, oldName);
                         }
                     }
                 }
@@ -235,11 +236,11 @@ public class ChannelUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(VoiceChannelChangePositionListener.class);
+                    List<VoiceChannelChangePositionListener> listeners =
+                            api.getListeners(VoiceChannelChangePositionListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((VoiceChannelChangePositionListener) listener)
-                                    .onVoiceChannelChangePosition(api, channel, oldPosition);
+                        for (VoiceChannelChangePositionListener listener : listeners) {
+                            listener.onVoiceChannelChangePosition(api, channel, oldPosition);
                         }
                     }
                 }
@@ -269,11 +270,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                     listenerExecutorService.submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(UserChangeOverwrittenPermissionsListener.class);
+                            List<UserChangeOverwrittenPermissionsListener> listeners =
+                                    api.getListeners(UserChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((UserChangeOverwrittenPermissionsListener) listener)
-                                            .onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                for (UserChangeOverwrittenPermissionsListener listener : listeners) {
+                                    listener.onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
                                 }
                             }
                         }
@@ -292,11 +293,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                     listenerExecutorService.submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners = api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
+                            List<RoleChangeOverwrittenPermissionsListener> listeners =
+                                    api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((RoleChangeOverwrittenPermissionsListener) listener)
-                                            .onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                for (RoleChangeOverwrittenPermissionsListener listener : listeners) {
+                                    listener.onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
                                 }
                             }
                         }

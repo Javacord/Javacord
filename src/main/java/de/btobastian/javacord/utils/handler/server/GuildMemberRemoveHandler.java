@@ -53,10 +53,10 @@ public class GuildMemberRemoveHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                    List<ServerMemberRemoveListener> listeners = api.getListeners(ServerMemberRemoveListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberRemoveListener) listener).onServerMemberRemove(api, user, server);
+                        for (ServerMemberRemoveListener listener : listeners) {
+                            listener.onServerMemberRemove(api, user, server);
                         }
                     }
                 }

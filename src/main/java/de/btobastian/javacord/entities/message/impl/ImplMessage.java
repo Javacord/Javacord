@@ -224,10 +224,10 @@ public class ImplMessage implements Message {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);
+                            List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((MessageDeleteListener) listener).onMessageDelete(api, message);
+                                for (MessageDeleteListener listener : listeners) {
+                                    listener.onMessageDelete(api, message);
                                 }
                             }
                         }
@@ -356,11 +356,10 @@ public class ImplMessage implements Message {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(MessageEditListener.class);
+                                List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((MessageEditListener) listener)
-                                                .onMessageEdit(api, ImplMessage.this, oldContent);
+                                    for (MessageEditListener listener : listeners) {
+                                        listener.onMessageEdit(api, ImplMessage.this, oldContent);
                                     }
                                 }
                             }

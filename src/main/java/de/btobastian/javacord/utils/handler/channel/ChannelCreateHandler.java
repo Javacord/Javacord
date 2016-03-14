@@ -75,10 +75,10 @@ public class ChannelCreateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                List<ChannelCreateListener> listeners = api.getListeners(ChannelCreateListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                    for (ChannelCreateListener listener : listeners) {
+                        listener.onChannelCreate(api, channel);
                     }
                 }
             }
@@ -99,10 +99,10 @@ public class ChannelCreateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(VoiceChannelCreateListener.class);
+                List<VoiceChannelCreateListener> listeners = api.getListeners(VoiceChannelCreateListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((VoiceChannelCreateListener) listener).onVoiceChannelCreate(api, channel);
+                    for (VoiceChannelCreateListener listener : listeners) {
+                        listener.onVoiceChannelCreate(api, channel);
                     }
                 }
             }

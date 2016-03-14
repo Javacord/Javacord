@@ -60,10 +60,10 @@ public class GuildRoleDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                List<RoleDeleteListener> listeners = api.getListeners(RoleDeleteListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((RoleDeleteListener) listener).onRoleDelete(api, role);
+                    for (RoleDeleteListener listener : listeners) {
+                        listener.onRoleDelete(api, role);
                     }
                 }
             }

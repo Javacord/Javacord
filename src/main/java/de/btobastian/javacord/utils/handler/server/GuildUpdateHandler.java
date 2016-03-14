@@ -57,10 +57,10 @@ public class GuildUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerChangeNameListener.class);
+                    List<ServerChangeNameListener> listeners = api.getListeners(ServerChangeNameListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerChangeNameListener) listener).onServerChangeName(api, server, oldName);
+                        for (ServerChangeNameListener listener : listeners) {
+                            listener.onServerChangeName(api, server, oldName);
                         }
                     }
                 }
@@ -74,10 +74,10 @@ public class GuildUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerChangeRegionListener.class);
+                    List<ServerChangeRegionListener> listeners = api.getListeners(ServerChangeRegionListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerChangeRegionListener) listener).onServerChangeRegion(api, server, oldRegion);
+                        for (ServerChangeRegionListener listener : listeners) {
+                            listener.onServerChangeRegion(api, server, oldRegion);
                         }
                     }
                 }

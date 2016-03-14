@@ -170,10 +170,10 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                for (ServerLeaveListener listener : listeners) {
+                                    listener.onServerLeave(api, ImplServer.this);
                                 }
                             }
                         }
@@ -202,10 +202,10 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                for (ServerLeaveListener listener : listeners) {
+                                    listener.onServerLeave(api, ImplServer.this);
                                 }
                             }
                         }
@@ -285,10 +285,10 @@ public class ImplServer implements Server {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                                List<ChannelCreateListener> listeners = api.getListeners(ChannelCreateListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                                    for (ChannelCreateListener listener : listeners) {
+                                        listener.onChannelCreate(api, channel);
                                     }
                                 }
                             }
@@ -319,10 +319,11 @@ public class ImplServer implements Server {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(VoiceChannelCreateListener.class);
+                                List<VoiceChannelCreateListener> listeners =
+                                        api.getListeners(VoiceChannelCreateListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((VoiceChannelCreateListener) listener).onVoiceChannelCreate(api, channel);
+                                    for (VoiceChannelCreateListener listener : listeners) {
+                                        listener.onVoiceChannelCreate(api, channel);
                                     }
                                 }
                             }
@@ -398,10 +399,11 @@ public class ImplServer implements Server {
                             api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                                 @Override
                                 public void run() {
-                                    List<Listener> listeners =  api.getListeners(UserRoleRemoveListener.class);
+                                    List<UserRoleRemoveListener> listeners =
+                                            api.getListeners(UserRoleRemoveListener.class);
                                     synchronized (listeners) {
-                                        for (Listener listener : listeners) {
-                                            ((UserRoleRemoveListener) listener).onUserRoleRemove(api, user, role);
+                                        for (UserRoleRemoveListener listener : listeners) {
+                                            listener.onUserRoleRemove(api, user, role);
                                         }
                                     }
                                 }
@@ -414,10 +416,10 @@ public class ImplServer implements Server {
                             api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                                 @Override
                                 public void run() {
-                                    List<Listener> listeners =  api.getListeners(UserRoleAddListener.class);
+                                    List<UserRoleAddListener> listeners = api.getListeners(UserRoleAddListener.class);
                                     synchronized (listeners) {
-                                        for (Listener listener : listeners) {
-                                            ((UserRoleAddListener) listener).onUserRoleAdd(api, user, role);
+                                        for (UserRoleAddListener listener : listeners) {
+                                            listener.onUserRoleAdd(api, user, role);
                                         }
                                     }
                                 }
@@ -471,10 +473,10 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerMemberBanListener.class);
+                            List<ServerMemberBanListener> listeners = api.getListeners(ServerMemberBanListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerMemberBanListener) listener).onServerMemberBan(api, user, ImplServer.this);
+                                for (ServerMemberBanListener listener : listeners) {
+                                    listener.onServerMemberBan(api, user, ImplServer.this);
                                 }
                             }
                         }
@@ -503,11 +505,11 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerMemberUnbanListener.class);
+                            List<ServerMemberUnbanListener> listeners =
+                                    api.getListeners(ServerMemberUnbanListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerMemberUnbanListener) listener)
-                                            .onServerMemberUnban(api, userId, ImplServer.this);
+                                for (ServerMemberUnbanListener listener : listeners) {
+                                    listener.onServerMemberUnban(api, userId, ImplServer.this);
                                 }
                             }
                         }
@@ -577,11 +579,10 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                            List<ServerMemberRemoveListener> listeners = api.getListeners(ServerMemberRemoveListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerMemberRemoveListener) listener)
-                                            .onServerMemberRemove(api, user, ImplServer.this);
+                                for (ServerMemberRemoveListener listener : listeners) {
+                                    listener.onServerMemberRemove(api, user, ImplServer.this);
                                 }
                             }
                         }
@@ -616,10 +617,10 @@ public class ImplServer implements Server {
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                     @Override
                     public void run() {
-                        List<Listener> listeners =  api.getListeners(RoleCreateListener.class);
+                        List<RoleCreateListener> listeners = api.getListeners(RoleCreateListener.class);
                         synchronized (listeners) {
-                            for (Listener listener : listeners) {
-                                ((RoleCreateListener) listener).onRoleCreate(api, role);
+                            for (RoleCreateListener listener : listeners) {
+                                listener.onRoleCreate(api, role);
                             }
                         }
                     }
@@ -685,11 +686,11 @@ public class ImplServer implements Server {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ServerChangeNameListener.class);
+                                List<ServerChangeNameListener> listeners =
+                                        api.getListeners(ServerChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ServerChangeNameListener) listener)
-                                                .onServerChangeName(api, ImplServer.this, oldName);
+                                    for (ServerChangeNameListener listener : listeners) {
+                                        listener.onServerChangeName(api, ImplServer.this, oldName);
                                     }
                                 }
                             }

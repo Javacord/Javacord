@@ -68,10 +68,10 @@ public class TypingStartHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(TypingStartListener.class);
+                List<TypingStartListener> listeners = api.getListeners(TypingStartListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((TypingStartListener) listener).onTypingStart(api, user, channel);
+                    for (TypingStartListener listener : listeners) {
+                        listener.onTypingStart(api, user, channel);
                     }
                 }
             }

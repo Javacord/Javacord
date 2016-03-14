@@ -51,10 +51,10 @@ public class GuildCreateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(ServerJoinListener.class);
+                List<ServerJoinListener> listeners = api.getListeners(ServerJoinListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((ServerJoinListener) listener).onServerJoin(api, server);
+                    for (ServerJoinListener listener : listeners) {
+                        listener.onServerJoin(api, server);
                     }
                 }
             }

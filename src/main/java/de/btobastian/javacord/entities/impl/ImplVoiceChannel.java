@@ -138,11 +138,11 @@ public class ImplVoiceChannel implements VoiceChannel {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(VoiceChannelDeleteListener.class);
+                            List<VoiceChannelDeleteListener> listeners =
+                                    api.getListeners(VoiceChannelDeleteListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((VoiceChannelDeleteListener) listener)
-                                            .onVoiceChannelDelete(api, ImplVoiceChannel.this);
+                                for (VoiceChannelDeleteListener listener : listeners) {
+                                    listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
                                 }
                             }
                         }
@@ -198,11 +198,11 @@ public class ImplVoiceChannel implements VoiceChannel {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(VoiceChannelChangeNameListener.class);
+                                List<VoiceChannelChangeNameListener> listeners =
+                                        api.getListeners(VoiceChannelChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((VoiceChannelChangeNameListener) listener)
-                                                .onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
+                                    for (VoiceChannelChangeNameListener listener : listeners) {
+                                        listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
                                     }
                                 }
                             }

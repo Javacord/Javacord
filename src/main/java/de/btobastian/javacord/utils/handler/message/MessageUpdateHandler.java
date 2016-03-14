@@ -57,10 +57,10 @@ public class MessageUpdateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(MessageEditListener.class);
+                List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((MessageEditListener) listener).onMessageEdit(api, message, oldContent);
+                    for (MessageEditListener listener : listeners) {
+                        listener.onMessageEdit(api, message, oldContent);
                     }
                 }
             }

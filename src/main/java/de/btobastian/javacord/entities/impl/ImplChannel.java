@@ -159,10 +159,10 @@ public class ImplChannel implements Channel {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
+                            List<ChannelDeleteListener> listeners = api.getListeners(ChannelDeleteListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ChannelDeleteListener) listener).onChannelDelete(api, ImplChannel.this);
+                                for (ChannelDeleteListener listener : listeners) {
+                                    listener.onChannelDelete(api, ImplChannel.this);
                                 }
                             }
                         }
@@ -378,11 +378,11 @@ public class ImplChannel implements Channel {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ChannelChangeNameListener.class);
+                                List<ChannelChangeNameListener> listeners =
+                                        api.getListeners(ChannelChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ChannelChangeNameListener) listener)
-                                                .onChannelChangeName(api, ImplChannel.this, oldName);
+                                    for (ChannelChangeNameListener listener : listeners) {
+                                        listener.onChannelChangeName(api, ImplChannel.this, oldName);
                                     }
                                 }
                             }
@@ -397,11 +397,11 @@ public class ImplChannel implements Channel {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ChannelChangeTopicListener.class);
+                                List<ChannelChangeTopicListener> listeners =
+                                        api.getListeners(ChannelChangeTopicListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ChannelChangeTopicListener) listener)
-                                                .onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                    for (ChannelChangeTopicListener listener : listeners) {
+                                        listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
                                     }
                                 }
                             }

@@ -53,10 +53,10 @@ public class GuildMemberAddHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberAddListener.class);
+                    List<ServerMemberAddListener> listeners = api.getListeners(ServerMemberAddListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberAddListener) listener).onServerMemberAdd(api, user, server);
+                        for (ServerMemberAddListener listener : listeners) {
+                            listener.onServerMemberAdd(api, user, server);
                         }
                     }
                 }

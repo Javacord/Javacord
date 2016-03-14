@@ -21,7 +21,6 @@ package de.btobastian.javacord.utils.handler.message;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -53,10 +52,10 @@ public class MessageCreateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(MessageCreateListener.class);
+                List<MessageCreateListener> listeners = api.getListeners(MessageCreateListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((MessageCreateListener) listener).onMessageCreate(api, message);
+                    for (MessageCreateListener listener : listeners) {
+                        listener.onMessageCreate(api, message);
                     }
                 }
             }

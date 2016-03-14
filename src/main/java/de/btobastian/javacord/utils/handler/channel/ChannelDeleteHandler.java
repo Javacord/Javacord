@@ -71,10 +71,10 @@ public class ChannelDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
+                List<ChannelDeleteListener> listeners = api.getListeners(ChannelDeleteListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((ChannelDeleteListener) listener).onChannelDelete(api, channel);
+                    for (ChannelDeleteListener listener : listeners) {
+                        listener.onChannelDelete(api, channel);
                     }
                 }
             }
@@ -93,10 +93,10 @@ public class ChannelDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(VoiceChannelDeleteListener.class);
+                List<VoiceChannelDeleteListener> listeners = api.getListeners(VoiceChannelDeleteListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((VoiceChannelDeleteListener) listener).onVoiceChannelDelete(api, channel);
+                    for (VoiceChannelDeleteListener listener : listeners) {
+                        listener.onVoiceChannelDelete(api, channel);
                     }
                 }
             }
