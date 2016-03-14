@@ -174,4 +174,13 @@ public interface Message extends Comparable<Message> {
      */
     public Calendar getCreationDate();
 
+    /**
+     * Edits the message.
+     *
+     * @param content The new content of the message.
+     * @return A future which tells us if the edit was successful or not.
+     *         If the exception is <code>null</code> the edit was successful.
+     */
+    public Future<Exception> edit(String content);
+
 }

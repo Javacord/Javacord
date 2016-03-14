@@ -35,6 +35,7 @@ import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
+import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -334,6 +335,43 @@ public class ImplMessage implements Message {
     @Override
     public int compareTo(Message other) {
         return this.creationDate.compareTo(other.getCreationDate());
+    }
+
+    @Override
+    public Future<Exception> edit(final String content) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                            .header("authorization", api.getToken())
+                            .header("content-type", "application/json")
+                            .body(new JSONObject().put("content", content).toString())
+                            .asJson();
+                    api.checkResponse(response);
+                    final String oldContent = getContent();
+                    setContent(content);
+                    if (!oldContent.equals(content)) {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Listener> listeners =  api.getListeners(MessageEditListener.class);
+                                synchronized (listeners) {
+                                    for (Listener listener : listeners) {
+                                        ((MessageEditListener) listener)
+                                                .onMessageEdit(api, ImplMessage.this, oldContent);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**
