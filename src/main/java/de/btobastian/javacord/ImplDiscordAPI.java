@@ -1141,13 +1141,15 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public void checkResponse(HttpResponse<JsonNode> response) throws Exception {
         String message = "";
-        if (response.getBody() != null && !response.getBody().isArray() && response.getBody().getObject().has("message")) {
+        if (response.getBody() != null && !response.getBody().isArray() &&
+                response.getBody().getObject().has("message")) {
             message = " " + response.getBody().getObject().getString("message");
         }
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!" + message);
         }
-        if (response.getBody() != null && !response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
+        if (response.getBody() != null && !response.getBody().isArray()
+                && response.getBody().getObject().has("retry_after")) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");
             RateLimitedException exception =
                     new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);

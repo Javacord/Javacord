@@ -133,32 +133,32 @@ public class ImplUser implements User {
     public Future<byte[]> getAvatarAsByteArray(FutureCallback<byte[]> callback) {
         ListenableFuture<byte[]> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<byte[]>() {
-            @Override
-            public byte[] call() throws Exception {
-                logger.debug("Trying to get avatar from user {}", ImplUser.this);
-                if (avatarId == null) {
-                    logger.debug("User {} seems to have no avatar. Returning empty array!", ImplUser.this);
-                    return new byte[0];
-                }
-                URL url = new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
-                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                conn.setRequestProperty("User-Agent", "Javacord");
-                InputStream in = new BufferedInputStream(conn.getInputStream());
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                byte[] buf = new byte[1024];
-                int n;
-                while (-1 != (n = in.read(buf))) {
-                    out.write(buf, 0, n);
-                }
-                out.close();
-                in.close();
-                byte[] avatar = out.toByteArray();
-                logger.debug("Got avatar from user {} (size: {})", ImplUser.this, avatar.length);
-                return avatar;
-            }
-        });
+                    @Override
+                    public byte[] call() throws Exception {
+                        logger.debug("Trying to get avatar from user {}", ImplUser.this);
+                        if (avatarId == null) {
+                            logger.debug("User {} seems to have no avatar. Returning empty array!", ImplUser.this);
+                            return new byte[0];
+                        }
+                        URL url = new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
+                        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                        conn.setRequestMethod("GET");
+                        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                        conn.setRequestProperty("User-Agent", "Javacord");
+                        InputStream in = new BufferedInputStream(conn.getInputStream());
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        byte[] buf = new byte[1024];
+                        int n;
+                        while (-1 != (n = in.read(buf))) {
+                            out.write(buf, 0, n);
+                        }
+                        out.close();
+                        in.close();
+                        byte[] avatar = out.toByteArray();
+                        logger.debug("Got avatar from user {} (size: {})", ImplUser.this, avatar.length);
+                        return avatar;
+                    }
+                });
         if (callback != null) {
             Futures.addCallback(future, callback);
         }
@@ -174,16 +174,16 @@ public class ImplUser implements User {
     public Future<BufferedImage> getAvatar(FutureCallback<BufferedImage> callback) {
         ListenableFuture<BufferedImage> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<BufferedImage>() {
-            @Override
-            public BufferedImage call() throws Exception {
-                byte[] imageAsBytes = getAvatarAsByteArray().get();
-                if (imageAsBytes.length == 0) {
-                    return null;
-                }
-                InputStream in = new ByteArrayInputStream(imageAsBytes);
-                return ImageIO.read(in);
-            }
-        });
+                    @Override
+                    public BufferedImage call() throws Exception {
+                        byte[] imageAsBytes = getAvatarAsByteArray().get();
+                        if (imageAsBytes.length == 0) {
+                            return null;
+                        }
+                        InputStream in = new ByteArrayInputStream(imageAsBytes);
+                        return ImageIO.read(in);
+                    }
+                });
         if (callback != null) {
             Futures.addCallback(future, callback);
         }

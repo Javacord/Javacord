@@ -19,8 +19,6 @@
 package de.btobastian.javacord;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
@@ -28,7 +26,6 @@ import de.btobastian.javacord.utils.ThreadPool;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
