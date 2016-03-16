@@ -19,6 +19,7 @@
 package de.btobastian.javacord.entities;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 
 import java.awt.image.BufferedImage;
@@ -361,5 +362,24 @@ public interface Server {
      * @return Whether the server is large or not.
      */
     public boolean isLarge();
+
+    /**
+     * Authorizes a bot to join the server.
+     *
+     * @param applicationId The id of the bot's application.
+     * @return A future which tells us whether the authorization was successful or not.
+     *         If the exception is <code>null</code> the authorization was successful.
+     */
+    public Future<Exception> authorizeBot(String applicationId);
+
+    /**
+     * Authorizes a bot to join the server.
+     *
+     * @param applicationId The id of the bot's application.
+     * @param permissions The permissions the bot should get on join.
+     * @return A future which tells us whether the authorization was successful or not.
+     *         If the exception is <code>null</code> the authorization was successful.
+     */
+    public Future<Exception> authorizeBot(String applicationId, Permissions permissions);
 
 }

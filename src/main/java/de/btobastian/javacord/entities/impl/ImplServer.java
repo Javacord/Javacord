@@ -26,7 +26,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
@@ -717,6 +719,37 @@ public class ImplServer implements Server {
     @Override
     public boolean isLarge() {
         return large;
+    }
+
+    @Override
+    public Future<Exception> authorizeBot(String applicationId) {
+        return authorizeBot(applicationId, null);
+    }
+
+    @Override
+    public Future<Exception> authorizeBot(final String applicationId, final Permissions permissions) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .post("https://discordapp.com/api/oauth2/authorize?client_id={id}&scope=bot")
+                            .routeParam("id", applicationId)
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(new JSONObject()
+                                    .put("guild_id", getId())
+                                    .put("permissions", ((ImplPermissions) permissions).getAllowed())
+                                    .put("authorize", true)
+                                    .toString())
+                            .asJson();
+                    api.checkResponse(response);
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**
