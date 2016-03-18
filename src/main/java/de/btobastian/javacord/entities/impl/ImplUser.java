@@ -25,6 +25,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
@@ -144,7 +145,7 @@ public class ImplUser implements User {
                         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                         conn.setRequestMethod("GET");
                         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                        conn.setRequestProperty("User-Agent", "Javacord");
+                        conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
                         InputStream in = new BufferedInputStream(conn.getInputStream());
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         byte[] buf = new byte[1024];
@@ -423,7 +424,8 @@ public class ImplUser implements User {
                 return userChannelId;
             }
             logger.debug("Trying to get channel id of user {}", ImplUser.this);
-            HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/users/" + api.getYourself().getId() + "/channels")
+            HttpResponse<JsonNode> response = Unirest
+                    .post("https://discordapp.com/api/users/" + api.getYourself().getId() + "/channels")
                     .header("authorization", api.getToken())
                     .header("Content-Type", "application/json")
                     .body(new JSONObject().put("recipient_id", id).toString())
