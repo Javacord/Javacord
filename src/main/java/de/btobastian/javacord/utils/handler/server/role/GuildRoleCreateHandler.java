@@ -23,7 +23,6 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.RoleCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;

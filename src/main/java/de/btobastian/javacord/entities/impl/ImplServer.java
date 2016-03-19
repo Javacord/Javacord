@@ -30,7 +30,6 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.role.RoleCreateListener;
 import de.btobastian.javacord.listener.server.*;
@@ -195,7 +194,8 @@ public class ImplServer implements Server {
             public Exception call() throws Exception {
                 try {
                     logger.debug("Trying to leave server {}", ImplServer.this);
-                    HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/users/@me/guilds/" + id)
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/users/@me/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
@@ -581,7 +581,8 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<ServerMemberRemoveListener> listeners = api.getListeners(ServerMemberRemoveListener.class);
+                            List<ServerMemberRemoveListener> listeners =
+                                    api.getListeners(ServerMemberRemoveListener.class);
                             synchronized (listeners) {
                                 for (ServerMemberRemoveListener listener : listeners) {
                                     listener.onServerMemberRemove(api, user, ImplServer.this);

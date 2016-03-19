@@ -21,7 +21,6 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerChangeNameListener;
 import de.btobastian.javacord.listener.server.ServerChangeRegionListener;
 import de.btobastian.javacord.utils.PacketHandler;
