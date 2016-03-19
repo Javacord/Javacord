@@ -325,6 +325,13 @@ public interface DiscordAPI {
     public User getYourself();
 
     /**
+     * Gets relationships with other users
+     *
+     * @return Array of friends
+     * */
+    public Future<List<User>> getFriends(FutureCallback<DiscordAPI>);
+
+    /**
      * Updates the username.
      * If you want to update the email or password, too, use
      * {@link #updateProfile(String, String, String, BufferedImage)}.

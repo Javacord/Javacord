@@ -511,6 +511,37 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
+    public Future<List<User>> getFriends() {
+
+        Futures.addCallback(getThreadPool()).getListeningExecutorService().submit(new Callable<DiscordAPI>() {
+            @Override
+            public DiscordAPI call() {
+                List<User> friends = new ArrayList<User>();
+
+                try {
+                    HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/users/@me/relationships")
+                            .header("authorization", token)
+                            .asJson();
+
+                    JSONArray relationsArray = response.getBody().getArray();
+
+                    for(int i = 0; i < relationsArray.length()-1; i++) {
+                        JSONObject obj = relationsArray.getJSONObject(i);
+                        User u = new ImplUser(obj, ImplDiscordAPI.this);
+                        friends.add(u);
+                    }
+
+                } catch (Exception e) {
+                    //
+                }
+
+                return friends;
+            }
+        }), callback);
+
+    }
+
+    @Override
     public Future<Exception> updateUsername(String newUsername) {
         return updateProfile(newUsername, null, null, null);
     }
