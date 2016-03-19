@@ -51,7 +51,7 @@ public class ReadyReconnectHandler extends PacketHandler {
     public void handle(JSONObject packet) {
         // TODO improve this whole thing. e.g. it doesn't handle role removes etc. atm.
         long heartbeatInterval = packet.getLong("heartbeat_interval");
-        api.getSocket().startHeartbeat(heartbeatInterval);
+        api.getSocketAdapter().startHeartbeat(heartbeatInterval);
 
         JSONArray guilds = packet.getJSONArray("guilds"); // guild = server
         for (int i = 0; i < guilds.length(); i++) {

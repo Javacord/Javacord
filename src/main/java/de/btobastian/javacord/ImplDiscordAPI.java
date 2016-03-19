@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord;
 
+import com.google.common.io.BaseEncoding;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -26,6 +27,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.neovisionaries.ws.client.WebSocketFactory;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.impl.ImplApplication;
 import de.btobastian.javacord.entities.impl.ImplInvite;
@@ -42,11 +44,9 @@ import de.btobastian.javacord.exceptions.RateLimitedException;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
-import de.btobastian.javacord.utils.DiscordWebsocket;
+import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ThreadPool;
-import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
-import org.java_websocket.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private volatile int messageCacheSize = 200;
 
-    private DiscordWebsocket socket = null;
+    private DiscordWebsocketAdapter socketAdapter = null;
 
     private RateLimitedException lastRateLimitedException = null;
 
@@ -152,15 +152,13 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         String gateway = requestGatewayBlocking();
         try {
-            socket = new DiscordWebsocket(new URI(gateway), this, false);
-            socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
-            socket.connect();
-        } catch (URISyntaxException | NoSuchAlgorithmException e) {
+            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, false);
+        } catch (URISyntaxException e) {
             logger.warn("Something went wrong while connecting. Please contact the developer!", e);
             return;
         }
         try {
-            if (!socket.isReady().get()) {
+            if (!socketAdapter.isReady().get()) {
                 throw new IllegalStateException("Socket closed before ready packet was received!");
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -182,8 +180,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void setGame(String game) {
         this.game = game;
         try {
-            if (socket != null && socket.isReady().isDone() && socket.isReady().get()) {
-                socket.updateStatus();
+            if (socketAdapter != null && socketAdapter.isReady().isDone() && socketAdapter.isReady().get()) {
+                socketAdapter.updateStatus();
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -343,8 +341,8 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void setIdle(boolean idle) {
         this.idle = idle;
         try {
-            if (socket != null && socket.isReady().isDone() && socket.isReady().get()) {
-                socket.updateStatus();
+            if (socketAdapter != null && socketAdapter.isReady().isDone() && socketAdapter.isReady().get()) {
+                socketAdapter.updateStatus();
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -477,7 +475,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     }
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                     ImageIO.write(icon, "jpg", os);
-                    params.put("icon", "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray()));
+                    params.put("icon", "data:image/jpg;base64," + BaseEncoding.base64().encode(os.toByteArray()));
                 }
                 params.put("name", name);
                 params.put("region", region == null ? Region.US_WEST.getKey() : region.getKey());
@@ -540,7 +538,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             try {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 ImageIO.write(newAvatar, "jpg", os);
-                avatarString = "data:image/jpg;base64," + Base64.encodeBytes(os.toByteArray());
+                avatarString = "data:image/jpg;base64," + BaseEncoding.base64().encode(os.toByteArray());
             } catch (IOException ignored) { }
         }
         final JSONObject params = new JSONObject()
@@ -913,25 +911,21 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public void reconnectBlocking(String gateway) {
         logger.debug("Trying to reconnect to gateway {}", gateway);
-        try {
-            socket.closeBlocking();
-        } catch (InterruptedException e) {
-            logger.warn(
-                    "We were interrupted when we tried to close the current socket. Please contact the developer!", e);
-        }
+        socketAdapter.getWebSocket().disconnect();
         if (token == null || !checkTokenBlocking(token)) {
             token = requestTokenBlocking();
         }
         try {
-            socket = new DiscordWebsocket(new URI(gateway), this, true);
-            socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
-            socket.connect();
+            WebSocketFactory factory = new WebSocketFactory();
+            factory.setSSLContext(SSLContext.getDefault());
+
+            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, true);
         } catch (URISyntaxException | NoSuchAlgorithmException e) {
             logger.warn("Reconnect failed. Please contact the developer!", e);
             return;
         }
         try {
-            if (!socket.isReady().get()) {
+            if (!socketAdapter.isReady().get()) {
                 throw new IllegalStateException("Socket closed before ready packet was received!");
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -995,12 +989,12 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     /**
-     * Gets the used websocket.
+     * Gets the used socket adapter.
      *
-     * @return The websocket.
+     * @return The socket adapter.
      */
-    public DiscordWebsocket getSocket() {
-        return socket;
+    public DiscordWebsocketAdapter getSocketAdapter() {
+        return socketAdapter;
     }
 
     /**
@@ -1182,12 +1176,12 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     /**
-     * Sets the socket.
+     * Sets the socket adapter.
      *
-     * @param socket The socket to set.
+     * @param socketAdapter The socket adapter to set.
      */
-    public void setSocket(DiscordWebsocket socket) {
-        this.socket = socket;
+    public void setSocketAdapter(DiscordWebsocketAdapter socketAdapter) {
+        this.socketAdapter = socketAdapter;
     }
 
 }
