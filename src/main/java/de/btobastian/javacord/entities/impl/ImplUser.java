@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.body.MultipartBody;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Server;
@@ -257,26 +258,85 @@ public class ImplUser implements User {
 
     @Override
     public Future<Message> sendFile(final File file) {
-        return sendFile(file, null);
+        return sendFile(file, null, null);
     }
 
     @Override
     public Future<Message> sendFile(final File file, FutureCallback<Message> callback) {
+        return sendFile(file, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename) {
+        return sendFile(inputStream, filename, null, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename, FutureCallback<Message> callback) {
+        return sendFile(inputStream, filename, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(File file, String comment) {
+        return sendFile(file, comment, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(final File file, final String comment, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
-                        logger.debug("Trying to send file to user {} (name: {})", ImplUser.this, file.getName());
+                        logger.debug("Trying to send a file to user {} (name: {}, comment: {})",
+                                ImplUser.this, file.getName(), comment);
                         api.checkRateLimit();
-                        HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/"
-                                        + getUserChannelIdBlocking() + "/messages")
-                                        .header("authorization", api.getToken())
-                                        .field("file", file)
-                                        .asJson();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", file);
+                        if (comment != null) {
+                            body.field("content", comment);
+                        }
+                        HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        logger.debug("Sent file to user {} (name: {})", ImplUser.this, file.getName());
+                        logger.debug("Sent a file to user {} (name: {}, comment: {})",
+                                ImplUser.this, file.getName(), comment);
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename, String comment) {
+        return sendFile(inputStream, filename, comment, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(final InputStream inputStream, final String filename, final String comment,
+                                    FutureCallback<Message> callback) {
+        final MessageReceiver receiver = this;
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        logger.debug("Trying to send an input stream to user {} (comment: {})",
+                                ImplUser.this, comment);
+                        api.checkRateLimit();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", inputStream, filename);
+                        if (comment != null) {
+                            body.field("content", comment);
+                        }
+                        HttpResponse<JsonNode> response = body.asJson();
+                        api.checkResponse(response);
+                        logger.debug("Sent an input stream to user {} (comment: {})", ImplUser.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });

@@ -21,6 +21,7 @@ package de.btobastian.javacord.entities.message;
 import com.google.common.util.concurrent.FutureCallback;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.concurrent.Future;
 
 /**
@@ -83,6 +84,65 @@ public interface MessageReceiver {
      */
     public Future<Message> sendFile(File file, FutureCallback<Message> callback);
 
+    /**
+     * Replies with a file.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> sendFile(InputStream inputStream, String filename);
+
+    /**
+     * Replies with a file.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> sendFile(InputStream inputStream, String filename, FutureCallback<Message> callback);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param file The file to upload.
+     * @param comment An additional comment to your file.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> sendFile(File file, String comment);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param file The file to upload.
+     * @param comment An additional comment to your file.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> sendFile(File file, String comment, FutureCallback<Message> callback);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @param comment An additional comment to your file.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> sendFile(InputStream inputStream, String filename, String comment);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @param comment An additional comment to your file.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> sendFile(InputStream inputStream, String filename, String comment,
+                                    FutureCallback<Message> callback);
 
     /**
      * Gets the message history of this channel.

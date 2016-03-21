@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.body.MultipartBody;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
@@ -42,6 +43,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -293,28 +295,86 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> replyFile(final File file) {
-        return replyFile(file, null);
+        return replyFile(file, null, null);
     }
 
     @Override
     public Future<Message> replyFile(final File file, FutureCallback<Message> callback) {
+        return replyFile(file, null, callback);
+    }
+
+    @Override
+    public Future<Message> replyFile(InputStream inputStream, String filename) {
+        return replyFile(inputStream, filename, null, null);
+    }
+
+    @Override
+    public Future<Message> replyFile(InputStream inputStream, String filename, FutureCallback<Message> callback) {
+        return replyFile(inputStream, filename, null, callback);
+    }
+
+    @Override
+    public Future<Message> replyFile(File file, String comment) {
+        return replyFile(file, comment, null);
+    }
+
+    @Override
+    public Future<Message> replyFile(final File file, final String comment, FutureCallback<Message> callback) {
         final MessageReceiver receiver = findReceiver(channelId);
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
-                        logger.debug(
-                                "Trying to reply a file to message with id {} and content \"{}\" from {} (name: {})",
-                                getId(), getContent(), getAuthor(), file.getName());
+                        logger.debug("Trying to reply a file to message with id {} and content \"{}\" from {} " +
+                                "(name: {}, comment: {})", getId(), getContent(), getAuthor(), file.getName(), comment);
                         api.checkRateLimit();
-                        HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
-                                        .header("authorization", api.getToken())
-                                        .field("file", file)
-                                        .asJson();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + channelId + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", file);
+                                if (comment != null) {
+                                    body.field("content", comment);
+                                }
+                        HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        logger.debug("Replied a file to message with id {} and content \"{}\" from {} (name: {})",
-                                getId(), getContent(), getAuthor(), file.getName());
+                        logger.debug("Replied a file to message with id {} and content \"{}\" from {} " +
+                                "(name: {}, comment: {})", getId(), getContent(), getAuthor(), file.getName(), comment);
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Message> replyFile(InputStream inputStream, String filename, String comment) {
+        return replyFile(inputStream, filename, comment, null);
+    }
+
+    @Override
+    public Future<Message> replyFile(final InputStream inputStream, final String filename, final String comment,
+                                     FutureCallback<Message> callback) {
+        final MessageReceiver receiver = findReceiver(channelId);
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        logger.debug("Trying to reply an input stream to message with id {} and content \"{}\" " +
+                                "from {} (comment: {})", getId(), getContent(), getAuthor(), comment);
+                        api.checkRateLimit();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + channelId + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", inputStream, filename);
+                        if (comment != null) {
+                            body.field("content", comment);
+                        }
+                        HttpResponse<JsonNode> response = body.asJson();
+                        api.checkResponse(response);
+                        logger.debug("Replied an input stream to message with id {} and content \"{}\" from {} " +
+                                "(comment: {})", getId(), getContent(), getAuthor(), comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
