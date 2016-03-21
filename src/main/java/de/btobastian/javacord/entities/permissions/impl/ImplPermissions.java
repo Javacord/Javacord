@@ -87,6 +87,11 @@ public class ImplPermissions implements Permissions {
     }
 
     @Override
+    public String toString() {
+        return "Permissions (allowed: " + getAllowed() + ", denied: " + getDenied() + ")";
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ImplPermissions)) {
             return false;
