@@ -47,11 +47,6 @@ public interface User extends MessageReceiver {
     public String getName();
 
     /**
-     * Shows the "is typing.." status for 5 seconds.
-     */
-    public void type();
-
-    /**
      * Checks if the user is the account you logged in.
      *
      * @return Whether the user is you or not.

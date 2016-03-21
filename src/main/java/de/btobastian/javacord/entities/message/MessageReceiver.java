@@ -32,6 +32,13 @@ import java.util.concurrent.Future;
 public interface MessageReceiver {
 
     /**
+     * Gets the of of the message receiver.
+     *
+     * @return The id of the message receiver.
+     */
+    public String getId();
+
+    /**
      * Sends a message with the given content.
      *
      * @param content The content of the message.
@@ -240,5 +247,10 @@ public interface MessageReceiver {
      */
     public Future<MessageHistory> getMessageHistoryAfter(
             String afterId, int limit, FutureCallback<MessageHistory> callback);
+
+    /**
+     * Shows the "is typing.." status for 5 seconds.
+     */
+    public void type();
 
 }
