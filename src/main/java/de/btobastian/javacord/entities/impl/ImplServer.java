@@ -733,6 +733,8 @@ public class ImplServer implements Server {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug("Trying to authorize bot with application id {} and permissions {}",
+                            applicationId, permissions);
                     HttpResponse<JsonNode> response = Unirest
                             .post("https://discordapp.com/api/oauth2/authorize?client_id={id}&scope=bot")
                             .routeParam("id", applicationId)
@@ -745,6 +747,8 @@ public class ImplServer implements Server {
                                     .toString())
                             .asJson();
                     api.checkResponse(response);
+                    logger.debug("Authorized bot with application id {} and permissions {}",
+                            applicationId, permissions);
                 } catch (Exception e) {
                     return e;
                 }
