@@ -19,20 +19,16 @@
 package de.btobastian.javacord.entities.message;
 
 /**
- * All decorations available in discord.
+ * All basic decorations available in discord.
  */
 public enum MessageDecoration {
 
     ITALICS("*"),
     BOLD("**"),
-    BOLD_ITALICS("***"),
     STRIKEOUT("~~"),
     CODE_SIMPLE("`"),
     CODE_LONG("```"),
-    UNDERLINE("__"),
-    UNDERLINE_ITALICS("__*"),
-    UNDERLINE_BOLD("__**"),
-    UNDERLINE_BOLD_ITALICS("__***");
+    UNDERLINE("__");
 
     private final String prefix;
     private final String suffix;
