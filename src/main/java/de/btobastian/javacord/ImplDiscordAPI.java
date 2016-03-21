@@ -939,6 +939,7 @@ public class ImplDiscordAPI implements DiscordAPI {
      * @throws RateLimitedException If we are rate limited.
      */
     public void checkRateLimit() throws RateLimitedException {
+        // TODO remake rate limit checks
         long retryAt = lastRateLimitedException == null ? 0L : lastRateLimitedException.getRetryAfter();
         long retryAfter = retryAt - System.currentTimeMillis();
         if (retryAfter > 0) {
