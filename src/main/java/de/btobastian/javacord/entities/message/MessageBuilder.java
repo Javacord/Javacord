@@ -52,9 +52,30 @@ public class MessageBuilder {
      * @param decoration The decoration/style.
      * @param message The message.
      * @return This object to reuse it.
+     * @deprecated This method will be removed in the next release.
+     *             Use {@link #appendDecoration(String, MessageDecoration...)} instead.
      */
+    @Deprecated
     public MessageBuilder appendDecoration(MessageDecoration decoration, String message) {
-        strBuilder.append(decoration.getPrefix()).append(message).append(decoration.getSuffix());
+        appendDecoration(message, decoration);
+        return this;
+    }
+
+    /**
+     * Appends the decoration to the text.
+     *
+     * @param message The message.
+     * @param decorations The decorations/style.
+     * @return This object to reuse it.
+     */
+    public MessageBuilder appendDecoration(String message, MessageDecoration... decorations) {
+        for (MessageDecoration decoration : decorations) {
+            strBuilder.append(decoration.getPrefix());
+        }
+        strBuilder.append(message);
+        for (MessageDecoration decoration : decorations) {
+            strBuilder.append(decoration.getSuffix());
+        }
         return this;
     }
 
