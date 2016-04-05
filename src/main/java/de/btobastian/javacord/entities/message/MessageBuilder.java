@@ -137,6 +137,15 @@ public class MessageBuilder {
     }
 
     /**
+     * Gets the {@link StringBuilder} which is used to build the message.
+     *
+     * @return The StringBuilder which is used to build the message.
+     */
+    public StringBuilder getStringBuilder() {
+        return strBuilder;
+    }
+
+    /**
      * Generates the String to send.
      *
      * @return The String to send.
