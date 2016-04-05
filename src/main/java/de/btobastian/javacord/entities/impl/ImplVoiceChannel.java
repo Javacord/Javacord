@@ -127,7 +127,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                 logger.debug("Trying to delete voice channel {}", ImplVoiceChannel.this);
                 try {
                     HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/channels/:id" + id)
+                            .delete("https://discordapp.com/api/channels/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);

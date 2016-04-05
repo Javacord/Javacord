@@ -150,7 +150,7 @@ public class ImplChannel implements Channel {
                 try {
                     logger.debug("Trying to delete channel {}", ImplChannel.this);
                     HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/channels/:id" + id)
+                            .delete("https://discordapp.com/api/channels/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
