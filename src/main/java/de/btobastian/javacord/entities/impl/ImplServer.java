@@ -26,9 +26,10 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.role.RoleCreateListener;
 import de.btobastian.javacord.listener.server.*;
@@ -46,7 +47,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -127,14 +127,8 @@ public class ImplServer implements Server {
         }
         for (int i = 0; i < presences.length(); i++) {
             JSONObject presence = presences.getJSONObject(i);
-            User user;
-            try {
-                user = api.getUserById(presence.getJSONObject("user").getString("id")).get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                continue;
-            }
-            if (presence.has("game") && !presence.isNull("game")) {
+            User user = api.getCachedUserById(presence.getJSONObject("user").getString("id"));
+            if (user != null && presence.has("game") && !presence.isNull("game")) {
                 if (presence.getJSONObject("game").has("name") && !presence.getJSONObject("game").isNull("name")) {
                     ((ImplUser) user).setGame(presence.getJSONObject("game").getString("name"));
                 }
@@ -170,10 +164,10 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                for (ServerLeaveListener listener : listeners) {
+                                    listener.onServerLeave(api, ImplServer.this);
                                 }
                             }
                         }
@@ -193,7 +187,8 @@ public class ImplServer implements Server {
             public Exception call() throws Exception {
                 try {
                     logger.debug("Trying to leave server {}", ImplServer.this);
-                    HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/users/@me/guilds/" + id)
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/users/@me/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
@@ -202,10 +197,10 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                            List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerLeaveListener) listener).onServerLeave(api, ImplServer.this);
+                                for (ServerLeaveListener listener : listeners) {
+                                    listener.onServerLeave(api, ImplServer.this);
                                 }
                             }
                         }
@@ -285,10 +280,10 @@ public class ImplServer implements Server {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                                List<ChannelCreateListener> listeners = api.getListeners(ChannelCreateListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                                    for (ChannelCreateListener listener : listeners) {
+                                        listener.onChannelCreate(api, channel);
                                     }
                                 }
                             }
@@ -319,10 +314,11 @@ public class ImplServer implements Server {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(VoiceChannelCreateListener.class);
+                                List<VoiceChannelCreateListener> listeners =
+                                        api.getListeners(VoiceChannelCreateListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((VoiceChannelCreateListener) listener).onVoiceChannelCreate(api, channel);
+                                    for (VoiceChannelCreateListener listener : listeners) {
+                                        listener.onVoiceChannelCreate(api, channel);
                                     }
                                 }
                             }
@@ -398,10 +394,11 @@ public class ImplServer implements Server {
                             api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                                 @Override
                                 public void run() {
-                                    List<Listener> listeners =  api.getListeners(UserRoleRemoveListener.class);
+                                    List<UserRoleRemoveListener> listeners =
+                                            api.getListeners(UserRoleRemoveListener.class);
                                     synchronized (listeners) {
-                                        for (Listener listener : listeners) {
-                                            ((UserRoleRemoveListener) listener).onUserRoleRemove(api, user, role);
+                                        for (UserRoleRemoveListener listener : listeners) {
+                                            listener.onUserRoleRemove(api, user, role);
                                         }
                                     }
                                 }
@@ -414,10 +411,10 @@ public class ImplServer implements Server {
                             api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                                 @Override
                                 public void run() {
-                                    List<Listener> listeners =  api.getListeners(UserRoleAddListener.class);
+                                    List<UserRoleAddListener> listeners = api.getListeners(UserRoleAddListener.class);
                                     synchronized (listeners) {
-                                        for (Listener listener : listeners) {
-                                            ((UserRoleAddListener) listener).onUserRoleAdd(api, user, role);
+                                        for (UserRoleAddListener listener : listeners) {
+                                            listener.onUserRoleAdd(api, user, role);
                                         }
                                     }
                                 }
@@ -471,10 +468,10 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerMemberBanListener.class);
+                            List<ServerMemberBanListener> listeners = api.getListeners(ServerMemberBanListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerMemberBanListener) listener).onServerMemberBan(api, user, ImplServer.this);
+                                for (ServerMemberBanListener listener : listeners) {
+                                    listener.onServerMemberBan(api, user, ImplServer.this);
                                 }
                             }
                         }
@@ -503,11 +500,11 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerMemberUnbanListener.class);
+                            List<ServerMemberUnbanListener> listeners =
+                                    api.getListeners(ServerMemberUnbanListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerMemberUnbanListener) listener)
-                                            .onServerMemberUnban(api, userId, ImplServer.this);
+                                for (ServerMemberUnbanListener listener : listeners) {
+                                    listener.onServerMemberUnban(api, userId, ImplServer.this);
                                 }
                             }
                         }
@@ -577,11 +574,11 @@ public class ImplServer implements Server {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                            List<ServerMemberRemoveListener> listeners =
+                                    api.getListeners(ServerMemberRemoveListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ServerMemberRemoveListener) listener)
-                                            .onServerMemberRemove(api, user, ImplServer.this);
+                                for (ServerMemberRemoveListener listener : listeners) {
+                                    listener.onServerMemberRemove(api, user, ImplServer.this);
                                 }
                             }
                         }
@@ -616,10 +613,10 @@ public class ImplServer implements Server {
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                     @Override
                     public void run() {
-                        List<Listener> listeners =  api.getListeners(RoleCreateListener.class);
+                        List<RoleCreateListener> listeners = api.getListeners(RoleCreateListener.class);
                         synchronized (listeners) {
-                            for (Listener listener : listeners) {
-                                ((RoleCreateListener) listener).onRoleCreate(api, role);
+                            for (RoleCreateListener listener : listeners) {
+                                listener.onRoleCreate(api, role);
                             }
                         }
                     }
@@ -685,11 +682,11 @@ public class ImplServer implements Server {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ServerChangeNameListener.class);
+                                List<ServerChangeNameListener> listeners =
+                                        api.getListeners(ServerChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ServerChangeNameListener) listener)
-                                                .onServerChangeName(api, ImplServer.this, oldName);
+                                    for (ServerChangeNameListener listener : listeners) {
+                                        listener.onServerChangeName(api, ImplServer.this, oldName);
                                     }
                                 }
                             }
@@ -716,6 +713,41 @@ public class ImplServer implements Server {
     @Override
     public boolean isLarge() {
         return large;
+    }
+
+    @Override
+    public Future<Exception> authorizeBot(String applicationId) {
+        return authorizeBot(applicationId, null);
+    }
+
+    @Override
+    public Future<Exception> authorizeBot(final String applicationId, final Permissions permissions) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    logger.debug("Trying to authorize bot with application id {} and permissions {}",
+                            applicationId, permissions);
+                    HttpResponse<JsonNode> response = Unirest
+                            .post("https://discordapp.com/api/oauth2/authorize?client_id={id}&scope=bot")
+                            .routeParam("id", applicationId)
+                            .header("authorization", api.getToken())
+                            .header("Content-Type", "application/json")
+                            .body(new JSONObject()
+                                    .put("guild_id", getId())
+                                    .put("permissions", ((ImplPermissions) permissions).getAllowed())
+                                    .put("authorize", true)
+                                    .toString())
+                            .asJson();
+                    api.checkResponse(response);
+                    logger.debug("Authorized bot with application id {} and permissions {}",
+                            applicationId, permissions);
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**

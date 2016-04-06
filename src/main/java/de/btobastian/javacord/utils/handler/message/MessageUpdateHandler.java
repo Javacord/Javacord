@@ -21,7 +21,6 @@ package de.btobastian.javacord.utils.handler.message;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -57,10 +56,10 @@ public class MessageUpdateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(MessageEditListener.class);
+                List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((MessageEditListener) listener).onMessageEdit(api, message, oldContent);
+                    for (MessageEditListener listener : listeners) {
+                        listener.onMessageEdit(api, message, oldContent);
                     }
                 }
             }

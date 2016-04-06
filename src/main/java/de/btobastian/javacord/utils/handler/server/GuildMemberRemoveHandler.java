@@ -22,7 +22,6 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -53,10 +52,10 @@ public class GuildMemberRemoveHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberRemoveListener.class);
+                    List<ServerMemberRemoveListener> listeners = api.getListeners(ServerMemberRemoveListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberRemoveListener) listener).onServerMemberRemove(api, user, server);
+                        for (ServerMemberRemoveListener listener : listeners) {
+                            listener.onServerMemberRemove(api, user, server);
                         }
                     }
                 }

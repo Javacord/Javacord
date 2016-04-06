@@ -19,8 +19,6 @@
 package de.btobastian.javacord.entities.message.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -33,8 +31,8 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
+import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +40,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -223,10 +222,10 @@ public class ImplMessage implements Message {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(MessageDeleteListener.class);
+                            List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((MessageDeleteListener) listener).onMessageDelete(api, message);
+                                for (MessageDeleteListener listener : listeners) {
+                                    listener.onMessageDelete(api, message);
                                 }
                             }
                         }
@@ -261,67 +260,48 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> reply(final String content, final boolean tts, FutureCallback<Message> callback) {
-        final MessageReceiver receiver = findReceiver(channelId);
-        ListenableFuture<Message> future =
-                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
-                    @Override
-                    public Message call() throws Exception {
-                        logger.debug("Trying to reply to message with id {} and content \"{}\" from {}" +
-                                " (content: \"{}\", tts: {})", getId(), getContent(), getAuthor(), content, tts);
-                        api.checkRateLimit();
-                        HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
-                                        .header("authorization", api.getToken())
-                                        .header("content-type", "application/json")
-                                        .body(new JSONObject()
-                                                .put("content", content)
-                                                .put("tts", tts)
-                                                .put("mentions", new String[0]).toString())
-                                        .asJson();
-                        api.checkResponse(response);
-                        logger.debug(
-                                "Replied to message with id {} and content \"{}\" from {} (content: \"{}\", tts: {})",
-                                getId(), getContent(), getAuthor(), content, tts);
-                        return new ImplMessage(response.getBody().getObject(), api, receiver);
-                    }
-                });
-        if (callback != null) {
-            Futures.addCallback(future, callback);
-        }
-        return future;
+        return receiver.sendMessage(content, tts, callback);
     }
 
     @Override
     public Future<Message> replyFile(final File file) {
-        return replyFile(file, null);
+        return replyFile(file, null, null);
     }
 
     @Override
     public Future<Message> replyFile(final File file, FutureCallback<Message> callback) {
-        final MessageReceiver receiver = findReceiver(channelId);
-        ListenableFuture<Message> future =
-                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
-                    @Override
-                    public Message call() throws Exception {
-                        logger.debug(
-                                "Trying to reply a file to message with id {} and content \"{}\" from {} (name: {})",
-                                getId(), getContent(), getAuthor(), file.getName());
-                        api.checkRateLimit();
-                        HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
-                                        .header("authorization", api.getToken())
-                                        .field("file", file)
-                                        .asJson();
-                        api.checkResponse(response);
-                        logger.debug("Replied a file to message with id {} and content \"{}\" from {} (name: {})",
-                                getId(), getContent(), getAuthor(), file.getName());
-                        return new ImplMessage(response.getBody().getObject(), api, receiver);
-                    }
-                });
-        if (callback != null) {
-            Futures.addCallback(future, callback);
-        }
-        return future;
+        return replyFile(file, null, callback);
+    }
+
+    @Override
+    public Future<Message> replyFile(InputStream inputStream, String filename) {
+        return replyFile(inputStream, filename, null, null);
+    }
+
+    @Override
+    public Future<Message> replyFile(InputStream inputStream, String filename, FutureCallback<Message> callback) {
+        return replyFile(inputStream, filename, null, callback);
+    }
+
+    @Override
+    public Future<Message> replyFile(File file, String comment) {
+        return replyFile(file, comment, null);
+    }
+
+    @Override
+    public Future<Message> replyFile(final File file, final String comment, FutureCallback<Message> callback) {
+        return receiver.sendFile(file, comment, callback);
+    }
+
+    @Override
+    public Future<Message> replyFile(InputStream inputStream, String filename, String comment) {
+        return replyFile(inputStream, filename, comment, null);
+    }
+
+    @Override
+    public Future<Message> replyFile(final InputStream inputStream, final String filename, final String comment,
+                                     FutureCallback<Message> callback) {
+        return receiver.sendFile(inputStream, filename, comment, callback);
     }
 
     @Override
@@ -334,6 +314,42 @@ public class ImplMessage implements Message {
     @Override
     public int compareTo(Message other) {
         return this.creationDate.compareTo(other.getCreationDate());
+    }
+
+    @Override
+    public Future<Exception> edit(final String content) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    HttpResponse<JsonNode> response = Unirest
+                            .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                            .header("authorization", api.getToken())
+                            .header("content-type", "application/json")
+                            .body(new JSONObject().put("content", content).toString())
+                            .asJson();
+                    api.checkResponse(response);
+                    final String oldContent = getContent();
+                    setContent(content);
+                    if (!oldContent.equals(content)) {
+                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
+                                synchronized (listeners) {
+                                    for (MessageEditListener listener : listeners) {
+                                        listener.onMessageEdit(api, ImplMessage.this, oldContent);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
     }
 
     /**

@@ -22,7 +22,6 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.RoleDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -60,10 +59,10 @@ public class GuildRoleDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                List<RoleDeleteListener> listeners = api.getListeners(RoleDeleteListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((RoleDeleteListener) listener).onRoleDelete(api, role);
+                    for (RoleDeleteListener listener : listeners) {
+                        listener.onRoleDelete(api, role);
                     }
                 }
             }

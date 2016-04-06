@@ -43,7 +43,7 @@ public class ReadyHandler extends PacketHandler {
     @Override
     public void handle(JSONObject packet) {
         long heartbeatInterval = packet.getLong("heartbeat_interval");
-        api.getSocket().startHeartbeat(heartbeatInterval);
+        api.getSocketAdapter().startHeartbeat(heartbeatInterval);
 
         JSONArray guilds = packet.getJSONArray("guilds"); // guild = server
         for (int i = 0; i < guilds.length(); i++) {

@@ -21,7 +21,6 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerChangeNameListener;
 import de.btobastian.javacord.listener.server.ServerChangeRegionListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -57,10 +56,10 @@ public class GuildUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerChangeNameListener.class);
+                    List<ServerChangeNameListener> listeners = api.getListeners(ServerChangeNameListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerChangeNameListener) listener).onServerChangeName(api, server, oldName);
+                        for (ServerChangeNameListener listener : listeners) {
+                            listener.onServerChangeName(api, server, oldName);
                         }
                     }
                 }
@@ -74,10 +73,10 @@ public class GuildUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerChangeRegionListener.class);
+                    List<ServerChangeRegionListener> listeners = api.getListeners(ServerChangeRegionListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerChangeRegionListener) listener).onServerChangeRegion(api, server, oldRegion);
+                        for (ServerChangeRegionListener listener : listeners) {
+                            listener.onServerChangeRegion(api, server, oldRegion);
                         }
                     }
                 }

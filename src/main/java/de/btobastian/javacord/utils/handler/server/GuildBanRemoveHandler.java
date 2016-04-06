@@ -22,7 +22,6 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerMemberUnbanListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -52,10 +51,10 @@ public class GuildBanRemoveHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberUnbanListener.class);
+                    List<ServerMemberUnbanListener> listeners = api.getListeners(ServerMemberUnbanListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberUnbanListener) listener).onServerMemberUnban(api, user.getId(), server);
+                        for (ServerMemberUnbanListener listener : listeners) {
+                            listener.onServerMemberUnban(api, user.getId(), server);
                         }
                     }
                 }

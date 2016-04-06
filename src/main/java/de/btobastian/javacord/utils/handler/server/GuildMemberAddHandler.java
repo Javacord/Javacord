@@ -22,7 +22,6 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerMemberAddListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -53,10 +52,10 @@ public class GuildMemberAddHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberAddListener.class);
+                    List<ServerMemberAddListener> listeners = api.getListeners(ServerMemberAddListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberAddListener) listener).onServerMemberAdd(api, user, server);
+                        for (ServerMemberAddListener listener : listeners) {
+                            listener.onServerMemberAdd(api, user, server);
                         }
                     }
                 }

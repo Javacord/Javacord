@@ -29,15 +29,20 @@ public class Javacord {
     /**
      * The current javacord version.
      */
-    public static final String VERSION = "2.0.9";
+    public static final String VERSION = "2.0.10";
 
     /**
      * The github url of javacord.
      */
     public static final String GITHUB_URL = "https://github.com/BtoBastian/Javacord";
 
+    /**
+     * The user agent used for requests.
+     */
+    public static final String USER_AGENT = "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")";
+
     static {
-        Unirest.setDefaultHeader("User-Agent", "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")");
+        Unirest.setDefaultHeader("User-Agent", USER_AGENT);
     }
 
     private Javacord() { }

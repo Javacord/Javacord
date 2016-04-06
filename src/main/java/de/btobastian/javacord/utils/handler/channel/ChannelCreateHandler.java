@@ -21,11 +21,12 @@ package de.btobastian.javacord.utils.handler.channel;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.impl.ImplVoiceChannel;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -51,7 +52,9 @@ public class ChannelCreateHandler extends PacketHandler {
     public void handle(JSONObject packet) {
         boolean isPrivate = packet.getBoolean("is_private");
         if (isPrivate) {
-            return; // TODO ignored atm
+            User recipient = api.getOrCreateUser(packet.getJSONObject("recipient"));
+            ((ImplUser) recipient).setUserChannelId(packet.getString("id"));
+            return;
         }
         Server server = api.getServerById(packet.getString("guild_id"));
         if (packet.getString("type").equals("text")) {
@@ -75,10 +78,10 @@ public class ChannelCreateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(ChannelCreateListener.class);
+                List<ChannelCreateListener> listeners = api.getListeners(ChannelCreateListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((ChannelCreateListener) listener).onChannelCreate(api, channel);
+                    for (ChannelCreateListener listener : listeners) {
+                        listener.onChannelCreate(api, channel);
                     }
                 }
             }
@@ -99,10 +102,10 @@ public class ChannelCreateHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(VoiceChannelCreateListener.class);
+                List<VoiceChannelCreateListener> listeners = api.getListeners(VoiceChannelCreateListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((VoiceChannelCreateListener) listener).onVoiceChannelCreate(api, channel);
+                    for (VoiceChannelCreateListener listener : listeners) {
+                        listener.onVoiceChannelCreate(api, channel);
                     }
                 }
             }

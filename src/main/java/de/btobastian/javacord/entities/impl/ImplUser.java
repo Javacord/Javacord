@@ -24,7 +24,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.body.MultipartBody;
 import de.btobastian.javacord.ImplDiscordAPI;
+import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
@@ -133,32 +135,32 @@ public class ImplUser implements User {
     public Future<byte[]> getAvatarAsByteArray(FutureCallback<byte[]> callback) {
         ListenableFuture<byte[]> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<byte[]>() {
-            @Override
-            public byte[] call() throws Exception {
-                logger.debug("Trying to get avatar from user {}", ImplUser.this);
-                if (avatarId == null) {
-                    logger.debug("User {} seems to have no avatar. Returning empty array!", ImplUser.this);
-                    return new byte[0];
-                }
-                URL url = new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
-                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                conn.setRequestProperty("User-Agent", "Javacord");
-                InputStream in = new BufferedInputStream(conn.getInputStream());
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                byte[] buf = new byte[1024];
-                int n;
-                while (-1 != (n = in.read(buf))) {
-                    out.write(buf, 0, n);
-                }
-                out.close();
-                in.close();
-                byte[] avatar = out.toByteArray();
-                logger.debug("Got avatar from user {} (size: {})", ImplUser.this, avatar.length);
-                return avatar;
-            }
-        });
+                    @Override
+                    public byte[] call() throws Exception {
+                        logger.debug("Trying to get avatar from user {}", ImplUser.this);
+                        if (avatarId == null) {
+                            logger.debug("User {} seems to have no avatar. Returning empty array!", ImplUser.this);
+                            return new byte[0];
+                        }
+                        URL url = new URL("https://discordapp.com/api/users/" + id + "/avatars/" + avatarId + ".jpg");
+                        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                        conn.setRequestMethod("GET");
+                        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                        conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
+                        InputStream in = new BufferedInputStream(conn.getInputStream());
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        byte[] buf = new byte[1024];
+                        int n;
+                        while (-1 != (n = in.read(buf))) {
+                            out.write(buf, 0, n);
+                        }
+                        out.close();
+                        in.close();
+                        byte[] avatar = out.toByteArray();
+                        logger.debug("Got avatar from user {} (size: {})", ImplUser.this, avatar.length);
+                        return avatar;
+                    }
+                });
         if (callback != null) {
             Futures.addCallback(future, callback);
         }
@@ -174,16 +176,16 @@ public class ImplUser implements User {
     public Future<BufferedImage> getAvatar(FutureCallback<BufferedImage> callback) {
         ListenableFuture<BufferedImage> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<BufferedImage>() {
-            @Override
-            public BufferedImage call() throws Exception {
-                byte[] imageAsBytes = getAvatarAsByteArray().get();
-                if (imageAsBytes.length == 0) {
-                    return null;
-                }
-                InputStream in = new ByteArrayInputStream(imageAsBytes);
-                return ImageIO.read(in);
-            }
-        });
+                    @Override
+                    public BufferedImage call() throws Exception {
+                        byte[] imageAsBytes = getAvatarAsByteArray().get();
+                        if (imageAsBytes.length == 0) {
+                            return null;
+                        }
+                        InputStream in = new ByteArrayInputStream(imageAsBytes);
+                        return ImageIO.read(in);
+                    }
+                });
         if (callback != null) {
             Futures.addCallback(future, callback);
         }
@@ -256,26 +258,85 @@ public class ImplUser implements User {
 
     @Override
     public Future<Message> sendFile(final File file) {
-        return sendFile(file, null);
+        return sendFile(file, null, null);
     }
 
     @Override
     public Future<Message> sendFile(final File file, FutureCallback<Message> callback) {
+        return sendFile(file, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename) {
+        return sendFile(inputStream, filename, null, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename, FutureCallback<Message> callback) {
+        return sendFile(inputStream, filename, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(File file, String comment) {
+        return sendFile(file, comment, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(final File file, final String comment, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
-                        logger.debug("Trying to send file to user {} (name: {})", ImplUser.this, file.getName());
+                        logger.debug("Trying to send a file to user {} (name: {}, comment: {})",
+                                ImplUser.this, file.getName(), comment);
                         api.checkRateLimit();
-                        HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/"
-                                        + getUserChannelIdBlocking() + "/messages")
-                                        .header("authorization", api.getToken())
-                                        .field("file", file)
-                                        .asJson();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", file);
+                        if (comment != null) {
+                            body.field("content", comment);
+                        }
+                        HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        logger.debug("Sent file to user {} (name: {})", ImplUser.this, file.getName());
+                        logger.debug("Sent a file to user {} (name: {}, comment: {})",
+                                ImplUser.this, file.getName(), comment);
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename, String comment) {
+        return sendFile(inputStream, filename, comment, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(final InputStream inputStream, final String filename, final String comment,
+                                    FutureCallback<Message> callback) {
+        final MessageReceiver receiver = this;
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        logger.debug("Trying to send an input stream to user {} (comment: {})",
+                                ImplUser.this, comment);
+                        api.checkRateLimit();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", inputStream, filename);
+                        if (comment != null) {
+                            body.field("content", comment);
+                        }
+                        HttpResponse<JsonNode> response = body.asJson();
+                        api.checkResponse(response);
+                        logger.debug("Sent an input stream to user {} (comment: {})", ImplUser.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -423,7 +484,8 @@ public class ImplUser implements User {
                 return userChannelId;
             }
             logger.debug("Trying to get channel id of user {}", ImplUser.this);
-            HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/users/" + api.getYourself().getId() + "/channels")
+            HttpResponse<JsonNode> response = Unirest
+                    .post("https://discordapp.com/api/users/" + api.getYourself().getId() + "/channels")
                     .header("authorization", api.getToken())
                     .header("Content-Type", "application/json")
                     .body(new JSONObject().put("recipient_id", id).toString())

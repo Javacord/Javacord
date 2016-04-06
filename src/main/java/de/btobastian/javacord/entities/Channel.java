@@ -73,11 +73,6 @@ public interface Channel extends MessageReceiver {
     public Future<Exception> delete();
 
     /**
-     * Shows the "is typing.." status for 5 seconds.
-     */
-    public void type();
-
-    /**
      * Gets an invite builder.
      * An invite builder is used to easily create invites.
      *

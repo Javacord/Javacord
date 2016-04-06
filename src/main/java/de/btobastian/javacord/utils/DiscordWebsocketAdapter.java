@@ -19,6 +19,7 @@
 package de.btobastian.javacord.utils;
 
 import com.google.common.util.concurrent.SettableFuture;
+import com.neovisionaries.ws.client.*;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.ReadyReconnectHandler;
@@ -32,30 +33,33 @@ import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.UserGuildSettingsUpdateHandler;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 /**
- * The websocket which is used to connect to discord.
+ * The main websocket adapter.
  */
-public class DiscordWebsocket extends WebSocketClient {
+public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(DiscordWebsocket.class);
+    private static final Logger logger = LoggerUtil.getLogger(DiscordWebsocketAdapter.class);
+
+    private WebSocket socket = null;
 
     private final SettableFuture<Boolean> ready;
     private final ImplDiscordAPI api;
@@ -73,26 +77,58 @@ public class DiscordWebsocket extends WebSocketClient {
      * @param api The api.
      * @param reconnect Whether it's a reconnect or not.
      */
-    public DiscordWebsocket(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
-        super(serverURI);
+    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
         this.api = api;
         this.ready = SettableFuture.create();
         registerHandlers();
         this.isReconnect = reconnect;
+
+        WebSocketFactory factory = new WebSocketFactory();
+        try {
+            factory.setSSLContext(SSLContext.getDefault());
+        } catch (NoSuchAlgorithmException e) {
+            logger.warn("An error occurred while setting ssl context", e);
+        }
+        try {
+            socket = factory.createSocket(serverURI);
+            socket.addListener(this);
+            socket.connect();
+        } catch (IOException | WebSocketException e) {
+            logger.warn("An error occurred while connecting to websocket", e);
+        }
     }
 
     @Override
-    public void onClose(int code, String reason, boolean remote) {
-        // I don't know why, but sometimes we get an error with close code 1006 (connection closed abnormally (locally))
-        // The really strange thing is: Everything works fine after this error. The socket sometimes is still connected
-        // TODO find the reason for this behaviour
-        logger.info("Websocket closed with reason {} and code {}", reason, code);
+    public void onConnected(WebSocket socket, Map<String, List<String>> headers) throws Exception {
+        JSONObject connectPacket = new JSONObject()
+                .put("op", 2)
+                .put("d", new JSONObject()
+                        .put("token", api.getToken())
+                        .put("v", 3)
+                        .put("properties", new JSONObject()
+                                .put("$os", System.getProperty("os.name"))
+                                .put("$browser", "None")
+                                .put("$device", "")
+                                .put("$referrer", "https://discordapp.com/@me")
+                                .put("$referring_domain", "discordapp.com"))
+                        .put("large_threshold", 250)
+                        .put("compress", true));
+        logger.debug("Sending connect packet");
+        socket.sendText(connectPacket.toString());
+    }
+
+    @Override
+    public void onDisconnected(WebSocket socket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
+                               boolean closedByServer) throws Exception {
+        logger.info("Websocket closed with reason {} and code {}",
+                serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
+                serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown");
         isClosed = true;
-        if (remote && urlForReconnect != null) {
+        if (closedByServer && urlForReconnect != null) {
             logger.info("Trying to reconnect (we received op 7 before)...");
             api.reconnectBlocking(urlForReconnect);
             logger.info("Reconnected!");
-        } else if (remote && api.isAutoReconnectEnabled()) {
+        } else if (closedByServer && api.isAutoReconnectEnabled()) {
             logger.info("Trying to auto-reconnect...");
             api.reconnectBlocking();
             logger.info("Reconnected!");
@@ -103,13 +139,34 @@ public class DiscordWebsocket extends WebSocketClient {
     }
 
     @Override
-    public void onError(Exception e) {
-        e.printStackTrace();
+    public void onConnectError(WebSocket socket, WebSocketException exception) throws Exception {
+        logger.warn("Could not connect to websocket!", exception);
     }
 
     @Override
-    public void onMessage(String message) {
-        JSONObject obj = new JSONObject(message);
+    public void onError(WebSocket socket, WebSocketException cause) throws Exception {
+        logger.warn("Websocket error!", cause);
+    }
+
+    @Override
+    public void onMessageError(WebSocket socket, WebSocketException cause, List<WebSocketFrame> frames)
+            throws Exception {
+        logger.warn("Websocket message error!", cause);
+    }
+
+    @Override
+    public void onSendError(WebSocket socket, WebSocketException cause, WebSocketFrame frame) throws Exception {
+        logger.warn("Websocket error!", cause);
+    }
+
+    @Override
+    public void onSendingHandshake(WebSocket socket, String requestLine, List<String[]> headers) throws Exception {
+        Thread.currentThread().setName("Websocket");
+    }
+
+    @Override
+    public void onTextMessage(WebSocket socket, String text) throws Exception {
+        JSONObject obj = new JSONObject(text);
 
         int op = obj.getInt("op");
         if (op == 7) {
@@ -142,31 +199,10 @@ public class DiscordWebsocket extends WebSocketClient {
     }
 
     @Override
-    public void onOpen(ServerHandshake handshake) {
-        Thread.currentThread().setName("Websocket");
-        JSONObject connectPacket = new JSONObject()
-                .put("op", 2)
-                .put("d", new JSONObject()
-                    .put("token", api.getToken())
-                    .put("v", 3)
-                    .put("properties", new JSONObject()
-                        .put("$os", System.getProperty("os.name"))
-                        .put("$browser", "None")
-                        .put("$device", "")
-                        .put("$referrer", "https://discordapp.com/@me")
-                        .put("$referring_domain", "discordapp.com"))
-                    .put("large_threshold", 250)
-                    .put("compress", true));
-        logger.debug("Sending connect packet");
-        send(connectPacket.toString());
-    }
-
-    @Override
-    public void onMessage(ByteBuffer bytes) {
-        byte[] compressedData = bytes.array();
+    public void onBinaryMessage(WebSocket socket, byte[] binary) throws Exception {
         Inflater decompressor = new Inflater();
-        decompressor.setInput(compressedData);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
+        decompressor.setInput(binary);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(binary.length);
         byte[] buf = new byte[1024];
         while (!decompressor.finished()) {
             int count;
@@ -184,22 +220,19 @@ public class DiscordWebsocket extends WebSocketClient {
         } catch (IOException ignored) { }
         byte[] decompressedData = bos.toByteArray();
         try {
-            onMessage(new String(decompressedData, "UTF-8"));
+            onTextMessage(socket, new String(decompressedData, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             logger.warn("An error occurred while decompressing data", e);
         }
     }
 
-    @Override
-    public void close() {
-        isClosed = true;
-        super.close();
-    }
-
-    @Override
-    public void closeBlocking() throws InterruptedException {
-        isClosed = true;
-        super.closeBlocking();
+    /**
+     * Gets the websocket of the adapter.
+     *
+     * @return The websocket of the adapter.
+     */
+    public WebSocket getWebSocket() {
+        return socket;
     }
 
     /**
@@ -226,7 +259,7 @@ public class DiscordWebsocket extends WebSocketClient {
                         JSONObject heartbeat = new JSONObject()
                                 .put("op", 1)
                                 .put("d", System.currentTimeMillis());
-                        send(heartbeat.toString());
+                        socket.sendText(heartbeat.toString());
                         timer = System.currentTimeMillis();
                         logger.debug("Sending heartbeat (interval: {})", heartbeatInterval);
                         if (Math.random() < 0.1) {
@@ -247,7 +280,7 @@ public class DiscordWebsocket extends WebSocketClient {
     }
 
     /**
-     * Sens the update status packet
+     * Sends the update status packet
      */
     public void updateStatus() {
         logger.debug(
@@ -258,7 +291,7 @@ public class DiscordWebsocket extends WebSocketClient {
                         .put("game", new JSONObject()
                                 .put("name", api.getGame() == null ? JSONObject.NULL : api.getGame()))
                         .put("idle_since", api.isIdle() ? 1 : JSONObject.NULL));
-        send(updateStatus.toString());
+        socket.sendText(updateStatus.toString());
     }
 
     /**

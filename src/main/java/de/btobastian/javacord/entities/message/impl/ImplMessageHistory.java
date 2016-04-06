@@ -83,7 +83,8 @@ public class ImplMessageHistory implements MessageHistory {
                 receivedMessages = request(api, channelId, messageId, before, 100);
             } else {
                 // now use the oldest/newest message
-                receivedMessages = request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, 100);
+                receivedMessages =
+                        request(api, channelId, before ? oldestMessage.getId() : newestMessage.getId(), before, 100);
             }
             if (receivedMessages == 0) {
                 return; // stop requesting

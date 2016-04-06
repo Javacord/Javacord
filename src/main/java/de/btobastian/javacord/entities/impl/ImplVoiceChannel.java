@@ -30,7 +30,6 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -128,7 +127,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                 logger.debug("Trying to delete voice channel {}", ImplVoiceChannel.this);
                 try {
                     HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/channels/:id" + id)
+                            .delete("https://discordapp.com/api/channels/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
@@ -138,11 +137,11 @@ public class ImplVoiceChannel implements VoiceChannel {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(VoiceChannelDeleteListener.class);
+                            List<VoiceChannelDeleteListener> listeners =
+                                    api.getListeners(VoiceChannelDeleteListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((VoiceChannelDeleteListener) listener)
-                                            .onVoiceChannelDelete(api, ImplVoiceChannel.this);
+                                for (VoiceChannelDeleteListener listener : listeners) {
+                                    listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
                                 }
                             }
                         }
@@ -198,11 +197,11 @@ public class ImplVoiceChannel implements VoiceChannel {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(VoiceChannelChangeNameListener.class);
+                                List<VoiceChannelChangeNameListener> listeners =
+                                        api.getListeners(VoiceChannelChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((VoiceChannelChangeNameListener) listener)
-                                                .onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
+                                    for (VoiceChannelChangeNameListener listener : listeners) {
+                                        listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
                                     }
                                 }
                             }

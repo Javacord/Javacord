@@ -21,7 +21,6 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerMemberBanListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -50,10 +49,10 @@ public class GuildBanAddHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(ServerMemberBanListener.class);
+                    List<ServerMemberBanListener> listeners = api.getListeners(ServerMemberBanListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((ServerMemberBanListener) listener).onServerMemberBan(api, user, server);
+                        for (ServerMemberBanListener listener : listeners) {
+                            listener.onServerMemberBan(api, user, server);
                         }
                     }
                 }

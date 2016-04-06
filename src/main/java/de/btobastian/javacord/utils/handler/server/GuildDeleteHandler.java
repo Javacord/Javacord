@@ -20,7 +20,6 @@ package de.btobastian.javacord.utils.handler.server;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -51,10 +50,10 @@ public class GuildDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(ServerLeaveListener.class);
+                List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((ServerLeaveListener) listener).onServerLeave(api, server);
+                    for (ServerLeaveListener listener : listeners) {
+                        listener.onServerLeave(api, server);
                     }
                 }
             }

@@ -23,7 +23,6 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -72,10 +71,10 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(UserRoleRemoveListener.class);
+                            List<UserRoleRemoveListener> listeners = api.getListeners(UserRoleRemoveListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((UserRoleRemoveListener) listener).onUserRoleRemove(api, user, role);
+                                for (UserRoleRemoveListener listener : listeners) {
+                                    listener.onUserRoleRemove(api, user, role);
                                 }
                             }
                         }
@@ -90,10 +89,10 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(UserRoleAddListener.class);
+                            List<UserRoleAddListener> listeners = api.getListeners(UserRoleAddListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((UserRoleAddListener) listener).onUserRoleAdd(api, user, role);
+                                for (UserRoleAddListener listener : listeners) {
+                                    listener.onUserRoleAdd(api, user, role);
                                 }
                             }
                         }

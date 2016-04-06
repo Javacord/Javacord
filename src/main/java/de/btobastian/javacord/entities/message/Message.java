@@ -23,6 +23,7 @@ import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
@@ -118,7 +119,7 @@ public interface Message extends Comparable<Message> {
      * Replies to the message with the given content.
      *
      * @param content The content of the message.
-     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     * @return The sent message.
      */
     public Future<Message> reply(String content);
 
@@ -127,7 +128,7 @@ public interface Message extends Comparable<Message> {
      *
      * @param content The content of the message.
      * @param tts Whether the message should be tts or not.
-     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     * @return The sent message.
      */
     public Future<Message> reply(String content, boolean tts);
 
@@ -136,7 +137,7 @@ public interface Message extends Comparable<Message> {
      *
      * @param content The content of the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
-     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     * @return The sent message.
      */
     public Future<Message> reply(String content, FutureCallback<Message> callback);
 
@@ -146,7 +147,7 @@ public interface Message extends Comparable<Message> {
      * @param content The content of the message.
      * @param tts Whether the message should be tts or not.
      * @param callback The callback which will be informed when the message was sent or sending failed.
-     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     * @return The sent message.
      */
     public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback);
 
@@ -154,7 +155,7 @@ public interface Message extends Comparable<Message> {
      * Replies with a file.
      *
      * @param file The file to upload.
-     * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
+     * @return The sent message containing the file.
      */
     public Future<Message> replyFile(File file);
 
@@ -163,9 +164,69 @@ public interface Message extends Comparable<Message> {
      *
      * @param file The file to upload.
      * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
+     * @return The sent message containing the file.
      */
     public Future<Message> replyFile(File file, FutureCallback<Message> callback);
+
+    /**
+     * Replies with a file.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> replyFile(InputStream inputStream, String filename);
+
+    /**
+     * Replies with a file.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> replyFile(InputStream inputStream, String filename, FutureCallback<Message> callback);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param file The file to upload.
+     * @param comment An additional comment to your file.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> replyFile(File file, String comment);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param file The file to upload.
+     * @param comment An additional comment to your file.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> replyFile(File file, String comment, FutureCallback<Message> callback);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @param comment An additional comment to your file.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> replyFile(InputStream inputStream, String filename, String comment);
+
+    /**
+     * Replies with a file and comment.
+     *
+     * @param inputStream An input stream.
+     * @param filename The name of the file.
+     * @param comment An additional comment to your file.
+     * @param callback The callback which will be informed when the file was uploaded or upload failed.
+     * @return The sent message containing the file.
+     */
+    public Future<Message> replyFile(InputStream inputStream, String filename, String comment,
+                                     FutureCallback<Message> callback);
 
     /**
      * Gets the date of creation.
@@ -173,5 +234,14 @@ public interface Message extends Comparable<Message> {
      * @return The date of creation.
      */
     public Calendar getCreationDate();
+
+    /**
+     * Edits the message.
+     *
+     * @param content The new content of the message.
+     * @return A future which tells us if the edit was successful or not.
+     *         If the exception is <code>null</code> the edit was successful.
+     */
+    public Future<Exception> edit(String content);
 
 }

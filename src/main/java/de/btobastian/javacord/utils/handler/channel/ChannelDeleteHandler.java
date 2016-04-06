@@ -23,7 +23,6 @@ import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -71,10 +70,10 @@ public class ChannelDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
+                List<ChannelDeleteListener> listeners = api.getListeners(ChannelDeleteListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((ChannelDeleteListener) listener).onChannelDelete(api, channel);
+                    for (ChannelDeleteListener listener : listeners) {
+                        listener.onChannelDelete(api, channel);
                     }
                 }
             }
@@ -93,10 +92,10 @@ public class ChannelDeleteHandler extends PacketHandler {
         listenerExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                List<Listener> listeners =  api.getListeners(VoiceChannelDeleteListener.class);
+                List<VoiceChannelDeleteListener> listeners = api.getListeners(VoiceChannelDeleteListener.class);
                 synchronized (listeners) {
-                    for (Listener listener : listeners) {
-                        ((VoiceChannelDeleteListener) listener).onVoiceChannelDelete(api, channel);
+                    for (VoiceChannelDeleteListener listener : listeners) {
+                        listener.onVoiceChannelDelete(api, channel);
                     }
                 }
             }

@@ -29,7 +29,6 @@ import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.*;
 import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONObject;
@@ -224,11 +223,11 @@ public class ImplRole implements Role {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
+                                List<RoleChangePermissionsListener> listeners =
+                                        api.getListeners(RoleChangePermissionsListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((RoleChangePermissionsListener) listener)
-                                                .onRoleChangePermissions(api, ImplRole.this, oldPermissions);
+                                    for (RoleChangePermissionsListener listener : listeners) {
+                                        listener.onRoleChangePermissions(api, ImplRole.this, oldPermissions);
                                     }
                                 }
                             }
@@ -243,11 +242,10 @@ public class ImplRole implements Role {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
+                                List<RoleChangeNameListener> listeners = api.getListeners(RoleChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((RoleChangeNameListener) listener)
-                                                .onRoleChangeName(api, ImplRole.this, oldName);
+                                    for (RoleChangeNameListener listener : listeners) {
+                                        listener.onRoleChangeName(api, ImplRole.this, oldName);
                                     }
                                 }
                             }
@@ -262,11 +260,11 @@ public class ImplRole implements Role {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(RoleChangeColorListener.class);
+                                List<RoleChangeColorListener> listeners =
+                                        api.getListeners(RoleChangeColorListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((RoleChangeColorListener) listener)
-                                                .onRoleChangeColor(api, ImplRole.this, oldColor);
+                                    for (RoleChangeColorListener listener : listeners) {
+                                        listener.onRoleChangeColor(api, ImplRole.this, oldColor);
                                     }
                                 }
                             }
@@ -280,11 +278,11 @@ public class ImplRole implements Role {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(RoleChangeHoistListener.class);
+                                List<RoleChangeHoistListener> listeners =
+                                        api.getListeners(RoleChangeHoistListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((RoleChangeHoistListener) listener)
-                                                .onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
+                                    for (RoleChangeHoistListener listener : listeners) {
+                                        listener.onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
                                     }
                                 }
                             }
@@ -315,10 +313,10 @@ public class ImplRole implements Role {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(RoleDeleteListener.class);
+                            List<RoleDeleteListener> listeners = api.getListeners(RoleDeleteListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((RoleDeleteListener) listener).onRoleDelete(api, ImplRole.this);
+                                for (RoleDeleteListener listener : listeners) {
+                                    listener.onRoleDelete(api, ImplRole.this);
                                 }
                             }
                         }

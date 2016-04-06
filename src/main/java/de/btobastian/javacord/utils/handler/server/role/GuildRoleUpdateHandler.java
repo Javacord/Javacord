@@ -24,7 +24,6 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.role.*;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
@@ -61,10 +60,10 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(RoleChangeNameListener.class);
+                    List<RoleChangeNameListener> listeners = api.getListeners(RoleChangeNameListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((RoleChangeNameListener) listener).onRoleChangeName(api, role, oldName);
+                        for (RoleChangeNameListener listener : listeners) {
+                            listener.onRoleChangeName(api, role, oldName);
                         }
                     }
                 }
@@ -78,11 +77,11 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(RoleChangePermissionsListener.class);
+                    List<RoleChangePermissionsListener> listeners =
+                            api.getListeners(RoleChangePermissionsListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((RoleChangePermissionsListener) listener)
-                                    .onRoleChangePermissions(api, role, oldPermissions);
+                        for (RoleChangePermissionsListener listener : listeners) {
+                            listener.onRoleChangePermissions(api, role, oldPermissions);
                         }
                     }
                 }
@@ -96,10 +95,10 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(RoleChangeColorListener.class);
+                    List<RoleChangeColorListener> listeners = api.getListeners(RoleChangeColorListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((RoleChangeColorListener) listener).onRoleChangeColor(api, role, oldColor);
+                        for (RoleChangeColorListener listener : listeners) {
+                            listener.onRoleChangeColor(api, role, oldColor);
                         }
                     }
                 }
@@ -111,10 +110,10 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             listenerExecutorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    List<Listener> listeners =  api.getListeners(RoleChangeHoistListener.class);
+                    List<RoleChangeHoistListener> listeners = api.getListeners(RoleChangeHoistListener.class);
                     synchronized (listeners) {
-                        for (Listener listener : listeners) {
-                            ((RoleChangeHoistListener) listener).onRoleChangeHoist(api, role, !role.getHoist());
+                        for (RoleChangeHoistListener listener : listeners) {
+                            listener.onRoleChangeHoist(api, role, !role.getHoist());
                         }
                     }
                 }
@@ -129,10 +128,10 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listenerExecutorService.submit(new Runnable() {
                     @Override
                     public void run() {
-                        List<Listener> listeners =  api.getListeners(RoleChangePositionListener.class);
+                        List<RoleChangePositionListener> listeners = api.getListeners(RoleChangePositionListener.class);
                         synchronized (listeners) {
-                            for (Listener listener : listeners) {
-                                ((RoleChangePositionListener) listener).onRoleChangePosition(api, role, oldPosition);
+                            for (RoleChangePositionListener listener : listeners) {
+                                listener.onRoleChangePosition(api, role, oldPosition);
                             }
                         }
                     }

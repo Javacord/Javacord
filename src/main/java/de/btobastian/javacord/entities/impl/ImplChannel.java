@@ -25,6 +25,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.body.MultipartBody;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.InviteBuilder;
@@ -39,7 +40,6 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
-import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
 import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
@@ -50,6 +50,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,7 +150,7 @@ public class ImplChannel implements Channel {
                 try {
                     logger.debug("Trying to delete channel {}", ImplChannel.this);
                     HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/channels/:id" + id)
+                            .delete("https://discordapp.com/api/channels/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
@@ -159,10 +160,10 @@ public class ImplChannel implements Channel {
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<Listener> listeners =  api.getListeners(ChannelDeleteListener.class);
+                            List<ChannelDeleteListener> listeners = api.getListeners(ChannelDeleteListener.class);
                             synchronized (listeners) {
-                                for (Listener listener : listeners) {
-                                    ((ChannelDeleteListener) listener).onChannelDelete(api, ImplChannel.this);
+                                for (ChannelDeleteListener listener : listeners) {
+                                    listener.onChannelDelete(api, ImplChannel.this);
                                 }
                             }
                         }
@@ -241,25 +242,85 @@ public class ImplChannel implements Channel {
 
     @Override
     public Future<Message> sendFile(final File file) {
-        return sendFile(file, null);
+        return sendFile(file, null, null);
     }
 
     @Override
     public Future<Message> sendFile(final File file, FutureCallback<Message> callback) {
+        return sendFile(file, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename) {
+        return sendFile(inputStream, filename, null, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename, FutureCallback<Message> callback) {
+        return sendFile(inputStream, filename, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendFile(File file, String comment) {
+        return sendFile(file, comment, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(final File file, final String comment, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
-                        logger.debug("Trying to send file in channel {} (name: {})", ImplChannel.this, file.getName());
+                        logger.debug("Trying to send a file in channel {} (name: {}, comment: {})",
+                                ImplChannel.this, file.getName(), comment);
                         api.checkRateLimit();
-                        HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
-                                        .header("authorization", api.getToken())
-                                        .field("file", file)
-                                        .asJson();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + id + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", file);
+                        if (comment != null) {
+                            body.field("content", comment);
+                        }
+                        HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        logger.debug("Sent file in channel {} (name: {})", ImplChannel.this, file.getName());
+                        logger.debug("Sent a file in channel {} (name: {}, comment: {})",
+                                ImplChannel.this, file.getName(), comment);
+                        return new ImplMessage(response.getBody().getObject(), api, receiver);
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Message> sendFile(InputStream inputStream, String filename, String comment) {
+        return sendFile(inputStream, filename, comment, null);
+    }
+
+    @Override
+    public Future<Message> sendFile(final InputStream inputStream, final String filename, final String comment,
+                                    FutureCallback<Message> callback) {
+        final MessageReceiver receiver = this;
+        ListenableFuture<Message> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        logger.debug("Trying to send an input stream in channel {} (comment: {})",
+                                ImplChannel.this, comment);
+                        api.checkRateLimit();
+                        MultipartBody body = Unirest
+                                .post("https://discordapp.com/api/channels/" + id + "/messages")
+                                .header("authorization", api.getToken())
+                                .field("file", inputStream, filename);
+                        if (comment != null) {
+                            body.field("content", comment);
+                        }
+                        HttpResponse<JsonNode> response = body.asJson();
+                        api.checkResponse(response);
+                        logger.debug("Sent an input stream in channel {} (comment: {})", ImplChannel.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -378,11 +439,11 @@ public class ImplChannel implements Channel {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ChannelChangeNameListener.class);
+                                List<ChannelChangeNameListener> listeners =
+                                        api.getListeners(ChannelChangeNameListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ChannelChangeNameListener) listener)
-                                                .onChannelChangeName(api, ImplChannel.this, oldName);
+                                    for (ChannelChangeNameListener listener : listeners) {
+                                        listener.onChannelChangeName(api, ImplChannel.this, oldName);
                                     }
                                 }
                             }
@@ -397,11 +458,11 @@ public class ImplChannel implements Channel {
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
-                                List<Listener> listeners =  api.getListeners(ChannelChangeTopicListener.class);
+                                List<ChannelChangeTopicListener> listeners =
+                                        api.getListeners(ChannelChangeTopicListener.class);
                                 synchronized (listeners) {
-                                    for (Listener listener : listeners) {
-                                        ((ChannelChangeTopicListener) listener)
-                                                .onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                    for (ChannelChangeTopicListener listener : listeners) {
+                                        listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
                                     }
                                 }
                             }
