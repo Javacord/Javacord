@@ -29,7 +29,7 @@ public class Javacord {
     /**
      * The current javacord version.
      */
-    public static final String VERSION = "2.0.9";
+    public static final String VERSION = "2.0.10";
 
     /**
      * The github url of javacord.
