@@ -93,3 +93,18 @@ public class MyPingPongBot {
 }
 ```
 More examples can be found in the wiki: [Examples](https://github.com/BtoBastian/Javacord/wiki/Examples)
+
+# Command Framework
+
+I would recommend to use [sdcf4j](https://github.com/BtoBastian/sdcf4j) in order to create commands. It provides a clean and simple way to create commands. A ping-pong command would be as easy as this:
+```java
+public class PingCommand implements CommandExecutor {
+
+    @Command(aliases = {"!ping"}, description = "Pong!")
+    public String onCommand(String command, String[] args) {
+        return "Pong!";
+    }
+
+}
+```
+Take a look at the [sdcf4j wiki](https://github.com/BtoBastian/sdcf4j/wiki) to find out how it works.
