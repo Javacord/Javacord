@@ -196,7 +196,7 @@ public class ImplRole implements Role {
             public Exception call() throws Exception {
                 logger.debug("Trying to update role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                         " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
-                        ImplRole.this, name, getName(), color, getColor().getRGB(),
+                        ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
                         hoist, getHoist(), allow, permissions.getAllowed());
                 try {
                     HttpResponse<JsonNode> response = Unirest
@@ -205,7 +205,7 @@ public class ImplRole implements Role {
                             .header("Content-Type", "application/json")
                             .body(new JSONObject()
                                     .put("name", name)
-                                    .put("color", color)
+                                    .put("color", color & 0xFFFFFF)
                                     .put("hoist", hoist)
                                     .put("permissions", allow).toString())
                             .asJson();
@@ -213,7 +213,7 @@ public class ImplRole implements Role {
 
                     logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                             " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
-                            ImplRole.this, name, getName(), color, getColor().getRGB(),
+                            ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
                             hoist, getHoist(), allow, permissions.getAllowed());
                     // update permissions
                     if (ImplRole.this.permissions.getAllowed() != allow) {
