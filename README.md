@@ -2,7 +2,7 @@
 A simple library to create a discord bot.
 Supports the new application system!
 
-#Maven
+##  Maven
 ```xml
 <repository>
   <id>javacord-repo</id>
@@ -35,21 +35,21 @@ If you never used maven before you should take a look at the setup tutorial:
 * [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3)
 * [DiscordAPI #java_javacord channel](https://discord.gg/0SBTUU1wZTVXVKEo)
 
-#Wiki
+## Wiki
 
 For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord/wiki)
 
-#Download
-For those of you how don't use maven: [Jenkins](http://ci.ketrwu.de/job/Javacord/lastSuccessfulBuild/)
+## Download
+For those of you how don't use maven: [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/)
 
 Thanks to ketrwu (https://github.com/KennethWussmann).
 
-#Javadocs
-The javadocs can be found here: [JavaDocs](http://ci.ketrwu.de/job/Javacord/javadoc/)
+## Javadocs
+The javadocs can be found here: [JavaDocs](http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/)
 
 Thanks to ketrwu, too.
 
-#Examples
+## Examples
 
 Creating a simple ping-pong bot:
 ```java
@@ -94,7 +94,7 @@ public class MyPingPongBot {
 ```
 More examples can be found in the wiki: [Examples](https://github.com/BtoBastian/Javacord/wiki/Examples)
 
-# Command Framework
+## Command Framework
 
 I would recommend to use [sdcf4j](https://github.com/BtoBastian/sdcf4j) in order to create commands. It provides a clean and simple way to create commands. A ping-pong command would be as easy as this:
 ```java
