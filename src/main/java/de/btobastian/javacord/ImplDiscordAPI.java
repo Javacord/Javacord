@@ -683,50 +683,6 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public Future<String> convertToBotAccount(String ownerToken) {
-        return convertToBotAccount(null, ownerToken);
-    }
-
-    @Override
-    public Future<String> convertToBotAccount(final String applicationId, final String ownerToken) {
-        if (getYourself().isBot()) {
-            throw new NotSupportedForBotsException();
-        }
-        return getThreadPool().getExecutorService().submit(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                String id = applicationId;
-                logger.debug("Trying to convert account to bot account (application id: {}, owner token: {}",
-                        id, ownerToken.replaceAll(".{10}", "**********"));
-                if (applicationId == null) {
-                    logger.debug("Trying to create application for owner");
-                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
-                            .header("content-type", "application/json")
-                            .header("authorization", ownerToken)
-                            .body(new JSONObject()
-                                    .put("name", getYourself().getName())
-                                    .toString())
-                            .asJson();
-                    checkResponse(response);
-                    Application application = new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
-                    logger.debug("Created application for owner (application: {})", application);
-                    id = application.getId();
-                }
-                HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/oauth2/applications/" + id + "/bot")
-                        .header("content-type", "application/json")
-                        .header("authorization", ownerToken)
-                        .body(new JSONObject().put("token", getToken()).toString())
-                        .asJson();
-                setToken(response.getBody().getObject().getString("token"), true);
-                logger.info("Converted account into bot account (id: {}, new token: {})",
-                        id, getToken().replaceAll(".{10}", "**********"));
-                return id;
-            }
-        });
-    }
-
-    @Override
     public Future<Collection<Application>> getApplications() {
         return getApplications(null);
     }

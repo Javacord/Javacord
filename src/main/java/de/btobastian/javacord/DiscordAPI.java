@@ -453,26 +453,6 @@ public interface DiscordAPI {
     public boolean isAutoReconnectEnabled();
 
     /**
-     * Converts the current account to a bot account.
-     * Converting a user account to a bot account is irreversible. USE CAUTION!
-     * This will create a new application for the bot.
-     *
-     * @param ownerToken The token of the owner of the bot.
-     * @return The id of the application.
-     */
-    public Future<String> convertToBotAccount(String ownerToken);
-
-    /**
-     * Converts the current account to a bot account.
-     * Converting a user account to a bot account is irreversible. USE CAUTION!
-     *
-     * @param applicationId The od of the application the bot should belong to.
-     * @param ownerToken The token of the owner of the bot.
-     * @return The id of the application.
-     */
-    public Future<String> convertToBotAccount(String applicationId, String ownerToken);
-
-    /**
      * Gets a collection with all applications you own.
      *
      * @return A collection with all applications you own.
