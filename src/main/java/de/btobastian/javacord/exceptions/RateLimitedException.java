@@ -60,14 +60,12 @@ public class RateLimitedException extends Exception {
     /**
      * Causes the current thread to wait until we can retry the request.
      */
-    public void waitTillRetry() {
+    public void waitTillRetry() throws InterruptedException {
         long time = getRetryAt() - System.currentTimeMillis();
         if (time < 1) {
             return;
         }
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException ignored) { }
+        Thread.sleep(time);
     }
 
 }
