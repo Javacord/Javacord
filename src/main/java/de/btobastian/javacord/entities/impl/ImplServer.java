@@ -37,6 +37,7 @@ import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -159,6 +160,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     api.getServerMap().remove(id);
                     logger.info("Deleted server {}", ImplServer.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
@@ -192,6 +194,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     api.getServerMap().remove(id);
                     logger.info("Left server {}", ImplServer.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
@@ -349,6 +352,7 @@ public class ImplServer implements Server {
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                         Invite[] invites = new Invite[response.getBody().getArray().length()];
                         for (int i = 0; i < response.getBody().getArray().length(); i++) {
                             invites[i] = new ImplInvite(api, response.getBody().getArray().getJSONObject(i));
@@ -381,6 +385,7 @@ public class ImplServer implements Server {
                             .body(new JSONObject().put("roles", roleIds).toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     for (final Role role : user.getRoles(ImplServer.this)) {
                         boolean contains = false;
                         for (Role r : roles) {
@@ -459,6 +464,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     final User user = api.getUserById(userId).get();
                     if (user != null) {
                         removeMember(user);
@@ -496,6 +502,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     logger.info("Unbanned an user from server {} (user id: {})", ImplServer.this, userId);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
@@ -534,6 +541,7 @@ public class ImplServer implements Server {
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                         JSONArray bannedUsersJson = response.getBody().getArray();
                         User[] bannedUsers = new User[bannedUsersJson.length()];
                         for (int i = 0; i < bannedUsersJson.length(); i++) {
@@ -566,6 +574,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     final User user = api.getUserById(userId).get();
                     if (user != null) {
                         removeMember(user);
@@ -607,6 +616,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                 final Role role = new ImplRole(response.getBody().getObject(), ImplServer.this, api);
                 logger.info("Created role in server {} (name: {}, id: {})",
                         ImplServer.this, role.getName(), role.getId());
@@ -672,6 +682,7 @@ public class ImplServer implements Server {
                             .body(params.toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     logger.debug("Updated server {} (new name: {}, old name: {}, new region: {}, old region: {}",
                             ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
                             getRegion().getKey());
@@ -740,6 +751,7 @@ public class ImplServer implements Server {
                                     .toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     logger.debug("Authorized bot with application id {} and permissions {}",
                             applicationId, permissions);
                 } catch (Exception e) {
@@ -880,6 +892,7 @@ public class ImplServer implements Server {
                 .body(param.toString())
                 .asJson();
         api.checkResponse(response);
+        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
         if (voice) {
             return new ImplVoiceChannel(response.getBody().getObject(), this, api);
         } else {

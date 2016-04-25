@@ -25,6 +25,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -123,6 +124,7 @@ public class ImplMessageHistory implements MessageHistory {
                 + (before ? "before" : "after") + "=" + messageId + "&limit=" + limit;
         HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
         api.checkResponse(response);
+        api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
         JSONArray messages = response.getBody().getArray();
         for (int i = 0; i < messages.length(); i++) {
             JSONObject messageJson = messages.getJSONObject(i);

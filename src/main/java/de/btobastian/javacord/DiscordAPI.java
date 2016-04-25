@@ -23,6 +23,7 @@ import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
+import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -545,5 +546,12 @@ public interface DiscordAPI {
      * @return The application which owns the bot.
      */
     public Future<Application> createBot(String name, String applicationId, FutureCallback<Application> callback);
+
+    /**
+     * Gets the rate limit manager. This class caches all rate limits of the api.
+     *
+     * @return The rate limit manager of the api.
+     */
+    public RateLimitManager getRateLimitManager();
 
 }

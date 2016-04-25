@@ -33,6 +33,7 @@ import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -131,6 +132,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
                     server.removeVoiceChannel(ImplVoiceChannel.this);
                     logger.info("Deleted voice channel {}", ImplVoiceChannel.this);
                     // call listener
@@ -187,6 +189,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                             .body(params.toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
                     String updatedName = response.getBody().getObject().getString("name");
                     logger.debug("Updated voice channel {} (new name: {}, old name: {})",
                             ImplVoiceChannel.this, updatedName, getName());

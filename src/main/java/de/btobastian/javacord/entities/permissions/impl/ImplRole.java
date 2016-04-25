@@ -31,6 +31,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.role.*;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -210,6 +211,7 @@ public class ImplRole implements Role {
                                     .put("permissions", allow).toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
 
                     logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                             " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",

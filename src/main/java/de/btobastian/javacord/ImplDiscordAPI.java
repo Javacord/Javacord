@@ -47,6 +47,8 @@ import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ThreadPool;
+import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -91,7 +93,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private DiscordWebsocketAdapter socketAdapter = null;
 
-    private RateLimitedException lastRateLimitedException = null;
+    private RateLimitManager rateLimitManager = new RateLimitManager();
 
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
@@ -860,6 +862,11 @@ public class ImplDiscordAPI implements DiscordAPI {
         return future;
     }
 
+    @Override
+    public RateLimitManager getRateLimitManager() {
+        return rateLimitManager;
+    }
+
     /**
      * Tries to reconnect to the given gateway.
      *
@@ -886,20 +893,6 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
         } catch (InterruptedException | ExecutionException e) {
             logger.warn("Reconnect failed. Please contact the developer!", e);
-        }
-    }
-
-    /**
-     * Checks if we are still rate limited.
-     *
-     * @throws RateLimitedException If we are rate limited.
-     */
-    public void checkRateLimit() throws RateLimitedException {
-        // TODO remake rate limit checks
-        long retryAt = lastRateLimitedException == null ? 0L : lastRateLimitedException.getRetryAfter();
-        long retryAfter = retryAt - System.currentTimeMillis();
-        if (retryAfter > 0) {
-            throw new RateLimitedException("We are still rate limited for " + retryAfter + " ms!", retryAfter);
         }
     }
 
@@ -1099,18 +1092,36 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!" + message);
         }
-        if (response.getBody() != null && !response.getBody().isArray()
-                && response.getBody().getObject().has("retry_after")) {
-            long retryAfter = response.getBody().getObject().getLong("retry_after");
-            RateLimitedException exception =
-                    new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
-            lastRateLimitedException = exception;
-            throw exception;
-        }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
             throw new BadResponseException("Received http status code " + response.getStatus() + " with message "
                     + response.getStatusText() + " and body " + response.getBody(), response.getStatus(),
                     response.getStatusText(), response);
+        }
+    }
+
+    /**
+     * Checks if there current action if rate limited. The check should be performed before AND after making a request.
+     *
+     * @param response The response to check. Can be <code>null</code>.
+     * @param type The type of the rate limit.
+     * @param server The server of the rate limit.
+     *
+     * @throws RateLimitedException if there's a rate limit.
+     */
+    public void checkRateLimit(HttpResponse<JsonNode> response, RateLimitType type, Server server)
+            throws RateLimitedException {
+        if (rateLimitManager.isRateLimited(type, server) && type != RateLimitType.UNKNOWN) {
+            long retryAfter = rateLimitManager.getRateLimit(type, server);
+            throw new RateLimitedException(
+                    "We are rate limited for " + retryAfter + " ms!", retryAfter, type, server, rateLimitManager);
+        }
+        if (response != null && response.getBody() != null && !response.getBody().isArray()
+                && response.getBody().getObject().has("retry_after")) {
+            long retryAfter = response.getBody().getObject().getLong("retry_after");
+            rateLimitManager.addRateLimit(type, server, retryAfter);
+            throw new RateLimitedException(
+                    "We are rate limited for " + retryAfter + " ms (type: " + type.name() + ")!",
+                    retryAfter, type, server, rateLimitManager);
         }
     }
 
