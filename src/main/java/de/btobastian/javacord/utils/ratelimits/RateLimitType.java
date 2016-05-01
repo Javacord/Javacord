@@ -39,6 +39,16 @@ public enum RateLimitType {
     NAME_CHANGE(),
 
     /**
+     * Private message deletions were rate limited.
+     */
+    PRIVATE_MESSAGE_DELETE(),
+
+    /**
+     * Server message deletions were rate limited.
+     */
+    SERVER_MESSAGE_DELETE(),
+
+    /**
      * An unknown rate limit.
      */
     UNKNOWN();

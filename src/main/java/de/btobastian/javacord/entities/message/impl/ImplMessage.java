@@ -211,12 +211,22 @@ public class ImplMessage implements Message {
                 try {
                     logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
+                    if (isPrivateMessage()) {
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    } else {
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                    }
                     HttpResponse<JsonNode> response = Unirest.delete
                             ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                    if (isPrivateMessage()) {
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    } else {
+                        api.checkRateLimit(
+                                response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                    }
                     api.removeMessage(message);
                     logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
