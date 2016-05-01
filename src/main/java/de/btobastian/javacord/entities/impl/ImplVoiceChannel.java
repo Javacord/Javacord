@@ -143,7 +143,11 @@ public class ImplVoiceChannel implements VoiceChannel {
                                     api.getListeners(VoiceChannelDeleteListener.class);
                             synchronized (listeners) {
                                 for (VoiceChannelDeleteListener listener : listeners) {
-                                    listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
+                                    try {
+                                        listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in VoiceChannelDeleteListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -204,7 +208,11 @@ public class ImplVoiceChannel implements VoiceChannel {
                                         api.getListeners(VoiceChannelChangeNameListener.class);
                                 synchronized (listeners) {
                                     for (VoiceChannelChangeNameListener listener : listeners) {
-                                        listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
+                                        try {
+                                            listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in VocieChannelChangeNameListener!", t);
+                                        }
                                     }
                                 }
                             }

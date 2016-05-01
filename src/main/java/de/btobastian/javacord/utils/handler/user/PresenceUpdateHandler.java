@@ -26,9 +26,11 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.user.UserChangeGameListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -36,6 +38,11 @@ import java.util.List;
  * This class handles the presence update packet.
  */
 public class PresenceUpdateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(PresenceUpdateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -79,7 +86,11 @@ public class PresenceUpdateHandler extends PacketHandler {
                         List<UserChangeNameListener> listeners = api.getListeners(UserChangeNameListener.class);
                         synchronized (listeners) {
                             for (UserChangeNameListener listener : listeners) {
-                                listener.onUserChangeName(api, user, oldName);
+                                try {
+                                    listener.onUserChangeName(api, user, oldName);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in UserChangeNameListener!", t);
+                                }
                             }
                         }
                     }
@@ -99,7 +110,11 @@ public class PresenceUpdateHandler extends PacketHandler {
                     List<UserChangeGameListener> listeners = api.getListeners(UserChangeGameListener.class);
                     synchronized (listeners) {
                         for (UserChangeGameListener listener : listeners) {
-                            listener.onUserChangeGame(api, user, oldGame);
+                            try {
+                                listener.onUserChangeGame(api, user, oldGame);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in UserChangeGameListener!", t);
+                            }
                         }
                     }
                 }

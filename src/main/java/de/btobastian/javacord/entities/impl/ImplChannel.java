@@ -448,7 +448,11 @@ public class ImplChannel implements Channel {
                                         api.getListeners(ChannelChangeNameListener.class);
                                 synchronized (listeners) {
                                     for (ChannelChangeNameListener listener : listeners) {
-                                        listener.onChannelChangeName(api, ImplChannel.this, oldName);
+                                        try {
+                                            listener.onChannelChangeName(api, ImplChannel.this, oldName);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ChannelChangeNameListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -467,7 +471,11 @@ public class ImplChannel implements Channel {
                                         api.getListeners(ChannelChangeTopicListener.class);
                                 synchronized (listeners) {
                                     for (ChannelChangeTopicListener listener : listeners) {
-                                        listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                        try {
+                                            listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ChannelChangeTopicListener!", t);
+                                        }
                                     }
                                 }
                             }

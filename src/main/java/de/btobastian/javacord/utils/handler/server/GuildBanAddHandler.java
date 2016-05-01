@@ -22,8 +22,10 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listener.server.ServerMemberBanListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -31,6 +33,11 @@ import java.util.List;
  * Handles the guild ban add packet.
  */
 public class GuildBanAddHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildBanAddHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -52,7 +59,11 @@ public class GuildBanAddHandler extends PacketHandler {
                     List<ServerMemberBanListener> listeners = api.getListeners(ServerMemberBanListener.class);
                     synchronized (listeners) {
                         for (ServerMemberBanListener listener : listeners) {
-                            listener.onServerMemberBan(api, user, server);
+                            try {
+                                listener.onServerMemberBan(api, user, server);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ServerMemberBanListener!", t);
+                            }
                         }
                     }
                 }

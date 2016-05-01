@@ -237,7 +237,11 @@ public class ImplMessage implements Message {
                             List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
                             synchronized (listeners) {
                                 for (MessageDeleteListener listener : listeners) {
-                                    listener.onMessageDelete(api, message);
+                                    try {
+                                        listener.onMessageDelete(api, message);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in MessageDeleteListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -360,7 +364,11 @@ public class ImplMessage implements Message {
                                 List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
                                 synchronized (listeners) {
                                     for (MessageEditListener listener : listeners) {
-                                        listener.onMessageEdit(api, ImplMessage.this, oldContent);
+                                        try {
+                                            listener.onMessageEdit(api, ImplMessage.this, oldContent);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in MessageEditListener!", t);
+                                        }
                                     }
                                 }
                             }

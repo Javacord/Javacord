@@ -22,8 +22,10 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -31,6 +33,11 @@ import java.util.List;
  * Handles the guild create packet.
  */
 public class GuildCreateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildCreateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -53,7 +60,11 @@ public class GuildCreateHandler extends PacketHandler {
                 List<ServerJoinListener> listeners = api.getListeners(ServerJoinListener.class);
                 synchronized (listeners) {
                     for (ServerJoinListener listener : listeners) {
-                        listener.onServerJoin(api, server);
+                        try {
+                            listener.onServerJoin(api, server);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in ServerJoinListener!", t);
+                        }
                     }
                 }
             }

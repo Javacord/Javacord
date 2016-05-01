@@ -169,7 +169,11 @@ public class ImplServer implements Server {
                             List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
                                 for (ServerLeaveListener listener : listeners) {
-                                    listener.onServerLeave(api, ImplServer.this);
+                                    try {
+                                        listener.onServerLeave(api, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerLeaveListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -203,7 +207,11 @@ public class ImplServer implements Server {
                             List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
                                 for (ServerLeaveListener listener : listeners) {
-                                    listener.onServerLeave(api, ImplServer.this);
+                                    try {
+                                        listener.onServerLeave(api, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerLeaveListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -286,7 +294,11 @@ public class ImplServer implements Server {
                                 List<ChannelCreateListener> listeners = api.getListeners(ChannelCreateListener.class);
                                 synchronized (listeners) {
                                     for (ChannelCreateListener listener : listeners) {
-                                        listener.onChannelCreate(api, channel);
+                                        try {
+                                            listener.onChannelCreate(api, channel);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ChannelCreateListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -321,7 +333,11 @@ public class ImplServer implements Server {
                                         api.getListeners(VoiceChannelCreateListener.class);
                                 synchronized (listeners) {
                                     for (VoiceChannelCreateListener listener : listeners) {
+                                        try {
                                         listener.onVoiceChannelCreate(api, channel);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in VoiceChannelCreateListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -403,7 +419,11 @@ public class ImplServer implements Server {
                                             api.getListeners(UserRoleRemoveListener.class);
                                     synchronized (listeners) {
                                         for (UserRoleRemoveListener listener : listeners) {
-                                            listener.onUserRoleRemove(api, user, role);
+                                            try {
+                                                listener.onUserRoleRemove(api, user, role);
+                                            } catch (Throwable t) {
+                                                logger.warn("Uncaught exception in UserRoleRemoveListener!", t);
+                                            }
                                         }
                                     }
                                 }
@@ -419,7 +439,11 @@ public class ImplServer implements Server {
                                     List<UserRoleAddListener> listeners = api.getListeners(UserRoleAddListener.class);
                                     synchronized (listeners) {
                                         for (UserRoleAddListener listener : listeners) {
-                                            listener.onUserRoleAdd(api, user, role);
+                                            try {
+                                                listener.onUserRoleAdd(api, user, role);
+                                            } catch (Throwable t) {
+                                                logger.warn("Uncaught exception in UserRoleAddListener!", t);
+                                            }
                                         }
                                     }
                                 }
@@ -477,7 +501,11 @@ public class ImplServer implements Server {
                             List<ServerMemberBanListener> listeners = api.getListeners(ServerMemberBanListener.class);
                             synchronized (listeners) {
                                 for (ServerMemberBanListener listener : listeners) {
-                                    listener.onServerMemberBan(api, user, ImplServer.this);
+                                    try {
+                                        listener.onServerMemberBan(api, user, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerMemberBanListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -511,7 +539,11 @@ public class ImplServer implements Server {
                                     api.getListeners(ServerMemberUnbanListener.class);
                             synchronized (listeners) {
                                 for (ServerMemberUnbanListener listener : listeners) {
-                                    listener.onServerMemberUnban(api, userId, ImplServer.this);
+                                    try {
+                                        listener.onServerMemberUnban(api, userId, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerMemberUnbanListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -587,7 +619,11 @@ public class ImplServer implements Server {
                                     api.getListeners(ServerMemberRemoveListener.class);
                             synchronized (listeners) {
                                 for (ServerMemberRemoveListener listener : listeners) {
-                                    listener.onServerMemberRemove(api, user, ImplServer.this);
+                                    try {
+                                        listener.onServerMemberRemove(api, user, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerMemberRemoveListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -626,7 +662,11 @@ public class ImplServer implements Server {
                         List<RoleCreateListener> listeners = api.getListeners(RoleCreateListener.class);
                         synchronized (listeners) {
                             for (RoleCreateListener listener : listeners) {
-                                listener.onRoleCreate(api, role);
+                                try {
+                                    listener.onRoleCreate(api, role);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in RoleCreateListener!", t);
+                                }
                             }
                         }
                     }
@@ -697,7 +737,11 @@ public class ImplServer implements Server {
                                         api.getListeners(ServerChangeNameListener.class);
                                 synchronized (listeners) {
                                     for (ServerChangeNameListener listener : listeners) {
-                                        listener.onServerChangeName(api, ImplServer.this, oldName);
+                                        try {
+                                            listener.onServerChangeName(api, ImplServer.this, oldName);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ServerChangeNameListener!", t);
+                                        }
                                     }
                                 }
                             }

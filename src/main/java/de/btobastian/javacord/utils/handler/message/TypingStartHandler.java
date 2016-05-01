@@ -23,8 +23,10 @@ import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listener.message.TypingStartListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +36,11 @@ import java.util.concurrent.ExecutionException;
  * Handles the typing start packet.
  */
 public class TypingStartHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(TypingStartHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -70,7 +77,11 @@ public class TypingStartHandler extends PacketHandler {
                 List<TypingStartListener> listeners = api.getListeners(TypingStartListener.class);
                 synchronized (listeners) {
                     for (TypingStartListener listener : listeners) {
-                        listener.onTypingStart(api, user, channel);
+                        try {
+                            listener.onTypingStart(api, user, channel);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in TypingStartListener!", t);
+                        }
                     }
                 }
             }

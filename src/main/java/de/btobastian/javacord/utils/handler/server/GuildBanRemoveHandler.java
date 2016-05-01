@@ -23,8 +23,10 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.server.ServerMemberUnbanListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -32,6 +34,11 @@ import java.util.List;
  * Handles the guild ban remove packet.
  */
 public class GuildBanRemoveHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildBanRemoveHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -54,7 +61,11 @@ public class GuildBanRemoveHandler extends PacketHandler {
                     List<ServerMemberUnbanListener> listeners = api.getListeners(ServerMemberUnbanListener.class);
                     synchronized (listeners) {
                         for (ServerMemberUnbanListener listener : listeners) {
-                            listener.onServerMemberUnban(api, user.getId(), server);
+                            try {
+                                listener.onServerMemberUnban(api, user.getId(), server);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ServerMemberUnbanListener!", t);
+                            }
                         }
                     }
                 }

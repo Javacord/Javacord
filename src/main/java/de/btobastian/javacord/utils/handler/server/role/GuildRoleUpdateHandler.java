@@ -25,8 +25,10 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.role.*;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.awt.*;
 import java.util.List;
@@ -35,6 +37,11 @@ import java.util.List;
  * Handles the guild role update packet.
  */
 public class GuildRoleUpdateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildRoleUpdateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -63,7 +70,11 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                     List<RoleChangeNameListener> listeners = api.getListeners(RoleChangeNameListener.class);
                     synchronized (listeners) {
                         for (RoleChangeNameListener listener : listeners) {
-                            listener.onRoleChangeName(api, role, oldName);
+                            try {
+                                listener.onRoleChangeName(api, role, oldName);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in RoleChangeNameListener!", t);
+                            }
                         }
                     }
                 }
@@ -81,7 +92,11 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                             api.getListeners(RoleChangePermissionsListener.class);
                     synchronized (listeners) {
                         for (RoleChangePermissionsListener listener : listeners) {
-                            listener.onRoleChangePermissions(api, role, oldPermissions);
+                            try {
+                                listener.onRoleChangePermissions(api, role, oldPermissions);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in RoleChangePermissionsListener!", t);
+                            }
                         }
                     }
                 }
@@ -98,7 +113,11 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                     List<RoleChangeColorListener> listeners = api.getListeners(RoleChangeColorListener.class);
                     synchronized (listeners) {
                         for (RoleChangeColorListener listener : listeners) {
-                            listener.onRoleChangeColor(api, role, oldColor);
+                            try {
+                                listener.onRoleChangeColor(api, role, oldColor);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in RoleChangeColorListener!", t);
+                            }
                         }
                     }
                 }
@@ -113,7 +132,11 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                     List<RoleChangeHoistListener> listeners = api.getListeners(RoleChangeHoistListener.class);
                     synchronized (listeners) {
                         for (RoleChangeHoistListener listener : listeners) {
-                            listener.onRoleChangeHoist(api, role, !role.getHoist());
+                            try {
+                                listener.onRoleChangeHoist(api, role, !role.getHoist());
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in RoleChangeHoistListener!", t);
+                            }
                         }
                     }
                 }
@@ -131,7 +154,11 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                         List<RoleChangePositionListener> listeners = api.getListeners(RoleChangePositionListener.class);
                         synchronized (listeners) {
                             for (RoleChangePositionListener listener : listeners) {
-                                listener.onRoleChangePosition(api, role, oldPosition);
+                                try {
+                                    listener.onRoleChangePosition(api, role, oldPosition);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in RoleChangePositionListener!", t);
+                                }
                             }
                         }
                     }

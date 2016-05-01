@@ -25,8 +25,10 @@ import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -34,6 +36,11 @@ import java.util.List;
  * Handles the channel delete packet.
  */
 public class ChannelDeleteHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ChannelDeleteHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -73,7 +80,11 @@ public class ChannelDeleteHandler extends PacketHandler {
                 List<ChannelDeleteListener> listeners = api.getListeners(ChannelDeleteListener.class);
                 synchronized (listeners) {
                     for (ChannelDeleteListener listener : listeners) {
-                        listener.onChannelDelete(api, channel);
+                        try {
+                            listener.onChannelDelete(api, channel);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in ChannelDeleteListener!", t);
+                        }
                     }
                 }
             }
@@ -95,7 +106,11 @@ public class ChannelDeleteHandler extends PacketHandler {
                 List<VoiceChannelDeleteListener> listeners = api.getListeners(VoiceChannelDeleteListener.class);
                 synchronized (listeners) {
                     for (VoiceChannelDeleteListener listener : listeners) {
-                        listener.onVoiceChannelDelete(api, channel);
+                        try {
+                            listener.onVoiceChannelDelete(api, channel);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in VoiceChannelDeleteListener!", t);
+                        }
                     }
                 }
             }

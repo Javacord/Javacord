@@ -29,8 +29,10 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.impl.ImplVoiceChannel;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -38,6 +40,11 @@ import java.util.List;
  * Handles the channel create packet.
  */
 public class ChannelCreateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ChannelCreateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -81,7 +88,11 @@ public class ChannelCreateHandler extends PacketHandler {
                 List<ChannelCreateListener> listeners = api.getListeners(ChannelCreateListener.class);
                 synchronized (listeners) {
                     for (ChannelCreateListener listener : listeners) {
-                        listener.onChannelCreate(api, channel);
+                        try {
+                            listener.onChannelCreate(api, channel);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in ChannelCreateListener!", t);
+                        }
                     }
                 }
             }
@@ -105,7 +116,11 @@ public class ChannelCreateHandler extends PacketHandler {
                 List<VoiceChannelCreateListener> listeners = api.getListeners(VoiceChannelCreateListener.class);
                 synchronized (listeners) {
                     for (VoiceChannelCreateListener listener : listeners) {
-                        listener.onVoiceChannelCreate(api, channel);
+                        try {
+                            listener.onVoiceChannelCreate(api, channel);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in VoiceChannelCreateListener!", t);
+                        }
                     }
                 }
             }
