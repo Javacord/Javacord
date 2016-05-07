@@ -550,9 +550,11 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         final JSONObject params = new JSONObject()
                 .put("username", newUsername == null ? getYourself().getName() : newUsername)
-                .put("email", newEmail == null ? email : newEmail)
-                .put("avatar", avatarString == null ? JSONObject.NULL : avatarString)
-                .put("password", password);
+                .put("avatar", avatarString == null ? JSONObject.NULL : avatarString);
+        if (email != null && password != null) { // do not exist in bot accounts
+            params.put("email", newEmail == null ? email : newEmail)
+                    .put("password", password);
+        }
         if (newPassword != null) {
             params.put("new_password", newPassword);
         }
@@ -571,7 +573,9 @@ public class ImplDiscordAPI implements DiscordAPI {
                             newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"),
                             newAvatar != null);
                     ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
-                    setEmail(response.getBody().getObject().getString("email"));
+                    if (response.getBody().getObject().has("email")) {
+                        setEmail(response.getBody().getObject().getString("email"));
+                    }
                     setToken(response.getBody().getObject().getString("token"), token.startsWith("Bot "));
                     final String oldName = getYourself().getName();
                     ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
