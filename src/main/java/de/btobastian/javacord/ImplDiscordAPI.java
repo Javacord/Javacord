@@ -83,6 +83,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String password = null;
     private String token = null;
     private String game = null;
+    private String streamingUrl = null;
     private boolean idle = false;
 
     private boolean autoReconnect = true;
@@ -185,7 +186,13 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void setGame(String game) {
+        setGame(game, null);
+    }
+
+    @Override
+    public void setGame(String game, String streamingUrl) {
         this.game = game;
+        this.streamingUrl = streamingUrl;
         try {
             if (socketAdapter != null && socketAdapter.isReady().isDone() && socketAdapter.isReady().get()) {
                 socketAdapter.updateStatus();
@@ -198,6 +205,11 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public String getGame() {
         return game;
+    }
+
+    @Override
+    public String getStreamingUrl() {
+        return streamingUrl;
     }
 
     @Override

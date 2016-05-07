@@ -304,11 +304,15 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     public void updateStatus() {
         logger.debug(
                 "Updating status (game: {}, idle: {})", api.getGame() == null ? "none" : api.getGame(), api.isIdle());
+        JSONObject game = new JSONObject();
+        game.put("name", api.getGame() == null ? JSONObject.NULL : api.getGame());
+        if (api.getStreamingUrl() != null) {
+            game.put("url", api.getStreamingUrl()).put("type", 1);
+        }
         JSONObject updateStatus = new JSONObject()
                 .put("op", 3)
                 .put("d", new JSONObject()
-                        .put("game", new JSONObject()
-                                .put("name", api.getGame() == null ? JSONObject.NULL : api.getGame()))
+                        .put("game", game)
                         .put("idle_since", api.isIdle() ? 1 : JSONObject.NULL));
         socket.sendText(updateStatus.toString());
     }

@@ -77,11 +77,26 @@ public interface DiscordAPI {
     public void setGame(String game);
 
     /**
+     * Sets the game shown in the user list and a streaming url (which means it shows you as streaming).
+     *
+     * @param game The game to set.
+     * @param streamingUrl The url of the stream.
+     */
+    public void setGame(String game, String streamingUrl);
+
+    /**
      * Gets the game shown in the user list.
      *
      * @return The game.
      */
     public String getGame();
+
+    /**
+     * Gets the streaming url of the bot.
+     *
+     * @return The streaming url of the bot.
+     */
+    public String getStreamingUrl();
 
     /**
      * Gets a server by its id.
