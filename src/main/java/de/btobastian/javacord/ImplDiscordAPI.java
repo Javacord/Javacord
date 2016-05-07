@@ -87,6 +87,8 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private boolean autoReconnect = true;
 
+    private boolean waitForServersOnStartup = true;
+
     private User you = null;
 
     private volatile int messageCacheSize = 200;
@@ -121,6 +123,9 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
         }
     };
+
+    // a set with all unavailable servers
+    private final Set<String> unavailableServers = new HashSet<>();
 
     /**
      * Creates a new instance of this class.
@@ -865,6 +870,25 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public RateLimitManager getRateLimitManager() {
         return rateLimitManager;
+    }
+
+    @Override
+    public void setWaitForServersOnStartup(boolean wait) {
+        this.waitForServersOnStartup = wait;
+    }
+
+    @Override
+    public boolean isWaitingForServersOnStartup() {
+        return waitForServersOnStartup;
+    }
+
+    /**
+     * Gets a list with all unavailable servers.
+     *
+     * @return A list with all unavailable servers.
+     */
+    public Set<String> getUnavailableServers() {
+        return unavailableServers;
     }
 
     /**

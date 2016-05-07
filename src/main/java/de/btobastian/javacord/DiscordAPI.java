@@ -554,4 +554,24 @@ public interface DiscordAPI {
      */
     public RateLimitManager getRateLimitManager();
 
+    /**
+     * Sets whether the bot should wait for all servers to be loaded or not.
+     *
+     * This value is <code>true</code> by default.
+     * If it's set to <code>false</code> the list of servers ({@link #getServers()}) will be empty after connecting and
+     * will be filled a few seconds later (depending on the amount of servers).
+     *
+     * @param wait Whether the bot should wait for all servers to be loaded or not.
+     */
+    public void setWaitForServersOnStartup(boolean wait);
+
+    /**
+     * Checks whether the bot should wait for all servers to be loaded or not.
+     *
+     * This value is <code>true</code> by default.
+     * If it's set to <code>false</code> the list of servers ({@link #getServers()}) will be empty after connecting and
+     * will be filled a few seconds later (depending on the amount of servers).
+     */
+    public boolean isWaitingForServersOnStartup();
+
 }

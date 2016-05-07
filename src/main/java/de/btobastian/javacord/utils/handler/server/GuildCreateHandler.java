@@ -53,6 +53,16 @@ public class GuildCreateHandler extends PacketHandler {
         if (packet.has("unavailable") && packet.getBoolean("unavailable")) {
             return;
         }
+        String id = packet.getString("id");
+        if (api.getUnavailableServers().contains(id)) {
+            api.getUnavailableServers().remove(id);
+            new ImplServer(packet, api);
+            return;
+        }
+        if (api.getServerById(id) != null) {
+            // TODO update information
+            return;
+        }
         final Server server = new ImplServer(packet, api);
         listenerExecutorService.submit(new Runnable() {
             @Override

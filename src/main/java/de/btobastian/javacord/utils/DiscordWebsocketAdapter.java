@@ -192,7 +192,26 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             logger.debug("Received unknown packet of type {} (packet: {})", type, obj.toString());
         }
         if (type.equals("READY")) {
-            ready.set(true);
+            if (api.isWaitingForServersOnStartup()) {
+                api.getThreadPool().getExecutorService().submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        int amount = api.getServers().size();
+                        for (;;) {
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException ignored) { }
+                            if (api.getServers().size() <= amount) {
+                                break; // two seconds without new servers becoming available
+                            }
+                            amount = api.getServers().size();
+                        }
+                        ready.set(true);
+                    }
+                });
+            } else {
+                ready.set(true);
+            }
             logger.debug("Received READY-packet!");
             updateStatus();
         }
