@@ -134,6 +134,10 @@ public class ImplServer implements Server {
                     ((ImplUser) user).setGame(presence.getJSONObject("game").getString("name"));
                 }
             }
+            if (user != null && presence.has("status") && !presence.isNull("status")) {
+                UserStatus status = UserStatus.fromString(presence.getString("status"));
+                ((ImplUser) user).setStatus(status);
+            }
         }
 
         api.getServerMap().put(id, this);

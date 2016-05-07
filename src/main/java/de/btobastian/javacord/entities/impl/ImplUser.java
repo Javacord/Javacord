@@ -29,6 +29,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
@@ -73,6 +74,7 @@ public class ImplUser implements User {
     private String game = null;
     private final String discriminator;
     private final boolean bot;
+    private UserStatus status = UserStatus.OFFLINE;
 
     /**
      * Creates a new instance of this class.
@@ -436,6 +438,20 @@ public class ImplUser implements User {
     @Override
     public boolean isBot() {
         return bot;
+    }
+
+    @Override
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * Sets the status of the user.
+     *
+     * @param status The status of the user.
+     */
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     /**

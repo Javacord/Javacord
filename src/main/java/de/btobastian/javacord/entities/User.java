@@ -135,4 +135,11 @@ public interface User extends MessageReceiver {
      */
     public boolean isBot();
 
+    /**
+     * Gets the status of the user.
+     *
+     * @return The status of the user.
+     */
+    public UserStatus getStatus();
+
 }

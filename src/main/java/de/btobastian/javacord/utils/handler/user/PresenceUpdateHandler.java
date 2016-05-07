@@ -21,11 +21,13 @@ package de.btobastian.javacord.utils.handler.user;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.user.UserChangeGameListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
+import de.btobastian.javacord.listener.user.UserChangeStatusListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
@@ -73,6 +75,27 @@ public class PresenceUpdateHandler extends PacketHandler {
             }
         }
 
+        // check status
+        if (packet.has("status")) {
+            UserStatus status = UserStatus.fromString(packet.getString("status"));
+            final UserStatus oldStatus = user.getStatus();
+            ((ImplUser) user).setStatus(status);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<UserChangeStatusListener> listeners = api.getListeners(UserChangeStatusListener.class);
+                    synchronized (listeners) {
+                        for (UserChangeStatusListener listener : listeners) {
+                            try {
+                                listener.onUserChangeStatus(api, user, oldStatus);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in UserChangeStatusListener!", t);
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         // check username
         if (packet.getJSONObject("user").has("username")) {
