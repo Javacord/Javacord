@@ -898,6 +898,13 @@ public class ImplDiscordAPI implements DiscordAPI {
         return waitForServersOnStartup;
     }
 
+    @Override
+    public void disconnect() {
+        if (socketAdapter != null) {
+            socketAdapter.getWebSocket().sendClose(1000);
+        }
+    }
+
     /**
      * Gets a list with all unavailable servers.
      *

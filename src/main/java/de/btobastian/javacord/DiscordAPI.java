@@ -589,4 +589,10 @@ public interface DiscordAPI {
      */
     public boolean isWaitingForServersOnStartup();
 
+    /**
+     * Disconnects the bot.
+     * After disconnecting you should NOT use this instance again.
+     */
+    public void disconnect();
+
 }
