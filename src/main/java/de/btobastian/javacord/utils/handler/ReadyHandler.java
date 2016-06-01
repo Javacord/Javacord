@@ -45,6 +45,9 @@ public class ReadyHandler extends PacketHandler {
         long heartbeatInterval = packet.getLong("heartbeat_interval");
         api.getSocketAdapter().startHeartbeat(heartbeatInterval);
 
+        String sessionId = packet.getString("session_id");
+        api.getSocketAdapter().setSessionId(sessionId);
+
         JSONArray guilds = packet.getJSONArray("guilds"); // guild = server
         for (int i = 0; i < guilds.length(); i++) {
             JSONObject guild = guilds.getJSONObject(i);

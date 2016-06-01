@@ -70,6 +70,10 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     // received in packet with op = 7
     private String urlForReconnect = null;
 
+    // The last sequence number received
+    private int lastSeq = -1;
+    private String sessionId = null;
+
     /**
      * Creates a new instance of this class.
      *
@@ -78,10 +82,23 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param reconnect Whether it's a reconnect or not.
      */
     public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
+        this(serverURI, api, reconnect, null, -1);
+    }
+
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param serverURI The uri of the gateway the socket should connect to.
+     * @param api The api.
+     * @param reconnect Whether it's a reconnect or not.
+     */
+    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect, String sessionId, int lastSeq) {
         this.api = api;
         this.ready = SettableFuture.create();
         registerHandlers();
         this.isReconnect = reconnect;
+        this.sessionId = sessionId;
+        this.lastSeq = lastSeq;
 
         WebSocketFactory factory = new WebSocketFactory();
         try {
@@ -100,37 +117,51 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onConnected(WebSocket socket, Map<String, List<String>> headers) throws Exception {
-        JSONObject connectPacket = new JSONObject()
-                .put("op", 2)
-                .put("d", new JSONObject()
-                        .put("token", api.getToken())
-                        .put("v", 3)
-                        .put("properties", new JSONObject()
-                                .put("$os", System.getProperty("os.name"))
-                                .put("$browser", "None")
-                                .put("$device", "")
-                                .put("$referrer", "https://discordapp.com/@me")
-                                .put("$referring_domain", "discordapp.com"))
-                        .put("large_threshold", 250)
-                        .put("compress", true));
-        logger.debug("Sending connect packet");
-        socket.sendText(connectPacket.toString());
+        if (isReconnect && sessionId != null && lastSeq >= 0) { // send resume packet
+            JSONObject resumePacket = new JSONObject()
+                    .put("token", api.getToken())
+                    .put("session_id", sessionId)
+                    .put("seq", lastSeq);
+            logger.debug("Sending resume packet");
+            socket.sendText(resumePacket.toString());
+        } else { // send "normal" payload
+            JSONObject connectPacket = new JSONObject()
+                    .put("op", 2)
+                    .put("d", new JSONObject()
+                            .put("token", api.getToken())
+                            .put("v", 3)
+                            .put("properties", new JSONObject()
+                                    .put("$os", System.getProperty("os.name"))
+                                    .put("$browser", "None")
+                                    .put("$device", "")
+                                    .put("$referrer", "https://discordapp.com/@me")
+                                    .put("$referring_domain", "discordapp.com"))
+                            .put("large_threshold", 250)
+                            .put("compress", true));
+            logger.debug("Sending connect packet");
+            socket.sendText(connectPacket.toString());
+        }
     }
 
     @Override
     public void onDisconnected(WebSocket socket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                                boolean closedByServer) throws Exception {
-        logger.info("Websocket closed with reason {} and code {}",
+        logger.info("Websocket closed with reason {} and code {}{}",
                 serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
-                serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown");
+                serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown",
+                closedByServer ? " by server" : "");
         isClosed = true;
         if (closedByServer && urlForReconnect != null) {
             logger.info("Trying to reconnect (we received op 7 before)...");
-            api.reconnectBlocking(urlForReconnect);
+            api.reconnectBlocking(urlForReconnect, sessionId, lastSeq);
             logger.info("Reconnected!");
         } else if (closedByServer && api.isAutoReconnectEnabled()) {
             logger.info("Trying to auto-reconnect...");
-            api.reconnectBlocking();
+            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
+            logger.info("Reconnected!");
+        } else if (!closedByServer && (clientCloseFrame == null || clientCloseFrame.getCloseCode() != 1000)) {
+            logger.info("Trying to auto-reconnect...");
+            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
             logger.info("Reconnected!");
         }
         if (!ready.isDone()) {
@@ -174,12 +205,21 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             return;
         }
 
+        lastSeq = obj.getInt("s");
+
         JSONObject packet = obj.getJSONObject("d");
         String type = obj.getString("t");
 
         if (type.equals("READY") && isReconnect) {
             // we would get some errors if we do not handle the missed data
             handlers.get("READY_RECONNECT").handlePacket(packet);
+            ready.set(true);
+            updateStatus();
+            return; // do not handle the ready packet twice
+        }
+
+        // We don't receive a ready packet if we are resuming
+        if (isReconnect && !ready.isDone() && sessionId != null && lastSeq >= 0) {
             ready.set(true);
             updateStatus();
             return; // do not handle the ready packet twice
@@ -318,6 +358,15 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     }
 
     /**
+     * Sets the session id received in the ready packet.
+     *
+     * @param sessionId The session id to set.
+     */
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    /**
      * Registers all handlers.
      */
     private void registerHandlers() {
@@ -365,5 +414,4 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     private void addHandler(PacketHandler handler) {
         handlers.put(handler.getType(), handler);
     }
-
 }

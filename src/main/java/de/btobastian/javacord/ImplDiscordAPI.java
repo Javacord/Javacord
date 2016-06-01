@@ -692,7 +692,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void reconnectBlocking() {
-        reconnectBlocking(requestGatewayBlocking());
+        reconnectBlocking(requestGatewayBlocking(), null, -1);
     }
 
     @Override
@@ -918,8 +918,10 @@ public class ImplDiscordAPI implements DiscordAPI {
      * Tries to reconnect to the given gateway.
      *
      * @param gateway The gateway to reconnect to.
+     * @param sessionId The sessionId. Can be null if you don't like to resume the connection.
+     * @param lastSeq The last sequence number received. Can be < 0 if you don't like to resume the connection.
      */
-    public void reconnectBlocking(String gateway) {
+    public void reconnectBlocking(String gateway, String sessionId, int lastSeq) {
         logger.debug("Trying to reconnect to gateway {}", gateway);
         socketAdapter.getWebSocket().disconnect();
         if (token == null || !checkTokenBlocking(token)) {
@@ -929,7 +931,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             WebSocketFactory factory = new WebSocketFactory();
             factory.setSSLContext(SSLContext.getDefault());
 
-            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, true);
+            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, true, sessionId, lastSeq);
         } catch (URISyntaxException | NoSuchAlgorithmException e) {
             logger.warn("Reconnect failed. Please contact the developer!", e);
             return;
