@@ -119,9 +119,12 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     public void onConnected(WebSocket socket, Map<String, List<String>> headers) throws Exception {
         if (isReconnect && sessionId != null && lastSeq >= 0) { // send resume packet
             JSONObject resumePacket = new JSONObject()
-                    .put("token", api.getToken())
-                    .put("session_id", sessionId)
-                    .put("seq", lastSeq);
+                    .put("op", 6)
+                    .put("d", new JSONObject()
+                        .put("token", api.getToken())
+                        .put("session_id", sessionId)
+                        .put("seq", lastSeq)
+                    );
             logger.debug("Sending resume packet");
             socket.sendText(resumePacket.toString());
         } else { // send "normal" payload
