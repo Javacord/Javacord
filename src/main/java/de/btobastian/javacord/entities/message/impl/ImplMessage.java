@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities.message.impl;
 
+import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -62,7 +63,7 @@ public class ImplMessage implements Message {
     private static final ThreadLocal<SimpleDateFormat> TIMEZONE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'000000'XXX"); //Had to lose SSS, SimpleDateFormat can't do nano seconds...
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         }
     };
     private static final ThreadLocal<SimpleDateFormat> FORMAT = new ThreadLocal<SimpleDateFormat>() {
@@ -115,11 +116,13 @@ public class ImplMessage implements Message {
             String time = data.getString("timestamp");
             Calendar calendar = Calendar.getInstance();
             try {
-                calendar.setTime(TIMEZONE_FORMAT.get().parse(time));
+                //remove the nano seconds, rejoining on +. If the formatting change the string will remain the same
+                String nanoSecondsRemoved = Joiner.on("+").join(time.split("\\d{3}\\+"));
+                calendar.setTime(TIMEZONE_FORMAT.get().parse(nanoSecondsRemoved));
             } catch (ParseException timeZoneIgnored) {
-                try {
+                try { //Continuing with previous code before Issue 15 fix
                     calendar.setTime(FORMAT.get().parse(time.substring(0, time.length() - 9)));
-                } catch (ParseException ignored) { //Continuing with previous code before Issue 15 fix
+                } catch (ParseException ignored) {
                     try {
                         calendar.setTime(FORMAT_ALTERNATIVE.get().parse(time.substring(0, time.length() - 9)));
                     } catch (ParseException ignored2) {
