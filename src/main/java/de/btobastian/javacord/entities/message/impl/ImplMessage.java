@@ -116,7 +116,7 @@ public class ImplMessage implements Message {
             String time = data.getString("timestamp");
             Calendar calendar = Calendar.getInstance();
             try {
-                //remove the nano seconds, rejoining on +. If the formatting change the string will remain the same
+                //remove the nano seconds, rejoining on +. If the formatting changes then the string will remain the same
                 String nanoSecondsRemoved = Joiner.on("+").join(time.split("\\d{3}\\+"));
                 calendar.setTime(TIMEZONE_FORMAT.get().parse(nanoSecondsRemoved));
             } catch (ParseException timeZoneIgnored) {
