@@ -59,9 +59,30 @@ public class ImplMessage implements Message {
      */
     private static final Logger logger = LoggerUtil.getLogger(ImplMessage.class);
 
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    private static final SimpleDateFormat FORMAT_ALTERNATIVE_TWO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+    private static final ThreadLocal<SimpleDateFormat> TIMEZONE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'000000'XXX"); //Had to lose SSS, SimpleDateFormat can't do nano seconds...
+        }
+    };
+    private static final ThreadLocal<SimpleDateFormat> FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        }
+    };
+    private static final ThreadLocal<SimpleDateFormat> FORMAT_ALTERNATIVE = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
+    private static final ThreadLocal<SimpleDateFormat> FORMAT_ALTERNATIVE_TWO = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+        }
+    };
 
     private final ImplDiscordAPI api;
 
@@ -93,15 +114,17 @@ public class ImplMessage implements Message {
         if (data.has("timestamp")) {
             String time = data.getString("timestamp");
             Calendar calendar = Calendar.getInstance();
-            synchronized (FORMAT) { // SimpleDateFormat#parse() isn't thread safe...
+            try {
+                calendar.setTime(TIMEZONE_FORMAT.get().parse(time));
+            } catch (ParseException timeZoneIgnored) {
                 try {
-                    calendar.setTime(FORMAT.parse(time.substring(0, time.length() - 9)));
-                } catch (ParseException ignored) {
+                    calendar.setTime(FORMAT.get().parse(time.substring(0, time.length() - 9)));
+                } catch (ParseException ignored) { //Continuing with previous code before Issue 15 fix
                     try {
-                        calendar.setTime(FORMAT_ALTERNATIVE.parse(time.substring(0, time.length() - 9)));
+                        calendar.setTime(FORMAT_ALTERNATIVE.get().parse(time.substring(0, time.length() - 9)));
                     } catch (ParseException ignored2) {
                         try {
-                            calendar.setTime(FORMAT_ALTERNATIVE_TWO.parse(time.substring(0, time.length() - 9)));
+                            calendar.setTime(FORMAT_ALTERNATIVE_TWO.get().parse(time.substring(0, time.length() - 9)));
                         } catch (ParseException e) {
                             logger.warn("Could not parse timestamp {}. Please contact the developer!", time, e);
                         }
