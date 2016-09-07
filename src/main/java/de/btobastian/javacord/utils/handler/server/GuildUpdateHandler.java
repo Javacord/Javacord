@@ -23,8 +23,10 @@ import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.server.ServerChangeNameListener;
 import de.btobastian.javacord.listener.server.ServerChangeRegionListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -32,6 +34,11 @@ import java.util.List;
  * Handles the guild update packet.
  */
 public class GuildUpdateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildUpdateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -59,7 +66,11 @@ public class GuildUpdateHandler extends PacketHandler {
                     List<ServerChangeNameListener> listeners = api.getListeners(ServerChangeNameListener.class);
                     synchronized (listeners) {
                         for (ServerChangeNameListener listener : listeners) {
-                            listener.onServerChangeName(api, server, oldName);
+                            try {
+                                listener.onServerChangeName(api, server, oldName);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ServerChangeNameListener!", t);
+                            }
                         }
                     }
                 }
@@ -76,7 +87,11 @@ public class GuildUpdateHandler extends PacketHandler {
                     List<ServerChangeRegionListener> listeners = api.getListeners(ServerChangeRegionListener.class);
                     synchronized (listeners) {
                         for (ServerChangeRegionListener listener : listeners) {
-                            listener.onServerChangeRegion(api, server, oldRegion);
+                            try {
+                                listener.onServerChangeRegion(api, server, oldRegion);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ServerChangeRegionListener!", t);
+                            }
                         }
                     }
                 }

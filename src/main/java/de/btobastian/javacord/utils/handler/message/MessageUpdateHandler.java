@@ -22,8 +22,10 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.message.MessageEditListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -31,6 +33,11 @@ import java.util.List;
  * Handles the message update packet.
  */
 public class MessageUpdateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(MessageUpdateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -59,7 +66,11 @@ public class MessageUpdateHandler extends PacketHandler {
                 List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
                 synchronized (listeners) {
                     for (MessageEditListener listener : listeners) {
-                        listener.onMessageEdit(api, message, oldContent);
+                        try {
+                            listener.onMessageEdit(api, message, oldContent);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in MessageEditListener!", t);
+                        }
                     }
                 }
             }

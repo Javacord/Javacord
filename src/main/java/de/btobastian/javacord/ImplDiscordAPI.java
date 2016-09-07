@@ -19,6 +19,7 @@
 package de.btobastian.javacord;
 
 import com.google.common.io.BaseEncoding;
+import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -47,6 +48,8 @@ import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ThreadPool;
+import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -81,9 +84,12 @@ public class ImplDiscordAPI implements DiscordAPI {
     private String password = null;
     private String token = null;
     private String game = null;
+    private String streamingUrl = null;
     private boolean idle = false;
 
     private boolean autoReconnect = true;
+
+    private boolean waitForServersOnStartup = true;
 
     private User you = null;
 
@@ -91,7 +97,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     private DiscordWebsocketAdapter socketAdapter = null;
 
-    private RateLimitedException lastRateLimitedException = null;
+    private RateLimitManager rateLimitManager = new RateLimitManager();
 
     private final ConcurrentHashMap<String, Server> servers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
@@ -119,6 +125,9 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
         }
     };
+
+    // a set with all unavailable servers
+    private final Set<String> unavailableServers = new HashSet<>();
 
     /**
      * Creates a new instance of this class.
@@ -178,7 +187,13 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void setGame(String game) {
+        setGame(game, null);
+    }
+
+    @Override
+    public void setGame(String game, String streamingUrl) {
         this.game = game;
+        this.streamingUrl = streamingUrl;
         try {
             if (socketAdapter != null && socketAdapter.isReady().isDone() && socketAdapter.isReady().get()) {
                 socketAdapter.updateStatus();
@@ -191,6 +206,11 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public String getGame() {
         return game;
+    }
+
+    @Override
+    public String getStreamingUrl() {
+        return streamingUrl;
     }
 
     @Override
@@ -301,7 +321,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void registerListener(Listener listener) {
-        for (Class<?> implementedInterface : listener.getClass().getInterfaces()) {
+        for (Class<?> implementedInterface : TypeToken.of(listener.getClass()).getTypes().interfaces().rawTypes()) {
             if (Listener.class.isAssignableFrom(implementedInterface)) {
                 List<Listener> listenersList = listeners.get(implementedInterface);
                 if (listenersList == null) {
@@ -543,9 +563,11 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         final JSONObject params = new JSONObject()
                 .put("username", newUsername == null ? getYourself().getName() : newUsername)
-                .put("email", newEmail == null ? email : newEmail)
-                .put("avatar", avatarString == null ? JSONObject.NULL : avatarString)
-                .put("password", password);
+                .put("avatar", avatarString == null ? JSONObject.NULL : avatarString);
+        if (email != null && password != null) { // do not exist in bot accounts
+            params.put("email", newEmail == null ? email : newEmail)
+                    .put("password", password);
+        }
         if (newPassword != null) {
             params.put("new_password", newPassword);
         }
@@ -564,7 +586,9 @@ public class ImplDiscordAPI implements DiscordAPI {
                             newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"),
                             newAvatar != null);
                     ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
-                    setEmail(response.getBody().getObject().getString("email"));
+                    if (response.getBody().getObject().has("email")) {
+                        setEmail(response.getBody().getObject().getString("email"));
+                    }
                     setToken(response.getBody().getObject().getString("token"), token.startsWith("Bot "));
                     final String oldName = getYourself().getName();
                     ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
@@ -669,7 +693,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void reconnectBlocking() {
-        reconnectBlocking(requestGatewayBlocking());
+        reconnectBlocking(requestGatewayBlocking(), null, -1);
     }
 
     @Override
@@ -680,50 +704,6 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public boolean isAutoReconnectEnabled() {
         return autoReconnect;
-    }
-
-    @Override
-    public Future<String> convertToBotAccount(String ownerToken) {
-        return convertToBotAccount(null, ownerToken);
-    }
-
-    @Override
-    public Future<String> convertToBotAccount(final String applicationId, final String ownerToken) {
-        if (getYourself().isBot()) {
-            throw new NotSupportedForBotsException();
-        }
-        return getThreadPool().getExecutorService().submit(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                String id = applicationId;
-                logger.debug("Trying to convert account to bot account (application id: {}, owner token: {}",
-                        id, ownerToken.replaceAll(".{10}", "**********"));
-                if (applicationId == null) {
-                    logger.debug("Trying to create application for owner");
-                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
-                            .header("content-type", "application/json")
-                            .header("authorization", ownerToken)
-                            .body(new JSONObject()
-                                    .put("name", getYourself().getName())
-                                    .toString())
-                            .asJson();
-                    checkResponse(response);
-                    Application application = new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
-                    logger.debug("Created application for owner (application: {})", application);
-                    id = application.getId();
-                }
-                HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/oauth2/applications/" + id + "/bot")
-                        .header("content-type", "application/json")
-                        .header("authorization", ownerToken)
-                        .body(new JSONObject().put("token", getToken()).toString())
-                        .asJson();
-                setToken(response.getBody().getObject().getString("token"), true);
-                logger.info("Converted account into bot account (id: {}, new token: {})",
-                        id, getToken().replaceAll(".{10}", "**********"));
-                return id;
-            }
-        });
     }
 
     @Override
@@ -904,12 +884,45 @@ public class ImplDiscordAPI implements DiscordAPI {
         return future;
     }
 
+    @Override
+    public RateLimitManager getRateLimitManager() {
+        return rateLimitManager;
+    }
+
+    @Override
+    public void setWaitForServersOnStartup(boolean wait) {
+        this.waitForServersOnStartup = wait;
+    }
+
+    @Override
+    public boolean isWaitingForServersOnStartup() {
+        return waitForServersOnStartup;
+    }
+
+    @Override
+    public void disconnect() {
+        if (socketAdapter != null) {
+            socketAdapter.getWebSocket().sendClose(1000);
+        }
+    }
+
+    /**
+     * Gets a list with all unavailable servers.
+     *
+     * @return A list with all unavailable servers.
+     */
+    public Set<String> getUnavailableServers() {
+        return unavailableServers;
+    }
+
     /**
      * Tries to reconnect to the given gateway.
      *
      * @param gateway The gateway to reconnect to.
+     * @param sessionId The sessionId. Can be null if you don't like to resume the connection.
+     * @param lastSeq The last sequence number received. Can be < 0 if you don't like to resume the connection.
      */
-    public void reconnectBlocking(String gateway) {
+    public void reconnectBlocking(String gateway, String sessionId, int lastSeq) {
         logger.debug("Trying to reconnect to gateway {}", gateway);
         socketAdapter.getWebSocket().disconnect();
         if (token == null || !checkTokenBlocking(token)) {
@@ -919,7 +932,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             WebSocketFactory factory = new WebSocketFactory();
             factory.setSSLContext(SSLContext.getDefault());
 
-            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, true);
+            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, true, sessionId, lastSeq);
         } catch (URISyntaxException | NoSuchAlgorithmException e) {
             logger.warn("Reconnect failed. Please contact the developer!", e);
             return;
@@ -930,20 +943,6 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
         } catch (InterruptedException | ExecutionException e) {
             logger.warn("Reconnect failed. Please contact the developer!", e);
-        }
-    }
-
-    /**
-     * Checks if we are still rate limited.
-     *
-     * @throws RateLimitedException If we are rate limited.
-     */
-    public void checkRateLimit() throws RateLimitedException {
-        // TODO remake rate limit checks
-        long retryAt = lastRateLimitedException == null ? 0L : lastRateLimitedException.getRetryAfter();
-        long retryAfter = retryAt - System.currentTimeMillis();
-        if (retryAfter > 0) {
-            throw new RateLimitedException("We are still rate limited for " + retryAfter + " ms!", retryAfter);
         }
     }
 
@@ -1143,18 +1142,36 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!" + message);
         }
-        if (response.getBody() != null && !response.getBody().isArray()
-                && response.getBody().getObject().has("retry_after")) {
-            long retryAfter = response.getBody().getObject().getLong("retry_after");
-            RateLimitedException exception =
-                    new RateLimitedException("We got rate limited for " + retryAfter + " ms!", retryAfter);
-            lastRateLimitedException = exception;
-            throw exception;
-        }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
             throw new BadResponseException("Received http status code " + response.getStatus() + " with message "
                     + response.getStatusText() + " and body " + response.getBody(), response.getStatus(),
                     response.getStatusText(), response);
+        }
+    }
+
+    /**
+     * Checks if there current action if rate limited. The check should be performed before AND after making a request.
+     *
+     * @param response The response to check. Can be <code>null</code>.
+     * @param type The type of the rate limit.
+     * @param server The server of the rate limit.
+     *
+     * @throws RateLimitedException if there's a rate limit.
+     */
+    public void checkRateLimit(HttpResponse<JsonNode> response, RateLimitType type, Server server)
+            throws RateLimitedException {
+        if (rateLimitManager.isRateLimited(type, server) && type != RateLimitType.UNKNOWN) {
+            long retryAfter = rateLimitManager.getRateLimit(type, server);
+            throw new RateLimitedException(
+                    "We are rate limited for " + retryAfter + " ms!", retryAfter, type, server, rateLimitManager);
+        }
+        if (response != null && response.getBody() != null && !response.getBody().isArray()
+                && response.getBody().getObject().has("retry_after")) {
+            long retryAfter = response.getBody().getObject().getLong("retry_after");
+            rateLimitManager.addRateLimit(type, server, retryAfter);
+            throw new RateLimitedException(
+                    "We are rate limited for " + retryAfter + " ms (type: " + type.name() + ")!",
+                    retryAfter, type, server, rateLimitManager);
         }
     }
 

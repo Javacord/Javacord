@@ -28,6 +28,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -113,6 +114,7 @@ public class ImplInviteBuilder implements InviteBuilder {
                                 .body(jsonParam.toString())
                                 .asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
                         JSONObject data = response.getBody().getObject();
                         logger.debug("Created invite for channel {} (max uses: {}, temporary: {}, max age: {}",
                                 textChannel == null ? voiceChannel : textChannel, maxUses, temporary,

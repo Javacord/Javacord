@@ -23,6 +23,7 @@ import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
+import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -76,11 +77,26 @@ public interface DiscordAPI {
     public void setGame(String game);
 
     /**
+     * Sets the game shown in the user list and a streaming url (which means it shows you as streaming).
+     *
+     * @param game The game to set.
+     * @param streamingUrl The url of the stream.
+     */
+    public void setGame(String game, String streamingUrl);
+
+    /**
      * Gets the game shown in the user list.
      *
      * @return The game.
      */
     public String getGame();
+
+    /**
+     * Gets the streaming url of the bot.
+     *
+     * @return The streaming url of the bot.
+     */
+    public String getStreamingUrl();
 
     /**
      * Gets a server by its id.
@@ -453,26 +469,6 @@ public interface DiscordAPI {
     public boolean isAutoReconnectEnabled();
 
     /**
-     * Converts the current account to a bot account.
-     * Converting a user account to a bot account is irreversible. USE CAUTION!
-     * This will create a new application for the bot.
-     *
-     * @param ownerToken The token of the owner of the bot.
-     * @return The id of the application.
-     */
-    public Future<String> convertToBotAccount(String ownerToken);
-
-    /**
-     * Converts the current account to a bot account.
-     * Converting a user account to a bot account is irreversible. USE CAUTION!
-     *
-     * @param applicationId The od of the application the bot should belong to.
-     * @param ownerToken The token of the owner of the bot.
-     * @return The id of the application.
-     */
-    public Future<String> convertToBotAccount(String applicationId, String ownerToken);
-
-    /**
      * Gets a collection with all applications you own.
      *
      * @return A collection with all applications you own.
@@ -565,5 +561,38 @@ public interface DiscordAPI {
      * @return The application which owns the bot.
      */
     public Future<Application> createBot(String name, String applicationId, FutureCallback<Application> callback);
+
+    /**
+     * Gets the rate limit manager. This class caches all rate limits of the api.
+     *
+     * @return The rate limit manager of the api.
+     */
+    public RateLimitManager getRateLimitManager();
+
+    /**
+     * Sets whether the bot should wait for all servers to be loaded or not.
+     *
+     * This value is <code>true</code> by default.
+     * If it's set to <code>false</code> the list of servers ({@link #getServers()}) will be empty after connecting and
+     * will be filled a few seconds later (depending on the amount of servers).
+     *
+     * @param wait Whether the bot should wait for all servers to be loaded or not.
+     */
+    public void setWaitForServersOnStartup(boolean wait);
+
+    /**
+     * Checks whether the bot should wait for all servers to be loaded or not.
+     *
+     * This value is <code>true</code> by default.
+     * If it's set to <code>false</code> the list of servers ({@link #getServers()}) will be empty after connecting and
+     * will be filled a few seconds later (depending on the amount of servers).
+     */
+    public boolean isWaitingForServersOnStartup();
+
+    /**
+     * Disconnects the bot.
+     * After disconnecting you should NOT use this instance again.
+     */
+    public void disconnect();
 
 }

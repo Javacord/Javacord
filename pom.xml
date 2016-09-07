@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.btobastian.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>2.0.10</version>
+    <version>2.0.11</version>
     <name>Javacord</name>
     <description>A multithreaded but simple to use discord java api.</description>
 
@@ -15,11 +15,6 @@
 
     <dependencies>
         <!-- The JSON-lib cause discord returns in json format -->
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.8.1</version>
-        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>

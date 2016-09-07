@@ -21,8 +21,10 @@ package de.btobastian.javacord.utils.handler.message;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -30,6 +32,11 @@ import java.util.List;
  * Handles the message delete packet.
  */
 public class MessageDeleteHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(MessageDeleteHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -53,7 +60,11 @@ public class MessageDeleteHandler extends PacketHandler {
                 List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
                 synchronized (listeners) {
                     for (MessageDeleteListener listener : listeners) {
-                        listener.onMessageDelete(api, message);
+                        try {
+                            listener.onMessageDelete(api, message);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in MessageDeleteListener!", t);
+                        }
                     }
                 }
             }
