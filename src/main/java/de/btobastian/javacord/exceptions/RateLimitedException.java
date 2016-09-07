@@ -18,29 +18,58 @@
  */
 package de.btobastian.javacord.exceptions;
 
+import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
+
 /**
  * This exception is always thrown if we receive a response which has rate_limit.
  */
 public class RateLimitedException extends Exception {
 
     private final long retryAfter;
-    private final long retryAt;
+    private final RateLimitType type;
+    private final Server server;
+    private final RateLimitManager manager;
 
     /**
      * Creates a new instance of this class.
      *
      * @param message The message of the exception.
-     * @param retryAfter The "retry_after" received in the response.
+     * @param type The type of the rate limit.
+     * @param server The server of the rate limit. Can be <code>null</code> for non-server related limits.
+     * @param manager The rate limit manager.
      */
-    public RateLimitedException(String message, long retryAfter) {
+    public RateLimitedException(String message, long retryAfter, RateLimitType type, Server server, RateLimitManager manager) {
         super(message);
         this.retryAfter = retryAfter;
-        this.retryAt = System.currentTimeMillis() + retryAfter;
+        this.type = type;
+        this.server = server;
+        this.manager = manager;
+    }
+
+    /**
+     * Gets the type of the rate limit.
+     *
+     * @return The type of the rate limit.
+     */
+    public RateLimitType getType() {
+        return type;
+    }
+
+    /**
+     * Gets the server of the rate limit.
+     *
+     * @return The server of the rate limit. Can be <code>null</code> for non-server related limits.
+     */
+    public Server getServer() {
+        return server;
     }
 
     /**
      * Gets the "retry_after" received in the response.
      * Retry after is the time in milliseconds we have to wait for the next request.
+     * NOTE: The value does not get updated!
      *
      * @return The "retry_after" received in the response.
      */
@@ -49,25 +78,23 @@ public class RateLimitedException extends Exception {
     }
 
     /**
-     *  The calculated time when we can send a new messages.
+     * The calculated time when we can send a new messages.
      *
      * @return The calculated time when we can send a new message.
      */
     public long getRetryAt() {
-        return retryAt;
+        return System.currentTimeMillis() +  manager.getRateLimit(type, server);
     }
 
     /**
      * Causes the current thread to wait until we can retry the request.
      */
-    public void waitTillRetry() {
-        long time = getRetryAt() - System.currentTimeMillis();
+    public void waitTillRetry() throws InterruptedException {
+        long time = manager.getRateLimit(type, server);
         if (time < 1) {
             return;
         }
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException ignored) { }
+        Thread.sleep(time);
     }
 
 }

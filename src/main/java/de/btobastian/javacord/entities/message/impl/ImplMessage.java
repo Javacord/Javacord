@@ -34,6 +34,7 @@ import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -210,11 +211,22 @@ public class ImplMessage implements Message {
                 try {
                     logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
+                    if (isPrivateMessage()) {
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    } else {
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                    }
                     HttpResponse<JsonNode> response = Unirest.delete
                             ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    if (isPrivateMessage()) {
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    } else {
+                        api.checkRateLimit(
+                                response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                    }
                     api.removeMessage(message);
                     logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
@@ -225,7 +237,11 @@ public class ImplMessage implements Message {
                             List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
                             synchronized (listeners) {
                                 for (MessageDeleteListener listener : listeners) {
-                                    listener.onMessageDelete(api, message);
+                                    try {
+                                        listener.onMessageDelete(api, message);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in MessageDeleteListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -322,6 +338,11 @@ public class ImplMessage implements Message {
             @Override
             public Exception call() throws Exception {
                 try {
+                    if (isPrivateMessage()) {
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                    } else {
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                    }
                     HttpResponse<JsonNode> response = Unirest
                             .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
                             .header("authorization", api.getToken())
@@ -329,6 +350,11 @@ public class ImplMessage implements Message {
                             .body(new JSONObject().put("content", content).toString())
                             .asJson();
                     api.checkResponse(response);
+                    if (isPrivateMessage()) {
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                    } else {
+                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                    }
                     final String oldContent = getContent();
                     setContent(content);
                     if (!oldContent.equals(content)) {
@@ -338,7 +364,11 @@ public class ImplMessage implements Message {
                                 List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
                                 synchronized (listeners) {
                                     for (MessageEditListener listener : listeners) {
-                                        listener.onMessageEdit(api, ImplMessage.this, oldContent);
+                                        try {
+                                            listener.onMessageEdit(api, ImplMessage.this, oldContent);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in MessageEditListener!", t);
+                                        }
                                     }
                                 }
                             }

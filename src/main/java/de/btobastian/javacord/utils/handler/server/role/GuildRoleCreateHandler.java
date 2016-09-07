@@ -24,8 +24,10 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.role.RoleCreateListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -33,6 +35,11 @@ import java.util.List;
  * Handles the guild role create packet.
  */
 public class GuildRoleCreateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildRoleCreateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -57,7 +64,11 @@ public class GuildRoleCreateHandler extends PacketHandler {
                 List<RoleCreateListener> listeners = api.getListeners(RoleCreateListener.class);
                 synchronized (listeners) {
                     for (RoleCreateListener listener : listeners) {
-                        listener.onRoleCreate(api, role);
+                        try {
+                            listener.onRoleCreate(api, role);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in RoleCreateListener!", t);
+                        }
                     }
                 }
             }

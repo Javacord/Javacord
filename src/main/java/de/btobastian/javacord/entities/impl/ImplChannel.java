@@ -44,6 +44,7 @@ import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
 import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -218,7 +219,7 @@ public class ImplChannel implements Channel {
                     public Message call() throws Exception {
                         logger.debug("Trying to send message in channel {} (content: \"{}\", tts: {})",
                                 ImplChannel.this, content, tts);
-                        api.checkRateLimit();
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, server);
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
                                         .header("authorization", api.getToken())
@@ -229,6 +230,7 @@ public class ImplChannel implements Channel {
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, server);
                         logger.debug("Sent message in channel {} (content: \"{}\", tts: {})",
                                 ImplChannel.this, content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
@@ -274,7 +276,7 @@ public class ImplChannel implements Channel {
                     public Message call() throws Exception {
                         logger.debug("Trying to send a file in channel {} (name: {}, comment: {})",
                                 ImplChannel.this, file.getName(), comment);
-                        api.checkRateLimit();
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, server);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
@@ -284,6 +286,7 @@ public class ImplChannel implements Channel {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, server);
                         logger.debug("Sent a file in channel {} (name: {}, comment: {})",
                                 ImplChannel.this, file.getName(), comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
@@ -310,7 +313,7 @@ public class ImplChannel implements Channel {
                     public Message call() throws Exception {
                         logger.debug("Trying to send an input stream in channel {} (comment: {})",
                                 ImplChannel.this, comment);
-                        api.checkRateLimit();
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, server);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
@@ -320,6 +323,7 @@ public class ImplChannel implements Channel {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, server);
                         logger.debug("Sent an input stream in channel {} (comment: {})", ImplChannel.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -423,6 +427,7 @@ public class ImplChannel implements Channel {
                             .body(params.toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
                     logger.info("Updated channel {} (new name: {}, old name: {}, new topic: {}, old topic: {})",
                             ImplChannel.this, newName, getName(), newTopic, getTopic());
                     String updatedName = response.getBody().getObject().getString("name");
@@ -443,7 +448,11 @@ public class ImplChannel implements Channel {
                                         api.getListeners(ChannelChangeNameListener.class);
                                 synchronized (listeners) {
                                     for (ChannelChangeNameListener listener : listeners) {
-                                        listener.onChannelChangeName(api, ImplChannel.this, oldName);
+                                        try {
+                                            listener.onChannelChangeName(api, ImplChannel.this, oldName);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ChannelChangeNameListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -462,7 +471,11 @@ public class ImplChannel implements Channel {
                                         api.getListeners(ChannelChangeTopicListener.class);
                                 synchronized (listeners) {
                                     for (ChannelChangeTopicListener listener : listeners) {
-                                        listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                        try {
+                                            listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ChannelChangeTopicListener!", t);
+                                        }
                                     }
                                 }
                             }

@@ -23,8 +23,10 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.role.RoleDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -32,6 +34,11 @@ import java.util.List;
  * Handles the guild role delete packet.
  */
 public class GuildRoleDeleteHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildRoleDeleteHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -62,7 +69,11 @@ public class GuildRoleDeleteHandler extends PacketHandler {
                 List<RoleDeleteListener> listeners = api.getListeners(RoleDeleteListener.class);
                 synchronized (listeners) {
                     for (RoleDeleteListener listener : listeners) {
-                        listener.onRoleDelete(api, role);
+                        try {
+                            listener.onRoleDelete(api, role);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in RoleDeleteListener!", t);
+                        }
                     }
                 }
             }

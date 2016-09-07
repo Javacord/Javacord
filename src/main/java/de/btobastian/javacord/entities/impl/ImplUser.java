@@ -29,6 +29,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
@@ -36,6 +37,7 @@ import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -72,6 +74,7 @@ public class ImplUser implements User {
     private String game = null;
     private final String discriminator;
     private final boolean bot;
+    private UserStatus status = UserStatus.OFFLINE;
 
     /**
      * Creates a new instance of this class.
@@ -115,6 +118,7 @@ public class ImplUser implements User {
                     .header("authorization", api.getToken())
                     .asJson();
             api.checkResponse(response);
+            api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
             logger.debug("Sent typing state to user {}", this);
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,7 +238,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send message to user {} (content: \"{}\", tts: {})",
                                 ImplUser.this, content, tts);
-                        api.checkRateLimit();
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
@@ -246,6 +250,7 @@ public class ImplUser implements User {
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
                         logger.debug("Sent message to user {} (content: \"{}\", tts: {})", ImplUser.this, content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -290,7 +295,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send a file to user {} (name: {}, comment: {})",
                                 ImplUser.this, file.getName(), comment);
-                        api.checkRateLimit();
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
                                 .header("authorization", api.getToken())
@@ -300,6 +305,7 @@ public class ImplUser implements User {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
                         logger.debug("Sent a file to user {} (name: {}, comment: {})",
                                 ImplUser.this, file.getName(), comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
@@ -326,7 +332,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send an input stream to user {} (comment: {})",
                                 ImplUser.this, comment);
-                        api.checkRateLimit();
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
                                 .header("authorization", api.getToken())
@@ -336,6 +342,7 @@ public class ImplUser implements User {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
                         logger.debug("Sent an input stream to user {} (comment: {})", ImplUser.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -433,6 +440,20 @@ public class ImplUser implements User {
         return bot;
     }
 
+    @Override
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * Sets the status of the user.
+     *
+     * @param status The status of the user.
+     */
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
     /**
      * Gets the message history.
      *
@@ -491,6 +512,7 @@ public class ImplUser implements User {
                     .body(new JSONObject().put("recipient_id", id).toString())
                     .asJson();
             api.checkResponse(response);
+            api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
             userChannelId = response.getBody().getObject().getString("id");
             logger.debug("Got channel id of user {} (channel id: {})", ImplUser.this, userChannelId);
             return userChannelId;

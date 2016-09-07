@@ -37,6 +37,7 @@ import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -133,6 +134,10 @@ public class ImplServer implements Server {
                     ((ImplUser) user).setGame(presence.getJSONObject("game").getString("name"));
                 }
             }
+            if (user != null && presence.has("status") && !presence.isNull("status")) {
+                UserStatus status = UserStatus.fromString(presence.getString("status"));
+                ((ImplUser) user).setStatus(status);
+            }
         }
 
         api.getServerMap().put(id, this);
@@ -159,6 +164,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     api.getServerMap().remove(id);
                     logger.info("Deleted server {}", ImplServer.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
@@ -167,7 +173,11 @@ public class ImplServer implements Server {
                             List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
                                 for (ServerLeaveListener listener : listeners) {
-                                    listener.onServerLeave(api, ImplServer.this);
+                                    try {
+                                        listener.onServerLeave(api, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerLeaveListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -192,6 +202,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     api.getServerMap().remove(id);
                     logger.info("Left server {}", ImplServer.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
@@ -200,7 +211,11 @@ public class ImplServer implements Server {
                             List<ServerLeaveListener> listeners = api.getListeners(ServerLeaveListener.class);
                             synchronized (listeners) {
                                 for (ServerLeaveListener listener : listeners) {
-                                    listener.onServerLeave(api, ImplServer.this);
+                                    try {
+                                        listener.onServerLeave(api, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerLeaveListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -283,7 +298,11 @@ public class ImplServer implements Server {
                                 List<ChannelCreateListener> listeners = api.getListeners(ChannelCreateListener.class);
                                 synchronized (listeners) {
                                     for (ChannelCreateListener listener : listeners) {
-                                        listener.onChannelCreate(api, channel);
+                                        try {
+                                            listener.onChannelCreate(api, channel);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ChannelCreateListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -318,7 +337,11 @@ public class ImplServer implements Server {
                                         api.getListeners(VoiceChannelCreateListener.class);
                                 synchronized (listeners) {
                                     for (VoiceChannelCreateListener listener : listeners) {
+                                        try {
                                         listener.onVoiceChannelCreate(api, channel);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in VoiceChannelCreateListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -349,6 +372,7 @@ public class ImplServer implements Server {
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                         Invite[] invites = new Invite[response.getBody().getArray().length()];
                         for (int i = 0; i < response.getBody().getArray().length(); i++) {
                             invites[i] = new ImplInvite(api, response.getBody().getArray().getJSONObject(i));
@@ -381,6 +405,7 @@ public class ImplServer implements Server {
                             .body(new JSONObject().put("roles", roleIds).toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     for (final Role role : user.getRoles(ImplServer.this)) {
                         boolean contains = false;
                         for (Role r : roles) {
@@ -398,7 +423,11 @@ public class ImplServer implements Server {
                                             api.getListeners(UserRoleRemoveListener.class);
                                     synchronized (listeners) {
                                         for (UserRoleRemoveListener listener : listeners) {
-                                            listener.onUserRoleRemove(api, user, role);
+                                            try {
+                                                listener.onUserRoleRemove(api, user, role);
+                                            } catch (Throwable t) {
+                                                logger.warn("Uncaught exception in UserRoleRemoveListener!", t);
+                                            }
                                         }
                                     }
                                 }
@@ -414,7 +443,11 @@ public class ImplServer implements Server {
                                     List<UserRoleAddListener> listeners = api.getListeners(UserRoleAddListener.class);
                                     synchronized (listeners) {
                                         for (UserRoleAddListener listener : listeners) {
-                                            listener.onUserRoleAdd(api, user, role);
+                                            try {
+                                                listener.onUserRoleAdd(api, user, role);
+                                            } catch (Throwable t) {
+                                                logger.warn("Uncaught exception in UserRoleAddListener!", t);
+                                            }
                                         }
                                     }
                                 }
@@ -459,6 +492,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     final User user = api.getUserById(userId).get();
                     if (user != null) {
                         removeMember(user);
@@ -471,7 +505,11 @@ public class ImplServer implements Server {
                             List<ServerMemberBanListener> listeners = api.getListeners(ServerMemberBanListener.class);
                             synchronized (listeners) {
                                 for (ServerMemberBanListener listener : listeners) {
-                                    listener.onServerMemberBan(api, user, ImplServer.this);
+                                    try {
+                                        listener.onServerMemberBan(api, user, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerMemberBanListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -496,6 +534,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     logger.info("Unbanned an user from server {} (user id: {})", ImplServer.this, userId);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
@@ -504,7 +543,11 @@ public class ImplServer implements Server {
                                     api.getListeners(ServerMemberUnbanListener.class);
                             synchronized (listeners) {
                                 for (ServerMemberUnbanListener listener : listeners) {
-                                    listener.onServerMemberUnban(api, userId, ImplServer.this);
+                                    try {
+                                        listener.onServerMemberUnban(api, userId, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerMemberUnbanListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -534,6 +577,7 @@ public class ImplServer implements Server {
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                         JSONArray bannedUsersJson = response.getBody().getArray();
                         User[] bannedUsers = new User[bannedUsersJson.length()];
                         for (int i = 0; i < bannedUsersJson.length(); i++) {
@@ -566,6 +610,7 @@ public class ImplServer implements Server {
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     final User user = api.getUserById(userId).get();
                     if (user != null) {
                         removeMember(user);
@@ -578,7 +623,11 @@ public class ImplServer implements Server {
                                     api.getListeners(ServerMemberRemoveListener.class);
                             synchronized (listeners) {
                                 for (ServerMemberRemoveListener listener : listeners) {
-                                    listener.onServerMemberRemove(api, user, ImplServer.this);
+                                    try {
+                                        listener.onServerMemberRemove(api, user, ImplServer.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ServerMemberRemoveListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -607,6 +656,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                 final Role role = new ImplRole(response.getBody().getObject(), ImplServer.this, api);
                 logger.info("Created role in server {} (name: {}, id: {})",
                         ImplServer.this, role.getName(), role.getId());
@@ -616,7 +666,11 @@ public class ImplServer implements Server {
                         List<RoleCreateListener> listeners = api.getListeners(RoleCreateListener.class);
                         synchronized (listeners) {
                             for (RoleCreateListener listener : listeners) {
-                                listener.onRoleCreate(api, role);
+                                try {
+                                    listener.onRoleCreate(api, role);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in RoleCreateListener!", t);
+                                }
                             }
                         }
                     }
@@ -672,6 +726,7 @@ public class ImplServer implements Server {
                             .body(params.toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     logger.debug("Updated server {} (new name: {}, old name: {}, new region: {}, old region: {}",
                             ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
                             getRegion().getKey());
@@ -686,7 +741,11 @@ public class ImplServer implements Server {
                                         api.getListeners(ServerChangeNameListener.class);
                                 synchronized (listeners) {
                                     for (ServerChangeNameListener listener : listeners) {
-                                        listener.onServerChangeName(api, ImplServer.this, oldName);
+                                        try {
+                                            listener.onServerChangeName(api, ImplServer.this, oldName);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in ServerChangeNameListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -740,6 +799,7 @@ public class ImplServer implements Server {
                                     .toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
                     logger.debug("Authorized bot with application id {} and permissions {}",
                             applicationId, permissions);
                 } catch (Exception e) {
@@ -880,6 +940,7 @@ public class ImplServer implements Server {
                 .body(param.toString())
                 .asJson();
         api.checkResponse(response);
+        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
         if (voice) {
             return new ImplVoiceChannel(response.getBody().getObject(), this, api);
         } else {

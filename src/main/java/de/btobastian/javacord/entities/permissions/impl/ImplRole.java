@@ -31,6 +31,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.role.*;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -196,7 +197,7 @@ public class ImplRole implements Role {
             public Exception call() throws Exception {
                 logger.debug("Trying to update role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                         " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
-                        ImplRole.this, name, getName(), color, getColor().getRGB(),
+                        ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
                         hoist, getHoist(), allow, permissions.getAllowed());
                 try {
                     HttpResponse<JsonNode> response = Unirest
@@ -205,15 +206,16 @@ public class ImplRole implements Role {
                             .header("Content-Type", "application/json")
                             .body(new JSONObject()
                                     .put("name", name)
-                                    .put("color", color)
+                                    .put("color", color & 0xFFFFFF)
                                     .put("hoist", hoist)
                                     .put("permissions", allow).toString())
                             .asJson();
                     api.checkResponse(response);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
 
                     logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                             " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
-                            ImplRole.this, name, getName(), color, getColor().getRGB(),
+                            ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
                             hoist, getHoist(), allow, permissions.getAllowed());
                     // update permissions
                     if (ImplRole.this.permissions.getAllowed() != allow) {
@@ -227,7 +229,11 @@ public class ImplRole implements Role {
                                         api.getListeners(RoleChangePermissionsListener.class);
                                 synchronized (listeners) {
                                     for (RoleChangePermissionsListener listener : listeners) {
-                                        listener.onRoleChangePermissions(api, ImplRole.this, oldPermissions);
+                                        try {
+                                            listener.onRoleChangePermissions(api, ImplRole.this, oldPermissions);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in RoleChangePermissionsListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -245,7 +251,11 @@ public class ImplRole implements Role {
                                 List<RoleChangeNameListener> listeners = api.getListeners(RoleChangeNameListener.class);
                                 synchronized (listeners) {
                                     for (RoleChangeNameListener listener : listeners) {
-                                        listener.onRoleChangeName(api, ImplRole.this, oldName);
+                                        try {
+                                            listener.onRoleChangeName(api, ImplRole.this, oldName);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in RoleChangeNameListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -264,7 +274,11 @@ public class ImplRole implements Role {
                                         api.getListeners(RoleChangeColorListener.class);
                                 synchronized (listeners) {
                                     for (RoleChangeColorListener listener : listeners) {
-                                        listener.onRoleChangeColor(api, ImplRole.this, oldColor);
+                                        try {
+                                            listener.onRoleChangeColor(api, ImplRole.this, oldColor);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in RoleChangeColorListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -282,7 +296,11 @@ public class ImplRole implements Role {
                                         api.getListeners(RoleChangeHoistListener.class);
                                 synchronized (listeners) {
                                     for (RoleChangeHoistListener listener : listeners) {
-                                        listener.onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
+                                        try {
+                                            listener.onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
+                                        } catch (Throwable t) {
+                                            logger.warn("Uncaught exception in RoleChangeHoistListener!", t);
+                                        }
                                     }
                                 }
                             }
@@ -316,7 +334,11 @@ public class ImplRole implements Role {
                             List<RoleDeleteListener> listeners = api.getListeners(RoleDeleteListener.class);
                             synchronized (listeners) {
                                 for (RoleDeleteListener listener : listeners) {
-                                    listener.onRoleDelete(api, ImplRole.this);
+                                    try {
+                                        listener.onRoleDelete(api, ImplRole.this);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in RoleDeleteListener!", t);
+                                    }
                                 }
                             }
                         }

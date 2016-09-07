@@ -25,9 +25,11 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -35,6 +37,11 @@ import java.util.List;
  * Handles the guild member update packet.
  */
 public class GuildMemberUpdateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildMemberUpdateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -74,7 +81,11 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             List<UserRoleRemoveListener> listeners = api.getListeners(UserRoleRemoveListener.class);
                             synchronized (listeners) {
                                 for (UserRoleRemoveListener listener : listeners) {
-                                    listener.onUserRoleRemove(api, user, role);
+                                    try {
+                                        listener.onUserRoleRemove(api, user, role);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in UserRoleRemoveListenerListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -92,7 +103,11 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             List<UserRoleAddListener> listeners = api.getListeners(UserRoleAddListener.class);
                             synchronized (listeners) {
                                 for (UserRoleAddListener listener : listeners) {
-                                    listener.onUserRoleAdd(api, user, role);
+                                    try {
+                                        listener.onUserRoleAdd(api, user, role);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in UserRoleAddListener!", t);
+                                    }
                                 }
                             }
                         }

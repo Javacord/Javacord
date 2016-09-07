@@ -36,9 +36,11 @@ import de.btobastian.javacord.listener.role.RoleChangeOverwrittenPermissionsList
 import de.btobastian.javacord.listener.user.UserChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangePositionListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -47,6 +49,11 @@ import java.util.concurrent.ExecutionException;
  * Handles the channel update packet.
  */
 public class ChannelUpdateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ChannelUpdateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -93,7 +100,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                     List<ChannelChangeNameListener> listeners = api.getListeners(ChannelChangeNameListener.class);
                     synchronized (listeners) {
                         for (ChannelChangeNameListener listener : listeners) {
-                            listener.onChannelChangeName(api, channel, oldName);
+                            try {
+                                listener.onChannelChangeName(api, channel, oldName);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ChannelChangeNameListener!", t);
+                            }
                         }
                     }
                 }
@@ -113,7 +124,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                     List<ChannelChangeTopicListener> listeners = api.getListeners(ChannelChangeTopicListener.class);
                     synchronized (listeners) {
                         for (ChannelChangeTopicListener listener : listeners) {
-                            listener.onChannelChangeTopic(api, channel, oldTopic);
+                            try {
+                                listener.onChannelChangeTopic(api, channel, oldTopic);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ChannelChangeTopicListener!", t);
+                            }
                         }
                     }
                 }
@@ -131,7 +146,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                             api.getListeners(ChannelChangePositionListener.class);
                     synchronized (listeners) {
                         for (ChannelChangePositionListener listener : listeners) {
-                            listener.onChannelChangePosition(api, channel, oldPosition);
+                            try {
+                                listener.onChannelChangePosition(api, channel, oldPosition);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ChannelChangePositionListener!", t);
+                            }
                         }
                     }
                 }
@@ -165,7 +184,12 @@ public class ChannelUpdateHandler extends PacketHandler {
                                     api.getListeners(UserChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
                                 for (UserChangeOverwrittenPermissionsListener listener : listeners) {
-                                    listener.onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                    try {
+                                        listener.onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                    } catch (Throwable t) {
+                                        logger.warn(
+                                                "Uncaught exception in UserChangeOverwrittenPermissionsListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -188,7 +212,12 @@ public class ChannelUpdateHandler extends PacketHandler {
                                     api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
                                 for (RoleChangeOverwrittenPermissionsListener listener : listeners) {
-                                    listener.onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                    try {
+                                        listener.onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                    } catch (Throwable t) {
+                                        logger.warn(
+                                                "Uncaught exception in RoleChangeOverwrittenPermissionsListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -221,7 +250,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                             api.getListeners(VoiceChannelChangeNameListener.class);
                     synchronized (listeners) {
                         for (VoiceChannelChangeNameListener listener : listeners) {
-                            listener.onVoiceChannelChangeName(api, channel, oldName);
+                            try {
+                                listener.onVoiceChannelChangeName(api, channel, oldName);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in VoiceChannelChangeNameListener!", t);
+                            }
                         }
                     }
                 }
@@ -239,7 +272,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                             api.getListeners(VoiceChannelChangePositionListener.class);
                     synchronized (listeners) {
                         for (VoiceChannelChangePositionListener listener : listeners) {
-                            listener.onVoiceChannelChangePosition(api, channel, oldPosition);
+                            try {
+                                listener.onVoiceChannelChangePosition(api, channel, oldPosition);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in VoiceChannelChangePositionListener!", t);
+                            }
                         }
                     }
                 }
@@ -273,7 +310,12 @@ public class ChannelUpdateHandler extends PacketHandler {
                                     api.getListeners(UserChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
                                 for (UserChangeOverwrittenPermissionsListener listener : listeners) {
-                                    listener.onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                    try {
+                                        listener.onUserChangeOverwrittenPermissions(api, user, channel, oldPermissions);
+                                    } catch (Throwable t) {
+                                        logger.warn(
+                                                "Uncaught exception in UserChangeOverwrittenPermissionsListener!", t);
+                                    }
                                 }
                             }
                         }
@@ -296,7 +338,12 @@ public class ChannelUpdateHandler extends PacketHandler {
                                     api.getListeners(RoleChangeOverwrittenPermissionsListener.class);
                             synchronized (listeners) {
                                 for (RoleChangeOverwrittenPermissionsListener listener : listeners) {
-                                    listener.onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                    try {
+                                     listener.onRoleChangeOverwrittenPermissions(api, role, channel, oldPermissions);
+                                    } catch (Throwable t) {
+                                        logger.warn(
+                                                "Uncaught exception in RoleChangeOverwrittenPermissionsListener!", t);
+                                    }
                                 }
                             }
                         }
