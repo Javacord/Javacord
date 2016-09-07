@@ -64,8 +64,9 @@ import de.btobastian.javacord.listener.message.MessageCreateListener;
  */
 public class MyPingPongBot {
 
-    public MyPingPongBot(String email, String password) {
-        DiscordAPI api = Javacord.getApi(email, password);
+    public MyPingPongBot(String token) {
+        // Get the token from here: https://discordapp.com/developers/applications/me
+        DiscordAPI api = Javacord.getApi(token, true);
         // connect
         api.connect(new FutureCallback<DiscordAPI>() {
             @Override
