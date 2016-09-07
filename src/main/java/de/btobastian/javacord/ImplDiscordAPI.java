@@ -19,6 +19,7 @@
 package de.btobastian.javacord;
 
 import com.google.common.io.BaseEncoding;
+import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -320,7 +321,7 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void registerListener(Listener listener) {
-        for (Class<?> implementedInterface : listener.getClass().getInterfaces()) {
+        for (Class<?> implementedInterface : TypeToken.of(listener.getClass()).getTypes().interfaces().rawTypes()) {
             if (Listener.class.isAssignableFrom(implementedInterface)) {
                 List<Listener> listenersList = listeners.get(implementedInterface);
                 if (listenersList == null) {

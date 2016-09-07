@@ -12,7 +12,7 @@ Supports the new application system!
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.10</version>
+  <version>2.0.11</version>
    <!-- This will use the shaded javacord which contains all required dependencies -->
   <classifier>shaded</classifier>
 </dependency>
@@ -64,8 +64,9 @@ import de.btobastian.javacord.listener.message.MessageCreateListener;
  */
 public class MyPingPongBot {
 
-    public MyPingPongBot(String email, String password) {
-        DiscordAPI api = Javacord.getApi(email, password);
+    public MyPingPongBot(String token) {
+        // Get the token from here: https://discordapp.com/developers/applications/me
+        DiscordAPI api = Javacord.getApi(token, true);
         // connect
         api.connect(new FutureCallback<DiscordAPI>() {
             @Override
