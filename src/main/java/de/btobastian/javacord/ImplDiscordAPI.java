@@ -154,8 +154,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void connectBlocking() {
         if (token == null || !checkTokenBlocking(token)) {
             if (email == null || password == null) {
-                logger.warn("No valid token provided AND missing email or password. Connecting not possible!");
-                return;
+                throw new IllegalArgumentException("No valid token provided AND missing email or password. Connecting not possible!");
             }
             token = requestTokenBlocking();
         }
@@ -164,7 +163,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, false);
         } catch (URISyntaxException e) {
             logger.warn("Something went wrong while connecting. Please contact the developer!", e);
-            return;
+            throw new IllegalArgumentException("Invalid gateway url. Please contact the developer!");
         }
         try {
             if (!socketAdapter.isReady().get()) {
@@ -172,6 +171,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
         } catch (InterruptedException | ExecutionException e) {
             logger.warn("Something went wrong while connecting. Please contact the developer!", e);
+            throw new IllegalStateException("Could not figure out if ready or not. Please contact the developer!");
         }
     }
 
