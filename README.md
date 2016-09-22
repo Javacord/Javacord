@@ -4,11 +4,14 @@ Supports the new application system!
 
 ##  Maven
 ```xml
-<repository>
+ <repositories>
+  <repository>
   <id>javacord-repo</id>
   <url>http://repo.bastian-oppermann.de</url>
-</repository>
-...
+  </repository>
+  </repositories>
+ 
+<dependencies>
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
@@ -22,6 +25,8 @@ Supports the new application system!
   <artifactId>logback-classic</artifactId>
   <version>1.0.13</version>
 </dependency>
+</dependencies>
+
 ```
 
 ## IDE Setup (for beginners)
