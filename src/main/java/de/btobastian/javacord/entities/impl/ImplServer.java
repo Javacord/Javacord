@@ -487,7 +487,7 @@ public class ImplServer implements Server {
                     logger.debug("Trying to ban an user from server {} (user id: {}, delete days: {})",
                             ImplServer.this, userId, deleteDays);
                     HttpResponse<JsonNode> response = Unirest
-                            .put("https://discordapp.com/api/guilds/:guild_id/bans/" + userId
+                            .put("https://discordapp.com/api/guilds/" + getId() + "/bans/" + userId
                                     + "?delete-message-days=" + deleteDays)
                             .header("authorization", api.getToken())
                             .asJson();
