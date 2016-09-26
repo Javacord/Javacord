@@ -1012,7 +1012,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                     .asJson();
             JSONObject jsonResponse = response.getBody().getObject();
             if (response.getStatus() == 400) {
-                throw new IllegalArgumentException("400 Bad request! Maybe wrong email or password?");
+                throw new IllegalArgumentException("400 Bad request! Maybe wrong email or password? StatusText: " + response.getStatusText() + "; Body: " + response.getBody());
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
