@@ -72,11 +72,6 @@ import java.util.concurrent.Future;
  * The implementation of {@link DiscordAPI}.
  */
 public class ImplDiscordAPI implements DiscordAPI {
-    
-    // If you have a better way to retrieve this other than manually, please do implement
-	private static final String JAVA_VERSION = Runtime.class.getPackage().getImplementationVersion();
-	private static final String VERSION = "2.0.11";
-	private static final String UNIREST_VERSION = "1.4.8";
 
     /**
      * The logger of this class.
@@ -1011,9 +1006,9 @@ public class ImplDiscordAPI implements DiscordAPI {
         try {
             logger.debug("Trying to request token (email: {}, password: {})", email, password.replaceAll(".", "*"));
             HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/auth/login")
-                    .header("User-Agent", "DiscordBot (https://github.com/BtoBastian/Javacord " + VERSION + ") Java/" + JAVA_VERSION + " Unirest/" + UNIREST_VERSION)
+                    .header("User-Agent", Javacord.USER_AGENT)
                     .header("Content-Type", "application/json")
-                    .body("{\"email\":\"" + email +"\", \"password\":\"" + password + "\"}")
+                    .body(new JSONObject().put("email", email).put("password", password).toString())
                     .asJson();
             JSONObject jsonResponse = response.getBody().getObject();
             if (response.getStatus() == 400) {

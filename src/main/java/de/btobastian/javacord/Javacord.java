@@ -37,9 +37,19 @@ public class Javacord {
     public static final String GITHUB_URL = "https://github.com/BtoBastian/Javacord";
 
     /**
+     * The java version.
+     */
+    public static final String JAVA_VERSION = Runtime.class.getPackage().getImplementationVersion();
+
+    /**
+     * The unirest version of javacord.
+     */
+    public static final String UNIREST_VERSION = "1.4.8";
+
+    /**
      * The user agent used for requests.
      */
-    public static final String USER_AGENT = "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")";
+    public static final String USER_AGENT = "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ") Java/" + JAVA_VERSION + " Unirest/" + UNIREST_VERSION;
 
     static {
         Unirest.setDefaultHeader("User-Agent", USER_AGENT);
