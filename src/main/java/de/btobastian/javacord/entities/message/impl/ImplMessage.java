@@ -398,16 +398,45 @@ public class ImplMessage implements Message {
                         api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
                     }
                     final String oldContent = getContent();
-                    setContent(content);
                     if (!oldContent.equals(content)) {
-                        //to be modified
+                        final MessageEditListenerImpl editedMessageListerner = new MessageEditListenerImpl();
+                        synchronized (editedMessageListerner) {
+                            setContent(content);
+                            // check listener
+                            if (!editedMessageListerner.isEdited()) {
+                                editedMessageListerner.wait(10000); // Timeout is 10 seconds
+                                if (!editedMessageListerner.isEdited()) {
+                                    logger.warn("failed to edit message (id: {}, author: {}, content: \"{}\")",
+                                            getId(), getAuthor(), getContent());
+                                    throw new Error("failed to edit message (id: + " + getId() + ", author: " + getAuthor() + ", content: \"" + getContent() + "\")");
+                                }
+                            }
+                        }
                     }
                 } catch (Exception e) {
                     return e;
                 }
                 return null;
             }
+
+            class MessageEditListenerImpl implements MessageEditListener {
+
+                private boolean edited = false;
+
+                @Override
+                public void onMessageEdit(DiscordAPI api, Message message, String oldContent) {
+                    edited = true;
+                    synchronized (this) {
+                        notify();
+                    }
+                }
+
+                public boolean isEdited() {
+                    return edited;
+                }
+            }
         });
+
     }
 
     /**
