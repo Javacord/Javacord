@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
@@ -102,6 +103,7 @@ public class ImplMessage implements Message {
      *
      * @param data A JSONObject containing all necessary data.
      * @param api The api of this server.
+     * @param receiver Reciever of the message.
      */
     public ImplMessage(JSONObject data, ImplDiscordAPI api, MessageReceiver receiver) {
         this.api = api;
@@ -149,7 +151,8 @@ public class ImplMessage implements Message {
                 String name = attachment.getString("filename");
                 this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
             }
-        } catch (JSONException ignored) { }
+        } catch (JSONException ignored) {
+        }
 
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
@@ -242,8 +245,7 @@ public class ImplMessage implements Message {
                     } else {
                         api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
                     }
-                    HttpResponse<JsonNode> response = Unirest.delete
-                            ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                    HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
@@ -253,12 +255,42 @@ public class ImplMessage implements Message {
                         api.checkRateLimit(
                                 response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
                     }
-                    api.removeMessage(message);
+                    final MessageDeleteListenerImpl deletedMessageListerner = new MessageDeleteListenerImpl();
+                    synchronized (deletedMessageListerner) {
+                        api.removeMessage(message);
+                        // check listener
+                        if (!deletedMessageListerner.isDeleted()) {
+                            deletedMessageListerner.wait(10000); // Timeout is 10 seconds
+                            if (!deletedMessageListerner.isDeleted()) {
+                                logger.warn("failed to delete message (id: {}, author: {}, content: \"{}\")",
+                                        getId(), getAuthor(), getContent());
+                                throw new Error("failed to delete message (id: + " + getId() + ", author: " + getAuthor() + ", content: \"" + getContent() + "\")");
+                            }
+                        }
+                    }
                     logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
                     return null;
                 } catch (Exception e) {
                     return e;
+                }
+            }
+
+            class MessageDeleteListenerImpl implements MessageDeleteListener {
+
+                private boolean deleted = false;
+
+                @Override
+                public void onMessageDelete(DiscordAPI api, Message message) {
+                    deleted = true;
+                    synchronized (this) {
+                        notify();
+                    }
+
+                }
+
+                public boolean isDeleted() {
+                    return deleted;
                 }
             }
         });
@@ -326,7 +358,7 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> replyFile(final InputStream inputStream, final String filename, final String comment,
-                                     FutureCallback<Message> callback) {
+            FutureCallback<Message> callback) {
         return receiver.sendFile(inputStream, filename, comment, callback);
     }
 
@@ -368,21 +400,7 @@ public class ImplMessage implements Message {
                     final String oldContent = getContent();
                     setContent(content);
                     if (!oldContent.equals(content)) {
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
-                                synchronized (listeners) {
-                                    for (MessageEditListener listener : listeners) {
-                                        try {
-                                            listener.onMessageEdit(api, ImplMessage.this, oldContent);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in MessageEditListener!", t);
-                                        }
-                                    }
-                                }
-                            }
-                        });
+                        //to be modified
                     }
                 } catch (Exception e) {
                     return e;
