@@ -256,22 +256,6 @@ public class ImplMessage implements Message {
                     api.removeMessage(message);
                     logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
-                    // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
-                            synchronized (listeners) {
-                                for (MessageDeleteListener listener : listeners) {
-                                    try {
-                                        listener.onMessageDelete(api, message);
-                                    } catch (Throwable t) {
-                                        logger.warn("Uncaught exception in MessageDeleteListener!", t);
-                                    }
-                                }
-                            }
-                        }
-                    });
                     return null;
                 } catch (Exception e) {
                     return e;
