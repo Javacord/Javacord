@@ -32,8 +32,6 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
-import de.btobastian.javacord.listener.message.MessageDeleteListener;
-import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
@@ -56,9 +54,9 @@ import java.util.concurrent.Future;
 public class ImplMessage implements Message {
 
     /**
-     * The logger of this class.
+     * The LOGGER of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(ImplMessage.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(ImplMessage.class);
 
     private static final ThreadLocal<SimpleDateFormat> TIMEZONE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
         @Override
@@ -129,7 +127,7 @@ public class ImplMessage implements Message {
                         try {
                             calendar.setTime(FORMAT_ALTERNATIVE_TWO.get().parse(time.substring(0, time.length() - 9)));
                         } catch (ParseException e) {
-                            logger.warn("Could not parse timestamp {}. Please contact the developer!", time, e);
+                            LOGGER.warn("Could not parse timestamp {}. Please contact the developer!", time, e);
                         }
                     }
                 }
@@ -149,7 +147,8 @@ public class ImplMessage implements Message {
                 String name = attachment.getString("filename");
                 this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
             }
-        } catch (JSONException ignored) { }
+        } catch (JSONException ignored) {
+        }
 
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
@@ -235,15 +234,14 @@ public class ImplMessage implements Message {
             @Override
             public Exception call() throws Exception {
                 try {
-                    logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
+                    LOGGER.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
                     if (isPrivateMessage()) {
                         api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
                     } else {
                         api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
                     }
-                    HttpResponse<JsonNode> response = Unirest.delete
-                            ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                    HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
@@ -254,24 +252,8 @@ public class ImplMessage implements Message {
                                 response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
                     }
                     api.removeMessage(message);
-                    logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
+                    LOGGER.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                             getId(), getAuthor(), getContent());
-                    // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
-                            synchronized (listeners) {
-                                for (MessageDeleteListener listener : listeners) {
-                                    try {
-                                        listener.onMessageDelete(api, message);
-                                    } catch (Throwable t) {
-                                        logger.warn("Uncaught exception in MessageDeleteListener!", t);
-                                    }
-                                }
-                            }
-                        }
-                    });
                     return null;
                 } catch (Exception e) {
                     return e;
@@ -342,7 +324,7 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> replyFile(final InputStream inputStream, final String filename, final String comment,
-                                     FutureCallback<Message> callback) {
+            FutureCallback<Message> callback) {
         return receiver.sendFile(inputStream, filename, comment, callback);
     }
 
@@ -381,25 +363,7 @@ public class ImplMessage implements Message {
                     } else {
                         api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
                     }
-                    final String oldContent = getContent();
                     setContent(content);
-                    if (!oldContent.equals(content)) {
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
-                                synchronized (listeners) {
-                                    for (MessageEditListener listener : listeners) {
-                                        try {
-                                            listener.onMessageEdit(api, ImplMessage.this, oldContent);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in MessageEditListener!", t);
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
                 } catch (Exception e) {
                     return e;
                 }
