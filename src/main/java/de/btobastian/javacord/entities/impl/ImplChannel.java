@@ -202,16 +202,26 @@ public class ImplChannel implements Channel {
 
     @Override
     public Future<Message> sendMessage(String content, boolean tts) {
-        return sendMessage(content, tts, null);
+        return sendMessage(content, tts, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, String nonce) {
+        return sendMessage(content, tts, nonce, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
-        return sendMessage(content, false, callback);
+        return sendMessage(content, false, null, callback);
     }
 
     @Override
-    public Future<Message> sendMessage(final String content, final boolean tts, FutureCallback<Message> callback) {
+    public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, tts, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(final String content, final boolean tts, final String nonce, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
@@ -227,6 +237,7 @@ public class ImplChannel implements Channel {
                                         .body(new JSONObject()
                                                 .put("content", content)
                                                 .put("tts", tts)
+                                                .put("nonce", nonce)
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
                         api.checkResponse(response);

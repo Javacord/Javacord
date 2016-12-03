@@ -101,6 +101,13 @@ public interface Message extends Comparable<Message> {
     public boolean isTts();
 
     /**
+     * NONCE token of the message.
+     *
+     * @return NONCE token.
+     */
+    public String getNonce();
+
+    /**
      * Deletes the message.
      *
      * @return A future which tells us if the deletion was successful or not.

@@ -95,13 +95,14 @@ public class ImplMessage implements Message {
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
+    private final String nonce;
     private Calendar creationDate = Calendar.getInstance();
 
     /**
      * Creates a new instance of this class.
      *
      * @param data A JSONObject containing all necessary data.
-     * @param api The api of this server.
+     * @param api  The api of this server.
      */
     public ImplMessage(JSONObject data, ImplDiscordAPI api, MessageReceiver receiver) {
         this.api = api;
@@ -149,7 +150,8 @@ public class ImplMessage implements Message {
                 String name = attachment.getString("filename");
                 this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
             }
-        } catch (JSONException ignored) { }
+        } catch (JSONException ignored) {
+        }
 
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
@@ -169,6 +171,11 @@ public class ImplMessage implements Message {
         } else {
             this.receiver = receiver;
         }
+
+        if (data.has("nonce") && !data.isNull("nonce"))
+            nonce = data.getString("nonce");
+        else
+            nonce = null;
 
         if (getChannelReceiver() != null) {
             ((ImplServer) getChannelReceiver().getServer()).addMember(author);
@@ -226,6 +233,10 @@ public class ImplMessage implements Message {
     @Override
     public boolean isTts() {
         return tts;
+    }
+
+    public String getNonce() {
+        return nonce;
     }
 
     @Override

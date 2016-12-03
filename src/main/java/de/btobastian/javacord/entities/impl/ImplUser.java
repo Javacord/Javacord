@@ -86,11 +86,15 @@ public class ImplUser implements User {
         this.api = api;
 
         id = data.getString("id");
-        name = data.getString("username");
+        if (data.has("username"))
+            name = data.getString("username");
         try {
             avatarId = data.getString("avatar");
         } catch (JSONException ignored) { }
-        discriminator = data.getString("discriminator");
+        if (data.has("discriminator"))
+            discriminator = data.getString("discriminator");
+        else
+            discriminator = null;
         bot = data.has("bot") && data.getBoolean("bot");
 
         api.getUserMap().put(id, this);
@@ -216,21 +220,31 @@ public class ImplUser implements User {
 
     @Override
     public Future<Message> sendMessage(String content) {
-        return sendMessage(content, false);
+        return sendMessage(content, false, null, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, boolean tts) {
-        return sendMessage(content, tts, null);
+        return sendMessage(content, tts, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, String nonce) {
+        return sendMessage(content, tts, nonce, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
-        return sendMessage(content, false, callback);
+        return sendMessage(content, false, null, callback);
     }
 
     @Override
-    public Future<Message> sendMessage(final String content, final boolean tts, FutureCallback<Message> callback) {
+    public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, tts, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(final String content, final boolean tts, final String nonce, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {

@@ -59,6 +59,16 @@ public interface MessageReceiver {
      * Sends a message with the given content.
      *
      * @param content The content of the message.
+     * @param tts Whether the message should be tts or not.
+     * @param nonce NONCE token.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, boolean tts, String nonce);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
      */
@@ -73,6 +83,17 @@ public interface MessageReceiver {
      * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
      */
     public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param tts Whether the message should be tts or not.
+     * @param nonce NONCE token
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, boolean tts, String nonce, FutureCallback<Message> callback);
 
     /**
      * Uploads a file.
