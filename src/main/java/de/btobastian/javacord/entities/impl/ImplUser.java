@@ -48,9 +48,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -68,6 +66,7 @@ public class ImplUser implements User {
 
     private final String id;
     private String name;
+    private Map<String, String> nicknames;
     private String avatarId = null;
     private final Object userChannelIdLock = new Object();
     private String userChannelId = null;
@@ -86,8 +85,10 @@ public class ImplUser implements User {
         this.api = api;
 
         id = data.getString("id");
-        if (data.has("username"))
+        nicknames = new HashMap<>();
+        if (data.has("username")) {
             name = data.getString("username");
+        }
         try {
             avatarId = data.getString("avatar");
         } catch (JSONException ignored) { }
@@ -108,6 +109,20 @@ public class ImplUser implements User {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getNickname(String serverId) {
+        return nicknames.get(serverId);
+    }
+
+    @Override
+    public void setNickname(String serverId, String nickname) {
+        if (nickname != null) {
+            nicknames.put(serverId, nickname);
+        } else {
+            nicknames.remove(serverId);
+        }
     }
 
     @Override
