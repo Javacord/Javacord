@@ -32,6 +32,7 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -92,6 +93,7 @@ public class ImplMessage implements Message {
     private final boolean tts;
     private final User author;
     private final List<User> mentions = new ArrayList<>();
+    private final List<Role> mentionRoles = new ArrayList<>();
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
@@ -172,13 +174,24 @@ public class ImplMessage implements Message {
             this.receiver = receiver;
         }
 
-        if (data.has("nonce") && !data.isNull("nonce"))
+        if (data.has("nonce") && !data.isNull("nonce")) {
             nonce = data.getString("nonce");
-        else
+        } else {
             nonce = null;
+        }
 
         if (getChannelReceiver() != null) {
-            ((ImplServer) getChannelReceiver().getServer()).addMember(author);
+            ImplServer server = (ImplServer) getChannelReceiver().getServer();
+            server.addMember(author);
+
+            JSONArray mentionRoles = data.getJSONArray("mention_roles");
+            for (int i = 0; i < mentionRoles.length(); i++) {
+                String roleId = mentionRoles.getString(i);
+                Role role = server.getRoleById(roleId);
+                if (role != null) {
+                    this.mentionRoles.add(role);
+                }
+            }
         }
 
         api.addMessage(this);
@@ -228,6 +241,11 @@ public class ImplMessage implements Message {
     @Override
     public List<User> getMentions() {
         return new ArrayList<>(mentions);
+    }
+
+    @Override
+    public List<Role> getMentionRoles() {
+        return new ArrayList<>(mentionRoles);
     }
 
     @Override

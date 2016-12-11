@@ -66,6 +66,8 @@ public class ImplRole implements Role {
     private int position;
     private Color color;
     private boolean hoist;
+    private boolean mentionable;
+    private boolean managed;
 
     private final List<User> users = new ArrayList<>();
 
@@ -86,6 +88,8 @@ public class ImplRole implements Role {
         position = data.getInt("position");
         color = new Color(data.getInt("color"));
         hoist = data.getBoolean("hoist");
+        mentionable = data.getBoolean("mentionable");
+        managed = data.getBoolean("managed");
 
         server.addRole(this);
     }
@@ -146,6 +150,16 @@ public class ImplRole implements Role {
     @Override
     public Color getColor() {
         return color;
+    }
+
+    @Override
+    public boolean getMentionable() {
+        return mentionable;
+    }
+
+    @Override
+    public boolean getManaged() {
+        return managed;
     }
 
     @Override

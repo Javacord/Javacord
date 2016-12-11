@@ -21,6 +21,7 @@ package de.btobastian.javacord.entities.message;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.permissions.Role;
 
 import java.io.File;
 import java.io.InputStream;
@@ -92,6 +93,13 @@ public interface Message extends Comparable<Message> {
      * @return A list with all mentioned users.
      */
     public List<User> getMentions();
+
+    /**
+     * Gets all mentioned roles.
+     *
+     * @return A list with all mentioned roles.
+     */
+    public List<Role> getMentionRoles();
 
     /**
      * Checks if the message is tts.
