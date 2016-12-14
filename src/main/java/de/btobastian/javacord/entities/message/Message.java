@@ -116,6 +116,20 @@ public interface Message extends Comparable<Message> {
     public String getNonce();
 
     /**
+     * Whether the message mentions everyone.
+     *
+     * @return mention_everyone.
+     */
+    public boolean getMentionEveryone();
+
+    /**
+     * Whether the message is pinned.
+     *
+     * @return pinned.
+     */
+    public boolean getPinned();
+
+    /**
      * Deletes the message.
      *
      * @return A future which tells us if the deletion was successful or not.

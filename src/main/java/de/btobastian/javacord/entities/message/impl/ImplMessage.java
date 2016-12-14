@@ -98,6 +98,8 @@ public class ImplMessage implements Message {
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
     private final String nonce;
+    private boolean mentionEveryone;
+    private boolean pinned;
     private Calendar creationDate = Calendar.getInstance();
 
     /**
@@ -114,6 +116,8 @@ public class ImplMessage implements Message {
             content = data.getString("content");
         }
         tts = data.getBoolean("tts");
+        mentionEveryone = data.getBoolean("mention_everyone");
+        pinned = data.getBoolean("pinned");
 
         if (data.has("timestamp")) {
             String time = data.getString("timestamp");
@@ -253,8 +257,19 @@ public class ImplMessage implements Message {
         return tts;
     }
 
+    @Override
     public String getNonce() {
         return nonce;
+    }
+
+    @Override
+    public boolean getMentionEveryone() {
+        return mentionEveryone;
+    }
+
+    @Override
+    public boolean getPinned() {
+        return pinned;
     }
 
     @Override
