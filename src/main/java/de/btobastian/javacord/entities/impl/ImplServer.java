@@ -936,6 +936,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the owner id.
+     *
+     * @param ownerId The id of the owner.
+     */
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    /**
      * Creates a new channel.
      *
      * @param name The name of the channel.
