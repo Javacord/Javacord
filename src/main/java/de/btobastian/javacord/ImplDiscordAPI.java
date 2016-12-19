@@ -965,6 +965,9 @@ public class ImplDiscordAPI implements DiscordAPI {
         String id = data.getString("id");
         User user = users.get(id);
         if (user == null) {
+            if (!data.has("username")) {
+                return null;
+            }
             user = new ImplUser(data, this);
         }
         return user;

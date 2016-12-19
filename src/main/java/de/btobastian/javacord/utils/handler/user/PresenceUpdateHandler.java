@@ -58,6 +58,9 @@ public class PresenceUpdateHandler extends PacketHandler {
     @Override
     public void handle(JSONObject packet) {
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
+        if (user == null) {
+            return;
+        }
 
         Server server = null;
         if (packet.has("guild_id")) {
