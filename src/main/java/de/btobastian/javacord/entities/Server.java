@@ -364,6 +364,20 @@ public interface Server {
     public boolean isLarge();
 
     /**
+     * Gets the id of the server owner.
+     *
+     * @return The id of the server owner.
+     */
+    public String getOwnerId();
+
+    /**
+     * Gets the owner of the server.
+     *
+     * @return A future which contains the owner of the server.
+     */
+    public Future<User> getOwner();
+
+    /**
      * Authorizes a bot to join the server.
      *
      * @param applicationId The id of the bot's application.

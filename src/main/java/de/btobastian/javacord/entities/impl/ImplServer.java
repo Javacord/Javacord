@@ -72,6 +72,7 @@ public class ImplServer implements Server {
     private Region region;
     private int memberCount;
     private final boolean large;
+    private String ownerId;
 
     /**
      * Creates a new instance of this class.
@@ -87,6 +88,7 @@ public class ImplServer implements Server {
         region = Region.getRegionByKey(data.getString("region"));
         memberCount = data.getInt("member_count");
         large = data.getBoolean("large");
+        ownerId = data.getString("owner_id");
 
         JSONArray roles = data.getJSONArray("roles");
         for (int i = 0; i < roles.length(); i++) {
@@ -772,6 +774,16 @@ public class ImplServer implements Server {
     @Override
     public boolean isLarge() {
         return large;
+    }
+
+    @Override
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    @Override
+    public Future<User> getOwner() {
+        return api.getUserById(ownerId);
     }
 
     @Override
