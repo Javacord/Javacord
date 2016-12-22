@@ -144,35 +144,31 @@ public class ImplChannel implements Channel {
     }
 
     @Override
-    public Future<Exception> delete() {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+    public Future<Void> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
-                try {
-                    logger.debug("Trying to delete channel {}", ImplChannel.this);
-                    HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/channels/" + id)
-                            .header("authorization", api.getToken())
-                            .asJson();
-                    api.checkResponse(response);
-                    server.removeChannel(ImplChannel.this);
-                    logger.info("Deleted channel {}", ImplChannel.this);
-                    // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<ChannelDeleteListener> listeners = api.getListeners(ChannelDeleteListener.class);
-                            synchronized (listeners) {
-                                for (ChannelDeleteListener listener : listeners) {
-                                    listener.onChannelDelete(api, ImplChannel.this);
-                                }
+            public Void call() throws Exception {
+                logger.debug("Trying to delete channel {}", ImplChannel.this);
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/channels/" + id)
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                server.removeChannel(ImplChannel.this);
+                logger.info("Deleted channel {}", ImplChannel.this);
+                // call listener
+                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<ChannelDeleteListener> listeners = api.getListeners(ChannelDeleteListener.class);
+                        synchronized (listeners) {
+                            for (ChannelDeleteListener listener : listeners) {
+                                listener.onChannelDelete(api, ImplChannel.this);
                             }
                         }
-                    });
-                    return null;
-                } catch (Exception e) {
-                    return e;
-                }
+                    }
+                });
+                return null;
             }
         });
     }
@@ -400,89 +396,85 @@ public class ImplChannel implements Channel {
     }
 
     @Override
-    public Future<Exception> updateName(String newName) {
+    public Future<Void> updateName(String newName) {
         return update(newName, getTopic());
     }
 
     @Override
-    public Future<Exception> updateTopic(String newTopic) {
+    public Future<Void> updateTopic(String newTopic) {
         return update(getName(), newTopic);
     }
 
     @Override
-    public Future<Exception> update(final String newName, final String newTopic) {
+    public Future<Void> update(final String newName, final String newTopic) {
         final JSONObject params = new JSONObject()
                 .put("name", newName)
                 .put("topic", newTopic);
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
+            public Void call() throws Exception {
                 logger.debug("Trying to update channel {} (new name: {}, old name: {}, new topic: {}, old topic: {})",
                         ImplChannel.this, newName, getName(), newTopic, getTopic());
-                try {
-                    HttpResponse<JsonNode> response = Unirest
-                            .patch("https://discordapp.com/api/channels/" + getId())
-                            .header("authorization", api.getToken())
-                            .header("Content-Type", "application/json")
-                            .body(params.toString())
-                            .asJson();
-                    api.checkResponse(response);
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
-                    logger.info("Updated channel {} (new name: {}, old name: {}, new topic: {}, old topic: {})",
-                            ImplChannel.this, newName, getName(), newTopic, getTopic());
-                    String updatedName = response.getBody().getObject().getString("name");
-                    String updatedTopic = null;
-                    if (response.getBody().getObject().has("topic")
-                            && !response.getBody().getObject().isNull("topic")) {
-                        updatedTopic = response.getBody().getObject().getString("topic");
-                    }
+                HttpResponse<JsonNode> response = Unirest
+                        .patch("https://discordapp.com/api/channels/" + getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(params.toString())
+                        .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
+                logger.info("Updated channel {} (new name: {}, old name: {}, new topic: {}, old topic: {})",
+                        ImplChannel.this, newName, getName(), newTopic, getTopic());
+                String updatedName = response.getBody().getObject().getString("name");
+                String updatedTopic = null;
+                if (response.getBody().getObject().has("topic")
+                        && !response.getBody().getObject().isNull("topic")) {
+                    updatedTopic = response.getBody().getObject().getString("topic");
+                }
 
-                    // check name
-                    if (!updatedName.equals(getName())) {
-                        final String oldName = getName();
-                        setName(updatedName);
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<ChannelChangeNameListener> listeners =
-                                        api.getListeners(ChannelChangeNameListener.class);
-                                synchronized (listeners) {
-                                    for (ChannelChangeNameListener listener : listeners) {
-                                        try {
-                                            listener.onChannelChangeName(api, ImplChannel.this, oldName);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in ChannelChangeNameListener!", t);
-                                        }
+                // check name
+                if (!updatedName.equals(getName())) {
+                    final String oldName = getName();
+                    setName(updatedName);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<ChannelChangeNameListener> listeners =
+                                    api.getListeners(ChannelChangeNameListener.class);
+                            synchronized (listeners) {
+                                for (ChannelChangeNameListener listener : listeners) {
+                                    try {
+                                        listener.onChannelChangeName(api, ImplChannel.this, oldName);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ChannelChangeNameListener!", t);
                                     }
                                 }
                             }
-                        });
-                    }
+                        }
+                    });
+                }
 
-                    // check topic
-                    if ((getTopic() != null && updatedTopic == null) || (getTopic() == null && updatedTopic != null)
-                            || (getTopic() != null && !getTopic().equals(updatedTopic))) {
-                        final String oldTopic = getTopic();
-                        setTopic(updatedTopic);
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<ChannelChangeTopicListener> listeners =
-                                        api.getListeners(ChannelChangeTopicListener.class);
-                                synchronized (listeners) {
-                                    for (ChannelChangeTopicListener listener : listeners) {
-                                        try {
-                                            listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in ChannelChangeTopicListener!", t);
-                                        }
+                // check topic
+                if ((getTopic() != null && updatedTopic == null) || (getTopic() == null && updatedTopic != null)
+                        || (getTopic() != null && !getTopic().equals(updatedTopic))) {
+                    final String oldTopic = getTopic();
+                    setTopic(updatedTopic);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<ChannelChangeTopicListener> listeners =
+                                    api.getListeners(ChannelChangeTopicListener.class);
+                            synchronized (listeners) {
+                                for (ChannelChangeTopicListener listener : listeners) {
+                                    try {
+                                        listener.onChannelChangeTopic(api, ImplChannel.this, oldTopic);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in ChannelChangeTopicListener!", t);
                                     }
                                 }
                             }
-                        });
-                    }
-                } catch (Exception e) {
-                    return e;
+                        }
+                    });
                 }
                 return null;
             }

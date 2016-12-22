@@ -200,35 +200,31 @@ public class ImplCustomEmoji implements CustomEmoji {
     }
 
     @Override
-    public Future<Exception> delete() {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+    public Future<Void> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
-                try {
-                    logger.debug("Trying to delete emoji {}", ImplCustomEmoji.this);
-                    HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/guilds/" + server.getId() + "/emojis/" + id)
-                            .header("authorization", api.getToken())
-                            .asJson();
-                    api.checkResponse(response);
-                    server.removeCustomEmoji(ImplCustomEmoji.this);
-                    logger.info("Deleted emoji {}", ImplCustomEmoji.this);
-                    // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<CustomEmojiDeleteListener> listeners = api.getListeners(CustomEmojiDeleteListener.class);
-                            synchronized (listeners) {
-                                for (CustomEmojiDeleteListener listener : listeners) {
-                                    listener.onCustomEmojiDelete(api, ImplCustomEmoji.this);
-                                }
+            public Void call() throws Exception {
+                logger.debug("Trying to delete emoji {}", ImplCustomEmoji.this);
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/guilds/" + server.getId() + "/emojis/" + id)
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                server.removeCustomEmoji(ImplCustomEmoji.this);
+                logger.info("Deleted emoji {}", ImplCustomEmoji.this);
+                // call listener
+                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<CustomEmojiDeleteListener> listeners = api.getListeners(CustomEmojiDeleteListener.class);
+                        synchronized (listeners) {
+                            for (CustomEmojiDeleteListener listener : listeners) {
+                                listener.onCustomEmojiDelete(api, ImplCustomEmoji.this);
                             }
                         }
-                    });
-                    return null;
-                } catch (Exception e) {
-                    return e;
-                }
+                    }
+                });
+                return null;
             }
         });
     }

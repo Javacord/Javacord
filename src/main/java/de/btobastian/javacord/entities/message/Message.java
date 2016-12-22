@@ -104,9 +104,8 @@ public interface Message extends Comparable<Message> {
      * Deletes the message.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Gets the attachments of a message.
@@ -240,8 +239,7 @@ public interface Message extends Comparable<Message> {
      *
      * @param content The new content of the message.
      * @return A future which tells us if the edit was successful or not.
-     *         If the exception is <code>null</code> the edit was successful.
      */
-    public Future<Exception> edit(String content);
+    public Future<Void> edit(String content);
 
 }

@@ -60,9 +60,8 @@ public interface VoiceChannel {
      * Deletes the channel.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Gets an invite builder.
@@ -93,8 +92,7 @@ public interface VoiceChannel {
      *
      * @param newName The new name of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateName(String newName);
+    public Future<Void> updateName(String newName);
 
 }
