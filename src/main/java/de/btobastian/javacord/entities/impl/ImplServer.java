@@ -66,6 +66,7 @@ public class ImplServer implements Server {
     private final ConcurrentHashMap<String, VoiceChannel> voiceChannels = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Role> roles = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CustomEmoji> customEmojis = new ConcurrentHashMap<>();
 
     private final String id;
     private String name;
@@ -93,6 +94,11 @@ public class ImplServer implements Server {
         JSONArray roles = data.getJSONArray("roles");
         for (int i = 0; i < roles.length(); i++) {
             new ImplRole(roles.getJSONObject(i), this, api);
+        }
+
+        JSONArray emojis = data.getJSONArray("emojis");
+        for (int i = 0; i < emojis.length(); i++) {
+            new ImplCustomEmoji(emojis.getJSONObject(i), this, api);
         }
 
         JSONArray channels = data.getJSONArray("channels");
@@ -822,6 +828,16 @@ public class ImplServer implements Server {
         });
     }
 
+    @Override
+    public Collection<CustomEmoji> getCustomEmojis() {
+        return customEmojis.values();
+    }
+
+    @Override
+    public CustomEmoji getCustomEmojiById(String id) {
+        return customEmojis.get(id);
+    }
+
     /**
      * Sets the name of the server.
      *
@@ -933,6 +949,24 @@ public class ImplServer implements Server {
      */
     public void removeVoiceChannel(VoiceChannel channel) {
         voiceChannels.remove(channel.getId());
+    }
+
+    /**
+     * Adds a emoji to the server.
+     *
+     * @param emoji The emoji to add.
+     */
+    public void addCustomEmoji(CustomEmoji emoji) {
+        customEmojis.put(emoji.getId(), emoji);
+    }
+
+    /**
+     * Removes a emoji from the server.
+     *
+     * @param emoji The emoji to remove.
+     */
+    public void removeCustomEmoji(CustomEmoji emoji) {
+        customEmojis.remove(emoji.getId());
     }
 
     /**

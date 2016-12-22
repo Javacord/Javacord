@@ -396,4 +396,20 @@ public interface Server {
      */
     public Future<Exception> authorizeBot(String applicationId, Permissions permissions);
 
+    /**
+     * Gets a collection with all custom emojis on this server.
+     *
+     * @return A collection with all custom emojis on this server.
+     */
+    public Collection<CustomEmoji> getCustomEmojis();
+
+    /**
+     * Gets a custom emoji by its id.
+     *
+     * @param id The id of the emoji.
+     * @return The emoji with the given id.
+     *         <code>Null</code> if the emoji does not exist on this server.
+     */
+    public CustomEmoji getCustomEmojiById(String id);
+
 }
