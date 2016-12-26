@@ -32,6 +32,8 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -96,6 +98,7 @@ public class ImplMessage implements Message {
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
     private Calendar creationDate = Calendar.getInstance();
+    private final Collection<Embed> embeds = new ArrayList<>();
 
     /**
      * Creates a new instance of this class.
@@ -120,7 +123,7 @@ public class ImplMessage implements Message {
                 String nanoSecondsRemoved = Joiner.on("+").join(time.split("\\d{3}\\+"));
                 calendar.setTime(TIMEZONE_FORMAT.get().parse(nanoSecondsRemoved));
             } catch (ParseException timeZoneIgnored) {
-                try { //Continuing with previous code before Issue 15 fix
+                try {
                     calendar.setTime(FORMAT.get().parse(time.substring(0, time.length() - 9)));
                 } catch (ParseException ignored) {
                     try {
@@ -161,6 +164,12 @@ public class ImplMessage implements Message {
                 continue;
             }
             this.mentions.add(user);
+        }
+
+        JSONArray embeds = data.getJSONArray("embeds");
+        for (int i = 0; i < embeds.length(); i++) {
+            Embed embed = new ImplEmbed(embeds.getJSONObject(i));
+            this.embeds.add(embed);
         }
 
         channelId = data.getString("channel_id");
@@ -398,6 +407,11 @@ public class ImplMessage implements Message {
                 return null;
             }
         });
+    }
+
+    @Override
+    public Collection<Embed> getEmbeds() {
+        return Collections.unmodifiableCollection(embeds);
     }
 
     /**

@@ -21,6 +21,7 @@ package de.btobastian.javacord.entities.message;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.message.embed.Embed;
 
 import java.io.File;
 import java.io.InputStream;
@@ -241,5 +242,12 @@ public interface Message extends Comparable<Message> {
      * @return A future which tells us if the edit was successful or not.
      */
     public Future<Void> edit(String content);
+
+    /**
+     * Gets a collection with all embeds.
+     *
+     * @return A collection with all embeds.
+     */
+    public Collection<Embed> getEmbeds();
 
 }
