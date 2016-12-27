@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 
 import java.io.File;
 import java.io.InputStream;
@@ -136,6 +137,25 @@ public interface Message extends Comparable<Message> {
      * Replies to the message with the given content.
      *
      * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message.
      */
@@ -150,6 +170,27 @@ public interface Message extends Comparable<Message> {
      * @return The sent message.
      */
     public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback);
 
     /**
      * Replies with a file.

@@ -33,6 +33,7 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
@@ -292,22 +293,42 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> reply(String content) {
-        return reply(content, false);
+        return reply(content, null, false, null);
     }
 
     @Override
     public Future<Message> reply(String content, boolean tts) {
-        return reply(content, tts, null);
+        return reply(content, null, tts, null);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed) {
+        return reply(content, embed, false, null);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts) {
+        return reply(content, embed, tts, null);
     }
 
     @Override
     public Future<Message> reply(String content, FutureCallback<Message> callback) {
-        return reply(content, false, callback);
+        return reply(content, null, false, callback);
     }
 
     @Override
-    public Future<Message> reply(final String content, final boolean tts, FutureCallback<Message> callback) {
-        return receiver.sendMessage(content, tts, callback);
+    public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback) {
+        return reply(content, null, tts, callback);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
+        return reply(content, embed, false, callback);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback) {
+        return receiver.sendMessage(content, embed, tts, callback);
     }
 
     @Override

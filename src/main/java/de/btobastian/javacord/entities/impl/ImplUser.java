@@ -33,6 +33,7 @@ import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -225,12 +226,32 @@ public class ImplUser implements User {
     }
 
     @Override
-    public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
-        return sendMessage(content, false, callback);
+    public Future<Message> sendMessage(String content, EmbedBuilder embed) {
+        return sendMessage(content, embed, false, null);
     }
 
     @Override
-    public Future<Message> sendMessage(final String content, final boolean tts, FutureCallback<Message> callback) {
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts) {
+        return sendMessage(content, embed, tts, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
+        return sendMessage(content, null, false, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
+        return sendMessage(content, embed, false, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(final String content, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, null, tts, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(final String content, final EmbedBuilder embed, final boolean tts, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
@@ -239,15 +260,19 @@ public class ImplUser implements User {
                         logger.debug("Trying to send message to user {} (content: \"{}\", tts: {})",
                                 ImplUser.this, content, tts);
                         api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        JSONObject body = new JSONObject()
+                                .put("content", content)
+                                .put("tts", tts)
+                                .put("mentions", new String[0]);
+                        if (embed != null) {
+                            body.put("embed", embed.toJSONObject());
+                        }
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
                                         .header("authorization", api.getToken())
                                         .header("content-type", "application/json")
-                                        .body(new JSONObject()
-                                                .put("content", content)
-                                                .put("tts", tts)
-                                                .put("mentions", new String[0]).toString())
+                                        .body(body.toString())
                                         .asJson();
                         api.checkResponse(response);
                         api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
