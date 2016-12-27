@@ -32,6 +32,9 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -96,6 +99,7 @@ public class ImplMessage implements Message {
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
     private Calendar creationDate = Calendar.getInstance();
+    private final Collection<Embed> embeds = new ArrayList<>();
 
     /**
      * Creates a new instance of this class.
@@ -120,7 +124,7 @@ public class ImplMessage implements Message {
                 String nanoSecondsRemoved = Joiner.on("+").join(time.split("\\d{3}\\+"));
                 calendar.setTime(TIMEZONE_FORMAT.get().parse(nanoSecondsRemoved));
             } catch (ParseException timeZoneIgnored) {
-                try { //Continuing with previous code before Issue 15 fix
+                try {
                     calendar.setTime(FORMAT.get().parse(time.substring(0, time.length() - 9)));
                 } catch (ParseException ignored) {
                     try {
@@ -161,6 +165,12 @@ public class ImplMessage implements Message {
                 continue;
             }
             this.mentions.add(user);
+        }
+
+        JSONArray embeds = data.getJSONArray("embeds");
+        for (int i = 0; i < embeds.length(); i++) {
+            Embed embed = new ImplEmbed(embeds.getJSONObject(i));
+            this.embeds.add(embed);
         }
 
         channelId = data.getString("channel_id");
@@ -229,53 +239,49 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public Future<Exception> delete() {
+    public Future<Void> delete() {
         final Message message = this;
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
-                try {
-                    logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
-                            getId(), getAuthor(), getContent());
-                    if (isPrivateMessage()) {
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
-                    } else {
-                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
-                    }
-                    HttpResponse<JsonNode> response = Unirest.delete
-                            ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
-                            .header("authorization", api.getToken())
-                            .asJson();
-                    api.checkResponse(response);
-                    if (isPrivateMessage()) {
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
-                    } else {
-                        api.checkRateLimit(
-                                response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
-                    }
-                    api.removeMessage(message);
-                    logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
-                            getId(), getAuthor(), getContent());
-                    // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
-                            synchronized (listeners) {
-                                for (MessageDeleteListener listener : listeners) {
-                                    try {
-                                        listener.onMessageDelete(api, message);
-                                    } catch (Throwable t) {
-                                        logger.warn("Uncaught exception in MessageDeleteListener!", t);
-                                    }
+            public Void call() throws Exception {
+                logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
+                        getId(), getAuthor(), getContent());
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                } else {
+                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                }
+                HttpResponse<JsonNode> response = Unirest.delete
+                        ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                } else {
+                    api.checkRateLimit(
+                            response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                }
+                api.removeMessage(message);
+                logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
+                        getId(), getAuthor(), getContent());
+                // call listener
+                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<MessageDeleteListener> listeners = api.getListeners(MessageDeleteListener.class);
+                        synchronized (listeners) {
+                            for (MessageDeleteListener listener : listeners) {
+                                try {
+                                    listener.onMessageDelete(api, message);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in MessageDeleteListener!", t);
                                 }
                             }
                         }
-                    });
-                    return null;
-                } catch (Exception e) {
-                    return e;
-                }
+                    }
+                });
+                return null;
             }
         });
     }
@@ -287,22 +293,42 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> reply(String content) {
-        return reply(content, false);
+        return reply(content, null, false, null);
     }
 
     @Override
     public Future<Message> reply(String content, boolean tts) {
-        return reply(content, tts, null);
+        return reply(content, null, tts, null);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed) {
+        return reply(content, embed, false, null);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts) {
+        return reply(content, embed, tts, null);
     }
 
     @Override
     public Future<Message> reply(String content, FutureCallback<Message> callback) {
-        return reply(content, false, callback);
+        return reply(content, null, false, callback);
     }
 
     @Override
-    public Future<Message> reply(final String content, final boolean tts, FutureCallback<Message> callback) {
-        return receiver.sendMessage(content, tts, callback);
+    public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback) {
+        return reply(content, null, tts, callback);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
+        return reply(content, embed, false, callback);
+    }
+
+    @Override
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback) {
+        return receiver.sendMessage(content, embed, tts, callback);
     }
 
     @Override
@@ -359,53 +385,54 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public Future<Exception> edit(final String content) {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+    public Future<Void> edit(final String content) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
-                try {
-                    if (isPrivateMessage()) {
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
-                    } else {
-                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
-                    }
-                    HttpResponse<JsonNode> response = Unirest
-                            .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
-                            .header("authorization", api.getToken())
-                            .header("content-type", "application/json")
-                            .body(new JSONObject().put("content", content).toString())
-                            .asJson();
-                    api.checkResponse(response);
-                    if (isPrivateMessage()) {
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
-                    } else {
-                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
-                    }
-                    final String oldContent = getContent();
-                    setContent(content);
-                    if (!oldContent.equals(content)) {
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
-                                synchronized (listeners) {
-                                    for (MessageEditListener listener : listeners) {
-                                        try {
-                                            listener.onMessageEdit(api, ImplMessage.this, oldContent);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in MessageEditListener!", t);
-                                        }
+            public Void call() throws Exception {
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                } else {
+                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                }
+                HttpResponse<JsonNode> response = Unirest
+                        .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                        .header("authorization", api.getToken())
+                        .header("content-type", "application/json")
+                        .body(new JSONObject().put("content", content).toString())
+                        .asJson();
+                api.checkResponse(response);
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                } else {
+                    api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                }
+                final String oldContent = getContent();
+                setContent(content);
+                if (!oldContent.equals(content)) {
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<MessageEditListener> listeners = api.getListeners(MessageEditListener.class);
+                            synchronized (listeners) {
+                                for (MessageEditListener listener : listeners) {
+                                    try {
+                                        listener.onMessageEdit(api, ImplMessage.this, oldContent);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in MessageEditListener!", t);
                                     }
                                 }
                             }
-                        });
-                    }
-                } catch (Exception e) {
-                    return e;
+                        }
+                    });
                 }
                 return null;
             }
         });
+    }
+
+    @Override
+    public Collection<Embed> getEmbeds() {
+        return Collections.unmodifiableCollection(embeds);
     }
 
     /**

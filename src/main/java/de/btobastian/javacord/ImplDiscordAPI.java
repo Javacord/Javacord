@@ -154,8 +154,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void connectBlocking() {
         if (token == null || !checkTokenBlocking(token)) {
             if (email == null || password == null) {
-                logger.warn("No valid token provided AND missing email or password. Connecting not possible!");
-                return;
+                throw new IllegalArgumentException("No valid token provided AND missing email or password. Connecting not possible!");
             }
             token = requestTokenBlocking();
         }
@@ -164,7 +163,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, false);
         } catch (URISyntaxException e) {
             logger.warn("Something went wrong while connecting. Please contact the developer!", e);
-            return;
+            throw new IllegalArgumentException("Invalid gateway url. Please contact the developer!");
         }
         try {
             if (!socketAdapter.isReady().get()) {
@@ -172,6 +171,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
         } catch (InterruptedException | ExecutionException e) {
             logger.warn("Something went wrong while connecting. Please contact the developer!", e);
+            throw new IllegalStateException("Could not figure out if ready or not. Please contact the developer!");
         }
     }
 
@@ -529,27 +529,27 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public Future<Exception> updateUsername(String newUsername) {
+    public Future<Void> updateUsername(String newUsername) {
         return updateProfile(newUsername, null, null, null);
     }
 
     @Override
-    public Future<Exception> updateEmail(String newEmail) {
+    public Future<Void> updateEmail(String newEmail) {
         return updateProfile(null, newEmail, null, null);
     }
 
     @Override
-    public Future<Exception> updatePassword(String newPassword) {
+    public Future<Void> updatePassword(String newPassword) {
         return updateProfile(null, null, newPassword, null);
     }
 
     @Override
-    public Future<Exception> updateAvatar(BufferedImage newAvatar) {
+    public Future<Void> updateAvatar(BufferedImage newAvatar) {
         return updateProfile(null, null, null, newAvatar);
     }
 
     @Override
-    public Future<Exception> updateProfile(
+    public Future<Void> updateProfile(
             final String newUsername, String newEmail, final String newPassword, final BufferedImage newAvatar) {
         logger.debug("Trying to update profile (username: {}, email: {}, password: {}, change avatar: {}",
                 newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"), newAvatar != null);
@@ -571,46 +571,42 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (newPassword != null) {
             params.put("new_password", newPassword);
         }
-        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+        return getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
-                try {
-                    HttpResponse<JsonNode> response = Unirest
-                            .patch("https://discordapp.com/api/users/@me")
-                            .header("authorization", token)
-                            .header("Content-Type", "application/json")
-                            .body(params.toString())
-                            .asJson();
-                    checkResponse(response);
-                    logger.info("Updated profile (username: {}, email: {}, password: {}, change avatar: {}",
-                            newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"),
-                            newAvatar != null);
-                    ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
-                    if (response.getBody().getObject().has("email")) {
-                        setEmail(response.getBody().getObject().getString("email"));
-                    }
-                    setToken(response.getBody().getObject().getString("token"), token.startsWith("Bot "));
-                    final String oldName = getYourself().getName();
-                    ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
-                    if (newPassword != null) {
-                        password = newPassword;
-                    }
+            public Void call() throws Exception {
+                HttpResponse<JsonNode> response = Unirest
+                        .patch("https://discordapp.com/api/users/@me")
+                        .header("authorization", token)
+                        .header("Content-Type", "application/json")
+                        .body(params.toString())
+                        .asJson();
+                checkResponse(response);
+                logger.info("Updated profile (username: {}, email: {}, password: {}, change avatar: {}",
+                        newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"),
+                        newAvatar != null);
+                ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
+                if (response.getBody().getObject().has("email")) {
+                    setEmail(response.getBody().getObject().getString("email"));
+                }
+                setToken(response.getBody().getObject().getString("token"), token.startsWith("Bot "));
+                final String oldName = getYourself().getName();
+                ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
+                if (newPassword != null) {
+                    password = newPassword;
+                }
 
-                    if (!getYourself().getName().equals(oldName)) {
-                        getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<UserChangeNameListener> listeners = getListeners(UserChangeNameListener.class);
-                                synchronized (listeners) {
-                                    for (UserChangeNameListener listener : listeners) {
-                                        listener.onUserChangeName(ImplDiscordAPI.this, getYourself(), oldName);
-                                    }
+                if (!getYourself().getName().equals(oldName)) {
+                    getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<UserChangeNameListener> listeners = getListeners(UserChangeNameListener.class);
+                            synchronized (listeners) {
+                                for (UserChangeNameListener listener : listeners) {
+                                    listener.onUserChangeName(ImplDiscordAPI.this, getYourself(), oldName);
                                 }
                             }
-                        });
-                    }
-                } catch (Exception e) {
-                    return e;
+                        }
+                    });
                 }
                 return null;
             }
@@ -645,21 +641,17 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public Future<Exception> deleteInvite(final String inviteCode) {
-        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+    public Future<Void> deleteInvite(final String inviteCode) {
+        return getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
+            public Void call() throws Exception {
                 logger.debug("Trying to delete invite {}", inviteCode);
-                try {
-                    HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/invite/" + inviteCode)
-                            .header("authorization", token)
-                            .asJson();
-                    checkResponse(response);
-                    logger.info("Deleted invite {}", inviteCode);
-                } catch (Exception e) {
-                    return e;
-                }
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/invite/" + inviteCode)
+                        .header("authorization", token)
+                        .asJson();
+                checkResponse(response);
+                logger.info("Deleted invite {}", inviteCode);
                 return null;
             }
         });
@@ -810,24 +802,20 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public Future<Exception> deleteApplication(final String id) {
+    public Future<Void> deleteApplication(final String id) {
         if (getYourself().isBot()) {
             throw new NotSupportedForBotsException();
         }
-        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+        return getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
-                try {
-                    logger.debug("Trying to delete application with id {}", id);
-                    HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/oauth2/applications/" + id)
-                            .header("Authorization", getToken())
-                            .asJson();
-                    checkResponse(response);
-                    logger.debug("Deleted application with id {}", id);
-                } catch (Exception e) {
-                    return e;
-                }
+            public Void call() throws Exception {
+                logger.debug("Trying to delete application with id {}", id);
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/oauth2/applications/" + id)
+                        .header("Authorization", getToken())
+                        .asJson();
+                checkResponse(response);
+                logger.debug("Deleted application with id {}", id);
                 return null;
             }
         });
@@ -965,6 +953,9 @@ public class ImplDiscordAPI implements DiscordAPI {
         String id = data.getString("id");
         User user = users.get(id);
         if (user == null) {
+            if (!data.has("username")) {
+                return null;
+            }
             user = new ImplUser(data, this);
         }
         return user;
@@ -1006,12 +997,13 @@ public class ImplDiscordAPI implements DiscordAPI {
         try {
             logger.debug("Trying to request token (email: {}, password: {})", email, password.replaceAll(".", "*"));
             HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/auth/login")
-                    .field("email", email)
-                    .field("password", password)
+                    .header("User-Agent", Javacord.USER_AGENT)
+                    .header("Content-Type", "application/json")
+                    .body(new JSONObject().put("email", email).put("password", password).toString())
                     .asJson();
             JSONObject jsonResponse = response.getBody().getObject();
             if (response.getStatus() == 400) {
-                throw new IllegalArgumentException("400 Bad request! Maybe wrong email or password?");
+                throw new IllegalArgumentException("400 Bad request! Maybe wrong email or password? StatusText: " + response.getStatusText() + "; Body: " + response.getBody());
             }
             if (response.getStatus() < 200 || response.getStatus() > 299) {
                 throw new IllegalStateException("Received http status code " + response.getStatus()

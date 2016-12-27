@@ -58,6 +58,9 @@ public class PresenceUpdateHandler extends PacketHandler {
     @Override
     public void handle(JSONObject packet) {
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
+        if (user == null) {
+            return;
+        }
 
         Server server = null;
         if (packet.has("guild_id")) {
@@ -122,22 +125,27 @@ public class PresenceUpdateHandler extends PacketHandler {
         }
 
         // check game
-        if (packet.has("game") && !packet.isNull("game")) {
-            if (packet.getJSONObject("game").has("name")) {
-                String game = packet.getJSONObject("game").get("name").toString();
-                String oldGame = user.getGame();
-                if ((game == null && oldGame != null)
-                        || (game != null && oldGame == null)
-                        || (game != null && !game.equals(oldGame))) {
-                    ((ImplUser) user).setGame(game);
-                    List<UserChangeGameListener> listeners = api.getListeners(UserChangeGameListener.class);
-                    synchronized (listeners) {
-                        for (UserChangeGameListener listener : listeners) {
-                            try {
-                                listener.onUserChangeGame(api, user, oldGame);
-                            } catch (Throwable t) {
-                                logger.warn("Uncaught exception in UserChangeGameListener!", t);
-                            }
+        if (packet.has("game")) {
+            String game;
+            if (!packet.isNull("game")
+                    && packet.getJSONObject("game").has("name")
+                    && !packet.getJSONObject("game").isNull("name")) {
+                game = packet.getJSONObject("game").get("name").toString();
+            } else {
+                game = null;
+            }
+            String oldGame = user.getGame();
+            if ((game == null && oldGame != null)
+                    || (game != null && oldGame == null)
+                    || (game != null && !game.equals(oldGame))) {
+                ((ImplUser) user).setGame(game);
+                List<UserChangeGameListener> listeners = api.getListeners(UserChangeGameListener.class);
+                synchronized (listeners) {
+                    for (UserChangeGameListener listener : listeners) {
+                        try {
+                            listener.onUserChangeGame(api, user, oldGame);
+                        } catch (Throwable t) {
+                            logger.warn("Uncaught exception in UserChangeGameListener!", t);
                         }
                     }
                 }

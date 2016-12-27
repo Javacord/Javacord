@@ -81,9 +81,8 @@ public interface Application {
      * Deletes the application.
      *
      * @return A future which tells us whether the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      * @see de.btobastian.javacord.DiscordAPI#deleteApplication(String)
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
 }
