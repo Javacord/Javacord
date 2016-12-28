@@ -435,6 +435,33 @@ public class ImplMessage implements Message {
         return Collections.unmodifiableCollection(embeds);
     }
 
+    @Override
+    public Future<Void> addUnicodeReaction(final String unicodeEmoji) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(null, RateLimitType.UNKNOWN, null);
+                } else {
+                    api.checkRateLimit(null, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
+                }
+                HttpResponse<JsonNode> response = Unirest
+                        .put("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions/" + unicodeEmoji + "/@me")
+                        .header("authorization", api.getToken())
+                        .header("content-type", "application/json")
+                        .body("{}")
+                        .asJson();
+                api.checkResponse(response);
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                } else {
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
+                }
+                return null;
+            }
+        });
+    }
+
     /**
      * Updates the content of the message.
      *
