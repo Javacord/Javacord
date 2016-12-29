@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.neovisionaries</groupId>
             <artifactId>nv-websocket-client</artifactId>
-            <version>1.22</version>
+            <version>1.31</version>
         </dependency>
 
         <!-- Logging -->
