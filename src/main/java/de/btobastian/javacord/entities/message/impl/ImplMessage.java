@@ -440,6 +440,7 @@ public class ImplMessage implements Message {
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
+                logger.debug("Trying to add reaction to message with id {} (emoji: {})", getId(), unicodeEmoji);
                 if (isPrivateMessage()) {
                     api.checkRateLimit(null, RateLimitType.UNKNOWN, null);
                 } else {
@@ -457,6 +458,7 @@ public class ImplMessage implements Message {
                 } else {
                     api.checkRateLimit(response, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
                 }
+                logger.debug("Added reaction to message with id {} (emoji: {})", getId(), unicodeEmoji);
                 return null;
             }
         });
