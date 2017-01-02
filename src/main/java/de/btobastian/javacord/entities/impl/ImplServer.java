@@ -806,6 +806,16 @@ public class ImplServer implements Server {
         return customEmojis.get(id);
     }
 
+    @Override
+    public CustomEmoji getCustomEmojiByName(String name) {
+        for (CustomEmoji emoji : customEmojis.values()) {
+            if (emoji.getName().equals(name)) {
+                return emoji;
+            }
+        }
+        return null;
+    }
+
     /**
      * Sets the name of the server.
      *

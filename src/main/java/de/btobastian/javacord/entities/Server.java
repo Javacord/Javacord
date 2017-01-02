@@ -396,4 +396,13 @@ public interface Server {
      */
     public CustomEmoji getCustomEmojiById(String id);
 
+    /**
+     * Gets a custom emoji by its name.
+     *
+     * @param name The name of the emoji.
+     * @return The emoji with the given name.
+     *         <code>Null</code> if the emoji does not exist on this server.
+     */
+    public CustomEmoji getCustomEmojiByName(String name);
+
 }
