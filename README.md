@@ -12,7 +12,7 @@ Supports the new application system!
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.12</version>
+  <version>2.0.13</version>
    <!-- This will use the shaded javacord which contains all required dependencies -->
   <classifier>shaded</classifier>
 </dependency>
