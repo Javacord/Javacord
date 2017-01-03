@@ -74,16 +74,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     private int lastSeq = -1;
     private String sessionId = null;
 
-    /**
-     * Creates a new instance of this class.
-     *
-     * @param serverURI The uri of the gateway the socket should connect to.
-     * @param api The api.
-     * @param reconnect Whether it's a reconnect or not.
-     */
-    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
-        this(serverURI, api, reconnect, null, -1);
-    }
+    private long heartbeatInterval = -1;
 
     /**
      * Creates a new instance of this class.
@@ -92,13 +83,28 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param api The api.
      * @param reconnect Whether it's a reconnect or not.
      */
-    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect, String sessionId, int lastSeq) {
+    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
+        this(serverURI, api, reconnect, null, -1, -1);
+    }
+
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param serverURI The uri of the gateway the socket should connect to.
+     * @param api The api.
+     * @param reconnect Whether it's a reconnect or not.
+     * @param sessionId The session id.
+     * @param lastSeq The last sequence number received.
+     * @param heartbeatInterval The heartbeat interval from the last websocket. We don't receive a ready packet if we resume.
+     */
+    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect, String sessionId, int lastSeq, long heartbeatInterval) {
         this.api = api;
         this.ready = SettableFuture.create();
         registerHandlers();
         this.isReconnect = reconnect;
         this.sessionId = sessionId;
         this.lastSeq = lastSeq;
+        this.heartbeatInterval = heartbeatInterval;
 
         WebSocketFactory factory = new WebSocketFactory();
         try {
@@ -156,15 +162,15 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         isClosed = true;
         if (closedByServer && urlForReconnect != null) {
             logger.info("Trying to reconnect (we received op 7 before)...");
-            api.reconnectBlocking(urlForReconnect, sessionId, lastSeq);
+            api.reconnectBlocking(urlForReconnect, sessionId, lastSeq, heartbeatInterval);
             logger.info("Reconnected!");
         } else if (closedByServer && api.isAutoReconnectEnabled()) {
             logger.info("Trying to auto-reconnect...");
-            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
+            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq, heartbeatInterval);
             logger.info("Reconnected!");
         } else if (!closedByServer && (clientCloseFrame == null || clientCloseFrame.getCloseCode() != 1000)) {
             logger.info("Trying to auto-reconnect...");
-            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
+            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq, heartbeatInterval);
             logger.info("Reconnected!");
         }
         if (!ready.isDone()) {
@@ -225,6 +231,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         if (isReconnect && !ready.isDone() && sessionId != null && lastSeq >= 0) {
             ready.set(true);
             updateStatus();
+            startHeartbeat(heartbeatInterval);
             return; // do not handle the ready packet twice
         }
 
@@ -312,6 +319,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param heartbeatInterval The heartbeat interval received in the ready packet.
      */
     public void startHeartbeat(final long heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
         api.getThreadPool().getExecutorService().submit(new Runnable() {
             @Override
             public void run() {
