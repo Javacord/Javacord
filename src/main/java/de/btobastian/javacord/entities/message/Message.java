@@ -291,4 +291,14 @@ public interface Message extends Comparable<Message> {
      */
     public Collection<Embed> getEmbeds();
 
+    /**
+     * Adds an unicode emoji to the message.
+     * <p>
+     * It's recommended to use an emoji java library (e.g. https://github.com/vdurmont/emoji-java).
+     *
+     * @param unicodeEmoji The emoji to add.
+     * @return A future which tells us if the adding was successful or not.
+     */
+    public Future<Void> addUnicodeReaction(String unicodeEmoji);
+
 }
