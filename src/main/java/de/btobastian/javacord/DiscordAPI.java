@@ -345,9 +345,8 @@ public interface DiscordAPI {
      *
      * @param newUsername The new username.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateUsername(String newUsername);
+    public Future<Void> updateUsername(String newUsername);
 
     /**
      * Updates the email address.
@@ -358,9 +357,8 @@ public interface DiscordAPI {
      *
      * @param newEmail The new email.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateEmail(String newEmail);
+    public Future<Void> updateEmail(String newEmail);
 
     /**
      * Updates the password.
@@ -371,9 +369,8 @@ public interface DiscordAPI {
      *
      * @param newPassword The new password.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updatePassword(String newPassword);
+    public Future<Void> updatePassword(String newPassword);
 
     /**
      * Updates the avatar.
@@ -383,9 +380,8 @@ public interface DiscordAPI {
      *
      * @param newAvatar The new avatar.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateAvatar(BufferedImage newAvatar);
+    public Future<Void> updateAvatar(BufferedImage newAvatar);
 
     /**
      * Updates the profile.
@@ -395,10 +391,8 @@ public interface DiscordAPI {
      * @param newPassword The new password. Set to <code>null</code> to keep the current password.
      * @param newAvatar The new avatar. Set to <code>null</code> to keep the current avatar.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateProfile(
-            String newUsername, String newEmail, String newPassword, BufferedImage newAvatar);
+    public Future<Void> updateProfile(String newUsername, String newEmail, String newPassword, BufferedImage newAvatar);
 
     /**
      * Tries to parse the given invite.
@@ -422,9 +416,8 @@ public interface DiscordAPI {
      *
      * @param inviteCode The invite code.
      * @return A future which tells us whether the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> deleteInvite(String inviteCode);
+    public Future<Void> deleteInvite(String inviteCode);
 
     /**
      * Sets the size of message cache.
@@ -522,9 +515,8 @@ public interface DiscordAPI {
      *
      * @param id The id of the application.
      * @return A future which tells us whether the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> deleteApplication(String id);
+    public Future<Void> deleteApplication(String id);
 
     /**
      * Creates a new bot and an application for this bot.

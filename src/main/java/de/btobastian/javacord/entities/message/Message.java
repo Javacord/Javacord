@@ -21,6 +21,8 @@ package de.btobastian.javacord.entities.message;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.permissions.Role;
 
 import java.io.File;
@@ -133,9 +135,8 @@ public interface Message extends Comparable<Message> {
      * Deletes the message.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Gets the attachments of a message.
@@ -165,6 +166,25 @@ public interface Message extends Comparable<Message> {
      * Replies to the message with the given content.
      *
      * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message.
      */
@@ -179,6 +199,28 @@ public interface Message extends Comparable<Message> {
      * @return The sent message.
      */
     public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback);
+
+    /**
+     * Replies to the message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @param nonce The NONCE token of the message.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message.
+     */
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, String nonce, FutureCallback<Message> callback);
 
     /**
      * Replies with a file.
@@ -269,8 +311,24 @@ public interface Message extends Comparable<Message> {
      *
      * @param content The new content of the message.
      * @return A future which tells us if the edit was successful or not.
-     *         If the exception is <code>null</code> the edit was successful.
      */
-    public Future<Exception> edit(String content);
+    public Future<Void> edit(String content);
+
+    /**
+     * Gets a collection with all embeds.
+     *
+     * @return A collection with all embeds.
+     */
+    public Collection<Embed> getEmbeds();
+
+    /**
+     * Adds an unicode emoji to the message.
+     * <p>
+     * It's recommended to use an emoji java library (e.g. https://github.com/vdurmont/emoji-java).
+     *
+     * @param unicodeEmoji The emoji to add.
+     * @return A future which tells us if the adding was successful or not.
+     */
+    public Future<Void> addUnicodeReaction(String unicodeEmoji);
 
 }

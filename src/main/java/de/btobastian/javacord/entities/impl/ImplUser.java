@@ -33,6 +33,7 @@ import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -92,10 +93,11 @@ public class ImplUser implements User {
         try {
             avatarId = data.getString("avatar");
         } catch (JSONException ignored) { }
-        if (data.has("discriminator"))
+        if (data.has("discriminator")) {
             discriminator = data.getString("discriminator");
-        else
+        } else {
             discriminator = null;
+        }
         bot = data.has("bot") && data.getBoolean("bot");
 
         api.getUserMap().put(id, this);
@@ -235,31 +237,41 @@ public class ImplUser implements User {
 
     @Override
     public Future<Message> sendMessage(String content) {
-        return sendMessage(content, false, null, null);
+        return sendMessage(content, false);
     }
 
     @Override
     public Future<Message> sendMessage(String content, boolean tts) {
-        return sendMessage(content, tts, null, null);
+        return sendMessage(content, tts, null);
     }
 
     @Override
-    public Future<Message> sendMessage(String content, boolean tts, String nonce) {
-        return sendMessage(content, tts, nonce, null);
+    public Future<Message> sendMessage(String content, EmbedBuilder embed) {
+        return sendMessage(content, embed, false, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts) {
+        return sendMessage(content, embed, tts, null, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
-        return sendMessage(content, false, null, callback);
+        return sendMessage(content, null, false, null, null);
     }
 
     @Override
-    public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback) {
-        return sendMessage(content, tts, null, callback);
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
+        return sendMessage(content, embed, false, null, callback);
     }
 
     @Override
-    public Future<Message> sendMessage(final String content, final boolean tts, final String nonce, FutureCallback<Message> callback) {
+    public Future<Message> sendMessage(final String content, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, null, tts, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(final String content, final EmbedBuilder embed, final boolean tts, final String nonce, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
@@ -268,15 +280,20 @@ public class ImplUser implements User {
                         logger.debug("Trying to send message to user {} (content: \"{}\", tts: {})",
                                 ImplUser.this, content, tts);
                         api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        JSONObject body = new JSONObject()
+                                .put("content", content)
+                                .put("tts", tts)
+                                .put("nonce", nonce)
+                                .put("mentions", new String[0]);
+                        if (embed != null) {
+                            body.put("embed", embed.toJSONObject());
+                        }
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
                                         .header("authorization", api.getToken())
                                         .header("content-type", "application/json")
-                                        .body(new JSONObject()
-                                                .put("content", content)
-                                                .put("tts", tts)
-                                                .put("mentions", new String[0]).toString())
+                                        .body(body.toString())
                                         .asJson();
                         api.checkResponse(response);
                         api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);

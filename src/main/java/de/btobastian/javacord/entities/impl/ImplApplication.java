@@ -111,7 +111,7 @@ public class ImplApplication implements Application {
     }
 
     @Override
-    public Future<Exception> delete() {
+    public Future<Void> delete() {
         return api.deleteApplication(getId());
     }
 

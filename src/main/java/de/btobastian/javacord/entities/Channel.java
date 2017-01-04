@@ -68,9 +68,8 @@ public interface Channel extends MessageReceiver {
      * Deletes the channel.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Gets an invite builder.
@@ -103,9 +102,8 @@ public interface Channel extends MessageReceiver {
      *
      * @param newName The new name of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateName(String newName);
+    public Future<Void> updateName(String newName);
 
     /**
      * Updates the topic of the channel.
@@ -114,9 +112,8 @@ public interface Channel extends MessageReceiver {
      *
      * @param newTopic The new topic of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateTopic(String newTopic);
+    public Future<Void> updateTopic(String newTopic);
 
     /**
      * Updates the channel.
@@ -124,9 +121,8 @@ public interface Channel extends MessageReceiver {
      * @param newName The new name of the channel.
      * @param newTopic The new topic of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> update(String newName, String newTopic);
+    public Future<Void> update(String newName, String newTopic);
 
     /**
      * Gets the tag which is used to mention the channel.

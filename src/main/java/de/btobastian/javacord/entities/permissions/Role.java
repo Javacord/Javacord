@@ -116,9 +116,8 @@ public interface Role {
      * @param permissions The permissions to set. Roles don't have the {@link PermissionState#NONE} so every
      *                    permission with this state will be replaced with {@link PermissionState#DENIED}.
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updatePermissions(Permissions permissions);
+    public Future<Void> updatePermissions(Permissions permissions);
 
     /**
      * Updates the name of this role.
@@ -127,9 +126,8 @@ public interface Role {
      *
      * @param name The name to set.
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateName(String name);
+    public Future<Void> updateName(String name);
 
     /**
      * Updates the color of this role.
@@ -138,9 +136,8 @@ public interface Role {
      *
      * @param color The color to set.
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateColor(Color color);
+    public Future<Void> updateColor(Color color);
 
     /**
      * Updates the hoist of this role.
@@ -149,9 +146,8 @@ public interface Role {
      *
      * @param hoist The hoist to set.
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateHoist(boolean hoist);
+    public Future<Void> updateHoist(boolean hoist);
 
     /**
      * Updates the role.
@@ -161,17 +157,15 @@ public interface Role {
      * @param hoist The new hoist of the role.
      * @param permissions The new permissions of the role.
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> update(String name, Color color, boolean hoist, Permissions permissions);
+    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions);
 
     /**
      * Deletes the role.
      *
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Adds the user to the role.
@@ -179,17 +173,15 @@ public interface Role {
      *
      * @param user The user to add.
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> addUser(User user);
+    public Future<Void> addUser(User user);
 
     /**
      * Removes the user from the role.
      *
      * @param user The user to remove.
      * @return A future which tells us if the update was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> removeUser(User user);
+    public Future<Void> removeUser(User user);
 
 }
