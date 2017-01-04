@@ -155,23 +155,25 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     @Override
     public void onDisconnected(WebSocket socket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                                boolean closedByServer) throws Exception {
-        logger.info("Websocket closed with reason {} and code {}{}",
-                serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
-                serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown",
-                closedByServer ? " by server" : "");
+        if (!(!closedByServer && clientCloseFrame == null)) {
+            logger.info("Websocket closed with reason {} and code {}{}",
+                    serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
+                    serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown",
+                    closedByServer ? " by server" : "");
+        }
         isClosed = true;
         if (closedByServer && urlForReconnect != null) {
             logger.info("Trying to reconnect (we received op 7 before)...");
             api.reconnectBlocking(urlForReconnect, sessionId, lastSeq, heartbeatInterval);
             logger.info("Reconnected!");
         } else if (closedByServer && api.isAutoReconnectEnabled()) {
-            logger.info("Trying to auto-reconnect...");
+            logger.info("Trying to resume session (reconnect) ...");
             api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq, heartbeatInterval);
             logger.info("Reconnected!");
         } else if (!closedByServer && (clientCloseFrame == null || clientCloseFrame.getCloseCode() != 1000)) {
-            logger.info("Trying to auto-reconnect...");
+            logger.debug("Trying to resume session (reconnect) ...");
             api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq, heartbeatInterval);
-            logger.info("Reconnected!");
+            logger.debug("Reconnected!");
         }
         if (!ready.isDone()) {
             ready.set(false);
@@ -185,7 +187,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onError(WebSocket socket, WebSocketException cause) throws Exception {
-        logger.warn("Websocket error!", cause);
+        if (!cause.getMessage().equals("Connection closed by remote host")) {
+            logger.warn("Websocket error!", cause);
+        }
     }
 
     @Override
@@ -196,7 +200,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onSendError(WebSocket socket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-        logger.warn("Websocket error!", cause);
+        if (!cause.getMessage().equals("Connection closed by remote host")) {
+            logger.warn("Websocket error!", cause);
+        }
     }
 
     @Override
