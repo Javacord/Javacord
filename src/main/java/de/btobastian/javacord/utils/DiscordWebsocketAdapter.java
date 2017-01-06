@@ -159,7 +159,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
                     serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown");
         } else {
-            logger.info("Websocket closed with reason {} and code {} by server!",
+            logger.info("Websocket closed with reason {} and code {} by client!",
                     clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
                     clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
         }
