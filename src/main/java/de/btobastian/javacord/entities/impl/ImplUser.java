@@ -67,7 +67,6 @@ public class ImplUser implements User {
 
     private final String id;
     private String name;
-    private Map<String, String> nicknames;
     private String avatarId = null;
     private final Object userChannelIdLock = new Object();
     private String userChannelId = null;
@@ -86,7 +85,6 @@ public class ImplUser implements User {
         this.api = api;
 
         id = data.getString("id");
-        nicknames = new HashMap<>();
         if (data.has("username")) {
             name = data.getString("username");
         }
@@ -114,17 +112,13 @@ public class ImplUser implements User {
     }
 
     @Override
-    public String getNickname(String serverId) {
-        return nicknames.get(serverId);
+    public String getNickname(Server server) {
+        return server.getNickname(this);
     }
 
     @Override
-    public void setNickname(String serverId, String nickname) {
-        if (nickname != null) {
-            nicknames.put(serverId, nickname);
-        } else {
-            nicknames.remove(serverId);
-        }
+    public boolean hasNickname(Server server) {
+        return server.hasNickname(this);
     }
 
     @Override

@@ -67,6 +67,8 @@ public class ImplServer implements Server {
     private final ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Role> roles = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, CustomEmoji> customEmojis = new ConcurrentHashMap<>();
+    // key = user id; value = user nickname
+    private final ConcurrentHashMap<String, String> nicknames = new ConcurrentHashMap<>();
 
     private final String id;
     private String name;
@@ -120,7 +122,7 @@ public class ImplServer implements Server {
         for (int i = 0; i < members.length(); i++) {
             User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
             if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
-                member.setNickname(id, members.getJSONObject(i).getString("nick"));
+                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
             }
             this.members.put(member.getId(), member);
 
@@ -819,6 +821,16 @@ public class ImplServer implements Server {
         return null;
     }
 
+    @Override
+    public String getNickname(User user) {
+        return nicknames.get(user.getId());
+    }
+
+    @Override
+    public boolean hasNickname(User user) {
+        return nicknames.contains(user.getId());
+    }
+
     /**
      * Sets the name of the server.
      *
@@ -958,6 +970,21 @@ public class ImplServer implements Server {
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
+
+    /**
+     * Sets the nickname of an user.
+     *
+     * @param user The user.
+     * @param nickname The nickname to set.
+     */
+    public void setNickname(User user, String nickname) {
+        if (nickname == null) {
+            nicknames.remove(user.getId());
+        } else {
+            nicknames.put(user.getId(), nickname);
+        }
+    }
+
 
     /**
      * Creates a new channel.

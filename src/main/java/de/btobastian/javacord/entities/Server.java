@@ -405,4 +405,20 @@ public interface Server {
      */
     public CustomEmoji getCustomEmojiByName(String name);
 
+    /**
+     * Gets the nickname of the user on the server.
+     *
+     * @param user The user.
+     * @return The nickname of the user on the server or <code>null</code> if the user has no nick.
+     */
+    public String getNickname(User user);
+
+    /**
+     * Checks if the user has a nickname on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the user has a nickname on the server or not.
+     */
+    public boolean hasNickname(User user);
+
 }

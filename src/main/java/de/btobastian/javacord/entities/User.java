@@ -47,20 +47,20 @@ public interface User extends MessageReceiver {
     public String getName();
 
     /**
-     * Gets the nickname of the user.
+     * Gets the nickname of the user on the given server.
      *
-     * @param serverId ID of the server.
-     * @return The nickname of the user.
+     * @param server The server.
+     * @return The nickname of the user on the server or <code>null</code> if the user has no nick.
      */
-    public String getNickname(String serverId);
+    public String getNickname(Server server);
 
     /**
-     * Sets the nickname of the user.
+     * Checks if the user has a nickname on the given server.
      *
-     * @param serverId ID of the server.
-     * @param nickname The nickname of the user.
+     * @param server The server to check.
+     * @return Whether the user has a nickname on the server or not.
      */
-    public void setNickname(String serverId, String nickname);
+    public boolean hasNickname(Server server);
 
     /**
      * Checks if the user is the account you logged in.
