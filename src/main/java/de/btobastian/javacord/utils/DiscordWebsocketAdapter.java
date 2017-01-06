@@ -76,6 +76,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     private long heartbeatInterval = -1;
 
+    // Used to make sure we no reconnect two times
+    private boolean alreadyReconnecting = true;
+
     /**
      * Creates a new instance of this class.
      *
@@ -84,7 +87,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param reconnect Whether it's a reconnect or not.
      */
     public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
-        this(serverURI, api, reconnect, null, -1, -1);
+        this(serverURI, api, reconnect, null, -1);
     }
 
     /**
@@ -95,9 +98,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param reconnect Whether it's a reconnect or not.
      * @param sessionId The session id.
      * @param lastSeq The last sequence number received.
-     * @param heartbeatInterval The heartbeat interval from the last websocket. We don't receive a ready packet if we resume.
      */
-    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect, String sessionId, int lastSeq, long heartbeatInterval) {
+    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect, String sessionId, int lastSeq) {
         this.api = api;
         this.ready = SettableFuture.create();
         registerHandlers();
@@ -164,18 +166,23 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
         }
         isClosed = true;
-        if (closedByServer && urlForReconnect != null) {
-            logger.info("Trying to reconnect (we received op 7 before)...");
-            api.reconnectBlocking(urlForReconnect, sessionId, lastSeq, heartbeatInterval);
-            logger.info("Reconnected!");
-        } else if (closedByServer && api.isAutoReconnectEnabled()) {
-            logger.info("Trying to resume session (reconnect) ...");
-            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq, heartbeatInterval);
-            logger.info("Reconnected!");
-        } else if (!closedByServer && (clientCloseFrame == null || clientCloseFrame.getCloseCode() != 1000)) {
-            logger.debug("Trying to resume session (reconnect) ...");
-            api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq, heartbeatInterval);
-            logger.debug("Reconnected!");
+        if (!alreadyReconnecting) {
+            if (closedByServer && urlForReconnect != null) {
+                logger.info("Trying to reconnect (we received op 7 before)...");
+                alreadyReconnecting = true;
+                api.reconnectBlocking(urlForReconnect, sessionId, lastSeq);
+                logger.info("Reconnected!");
+            } else if (closedByServer && api.isAutoReconnectEnabled()) {
+                logger.info("Trying to resume session (reconnect) ...");
+                alreadyReconnecting = true;
+                api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
+                logger.info("Reconnected!");
+            } else if (!closedByServer && (clientCloseFrame == null || clientCloseFrame.getCloseCode() != 1000)) {
+                logger.debug("Trying to resume session (reconnect) ...");
+                alreadyReconnecting = true;
+                api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
+                logger.debug("Reconnected!");
+            }
         }
         if (!ready.isDone()) {
             ready.set(false);
@@ -222,9 +229,17 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             return;
         }
 
+        if (op == 9) {
+            alreadyReconnecting = true;
+            api.reconnectBlocking(urlForReconnect, sessionId, -1);
+            logger.debug("Received op 9 packet");
+            return;
+        }
+
         if (op == 10) {
             startHeartbeat(obj.getJSONObject("d").getLong("heartbeat_interval"));
             logger.debug("Received HELLO packet");
+            return;
         }
 
         lastSeq = obj.getInt("s");
