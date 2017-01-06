@@ -337,83 +337,22 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> reply(String content) {
-        return reply(content, null, false, null, null);
-    }
-
-    @Override
-    public Future<Message> reply(String content, boolean tts) {
-        return reply(content, null, tts, null, null);
+        return receiver.sendMessage(content);
     }
 
     @Override
     public Future<Message> reply(String content, EmbedBuilder embed) {
-        return reply(content, embed, false, null, null);
-    }
-
-    @Override
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts) {
-        return reply(content, embed, tts, null, null);
+        return receiver.sendMessage(content, embed);
     }
 
     @Override
     public Future<Message> reply(String content, FutureCallback<Message> callback) {
-        return reply(content, null, false, null, callback);
-    }
-
-    @Override
-    public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback) {
-        return reply(content, null, tts, null, callback);
+        return receiver.sendMessage(content, callback);
     }
 
     @Override
     public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
-        return reply(content, embed, false, null, callback);
-    }
-
-    @Override
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, String nonce, FutureCallback<Message> callback) {
-        return receiver.sendMessage(content, embed, tts, nonce, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(final File file) {
-        return replyFile(file, null, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(final File file, FutureCallback<Message> callback) {
-        return replyFile(file, null, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(InputStream inputStream, String filename) {
-        return replyFile(inputStream, filename, null, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(InputStream inputStream, String filename, FutureCallback<Message> callback) {
-        return replyFile(inputStream, filename, null, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(File file, String comment) {
-        return replyFile(file, comment, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(final File file, final String comment, FutureCallback<Message> callback) {
-        return receiver.sendFile(file, comment, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(InputStream inputStream, String filename, String comment) {
-        return replyFile(inputStream, filename, comment, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(final InputStream inputStream, final String filename, final String comment,
-                                     FutureCallback<Message> callback) {
-        return receiver.sendFile(inputStream, filename, comment, callback);
+        return receiver.sendMessage(content, embed, callback);
     }
 
     @Override

@@ -157,29 +157,10 @@ public interface Message extends Comparable<Message> {
      * Replies to the message with the given content.
      *
      * @param content The content of the message.
-     * @param tts Whether the message should be tts or not.
-     * @return The sent message.
-     */
-    public Future<Message> reply(String content, boolean tts);
-
-    /**
-     * Replies to the message with the given content.
-     *
-     * @param content The content of the message.
      * @param embed An embed that should be added to the message.
      * @return The sent message.
      */
     public Future<Message> reply(String content, EmbedBuilder embed);
-
-    /**
-     * Replies to the message with the given content.
-     *
-     * @param content The content of the message.
-     * @param embed An embed that should be added to the message.
-     * @param tts Whether the message should be tts or not.
-     * @return The sent message.
-     */
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts);
 
     /**
      * Replies to the message with the given content.
@@ -194,111 +175,12 @@ public interface Message extends Comparable<Message> {
      * Replies to the message with the given content.
      *
      * @param content The content of the message.
-     * @param tts Whether the message should be tts or not.
-     * @param callback The callback which will be informed when the message was sent or sending failed.
-     * @return The sent message.
-     */
-    public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback);
-
-    /**
-     * Replies to the message with the given content.
-     *
-     * @param content The content of the message.
      * @param embed An embed that should be added to the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message.
      */
     public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback);
-
-    /**
-     * Replies to the message with the given content.
-     *
-     * @param content The content of the message.
-     * @param embed An embed that should be added to the message.
-     * @param tts Whether the message should be tts or not.
-     * @param nonce The NONCE token of the message.
-     * @param callback The callback which will be informed when the message was sent or sending failed.
-     * @return The sent message.
-     */
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, String nonce, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file.
-     *
-     * @param file The file to upload.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file);
-
-    /**
-     * Replies with a file.
-     *
-     * @param file The file to upload.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename);
-
-    /**
-     * Replies with a file.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param file The file to upload.
-     * @param comment An additional comment to your file.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file, String comment);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param file The file to upload.
-     * @param comment An additional comment to your file.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file, String comment, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @param comment An additional comment to your file.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename, String comment);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @param comment An additional comment to your file.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename, String comment,
-                                     FutureCallback<Message> callback);
-
+    
     /**
      * Gets the date of creation.
      *
