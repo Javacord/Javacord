@@ -103,8 +103,8 @@ public class PresenceUpdateHandler extends PacketHandler {
         // check username
         if (packet.getJSONObject("user").has("username")) {
             String name = packet.getJSONObject("user").getString("username");
-            final String oldName = user.getName();
-            if ((oldName == null && name != null) || (oldName != null && !user.getName().equals(name))) {
+            if (!user.getName().equals(name)) {
+                final String oldName = user.getName();
                 ((ImplUser) user).setName(name);
                 listenerExecutorService.submit(new Runnable() {
                     @Override
