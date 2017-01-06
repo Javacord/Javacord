@@ -152,10 +152,10 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public void connectBlocking() {
-        if (token == null && (email == null || password == null)) {
-            throw new IllegalArgumentException("No valid token provided AND missing email or password. Connecting not possible!");
-        }
-        if (password != null && (token == null || !checkTokenBlocking(token))) {
+        if (token == null || !checkTokenBlocking(token)) {
+            if (email == null || password == null) {
+                throw new IllegalArgumentException("No valid token provided AND missing email or password. Connecting not possible!");
+            }
             token = requestTokenBlocking();
         }
         String gateway = requestGatewayBlocking();
@@ -914,8 +914,12 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void reconnectBlocking(String gateway, String sessionId, int lastSeq, long heartbeatInterval) {
         logger.debug("Trying to reconnect to gateway {}", gateway);
         socketAdapter.getWebSocket().disconnect();
-        if (password != null && (token == null || !checkTokenBlocking(token))) {
-            token = requestTokenBlocking();
+        if (token == null || !checkTokenBlocking(token)) {
+            if (email != null && password != null) {
+                token = requestTokenBlocking();
+            } else {
+                throw new IllegalStateException("Reconnect not possible! Invalid token AND missing email or password!");
+            }
         }
         try {
             WebSocketFactory factory = new WebSocketFactory();
