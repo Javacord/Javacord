@@ -23,6 +23,7 @@ import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.permissions.Role;
 
 import java.io.File;
 import java.io.InputStream;
@@ -96,11 +97,39 @@ public interface Message extends Comparable<Message> {
     public List<User> getMentions();
 
     /**
+     * Gets all mentioned roles.
+     *
+     * @return A list with all mentioned roles.
+     */
+    public List<Role> getMentionRoles();
+
+    /**
      * Checks if the message is tts.
      *
      * @return Whether the message is tts or not.
      */
     public boolean isTts();
+
+    /**
+     * NONCE token of the message.
+     *
+     * @return NONCE token.
+     */
+    public String getNonce();
+
+    /**
+     * Whether the message mentions everyone.
+     *
+     * @return mention_everyone.
+     */
+    public boolean getMentionEveryone();
+
+    /**
+     * Whether the message is pinned.
+     *
+     * @return pinned.
+     */
+    public boolean getPinned();
 
     /**
      * Deletes the message.
@@ -187,10 +216,11 @@ public interface Message extends Comparable<Message> {
      * @param content The content of the message.
      * @param embed An embed that should be added to the message.
      * @param tts Whether the message should be tts or not.
+     * @param nonce The NONCE token of the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message.
      */
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback);
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, String nonce, FutureCallback<Message> callback);
 
     /**
      * Replies with a file.

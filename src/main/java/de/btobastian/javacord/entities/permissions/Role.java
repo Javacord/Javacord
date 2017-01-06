@@ -104,6 +104,10 @@ public interface Role {
      */
     public Color getColor();
 
+    public boolean getMentionable();
+
+    public boolean getManaged();
+
     /**
      * Updates the permissions of this role.
      * If you want to update other things like name, color, etc. use

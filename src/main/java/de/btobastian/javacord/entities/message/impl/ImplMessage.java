@@ -35,6 +35,7 @@ import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -95,9 +96,13 @@ public class ImplMessage implements Message {
     private final boolean tts;
     private final User author;
     private final List<User> mentions = new ArrayList<>();
+    private final List<Role> mentionRoles = new ArrayList<>();
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
+    private final String nonce;
+    private boolean mentionEveryone;
+    private boolean pinned;
     private Calendar creationDate = Calendar.getInstance();
     private final Collection<Embed> embeds = new ArrayList<>();
 
@@ -105,7 +110,7 @@ public class ImplMessage implements Message {
      * Creates a new instance of this class.
      *
      * @param data A JSONObject containing all necessary data.
-     * @param api The api of this server.
+     * @param api  The api of this server.
      */
     public ImplMessage(JSONObject data, ImplDiscordAPI api, MessageReceiver receiver) {
         this.api = api;
@@ -115,6 +120,8 @@ public class ImplMessage implements Message {
             content = data.getString("content");
         }
         tts = data.getBoolean("tts");
+        mentionEveryone = data.getBoolean("mention_everyone");
+        pinned = data.getBoolean("pinned");
 
         if (data.has("timestamp")) {
             String time = data.getString("timestamp");
@@ -153,7 +160,8 @@ public class ImplMessage implements Message {
                 String name = attachment.getString("filename");
                 this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
             }
-        } catch (JSONException ignored) { }
+        } catch (JSONException ignored) {
+        }
 
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
@@ -180,8 +188,24 @@ public class ImplMessage implements Message {
             this.receiver = receiver;
         }
 
+        if (data.has("nonce") && !data.isNull("nonce")) {
+            nonce = data.getString("nonce");
+        } else {
+            nonce = null;
+        }
+
         if (getChannelReceiver() != null) {
-            ((ImplServer) getChannelReceiver().getServer()).addMember(author);
+            ImplServer server = (ImplServer) getChannelReceiver().getServer();
+            server.addMember(author);
+
+            JSONArray mentionRoles = data.getJSONArray("mention_roles");
+            for (int i = 0; i < mentionRoles.length(); i++) {
+                String roleId = mentionRoles.getString(i);
+                Role role = server.getRoleById(roleId);
+                if (role != null) {
+                    this.mentionRoles.add(role);
+                }
+            }
         }
 
         api.addMessage(this);
@@ -234,8 +258,28 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public List<Role> getMentionRoles() {
+        return new ArrayList<>(mentionRoles);
+    }
+
+    @Override
     public boolean isTts() {
         return tts;
+    }
+
+    @Override
+    public String getNonce() {
+        return nonce;
+    }
+
+    @Override
+    public boolean getMentionEveryone() {
+        return mentionEveryone;
+    }
+
+    @Override
+    public boolean getPinned() {
+        return pinned;
     }
 
     @Override
@@ -293,42 +337,42 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Message> reply(String content) {
-        return reply(content, null, false, null);
+        return reply(content, null, false, null, null);
     }
 
     @Override
     public Future<Message> reply(String content, boolean tts) {
-        return reply(content, null, tts, null);
+        return reply(content, null, tts, null, null);
     }
 
     @Override
     public Future<Message> reply(String content, EmbedBuilder embed) {
-        return reply(content, embed, false, null);
+        return reply(content, embed, false, null, null);
     }
 
     @Override
     public Future<Message> reply(String content, EmbedBuilder embed, boolean tts) {
-        return reply(content, embed, tts, null);
+        return reply(content, embed, tts, null, null);
     }
 
     @Override
     public Future<Message> reply(String content, FutureCallback<Message> callback) {
-        return reply(content, null, false, callback);
+        return reply(content, null, false, null, callback);
     }
 
     @Override
     public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback) {
-        return reply(content, null, tts, callback);
+        return reply(content, null, tts, null, callback);
     }
 
     @Override
     public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
-        return reply(content, embed, false, callback);
+        return reply(content, embed, false, null, callback);
     }
 
     @Override
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback) {
-        return receiver.sendMessage(content, embed, tts, callback);
+    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, String nonce, FutureCallback<Message> callback) {
+        return receiver.sendMessage(content, embed, tts, nonce, callback);
     }
 
     @Override

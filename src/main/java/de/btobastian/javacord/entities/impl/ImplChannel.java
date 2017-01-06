@@ -204,31 +204,31 @@ public class ImplChannel implements Channel {
 
     @Override
     public Future<Message> sendMessage(String content, EmbedBuilder embed) {
-        return sendMessage(content, embed, false, null);
+        return sendMessage(content, embed, false, null, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts) {
-        return sendMessage(content, embed, tts, null);
+        return sendMessage(content, embed, tts, null, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
-        return sendMessage(content, null, false, null);
+        return sendMessage(content, null, false, null, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
-        return sendMessage(content, embed, false, callback);
+        return sendMessage(content, embed, false, null, callback);
     }
 
     @Override
     public Future<Message> sendMessage(final String content, boolean tts, FutureCallback<Message> callback) {
-        return sendMessage(content, null, tts, callback);
+        return sendMessage(content, null, tts, null, callback);
     }
 
     @Override
-    public Future<Message> sendMessage(final String content, final EmbedBuilder embed, final boolean tts, FutureCallback<Message> callback) {
+    public Future<Message> sendMessage(final String content, final EmbedBuilder embed, final boolean tts, final String nonce, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
@@ -240,6 +240,7 @@ public class ImplChannel implements Channel {
                         JSONObject body = new JSONObject()
                                 .put("content", content)
                                 .put("tts", tts)
+                                .put("nonce", nonce)
                                 .put("mentions", new String[0]);
                         if (embed != null) {
                             body.put("embed", embed.toJSONObject());

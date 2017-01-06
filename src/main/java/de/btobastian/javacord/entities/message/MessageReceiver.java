@@ -110,10 +110,11 @@ public interface MessageReceiver {
      * @param content The content of the message.
      * @param embed An embed that should be added to the message.
      * @param tts Whether the message should be tts or not.
+     * @param nonce The NONCE token of the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
      */
-    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback);
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce, FutureCallback<Message> callback);
 
     /**
      * Sendss a file.

@@ -57,6 +57,11 @@ public class GuildMemberUpdateHandler extends PacketHandler {
         final Server server = api.getServerById(packet.getString("guild_id"));
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
         if (server != null) {
+            // update nickname
+            if (packet.has("nick")) {
+                user.setNickname(server.getId(), packet.isNull("nick") ? null : packet.getString("nick"));
+            }
+
             // get array with all roles
             JSONArray jsonRoles = packet.getJSONArray("roles");
             Role[] roles = new Role[jsonRoles.length()];

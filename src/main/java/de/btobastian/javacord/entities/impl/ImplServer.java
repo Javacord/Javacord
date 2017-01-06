@@ -119,6 +119,9 @@ public class ImplServer implements Server {
         }
         for (int i = 0; i < members.length(); i++) {
             User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
+            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
+                member.setNickname(id, members.getJSONObject(i).getString("nick"));
+            }
             this.members.put(member.getId(), member);
 
             JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
