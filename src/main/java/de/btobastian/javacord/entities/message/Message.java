@@ -111,9 +111,9 @@ public interface Message extends Comparable<Message> {
     public boolean isTts();
 
     /**
-     * NONCE token of the message.
+     * The nonce can be used for validating a message was sent.
      *
-     * @return NONCE token.
+     * @return The nonce of the message. May be <code>null</code>.
      */
     public String getNonce();
 
