@@ -237,12 +237,22 @@ public class ImplUser implements User {
 
     @Override
     public Future<Message> sendMessage(String content) {
-        return sendMessage(content, false);
+        return sendMessage(content, null, false, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, String nonce) {
+        return sendMessage(content, null, false, nonce, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, boolean tts) {
-        return sendMessage(content, tts, null);
+        return sendMessage(content, null, tts, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, String nonce) {
+        return sendMessage(content, null, tts, nonce, null);
     }
 
     @Override
@@ -251,13 +261,38 @@ public class ImplUser implements User {
     }
 
     @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, String nonce) {
+        return sendMessage(content, embed, false, nonce, null);
+    }
+
+    @Override
     public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts) {
         return sendMessage(content, embed, tts, null, null);
     }
 
     @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
+        return sendMessage(content, embed, tts, nonce, null);
+    }
+
+    @Override
     public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
-        return sendMessage(content, null, false, null, null);
+        return sendMessage(content, null, false, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, String nonce, FutureCallback<Message> callback) {
+        return sendMessage(content, null, false, nonce, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, null, tts, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, String nonce, FutureCallback<Message> callback) {
+        return sendMessage(content, null, tts, nonce, callback);
     }
 
     @Override
@@ -266,8 +301,13 @@ public class ImplUser implements User {
     }
 
     @Override
-    public Future<Message> sendMessage(final String content, boolean tts, FutureCallback<Message> callback) {
-        return sendMessage(content, null, tts, null, callback);
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, String nonce, FutureCallback<Message> callback) {
+        return sendMessage(content, embed, false, nonce, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, embed, tts, null, callback);
     }
 
     @Override
@@ -283,10 +323,12 @@ public class ImplUser implements User {
                         JSONObject body = new JSONObject()
                                 .put("content", content)
                                 .put("tts", tts)
-                                .put("nonce", nonce)
                                 .put("mentions", new String[0]);
                         if (embed != null) {
                             body.put("embed", embed.toJSONObject());
+                        }
+                        if (nonce != null) {
+                            body.put("nonce", nonce);
                         }
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
