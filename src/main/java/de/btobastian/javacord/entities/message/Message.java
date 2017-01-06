@@ -101,7 +101,7 @@ public interface Message extends Comparable<Message> {
      *
      * @return A list with all mentioned roles.
      */
-    public List<Role> getMentionRoles();
+    public List<Role> getMentionedRoles();
 
     /**
      * Checks if the message is tts.
@@ -118,18 +118,18 @@ public interface Message extends Comparable<Message> {
     public String getNonce();
 
     /**
-     * Whether the message mentions everyone.
+     * Checks if the message mentions everyone.
      *
-     * @return mention_everyone.
+     * @return Whether the message message mentions everyone or not.
      */
-    public boolean getMentionEveryone();
+    public boolean isMentioningEveryone();
 
     /**
-     * Whether the message is pinned.
+     * Checks if the message is pinned.
      *
-     * @return pinned.
+     * @return Whether the message is pinned or not.
      */
-    public boolean getPinned();
+    public boolean isPinned();
 
     /**
      * Deletes the message.
@@ -180,7 +180,7 @@ public interface Message extends Comparable<Message> {
      * @return The sent message.
      */
     public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback);
-    
+
     /**
      * Gets the date of creation.
      *

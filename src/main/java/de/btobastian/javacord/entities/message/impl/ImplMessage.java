@@ -96,12 +96,12 @@ public class ImplMessage implements Message {
     private final boolean tts;
     private final User author;
     private final List<User> mentions = new ArrayList<>();
-    private final List<Role> mentionRoles = new ArrayList<>();
+    private final List<Role> mentionedRoles = new ArrayList<>();
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
     private final String nonce;
-    private boolean mentionEveryone;
+    private boolean mentionsEveryone;
     private boolean pinned;
     private Calendar creationDate = Calendar.getInstance();
     private final Collection<Embed> embeds = new ArrayList<>();
@@ -120,7 +120,7 @@ public class ImplMessage implements Message {
             content = data.getString("content");
         }
         tts = data.getBoolean("tts");
-        mentionEveryone = data.getBoolean("mention_everyone");
+        mentionsEveryone = data.getBoolean("mention_everyone");
         pinned = data.getBoolean("pinned");
 
         if (data.has("timestamp")) {
@@ -203,7 +203,7 @@ public class ImplMessage implements Message {
                 String roleId = mentionRoles.getString(i);
                 Role role = server.getRoleById(roleId);
                 if (role != null) {
-                    this.mentionRoles.add(role);
+                    this.mentionedRoles.add(role);
                 }
             }
         }
@@ -258,8 +258,8 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public List<Role> getMentionRoles() {
-        return new ArrayList<>(mentionRoles);
+    public List<Role> getMentionedRoles() {
+        return new ArrayList<>(mentionedRoles);
     }
 
     @Override
@@ -273,12 +273,12 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public boolean getMentionEveryone() {
-        return mentionEveryone;
+    public boolean isMentioningEveryone() {
+        return mentionsEveryone;
     }
 
     @Override
-    public boolean getPinned() {
+    public boolean isPinned() {
         return pinned;
     }
 
