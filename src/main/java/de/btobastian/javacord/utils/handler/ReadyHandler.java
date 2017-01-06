@@ -42,9 +42,6 @@ public class ReadyHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        long heartbeatInterval = packet.getLong("heartbeat_interval");
-        api.getSocketAdapter().startHeartbeat(heartbeatInterval);
-
         String sessionId = packet.getString("session_id");
         api.getSocketAdapter().setSessionId(sessionId);
 
