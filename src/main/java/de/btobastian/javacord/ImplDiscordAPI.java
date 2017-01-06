@@ -160,7 +160,7 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         String gateway = requestGatewayBlocking();
         try {
-            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway + "?v=5"), this, false);
+            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, false);
         } catch (URISyntaxException e) {
             logger.warn("Something went wrong while connecting. Please contact the developer!", e);
             throw new IllegalArgumentException("Invalid gateway url. Please contact the developer!");
@@ -1048,7 +1048,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             String gateway = response.getBody().getObject().getString("url");
             logger.debug("Requested gateway {} (token: {})", gateway, token.replaceAll(".{10}", "**********"));
-            return gateway;
+            return gateway + "?v=5";
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
