@@ -189,7 +189,12 @@ public class ImplMessage implements Message {
         }
 
         if (data.has("nonce") && !data.isNull("nonce")) {
-            nonce = data.getString("nonce");
+            Object maybeItsAStringAndMaybeItsNotAStringIHaveNoClue = data.get("nonce");
+            if (maybeItsAStringAndMaybeItsNotAStringIHaveNoClue instanceof String) {
+                nonce = (String) maybeItsAStringAndMaybeItsNotAStringIHaveNoClue;
+            } else {
+                nonce = null;
+            }
         } else {
             nonce = null;
         }
