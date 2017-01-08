@@ -96,6 +96,40 @@ public interface Channel extends MessageReceiver {
     public Permissions getOverwrittenPermissions(Role role);
 
     /**
+     * Updates the permissions of the given role.
+     *
+     * @param role The role to update.
+     * @param permissions The permissions to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateOverwrittenPermissions(Role role, Permissions permissions);
+
+    /**
+     * Updates the permissions of the given user.
+     *
+     * @param user The user to update.
+     * @param permissions The permissions to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateOverwrittenPermissions(User user, Permissions permissions);
+
+    /**
+     * Deletes the overwritten permissions of the given role.
+     *
+     * @param role The role to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> deleteOverwrittenPermissions(Role role);
+
+    /**
+     * Deletes the overwritten permissions of the given user.
+     *
+     * @param user The user to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> deleteOverwrittenPermissions(User user);
+
+    /**
      * Updates the name of the channel.
      * If you want to update the topic, too, use {@link #update(String, String)}.
      * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).

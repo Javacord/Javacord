@@ -410,6 +410,80 @@ public class ImplChannel implements Channel {
     }
 
     @Override
+    public Future<Void> updateOverwrittenPermissions(final Role role, final Permissions permissions) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Updating permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                                .put("allow", ((ImplPermissions) permissions).getAllowed())
+                                .put("deny", ((ImplPermissions) permissions).getDenied())
+                                .put("type", "role").toString())
+                        .asJson();
+                logger.debug("Updated permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> updateOverwrittenPermissions(final User user, final Permissions permissions) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Updating permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                                .put("allow", ((ImplPermissions) permissions).getAllowed())
+                                .put("deny", ((ImplPermissions) permissions).getDenied())
+                                .put("type", "member").toString())
+                        .asJson();
+                logger.debug("Updated permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> deleteOverwrittenPermissions(final Role role) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Deleting permissions in channel {} for role {}", this, role);
+                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                logger.debug("Deleted permissions in channel {} for role {}", this, role);
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> deleteOverwrittenPermissions(final User user) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Deleting permissions in channel {} for user {}", this, user);
+                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                logger.debug("Deleted permissions in channel {} for user {}", this, user);
+                return null;
+            }
+        });
+    }
+
+    @Override
     public Future<MessageHistory> getMessageHistory(int limit) {
         return getMessageHistory(null, false, limit, null);
     }
