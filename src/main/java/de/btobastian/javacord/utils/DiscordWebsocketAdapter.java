@@ -1,21 +1,3 @@
-/*
- * Copyright (C) 2016 Bastian Oppermann
- * 
- * This file is part of Javacord.
- * 
- * Javacord is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser general Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Javacord is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, see <http://www.gnu.org/licenses/>.
- */
 package de.btobastian.javacord.utils;
 
 import com.google.common.util.concurrent.SettableFuture;
@@ -40,11 +22,8 @@ import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -59,55 +38,29 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      */
     private static final Logger logger = LoggerUtil.getLogger(DiscordWebsocketAdapter.class);
 
-    private WebSocket socket = null;
-
-    private final SettableFuture<Boolean> ready;
     private final ImplDiscordAPI api;
     private final HashMap<String, PacketHandler> handlers = new HashMap<>();
-    private final boolean isReconnect;
-    private volatile boolean isClosed = false;
+    private final SettableFuture<Boolean> ready = SettableFuture.create();
+    private final String gateway;
 
-    // received in packet with op = 7
-    private String urlForReconnect = null;
+    private WebSocket websocket = null;
 
-    // The last sequence number received
+    private Timer heartbeatTimer = null;
+
+    private int heartbeatInterval = -1;
     private int lastSeq = -1;
     private String sessionId = null;
 
-    private long heartbeatInterval = -1;
+    public DiscordWebsocketAdapter(ImplDiscordAPI api, String gateway) {
+        this.api = api;
+        this.gateway = gateway;
 
-    // Used to make sure we no reconnect two times
-    private boolean alreadyReconnecting = true;
+        registerHandlers();
 
-    /**
-     * Creates a new instance of this class.
-     *
-     * @param serverURI The uri of the gateway the socket should connect to.
-     * @param api The api.
-     * @param reconnect Whether it's a reconnect or not.
-     */
-    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect) {
-        this(serverURI, api, reconnect, null, -1);
+        connect();
     }
 
-    /**
-     * Creates a new instance of this class.
-     *
-     * @param serverURI The uri of the gateway the socket should connect to.
-     * @param api The api.
-     * @param reconnect Whether it's a reconnect or not.
-     * @param sessionId The session id.
-     * @param lastSeq The last sequence number received.
-     */
-    public DiscordWebsocketAdapter(URI serverURI, ImplDiscordAPI api, boolean reconnect, String sessionId, int lastSeq) {
-        this.api = api;
-        this.ready = SettableFuture.create();
-        registerHandlers();
-        this.isReconnect = reconnect;
-        this.sessionId = sessionId;
-        this.lastSeq = lastSeq;
-        this.heartbeatInterval = heartbeatInterval;
-
+    private void connect() {
         WebSocketFactory factory = new WebSocketFactory();
         try {
             factory.setSSLContext(SSLContext.getDefault());
@@ -115,47 +68,45 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             logger.warn("An error occurred while setting ssl context", e);
         }
         try {
-            socket = factory.createSocket(serverURI);
-            socket.addListener(this);
-            socket.connect();
+            websocket = factory.createSocket(gateway + "&v=5");
+            websocket.addListener(this);
+            websocket.connect();
         } catch (IOException | WebSocketException e) {
             logger.warn("An error occurred while connecting to websocket", e);
         }
     }
 
     @Override
-    public void onConnected(WebSocket socket, Map<String, List<String>> headers) throws Exception {
-        if (isReconnect && sessionId != null && lastSeq >= 0) { // send resume packet
-            JSONObject resumePacket = new JSONObject()
-                    .put("op", 6)
-                    .put("d", new JSONObject()
-                        .put("token", api.getToken())
-                        .put("session_id", sessionId)
-                        .put("seq", lastSeq)
-                    );
-            logger.debug("Sending resume packet");
-            socket.sendText(resumePacket.toString());
-        } else { // send "normal" payload
-            JSONObject connectPacket = new JSONObject()
+    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
+        if (sessionId == null) {
+            JSONObject identifyPacket = new JSONObject()
                     .put("op", 2)
                     .put("d", new JSONObject()
                             .put("token", api.getToken())
                             .put("properties", new JSONObject()
                                     .put("$os", System.getProperty("os.name"))
-                                    .put("$browser", "None")
-                                    .put("$device", "")
-                                    .put("$referrer", "https://discordapp.com/@me")
-                                    .put("$referring_domain", "discordapp.com"))
-                            .put("large_threshold", 250)
-                            .put("compress", true));
-            logger.debug("Sending connect packet");
-            socket.sendText(connectPacket.toString());
+                                    .put("$browser", "Javacord")
+                                    .put("$device", "Javacord")
+                                    .put("$referrer", "")
+                                    .put("$referring_domain", ""))
+                            .put("compress", true)
+                            .put("large_threshold", 250));
+            logger.debug("Sending identify packet");
+            websocket.sendText(identifyPacket.toString());
+        } else {
+            JSONObject resumePacket = new JSONObject()
+                    .put("op", 6)
+                    .put("d", new JSONObject()
+                        .put("token", api.getToken())
+                        .put("session_id", sessionId)
+                        .put("seq", lastSeq));
+            logger.debug("Sending resume packet");
+            websocket.sendText(resumePacket.toString());
         }
     }
 
     @Override
-    public void onDisconnected(WebSocket socket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
-                               boolean closedByServer) throws Exception {
+    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
         if (closedByServer) {
             logger.info("Websocket closed with reason {} and code {} by server!",
                     serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
@@ -165,137 +116,89 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
                     clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
         }
-        isClosed = true;
-        if (!alreadyReconnecting) {
-            if (closedByServer && urlForReconnect != null) {
-                logger.info("Trying to reconnect (we received op 7 before)...");
-                alreadyReconnecting = true;
-                api.reconnectBlocking(urlForReconnect, sessionId, lastSeq);
-                logger.info("Reconnected!");
-            } else if (closedByServer && api.isAutoReconnectEnabled()) {
-                logger.info("Trying to resume session (reconnect) ...");
-                alreadyReconnecting = true;
-                api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
-                logger.info("Reconnected!");
-            } else if (!closedByServer && (clientCloseFrame == null || clientCloseFrame.getCloseCode() != 1000)) {
-                logger.debug("Trying to resume session (reconnect) ...");
-                alreadyReconnecting = true;
-                api.reconnectBlocking(api.requestGatewayBlocking(), sessionId, lastSeq);
-                logger.debug("Reconnected!");
-            }
-        }
+
         if (!ready.isDone()) {
             ready.set(false);
-        }
-    }
-
-    @Override
-    public void onConnectError(WebSocket socket, WebSocketException exception) throws Exception {
-        logger.warn("Could not connect to websocket!", exception);
-    }
-
-    @Override
-    public void onError(WebSocket socket, WebSocketException cause) throws Exception {
-        if (!cause.getMessage().equals("Flushing frames to the server failed: Connection closed by remote host")) {
-            logger.warn("Websocket error!", cause);
-        }
-    }
-
-    @Override
-    public void onMessageError(WebSocket socket, WebSocketException cause, List<WebSocketFrame> frames)
-            throws Exception {
-        logger.warn("Websocket message error!", cause);
-    }
-
-    @Override
-    public void onSendError(WebSocket socket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-        if (!cause.getMessage().equals("Flushing frames to the server failed: Connection closed by remote host")) {
-            logger.warn("Websocket error!", cause);
-        }
-    }
-
-    @Override
-    public void onSendingHandshake(WebSocket socket, String requestLine, List<String[]> headers) throws Exception {
-        Thread.currentThread().setName("Websocket");
-    }
-
-    @Override
-    public void onTextMessage(WebSocket socket, String text) throws Exception {
-        JSONObject obj = new JSONObject(text);
-
-        int op = obj.getInt("op");
-        if (op == 7) {
-            urlForReconnect = obj.getJSONObject("d").getString("url");
             return;
         }
-
-        if (op == 9) {
-            alreadyReconnecting = true;
-            api.reconnectBlocking(urlForReconnect, sessionId, -1);
-            logger.debug("Received op 9 packet");
-            return;
+        // Reconnect
+        if (heartbeatTimer != null) {
+            heartbeatTimer.cancel();
+            heartbeatTimer = null;
         }
 
-        if (op == 10) {
-            startHeartbeat(obj.getJSONObject("d").getLong("heartbeat_interval"));
-            logger.debug("Received HELLO packet");
-            return;
-        }
+        connect();
+    }
 
-        lastSeq = obj.getInt("s");
+    @Override
+    public void onTextMessage(WebSocket websocket, String text) throws Exception {
+        JSONObject packet = new JSONObject(text);
 
-        JSONObject packet = obj.getJSONObject("d");
-        String type = obj.getString("t");
+        int op = packet.getInt("op");
 
-        if (type.equals("READY") && isReconnect) {
-            // we would get some errors if we do not handle the missed data
-            handlers.get("READY_RECONNECT").handlePacket(packet);
-            ready.set(true);
-            updateStatus();
-            return; // do not handle the ready packet twice
-        }
+        switch (op) {
+            case 0:
+                lastSeq = packet.getInt("s");
+                String type = packet.getString("t");
+                PacketHandler handler = handlers.get(type);
+                if (handler != null) {
+                    handler.handlePacket(packet.getJSONObject("d"));
+                } else {
+                    logger.debug("Received unknown packet of type {} (packet: {})", type, packet.toString());
+                }
 
-        // We don't receive a ready packet if we are resuming
-        if (isReconnect && !ready.isDone() && sessionId != null && lastSeq >= 0) {
-            ready.set(true);
-            updateStatus();
-            return; // do not handle the ready packet twice
-        }
-
-        PacketHandler handler = handlers.get(type);
-        if (handler != null) {
-            handler.handlePacket(packet);
-        } else {
-            logger.debug("Received unknown packet of type {} (packet: {})", type, obj.toString());
-        }
-        if (type.equals("READY")) {
-            if (api.isWaitingForServersOnStartup()) {
-                api.getThreadPool().getExecutorService().submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        int amount = api.getServers().size();
-                        for (;;) {
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException ignored) { }
-                            if (api.getServers().size() <= amount) {
-                                break; // two seconds without new servers becoming available
+                if (type.equals("RESUMED")) {
+                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
+                    logger.debug("Received RESUMED packet");
+                }
+                if (type.equals("READY")) {
+                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
+                    sessionId = packet.getJSONObject("d").getString("session_id");
+                    if (api.isWaitingForServersOnStartup()) {
+                        // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
+                        api.getThreadPool().getExecutorService().submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                int amount = api.getServers().size();
+                                for (;;) {
+                                    try {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException ignored) { }
+                                    if (api.getServers().size() <= amount) {
+                                        break; // two seconds without new servers becoming available
+                                    }
+                                    amount = api.getServers().size();
+                                }
+                                ready.set(true);
                             }
-                            amount = api.getServers().size();
-                        }
+                        });
+                    } else {
                         ready.set(true);
                     }
-                });
-            } else {
-                ready.set(true);
-            }
-            logger.debug("Received READY-packet!");
-            updateStatus();
+                    logger.debug("Received READY packet");
+                }
+                break;
+            case 7:
+                websocket.sendClose(1000);
+                connect();
+            case 9:
+                // Invalid session :(
+            case 10:
+                JSONObject data = packet.getJSONObject("d");
+                heartbeatInterval = data.getInt("heartbeat_interval");
+                if (sessionId != null) {
+                    // We are resuming and don't receive a READY packet.
+                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
+                }
+                logger.debug("Received HELLO packet");
+                break;
+            default:
+
         }
     }
 
     @Override
-    public void onBinaryMessage(WebSocket socket, byte[] binary) throws Exception {
+    public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception {
         Inflater decompressor = new Inflater();
         decompressor.setInput(binary);
         ByteArrayOutputStream bos = new ByteArrayOutputStream(binary.length);
@@ -309,99 +212,38 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 return;
             }
             bos.write(buf, 0, count);
-
         }
         try {
             bos.close();
         } catch (IOException ignored) { }
         byte[] decompressedData = bos.toByteArray();
         try {
-            onTextMessage(socket, new String(decompressedData, "UTF-8"));
+            onTextMessage(websocket, new String(decompressedData, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             logger.warn("An error occurred while decompressing data", e);
         }
     }
 
     /**
-     * Gets the websocket of the adapter.
+     * Starts the heartbeat.
      *
-     * @return The websocket of the adapter.
+     * @param websocket The websocket the heartbeat should be sent to.
+     * @param heartbeatInterval The heartbeat interval.
+     * @return The timer used for the heartbeat.
      */
-    public WebSocket getWebSocket() {
-        return socket;
-    }
-
-    /**
-     * Gets the Future which tells whether the connection is ready or failed.
-     *
-     * @return The Future.
-     */
-    public Future<Boolean> isReady() {
-        return ready;
-    }
-
-    /**
-     * Starts to send the heartbeat.
-     *
-     * @param heartbeatInterval The heartbeat interval received in the ready packet.
-     */
-    public void startHeartbeat(final long heartbeatInterval) {
-        this.heartbeatInterval = heartbeatInterval;
-        api.getThreadPool().getExecutorService().submit(new Runnable() {
+    private Timer startHeartbeat(final WebSocket websocket, final int heartbeatInterval) {
+        final Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                long timer = System.currentTimeMillis();
-                while (!isClosed) {
-                    if ((System.currentTimeMillis() - timer) >= heartbeatInterval - 10) {
-                        JSONObject heartbeat = new JSONObject()
-                                .put("op", 1)
-                                .put("d", System.currentTimeMillis());
-                        socket.sendText(heartbeat.toString());
-                        timer = System.currentTimeMillis();
-                        logger.debug("Sending heartbeat (interval: {})", heartbeatInterval);
-                        if (Math.random() < 0.1) {
-                            // some random status updates to ensure the game and idle status is updated correctly
-                            // (discord only accept 5 of these packets per minute and ignores more
-                            //  so some might get lost).
-                            updateStatus();
-                        }
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        logger.warn("An error occurred while sending heartbeat", e);
-                    }
-                }
+                JSONObject heartbeatPacket = new JSONObject();
+                heartbeatPacket.put("op", 1);
+                heartbeatPacket.put("d", lastSeq);
+                websocket.sendText(heartbeatPacket.toString());
+                logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
             }
-        });
-    }
-
-    /**
-     * Sends the update status packet
-     */
-    public void updateStatus() {
-        logger.debug(
-                "Updating status (game: {}, idle: {})", api.getGame() == null ? "none" : api.getGame(), api.isIdle());
-        JSONObject game = new JSONObject();
-        game.put("name", api.getGame() == null ? JSONObject.NULL : api.getGame());
-        if (api.getStreamingUrl() != null) {
-            game.put("url", api.getStreamingUrl()).put("type", 1);
-        }
-        JSONObject updateStatus = new JSONObject()
-                .put("op", 3)
-                .put("d", new JSONObject()
-                        .put("game", game)
-                        .put("idle_since", api.isIdle() ? 1 : JSONObject.NULL));
-        socket.sendText(updateStatus.toString());
-    }
-
-    /**
-     * Sets the session id received in the ready packet.
-     *
-     * @param sessionId The session id to set.
-     */
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+        }, 0, heartbeatInterval);
+        return timer;
     }
 
     /**
@@ -451,5 +293,83 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      */
     private void addHandler(PacketHandler handler) {
         handlers.put(handler.getType(), handler);
+    }
+
+    /**
+     * Gets the websocket of the adapter.
+     *
+     * @return The websocket of the adapter.
+     */
+    public WebSocket getWebSocket() {
+        return websocket;
+    }
+
+    /**
+     * Gets the Future which tells whether the connection is ready or failed.
+     *
+     * @return The Future.
+     */
+    public Future<Boolean> isReady() {
+        return ready;
+    }
+
+    /**
+     * Sends the update status packet
+     */
+    public void updateStatus() {
+        logger.debug("Updating status (game: {}, idle: {})", api.getGame() == null ? "none" : api.getGame(), api.isIdle());
+        JSONObject game = new JSONObject();
+        game.put("name", api.getGame() == null ? JSONObject.NULL : api.getGame());
+        if (api.getStreamingUrl() != null) {
+            game.put("url", api.getStreamingUrl()).put("type", 1);
+        }
+        JSONObject updateStatus = new JSONObject()
+                .put("op", 3)
+                .put("d", new JSONObject()
+                        .put("game", game)
+                        .put("idle_since", api.isIdle() ? 1 : JSONObject.NULL));
+        websocket.sendText(updateStatus.toString());
+    }
+
+    /* === ERROR LOGGING === */
+
+    @Override
+    public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
+        logger.warn("Websocket frame error!", cause);
+    }
+
+    @Override
+    public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
+        logger.warn("Websocket error!", cause);
+    }
+
+    @Override
+    public void onMessageError(WebSocket websocket, WebSocketException cause, List<WebSocketFrame> frames) throws Exception {
+        logger.warn("Websocket onMessage error!", cause);
+    }
+
+    @Override
+    public void onTextMessageError(WebSocket websocket, WebSocketException cause, byte[] data) throws Exception {
+        logger.warn("Websocket onTextMessage error!", cause);
+    }
+
+    @Override
+    public void onMessageDecompressionError(WebSocket websocket, WebSocketException cause, byte[] compressed) throws Exception {
+        logger.warn("Websocket onMessageDecompression error!", cause);
+    }
+
+    @Override
+    public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
+        logger.warn("Websocket onSend error!", cause);
+    }
+
+    @Override
+    public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
+        logger.warn("Websocket onUnexpected error!", cause);
+    }
+
+    @Override
+    public void onConnectError(WebSocket websocket, WebSocketException exception) throws Exception {
+        logger.warn("Websocket onConnect error!", exception);
     }
 }

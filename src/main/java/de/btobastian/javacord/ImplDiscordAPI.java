@@ -28,7 +28,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.neovisionaries.ws.client.WebSocketFactory;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.impl.ImplApplication;
 import de.btobastian.javacord.entities.impl.ImplInvite;
@@ -55,13 +54,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
-import javax.net.ssl.SSLContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -159,12 +154,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             token = requestTokenBlocking();
         }
         String gateway = requestGatewayBlocking();
-        try {
-            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, false);
-        } catch (URISyntaxException e) {
-            logger.warn("Something went wrong while connecting. Please contact the developer!", e);
-            throw new IllegalArgumentException("Invalid gateway url. Please contact the developer!");
-        }
+        socketAdapter = new DiscordWebsocketAdapter(this, gateway);
         try {
             if (!socketAdapter.isReady().get()) {
                 throw new IllegalStateException("Socket closed before ready packet was received!");
@@ -673,22 +663,6 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void reconnect(FutureCallback<DiscordAPI> callback) {
-        Futures.addCallback(getThreadPool().getListeningExecutorService().submit(new Callable<DiscordAPI>() {
-            @Override
-            public DiscordAPI call() throws Exception {
-                reconnectBlocking();
-                return ImplDiscordAPI.this;
-            }
-        }), callback);
-    }
-
-    @Override
-    public void reconnectBlocking() {
-        reconnectBlocking(requestGatewayBlocking(), null, -1);
-    }
-
-    @Override
     public void setAutoReconnect(boolean autoReconnect) {
         this.autoReconnect = autoReconnect;
     }
@@ -901,41 +875,6 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public Set<String> getUnavailableServers() {
         return unavailableServers;
-    }
-
-    /**
-     * Tries to reconnect to the given gateway.
-     *
-     * @param gateway The gateway to reconnect to.
-     * @param sessionId The sessionId. Can be null if you don't like to resume the connection.
-     * @param lastSeq The last sequence number received. Can be < 0 if you don't like to resume the connection.
-     */
-    public void reconnectBlocking(String gateway, String sessionId, int lastSeq) {
-        logger.debug("Trying to reconnect to gateway {}", gateway);
-        socketAdapter.getWebSocket().disconnect();
-        if (token == null || !checkTokenBlocking(token)) {
-            if (email != null && password != null) {
-                token = requestTokenBlocking();
-            } else {
-                throw new IllegalStateException("Reconnect not possible! Invalid token AND missing email or password!");
-            }
-        }
-        try {
-            WebSocketFactory factory = new WebSocketFactory();
-            factory.setSSLContext(SSLContext.getDefault());
-
-            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, true, sessionId, lastSeq);
-        } catch (URISyntaxException | NoSuchAlgorithmException e) {
-            logger.warn("Reconnect failed. Please contact the developer!", e);
-            return;
-        }
-        try {
-            if (!socketAdapter.isReady().get()) {
-                throw new IllegalStateException("Socket closed before ready packet was received!");
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            logger.warn("Reconnect failed. Please contact the developer!", e);
-        }
     }
 
     /**
