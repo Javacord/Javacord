@@ -4,7 +4,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.neovisionaries.ws.client.*;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
-import de.btobastian.javacord.utils.handler.ReadyReconnectHandler;
+import de.btobastian.javacord.utils.handler.ResumedHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
@@ -252,7 +252,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     private void registerHandlers() {
         // general
         addHandler(new ReadyHandler(api));
-        addHandler(new ReadyReconnectHandler(api));
+        addHandler(new ResumedHandler(api));
 
         // channel
         addHandler(new ChannelCreateHandler(api));
