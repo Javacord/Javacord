@@ -285,6 +285,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
         // message
         addHandler(new MessageAckHandler(api));
+        addHandler(new MessageBulkDeleteHandler(api));
         addHandler(new MessageCreateHandler(api));
         addHandler(new MessageDeleteHandler(api));
         addHandler(new MessageUpdateHandler(api));
