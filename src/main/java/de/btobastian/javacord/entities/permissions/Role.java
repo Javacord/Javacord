@@ -119,6 +119,13 @@ public interface Role {
     public boolean getManaged();
 
     /**
+     * Gets the tag used to mention a role.
+     *
+     * @return The tag used to mention a role.
+     */
+    public String getMentionTag();
+
+    /**
      * Updates the permissions of this role.
      * If you want to update other things like name, color, etc. use
      * {@link #update(String, Color, boolean, Permissions)} or your previous updates may be overwritten.

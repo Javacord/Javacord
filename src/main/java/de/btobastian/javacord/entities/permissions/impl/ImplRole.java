@@ -163,6 +163,11 @@ public class ImplRole implements Role {
     }
 
     @Override
+    public String getMentionTag() {
+        return "<@&" + getId() + ">";
+    }
+
+    @Override
     public Future<Void> updatePermissions(Permissions permissions) {
         return update(name, color, hoist, permissions);
     }
