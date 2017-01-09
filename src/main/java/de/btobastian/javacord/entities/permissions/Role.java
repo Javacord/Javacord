@@ -116,7 +116,7 @@ public interface Role {
      *
      * @return Whether this role is managed by an integration or not.
      */
-    public boolean getManaged();
+    public boolean isManaged();
 
     /**
      * Gets the tag used to mention a role.

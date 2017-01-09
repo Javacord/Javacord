@@ -158,7 +158,7 @@ public class ImplRole implements Role {
     }
 
     @Override
-    public boolean getManaged() {
+    public boolean isManaged() {
         return managed;
     }
 
