@@ -20,6 +20,7 @@ package de.btobastian.javacord.entities.message;
 
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.permissions.Role;
 
 /**
  * This class helps to build messages with decorations.
@@ -133,6 +134,17 @@ public class MessageBuilder {
      */
     public MessageBuilder appendChannel(Channel channel) {
         strBuilder.append("<#").append(channel.getId()).append(">");
+        return this;
+    }
+
+    /**
+     * Appends a role (@role).
+     *
+     * @param role The role to append.
+     * @return This object to reuse it.
+     */
+    public MessageBuilder appendRole(Role role) {
+        strBuilder.append(role.getMentionTag());
         return this;
     }
 
