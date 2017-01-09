@@ -1,4 +1,4 @@
-# Javacord
+# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-2.0.13-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
 A simple library to create a discord bot.
 Supports the new application system!
 
@@ -65,7 +65,7 @@ import de.btobastian.javacord.listener.message.MessageCreateListener;
 public class MyPingPongBot {
 
     public MyPingPongBot(String token) {
-        // Get the token from here: https://discordapp.com/developers/applications/me
+        // See "How to get the token" below
         DiscordAPI api = Javacord.getApi(token, true);
         // connect
         api.connect(new FutureCallback<DiscordAPI>() {
@@ -94,6 +94,18 @@ public class MyPingPongBot {
 }
 ```
 More examples can be found in the wiki: [Examples](https://github.com/BtoBastian/Javacord/wiki/Examples)
+
+## How to get the token
+
+**1.** Open https://discordapp.com/developers/applications/me and click on "New App".
+
+**2.** Enter a name for your bot and click "Create App"
+
+**3.** Click on "Create a Bot user"
+
+**4.** Reveal the bot's token. This token is used to login your bot.
+
+>![](http://i.imgur.com/EbexbiD.gif)
 
 ## Command Framework
 
