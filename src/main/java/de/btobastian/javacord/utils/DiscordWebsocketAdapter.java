@@ -112,9 +112,14 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
                     serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown");
         } else {
-            logger.info("Websocket closed with reason {} and code {} by client!",
-                    clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
-                    clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
+            if (clientCloseFrame != null && clientCloseFrame.getCloseCode() == 1002
+                    && "No more WebSocket frame from the server.".equals(clientCloseFrame.getCloseReason())) {
+                logger.debug("Websocket closed! Trying to resume connection.");
+            } else {
+                logger.info("Websocket closed with reason {} and code {} by client!",
+                        clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
+                        clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
+            }
         }
 
         if (!ready.isDone()) {
@@ -178,11 +183,17 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     logger.debug("Received READY packet");
                 }
                 break;
+            case 1:
+                sendHeartbeat(websocket);
+                break;
             case 7:
+                logger.debug("Received op 7 packet. Reconnecting...");
                 websocket.sendClose(1000);
                 connect();
+                break;
             case 9:
                 // Invalid session :(
+                break;
             case 10:
                 JSONObject data = packet.getJSONObject("d");
                 heartbeatInterval = data.getInt("heartbeat_interval");
@@ -192,8 +203,12 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 }
                 logger.debug("Received HELLO packet");
                 break;
+            case 11:
+                // Heartbeat Ack. We don't really care about this packet
+                break;
             default:
-
+                logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
+                break;
         }
     }
 
@@ -236,14 +251,23 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                JSONObject heartbeatPacket = new JSONObject();
-                heartbeatPacket.put("op", 1);
-                heartbeatPacket.put("d", lastSeq);
-                websocket.sendText(heartbeatPacket.toString());
+                sendHeartbeat(websocket);
                 logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
             }
         }, 0, heartbeatInterval);
         return timer;
+    }
+
+    /**
+     * Sends the heartbeat.
+     *
+     * @param websocket The websocket the heartbeat should be sent to.
+     */
+    private void sendHeartbeat(WebSocket websocket) {
+        JSONObject heartbeatPacket = new JSONObject();
+        heartbeatPacket.put("op", 1);
+        heartbeatPacket.put("d", lastSeq);
+        websocket.sendText(heartbeatPacket.toString());
     }
 
     /**
@@ -340,7 +364,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
-        logger.warn("Websocket error!", cause);
+        if (!cause.getMessage().equals("Flushing frames to the server failed: Connection closed by remote host")) {
+            logger.warn("Websocket error!", cause);
+        }
     }
 
     @Override
@@ -360,7 +386,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-        logger.warn("Websocket onSend error!", cause);
+        if (!cause.getMessage().equals("Flushing frames to the server failed: Connection closed by remote host")) {
+            logger.warn("Websocket onSend error!", cause);
+        }
     }
 
     @Override
