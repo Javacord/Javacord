@@ -782,7 +782,7 @@ public class ImplServer implements Server {
                 logger.debug("Trying to authorize bot with application id {} and permissions {}",
                         applicationId, permissions);
                 HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/oauth2/authorize?client_id={id}&scope=bot")
+                        .post("https://discordapp.com/api/oauth2/authorize?client_id=" + applicationId + "&scope=bot")
                         .routeParam("id", applicationId)
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
