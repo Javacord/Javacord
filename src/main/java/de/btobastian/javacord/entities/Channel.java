@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -164,5 +165,21 @@ public interface Channel extends MessageReceiver {
      * @return Gets the tag which is used to mention the channel.
      */
     public String getMentionTag();
+
+    /**
+     * Deletes multiple messages at once.
+     *
+     * @param messages The messages to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> bulkDelete(String... messages);
+
+    /**
+     * Deletes multiple messages at once.
+     *
+     * @param messages The messages to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> bulkDelete(Message... messages);
 
 }

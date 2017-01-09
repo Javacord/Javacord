@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities.impl;
 
+import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -626,6 +627,34 @@ public class ImplChannel implements Channel {
     @Override
     public String getMentionTag() {
         return "<#" + getId() + ">";
+    }
+
+    @Override
+    public Future<Void> bulkDelete(final String... messages) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Bulk deleting messages in channel {} (ids: [{}])", this, Joiner.on(",").join(messages));
+                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/messages/bulk-delete")
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                            .put("messages", new JSONArray().put(messages))
+                            .toString())
+                        .asJson();
+                logger.debug("Bulk deleted messages in channel {} (ids: [{}])", this, Joiner.on(",").join(messages));
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> bulkDelete(Message... messages) {
+        String[] messageIds = new String[messages.length];
+        for (int i = 0; i < messages.length; i++) {
+            messageIds[i] = messages[i].getId();
+        }
+        return bulkDelete(messageIds);
     }
 
     /**
