@@ -21,6 +21,8 @@ package de.btobastian.javacord;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
@@ -434,6 +436,21 @@ public interface DiscordAPI {
      * @return The size of the cache.
      */
     public int getMessageCacheSize();
+
+    /**
+     * Gets a new permissions builder with every type set to {@link de.btobastian.javacord.entities.permissions.PermissionState#NONE}
+     *
+     * @return A new permissions builder.
+     */
+    public PermissionsBuilder getPermissionsBuilder();
+
+    /**
+     * Gets a new permissions builder.
+     *
+     * @param permissions The permissions which should be copied.
+     * @return A new permissions builder.
+     */
+    public PermissionsBuilder getPermissionsBuilder(Permissions permissions);
 
     /**
      * Sets whether the api should try to auto-reconnect or not.

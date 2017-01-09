@@ -36,6 +36,9 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissionsBuilder;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.BadResponseException;
 import de.btobastian.javacord.exceptions.NotSupportedForBotsException;
@@ -660,6 +663,16 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public int getMessageCacheSize() {
         return messageCacheSize;
+    }
+
+    @Override
+    public PermissionsBuilder getPermissionsBuilder() {
+        return new ImplPermissionsBuilder();
+    }
+
+    @Override
+    public PermissionsBuilder getPermissionsBuilder(Permissions permissions) {
+        return new ImplPermissionsBuilder(permissions);
     }
 
     @Override
