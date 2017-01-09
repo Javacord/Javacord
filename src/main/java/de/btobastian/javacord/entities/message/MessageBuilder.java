@@ -127,7 +127,7 @@ public class MessageBuilder {
     }
 
     /**
-     * Appends a channel (@user).
+     * Appends a channel (@channel).
      *
      * @param channel The channel to append.
      * @return This object to reuse it.
