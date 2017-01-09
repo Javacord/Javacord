@@ -107,6 +107,20 @@ More examples can be found in the wiki: [Examples](https://github.com/BtoBastian
 
 >![](http://i.imgur.com/EbexbiD.gif)
 
+## How to add a bot to your server
+
+In order to add a bot to your server you need it's client id.
+
+You can get your client id from the [same page](https://discordapp.com/developers/applications/me) where you created it. 
+
+>![](http://i.imgur.com/qzPDsp2.png)
+
+With this id you can create an invite link for your bot:
+
+**https://discordapp.com/api/oauth2/authorize?client_id=123456789&scope=bot&permissions=0**
+
+If you are the owner or admin of the server you can use this link to add your bot to your server. Otherwise you have to give the link to the server owner/admin and ask him to add your bot.
+
 ## Command Framework
 
 I would recommend to use [sdcf4j](https://github.com/BtoBastian/sdcf4j) in order to create commands. It provides a clean and simple way to create commands. A ping-pong command would be as easy as this:
