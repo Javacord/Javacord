@@ -153,7 +153,7 @@ public class ImplRole implements Role {
     }
 
     @Override
-    public boolean getMentionable() {
+    public boolean isMentionable() {
         return mentionable;
     }
 

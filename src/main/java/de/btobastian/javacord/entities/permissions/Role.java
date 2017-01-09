@@ -109,7 +109,7 @@ public interface Role {
      *
      * @return Whether the role is mentionable or not.
      */
-    public boolean getMentionable();
+    public boolean isMentionable();
 
     /**
      * Gets whether this role is managed by an integration or not.
