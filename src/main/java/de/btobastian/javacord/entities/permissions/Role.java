@@ -104,8 +104,18 @@ public interface Role {
      */
     public Color getColor();
 
+    /**
+     * Gets whether the role is mentionable or not.
+     *
+     * @return Whether the role is mentionable or not.
+     */
     public boolean getMentionable();
 
+    /**
+     * Gets whether this role is managed by an integration or not.
+     *
+     * @return Whether this role is managed by an integration or not.
+     */
     public boolean getManaged();
 
     /**
