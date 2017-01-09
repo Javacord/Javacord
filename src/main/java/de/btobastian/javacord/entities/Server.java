@@ -421,4 +421,13 @@ public interface Server {
      */
     public boolean hasNickname(User user);
 
+    /**
+     * Updates the nickname of a user.
+     *
+     * @param user The user to modify.
+     * @param nickname The nickname to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateNickname(User user, String nickname);
+
 }

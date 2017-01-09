@@ -831,6 +831,28 @@ public class ImplServer implements Server {
         return nicknames.contains(user.getId());
     }
 
+    @Override
+    public Future<Void> updateNickname(final User user, final String nickname) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Trying to update nickname of user {} to {}", user, nickname);
+                HttpResponse<JsonNode> response = Unirest
+                        .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" + user.getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                                .put("nick", nickname)
+                                .toString())
+                        .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                logger.debug("Updated nickname of user {} to {}", user, nickname);
+                return null;
+            }
+        });
+    }
+
     /**
      * Sets the name of the server.
      *
@@ -984,7 +1006,6 @@ public class ImplServer implements Server {
             nicknames.put(user.getId(), nickname);
         }
     }
-
 
     /**
      * Creates a new channel.

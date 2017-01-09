@@ -122,6 +122,11 @@ public class ImplUser implements User {
     }
 
     @Override
+    public Future<Void> updateNickname(Server server, String nickname) {
+        return server.updateNickname(this, nickname);
+    }
+
+    @Override
     public void type() {
         if (userChannelId == null) {
             return;

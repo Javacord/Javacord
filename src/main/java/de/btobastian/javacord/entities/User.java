@@ -63,6 +63,15 @@ public interface User extends MessageReceiver {
     public boolean hasNickname(Server server);
 
     /**
+     * Updates the nickname of a user.
+     *
+     * @param server The server.
+     * @param nickname The nickname to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateNickname(Server server, String nickname);
+
+    /**
      * Checks if the user is the account you logged in.
      *
      * @return Whether the user is you or not.
