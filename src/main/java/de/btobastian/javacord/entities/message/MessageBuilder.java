@@ -101,7 +101,7 @@ public class MessageBuilder {
      * @see #appendUser(User)
      */
     public MessageBuilder appendMention(User user) {
-        strBuilder.append("<@").append(user.getId()).append(">");
+        strBuilder.append(user.getMentionTag());
         return this;
     }
 
@@ -133,7 +133,7 @@ public class MessageBuilder {
      * @return This object to reuse it.
      */
     public MessageBuilder appendChannel(Channel channel) {
-        strBuilder.append("<#").append(channel.getId()).append(">");
+        strBuilder.append(channel.getMentionTag());
         return this;
     }
 
