@@ -635,11 +635,11 @@ public class ImplChannel implements Channel {
             @Override
             public Void call() throws Exception {
                 logger.debug("Bulk deleting messages in channel {} (ids: [{}])", this, Joiner.on(",").join(messages));
-                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/messages/bulk-delete")
+                Unirest.post("https://discordapp.com/api/channels/" + getId() + "/messages/bulk-delete")
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject()
-                            .put("messages", new JSONArray().put(messages))
+                            .put("messages", messages)
                             .toString())
                         .asJson();
                 logger.debug("Bulk deleted messages in channel {} (ids: [{}])", this, Joiner.on(",").join(messages));
