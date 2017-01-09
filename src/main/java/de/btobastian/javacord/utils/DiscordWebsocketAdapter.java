@@ -15,6 +15,7 @@ import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.UserGuildSettingsUpdateHandler;
+import de.btobastian.javacord.utils.handler.voice.VoiceStateUpdateHandler;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -288,6 +289,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         addHandler(new MessageBulkDeleteHandler(api));
         addHandler(new MessageCreateHandler(api));
         addHandler(new MessageDeleteHandler(api));
+        addHandler(new MessageReactionAddHandler(api));
+        addHandler(new MessageReactionDeleteHandler(api));
         addHandler(new MessageUpdateHandler(api));
         addHandler(new TypingStartHandler(api));
 
@@ -309,6 +312,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         // user
         addHandler(new PresenceUpdateHandler(api));
         addHandler(new UserGuildSettingsUpdateHandler(api));
+
+        // voice
+        addHandler(new VoiceStateUpdateHandler(api));
     }
 
     /**
