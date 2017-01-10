@@ -82,29 +82,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     @Override
     public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
         if (sessionId == null) {
-            JSONObject identifyPacket = new JSONObject()
-                    .put("op", 2)
-                    .put("d", new JSONObject()
-                            .put("token", api.getToken())
-                            .put("properties", new JSONObject()
-                                    .put("$os", System.getProperty("os.name"))
-                                    .put("$browser", "Javacord")
-                                    .put("$device", "Javacord")
-                                    .put("$referrer", "")
-                                    .put("$referring_domain", ""))
-                            .put("compress", true)
-                            .put("large_threshold", 250));
-            logger.debug("Sending identify packet");
-            websocket.sendText(identifyPacket.toString());
+            sendIdentify(websocket);
         } else {
-            JSONObject resumePacket = new JSONObject()
-                    .put("op", 6)
-                    .put("d", new JSONObject()
-                        .put("token", api.getToken())
-                        .put("session_id", sessionId)
-                        .put("seq", lastSeq));
-            logger.debug("Sending resume packet");
-            websocket.sendText(resumePacket.toString());
+            sendResume(websocket);
         }
     }
 
@@ -161,7 +141,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     logger.debug("Received RESUMED packet");
                 }
-                if (type.equals("READY")) {
+                if (type.equals("READY") && sessionId == null) {
                     // We are the one who send the first heartbeat
                     heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
@@ -200,6 +180,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 break;
             case 9:
                 // Invalid session :(
+                logger.info("Could not resume session. Reconnecting now...");
+                sendIdentify(websocket);
                 break;
             case 10:
                 JSONObject data = packet.getJSONObject("d");
@@ -281,6 +263,44 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         heartbeatPacket.put("op", 1);
         heartbeatPacket.put("d", lastSeq);
         websocket.sendText(heartbeatPacket.toString());
+    }
+
+    /**
+     * Sends the resume packet.
+     *
+     * @param websocket The websocket the resume packet should be sent to.
+     */
+    private void sendResume(WebSocket websocket) {
+        JSONObject resumePacket = new JSONObject()
+                .put("op", 6)
+                .put("d", new JSONObject()
+                        .put("token", api.getToken())
+                        .put("session_id", sessionId)
+                        .put("seq", lastSeq));
+        logger.debug("Sending resume packet");
+        websocket.sendText(resumePacket.toString());
+    }
+
+    /**
+     * Sends the identify packet.
+     *
+     * @param websocket The websocket the identify packet should be sent to.
+     */
+    private void sendIdentify(WebSocket websocket) {
+        JSONObject identifyPacket = new JSONObject()
+                .put("op", 2)
+                .put("d", new JSONObject()
+                        .put("token", api.getToken())
+                        .put("properties", new JSONObject()
+                                .put("$os", System.getProperty("os.name"))
+                                .put("$browser", "Javacord")
+                                .put("$device", "Javacord")
+                                .put("$referrer", "")
+                                .put("$referring_domain", ""))
+                        .put("compress", true)
+                        .put("large_threshold", 250));
+        logger.debug("Sending identify packet");
+        websocket.sendText(identifyPacket.toString());
     }
 
     /**
