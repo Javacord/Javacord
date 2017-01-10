@@ -176,6 +176,8 @@ public interface Channel extends MessageReceiver {
 
     /**
      * Deletes multiple messages at once.
+     * <p>
+     * Note: You can only bulk delete 2-100 messages.
      *
      * @param messages The messages to delete.
      * @return A future which tells us whether the deletion was successful or not.
