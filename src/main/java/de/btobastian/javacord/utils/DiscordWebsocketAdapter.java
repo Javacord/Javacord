@@ -187,10 +187,6 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             case 10:
                 JSONObject data = packet.getJSONObject("d");
                 heartbeatInterval = data.getInt("heartbeat_interval");
-                if (sessionId != null) {
-                    // We are resuming and don't receive a READY packet.
-                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
-                }
                 logger.debug("Received HELLO packet");
                 break;
             case 11:
