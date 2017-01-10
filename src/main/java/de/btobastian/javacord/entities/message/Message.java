@@ -20,6 +20,7 @@ package de.btobastian.javacord.entities.message;
 
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.CustomEmoji;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
@@ -212,5 +213,13 @@ public interface Message extends Comparable<Message> {
      * @return A future which tells us if the adding was successful or not.
      */
     public Future<Void> addUnicodeReaction(String unicodeEmoji);
+
+    /**
+     * Adds an custom emoji to the message.
+     *
+     * @param emoji The emoji to add.
+     * @return A future which tells us if the adding was successful or not.
+     */
+    public Future<Void> addCustomEmojiReaction(CustomEmoji emoji);
 
 }

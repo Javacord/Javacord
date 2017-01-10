@@ -25,6 +25,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.CustomEmoji;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
@@ -425,17 +426,41 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Void> addUnicodeReaction(final String unicodeEmoji) {
+        return addReaction(unicodeEmoji);
+    }
+
+    @Override
+    public Future<Void> addCustomEmojiReaction(CustomEmoji emoji) {
+        return addReaction(emoji.getName() + ":" + emoji.getId());
+    }
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param content The new content of the message.
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * Adds an reaction to the message.
+     *
+     * @param reaction The reaction to add. Whether a unicode emoji or a custom emoji in the format <code>name:id</code>.
+     * @return
+     */
+    private Future<Void> addReaction(final String reaction) {
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                logger.debug("Trying to add reaction to message with id {} (emoji: {})", getId(), unicodeEmoji);
+                logger.debug("Trying to add reaction to message with id {} (reaction: {})", getId(), reaction);
                 if (isPrivateMessage()) {
                     api.checkRateLimit(null, RateLimitType.UNKNOWN, null);
                 } else {
                     api.checkRateLimit(null, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
                 }
                 HttpResponse<JsonNode> response = Unirest
-                        .put("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions/" + unicodeEmoji + "/@me")
+                        .put("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions/" + reaction + "/@me")
                         .header("authorization", api.getToken())
                         .header("content-type", "application/json")
                         .body("{}")
@@ -446,19 +471,10 @@ public class ImplMessage implements Message {
                 } else {
                     api.checkRateLimit(response, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
                 }
-                logger.debug("Added reaction to message with id {} (emoji: {})", getId(), unicodeEmoji);
+                logger.debug("Added reaction to message with id {} (reaction: {})", getId(), reaction);
                 return null;
             }
         });
-    }
-
-    /**
-     * Updates the content of the message.
-     *
-     * @param content The new content of the message.
-     */
-    public void setContent(String content) {
-        this.content = content;
     }
 
     /**
