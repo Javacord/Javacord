@@ -71,7 +71,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             logger.warn("An error occurred while setting ssl context", e);
         }
         try {
-            websocket = factory.createSocket(gateway + "&v=5");
+            websocket = factory.createSocket(gateway + "?encoding=json&v=5");
+            websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
             websocket.connect();
         } catch (IOException | WebSocketException e) {

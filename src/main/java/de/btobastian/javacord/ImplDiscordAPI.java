@@ -999,7 +999,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             }
             String gateway = response.getBody().getObject().getString("url");
             logger.debug("Requested gateway {} (token: {})", gateway, token.replaceAll(".{10}", "**********"));
-            return gateway + "?v=5";
+            return gateway;
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
