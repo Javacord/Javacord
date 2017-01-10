@@ -52,6 +52,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     private int lastSeq = -1;
     private String sessionId = null;
 
+    private boolean heartbeatAckReceived = false;
+
     public DiscordWebsocketAdapter(ImplDiscordAPI api, String gateway) {
         this.api = api;
         this.gateway = gateway;
@@ -154,10 +156,14 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 }
 
                 if (type.equals("RESUMED")) {
+                    // We are the one who send the first heartbeat
+                    heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     logger.debug("Received RESUMED packet");
                 }
                 if (type.equals("READY")) {
+                    // We are the one who send the first heartbeat
+                    heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     sessionId = packet.getJSONObject("d").getString("session_id");
                     if (api.isWaitingForServersOnStartup()) {
@@ -205,7 +211,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 logger.debug("Received HELLO packet");
                 break;
             case 11:
-                // Heartbeat Ack. We don't really care about this packet
+                heartbeatAckReceived = true;
                 break;
             default:
                 logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
@@ -252,8 +258,14 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                sendHeartbeat(websocket);
-                logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
+                if (heartbeatAckReceived) {
+                    heartbeatAckReceived = false;
+                    sendHeartbeat(websocket);
+                    logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
+                } else {
+                    logger.info("We did not receive an answer to our last heartbeat. Trying to reconnect!");
+                    websocket.sendClose(1002);
+                }
             }
         }, 0, heartbeatInterval);
         return timer;
