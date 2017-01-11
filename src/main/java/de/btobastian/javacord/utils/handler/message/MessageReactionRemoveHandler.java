@@ -27,20 +27,20 @@ import org.slf4j.Logger;
 /**
  * Handles the message reaction delete packet.
  */
-public class MessageReactionDeleteHandler extends PacketHandler {
+public class MessageReactionRemoveHandler extends PacketHandler {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(MessageReactionDeleteHandler.class);
+    private static final Logger logger = LoggerUtil.getLogger(MessageReactionRemoveHandler.class);
 
     /**
      * Creates a new instance of this class.
      *
      * @param api The api.
      */
-    public MessageReactionDeleteHandler(ImplDiscordAPI api) {
-        super(api, true, "MESSAGE_REACTION_DELETE");
+    public MessageReactionRemoveHandler(ImplDiscordAPI api) {
+        super(api, true, "MESSAGE_REACTION_REMOVE");
     }
 
     @Override
