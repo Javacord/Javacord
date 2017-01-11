@@ -20,6 +20,7 @@ package de.btobastian.javacord.utils.handler.message;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -51,8 +52,15 @@ public class MessageDeleteHandler extends PacketHandler {
     public void handle(JSONObject packet) {
         String messageId = packet.getString("id");
         final Message message = api.getMessageById(messageId);
-        if (message == null || message.isDeleted()) {
+        if (message == null) {
             return; // no cached version available
+        }
+        synchronized (message) {
+            if (message.isDeleted()) {
+                return; // already called listener
+            } else {
+                ((ImplMessage) message).setDeleted(true);
+            }
         }
         listenerExecutorService.submit(new Runnable() {
             @Override

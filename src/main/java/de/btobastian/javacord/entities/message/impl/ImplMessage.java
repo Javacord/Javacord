@@ -291,7 +291,7 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Void> delete() {
-        final Message message = this;
+        final ImplMessage message = this;
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -314,9 +314,15 @@ public class ImplMessage implements Message {
                             response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
                 }
                 api.removeMessage(message);
-                deleted = true;
                 logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                         getId(), getAuthor(), getContent());
+                synchronized (this) {
+                    if (message.isDeleted()) {
+                        return null;
+                    } else {
+                        message.setDeleted(true);
+                    }
+                }
                 // call listener
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                     @Override
@@ -448,6 +454,15 @@ public class ImplMessage implements Message {
      */
     public void setContent(String content) {
         this.content = content;
+    }
+
+    /**
+     * Sets the deleted flag.
+     *
+     * @param deleted Whether the flag should be set to <code>true</code> or <code>false</code>.
+     */
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     /**
