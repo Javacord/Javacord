@@ -25,7 +25,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 /**
- * Handles the message reaction delete packet.
+ * Handles the message reaction remove packet.
  */
 public class MessageReactionRemoveHandler extends PacketHandler {
 

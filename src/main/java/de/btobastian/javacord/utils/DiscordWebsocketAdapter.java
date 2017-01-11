@@ -322,7 +322,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         addHandler(new MessageCreateHandler(api));
         addHandler(new MessageDeleteHandler(api));
         addHandler(new MessageReactionAddHandler(api));
-        addHandler(new MessageReactionDeleteHandler(api));
+        addHandler(new MessageReactionRemoveHandler(api));
         addHandler(new MessageUpdateHandler(api));
         addHandler(new TypingStartHandler(api));
 
