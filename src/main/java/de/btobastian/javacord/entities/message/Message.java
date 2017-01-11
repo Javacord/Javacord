@@ -140,6 +140,13 @@ public interface Message extends Comparable<Message> {
     public Future<Void> delete();
 
     /**
+     * Checks if the message is deleted.
+     *
+     * @return Whether the message is deleted or not.
+     */
+    public boolean isDeleted();
+
+    /**
      * Gets the attachments of a message.
      *
      * @return The attachments of the message.

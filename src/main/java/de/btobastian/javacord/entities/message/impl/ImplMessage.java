@@ -104,6 +104,7 @@ public class ImplMessage implements Message {
     private final String nonce;
     private boolean mentionsEveryone;
     private boolean pinned;
+    private boolean deleted = false;
     private Calendar creationDate = Calendar.getInstance();
     private final Collection<Embed> embeds = new ArrayList<>();
 
@@ -313,6 +314,7 @@ public class ImplMessage implements Message {
                             response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
                 }
                 api.removeMessage(message);
+                deleted = true;
                 logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                         getId(), getAuthor(), getContent());
                 // call listener
@@ -334,6 +336,11 @@ public class ImplMessage implements Message {
                 return null;
             }
         });
+    }
+
+    @Override
+    public boolean isDeleted() {
+        return deleted;
     }
 
     @Override

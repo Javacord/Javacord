@@ -51,7 +51,7 @@ public class MessageDeleteHandler extends PacketHandler {
     public void handle(JSONObject packet) {
         String messageId = packet.getString("id");
         final Message message = api.getMessageById(messageId);
-        if (message == null) {
+        if (message == null || message.isDeleted()) {
             return; // no cached version available
         }
         listenerExecutorService.submit(new Runnable() {
