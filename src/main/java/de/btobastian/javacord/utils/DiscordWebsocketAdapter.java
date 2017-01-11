@@ -240,14 +240,14 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (heartbeatAckReceived) {
+                /* if (heartbeatAckReceived) { temporally removed */
                     heartbeatAckReceived = false;
                     sendHeartbeat(websocket);
                     logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
-                } else {
+                /*} else {
                     logger.info("We did not receive an answer to our last heartbeat. Trying to reconnect!");
                     websocket.sendClose(1002);
-                }
+                }*/
             }
         }, 0, heartbeatInterval);
         return timer;
