@@ -169,6 +169,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                         ready.set(true);
                     }
                     logger.debug("Received READY packet");
+                } else if (type.equals("READY")) {
+                    heartbeatAckReceived = true;
+                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                 }
                 break;
             case 1:
