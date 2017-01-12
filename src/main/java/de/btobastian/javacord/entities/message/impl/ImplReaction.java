@@ -149,7 +149,7 @@ public class ImplReaction implements Reaction {
                         logger.debug("Trying to get reactors of reaction {} of message {}", ImplReaction.this, message);
                         String reactionString = isCustomEmoji() ? getCustomEmoji().getName() + ":" + getCustomEmoji().getId() : getUnicodeEmoji();
                         HttpResponse<JsonNode> response =
-                                Unirest.get("/channels/{channel.id}/messages/" + message.getId() + "/reactions/" + reactionString)
+                                Unirest.get("/channels/" + ((ImplMessage) message).getChannelId() + "/messages/" + message.getId() + "/reactions/" + reactionString)
                                         .header("authorization", api.getToken())
                                         .asJson();
                         api.checkResponse(response);
@@ -173,8 +173,22 @@ public class ImplReaction implements Reaction {
     }
 
     @Override
-    public Future<Void> removeReactor(User user) {
-        return null;
+    public Future<Void> removeReactor(final User user) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Trying to remove reactor {} from reaction {} of message {}", user, ImplReaction.this, message);
+                String reactionString = isCustomEmoji() ? getCustomEmoji().getName() + ":" + getCustomEmoji().getId() : getUnicodeEmoji();
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/channels/" + ((ImplMessage) message).getChannelId() + "/messages/" + message.getId() + "/reactions/" + reactionString + "/" + user.getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, null, message.getChannelReceiver());
+                logger.debug("Removed reactor {} from reaction {} of message {}", user, ImplReaction.this, message);
+                return null;
+            }
+        });
     }
 
     /**

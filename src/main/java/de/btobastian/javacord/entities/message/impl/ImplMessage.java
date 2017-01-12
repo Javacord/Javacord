@@ -591,6 +591,15 @@ public class ImplMessage implements Message {
     }
 
     /**
+     * Gets the channel id of the message.
+     *
+     * @return The channel id of the message.
+     */
+    public String getChannelId() {
+        return channelId;
+    }
+
+    /**
      * Adds an reaction to the message.
      *
      * @param reaction The reaction to add. Whether a unicode emoji or a custom emoji in the format <code>name:id</code>.
