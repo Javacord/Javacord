@@ -562,6 +562,13 @@ public class ImplMessage implements Message {
     }
 
     /**
+     * Removes all reactions from cache.
+     */
+    public void removeAllReactionsFromCache() {
+        reactions.clear();
+    }
+
+    /**
      * Adds an reaction to the message.
      *
      * @param reaction The reaction to add. Whether a unicode emoji or a custom emoji in the format <code>name:id</code>.
