@@ -193,7 +193,7 @@ public class ImplMessage implements Message {
         if (data.has("reactions")) {
             JSONArray reactions = data.getJSONArray("reactions");
             for (int i = 0; i < reactions.length(); i++) {
-                this.reactions.add(new ImplReaction(this, reactions.getJSONObject(i)));
+                this.reactions.add(new ImplReaction(api, this, reactions.getJSONObject(i)));
             }
         }
 
@@ -514,7 +514,7 @@ public class ImplMessage implements Message {
             }
         }
 
-        Reaction reaction = new ImplReaction(this, you, 1, unicodeReaction, null);
+        Reaction reaction = new ImplReaction(api, this, you, 1, unicodeReaction, null);
         reactions.add(reaction);
         return reaction;
     }
@@ -534,7 +534,7 @@ public class ImplMessage implements Message {
             }
         }
 
-        Reaction reaction = new ImplReaction(this, you, 1, null, customEmoji);
+        Reaction reaction = new ImplReaction(api, this, you, 1, null, customEmoji);
         reactions.add(reaction);
         return reaction;
     }

@@ -18,9 +18,9 @@
  */
 package de.btobastian.javacord.entities.message;
 
+import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.CustomEmoji;
 import de.btobastian.javacord.entities.User;
-import org.apache.http.concurrent.FutureCallback;
 
 import java.util.List;
 import java.util.concurrent.Future;
