@@ -277,7 +277,7 @@ public class ImplChannel implements Channel {
                     public Message call() throws Exception {
                         logger.debug("Trying to send message in channel {} (content: \"{}\", tts: {})",
                                 ImplChannel.this, content, tts);
-                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, server);
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         JSONObject body = new JSONObject()
                                 .put("content", content)
                                 .put("tts", tts)
@@ -295,7 +295,7 @@ public class ImplChannel implements Channel {
                                         .body(body.toString())
                                         .asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, server);
+                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         logger.debug("Sent message in channel {} (content: \"{}\", tts: {})",
                                 ImplChannel.this, content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
@@ -341,7 +341,7 @@ public class ImplChannel implements Channel {
                     public Message call() throws Exception {
                         logger.debug("Trying to send a file in channel {} (name: {}, comment: {})",
                                 ImplChannel.this, file.getName(), comment);
-                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, server);
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
@@ -351,7 +351,7 @@ public class ImplChannel implements Channel {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, server);
+                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         logger.debug("Sent a file in channel {} (name: {}, comment: {})",
                                 ImplChannel.this, file.getName(), comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
@@ -378,7 +378,7 @@ public class ImplChannel implements Channel {
                     public Message call() throws Exception {
                         logger.debug("Trying to send an input stream in channel {} (comment: {})",
                                 ImplChannel.this, comment);
-                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, server);
+                        api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
@@ -388,7 +388,7 @@ public class ImplChannel implements Channel {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, server);
+                        api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         logger.debug("Sent an input stream in channel {} (comment: {})", ImplChannel.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -565,7 +565,7 @@ public class ImplChannel implements Channel {
                         .body(params.toString())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
                 logger.info("Updated channel {} (new name: {}, old name: {}, new topic: {}, old topic: {})",
                         ImplChannel.this, newName, getName(), newTopic, getTopic());
                 String updatedName = response.getBody().getObject().getString("name");
@@ -635,13 +635,16 @@ public class ImplChannel implements Channel {
             @Override
             public Void call() throws Exception {
                 logger.debug("Bulk deleting messages in channel {} (ids: [{}])", this, Joiner.on(",").join(messages));
-                Unirest.post("https://discordapp.com/api/channels/" + getId() + "/messages/bulk-delete")
-                        .header("authorization", api.getToken())
-                        .header("Content-Type", "application/json")
-                        .body(new JSONObject()
-                            .put("messages", messages)
-                            .toString())
-                        .asJson();
+                api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
+                HttpResponse<JsonNode> response =
+                        Unirest.post("https://discordapp.com/api/channels/" + getId() + "/messages/bulk-delete")
+                                .header("authorization", api.getToken())
+                                .header("Content-Type", "application/json")
+                                .body(new JSONObject()
+                                        .put("messages", messages)
+                                        .toString())
+                                .asJson();
+                api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                 logger.debug("Bulk deleted messages in channel {} (ids: [{}])", this, Joiner.on(",").join(messages));
                 return null;
             }

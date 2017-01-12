@@ -138,7 +138,7 @@ public class ImplUser implements User {
                     .header("authorization", api.getToken())
                     .asJson();
             api.checkResponse(response);
-            api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+            api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
             logger.debug("Sent typing state to user {}", this);
         } catch (Exception e) {
             e.printStackTrace();
@@ -318,7 +318,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send message to user {} (content: \"{}\", tts: {})",
                                 ImplUser.this, content, tts);
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
                         JSONObject body = new JSONObject()
                                 .put("content", content)
                                 .put("tts", tts)
@@ -337,7 +337,7 @@ public class ImplUser implements User {
                                         .body(body.toString())
                                         .asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                         logger.debug("Sent message to user {} (content: \"{}\", tts: {})", ImplUser.this, content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -382,7 +382,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send a file to user {} (name: {}, comment: {})",
                                 ImplUser.this, file.getName(), comment);
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
                                 .header("authorization", api.getToken())
@@ -392,7 +392,7 @@ public class ImplUser implements User {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                         logger.debug("Sent a file to user {} (name: {}, comment: {})",
                                 ImplUser.this, file.getName(), comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
@@ -419,7 +419,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send an input stream to user {} (comment: {})",
                                 ImplUser.this, comment);
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
                                 .header("authorization", api.getToken())
@@ -429,7 +429,7 @@ public class ImplUser implements User {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                         logger.debug("Sent an input stream to user {} (comment: {})", ImplUser.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -599,7 +599,7 @@ public class ImplUser implements User {
                     .body(new JSONObject().put("recipient_id", id).toString())
                     .asJson();
             api.checkResponse(response);
-            api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+            api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
             userChannelId = response.getBody().getObject().getString("id");
             logger.debug("Got channel id of user {} (channel id: {})", ImplUser.this, userChannelId);
             return userChannelId;

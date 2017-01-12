@@ -229,7 +229,7 @@ public class ImplRole implements Role {
                                 .put("permissions", allow).toString())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
 
                 logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                                 " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",

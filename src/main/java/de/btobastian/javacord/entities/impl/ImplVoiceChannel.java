@@ -131,7 +131,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
                 server.removeVoiceChannel(ImplVoiceChannel.this);
                 logger.info("Deleted voice channel {}", ImplVoiceChannel.this);
                 // call listener
@@ -262,7 +262,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                         .body(params.toString())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
                 String updatedName = response.getBody().getObject().getString("name");
                 logger.debug("Updated voice channel {} (new name: {}, old name: {})",
                         ImplVoiceChannel.this, updatedName, getName());

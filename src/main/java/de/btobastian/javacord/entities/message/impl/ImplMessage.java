@@ -305,9 +305,9 @@ public class ImplMessage implements Message {
                 logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
                         getId(), getAuthor(), getContent());
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null, null);
                 } else {
-                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, null, getChannelReceiver());
                 }
                 HttpResponse<JsonNode> response = Unirest.delete
                         ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
@@ -315,10 +315,10 @@ public class ImplMessage implements Message {
                         .asJson();
                 api.checkResponse(response);
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null, null);
                 } else {
                     api.checkRateLimit(
-                            response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                            response, RateLimitType.SERVER_MESSAGE_DELETE, null, getChannelReceiver());
                 }
                 api.removeMessage(message);
                 logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
@@ -399,9 +399,9 @@ public class ImplMessage implements Message {
             @Override
             public Void call() throws Exception {
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
                 } else {
-                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
                 }
                 HttpResponse<JsonNode> response = Unirest
                         .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
@@ -411,9 +411,9 @@ public class ImplMessage implements Message {
                         .asJson();
                 api.checkResponse(response);
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                 } else {
-                    api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                    api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
                 }
                 final String oldContent = getContent();
                 setContent(content);
@@ -572,11 +572,6 @@ public class ImplMessage implements Message {
             @Override
             public Void call() throws Exception {
                 logger.debug("Trying to add reaction to message with id {} (reaction: {})", getId(), reaction);
-                if (isPrivateMessage()) {
-                    api.checkRateLimit(null, RateLimitType.UNKNOWN, null);
-                } else {
-                    api.checkRateLimit(null, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
-                }
                 HttpResponse<JsonNode> response = Unirest
                         .put("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions/" + reaction + "/@me")
                         .header("authorization", api.getToken())
@@ -585,9 +580,9 @@ public class ImplMessage implements Message {
                         .asJson();
                 api.checkResponse(response);
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
                 } else {
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, getChannelReceiver());
                 }
                 logger.debug("Added reaction to message with id {} (reaction: {})", getId(), reaction);
                 return null;

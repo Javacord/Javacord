@@ -124,7 +124,7 @@ public class ImplMessageHistory implements MessageHistory {
                 + (before ? "before" : "after") + "=" + messageId + "&limit=" + limit;
         HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
         api.checkResponse(response);
-        api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+        api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
         JSONArray messages = response.getBody().getArray();
         for (int i = 0; i < messages.length(); i++) {
             JSONObject messageJson = messages.getJSONObject(i);

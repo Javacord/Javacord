@@ -1107,23 +1107,24 @@ public class ImplDiscordAPI implements DiscordAPI {
      * @param response The response to check. Can be <code>null</code>.
      * @param type The type of the rate limit.
      * @param server The server of the rate limit.
+     * @param channel The channel of the rate limit.
      *
      * @throws RateLimitedException if there's a rate limit.
      */
-    public void checkRateLimit(HttpResponse<JsonNode> response, RateLimitType type, Server server)
+    public void checkRateLimit(HttpResponse<JsonNode> response, RateLimitType type, Server server, Channel channel)
             throws RateLimitedException {
-        if (rateLimitManager.isRateLimited(type, server) && type != RateLimitType.UNKNOWN) {
-            long retryAfter = rateLimitManager.getRateLimit(type, server);
+        if (rateLimitManager.isRateLimited(type, server, channel) && type != RateLimitType.UNKNOWN) {
+            long retryAfter = rateLimitManager.getRateLimit(type, server, channel);
             throw new RateLimitedException(
-                    "We are rate limited for " + retryAfter + " ms!", retryAfter, type, server, rateLimitManager);
+                    "We are rate limited for " + retryAfter + " ms!", retryAfter, type, server, channel, rateLimitManager);
         }
         // {"global":false,"retry_after":104,"message":"You are being rate limited."}
         if (response != null && response.getStatus() == 429) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");
-            rateLimitManager.addRateLimit(type, server, retryAfter);
+            rateLimitManager.addRateLimit(type, server, channel, retryAfter);
             throw new RateLimitedException(
                     "We are rate limited for " + retryAfter + " ms (type: " + type.name() + ")!",
-                    retryAfter, type, server, rateLimitManager);
+                    retryAfter, type, server, channel, rateLimitManager);
         }
     }
 
