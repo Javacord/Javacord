@@ -229,4 +229,11 @@ public interface Message extends Comparable<Message> {
      */
     public Future<Void> addCustomEmojiReaction(CustomEmoji emoji);
 
+    /**
+     * Gets a list with all reactions.
+     *
+     * @return A list with all reactions.
+     */
+    public List<Reaction> getReactions();
+
 }

@@ -28,6 +28,13 @@ import java.util.concurrent.Future;
 public interface Reaction {
 
     /**
+     * Gets the message this reaction belongs to.
+     *
+     * @return The message this reaction belongs to.
+     */
+    public Message getMessage();
+
+    /**
      * Gets the amount of people reacted with this emoji.
      *
      * @return The amount of people reacted with this emoji.

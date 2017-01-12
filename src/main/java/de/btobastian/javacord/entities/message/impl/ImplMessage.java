@@ -33,6 +33,7 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
@@ -46,8 +47,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -107,6 +106,7 @@ public class ImplMessage implements Message {
     private boolean deleted = false;
     private Calendar creationDate = Calendar.getInstance();
     private final Collection<Embed> embeds = new ArrayList<>();
+    private final List<Reaction> reactions = new ArrayList<>();
 
     /**
      * Creates a new instance of this class.
@@ -188,6 +188,13 @@ public class ImplMessage implements Message {
             this.receiver = findReceiver(channelId);
         } else {
             this.receiver = receiver;
+        }
+
+        if (data.has("reactions")) {
+            JSONArray reactions = data.getJSONArray("reactions");
+            for (int i = 0; i < reactions.length(); i++) {
+                this.reactions.add(new ImplReaction(this, reactions.getJSONObject(i)));
+            }
         }
 
         if (data.has("nonce") && !data.isNull("nonce")) {
@@ -447,6 +454,11 @@ public class ImplMessage implements Message {
         return addReaction(emoji.getName() + ":" + emoji.getId());
     }
 
+    @Override
+    public List<Reaction> getReactions() {
+        return new ArrayList<>(reactions);
+    }
+
     /**
      * Updates the content of the message.
      *
@@ -466,10 +478,94 @@ public class ImplMessage implements Message {
     }
 
     /**
+     * Adds an unicode reaction to the cache.
+     *
+     * @param unicodeReaction The reaction to add.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction addUnicodeReactionToCache(String unicodeReaction, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (unicodeReaction.equals(reaction.getUnicodeEmoji())) {
+                ((ImplReaction) reaction).incrementCount(you);
+                return reaction;
+            }
+        }
+
+        Reaction reaction = new ImplReaction(this, you, 1, unicodeReaction, null);
+        reactions.add(reaction);
+        return reaction;
+    }
+
+    /**
+     * Adds an unicode reaction to the cache.
+     *
+     * @param customEmoji The reaction to add.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction addCustomEmojiReactionToCache(CustomEmoji customEmoji, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (customEmoji == reaction.getCustomEmoji()) {
+                ((ImplReaction) reaction).incrementCount(you);
+                return reaction;
+            }
+        }
+
+        Reaction reaction = new ImplReaction(this, you, 1, null, customEmoji);
+        reactions.add(reaction);
+        return reaction;
+    }
+
+    /**
+     * Removes an unicode reaction to the cache.
+     *
+     * @param unicodeReaction The reaction to remove.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction removeUnicodeReactionToCache(String unicodeReaction, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (unicodeReaction.equals(reaction.getUnicodeEmoji())) {
+                ((ImplReaction) reaction).decrementCount(you);
+                if (reaction.getCount() == 0) {
+                    reactions.remove(reaction);
+                }
+                return reaction;
+            }
+        }
+
+        // Reaction was not cached
+        return null;
+    }
+
+    /**
+     * Removes an unicode reaction to the cache.
+     *
+     * @param customEmoji The reaction to remove.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction removeCustomEmojiReactionToCache(CustomEmoji customEmoji, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (customEmoji == reaction.getCustomEmoji()) {
+                ((ImplReaction) reaction).decrementCount(you);
+                if (reaction.getCount() == 0) {
+                    reactions.remove(reaction);
+                }
+                return reaction;
+            }
+        }
+
+        // Reaction was not cached
+        return null;
+    }
+
+    /**
      * Adds an reaction to the message.
      *
      * @param reaction The reaction to add. Whether a unicode emoji or a custom emoji in the format <code>name:id</code>.
-     * @return
+     * @return A future which tells us if the creation was a success.
      */
     private Future<Void> addReaction(final String reaction) {
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
