@@ -459,6 +459,28 @@ public class ImplMessage implements Message {
         return new ArrayList<>(reactions);
     }
 
+    @Override
+    public Future<Void> removeAllReactions() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Trying to remove all reactions from message {}", ImplMessage.this);
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions")
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
+                } else {
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, getChannelReceiver());
+                }
+                logger.debug("Removed all reactions from message {}", ImplMessage.this);
+                return null;
+            }
+        });
+    }
+
     /**
      * Updates the content of the message.
      *

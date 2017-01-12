@@ -236,4 +236,11 @@ public interface Message extends Comparable<Message> {
      */
     public List<Reaction> getReactions();
 
+    /**
+     * Removes all reactions from the message.
+     *
+     * @return A future which tells us if the removal was successful.
+     */
+    public Future<Void> removeAllReactions();
+
 }
