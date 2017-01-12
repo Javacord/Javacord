@@ -1090,6 +1090,10 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!" + message);
         }
+        if (response.getStatus() == 429) {
+            // Handled in #checkRateLimit
+            return;
+        }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
             throw new BadResponseException("Received http status code " + response.getStatus() + " with message "
                     + response.getStatusText() + " and body " + response.getBody(), response.getStatus(),
@@ -1113,8 +1117,8 @@ public class ImplDiscordAPI implements DiscordAPI {
             throw new RateLimitedException(
                     "We are rate limited for " + retryAfter + " ms!", retryAfter, type, server, rateLimitManager);
         }
-        if (response != null && response.getBody() != null && !response.getBody().isArray()
-                && response.getBody().getObject().has("retry_after")) {
+        // {"global":false,"retry_after":104,"message":"You are being rate limited."}
+        if (response != null && response.getStatus() == 429) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");
             rateLimitManager.addRateLimit(type, server, retryAfter);
             throw new RateLimitedException(
