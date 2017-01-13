@@ -26,8 +26,10 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.permissions.Ban;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.impl.ImplBan;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.channel.ChannelCreateListener;
@@ -554,16 +556,16 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Future<User[]> getBans() {
+    public Future<Ban[]> getBans() {
         return getBans(null);
     }
 
     @Override
-    public Future<User[]> getBans(FutureCallback<User[]> callback) {
-        ListenableFuture<User[]> future =
-                api.getThreadPool().getListeningExecutorService().submit(new Callable<User[]>() {
+    public Future<Ban[]> getBans(FutureCallback<Ban[]> callback) {
+        ListenableFuture<Ban[]> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<Ban[]>() {
                     @Override
-                    public User[] call() throws Exception {
+                    public Ban[] call() throws Exception {
                         logger.debug("Trying to get bans for server {}", ImplServer.this);
                         HttpResponse<JsonNode> response = Unirest
                                 .get("https://discordapp.com/api/guilds/" + getId() + "/bans")
@@ -571,13 +573,13 @@ public class ImplServer implements Server {
                                 .asJson();
                         api.checkResponse(response);
                         api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
-                        JSONArray bannedUsersJson = response.getBody().getArray();
-                        User[] bannedUsers = new User[bannedUsersJson.length()];
-                        for (int i = 0; i < bannedUsersJson.length(); i++) {
-                            bannedUsers[i] = api.getOrCreateUser(bannedUsersJson.getJSONObject(i));
+                        JSONArray bansJson = response.getBody().getArray();
+                        Ban[] bans = new Ban[bansJson.length()];
+                        for (int i = 0; i < bansJson.length(); i++) {
+                            bans[i] = new ImplBan(api, ImplServer.this, bansJson.getJSONObject(i));
                         }
-                        logger.debug("Got bans for server {} (amount: {})", ImplServer.this, bannedUsers.length);
-                        return bannedUsers;
+                        logger.debug("Got bans for server {} (amount: {})", ImplServer.this, bans.length);
+                        return bans;
                     }
                 });
         if (callback != null) {

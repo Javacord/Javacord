@@ -19,6 +19,7 @@
 package de.btobastian.javacord.entities;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.permissions.Ban;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 
@@ -241,19 +242,19 @@ public interface Server {
     public Future<Void> unbanUser(String userId);
 
     /**
-     * Gets an array with all banned users.
+     * Gets an array with all bans.
      *
-     * @return An array with all banned users.
+     * @return An array with all bans.
      */
-    public Future<User[]> getBans();
+    public Future<Ban[]> getBans();
 
     /**
-     * Gets an array with all banned users.
+     * Gets an array with all bans.
      *
      * @param callback The callback which will be informed when the request finished.
-     * @return An array with all banned users.
+     * @return An array with all bans.
      */
-    public Future<User[]> getBans(FutureCallback<User[]> callback);
+    public Future<Ban[]> getBans(FutureCallback<Ban[]> callback);
 
     /**
      * Kicks the given user from the server.
