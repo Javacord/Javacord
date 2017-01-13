@@ -40,7 +40,7 @@ import java.util.concurrent.Future;
 public interface DiscordAPI {
 
     /**
-     * Connects to the account with the given email and password.
+     * Connects to the account with the given token or email and password.
      *
      * This method is non-blocking.
      *
@@ -50,7 +50,7 @@ public interface DiscordAPI {
     public void connect(FutureCallback<DiscordAPI> callback);
 
     /**
-     * Connects to the account with the given email and password.
+     * Connects to the account with the given token or email and password.
      *
      * This method is blocking! It's recommended to use the non-blocking version which
      * uses a thread from the internal used thread pool to connect.
