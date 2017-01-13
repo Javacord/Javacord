@@ -1,6 +1,5 @@
 # Javacord <a href="#"><img src="https://img.shields.io/badge/Version-2.0.13-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
-A simple library to create a discord bot.
-Supports the new application system!
+A multithreaded but simple to use library to create a Discord bot in Java.
 
 ##  Maven
 ```xml
