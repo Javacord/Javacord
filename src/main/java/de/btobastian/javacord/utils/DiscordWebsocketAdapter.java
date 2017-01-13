@@ -114,13 +114,16 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
                     serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown");
         } else {
-            if (clientCloseFrame != null && clientCloseFrame.getCloseCode() == 1002
-                    && "No more WebSocket frame from the server.".equals(clientCloseFrame.getCloseReason())) {
-                logger.debug("Websocket closed! Trying to resume connection.");
-            } else {
-                logger.info("Websocket closed with reason {} and code {} by client!",
-                        clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
-                        clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
+            switch (clientCloseFrame == null ? -1 : clientCloseFrame.getCloseCode()) {
+                case 1002:
+                case 1008:
+                    logger.debug("Websocket closed! Trying to resume connection.");
+                    break;
+                default:
+                    logger.info("Websocket closed with reason {} and code {} by client!",
+                            clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
+                            clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
+                    break;
             }
         }
 
@@ -415,36 +418,16 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     /* === ERROR LOGGING === */
 
     @Override
-    public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-        logger.warn("Websocket frame error!", cause);
-    }
-
-    @Override
     public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
-        if (!cause.getMessage().equals("Flushing frames to the server failed: Connection closed by remote host")) {
-            logger.warn("Websocket error!", cause);
-        }
-    }
-
-    @Override
-    public void onMessageError(WebSocket websocket, WebSocketException cause, List<WebSocketFrame> frames) throws Exception {
-        logger.warn("Websocket onMessage error!", cause);
-    }
-
-    @Override
-    public void onTextMessageError(WebSocket websocket, WebSocketException cause, byte[] data) throws Exception {
-        logger.warn("Websocket onTextMessage error!", cause);
-    }
-
-    @Override
-    public void onMessageDecompressionError(WebSocket websocket, WebSocketException cause, byte[] compressed) throws Exception {
-        logger.warn("Websocket onMessageDecompression error!", cause);
-    }
-
-    @Override
-    public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-        if (!cause.getMessage().equals("Flushing frames to the server failed: Connection closed by remote host")) {
-            logger.warn("Websocket onSend error!", cause);
+        switch (cause.getMessage()) {
+            case "Flushing frames to the server failed: Connection closed by remote host":
+            case "Flushing frames to the server failed: Socket is closed":
+            case "Flushing frames to the server failed: Connection has been shutdown: javax.net.ssl.SSLException: java.net.SocketException: Connection reset":
+            case "An I/O error occurred while a frame was being read from the web socket: Connection reset":
+                break;
+            default:
+                logger.warn("Websocket error!", cause);
+                break;
         }
     }
 
