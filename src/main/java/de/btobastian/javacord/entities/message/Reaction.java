@@ -81,7 +81,7 @@ public interface Reaction {
      *
      * @return A list of users who used this reaction.
      */
-    public Future<List<User>> getReactors();
+    public Future<List<User>> getUsers();
 
     /**
      * Gets a list of users who used this reaction.
@@ -89,7 +89,7 @@ public interface Reaction {
      * @param callback The callback which will be informed when the reactors were fetched or fetching failed.
      * @return A list of users who used this reaction.
      */
-    public Future<List<User>> getReactors(FutureCallback<List<User>> callback);
+    public Future<List<User>> getUsers(FutureCallback<List<User>> callback);
 
     /**
      * Removes an user of the reactors list.
@@ -97,6 +97,6 @@ public interface Reaction {
      * @param user The user to remove.
      * @return A future which tells us if the removal was successful.
      */
-    public Future<Void> removeReactor(User user);
+    public Future<Void> removeUser(User user);
 
 }

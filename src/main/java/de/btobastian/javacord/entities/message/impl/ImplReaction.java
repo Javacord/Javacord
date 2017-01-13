@@ -136,12 +136,12 @@ public class ImplReaction implements Reaction {
     }
 
     @Override
-    public Future<List<User>> getReactors() {
-        return getReactors(null);
+    public Future<List<User>> getUsers() {
+        return getUsers(null);
     }
 
     @Override
-    public Future<List<User>> getReactors(FutureCallback<List<User>> callback) {
+    public Future<List<User>> getUsers(FutureCallback<List<User>> callback) {
         ListenableFuture<List<User>> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<List<User>>() {
                     @Override
@@ -173,7 +173,7 @@ public class ImplReaction implements Reaction {
     }
 
     @Override
-    public Future<Void> removeReactor(final User user) {
+    public Future<Void> removeUser(final User user) {
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
