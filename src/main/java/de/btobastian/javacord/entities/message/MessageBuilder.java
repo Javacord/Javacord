@@ -50,21 +50,6 @@ public class MessageBuilder {
     /**
      * Appends the decoration to the text.
      *
-     * @param decoration The decoration/style.
-     * @param message The message.
-     * @return This object to reuse it.
-     * @deprecated This method will be removed in the next release.
-     *             Use {@link #appendDecoration(String, MessageDecoration...)} instead.
-     */
-    @Deprecated
-    public MessageBuilder appendDecoration(MessageDecoration decoration, String message) {
-        appendDecoration(message, decoration);
-        return this;
-    }
-
-    /**
-     * Appends the decoration to the text.
-     *
      * @param message The message.
      * @param decorations The decorations/style.
      * @return This object to reuse it.
