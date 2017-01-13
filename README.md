@@ -1,4 +1,4 @@
-# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-2.0.13-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
+# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-2.0.14-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
 A multithreaded but simple to use library to create a Discord bot in Java.
 
 ##  Maven
@@ -11,7 +11,7 @@ A multithreaded but simple to use library to create a Discord bot in Java.
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.13</version>
+  <version>2.0.14</version>
    <!-- This will use the shaded javacord which contains all required dependencies -->
   <classifier>shaded</classifier>
 </dependency>
@@ -19,7 +19,7 @@ A multithreaded but simple to use library to create a Discord bot in Java.
 <dependency>
   <groupId>ch.qos.logback</groupId>
   <artifactId>logback-classic</artifactId>
-  <version>1.0.13</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 
