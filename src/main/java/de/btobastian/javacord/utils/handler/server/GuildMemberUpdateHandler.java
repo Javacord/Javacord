@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -21,8 +21,11 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
+import de.btobastian.javacord.listener.user.UserChangeNameListener;
+import de.btobastian.javacord.listener.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -54,9 +57,33 @@ public class GuildMemberUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        final Server server = api.getServerById(packet.getString("guild_id"));
+        final ImplServer server = (ImplServer) api.getServerById(packet.getString("guild_id"));
         final User user = api.getOrCreateUser(packet.getJSONObject("user"));
         if (server != null) {
+            // update nickname
+            if (packet.has("nick")) {
+                String newNick = packet.isNull("nick") ? null : packet.getString("nick");
+                final String oldNick = server.getNickname(user);
+                if (newNick != null && !newNick.equals(oldNick) || ((oldNick != null) && !oldNick.equals(newNick))) {
+                    server.setNickname(user, newNick);
+                    listenerExecutorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<UserChangeNicknameListener> listeners = api.getListeners(UserChangeNicknameListener.class);
+                            synchronized (listeners) {
+                                for (UserChangeNicknameListener listener : listeners) {
+                                    try {
+                                        listener.onUserChangeNickname(api, server, user, oldNick);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in UserChangeNicknameListener!", t);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
             // get array with all roles
             JSONArray jsonRoles = packet.getJSONArray("roles");
             Role[] roles = new Role[jsonRoles.length()];

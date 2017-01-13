@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -66,6 +66,8 @@ public class ImplRole implements Role {
     private int position;
     private Color color;
     private boolean hoist;
+    private boolean mentionable;
+    private boolean managed;
 
     private final List<User> users = new ArrayList<>();
 
@@ -86,6 +88,8 @@ public class ImplRole implements Role {
         position = data.getInt("position");
         color = new Color(data.getInt("color"));
         hoist = data.getBoolean("hoist");
+        mentionable = data.getBoolean("mentionable");
+        managed = data.getBoolean("managed");
 
         server.addRole(this);
     }
@@ -146,6 +150,21 @@ public class ImplRole implements Role {
     @Override
     public Color getColor() {
         return color;
+    }
+
+    @Override
+    public boolean isMentionable() {
+        return mentionable;
+    }
+
+    @Override
+    public boolean isManaged() {
+        return managed;
+    }
+
+    @Override
+    public String getMentionTag() {
+        return "<@&" + getId() + ">";
     }
 
     @Override
@@ -210,7 +229,7 @@ public class ImplRole implements Role {
                                 .put("permissions", allow).toString())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
 
                 logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                                 " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",

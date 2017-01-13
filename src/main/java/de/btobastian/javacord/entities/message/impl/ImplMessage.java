@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -25,6 +25,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.CustomEmoji;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
@@ -32,9 +33,11 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.listener.message.MessageEditListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -44,8 +47,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -95,17 +96,23 @@ public class ImplMessage implements Message {
     private final boolean tts;
     private final User author;
     private final List<User> mentions = new ArrayList<>();
+    private final List<Role> mentionedRoles = new ArrayList<>();
     private final MessageReceiver receiver;
     private final String channelId;
     private final List<MessageAttachment> attachments = new ArrayList<>();
+    private final String nonce;
+    private boolean mentionsEveryone;
+    private boolean pinned;
+    private boolean deleted = false;
     private Calendar creationDate = Calendar.getInstance();
     private final Collection<Embed> embeds = new ArrayList<>();
+    private final List<Reaction> reactions = new ArrayList<>();
 
     /**
      * Creates a new instance of this class.
      *
      * @param data A JSONObject containing all necessary data.
-     * @param api The api of this server.
+     * @param api  The api of this server.
      */
     public ImplMessage(JSONObject data, ImplDiscordAPI api, MessageReceiver receiver) {
         this.api = api;
@@ -115,6 +122,8 @@ public class ImplMessage implements Message {
             content = data.getString("content");
         }
         tts = data.getBoolean("tts");
+        mentionsEveryone = data.getBoolean("mention_everyone");
+        pinned = data.getBoolean("pinned");
 
         if (data.has("timestamp")) {
             String time = data.getString("timestamp");
@@ -153,7 +162,8 @@ public class ImplMessage implements Message {
                 String name = attachment.getString("filename");
                 this.attachments.add(new ImplMessageAttachment(url, proxyUrl, size, id, name));
             }
-        } catch (JSONException ignored) { }
+        } catch (JSONException ignored) {
+        }
 
         JSONArray mentions = data.getJSONArray("mentions");
         for (int i = 0; i < mentions.length(); i++) {
@@ -180,8 +190,36 @@ public class ImplMessage implements Message {
             this.receiver = receiver;
         }
 
+        if (data.has("reactions")) {
+            JSONArray reactions = data.getJSONArray("reactions");
+            for (int i = 0; i < reactions.length(); i++) {
+                this.reactions.add(new ImplReaction(api, this, reactions.getJSONObject(i)));
+            }
+        }
+
+        if (data.has("nonce") && !data.isNull("nonce")) {
+            Object maybeItsAStringAndMaybeItsNotAStringIHaveNoClue = data.get("nonce");
+            if (maybeItsAStringAndMaybeItsNotAStringIHaveNoClue instanceof String) {
+                nonce = (String) maybeItsAStringAndMaybeItsNotAStringIHaveNoClue;
+            } else {
+                nonce = null;
+            }
+        } else {
+            nonce = null;
+        }
+
         if (getChannelReceiver() != null) {
-            ((ImplServer) getChannelReceiver().getServer()).addMember(author);
+            ImplServer server = (ImplServer) getChannelReceiver().getServer();
+            server.addMember(author);
+
+            JSONArray mentionRoles = data.getJSONArray("mention_roles");
+            for (int i = 0; i < mentionRoles.length(); i++) {
+                String roleId = mentionRoles.getString(i);
+                Role role = server.getRoleById(roleId);
+                if (role != null) {
+                    this.mentionedRoles.add(role);
+                }
+            }
         }
 
         api.addMessage(this);
@@ -234,22 +272,42 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public List<Role> getMentionedRoles() {
+        return new ArrayList<>(mentionedRoles);
+    }
+
+    @Override
     public boolean isTts() {
         return tts;
     }
 
     @Override
+    public String getNonce() {
+        return nonce;
+    }
+
+    @Override
+    public boolean isMentioningEveryone() {
+        return mentionsEveryone;
+    }
+
+    @Override
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    @Override
     public Future<Void> delete() {
-        final Message message = this;
+        final ImplMessage message = this;
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
                         getId(), getAuthor(), getContent());
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE_DELETE, null, null);
                 } else {
-                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, null, getChannelReceiver());
                 }
                 HttpResponse<JsonNode> response = Unirest.delete
                         ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
@@ -257,14 +315,21 @@ public class ImplMessage implements Message {
                         .asJson();
                 api.checkResponse(response);
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null);
+                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE_DELETE, null, null);
                 } else {
                     api.checkRateLimit(
-                            response, RateLimitType.SERVER_MESSAGE_DELETE, getChannelReceiver().getServer());
+                            response, RateLimitType.SERVER_MESSAGE_DELETE, null, getChannelReceiver());
                 }
                 api.removeMessage(message);
                 logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
                         getId(), getAuthor(), getContent());
+                synchronized (this) {
+                    if (message.isDeleted()) {
+                        return null;
+                    } else {
+                        message.setDeleted(true);
+                    }
+                }
                 // call listener
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                     @Override
@@ -287,89 +352,33 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    @Override
     public Collection<MessageAttachment> getAttachments() {
         return Collections.unmodifiableCollection(attachments);
     }
 
     @Override
     public Future<Message> reply(String content) {
-        return reply(content, null, false, null);
-    }
-
-    @Override
-    public Future<Message> reply(String content, boolean tts) {
-        return reply(content, null, tts, null);
+        return receiver.sendMessage(content);
     }
 
     @Override
     public Future<Message> reply(String content, EmbedBuilder embed) {
-        return reply(content, embed, false, null);
-    }
-
-    @Override
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts) {
-        return reply(content, embed, tts, null);
+        return receiver.sendMessage(content, embed);
     }
 
     @Override
     public Future<Message> reply(String content, FutureCallback<Message> callback) {
-        return reply(content, null, false, callback);
-    }
-
-    @Override
-    public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback) {
-        return reply(content, null, tts, callback);
+        return receiver.sendMessage(content, callback);
     }
 
     @Override
     public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
-        return reply(content, embed, false, callback);
-    }
-
-    @Override
-    public Future<Message> reply(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback) {
-        return receiver.sendMessage(content, embed, tts, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(final File file) {
-        return replyFile(file, null, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(final File file, FutureCallback<Message> callback) {
-        return replyFile(file, null, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(InputStream inputStream, String filename) {
-        return replyFile(inputStream, filename, null, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(InputStream inputStream, String filename, FutureCallback<Message> callback) {
-        return replyFile(inputStream, filename, null, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(File file, String comment) {
-        return replyFile(file, comment, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(final File file, final String comment, FutureCallback<Message> callback) {
-        return receiver.sendFile(file, comment, callback);
-    }
-
-    @Override
-    public Future<Message> replyFile(InputStream inputStream, String filename, String comment) {
-        return replyFile(inputStream, filename, comment, null);
-    }
-
-    @Override
-    public Future<Message> replyFile(final InputStream inputStream, final String filename, final String comment,
-                                     FutureCallback<Message> callback) {
-        return receiver.sendFile(inputStream, filename, comment, callback);
+        return receiver.sendMessage(content, embed, callback);
     }
 
     @Override
@@ -390,9 +399,9 @@ public class ImplMessage implements Message {
             @Override
             public Void call() throws Exception {
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
                 } else {
-                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
                 }
                 HttpResponse<JsonNode> response = Unirest
                         .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
@@ -402,9 +411,9 @@ public class ImplMessage implements Message {
                         .asJson();
                 api.checkResponse(response);
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                 } else {
-                    api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, getChannelReceiver().getServer());
+                    api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
                 }
                 final String oldContent = getContent();
                 setContent(content);
@@ -437,28 +446,36 @@ public class ImplMessage implements Message {
 
     @Override
     public Future<Void> addUnicodeReaction(final String unicodeEmoji) {
+        return addReaction(unicodeEmoji);
+    }
+
+    @Override
+    public Future<Void> addCustomEmojiReaction(CustomEmoji emoji) {
+        return addReaction(emoji.getName() + ":" + emoji.getId());
+    }
+
+    @Override
+    public List<Reaction> getReactions() {
+        return new ArrayList<>(reactions);
+    }
+
+    @Override
+    public Future<Void> removeAllReactions() {
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                logger.debug("Trying to add reaction to message with id {} (emoji: {})", getId(), unicodeEmoji);
-                if (isPrivateMessage()) {
-                    api.checkRateLimit(null, RateLimitType.UNKNOWN, null);
-                } else {
-                    api.checkRateLimit(null, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
-                }
+                logger.debug("Trying to remove all reactions from message {}", ImplMessage.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .put("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions/" + unicodeEmoji + "/@me")
+                        .delete("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions")
                         .header("authorization", api.getToken())
-                        .header("content-type", "application/json")
-                        .body("{}")
                         .asJson();
                 api.checkResponse(response);
                 if (isPrivateMessage()) {
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
                 } else {
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, getChannelReceiver().getServer());
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, getChannelReceiver());
                 }
-                logger.debug("Added reaction to message with id {} (emoji: {})", getId(), unicodeEmoji);
+                logger.debug("Removed all reactions from message {}", ImplMessage.this);
                 return null;
             }
         });
@@ -471,6 +488,144 @@ public class ImplMessage implements Message {
      */
     public void setContent(String content) {
         this.content = content;
+    }
+
+    /**
+     * Sets the deleted flag.
+     *
+     * @param deleted Whether the flag should be set to <code>true</code> or <code>false</code>.
+     */
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    /**
+     * Adds an unicode reaction to the cache.
+     *
+     * @param unicodeReaction The reaction to add.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction addUnicodeReactionToCache(String unicodeReaction, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (unicodeReaction.equals(reaction.getUnicodeEmoji())) {
+                ((ImplReaction) reaction).incrementCount(you);
+                return reaction;
+            }
+        }
+
+        Reaction reaction = new ImplReaction(api, this, you, 1, unicodeReaction, null);
+        reactions.add(reaction);
+        return reaction;
+    }
+
+    /**
+     * Adds an unicode reaction to the cache.
+     *
+     * @param customEmoji The reaction to add.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction addCustomEmojiReactionToCache(CustomEmoji customEmoji, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (customEmoji == reaction.getCustomEmoji()) {
+                ((ImplReaction) reaction).incrementCount(you);
+                return reaction;
+            }
+        }
+
+        Reaction reaction = new ImplReaction(api, this, you, 1, null, customEmoji);
+        reactions.add(reaction);
+        return reaction;
+    }
+
+    /**
+     * Removes an unicode reaction to the cache.
+     *
+     * @param unicodeReaction The reaction to remove.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction removeUnicodeReactionToCache(String unicodeReaction, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (unicodeReaction.equals(reaction.getUnicodeEmoji())) {
+                ((ImplReaction) reaction).decrementCount(you);
+                if (reaction.getCount() == 0) {
+                    reactions.remove(reaction);
+                }
+                return reaction;
+            }
+        }
+
+        // Reaction was not cached
+        return null;
+    }
+
+    /**
+     * Removes an unicode reaction to the cache.
+     *
+     * @param customEmoji The reaction to remove.
+     * @param you Whether the reaction was by you or not.
+     * @return The reaction.
+     */
+    public Reaction removeCustomEmojiReactionToCache(CustomEmoji customEmoji, boolean you) {
+        for (Reaction reaction : reactions) {
+            if (customEmoji == reaction.getCustomEmoji()) {
+                ((ImplReaction) reaction).decrementCount(you);
+                if (reaction.getCount() == 0) {
+                    reactions.remove(reaction);
+                }
+                return reaction;
+            }
+        }
+
+        // Reaction was not cached
+        return null;
+    }
+
+    /**
+     * Removes all reactions from cache.
+     */
+    public void removeAllReactionsFromCache() {
+        reactions.clear();
+    }
+
+    /**
+     * Gets the channel id of the message.
+     *
+     * @return The channel id of the message.
+     */
+    public String getChannelId() {
+        return channelId;
+    }
+
+    /**
+     * Adds an reaction to the message.
+     *
+     * @param reaction The reaction to add. Whether a unicode emoji or a custom emoji in the format <code>name:id</code>.
+     * @return A future which tells us if the creation was a success.
+     */
+    private Future<Void> addReaction(final String reaction) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Trying to add reaction to message with id {} (reaction: {})", getId(), reaction);
+                HttpResponse<JsonNode> response = Unirest
+                        .put("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions/" + reaction + "/@me")
+                        .header("authorization", api.getToken())
+                        .header("content-type", "application/json")
+                        .body("{}")
+                        .asJson();
+                api.checkResponse(response);
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
+                } else {
+                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null, getChannelReceiver());
+                }
+                logger.debug("Added reaction to message with id {} (reaction: {})", getId(), reaction);
+                return null;
+            }
+        });
     }
 
     /**

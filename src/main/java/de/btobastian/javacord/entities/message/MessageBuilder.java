@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -20,6 +20,7 @@ package de.btobastian.javacord.entities.message;
 
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.permissions.Role;
 
 /**
  * This class helps to build messages with decorations.
@@ -43,21 +44,6 @@ public class MessageBuilder {
      */
     public MessageBuilder append(String message) {
         strBuilder.append(message);
-        return this;
-    }
-
-    /**
-     * Appends the decoration to the text.
-     *
-     * @param decoration The decoration/style.
-     * @param message The message.
-     * @return This object to reuse it.
-     * @deprecated This method will be removed in the next release.
-     *             Use {@link #appendDecoration(String, MessageDecoration...)} instead.
-     */
-    @Deprecated
-    public MessageBuilder appendDecoration(MessageDecoration decoration, String message) {
-        appendDecoration(message, decoration);
         return this;
     }
 
@@ -100,7 +86,7 @@ public class MessageBuilder {
      * @see #appendUser(User)
      */
     public MessageBuilder appendMention(User user) {
-        strBuilder.append("<@").append(user.getId()).append(">");
+        strBuilder.append(user.getMentionTag());
         return this;
     }
 
@@ -126,13 +112,24 @@ public class MessageBuilder {
     }
 
     /**
-     * Appends a channel (@user).
+     * Appends a channel (@channel).
      *
      * @param channel The channel to append.
      * @return This object to reuse it.
      */
     public MessageBuilder appendChannel(Channel channel) {
-        strBuilder.append("<#").append(channel.getId()).append(">");
+        strBuilder.append(channel.getMentionTag());
+        return this;
+    }
+
+    /**
+     * Appends a role (@role).
+     *
+     * @param role The role to append.
+     * @return This object to reuse it.
+     */
+    public MessageBuilder appendRole(Role role) {
+        strBuilder.append(role.getMentionTag());
         return this;
     }
 

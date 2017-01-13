@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -405,5 +405,30 @@ public interface Server {
      *         <code>Null</code> if the emoji does not exist on this server.
      */
     public CustomEmoji getCustomEmojiByName(String name);
+
+    /**
+     * Gets the nickname of the user on the server.
+     *
+     * @param user The user.
+     * @return The nickname of the user on the server or <code>null</code> if the user has no nick.
+     */
+    public String getNickname(User user);
+
+    /**
+     * Checks if the user has a nickname on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the user has a nickname on the server or not.
+     */
+    public boolean hasNickname(User user);
+
+    /**
+     * Updates the nickname of a user.
+     *
+     * @param user The user to modify.
+     * @param nickname The nickname to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateNickname(User user, String nickname);
 
 }

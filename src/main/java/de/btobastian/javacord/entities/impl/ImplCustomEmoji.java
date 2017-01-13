@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  *
  * This file is part of Javacord.
  *
@@ -31,6 +31,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.server.CustomEmojiDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -210,6 +211,7 @@ public class ImplCustomEmoji implements CustomEmoji {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
                 server.removeCustomEmoji(ImplCustomEmoji.this);
                 logger.info("Deleted emoji {}", ImplCustomEmoji.this);
                 // call listener

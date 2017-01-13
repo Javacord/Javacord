@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -28,15 +28,16 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.neovisionaries.ws.client.WebSocketFactory;
 import de.btobastian.javacord.entities.*;
-import de.btobastian.javacord.entities.impl.ImplApplication;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissionsBuilder;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.exceptions.BadResponseException;
 import de.btobastian.javacord.exceptions.NotSupportedForBotsException;
@@ -55,13 +56,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
-import javax.net.ssl.SSLContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -159,12 +156,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             token = requestTokenBlocking();
         }
         String gateway = requestGatewayBlocking();
-        try {
-            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, false);
-        } catch (URISyntaxException e) {
-            logger.warn("Something went wrong while connecting. Please contact the developer!", e);
-            throw new IllegalArgumentException("Invalid gateway url. Please contact the developer!");
-        }
+        socketAdapter = new DiscordWebsocketAdapter(this, gateway);
         try {
             if (!socketAdapter.isReady().get()) {
                 throw new IllegalStateException("Socket closed before ready packet was received!");
@@ -673,19 +665,13 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void reconnect(FutureCallback<DiscordAPI> callback) {
-        Futures.addCallback(getThreadPool().getListeningExecutorService().submit(new Callable<DiscordAPI>() {
-            @Override
-            public DiscordAPI call() throws Exception {
-                reconnectBlocking();
-                return ImplDiscordAPI.this;
-            }
-        }), callback);
+    public PermissionsBuilder getPermissionsBuilder() {
+        return new ImplPermissionsBuilder();
     }
 
     @Override
-    public void reconnectBlocking() {
-        reconnectBlocking(requestGatewayBlocking(), null, -1, -1);
+    public PermissionsBuilder getPermissionsBuilder(Permissions permissions) {
+        return new ImplPermissionsBuilder(permissions);
     }
 
     @Override
@@ -696,180 +682,6 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public boolean isAutoReconnectEnabled() {
         return autoReconnect;
-    }
-
-    @Override
-    public Future<Collection<Application>> getApplications() {
-        return getApplications(null);
-    }
-
-    @Override
-    public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback) {
-        if (getYourself().isBot()) {
-            throw new NotSupportedForBotsException();
-        }
-        ListenableFuture<Collection<Application>> future =
-                getThreadPool().getListeningExecutorService().submit(new Callable<Collection<Application>>() {
-                    @Override
-                    public Collection<Application> call() throws Exception {
-                        logger.debug("Trying to get applications");
-                        HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/oauth2/applications")
-                                .header("authorization", token)
-                                .asJson();
-                        checkResponse(response);
-                        JSONArray jsonApplications = response.getBody().getArray();
-                        Set<Application> applications = new HashSet<>();
-                        for (int i = 0; i < jsonApplications.length(); i++) {
-                            applications.add(
-                                    new ImplApplication(ImplDiscordAPI.this, jsonApplications.getJSONObject(i)));
-                        }
-                        logger.debug("Got applications (amount: {})", applications.size());
-                        return applications;
-                    }
-                });
-        if (callback != null) {
-            Futures.addCallback(future, callback);
-        }
-        return future;
-    }
-
-    @Override
-    public Future<Application> createApplication(String name) {
-        return createApplication(name, null);
-    }
-
-    @Override
-    public Future<Application> createApplication(final String name, FutureCallback<Application> callback) {
-        if (getYourself().isBot()) {
-            throw new NotSupportedForBotsException();
-        }
-        ListenableFuture<Application> future =
-                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
-                    @Override
-                    public Application call() throws Exception {
-                        logger.debug("Trying to create application with name {}", name);
-                        HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
-                                .header("content-type", "application/json")
-                                .header("authorization", getToken())
-                                .body(new JSONObject()
-                                        .put("name", name)
-                                        .toString())
-                                .asJson();
-                        checkResponse(response);
-                        Application application =
-                                new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
-                        logger.debug("Created application {}", application);
-                        return application;
-                    }
-                });
-        if (callback != null) {
-            Futures.addCallback(future, callback);
-        }
-        return future;
-    }
-
-    @Override
-    public Future<Application> getApplication(String id) {
-        return getApplication(id, null);
-    }
-
-    @Override
-    public Future<Application> getApplication(final String id, FutureCallback<Application> callback) {
-        if (getYourself().isBot()) {
-            throw new NotSupportedForBotsException();
-        }
-        ListenableFuture<Application> future =
-                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
-                    @Override
-                    public Application call() throws Exception {
-                        logger.debug("Trying to get application with id {}", id);
-                        HttpResponse<JsonNode> response = Unirest
-                                .get("https://discordapp.com/api/oauth2/applications/" + id)
-                                .header("Authorization", token)
-                                .asJson();
-                        checkResponse(response);
-                        Application application =
-                                new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
-                        logger.debug("Got application {}", application);
-                        return application;
-
-                    }
-                });
-        if (callback != null) {
-            Futures.addCallback(future, callback);
-        }
-        return future;
-    }
-
-    @Override
-    public Future<Void> deleteApplication(final String id) {
-        if (getYourself().isBot()) {
-            throw new NotSupportedForBotsException();
-        }
-        return getThreadPool().getExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Trying to delete application with id {}", id);
-                HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/oauth2/applications/" + id)
-                        .header("Authorization", getToken())
-                        .asJson();
-                checkResponse(response);
-                logger.debug("Deleted application with id {}", id);
-                return null;
-            }
-        });
-    }
-
-    @Override
-    public Future<Application> createBot(String name) {
-        return createBot(name, null, null);
-    }
-
-    @Override
-    public Future<Application> createBot(String name, FutureCallback<Application> callback) {
-        return createBot(name, null, callback);
-    }
-
-    @Override
-    public Future<Application> createBot(String name, String applicationId) {
-        return createBot(name, applicationId, null);
-    }
-
-    @Override
-    public Future<Application> createBot(
-            final String name, final String applicationId, FutureCallback<Application> callback) {
-        if (getYourself().isBot()) {
-            throw new NotSupportedForBotsException();
-        }
-        ListenableFuture<Application> future =
-                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
-                    @Override
-                    public Application call() throws Exception {
-                        ImplApplication application;
-                        if (applicationId == null) {
-                            application = (ImplApplication) createApplication(name).get();
-                        } else {
-                            application = (ImplApplication) getApplication(applicationId).get();
-                        }
-                        HttpResponse<JsonNode> response = Unirest
-                                .post("https://discordapp.com/api/oauth2/applications/" + application.getId() + "/bot")
-                                .header("Authorization", getToken())
-                                .header("content-type", "application/json")
-                                .body(new JSONObject().toString())
-                                .asJson();
-                        checkResponse(response);
-                        User bot = getOrCreateUser(response.getBody().getObject());
-                        String botToken = response.getBody().getObject().getString("token");
-                        application.setBot(bot);
-                        application.setBotToken(botToken);
-                        return application;
-                    }
-                });
-        if (callback != null) {
-            Futures.addCallback(future, callback);
-        }
-        return future;
     }
 
     @Override
@@ -901,38 +713,6 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public Set<String> getUnavailableServers() {
         return unavailableServers;
-    }
-
-    /**
-     * Tries to reconnect to the given gateway.
-     *
-     * @param gateway The gateway to reconnect to.
-     * @param sessionId The sessionId. Can be null if you don't like to resume the connection.
-     * @param lastSeq The last sequence number received. Can be < 0 if you don't like to resume the connection.
-     * @param heartbeatInterval The hearbeat interval from the last connection. Required if we want to resume.
-     */
-    public void reconnectBlocking(String gateway, String sessionId, int lastSeq, long heartbeatInterval) {
-        logger.debug("Trying to reconnect to gateway {}", gateway);
-        socketAdapter.getWebSocket().disconnect();
-        if (token == null || !checkTokenBlocking(token)) {
-            token = requestTokenBlocking();
-        }
-        try {
-            WebSocketFactory factory = new WebSocketFactory();
-            factory.setSSLContext(SSLContext.getDefault());
-
-            socketAdapter = new DiscordWebsocketAdapter(new URI(gateway), this, true, sessionId, lastSeq, heartbeatInterval);
-        } catch (URISyntaxException | NoSuchAlgorithmException e) {
-            logger.warn("Reconnect failed. Please contact the developer!", e);
-            return;
-        }
-        try {
-            if (!socketAdapter.isReady().get()) {
-                throw new IllegalStateException("Socket closed before ready packet was received!");
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            logger.warn("Reconnect failed. Please contact the developer!", e);
-        }
     }
 
     /**
@@ -1135,6 +915,10 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (response.getStatus() == 403) {
             throw new PermissionsException("Missing permissions!" + message);
         }
+        if (response.getStatus() == 429) {
+            // Handled in #checkRateLimit
+            return;
+        }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
             throw new BadResponseException("Received http status code " + response.getStatus() + " with message "
                     + response.getStatusText() + " and body " + response.getBody(), response.getStatus(),
@@ -1148,23 +932,24 @@ public class ImplDiscordAPI implements DiscordAPI {
      * @param response The response to check. Can be <code>null</code>.
      * @param type The type of the rate limit.
      * @param server The server of the rate limit.
+     * @param channel The channel of the rate limit.
      *
      * @throws RateLimitedException if there's a rate limit.
      */
-    public void checkRateLimit(HttpResponse<JsonNode> response, RateLimitType type, Server server)
+    public void checkRateLimit(HttpResponse<JsonNode> response, RateLimitType type, Server server, Channel channel)
             throws RateLimitedException {
-        if (rateLimitManager.isRateLimited(type, server) && type != RateLimitType.UNKNOWN) {
-            long retryAfter = rateLimitManager.getRateLimit(type, server);
+        if (rateLimitManager.isRateLimited(type, server, channel) && type != RateLimitType.UNKNOWN) {
+            long retryAfter = rateLimitManager.getRateLimit(type, server, channel);
             throw new RateLimitedException(
-                    "We are rate limited for " + retryAfter + " ms!", retryAfter, type, server, rateLimitManager);
+                    "We are rate limited for " + retryAfter + " ms!", retryAfter, type, server, channel, rateLimitManager);
         }
-        if (response != null && response.getBody() != null && !response.getBody().isArray()
-                && response.getBody().getObject().has("retry_after")) {
+        // {"global":false,"retry_after":104,"message":"You are being rate limited."}
+        if (response != null && response.getStatus() == 429) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");
-            rateLimitManager.addRateLimit(type, server, retryAfter);
+            rateLimitManager.addRateLimit(type, server, channel, retryAfter);
             throw new RateLimitedException(
                     "We are rate limited for " + retryAfter + " ms (type: " + type.name() + ")!",
-                    retryAfter, type, server, rateLimitManager);
+                    retryAfter, type, server, channel, rateLimitManager);
         }
     }
 

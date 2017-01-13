@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -103,6 +103,27 @@ public interface Role {
      * @return The color of the role.
      */
     public Color getColor();
+
+    /**
+     * Gets whether the role is mentionable or not.
+     *
+     * @return Whether the role is mentionable or not.
+     */
+    public boolean isMentionable();
+
+    /**
+     * Gets whether this role is managed by an integration or not.
+     *
+     * @return Whether this role is managed by an integration or not.
+     */
+    public boolean isManaged();
+
+    /**
+     * Gets the tag used to mention a role.
+     *
+     * @return The tag used to mention a role.
+     */
+    public String getMentionTag();
 
     /**
      * Updates the permissions of this role.

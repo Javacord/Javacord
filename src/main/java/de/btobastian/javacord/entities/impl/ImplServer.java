@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -69,6 +69,8 @@ public class ImplServer implements Server {
     private final ConcurrentHashMap<String, User> members = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Role> roles = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, CustomEmoji> customEmojis = new ConcurrentHashMap<>();
+    // key = user id; value = user nickname
+    private final ConcurrentHashMap<String, String> nicknames = new ConcurrentHashMap<>();
 
     private final String id;
     private String name;
@@ -121,6 +123,9 @@ public class ImplServer implements Server {
         }
         for (int i = 0; i < members.length(); i++) {
             User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
+            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
+                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
+            }
             this.members.put(member.getId(), member);
 
             JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
@@ -173,7 +178,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 api.getServerMap().remove(id);
                 logger.info("Deleted server {}", ImplServer.this);
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
@@ -207,7 +212,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 api.getServerMap().remove(id);
                 logger.info("Left server {}", ImplServer.this);
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
@@ -374,7 +379,7 @@ public class ImplServer implements Server {
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                         Invite[] invites = new Invite[response.getBody().getArray().length()];
                         for (int i = 0; i < response.getBody().getArray().length(); i++) {
                             invites[i] = new ImplInvite(api, response.getBody().getArray().getJSONObject(i));
@@ -406,7 +411,7 @@ public class ImplServer implements Server {
                         .body(new JSONObject().put("roles", roleIds).toString())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 for (final Role role : user.getRoles(ImplServer.this)) {
                     boolean contains = false;
                     for (Role r : roles) {
@@ -489,7 +494,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 final User user = api.getUserById(userId).get();
                 if (user != null) {
                     removeMember(user);
@@ -527,7 +532,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 logger.info("Unbanned an user from server {} (user id: {})", ImplServer.this, userId);
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                     @Override
@@ -567,7 +572,7 @@ public class ImplServer implements Server {
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                         JSONArray bansJson = response.getBody().getArray();
                         Ban[] bans = new Ban[bansJson.length()];
                         for (int i = 0; i < bansJson.length(); i++) {
@@ -599,7 +604,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 final User user = api.getUserById(userId).get();
                 if (user != null) {
                     removeMember(user);
@@ -642,7 +647,7 @@ public class ImplServer implements Server {
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 final Role role = new ImplRole(response.getBody().getObject(), ImplServer.this, api);
                 logger.info("Created role in server {} (name: {}, id: {})",
                         ImplServer.this, role.getName(), role.getId());
@@ -711,7 +716,7 @@ public class ImplServer implements Server {
                         .body(params.toString())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 logger.debug("Updated server {} (new name: {}, old name: {}, new region: {}, old region: {}",
                         ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
                         getRegion().getKey());
@@ -779,7 +784,7 @@ public class ImplServer implements Server {
                 logger.debug("Trying to authorize bot with application id {} and permissions {}",
                         applicationId, permissions);
                 HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/oauth2/authorize?client_id={id}&scope=bot")
+                        .post("https://discordapp.com/api/oauth2/authorize?client_id=" + applicationId + "&scope=bot")
                         .routeParam("id", applicationId)
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
@@ -790,7 +795,7 @@ public class ImplServer implements Server {
                                 .toString())
                         .asJson();
                 api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
                 logger.debug("Authorized bot with application id {} and permissions {}",
                         applicationId, permissions);
                 return null;
@@ -816,6 +821,38 @@ public class ImplServer implements Server {
             }
         }
         return null;
+    }
+
+    @Override
+    public String getNickname(User user) {
+        return nicknames.get(user.getId());
+    }
+
+    @Override
+    public boolean hasNickname(User user) {
+        return nicknames.contains(user.getId());
+    }
+
+    @Override
+    public Future<Void> updateNickname(final User user, final String nickname) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Trying to update nickname of user {} to {}", user, nickname);
+                HttpResponse<JsonNode> response = Unirest
+                        .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" + user.getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                                .put("nick", nickname)
+                                .toString())
+                        .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
+                logger.debug("Updated nickname of user {} to {}", user, nickname);
+                return null;
+            }
+        });
     }
 
     /**
@@ -959,6 +996,20 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the nickname of an user.
+     *
+     * @param user The user.
+     * @param nickname The nickname to set.
+     */
+    public void setNickname(User user, String nickname) {
+        if (nickname == null) {
+            nicknames.remove(user.getId());
+        } else {
+            nicknames.put(user.getId(), nickname);
+        }
+    }
+
+    /**
      * Creates a new channel.
      *
      * @param name The name of the channel.
@@ -975,7 +1026,7 @@ public class ImplServer implements Server {
                 .body(param.toString())
                 .asJson();
         api.checkResponse(response);
-        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this);
+        api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
         if (voice) {
             return new ImplVoiceChannel(response.getBody().getObject(), this, api);
         } else {

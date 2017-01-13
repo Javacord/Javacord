@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -29,7 +29,7 @@ public class Javacord {
     /**
      * The current javacord version.
      */
-    public static final String VERSION = "2.0.13";
+    public static final String VERSION = "2.0.14";
 
     /**
      * The github url of javacord.
@@ -37,19 +37,9 @@ public class Javacord {
     public static final String GITHUB_URL = "https://github.com/BtoBastian/Javacord";
 
     /**
-     * The java version.
-     */
-    public static final String JAVA_VERSION = Runtime.class.getPackage().getImplementationVersion();
-
-    /**
-     * The unirest version of javacord.
-     */
-    public static final String UNIREST_VERSION = "1.4.8";
-
-    /**
      * The user agent used for requests.
      */
-    public static final String USER_AGENT = "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ") Java/" + JAVA_VERSION + " Unirest/" + UNIREST_VERSION;
+    public static final String USER_AGENT = "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")";
 
     static {
         Unirest.setDefaultHeader("User-Agent", USER_AGENT);

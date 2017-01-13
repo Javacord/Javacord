@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -20,6 +20,7 @@ package de.btobastian.javacord.utils.handler.message;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -53,6 +54,13 @@ public class MessageDeleteHandler extends PacketHandler {
         final Message message = api.getMessageById(messageId);
         if (message == null) {
             return; // no cached version available
+        }
+        synchronized (message) {
+            if (message.isDeleted()) {
+                return; // already called listener
+            } else {
+                ((ImplMessage) message).setDeleted(true);
+            }
         }
         listenerExecutorService.submit(new Runnable() {
             @Override

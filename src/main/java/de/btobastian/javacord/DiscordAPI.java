@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -21,6 +21,8 @@ package de.btobastian.javacord;
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
@@ -38,7 +40,7 @@ import java.util.concurrent.Future;
 public interface DiscordAPI {
 
     /**
-     * Connects to the account with the given email and password.
+     * Connects to the account with the given token or email and password.
      *
      * This method is non-blocking.
      *
@@ -48,7 +50,7 @@ public interface DiscordAPI {
     public void connect(FutureCallback<DiscordAPI> callback);
 
     /**
-     * Connects to the account with the given email and password.
+     * Connects to the account with the given token or email and password.
      *
      * This method is blocking! It's recommended to use the non-blocking version which
      * uses a thread from the internal used thread pool to connect.
@@ -436,16 +438,19 @@ public interface DiscordAPI {
     public int getMessageCacheSize();
 
     /**
-     * Tries to close the current connection and connect again.
+     * Gets a new permissions builder with every type set to {@link de.btobastian.javacord.entities.permissions.PermissionState#NONE}
      *
-     * @param callback The callback which will be informed when we receive the ready packet (again).
+     * @return A new permissions builder.
      */
-    public void reconnect(FutureCallback<DiscordAPI> callback);
+    public PermissionsBuilder getPermissionsBuilder();
 
     /**
-     * Tries to close the current connection and connect again.
+     * Gets a new permissions builder.
+     *
+     * @param permissions The permissions which should be copied.
+     * @return A new permissions builder.
      */
-    public void reconnectBlocking();
+    public PermissionsBuilder getPermissionsBuilder(Permissions permissions);
 
     /**
      * Sets whether the api should try to auto-reconnect or not.
@@ -460,99 +465,6 @@ public interface DiscordAPI {
      * @return Whether the api should try to auto-reconnect or not.
      */
     public boolean isAutoReconnectEnabled();
-
-    /**
-     * Gets a collection with all applications you own.
-     *
-     * @return A collection with all applications you own.
-     */
-    public Future<Collection<Application>> getApplications();
-
-    /**
-     * Gets a collection with all applications you own.
-     *
-     * @param callback The callback which will be informed when the request finished.
-     * @return A collection with all applications you own.
-     */
-    public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback);
-
-    /**
-     * Create a new application.
-     *
-     * @param name The name of the application.
-     * @return The created application.
-     */
-    public Future<Application> createApplication(String name);
-
-    /**
-     * Create a new application.
-     *
-     * @param name The name of the application.
-     * @param callback The callback which will be informed when the application was created.
-     * @return The created application.
-     */
-    public Future<Application> createApplication(String name, FutureCallback<Application> callback);
-
-    /**
-     * Gets an application by its id.
-     *
-     * @param id The id of the application.
-     * @return The application with the given id.
-     */
-    public Future<Application> getApplication(String id);
-
-    /**
-     * Gets an application by its id.
-     *
-     * @param id The id of the application.
-     * @param callback The callback which will be informed when the request finished.
-     * @return The application with the given id.
-     */
-    public Future<Application> getApplication(String id, FutureCallback<Application> callback);
-
-    /**
-     * Deletes an application.
-     *
-     * @param id The id of the application.
-     * @return A future which tells us whether the deletion was successful or not.
-     */
-    public Future<Void> deleteApplication(String id);
-
-    /**
-     * Creates a new bot and an application for this bot.
-     *
-     * @param name The name of the bot and application.
-     * @return The application which owns the bot.
-     */
-    public Future<Application> createBot(String name);
-
-    /**
-     * Creates a new bot and an application for this bot.
-     *
-     * @param name The name of the bot and application.
-     * @param callback The callback which will be informed when the bot was created.
-     * @return The application which owns the bot.
-     */
-    public Future<Application> createBot(String name, FutureCallback<Application> callback);
-
-    /**
-     * Creates a new bot for an application.
-     *
-     * @param name The name of the bot.
-     * @param applicationId The id of the application.
-     * @return The application which owns the bot.
-     */
-    public Future<Application> createBot(String name, String applicationId);
-
-    /**
-     * Creates a new bot for an application.
-     *
-     * @param name The name of the bot.
-     * @param applicationId The id of the application.
-     * @param callback The callback which will be informed when the bot was created.
-     * @return The application which owns the bot.
-     */
-    public Future<Application> createBot(String name, String applicationId, FutureCallback<Application> callback);
 
     /**
      * Gets the rate limit manager. This class caches all rate limits of the api.
