@@ -130,7 +130,11 @@ public class AudioConnection {
 			DatagramPacket nextPacket = null;
 			
 			try {
-				if (silenceSent && provider != null && provider.canProvide()) {
+				if (silenceSent && provider != null) {
+					if (!provider.canProvide()) {
+						setSpeaking(false);
+						return null;
+					}
 					silenceCount = -1;
 					byte[] raw = provider.provide();
 					if (raw == null || raw.length == 0) {
@@ -201,6 +205,7 @@ public class AudioConnection {
 	}
 	
 	private void sendSilence() {
+		silenceSent = false;
 		silenceCount = 0;
 	}
 }
