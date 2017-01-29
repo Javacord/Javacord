@@ -329,5 +329,14 @@ public class ImplVoiceChannel implements VoiceChannel {
     public int hashCode() {
         return getId().hashCode();
     }
-
+    
+    @Override
+    public Future<Void> joinVoice() {
+        return getServer().getAudioManager().joinOrMoveVoice(this);
+    }
+    
+    @Override
+    public void leaveVoice() {
+        getServer().getAudioManager().leaveVoice();
+    }
 }

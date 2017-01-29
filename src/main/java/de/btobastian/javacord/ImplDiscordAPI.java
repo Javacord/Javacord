@@ -49,8 +49,11 @@ import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ThreadPool;
+import de.btobastian.javacord.utils.audio.AudioObjFactory;
+import de.btobastian.javacord.utils.audio.ImplAudioManager;
 import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
+import org.apache.http.HttpHost;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -93,6 +96,11 @@ public class ImplDiscordAPI implements DiscordAPI {
     private volatile int messageCacheSize = 200;
 
     private DiscordWebsocketAdapter socketAdapter = null;
+    
+    private AudioObjFactory audioObjFactory = new AudioObjFactory(this);
+    private HttpHost audioProxy = null;
+    
+    private ConcurrentHashMap<String, ImplAudioManager> audioManagers = new ConcurrentHashMap<>();
 
     private RateLimitManager rateLimitManager = new RateLimitManager();
 
@@ -256,7 +264,12 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
         return null;
     }
-
+    
+    @Override
+    public boolean isAudioEnabled() {
+        return ImplAudioManager.audioEnabled();
+    }
+    
     @Override
     public Future<User> getUserById(final String id) {
         User user = users.get(id);
@@ -705,7 +718,12 @@ public class ImplDiscordAPI implements DiscordAPI {
             socketAdapter.getWebSocket().sendClose(1000);
         }
     }
-
+    
+    @Override
+    public void setAudioProxy(HttpHost host) {
+        audioProxy = host;
+    }
+    
     /**
      * Gets a list with all unavailable servers.
      *
@@ -767,6 +785,10 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public DiscordWebsocketAdapter getSocketAdapter() {
         return socketAdapter;
+    }
+    
+    public ConcurrentHashMap<String, ImplAudioManager> getAudioManagers() {
+        return audioManagers;
     }
 
     /**
@@ -978,6 +1000,14 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public void setSocketAdapter(DiscordWebsocketAdapter socketAdapter) {
         this.socketAdapter = socketAdapter;
+    }
+    
+    public AudioObjFactory getAudioObjFactory() {
+        return audioObjFactory;
+    }
+    
+    public HttpHost getAudioProxy() {
+        return audioProxy;
     }
 
 }

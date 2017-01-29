@@ -128,5 +128,9 @@ public interface VoiceChannel {
      * @return A future which tells us whether the update was successful or not.
      */
     public Future<Void> updateName(String newName);
+    
+    public Future<Void> joinVoice();
+    
+    public void leaveVoice();
 
 }

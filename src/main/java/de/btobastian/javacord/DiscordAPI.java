@@ -26,6 +26,7 @@ import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
+import org.apache.http.HttpHost;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -144,6 +145,8 @@ public interface DiscordAPI {
      * @return The voice channel with the given id. <code>Null</code> if no channel with the id was found.
      */
     public VoiceChannel getVoiceChannelById(String id);
+    
+    public boolean isAudioEnabled();
 
     /**
      * Gets an user by its id. It first will check if the user is in the cache. If no user was found in the cache it
@@ -498,5 +501,7 @@ public interface DiscordAPI {
      * After disconnecting you should NOT use this instance again.
      */
     public void disconnect();
+    
+    public void setAudioProxy(HttpHost host);
 
 }
