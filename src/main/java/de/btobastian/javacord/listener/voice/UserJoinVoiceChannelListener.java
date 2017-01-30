@@ -24,7 +24,7 @@ import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.listener.Listener;
 
 /**
- * This listener listens to user game changes.
+ * This listener listens to user join voice channel events.
  */
 public interface UserJoinVoiceChannelListener extends Listener {
 
