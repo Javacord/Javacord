@@ -32,8 +32,8 @@ public interface UserJoinVoiceChannelListener extends Listener {
      * This method is called every time a user connects to a voice channel.
      *
      * @param api The api.
-     * @param user The user.
-     * @param oldGame The old game of the user. May be <code>null</code>.
+     * @param user The user. May be <code>null</code>.
+     * @param channel The voice channel the user joined.
      */
     public void onUserJoinVoiceChannel(DiscordAPI api, User user, VoiceChannel channel);
 

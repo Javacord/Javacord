@@ -32,8 +32,7 @@ public interface UserLeaveVoiceChannelListener extends Listener {
      * This method is called every time a user disconnects from a voice channel.
      *
      * @param api The api.
-     * @param user The user.
-     * @param oldGame The old game of the user. May be <code>null</code>.
+     * @param user The user. May be <code>null</code>.
      */
     public void onUserLeaveVoiceChannel(DiscordAPI api, User user);
 
