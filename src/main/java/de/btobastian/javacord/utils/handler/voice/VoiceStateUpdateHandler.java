@@ -63,7 +63,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 		final User userPassed = user;
 		String channelId = null;
 		try {
-    	channelId = packet.getString("channel_id");
+			channelId = packet.getString("channel_id");
 		} catch (JSONException ignored) {
 		}
     	if (channelId != null) {
