@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -19,6 +19,7 @@
 package de.btobastian.javacord.entities;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.permissions.Ban;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 
@@ -49,17 +50,15 @@ public interface Server {
      * Deletes the server.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Leaves the server.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> leave();
+    public Future<Void> leave();
 
     /**
      * Gets a channel by its id.
@@ -197,27 +196,24 @@ public interface Server {
      * @param user The user.
      * @param roles The roles to set. This will override the existing roles of the user.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateRoles(User user, Role[] roles);
+    public Future<Void> updateRoles(User user, Role[] roles);
 
     /**
      * Bans the given user from the server.
      *
      * @param user The user to ban.
      * @return A future which tells us whether the ban was successful or not.
-     *         If the exception is <code>null</code> the ban was successful.
      */
-    public Future<Exception> banUser(User user);
+    public Future<Void> banUser(User user);
 
     /**
      * Bans the given user from the server.
      *
      * @param userId The id of the user to ban.
      * @return A future which tells us whether the ban was successful or not.
-     *         If the exception is <code>null</code> the ban was successful.
      */
-    public Future<Exception> banUser(String userId);
+    public Future<Void> banUser(String userId);
 
     /**
      * Bans the given user from the server.
@@ -225,9 +221,8 @@ public interface Server {
      * @param user The user to ban.
      * @param deleteDays Deletes all messages of the user which are younger than <code>deleteDays</code> days.
      * @return A future which tells us whether the ban was successful or not.
-     *         If the exception is <code>null</code> the ban was successful.
      */
-    public Future<Exception> banUser(User user, int deleteDays);
+    public Future<Void> banUser(User user, int deleteDays);
 
     /**
      * Bans the given user from the server.
@@ -235,51 +230,47 @@ public interface Server {
      * @param userId The id of the user to ban.
      * @param deleteDays Deletes all messages of the user which are younger than <code>deleteDays</code> days.
      * @return A future which tells us whether the ban was successful or not.
-     *         If the exception is <code>null</code> the ban was successful.
      */
-    public Future<Exception> banUser(String userId, int deleteDays);
+    public Future<Void> banUser(String userId, int deleteDays);
 
     /**
      * Unbans the user from the server.
      *
      * @param userId The id of the user to unban.
      * @return A future which tells us whether the unban was successful or not.
-     *         If the exception is <code>null</code> the unban was successful.
      */
-    public Future<Exception> unbanUser(String userId);
+    public Future<Void> unbanUser(String userId);
 
     /**
-     * Gets an array with all banned users.
+     * Gets an array with all bans.
      *
-     * @return An array with all banned users.
+     * @return An array with all bans.
      */
-    public Future<User[]> getBans();
+    public Future<Ban[]> getBans();
 
     /**
-     * Gets an array with all banned users.
+     * Gets an array with all bans.
      *
      * @param callback The callback which will be informed when the request finished.
-     * @return An array with all banned users.
+     * @return An array with all bans.
      */
-    public Future<User[]> getBans(FutureCallback<User[]> callback);
+    public Future<Ban[]> getBans(FutureCallback<Ban[]> callback);
 
     /**
      * Kicks the given user from the server.
      *
      * @param user The user to kick.
      * @return A future which tells us whether the kick was successful or not.
-     *         If the exception is <code>null</code> the kick was successful.
      */
-    public Future<Exception> kickUser(User user);
+    public Future<Void> kickUser(User user);
 
     /**
      * Kicks the given user from the server.
      *
      * @param userId The id of the user to kick.
      * @return A future which tells us whether the kick was successful or not.
-     *         If the exception is <code>null</code> the kick was successful.
      */
-    public Future<Exception> kickUser(String userId);
+    public Future<Void> kickUser(String userId);
 
     /**
      * Creates a new role.
@@ -303,9 +294,8 @@ public interface Server {
      *
      * @param newName The new name of the server.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateName(String newName);
+    public Future<Void> updateName(String newName);
 
     /**
      * Updates the region of the server.
@@ -314,9 +304,8 @@ public interface Server {
      *
      * @param newRegion The new region of the server.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateRegion(Region newRegion);
+    public Future<Void> updateRegion(Region newRegion);
 
     /**
      * Updates the icon of the server.
@@ -325,9 +314,8 @@ public interface Server {
      *
      * @param newIcon The new icon of the server.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateIcon(BufferedImage newIcon);
+    public Future<Void> updateIcon(BufferedImage newIcon);
 
     /**
      * Updates the server.
@@ -336,9 +324,8 @@ public interface Server {
      * @param newRegion The region of the server. Set it to <code>null</code> if you don't want to change the region.
      * @param newIcon The icon of the server. Set it to <code>null</code> if you don't want to change the icon.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> update(String newName, Region newRegion, BufferedImage newIcon);
+    public Future<Void> update(String newName, Region newRegion, BufferedImage newIcon);
 
     /**
      * Gets the region of the server.
@@ -364,13 +351,26 @@ public interface Server {
     public boolean isLarge();
 
     /**
+     * Gets the id of the server owner.
+     *
+     * @return The id of the server owner.
+     */
+    public String getOwnerId();
+
+    /**
+     * Gets the owner of the server.
+     *
+     * @return A future which contains the owner of the server.
+     */
+    public Future<User> getOwner();
+
+    /**
      * Authorizes a bot to join the server.
      *
      * @param applicationId The id of the bot's application.
      * @return A future which tells us whether the authorization was successful or not.
-     *         If the exception is <code>null</code> the authorization was successful.
      */
-    public Future<Exception> authorizeBot(String applicationId);
+    public Future<Void> authorizeBot(String applicationId);
 
     /**
      * Authorizes a bot to join the server.
@@ -378,8 +378,57 @@ public interface Server {
      * @param applicationId The id of the bot's application.
      * @param permissions The permissions the bot should get on join.
      * @return A future which tells us whether the authorization was successful or not.
-     *         If the exception is <code>null</code> the authorization was successful.
      */
-    public Future<Exception> authorizeBot(String applicationId, Permissions permissions);
+    public Future<Void> authorizeBot(String applicationId, Permissions permissions);
+
+    /**
+     * Gets a collection with all custom emojis on this server.
+     *
+     * @return A collection with all custom emojis on this server.
+     */
+    public Collection<CustomEmoji> getCustomEmojis();
+
+    /**
+     * Gets a custom emoji by its id.
+     *
+     * @param id The id of the emoji.
+     * @return The emoji with the given id.
+     *         <code>Null</code> if the emoji does not exist on this server.
+     */
+    public CustomEmoji getCustomEmojiById(String id);
+
+    /**
+     * Gets a custom emoji by its name.
+     *
+     * @param name The name of the emoji.
+     * @return The emoji with the given name.
+     *         <code>Null</code> if the emoji does not exist on this server.
+     */
+    public CustomEmoji getCustomEmojiByName(String name);
+
+    /**
+     * Gets the nickname of the user on the server.
+     *
+     * @param user The user.
+     * @return The nickname of the user on the server or <code>null</code> if the user has no nick.
+     */
+    public String getNickname(User user);
+
+    /**
+     * Checks if the user has a nickname on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the user has a nickname on the server or not.
+     */
+    public boolean hasNickname(User user);
+
+    /**
+     * Updates the nickname of a user.
+     *
+     * @param user The user to modify.
+     * @param nickname The nickname to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateNickname(User user, String nickname);
 
 }

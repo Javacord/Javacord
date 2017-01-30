@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.utils.ratelimits;
 
+import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.utils.LoggerUtil;
 import org.slf4j.Logger;
@@ -36,17 +37,19 @@ public class RateLimitManager {
 
     // all non-server related limits (e.g. username updates)
     private final HashMap<RateLimitType, Long> rateLimits = new HashMap<>();
-    // all server related limits (e.g. sending messages)
+    // all server related limits
     private final HashMap<Server, HashMap<RateLimitType, Long>> serverRateLimits = new HashMap<>();
+    // all channel related limits
+    private final HashMap<Channel, HashMap<RateLimitType, Long>> channelRateLimits = new HashMap<>();
 
     /**
      * Adds a rate limit for the given type.
      *
      * @param type The type of the rate limit.
-     * @param retryAfter The
+     * @param retryAfter The retryAfter.
      */
     public void addRateLimit(RateLimitType type, long retryAfter) {
-        addRateLimit(type, null, retryAfter);
+        addRateLimit(type, null, null, retryAfter);
     }
 
     /**
@@ -54,16 +57,24 @@ public class RateLimitManager {
      *
      * @param type The type of the rate limit.
      * @param server The server of the rate limit. Can be <code>null</code> for non-server related limits.
-     * @param retryAfter The
+     * @param channel The channel of the rate limit. Can be <code>null</code> for non-channel related limits.
+     * @param retryAfter The retryAfter.
      */
-    public void addRateLimit(RateLimitType type, Server server, long retryAfter) {
-        if (server == null) {
+    public void addRateLimit(RateLimitType type, Server server, Channel channel, long retryAfter) {
+        if (server == null && channel == null) {
             rateLimits.put(type, System.currentTimeMillis() + retryAfter);
-        } else {
+        } else if (channel == null) { // server related
             HashMap<RateLimitType, Long> rateLimits = serverRateLimits.get(server);
             if (rateLimits == null) {
                 rateLimits = new HashMap<>();
                 serverRateLimits.put(server, rateLimits);
+            }
+            rateLimits.put(type, System.currentTimeMillis() + retryAfter);
+        } else { // channel related
+            HashMap<RateLimitType, Long> rateLimits = channelRateLimits.get(channel);
+            if (rateLimits == null) {
+                rateLimits = new HashMap<>();
+                channelRateLimits.put(channel, rateLimits);
             }
             rateLimits.put(type, System.currentTimeMillis() + retryAfter);
         }
@@ -76,7 +87,7 @@ public class RateLimitManager {
      * @return Whether the given type is rate limited or not.
      */
     public boolean isRateLimited(RateLimitType type) {
-        return isRateLimited(type, null);
+        return getRateLimit(type, null, null) > 0;
     }
 
     /**
@@ -87,8 +98,32 @@ public class RateLimitManager {
      * @return Whether the given type is rate limited or not.
      */
     public boolean isRateLimited(RateLimitType type, Server server) {
-        return getRateLimit(type, server) > 0;
+        return getRateLimit(type, server, null) > 0;
     }
+
+    /**
+     * Checks if a {@link RateLimitType} is rate limited.
+     *
+     * @param type The type of the rate limit.
+     * @param channel The channel of the rate limit. Can be <code>null</code> for non-channel related limits.
+     * @return Whether the given type is rate limited or not.
+     */
+    public boolean isRateLimited(RateLimitType type, Channel channel) {
+        return getRateLimit(type, null, channel) > 0;
+    }
+
+    /**
+     * Checks if a {@link RateLimitType} is rate limited.
+     *
+     * @param type The type of the rate limit.
+     * @param server The server of the rate limit. Can be <code>null</code> for non-server related limits.
+     * @param channel The channel of the rate limit. Can be <code>null</code> for non-server related limits.
+     * @return Whether the given type is rate limited or not.
+     */
+    public boolean isRateLimited(RateLimitType type, Server server, Channel channel) {
+        return getRateLimit(type, server, channel) > 0;
+    }
+
 
     /**
      * Gets the rate limit the given type.
@@ -96,25 +131,37 @@ public class RateLimitManager {
      * @return Gets the rate limit of the given type in milliseconds or <code>-1</code> if not limited.
      */
     public long getRateLimit(RateLimitType type) {
-        return getRateLimit(type, null);
+        return getRateLimit(type, null, null);
     }
 
     /**
      * Gets the rate limit the given type.
      * @param type The type of the rate limit.
      * @param server The server of the rate limit. Can be <code>null</code> for non-server related limits.
+     * @param channel The channel of the rate limit. Can be <code>null</code> for non-channel related limits.
      * @return Gets the rate limit of the given type in milliseconds or <code>-1</code> if not limited.
      */
-    public long getRateLimit(RateLimitType type, Server server) {
-        if (server == null) { // non-server related
+    public long getRateLimit(RateLimitType type, Server server, Channel channel) {
+        if (server == null && channel == null) { // non-server related
             Long retryAt = rateLimits.get(type);
             if (retryAt == null) {
                 return -1;
             }
             long retryAfter = retryAt - System.currentTimeMillis();
             return retryAfter <= 0 ? -1 : retryAfter;
-        } else { // server related
+        } else if (channel == null ){ // server related
             HashMap<RateLimitType, Long> rateLimits = serverRateLimits.get(server);
+            if (rateLimits == null) {
+                return -1;
+            }
+            Long retryAt = rateLimits.get(type);
+            if (retryAt == null) {
+                return -1;
+            }
+            long retryAfter = retryAt - System.currentTimeMillis();
+            return retryAfter <= 0 ? -1 : retryAfter;
+        } else { // channel related
+            HashMap<RateLimitType, Long> rateLimits = channelRateLimits.get(channel);
             if (rateLimits == null) {
                 return -1;
             }

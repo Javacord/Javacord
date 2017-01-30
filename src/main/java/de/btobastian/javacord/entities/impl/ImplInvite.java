@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -227,7 +227,7 @@ public class ImplInvite implements Invite {
     }
 
     @Override
-    public Future<Exception> delete() {
+    public Future<Void> delete() {
         return api.deleteInvite(getCode());
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.exceptions;
 
+import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
@@ -30,6 +31,7 @@ public class RateLimitedException extends Exception {
     private final long retryAfter;
     private final RateLimitType type;
     private final Server server;
+    private final Channel channel;
     private final RateLimitManager manager;
 
     /**
@@ -40,11 +42,12 @@ public class RateLimitedException extends Exception {
      * @param server The server of the rate limit. Can be <code>null</code> for non-server related limits.
      * @param manager The rate limit manager.
      */
-    public RateLimitedException(String message, long retryAfter, RateLimitType type, Server server, RateLimitManager manager) {
+    public RateLimitedException(String message, long retryAfter, RateLimitType type, Server server, Channel channel, RateLimitManager manager) {
         super(message);
         this.retryAfter = retryAfter;
         this.type = type;
         this.server = server;
+        this.channel = channel;
         this.manager = manager;
     }
 
@@ -83,14 +86,14 @@ public class RateLimitedException extends Exception {
      * @return The calculated time when we can send a new message.
      */
     public long getRetryAt() {
-        return System.currentTimeMillis() +  manager.getRateLimit(type, server);
+        return System.currentTimeMillis() +  manager.getRateLimit(type, server, channel);
     }
 
     /**
      * Causes the current thread to wait until we can retry the request.
      */
     public void waitTillRetry() throws InterruptedException {
-        long time = manager.getRateLimit(type, server);
+        long time = manager.getRateLimit(type, server, channel);
         if (time < 1) {
             return;
         }

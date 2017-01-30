@@ -1,6 +1,5 @@
-# Javacord
-A simple library to create a discord bot.
-Supports the new application system!
+# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-2.0.14-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
+A multithreaded but simple to use library to create a Discord bot in Java.
 
 ##  Maven
 ```xml
@@ -12,7 +11,7 @@ Supports the new application system!
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.11</version>
+  <version>2.0.14</version>
    <!-- This will use the shaded javacord which contains all required dependencies -->
   <classifier>shaded</classifier>
 </dependency>
@@ -20,7 +19,7 @@ Supports the new application system!
 <dependency>
   <groupId>ch.qos.logback</groupId>
   <artifactId>logback-classic</artifactId>
-  <version>1.0.13</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 
@@ -65,7 +64,7 @@ import de.btobastian.javacord.listener.message.MessageCreateListener;
 public class MyPingPongBot {
 
     public MyPingPongBot(String token) {
-        // Get the token from here: https://discordapp.com/developers/applications/me
+        // See "How to get the token" below
         DiscordAPI api = Javacord.getApi(token, true);
         // connect
         api.connect(new FutureCallback<DiscordAPI>() {
@@ -94,6 +93,32 @@ public class MyPingPongBot {
 }
 ```
 More examples can be found in the wiki: [Examples](https://github.com/BtoBastian/Javacord/wiki/Examples)
+
+## How to get the token
+
+**1.** Open https://discordapp.com/developers/applications/me and click on "New App".
+
+**2.** Enter a name for your bot and click "Create App"
+
+**3.** Click on "Create a Bot user"
+
+**4.** Reveal the bot's token. This token is used to login your bot.
+
+>![](http://i.imgur.com/EbexbiD.gif)
+
+## How to add a bot to your server
+
+In order to add a bot to your server you need it's client id.
+
+You can get your client id from the [same page](https://discordapp.com/developers/applications/me) where you created it. 
+
+>![](http://i.imgur.com/qzPDsp2.png)
+
+With this id you can create an invite link for your bot:
+
+**https://discordapp.com/api/oauth2/authorize?client_id=123456789&scope=bot&permissions=0**
+
+If you are the owner or admin of the server you can use this link to add your bot to your server. Otherwise you have to give the link to the server owner/admin and ask him to add your bot.
 
 ## Command Framework
 

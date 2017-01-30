@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -114,7 +114,7 @@ public class ImplInviteBuilder implements InviteBuilder {
                                 .body(jsonParam.toString())
                                 .asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                        api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
                         JSONObject data = response.getBody().getObject();
                         logger.debug("Created invite for channel {} (max uses: {}, temporary: {}, max age: {}",
                                 textChannel == null ? voiceChannel : textChannel, maxUses, temporary,

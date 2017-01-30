@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -33,6 +33,7 @@ import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -48,9 +49,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -86,11 +85,17 @@ public class ImplUser implements User {
         this.api = api;
 
         id = data.getString("id");
-        name = data.getString("username");
+        if (data.has("username")) {
+            name = data.getString("username");
+        }
         try {
             avatarId = data.getString("avatar");
         } catch (JSONException ignored) { }
-        discriminator = data.getString("discriminator");
+        if (data.has("discriminator")) {
+            discriminator = data.getString("discriminator");
+        } else {
+            discriminator = null;
+        }
         bot = data.has("bot") && data.getBoolean("bot");
 
         api.getUserMap().put(id, this);
@@ -107,6 +112,21 @@ public class ImplUser implements User {
     }
 
     @Override
+    public String getNickname(Server server) {
+        return server.getNickname(this);
+    }
+
+    @Override
+    public boolean hasNickname(Server server) {
+        return server.hasNickname(this);
+    }
+
+    @Override
+    public Future<Void> updateNickname(Server server, String nickname) {
+        return server.updateNickname(this, nickname);
+    }
+
+    @Override
     public void type() {
         if (userChannelId == null) {
             return;
@@ -118,7 +138,7 @@ public class ImplUser implements User {
                     .header("authorization", api.getToken())
                     .asJson();
             api.checkResponse(response);
-            api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+            api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
             logger.debug("Sent typing state to user {}", this);
         } catch (Exception e) {
             e.printStackTrace();
@@ -216,21 +236,81 @@ public class ImplUser implements User {
 
     @Override
     public Future<Message> sendMessage(String content) {
-        return sendMessage(content, false);
+        return sendMessage(content, null, false, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, String nonce) {
+        return sendMessage(content, null, false, nonce, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, boolean tts) {
-        return sendMessage(content, tts, null);
+        return sendMessage(content, null, tts, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, String nonce) {
+        return sendMessage(content, null, tts, nonce, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed) {
+        return sendMessage(content, embed, false, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, String nonce) {
+        return sendMessage(content, embed, false, nonce, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts) {
+        return sendMessage(content, embed, tts, null, null);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
+        return sendMessage(content, embed, tts, nonce, null);
     }
 
     @Override
     public Future<Message> sendMessage(String content, FutureCallback<Message> callback) {
-        return sendMessage(content, false, callback);
+        return sendMessage(content, null, false, null, callback);
     }
 
     @Override
-    public Future<Message> sendMessage(final String content, final boolean tts, FutureCallback<Message> callback) {
+    public Future<Message> sendMessage(String content, String nonce, FutureCallback<Message> callback) {
+        return sendMessage(content, null, false, nonce, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, null, tts, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, boolean tts, String nonce, FutureCallback<Message> callback) {
+        return sendMessage(content, null, tts, nonce, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, FutureCallback<Message> callback) {
+        return sendMessage(content, embed, false, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, String nonce, FutureCallback<Message> callback) {
+        return sendMessage(content, embed, false, nonce, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback) {
+        return sendMessage(content, embed, tts, null, callback);
+    }
+
+    @Override
+    public Future<Message> sendMessage(final String content, final EmbedBuilder embed, final boolean tts, final String nonce, FutureCallback<Message> callback) {
         final MessageReceiver receiver = this;
         ListenableFuture<Message> future =
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
@@ -238,19 +318,26 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send message to user {} (content: \"{}\", tts: {})",
                                 ImplUser.this, content, tts);
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
+                        JSONObject body = new JSONObject()
+                                .put("content", content)
+                                .put("tts", tts)
+                                .put("mentions", new String[0]);
+                        if (embed != null) {
+                            body.put("embed", embed.toJSONObject());
+                        }
+                        if (nonce != null) {
+                            body.put("nonce", nonce);
+                        }
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/"
                                         + getUserChannelIdBlocking() + "/messages")
                                         .header("authorization", api.getToken())
                                         .header("content-type", "application/json")
-                                        .body(new JSONObject()
-                                                .put("content", content)
-                                                .put("tts", tts)
-                                                .put("mentions", new String[0]).toString())
+                                        .body(body.toString())
                                         .asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                         logger.debug("Sent message to user {} (content: \"{}\", tts: {})", ImplUser.this, content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -295,7 +382,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send a file to user {} (name: {}, comment: {})",
                                 ImplUser.this, file.getName(), comment);
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
                                 .header("authorization", api.getToken())
@@ -305,7 +392,7 @@ public class ImplUser implements User {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                         logger.debug("Sent a file to user {} (name: {}, comment: {})",
                                 ImplUser.this, file.getName(), comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
@@ -332,7 +419,7 @@ public class ImplUser implements User {
                     public Message call() throws Exception {
                         logger.debug("Trying to send an input stream to user {} (comment: {})",
                                 ImplUser.this, comment);
-                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
                         MultipartBody body = Unirest
                                 .post("https://discordapp.com/api/channels/" + getUserChannelIdBlocking() + "/messages")
                                 .header("authorization", api.getToken())
@@ -342,7 +429,7 @@ public class ImplUser implements User {
                         }
                         HttpResponse<JsonNode> response = body.asJson();
                         api.checkResponse(response);
-                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null);
+                        api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
                         logger.debug("Sent an input stream to user {} (comment: {})", ImplUser.this, comment);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
@@ -512,7 +599,7 @@ public class ImplUser implements User {
                     .body(new JSONObject().put("recipient_id", id).toString())
                     .asJson();
             api.checkResponse(response);
-            api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+            api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
             userChannelId = response.getBody().getObject().getString("id");
             logger.debug("Got channel id of user {} (channel id: {})", ImplUser.this, userChannelId);
             return userChannelId;

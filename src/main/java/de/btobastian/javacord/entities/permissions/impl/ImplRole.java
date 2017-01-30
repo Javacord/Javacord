@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -66,6 +66,8 @@ public class ImplRole implements Role {
     private int position;
     private Color color;
     private boolean hoist;
+    private boolean mentionable;
+    private boolean managed;
 
     private final List<User> users = new ArrayList<>();
 
@@ -86,6 +88,8 @@ public class ImplRole implements Role {
         position = data.getInt("position");
         color = new Color(data.getInt("color"));
         hoist = data.getBoolean("hoist");
+        mentionable = data.getBoolean("mentionable");
+        managed = data.getBoolean("managed");
 
         server.addRole(this);
     }
@@ -149,27 +153,42 @@ public class ImplRole implements Role {
     }
 
     @Override
-    public Future<Exception> updatePermissions(Permissions permissions) {
+    public boolean isMentionable() {
+        return mentionable;
+    }
+
+    @Override
+    public boolean isManaged() {
+        return managed;
+    }
+
+    @Override
+    public String getMentionTag() {
+        return "<@&" + getId() + ">";
+    }
+
+    @Override
+    public Future<Void> updatePermissions(Permissions permissions) {
         return update(name, color, hoist, permissions);
     }
 
     @Override
-    public Future<Exception> updateName(String name) {
+    public Future<Void> updateName(String name) {
         return update(name, color, hoist, permissions);
     }
 
     @Override
-    public Future<Exception> updateColor(Color color) {
+    public Future<Void> updateColor(Color color) {
         return update(name, color, hoist, permissions);
     }
 
     @Override
-    public Future<Exception> updateHoist(boolean hoist) {
+    public Future<Void> updateHoist(boolean hoist) {
         return update(name, color, hoist, permissions);
     }
 
     @Override
-    public Future<Exception> update(String name, Color color, boolean hoist, Permissions permissions) {
+    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions) {
         if (name == null) {
             name = getName();
         }
@@ -191,160 +210,119 @@ public class ImplRole implements Role {
      * @param allow The new permissions of the role.
      * @return A future.
      */
-    private Future<Exception> update(final String name, final int color, final boolean hoist, final int allow) {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+    private Future<Void> update(final String name, final int color, final boolean hoist, final int allow) {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
+            public Void call() throws Exception {
                 logger.debug("Trying to update role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
                         " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
                         ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
                         hoist, getHoist(), allow, permissions.getAllowed());
-                try {
-                    HttpResponse<JsonNode> response = Unirest
-                            .patch("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
-                            .header("authorization", api.getToken())
-                            .header("Content-Type", "application/json")
-                            .body(new JSONObject()
-                                    .put("name", name)
-                                    .put("color", color & 0xFFFFFF)
-                                    .put("hoist", hoist)
-                                    .put("permissions", allow).toString())
-                            .asJson();
-                    api.checkResponse(response);
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, null);
+                HttpResponse<JsonNode> response = Unirest
+                        .patch("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                                .put("name", name)
+                                .put("color", color & 0xFFFFFF)
+                                .put("hoist", hoist)
+                                .put("permissions", allow).toString())
+                        .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
 
-                    logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
-                            " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
-                            ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
-                            hoist, getHoist(), allow, permissions.getAllowed());
-                    // update permissions
-                    if (ImplRole.this.permissions.getAllowed() != allow) {
-                        final ImplPermissions oldPermissions = ImplRole.this.permissions;
-                        ImplRole.this.permissions = new ImplPermissions(allow);
-                        // call listener
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<RoleChangePermissionsListener> listeners =
-                                        api.getListeners(RoleChangePermissionsListener.class);
-                                synchronized (listeners) {
-                                    for (RoleChangePermissionsListener listener : listeners) {
-                                        try {
-                                            listener.onRoleChangePermissions(api, ImplRole.this, oldPermissions);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in RoleChangePermissionsListener!", t);
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-
-                    // update name
-                    if (ImplRole.this.name.equals(name)) {
-                        final String oldName = ImplRole.this.name;
-                        ImplRole.this.name = name;
-                        // call listener
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<RoleChangeNameListener> listeners = api.getListeners(RoleChangeNameListener.class);
-                                synchronized (listeners) {
-                                    for (RoleChangeNameListener listener : listeners) {
-                                        try {
-                                            listener.onRoleChangeName(api, ImplRole.this, oldName);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in RoleChangeNameListener!", t);
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-
-                    // update color
-                    if (ImplRole.this.color.getRGB() != new Color(color).getRGB()) {
-                        final Color oldColor = ImplRole.this.color;
-                        ImplRole.this.color = new Color(color);
-                        // call listener
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<RoleChangeColorListener> listeners =
-                                        api.getListeners(RoleChangeColorListener.class);
-                                synchronized (listeners) {
-                                    for (RoleChangeColorListener listener : listeners) {
-                                        try {
-                                            listener.onRoleChangeColor(api, ImplRole.this, oldColor);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in RoleChangeColorListener!", t);
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-
-                    // update hoist
-                    if (ImplRole.this.hoist != hoist) {
-                        ImplRole.this.hoist = hoist;
-                        // call listener
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<RoleChangeHoistListener> listeners =
-                                        api.getListeners(RoleChangeHoistListener.class);
-                                synchronized (listeners) {
-                                    for (RoleChangeHoistListener listener : listeners) {
-                                        try {
-                                            listener.onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in RoleChangeHoistListener!", t);
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    return null;
-                } catch (Exception e) {
-                    return e;
-                }
-            }
-        });
-    }
-
-    @Override
-    public Future<Exception> delete() {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
-            @Override
-            public Exception call() throws Exception {
-                try {
-                    logger.debug("Trying to delete role {}", ImplRole.this);
-                    HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
-                            .header("authorization", api.getToken())
-                            .asJson();
-                    api.checkResponse(response);
-                    server.removeRole(ImplRole.this);
-                    logger.info("Deleted role {}", ImplRole.this);
+                logger.info("Updated role {} (new name: {}, old name: {}, new color: {}, old color: {}," +
+                                " new hoist: {}, old hoist: {}, new allow: {}, old allow: {})",
+                        ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
+                        hoist, getHoist(), allow, permissions.getAllowed());
+                // update permissions
+                if (ImplRole.this.permissions.getAllowed() != allow) {
+                    final ImplPermissions oldPermissions = ImplRole.this.permissions;
+                    ImplRole.this.permissions = new ImplPermissions(allow);
+                    // call listener
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
-                            List<RoleDeleteListener> listeners = api.getListeners(RoleDeleteListener.class);
+                            List<RoleChangePermissionsListener> listeners =
+                                    api.getListeners(RoleChangePermissionsListener.class);
                             synchronized (listeners) {
-                                for (RoleDeleteListener listener : listeners) {
+                                for (RoleChangePermissionsListener listener : listeners) {
                                     try {
-                                        listener.onRoleDelete(api, ImplRole.this);
+                                        listener.onRoleChangePermissions(api, ImplRole.this, oldPermissions);
                                     } catch (Throwable t) {
-                                        logger.warn("Uncaught exception in RoleDeleteListener!", t);
+                                        logger.warn("Uncaught exception in RoleChangePermissionsListener!", t);
                                     }
                                 }
                             }
                         }
                     });
-                } catch (Exception e) {
-                    return e;
+                }
+
+                // update name
+                if (ImplRole.this.name.equals(name)) {
+                    final String oldName = ImplRole.this.name;
+                    ImplRole.this.name = name;
+                    // call listener
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<RoleChangeNameListener> listeners = api.getListeners(RoleChangeNameListener.class);
+                            synchronized (listeners) {
+                                for (RoleChangeNameListener listener : listeners) {
+                                    try {
+                                        listener.onRoleChangeName(api, ImplRole.this, oldName);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in RoleChangeNameListener!", t);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // update color
+                if (ImplRole.this.color.getRGB() != new Color(color).getRGB()) {
+                    final Color oldColor = ImplRole.this.color;
+                    ImplRole.this.color = new Color(color);
+                    // call listener
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<RoleChangeColorListener> listeners =
+                                    api.getListeners(RoleChangeColorListener.class);
+                            synchronized (listeners) {
+                                for (RoleChangeColorListener listener : listeners) {
+                                    try {
+                                        listener.onRoleChangeColor(api, ImplRole.this, oldColor);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in RoleChangeColorListener!", t);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // update hoist
+                if (ImplRole.this.hoist != hoist) {
+                    ImplRole.this.hoist = hoist;
+                    // call listener
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<RoleChangeHoistListener> listeners =
+                                    api.getListeners(RoleChangeHoistListener.class);
+                            synchronized (listeners) {
+                                for (RoleChangeHoistListener listener : listeners) {
+                                    try {
+                                        listener.onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in RoleChangeHoistListener!", t);
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
                 return null;
             }
@@ -352,14 +330,47 @@ public class ImplRole implements Role {
     }
 
     @Override
-    public Future<Exception> removeUser(User user) {
+    public Future<Void> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Trying to delete role {}", ImplRole.this);
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                server.removeRole(ImplRole.this);
+                logger.info("Deleted role {}", ImplRole.this);
+                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<RoleDeleteListener> listeners = api.getListeners(RoleDeleteListener.class);
+                        synchronized (listeners) {
+                            for (RoleDeleteListener listener : listeners) {
+                                try {
+                                    listener.onRoleDelete(api, ImplRole.this);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in RoleDeleteListener!", t);
+                                }
+                            }
+                        }
+                    }
+                });
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> removeUser(User user) {
         List<Role> roles = new ArrayList<>(user.getRoles(getServer()));
         roles.remove(this);
         return getServer().updateRoles(user, roles.toArray(new Role[roles.size()]));
     }
 
     @Override
-    public Future<Exception> addUser(User user) {
+    public Future<Void> addUser(User user) {
         List<Role> roles = new ArrayList<>(user.getRoles(getServer()));
         roles.add(this);
         return getServer().updateRoles(user, roles.toArray(new Role[roles.size()]));

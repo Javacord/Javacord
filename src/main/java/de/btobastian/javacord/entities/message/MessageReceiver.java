@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -19,6 +19,7 @@
 package de.btobastian.javacord.entities.message;
 
 import com.google.common.util.concurrent.FutureCallback;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 
 import java.io.File;
 import java.io.InputStream;
@@ -50,10 +51,69 @@ public interface MessageReceiver {
      * Sends a message with the given content.
      *
      * @param content The content of the message.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, String nonce);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
      * @param tts Whether the message should be tts or not.
      * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
      */
     public Future<Message> sendMessage(String content, boolean tts);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param tts Whether the message should be tts or not.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, boolean tts, String nonce);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, String nonce);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce);
 
     /**
      * Sends a message with the given content.
@@ -68,6 +128,16 @@ public interface MessageReceiver {
      * Sends a message with the given content.
      *
      * @param content The content of the message.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, String nonce, FutureCallback<Message> callback);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
      * @param tts Whether the message should be tts or not.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
@@ -75,7 +145,62 @@ public interface MessageReceiver {
     public Future<Message> sendMessage(String content, boolean tts, FutureCallback<Message> callback);
 
     /**
-     * Uploads a file.
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param tts Whether the message should be tts or not.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, boolean tts, String nonce, FutureCallback<Message> callback);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, FutureCallback<Message> callback);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, String nonce, FutureCallback<Message> callback);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, FutureCallback<Message> callback);
+
+    /**
+     * Sends a message with the given content.
+     *
+     * @param content The content of the message.
+     * @param embed An embed that should be added to the message.
+     * @param tts Whether the message should be tts or not.
+     * @param nonce The nonce can be used for validating a message was sent.
+     * @param callback The callback which will be informed when the message was sent or sending failed.
+     * @return The sent message. Canceled if something didn't work (e.g. missing permissions).
+     */
+    public Future<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce, FutureCallback<Message> callback);
+
+    /**
+     * Sendss a file.
      *
      * @param file The file to upload.
      * @return The sent message containing the file. Canceled if something didn't work (e.g. missing permissions).
@@ -83,7 +208,7 @@ public interface MessageReceiver {
     public Future<Message> sendFile(File file);
 
     /**
-     * Uploads a file.
+     * Sends a file.
      *
      * @param file The file to upload.
      * @param callback The callback which will be informed when the file was uploaded or upload failed.
@@ -92,7 +217,7 @@ public interface MessageReceiver {
     public Future<Message> sendFile(File file, FutureCallback<Message> callback);
 
     /**
-     * Replies with a file.
+     * Sends a file.
      *
      * @param inputStream An input stream.
      * @param filename The name of the file.
@@ -101,7 +226,7 @@ public interface MessageReceiver {
     public Future<Message> sendFile(InputStream inputStream, String filename);
 
     /**
-     * Replies with a file.
+     * Sends a file.
      *
      * @param inputStream An input stream.
      * @param filename The name of the file.
@@ -111,7 +236,7 @@ public interface MessageReceiver {
     public Future<Message> sendFile(InputStream inputStream, String filename, FutureCallback<Message> callback);
 
     /**
-     * Replies with a file and comment.
+     * Sends a file with a comment.
      *
      * @param file The file to upload.
      * @param comment An additional comment to your file.
@@ -120,7 +245,7 @@ public interface MessageReceiver {
     public Future<Message> sendFile(File file, String comment);
 
     /**
-     * Replies with a file and comment.
+     * Sends a file with a comment.
      *
      * @param file The file to upload.
      * @param comment An additional comment to your file.
@@ -130,7 +255,7 @@ public interface MessageReceiver {
     public Future<Message> sendFile(File file, String comment, FutureCallback<Message> callback);
 
     /**
-     * Replies with a file and comment.
+     * Sends a file with a comment.
      *
      * @param inputStream An input stream.
      * @param filename The name of the file.
@@ -140,7 +265,7 @@ public interface MessageReceiver {
     public Future<Message> sendFile(InputStream inputStream, String filename, String comment);
 
     /**
-     * Replies with a file and comment.
+     * Sends a file with a comment.
      *
      * @param inputStream An input stream.
      * @param filename The name of the file.

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.btobastian.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>2.0.11</version>
+    <version>2.0.14</version>
     <name>Javacord</name>
     <description>A multithreaded but simple to use discord java api.</description>
 
@@ -25,28 +25,28 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>20.0</version>
         </dependency>
 
         <!-- Unirest for REST-calls -->
         <dependency>
             <groupId>com.mashape.unirest</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>1.4.8</version>
+            <version>1.4.9</version>
         </dependency>
 
         <!-- The WebSocket -->
         <dependency>
             <groupId>com.neovisionaries</groupId>
             <artifactId>nv-websocket-client</artifactId>
-            <version>1.22</version>
+            <version>1.31</version>
         </dependency>
 
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.18</version>
+            <version>1.7.22</version>
         </dependency>
     </dependencies>
 

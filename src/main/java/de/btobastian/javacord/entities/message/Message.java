@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -20,7 +20,11 @@ package de.btobastian.javacord.entities.message;
 
 import com.google.common.util.concurrent.FutureCallback;
 import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.CustomEmoji;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.permissions.Role;
 
 import java.io.File;
 import java.io.InputStream;
@@ -94,6 +98,13 @@ public interface Message extends Comparable<Message> {
     public List<User> getMentions();
 
     /**
+     * Gets all mentioned roles.
+     *
+     * @return A list with all mentioned roles.
+     */
+    public List<Role> getMentionedRoles();
+
+    /**
      * Checks if the message is tts.
      *
      * @return Whether the message is tts or not.
@@ -101,12 +112,39 @@ public interface Message extends Comparable<Message> {
     public boolean isTts();
 
     /**
+     * The nonce can be used for validating a message was sent.
+     *
+     * @return The nonce of the message. May be <code>null</code>.
+     */
+    public String getNonce();
+
+    /**
+     * Checks if the message mentions everyone.
+     *
+     * @return Whether the message message mentions everyone or not.
+     */
+    public boolean isMentioningEveryone();
+
+    /**
+     * Checks if the message is pinned.
+     *
+     * @return Whether the message is pinned or not.
+     */
+    public boolean isPinned();
+
+    /**
      * Deletes the message.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
+
+    /**
+     * Checks if the message is deleted.
+     *
+     * @return Whether the message is deleted or not.
+     */
+    public boolean isDeleted();
 
     /**
      * Gets the attachments of a message.
@@ -127,10 +165,10 @@ public interface Message extends Comparable<Message> {
      * Replies to the message with the given content.
      *
      * @param content The content of the message.
-     * @param tts Whether the message should be tts or not.
+     * @param embed An embed that should be added to the message.
      * @return The sent message.
      */
-    public Future<Message> reply(String content, boolean tts);
+    public Future<Message> reply(String content, EmbedBuilder embed);
 
     /**
      * Replies to the message with the given content.
@@ -145,88 +183,11 @@ public interface Message extends Comparable<Message> {
      * Replies to the message with the given content.
      *
      * @param content The content of the message.
-     * @param tts Whether the message should be tts or not.
+     * @param embed An embed that should be added to the message.
      * @param callback The callback which will be informed when the message was sent or sending failed.
      * @return The sent message.
      */
-    public Future<Message> reply(String content, boolean tts, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file.
-     *
-     * @param file The file to upload.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file);
-
-    /**
-     * Replies with a file.
-     *
-     * @param file The file to upload.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename);
-
-    /**
-     * Replies with a file.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param file The file to upload.
-     * @param comment An additional comment to your file.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file, String comment);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param file The file to upload.
-     * @param comment An additional comment to your file.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(File file, String comment, FutureCallback<Message> callback);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @param comment An additional comment to your file.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename, String comment);
-
-    /**
-     * Replies with a file and comment.
-     *
-     * @param inputStream An input stream.
-     * @param filename The name of the file.
-     * @param comment An additional comment to your file.
-     * @param callback The callback which will be informed when the file was uploaded or upload failed.
-     * @return The sent message containing the file.
-     */
-    public Future<Message> replyFile(InputStream inputStream, String filename, String comment,
-                                     FutureCallback<Message> callback);
+    public Future<Message> reply(String content, EmbedBuilder embed, FutureCallback<Message> callback);
 
     /**
      * Gets the date of creation.
@@ -240,8 +201,46 @@ public interface Message extends Comparable<Message> {
      *
      * @param content The new content of the message.
      * @return A future which tells us if the edit was successful or not.
-     *         If the exception is <code>null</code> the edit was successful.
      */
-    public Future<Exception> edit(String content);
+    public Future<Void> edit(String content);
+
+    /**
+     * Gets a collection with all embeds.
+     *
+     * @return A collection with all embeds.
+     */
+    public Collection<Embed> getEmbeds();
+
+    /**
+     * Adds an unicode emoji to the message.
+     * <p>
+     * It's recommended to use an emoji java library (e.g. https://github.com/vdurmont/emoji-java).
+     *
+     * @param unicodeEmoji The emoji to add.
+     * @return A future which tells us if the adding was successful or not.
+     */
+    public Future<Void> addUnicodeReaction(String unicodeEmoji);
+
+    /**
+     * Adds an custom emoji to the message.
+     *
+     * @param emoji The emoji to add.
+     * @return A future which tells us if the adding was successful or not.
+     */
+    public Future<Void> addCustomEmojiReaction(CustomEmoji emoji);
+
+    /**
+     * Gets a list with all reactions.
+     *
+     * @return A list with all reactions.
+     */
+    public List<Reaction> getReactions();
+
+    /**
+     * Removes all reactions from the message.
+     *
+     * @return A future which tells us if the removal was successful.
+     */
+    public Future<Void> removeAllReactions();
 
 }

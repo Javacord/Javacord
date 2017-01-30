@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -22,6 +22,7 @@ import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listener.server.ServerChangeNameListener;
+import de.btobastian.javacord.listener.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listener.server.ServerChangeRegionListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -91,6 +92,27 @@ public class GuildUpdateHandler extends PacketHandler {
                                 listener.onServerChangeRegion(api, server, oldRegion);
                             } catch (Throwable t) {
                                 logger.warn("Uncaught exception in ServerChangeRegionListener!", t);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        String ownerId = packet.getString("owner_id");
+        if (!server.getOwnerId().equals(ownerId)) {
+            final String oldOwnerId = server.getOwnerId();
+            server.setOwnerId(ownerId);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<ServerChangeOwnerListener> listeners = api.getListeners(ServerChangeOwnerListener.class);
+                    synchronized (listeners) {
+                        for (ServerChangeOwnerListener listener : listeners) {
+                            try {
+                                listener.onServerChangeOwner(api, server, oldOwnerId);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ServerChangeOwnerListener!", t);
                             }
                         }
                     }

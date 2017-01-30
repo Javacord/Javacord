@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -68,9 +69,8 @@ public interface Channel extends MessageReceiver {
      * Deletes the channel.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Gets an invite builder.
@@ -97,15 +97,48 @@ public interface Channel extends MessageReceiver {
     public Permissions getOverwrittenPermissions(Role role);
 
     /**
+     * Updates the permissions of the given role.
+     *
+     * @param role The role to update.
+     * @param permissions The permissions to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateOverwrittenPermissions(Role role, Permissions permissions);
+
+    /**
+     * Updates the permissions of the given user.
+     *
+     * @param user The user to update.
+     * @param permissions The permissions to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateOverwrittenPermissions(User user, Permissions permissions);
+
+    /**
+     * Deletes the overwritten permissions of the given role.
+     *
+     * @param role The role to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> deleteOverwrittenPermissions(Role role);
+
+    /**
+     * Deletes the overwritten permissions of the given user.
+     *
+     * @param user The user to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> deleteOverwrittenPermissions(User user);
+
+    /**
      * Updates the name of the channel.
      * If you want to update the topic, too, use {@link #update(String, String)}.
      * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
      *
      * @param newName The new name of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateName(String newName);
+    public Future<Void> updateName(String newName);
 
     /**
      * Updates the topic of the channel.
@@ -114,9 +147,8 @@ public interface Channel extends MessageReceiver {
      *
      * @param newTopic The new topic of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateTopic(String newTopic);
+    public Future<Void> updateTopic(String newTopic);
 
     /**
      * Updates the channel.
@@ -124,9 +156,8 @@ public interface Channel extends MessageReceiver {
      * @param newName The new name of the channel.
      * @param newTopic The new topic of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> update(String newName, String newTopic);
+    public Future<Void> update(String newName, String newTopic);
 
     /**
      * Gets the tag which is used to mention the channel.
@@ -134,5 +165,23 @@ public interface Channel extends MessageReceiver {
      * @return Gets the tag which is used to mention the channel.
      */
     public String getMentionTag();
+
+    /**
+     * Deletes multiple messages at once.
+     *
+     * @param messages The messages to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> bulkDelete(String... messages);
+
+    /**
+     * Deletes multiple messages at once.
+     * <p>
+     * Note: You can only bulk delete 2-100 messages.
+     *
+     * @param messages The messages to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> bulkDelete(Message... messages);
 
 }

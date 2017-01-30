@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -27,11 +27,10 @@ public enum PermissionType {
     CREATE_INSTANT_INVITE(0),
     KICK_MEMBERS(1),
     BAN_MEMBERS(2),
-    MANAGE_ROLES(3),
-    MANAGE_PERMISSIONS(3),
+    ADMINISTRATOR(3),
     MANAGE_CHANNELS(4),
-    MANAGE_CHANNEL(4),
     MANAGE_SERVER(5),
+    ADD_REACTIONS(6),
 
     // chat
     READ_MESSAGES(10),
@@ -42,6 +41,7 @@ public enum PermissionType {
     ATTACH_FILE(15),
     READ_MESSAGE_HISTORY(16),
     MENTION_EVERYONE(17),
+    USE_EXTERNAL_EMOJIS(18),
 
     // voice
     VOICE_CONNECT(20),
@@ -49,7 +49,14 @@ public enum PermissionType {
     VOICE_MUTE_MEMBERS(22),
     VOICE_DEAFEN_MEMBERS(23),
     VOICE_MOVE_MEMBERS(24),
-    VOICE_USE_VAD(25);
+    VOICE_USE_VAD(25),
+
+    // misc
+    CHANGE_NICKNAME(26),
+    MANAGE_NICKNAMES(27),
+    MANAGE_ROLES(28),
+    MANAGE_WEBHOOKS(29),
+    MANAGE_EMOJIS(30);
 
     private final int offset;
 

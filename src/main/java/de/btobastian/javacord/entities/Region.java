@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -24,6 +24,9 @@ package de.btobastian.javacord.entities;
 public enum Region {
 
     AMSTERDAM("amsterdam", "Amsterdam"),
+    BRAZIL("brazil", "Brazil"),
+    EU_CENTRAL("eu-central", "EU Central"),
+    EU_WEST("eu-west", "EU West"),
     FRANKFURT("frankfurt", "Frankfurt"),
     LONDON("london", "London"),
     SINGAPORE("singapore", "Singapore"),

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -60,9 +60,8 @@ public interface VoiceChannel {
      * Deletes the channel.
      *
      * @return A future which tells us if the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
     /**
      * Gets an invite builder.
@@ -89,12 +88,45 @@ public interface VoiceChannel {
     public Permissions getOverwrittenPermissions(Role role);
 
     /**
+     * Updates the permissions of the given role.
+     *
+     * @param role The role to update.
+     * @param permissions The permissions to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateOverwrittenPermissions(Role role, Permissions permissions);
+
+    /**
+     * Updates the permissions of the given user.
+     *
+     * @param user The user to update.
+     * @param permissions The permissions to set.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updateOverwrittenPermissions(User user, Permissions permissions);
+
+    /**
+     * Deletes the overwritten permissions of the given role.
+     *
+     * @param role The role to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> deleteOverwrittenPermissions(Role role);
+
+    /**
+     * Deletes the overwritten permissions of the given user.
+     *
+     * @param user The user to delete.
+     * @return A future which tells us whether the deletion was successful or not.
+     */
+    public Future<Void> deleteOverwrittenPermissions(User user);
+
+    /**
      * Updates the name of the channel.
      *
      * @param newName The new name of the channel.
      * @return A future which tells us whether the update was successful or not.
-     *         If the exception is <code>null</code> the update was successful.
      */
-    public Future<Exception> updateName(String newName);
+    public Future<Void> updateName(String newName);
 
 }

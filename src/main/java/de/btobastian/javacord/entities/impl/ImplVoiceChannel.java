@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -121,41 +121,37 @@ public class ImplVoiceChannel implements VoiceChannel {
     }
 
     @Override
-    public Future<Exception> delete() {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+    public Future<Void> delete() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
+            public Void call() throws Exception {
                 logger.debug("Trying to delete voice channel {}", ImplVoiceChannel.this);
-                try {
-                    HttpResponse<JsonNode> response = Unirest
-                            .delete("https://discordapp.com/api/channels/" + id)
-                            .header("authorization", api.getToken())
-                            .asJson();
-                    api.checkResponse(response);
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
-                    server.removeVoiceChannel(ImplVoiceChannel.this);
-                    logger.info("Deleted voice channel {}", ImplVoiceChannel.this);
-                    // call listener
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<VoiceChannelDeleteListener> listeners =
-                                    api.getListeners(VoiceChannelDeleteListener.class);
-                            synchronized (listeners) {
-                                for (VoiceChannelDeleteListener listener : listeners) {
-                                    try {
-                                        listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
-                                    } catch (Throwable t) {
-                                        logger.warn("Uncaught exception in VoiceChannelDeleteListener!", t);
-                                    }
+                HttpResponse<JsonNode> response = Unirest
+                        .delete("https://discordapp.com/api/channels/" + id)
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
+                server.removeVoiceChannel(ImplVoiceChannel.this);
+                logger.info("Deleted voice channel {}", ImplVoiceChannel.this);
+                // call listener
+                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<VoiceChannelDeleteListener> listeners =
+                                api.getListeners(VoiceChannelDeleteListener.class);
+                        synchronized (listeners) {
+                            for (VoiceChannelDeleteListener listener : listeners) {
+                                try {
+                                    listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in VoiceChannelDeleteListener!", t);
                                 }
                             }
                         }
-                    });
-                    return null;
-                } catch (Exception e) {
-                    return e;
-                }
+                    }
+                });
+                return null;
             }
         });
     }
@@ -177,49 +173,119 @@ public class ImplVoiceChannel implements VoiceChannel {
     }
 
     @Override
-    public Future<Exception> updateName(final String newName) {
+    public Future<Void> updateOverwrittenPermissions(final Role role, final Permissions permissions) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Updating permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                                .put("allow", ((ImplPermissions) permissions).getAllowed())
+                                .put("deny", ((ImplPermissions) permissions).getDenied())
+                                .put("type", "role").toString())
+                        .asJson();
+                logger.debug("Updated permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> updateOverwrittenPermissions(final User user, final Permissions permissions) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Updating permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(new JSONObject()
+                                .put("allow", ((ImplPermissions) permissions).getAllowed())
+                                .put("deny", ((ImplPermissions) permissions).getDenied())
+                                .put("type", "member").toString())
+                        .asJson();
+                logger.debug("Updated permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
+                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> deleteOverwrittenPermissions(final Role role) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Deleting permissions in channel {} for role {}", this, role);
+                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                logger.debug("Deleted permissions in channel {} for role {}", this, role);
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> deleteOverwrittenPermissions(final User user) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Deleting permissions in channel {} for user {}", this, user);
+                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                logger.debug("Deleted permissions in channel {} for user {}", this, user);
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> updateName(final String newName) {
         final JSONObject params = new JSONObject()
                 .put("name", newName);
-        return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
-            public Exception call() throws Exception {
+            public Void call() throws Exception {
                 logger.debug("Trying to update voice channel {} (new name: {}, old name: {})",
                         ImplVoiceChannel.this, newName, getName());
-                try {
-                    HttpResponse<JsonNode> response = Unirest
-                            .patch("https://discordapp.com/api/channels/" + getId())
-                            .header("authorization", api.getToken())
-                            .header("Content-Type", "application/json")
-                            .body(params.toString())
-                            .asJson();
-                    api.checkResponse(response);
-                    api.checkRateLimit(response, RateLimitType.UNKNOWN, server);
-                    String updatedName = response.getBody().getObject().getString("name");
-                    logger.debug("Updated voice channel {} (new name: {}, old name: {})",
-                            ImplVoiceChannel.this, updatedName, getName());
-                    // check name
-                    if (!updatedName.equals(getName())) {
-                        final String oldName = getName();
-                        setName(updatedName);
-                        api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                List<VoiceChannelChangeNameListener> listeners =
-                                        api.getListeners(VoiceChannelChangeNameListener.class);
-                                synchronized (listeners) {
-                                    for (VoiceChannelChangeNameListener listener : listeners) {
-                                        try {
-                                            listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
-                                        } catch (Throwable t) {
-                                            logger.warn("Uncaught exception in VocieChannelChangeNameListener!", t);
-                                        }
+                HttpResponse<JsonNode> response = Unirest
+                        .patch("https://discordapp.com/api/channels/" + getId())
+                        .header("authorization", api.getToken())
+                        .header("Content-Type", "application/json")
+                        .body(params.toString())
+                        .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
+                String updatedName = response.getBody().getObject().getString("name");
+                logger.debug("Updated voice channel {} (new name: {}, old name: {})",
+                        ImplVoiceChannel.this, updatedName, getName());
+                // check name
+                if (!updatedName.equals(getName())) {
+                    final String oldName = getName();
+                    setName(updatedName);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<VoiceChannelChangeNameListener> listeners =
+                                    api.getListeners(VoiceChannelChangeNameListener.class);
+                            synchronized (listeners) {
+                                for (VoiceChannelChangeNameListener listener : listeners) {
+                                    try {
+                                        listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in VocieChannelChangeNameListener!", t);
                                     }
                                 }
                             }
-                        });
-                    }
-                } catch (Exception e) {
-                    return e;
+                        }
+                    });
                 }
                 return null;
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Bastian Oppermann
+ * Copyright (C) 2017 Bastian Oppermann
  * 
  * This file is part of Javacord.
  * 
@@ -178,8 +178,7 @@ public interface Invite {
      * Deletes the invite.
      *
      * @return A future which tells us whether the deletion was successful or not.
-     *         If the exception is <code>null</code> the deletion was successful.
      */
-    public Future<Exception> delete();
+    public Future<Void> delete();
 
 }
