@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.entities.impl.ImplVoiceChannel;
 import de.btobastian.javacord.listener.voice.UserJoinVoiceChannelListener;
 import de.btobastian.javacord.listener.voice.UserLeaveVoiceChannelListener;
 import de.btobastian.javacord.utils.LoggerUtil;
@@ -67,10 +67,17 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 			channelId = packet.getString("channel_id");
 		} catch (JSONException ignored) {
 		}
-		final VoiceChannel channel = api.getVoiceChannelById(channelId);
-		user.setVoiceChannel(channel);
 		final User userPassed = user;
 		if (channelId != null) {
+			if (user.getVoiceChannel() != null) {
+				if (channelId.equals(user.getVoiceChannel().getId())) { // Probably a mute/unmute event; Ignore for now
+					return;
+				}
+				((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
+			}
+			final ImplVoiceChannel channel = (ImplVoiceChannel) api.getVoiceChannelById(channelId);
+			channel.addConnectedUser(user);
+			user.setVoiceChannel(channel);
 			listenerExecutorService.submit(new Runnable() {
 				@Override
 				public void run() {
@@ -87,6 +94,10 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 				}
 			});
 		} else {
+			if (user.getVoiceChannel() != null) {
+				((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
+			}
+			user.setVoiceChannel(null);
 			listenerExecutorService.submit(new Runnable() {
 				@Override
 				public void run() {
