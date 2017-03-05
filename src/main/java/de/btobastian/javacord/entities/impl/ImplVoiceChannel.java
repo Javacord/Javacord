@@ -18,9 +18,21 @@
  */
 package de.btobastian.javacord.entities.impl;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.entities.Server;
@@ -34,14 +46,6 @@ import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListen
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 /**
  * The implementation of the voice channel interface.
@@ -64,6 +68,7 @@ public class ImplVoiceChannel implements VoiceChannel {
 
     private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
+	private Set<User> connectedUsers = new HashSet<>();
     /**
      * Creates a new instance of this class.
      *
@@ -320,14 +325,43 @@ public class ImplVoiceChannel implements VoiceChannel {
         overwrittenPermissions.put(user.getId(), permissions);
     }
 
-    @Override
-    public String toString() {
-        return getName() + " (id: " + getId() + ")";
-    }
+	/**
+	 * Adds a {@link User} to the set of connected Users.
+	 * 
+	 * @param user
+	 *            The connected user to add.
+	 */
+	public void addConnectedUser(User user) {
+		this.connectedUsers.add(user);
+	}
 
-    @Override
-    public int hashCode() {
-        return getId().hashCode();
-    }
+	/**
+	 * Removes a {@link User} from the set of connected Users.
+	 * 
+	 * @param user
+	 *            The connected user to remove if found.
+	 */
+	public void removeConnectedUser(User user) {
+		this.connectedUsers.remove(user);
+	}
+
+    /**
+     * Returns a set of users connected to this channel.
+     * 
+     * @return the set of users connected to this channel.
+     */
+	public final Set<User> getConnectedUsers() {
+		return this.connectedUsers;
+	}
+
+	@Override
+	public String toString() {
+		return getName() + " (id: " + getId() + ")";
+	}
+
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
+	}
 
 }

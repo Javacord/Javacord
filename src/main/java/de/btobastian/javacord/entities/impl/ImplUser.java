@@ -30,6 +30,7 @@ import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.MessageReceiver;
@@ -74,6 +75,7 @@ public class ImplUser implements User {
     private final String discriminator;
     private final boolean bot;
     private UserStatus status = UserStatus.OFFLINE;
+    private VoiceChannel voiceChannel = null;
 
     /**
      * Creates a new instance of this class.
@@ -644,6 +646,20 @@ public class ImplUser implements User {
     public void setAvatarId(String avatarId) {
         this.avatarId = avatarId;
     }
+    
+    /**
+     * Sets the {@link VoiceChannel} the user is currently in (null for none).
+     *
+     * @param voiceChannel The voice channel the user is in.
+     */
+    public void setVoiceChannel(VoiceChannel voiceChannel) {
+    	this.voiceChannel = voiceChannel;
+    }
+    
+	@Override
+	public final VoiceChannel getVoiceChannel() {
+		return this.voiceChannel;
+	}
 
     @Override
     public String toString() {
@@ -652,7 +668,7 @@ public class ImplUser implements User {
 
     @Override
     public int hashCode() {
-        return getId().hashCode();
-    }
+		return getId().hashCode();
+	}
 
 }

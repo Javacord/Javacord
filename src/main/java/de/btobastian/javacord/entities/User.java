@@ -166,5 +166,12 @@ public interface User extends MessageReceiver {
      * @return The status of the user.
      */
     public UserStatus getStatus();
+    
+    /**
+     * Gets the status of the user.
+     *
+     * @return The status of the user.
+     */
+    public VoiceChannel getVoiceChannel();
 
 }
