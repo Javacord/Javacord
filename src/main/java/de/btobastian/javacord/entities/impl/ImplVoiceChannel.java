@@ -68,7 +68,7 @@ public class ImplVoiceChannel implements VoiceChannel {
 
     private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
-	private Set<User> connectedUsers = new HashSet<>();
+    private Set<User> connectedUsers = new HashSet<>();
     /**
      * Creates a new instance of this class.
      *
@@ -325,43 +325,43 @@ public class ImplVoiceChannel implements VoiceChannel {
         overwrittenPermissions.put(user.getId(), permissions);
     }
 
-	/**
-	 * Adds a {@link User} to the set of connected Users.
-	 * 
-	 * @param user
-	 *            The connected user to add.
-	 */
-	public void addConnectedUser(User user) {
-		this.connectedUsers.add(user);
-	}
+    /**
+     * Adds a {@link User} to the set of connected Users.
+     *
+     * @param user
+     *            The connected user to add.
+     */
+    public void addConnectedUser(User user) {
+        this.connectedUsers.add(user);
+    }
 
-	/**
-	 * Removes a {@link User} from the set of connected Users.
-	 * 
-	 * @param user
-	 *            The connected user to remove if found.
-	 */
-	public void removeConnectedUser(User user) {
-		this.connectedUsers.remove(user);
-	}
+    /**
+     * Removes a {@link User} from the set of connected Users.
+     *
+     * @param user
+     *            The connected user to remove if found.
+     */
+    public void removeConnectedUser(User user) {
+        this.connectedUsers.remove(user);
+    }
 
     /**
      * Returns a set of users connected to this channel.
      * 
      * @return the set of users connected to this channel.
      */
-	public final Set<User> getConnectedUsers() {
-		return this.connectedUsers;
-	}
+    public final Set<User> getConnectedUsers() {
+        return this.connectedUsers;
+    }
 
-	@Override
-	public String toString() {
-		return getName() + " (id: " + getId() + ")";
-	}
+    @Override
+    public String toString() {
+        return getName() + " (id: " + getId() + ")";
+    }
 
-	@Override
-	public int hashCode() {
-		return getId().hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
 
 }

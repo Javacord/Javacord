@@ -153,26 +153,26 @@ public class ImplServer implements Server {
 
         JSONArray voiceStates = new JSONArray();
         if (data.has("voice_states")) {
-        	voiceStates = data.getJSONArray("voice_states");
+            voiceStates = data.getJSONArray("voice_states");
         }
         for (int i = 0; i < voiceStates.length(); ++i) {
-        	JSONObject voiceState = voiceStates.getJSONObject(i);
-        	ImplUser user = null;
-        	try {
-        		user = (ImplUser) this.members.get(voiceState.getString("user_id"));
-        	} catch (JSONException | NullPointerException e) {
-        		continue;
-        	}
-        	VoiceChannel channel = null;
-    		try {
-    			channel = this.voiceChannels.get(voiceState.getString("channel_id"));
-    		} catch (JSONException | NullPointerException e) {
-    			continue;
-    		}
-    		if (channel != null) {
-    			((ImplVoiceChannel) channel).addConnectedUser(user);
-    			user.setVoiceChannel(channel);
-    		}
+            JSONObject voiceState = voiceStates.getJSONObject(i);
+            ImplUser user = null;
+            try {
+                user = (ImplUser) this.members.get(voiceState.getString("user_id"));
+            } catch (JSONException | NullPointerException e) {
+                continue;
+            }
+            VoiceChannel channel = null;
+            try {
+                channel = this.voiceChannels.get(voiceState.getString("channel_id"));
+            } catch (JSONException | NullPointerException e) {
+                continue;
+            }
+            if (channel != null) {
+                ((ImplVoiceChannel) channel).addConnectedUser(user);
+                user.setVoiceChannel(channel);
+            }
         }
 
         JSONArray presences = new JSONArray();

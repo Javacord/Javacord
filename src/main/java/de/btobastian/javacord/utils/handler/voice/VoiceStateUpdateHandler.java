@@ -39,82 +39,82 @@ import de.btobastian.javacord.utils.PacketHandler;
  */
 public class VoiceStateUpdateHandler extends PacketHandler {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger logger = LoggerUtil.getLogger(VoiceStateUpdateHandler.class);
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(VoiceStateUpdateHandler.class);
 
-	/**
-	 * Creates a new instance of this class.
-	 *
-	 * @param api
-	 *            The api.
-	 */
-	public VoiceStateUpdateHandler(ImplDiscordAPI api) {
-		super(api, true, "VOICE_STATE_UPDATE");
-	}
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param api
+     *            The api.
+     */
+    public VoiceStateUpdateHandler(ImplDiscordAPI api) {
+        super(api, true, "VOICE_STATE_UPDATE");
+    }
 
-	@Override
-	public void handle(JSONObject packet) {
-		ImplUser user = null;
-		try {
-			user = (ImplUser) api.getUserById(packet.getString("user_id")).get();
-		} catch (JSONException | InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-		String channelId = null;
-		try {
-			channelId = packet.getString("channel_id");
-		} catch (JSONException ignored) {
-		}
-		final User userPassed = user;
-		if (channelId != null) {
-			if (user.getVoiceChannel() != null) {
-				if (channelId.equals(user.getVoiceChannel().getId())) { // Probably a mute/unmute event; Ignore for now
-					return;
-				}
-				((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
-			}
-			final ImplVoiceChannel channel = (ImplVoiceChannel) api.getVoiceChannelById(channelId);
-			channel.addConnectedUser(user);
-			user.setVoiceChannel(channel);
-			listenerExecutorService.submit(new Runnable() {
-				@Override
-				public void run() {
-					List<UserJoinVoiceChannelListener> listeners = api.getListeners(UserJoinVoiceChannelListener.class);
-					synchronized (listeners) {
-						for (UserJoinVoiceChannelListener listener : listeners) {
-							try {
-								listener.onUserJoinVoiceChannel(api, userPassed, channel);
-							} catch (Throwable t) {
-								logger.warn("Uncaught exception in UserJoinVoiceChannelListener!", t);
-							}
-						}
-					}
-				}
-			});
-		} else {
-			if (user.getVoiceChannel() != null) {
-				((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
-			}
-			user.setVoiceChannel(null);
-			listenerExecutorService.submit(new Runnable() {
-				@Override
-				public void run() {
-					List<UserLeaveVoiceChannelListener> listeners = api
-							.getListeners(UserLeaveVoiceChannelListener.class);
-					synchronized (listeners) {
-						for (UserLeaveVoiceChannelListener listener : listeners) {
-							try {
-								listener.onUserLeaveVoiceChannel(api, userPassed);
-							} catch (Throwable t) {
-								logger.warn("Uncaught exception in UserLeaveVoiceChannelListener!", t);
-							}
-						}
-					}
-				}
-			});
-		}
-	}
+    @Override
+    public void handle(JSONObject packet) {
+        ImplUser user = null;
+        try {
+            user = (ImplUser) api.getUserById(packet.getString("user_id")).get();
+        } catch (JSONException | InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        String channelId = null;
+        try {
+            channelId = packet.getString("channel_id");
+        } catch (JSONException ignored) {
+        }
+        final User userPassed = user;
+        if (channelId != null) {
+            if (user.getVoiceChannel() != null) {
+                if (channelId.equals(user.getVoiceChannel().getId())) { // Probably a mute/unmute event; Ignore for now
+                    return;
+                }
+                ((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
+            }
+            final ImplVoiceChannel channel = (ImplVoiceChannel) api.getVoiceChannelById(channelId);
+            channel.addConnectedUser(user);
+            user.setVoiceChannel(channel);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<UserJoinVoiceChannelListener> listeners = api.getListeners(UserJoinVoiceChannelListener.class);
+                    synchronized (listeners) {
+                        for (UserJoinVoiceChannelListener listener : listeners) {
+                            try {
+                                listener.onUserJoinVoiceChannel(api, userPassed, channel);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in UserJoinVoiceChannelListener!", t);
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            if (user.getVoiceChannel() != null) {
+                ((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
+            }
+            user.setVoiceChannel(null);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<UserLeaveVoiceChannelListener> listeners = api
+                            .getListeners(UserLeaveVoiceChannelListener.class);
+                    synchronized (listeners) {
+                        for (UserLeaveVoiceChannelListener listener : listeners) {
+                            try {
+                                listener.onUserLeaveVoiceChannel(api, userPassed);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in UserLeaveVoiceChannelListener!", t);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
 
 }
