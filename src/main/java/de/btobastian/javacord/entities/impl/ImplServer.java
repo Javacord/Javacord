@@ -877,8 +877,12 @@ public class ImplServer implements Server {
             @Override
             public Void call() throws Exception {
                 logger.debug("Trying to update nickname of user {} to {}", user, nickname);
+                String url = "https://discordapp.com/api/guilds/" + getId() + "/members/" + user.getId();
+                if (user.isYourself()) {
+                    url = "https://discordapp.com/api/guilds/" + getId() + "/members/@me/nick";
+                }
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" + user.getId())
+                        .patch(url)
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject()
