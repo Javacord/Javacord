@@ -18,6 +18,28 @@
  */
 package de.btobastian.javacord;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.imageio.ImageIO;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+
 import com.google.common.io.BaseEncoding;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.FutureCallback;
@@ -28,7 +50,13 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import de.btobastian.javacord.entities.*;
+
+import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.Invite;
+import de.btobastian.javacord.entities.Region;
+import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
@@ -51,19 +79,6 @@ import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RateLimitManager;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * The implementation of {@link DiscordAPI}.

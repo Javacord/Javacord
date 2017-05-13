@@ -16,24 +16,24 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.listener.voice;
+package de.btobastian.javacord.listener.user;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.VoiceChannel;
 import de.btobastian.javacord.listener.Listener;
 
 /**
- * This listener listens to user leave voice channel events.
+ * This listener listens to user avatar changes.
  */
-public interface UserLeaveVoiceChannelListener extends Listener {
+public interface UserChangeAvatarListener extends Listener {
 
     /**
-     * This method is called every time a user disconnects from a voice channel.
+     * This method is called every time a user changed its avatar.
      *
      * @param api The api.
-     * @param user The user. May be <code>null</code>.
+     * @param user The user with the updated avatar.
+     * @param oldAvatarId The old avatar ID of the user.
      */
-    public void onUserLeaveVoiceChannel(DiscordAPI api, User user, VoiceChannel oldChannel);
+    public void onUserChangeAvatar(DiscordAPI api, User user, String oldAvatarId);
 
 }

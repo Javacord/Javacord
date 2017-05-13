@@ -18,20 +18,19 @@
  */
 package de.btobastian.javacord.entities.message;
 
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Future;
+
 import com.google.common.util.concurrent.FutureCallback;
+
 import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.CustomEmoji;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.permissions.Role;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * This interface represents a message.
@@ -203,6 +202,14 @@ public interface Message extends Comparable<Message> {
      * @return A future which tells us if the edit was successful or not.
      */
     public Future<Void> edit(String content);
+    
+    /**
+     * Edits the message.
+     *
+     * @param content The new content of the message.
+     * @return A future which tells us if the edit was successful or not.
+     */
+    public Future<Void> edit(String content, EmbedBuilder embed);
 
     /**
      * Gets a collection with all embeds.

@@ -18,6 +18,12 @@
  */
 package de.btobastian.javacord.utils.handler.user;
 
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
@@ -25,16 +31,12 @@ import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
+import de.btobastian.javacord.listener.user.UserChangeAvatarListener;
 import de.btobastian.javacord.listener.user.UserChangeGameListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.listener.user.UserChangeStatusListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
-import java.util.List;
 
 /**
  * This class handles the presence update packet.
@@ -101,8 +103,9 @@ public class PresenceUpdateHandler extends PacketHandler {
         }
 
         // check username
-        if (packet.getJSONObject("user").has("username")) {
-            String name = packet.getJSONObject("user").getString("username");
+        JSONObject jUser = packet.getJSONObject("user");
+        if (jUser.has("username")) {
+            String name = jUser.getString("username");
             if (!user.getName().equals(name)) {
                 final String oldName = user.getName();
                 ((ImplUser) user).setName(name);
@@ -116,6 +119,29 @@ public class PresenceUpdateHandler extends PacketHandler {
                                     listener.onUserChangeName(api, user, oldName);
                                 } catch (Throwable t) {
                                     logger.warn("Uncaught exception in UserChangeNameListener!", t);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        // check avatar
+        if (jUser.has("avatar")) {
+            String hash = jUser.getString("avatar");
+            if (!user.getAvatarId().equals(hash)) {
+                final String oldHash = user.getAvatarId();
+                ((ImplUser) user).setAvatarId(hash);
+                listenerExecutorService.submit(new Runnable() {
+                    @Override
+                    public void run() { //TODO
+                        List<UserChangeAvatarListener> listeners = api.getListeners(UserChangeAvatarListener.class);
+                        synchronized (listeners) {
+                            for (UserChangeAvatarListener listener : listeners) {
+                                try {
+                                    listener.onUserChangeAvatar(api, user, oldHash);
+                                } catch (Throwable t) {
+                                    logger.warn("Uncaught exception in UserChangeAvatarListener!", t);
                                 }
                             }
                         }
