@@ -124,16 +124,20 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
                     serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown");
         } else {
-            switch (clientCloseFrame == null ? -1 : clientCloseFrame.getCloseCode()) {
-                case 1002:
-                case 1008:
-                    logger.debug("Websocket closed! Trying to resume connection.");
-                    break;
-                default:
-                    logger.info("Websocket closed with reason {} and code {} by client!",
-                            clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
-                            clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
-                    break;
+            if (reconnect) {
+                switch (clientCloseFrame == null ? -1 : clientCloseFrame.getCloseCode()) {
+                    case 1002:
+                    case 1008:
+                        logger.debug("Websocket closed! Trying to resume connection.");
+                        break;
+                    default:
+                        logger.info("Websocket closed with reason {} and code {} by client!",
+                                clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
+                                clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
+                        break;
+                }
+            } else {
+                logger.info("Websocket expected!");
             }
         }
 
