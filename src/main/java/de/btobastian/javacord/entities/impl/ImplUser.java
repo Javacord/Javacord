@@ -653,13 +653,13 @@ public class ImplUser implements User {
      * @param voiceChannel The voice channel the user is in.
      */
     public void setVoiceChannel(VoiceChannel voiceChannel) {
-    	this.voiceChannel = voiceChannel;
+        this.voiceChannel = voiceChannel;
     }
     
-	@Override
-	public final VoiceChannel getVoiceChannel() {
-		return this.voiceChannel;
-	}
+    @Override
+    public final VoiceChannel getVoiceChannel() {
+        return this.voiceChannel;
+    }
 
     @Override
     public String toString() {
@@ -668,7 +668,7 @@ public class ImplUser implements User {
 
     @Override
     public int hashCode() {
-		return getId().hashCode();
-	}
+        return getId().hashCode();
+    }
 
 }
