@@ -191,7 +191,7 @@ public interface DiscordAPI {
      * Gets the used thread pool of this plugin.
      *
      * The {@link ThreadPool} contains the used thread pool(s) of this api.
-     * Don't use multi-threading if you don't known how to made things thread-safe
+     * Don't use multi-threading if you don't know how to make things thread-safe
      * or how to prevent stuff like deadlocks!
      *
      * @return The used thread pool.
