@@ -72,6 +72,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     private boolean heartbeatAckReceived = false;
 
+    private boolean reconnect = true;
+
     public DiscordWebsocketAdapter(ImplDiscordAPI api, String gateway) {
         this.api = api;
         this.gateway = gateway;
@@ -79,6 +81,14 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         registerHandlers();
 
         connect();
+    }
+
+    /**
+     * Disconnects from the websocket.
+     */
+    public void disconnect() {
+        reconnect = false;
+        websocket.sendClose(1000);
     }
 
     private void connect() {

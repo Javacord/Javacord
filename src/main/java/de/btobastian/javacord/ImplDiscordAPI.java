@@ -702,7 +702,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public void disconnect() {
         if (socketAdapter != null) {
-            socketAdapter.getWebSocket().sendClose(1000);
+            socketAdapter.disconnect();
         }
     }
 
