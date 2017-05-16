@@ -71,13 +71,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 		final User userPassed = user;
 		if (channelId != null) {
 			if (user.getVoiceChannel() != null) {
-				if (channelId.equals(user.getVoiceChannel().getId())) { // Probably
-																		// a
-																		// mute/unmute
-																		// event;
-																		// Ignore
-																		// for
-																		// now
+				if (channelId.equals(user.getVoiceChannel().getId())) { //mute/unmute
 					return;
 				}
 				((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
