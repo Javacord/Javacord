@@ -3,11 +3,14 @@ A multithreaded but simple to use library to create a Discord bot in Java.
 
 ##  Maven
 ```xml
-<repository>
+ <repositories>
+  <repository>
   <id>javacord-repo</id>
   <url>http://repo.bastian-oppermann.de</url>
-</repository>
-...
+  </repository>
+  </repositories>
+ 
+<dependencies>
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
@@ -21,6 +24,8 @@ A multithreaded but simple to use library to create a Discord bot in Java.
   <artifactId>logback-classic</artifactId>
   <version>1.1.3</version>
 </dependency>
+</dependencies>
+
 ```
 
 ## IDE Setup (for beginners)
