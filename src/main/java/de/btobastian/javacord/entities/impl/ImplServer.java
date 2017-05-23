@@ -39,6 +39,7 @@ import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.audio.ImplAudioManager;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -249,7 +250,14 @@ public class ImplServer implements Server {
     public VoiceChannel getVoiceChannelById(String id) {
         return voiceChannels.get(id);
     }
-
+    
+    @Override
+    public AudioManager getAudioManager() {
+        if (!api.isAudioEnabled()) throw new IllegalArgumentException("Audio is disabled. Opus not supported.");
+        ConcurrentHashMap<String, ImplAudioManager> audioManagers = api.getAudioManagers();
+        return audioManagers.computeIfAbsent(id, k -> new ImplAudioManager(api, this));
+    }
+    
     @Override
     public Collection<VoiceChannel> getVoiceChannels() {
         return Collections.unmodifiableCollection(voiceChannels.values());

@@ -91,6 +91,8 @@ public interface Server {
      * @return A collection with all voice channels of the server.
      */
     public Collection<VoiceChannel> getVoiceChannels();
+    
+    public AudioManager getAudioManager();
 
     /**
      * Gets an user by its id.
