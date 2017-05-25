@@ -31,6 +31,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListener;
+import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangePositionListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
@@ -247,14 +248,26 @@ public class ImplVoiceChannel implements VoiceChannel {
     }
 
     @Override
-    public Future<Void> updateName(final String newName) {
+    public Future<Void> updateName(String newName) {
+        return update(newName, getPosition());
+    }
+
+    @Override
+    public Future<Void> updatePosition(int newPosition) {
+        return update(getName(), newPosition);
+    }
+
+
+    @Override
+    public Future<Void> update(final String newName, final int newPosition) {
         final JSONObject params = new JSONObject()
-                .put("name", newName);
+                .put("name", newName)
+                .put("position", newPosition);
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                logger.debug("Trying to update voice channel {} (new name: {}, old name: {})",
-                        ImplVoiceChannel.this, newName, getName());
+                logger.debug("Trying to update channel {} (new name: {}, old name: {}, new position: {}, old position: {})",
+                        ImplVoiceChannel.this, newName, getName(), newPosition, getPosition());
                 HttpResponse<JsonNode> response = Unirest
                         .patch("https://discordapp.com/api/channels/" + getId())
                         .header("authorization", api.getToken())
@@ -263,9 +276,11 @@ public class ImplVoiceChannel implements VoiceChannel {
                         .asJson();
                 api.checkResponse(response);
                 api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
+                logger.info("Updated channel {} (new name: {}, old name: {}, new position: {}, old position: {})",
+                        ImplVoiceChannel.this, newName, getName(), newPosition, getPosition());
                 String updatedName = response.getBody().getObject().getString("name");
-                logger.debug("Updated voice channel {} (new name: {}, old name: {})",
-                        ImplVoiceChannel.this, updatedName, getName());
+                int updatedPosition = response.getBody().getObject().getInt("position");
+
                 // check name
                 if (!updatedName.equals(getName())) {
                     final String oldName = getName();
@@ -280,7 +295,29 @@ public class ImplVoiceChannel implements VoiceChannel {
                                     try {
                                         listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
                                     } catch (Throwable t) {
-                                        logger.warn("Uncaught exception in VocieChannelChangeNameListener!", t);
+                                        logger.warn("Uncaught exception in VoiceChannelChangeNameListener!", t);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // check position
+                if (updatedPosition != getPosition()) {
+                    final int oldPosition = getPosition();
+                    setPosition(updatedPosition);
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<VoiceChannelChangePositionListener> listeners =
+                                    api.getListeners(VoiceChannelChangePositionListener.class);
+                            synchronized (listeners) {
+                                for (VoiceChannelChangePositionListener listener : listeners) {
+                                    try {
+                                        listener.onVoiceChannelChangePosition(api, ImplVoiceChannel.this, oldPosition);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in VoiceChannelChangePositionListener!", t);
                                     }
                                 }
                             }
@@ -291,6 +328,8 @@ public class ImplVoiceChannel implements VoiceChannel {
             }
         });
     }
+
+
 
     /**
      * Sets the name of the channel (no update!).

@@ -132,7 +132,7 @@ public interface Channel extends MessageReceiver {
 
     /**
      * Updates the name of the channel.
-     * If you want to update the topic, too, use {@link #update(String, String)}.
+     * If you want to update the topic and position too, use {@link #update(String, String, int)}.
      * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
      *
      * @param newName The new name of the channel.
@@ -142,7 +142,7 @@ public interface Channel extends MessageReceiver {
 
     /**
      * Updates the topic of the channel.
-     * If you want to update the name, too, use {@link #update(String, String)}.
+     * If you want to update the name and position too, use {@link #update(String, String, int)}.
      * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
      *
      * @param newTopic The new topic of the channel.
@@ -151,13 +151,24 @@ public interface Channel extends MessageReceiver {
     public Future<Void> updateTopic(String newTopic);
 
     /**
+     * Updates the position of the channel.
+     * If you want to update the name and topic too, use {@link #update(String, String, int).
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newPosition The new topic of the channel.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updatePosition(int newPosition);
+
+    /**
      * Updates the channel.
      *
      * @param newName The new name of the channel.
      * @param newTopic The new topic of the channel.
+     * @param newPosition The new position of the channel.
      * @return A future which tells us whether the update was successful or not.
      */
-    public Future<Void> update(String newName, String newTopic);
+    public Future<Void> update(String newName, String newTopic, int newPosition);
 
     /**
      * Gets the tag which is used to mention the channel.
