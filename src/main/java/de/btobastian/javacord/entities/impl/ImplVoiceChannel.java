@@ -257,7 +257,6 @@ public class ImplVoiceChannel implements VoiceChannel {
         return update(getName(), newPosition);
     }
 
-
     @Override
     public Future<Void> update(final String newName, final int newPosition) {
         final JSONObject params = new JSONObject()
@@ -328,8 +327,6 @@ public class ImplVoiceChannel implements VoiceChannel {
             }
         });
     }
-
-
 
     /**
      * Sets the name of the channel (no update!).
