@@ -24,6 +24,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.Future;
 
@@ -38,6 +39,13 @@ public interface User extends MessageReceiver {
      * @return The id of the user.
      */
     public String getId();
+
+    /**
+     * Gets the creation date of the user account.
+     *
+     * @return The creation date of the user account.
+     */
+    public Calendar getCreationDate();
 
     /**
      * Gets the name of the user.

@@ -23,6 +23,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.Future;
 
@@ -37,6 +38,13 @@ public interface CustomEmoji {
      * @return The id of the emoji.
      */
     public String getId();
+
+    /**
+     * Gets the creation date of the custom emoji.
+     *
+     * @return The creation date of the custom emoji.
+     */
+    public Calendar getCreationDate();
 
     /**
      * Gets the name of the emoji.

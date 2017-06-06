@@ -21,6 +21,7 @@ package de.btobastian.javacord.entities;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 
+import java.util.Calendar;
 import java.util.concurrent.Future;
 
 /**
@@ -34,6 +35,13 @@ public interface VoiceChannel {
      * @return The id of the channel.
      */
     public String getId();
+
+    /**
+     * Gets the creation date of the channel.
+     *
+     * @return The creation date of the channel.
+     */
+    public Calendar getCreationDate();
 
     /**
      * Gets the name of the channel.
