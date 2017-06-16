@@ -938,6 +938,15 @@ public class ImplServer implements Server {
      */
     public void removeMember(User user) {
         members.remove(user.getId());
+        for (Role role : getRoles()) {
+            ((ImplRole) role).removeUserNoUpdate(user);
+        }
+        for (Channel channel : getChannels()) {
+            ((ImplChannel) channel).removeOverwrittenPermissions(user);
+        }
+        for (VoiceChannel channel : getVoiceChannels()) {
+            ((ImplVoiceChannel) channel).removeOverwrittenPermissions(user);
+        }
     }
 
     /**

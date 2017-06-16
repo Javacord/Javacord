@@ -731,6 +731,16 @@ public class ImplChannel implements Channel {
         overwrittenPermissions.put(user.getId(), permissions);
     }
 
+    /**
+     * Removes the overwritten permissions of a user from the cache.
+     *
+     *
+     * @param user The user, which permissions should be removed.
+     */
+    public void removeOverwrittenPermissions(User user) {
+        overwrittenPermissions.remove(user.getId());
+    }
+
     @Override
     public String toString() {
         return getName() + " (id: " + getId() + ")";
