@@ -439,4 +439,10 @@ public interface Server {
      */
     public Future<Void> updateNickname(User user, String nickname);
 
+    /**
+     * Gets the icon hash code of this server. Used for fetching the .wepb image icon.
+     *
+     * @return The hashcode of this server icon.
+     */
+    public String getIconHash();
 }

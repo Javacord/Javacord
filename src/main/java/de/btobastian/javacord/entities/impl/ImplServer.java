@@ -94,6 +94,7 @@ public class ImplServer implements Server {
     private int memberCount;
     private final boolean large;
     private String ownerId;
+    private String iconHash;
 
     /**
      * Creates a new instance of this class.
@@ -194,6 +195,8 @@ public class ImplServer implements Server {
                 ((ImplUser) user).setStatus(status);
             }
         }
+        
+        this.iconHash = data.getString("icon");
 
         api.getServerMap().put(id, this);
     }
@@ -904,6 +907,11 @@ public class ImplServer implements Server {
         });
     }
 
+    @Override
+    public String getIconHash() {
+        return iconHash;
+    }
+
     /**
      * Sets the name of the server.
      *
@@ -1066,6 +1074,15 @@ public class ImplServer implements Server {
             nicknames.put(user.getId(), nickname);
         }
     }
+    
+    /**
+     * Sets the icon hash of the server.
+     *
+     * @param hash The hash to use.
+     */
+    public void setIconHash(String hash) {
+        this.iconHash = hash;
+    }
 
     /**
      * Creates a new channel.
@@ -1101,5 +1118,5 @@ public class ImplServer implements Server {
     public int hashCode() {
         return getId().hashCode();
     }
-
+    
 }
