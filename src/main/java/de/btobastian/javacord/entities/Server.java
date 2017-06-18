@@ -19,13 +19,20 @@
 package de.btobastian.javacord.entities;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import de.btobastian.javacord.entities.permissions.Ban;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
@@ -440,9 +447,24 @@ public interface Server {
     public Future<Void> updateNickname(User user, String nickname);
 
     /**
-     * Gets the icon hash code of this server. Used for fetching the .wepb image icon.
+     * Gets the url of the server icon.
      *
-     * @return The hashcode of this server icon.
+     * @return The url of the server icon. <code>Null</code> if something went wrong.
      */
-    public String getIconHash();
+    public URL getIconUrl();
+
+    /**
+     * Gets the byte array (webp format) for the server icon.
+     *
+     * @return A future containing the webp image data for the icon.
+     */
+    public Future<byte[]> getIcon();
+
+    /**
+     * Gets the byte array (webp format) for the server icon.
+     *
+     * @param callback A callback which will be informed when the image is recieved.
+     * @return A future containing the webp image data for the icon.
+     */
+    public Future<byte[]> getIcon(FutureCallback<byte[]> callback);
 }
