@@ -39,6 +39,7 @@ import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.SnowflakeUtil;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,6 +107,11 @@ public class ImplUser implements User {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public Calendar getCreationDate() {
+        return SnowflakeUtil.parseDate(id);
     }
 
     @Override

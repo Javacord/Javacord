@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities.impl;
 
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
+import de.btobastian.javacord.utils.SnowflakeUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -108,6 +110,11 @@ public class ImplVoiceChannel implements VoiceChannel {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public Calendar getCreationDate() {
+        return SnowflakeUtil.parseDate(id);
     }
 
     @Override

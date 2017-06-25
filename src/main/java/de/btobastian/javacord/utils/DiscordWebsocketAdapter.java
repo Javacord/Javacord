@@ -95,7 +95,6 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 	private int lastSeq = -1;
 	private String sessionId = null;
 
-	private boolean heartbeatAckReceived = false;
 	private boolean reconnect = true;
 
 	public DiscordWebsocketAdapter(ImplDiscordAPI api, String gateway) {
@@ -194,13 +193,11 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
 			if (type.equals("RESUMED")) {
 				// We are the one who send the first heartbeat
-				heartbeatAckReceived = true;
 				heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
 				logger.debug("Received RESUMED packet");
 			}
 			if (type.equals("READY") && sessionId == null) {
 				// We are the one who send the first heartbeat
-				heartbeatAckReceived = true;
 				heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
 				sessionId = packet.getJSONObject("d").getString("session_id");
 				if (api.isWaitingForServersOnStartup()) {
@@ -212,12 +209,12 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 							int amount = api.getServers().size();
 							for (;;) {
 								try {
-									Thread.sleep(2000);
+									Thread.sleep(1500);
 								} catch (InterruptedException ignored) {
 								}
 								if (api.getServers().size() <= amount) {
-									break; // two seconds without new servers
-											// becoming available
+									break; // 1.5 without new servers becoming
+											// available
 								}
 								amount = api.getServers().size();
 							}
@@ -229,7 +226,6 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 				}
 				logger.debug("Received READY packet");
 			} else if (type.equals("READY")) {
-				heartbeatAckReceived = true;
 				heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
 			}
 			break;
@@ -252,7 +248,6 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 			logger.debug("Received HELLO packet");
 			break;
 		case 11:
-			heartbeatAckReceived = true;
 			break;
 		default:
 			logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
@@ -303,7 +298,6 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 			@Override
 			public void run() {
 				/* if (heartbeatAckReceived) { temporally removed */
-				heartbeatAckReceived = false;
 				sendHeartbeat(websocket);
 				logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
 				/*

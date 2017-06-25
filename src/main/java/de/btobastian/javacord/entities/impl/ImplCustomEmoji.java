@@ -31,6 +31,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listener.server.CustomEmojiDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.SnowflakeUtil;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -94,6 +96,11 @@ public class ImplCustomEmoji implements CustomEmoji {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public Calendar getCreationDate() {
+        return SnowflakeUtil.parseDate(id);
     }
 
     @Override

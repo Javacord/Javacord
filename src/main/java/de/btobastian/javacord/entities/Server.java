@@ -24,6 +24,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 
 import java.awt.image.BufferedImage;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.Future;
 
@@ -38,6 +39,13 @@ public interface Server {
      * @return The unique id of the server.
      */
     public String getId();
+
+    /**
+     * Gets the creation date of the server.
+     *
+     * @return The creation date of the server.
+     */
+    public Calendar getCreationDate();
 
     /**
      * Gets the name of the server.
