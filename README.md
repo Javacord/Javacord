@@ -39,7 +39,7 @@ If you never used maven before you should take a look at the setup tutorial:
 For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord/wiki)
 
 ## Download
-For those of you how don't use maven: [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/)
+For those of you who don't use maven: [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/)
 
 Thanks to ketrwu (https://github.com/KennethWussmann).
 
