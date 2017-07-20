@@ -21,6 +21,7 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.listener.server.ServerChangeIconListener;
 import de.btobastian.javacord.listener.server.ServerChangeNameListener;
 import de.btobastian.javacord.listener.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listener.server.ServerChangeRegionListener;
@@ -113,6 +114,27 @@ public class GuildUpdateHandler extends PacketHandler {
                                 listener.onServerChangeOwner(api, server, oldOwnerId);
                             } catch (Throwable t) {
                                 logger.warn("Uncaught exception in ServerChangeOwnerListener!", t);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        String icon = packet.getString("icon");
+        if (!server.getIconHash().equals(icon)) {
+            final String oldIcon = server.getIconHash();
+            server.setIconHash(icon);
+            listenerExecutorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    List<ServerChangeIconListener> listeners = api.getListeners(ServerChangeIconListener.class);
+                    synchronized (listeners) {
+                        for (ServerChangeIconListener listener : listeners) {
+                            try {
+                                listener.onServerChangeIcon(api, server, oldIcon);
+                            } catch (Throwable t) {
+                                logger.warn("Uncaught exception in ServerChangeIconListener!", t);
                             }
                         }
                     }

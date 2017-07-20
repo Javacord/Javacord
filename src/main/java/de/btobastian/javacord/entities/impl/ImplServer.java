@@ -19,6 +19,12 @@
 package de.btobastian.javacord.entities.impl;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +33,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
+import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.utils.SnowflakeUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +75,9 @@ import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
 import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 
+import javax.imageio.ImageIO;
+import javax.net.ssl.HttpsURLConnection;
+
 /**
  * The implementation of the server interface.
  */
@@ -94,6 +104,7 @@ public class ImplServer implements Server {
     private int memberCount;
     private final boolean large;
     private String ownerId;
+    private String iconHash;
 
     /**
      * Creates a new instance of this class.
@@ -194,6 +205,8 @@ public class ImplServer implements Server {
                 ((ImplUser) user).setStatus(status);
             }
         }
+        
+        this.iconHash = data.getString("icon");
 
         api.getServerMap().put(id, this);
     }
@@ -904,6 +917,75 @@ public class ImplServer implements Server {
         });
     }
 
+    @Override
+    public URL getIconUrl() {
+        if (iconHash == null) {
+            return null;
+        }
+        try {
+            return new URL("https://cdn.discordapp.com/icons/" + id + "/avatars/" + iconHash + ".webp");
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            return null;
+        }
+    }
+
+    public Future<byte[]> getIconAsByteArray() {
+        ListenableFuture<byte[]> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<byte[]>() {
+                    @Override
+                    public byte[] call() throws Exception {
+                        logger.debug("Trying to get icon from server {}", ImplServer.this);
+                        if (iconHash == null) {
+                            logger.debug("Server {} seems to have no icon. Returning empty array!", ImplServer.this);
+                            return new byte[0];
+                        }
+                        URL url = getIconUrl();
+                        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                        conn.setRequestMethod("GET");
+                        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                        conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
+                        InputStream in = new BufferedInputStream(conn.getInputStream());
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        byte[] buf = new byte[1024];
+                        int n;
+                        while (-1 != (n = in.read(buf))) {
+                            out.write(buf, 0, n);
+                        }
+                        out.close();
+                        in.close();
+                        byte[] avatar = out.toByteArray();
+                        logger.debug("Got icon from server {} (size: {})", ImplServer.this, avatar.length);
+                        return avatar;
+                    }
+                });
+        return future;
+    }
+
+    @Override
+    public Future<byte[]> getIcon() {
+        return getIcon(null);
+    }
+
+    @Override
+    public Future<byte[]> getIcon(FutureCallback<byte[]> callback) {
+        ListenableFuture<byte[]> future =
+                api.getThreadPool().getListeningExecutorService().submit(new Callable<byte[]>() {
+                    @Override
+                    public byte[] call() throws Exception {
+                        byte[] imageAsBytes = getIconAsByteArray().get();
+                        if (imageAsBytes.length == 0) {
+                            return null;
+                        }
+                        return imageAsBytes;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
     /**
      * Sets the name of the server.
      *
@@ -1068,6 +1150,24 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Gets the icon hash of the server.
+     *
+     * @return The icon hash of the server.
+     */
+    public String getIconHash() {
+        return this.iconHash;
+    }
+
+    /**
+     * Sets the icon hash of the server.
+     *
+     * @param hash The hash to use.
+     */
+    public void setIconHash(String hash) {
+        this.iconHash = hash;
+    }
+
+    /**
      * Creates a new channel.
      *
      * @param name The name of the channel.
@@ -1101,5 +1201,5 @@ public class ImplServer implements Server {
     public int hashCode() {
         return getId().hashCode();
     }
-
+    
 }
