@@ -131,10 +131,30 @@ public interface VoiceChannel {
 
     /**
      * Updates the name of the channel.
+     * If you want to update position too, use {@link #update(String, int)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
      *
      * @param newName The new name of the channel.
      * @return A future which tells us whether the update was successful or not.
      */
     public Future<Void> updateName(String newName);
 
+    /**
+     * Updates the position of the channel.
+     * If you want to update the name too, use {@link #update(String, int)}.
+     * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
+     *
+     * @param newPosition The new position of the channel.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> updatePosition(int newPosition);
+
+    /**
+     * Updates the voice channel.
+     *
+     * @param newName The new name of the channel.
+     * @param newPosition The new topic of the channel.
+     * @return A future which tells us whether the update was successful or not.
+     */
+    public Future<Void> update(String newName, int newPosition);
 }
