@@ -126,6 +126,13 @@ public interface Message extends Comparable<Message> {
     public boolean isMentioningEveryone();
 
     /**
+     * Pins the message.
+     *
+     * @return A future which tells us if the message was pinned successfully.
+     */
+    public Future<Void> pin();
+
+    /**
      * Checks if the message is pinned.
      *
      * @return Whether the message is pinned or not.
