@@ -206,7 +206,7 @@ public class ImplServer implements Server {
             }
         }
         
-        this.iconHash = data.getString("icon");
+        this.iconHash = data.isNull("icon") ? null : data.getString("icon");
 
         api.getServerMap().put(id, this);
     }
@@ -923,7 +923,7 @@ public class ImplServer implements Server {
             return null;
         }
         try {
-            return new URL("https://cdn.discordapp.com/icons/" + id + "/avatars/" + iconHash + ".webp");
+            return new URL("https://cdn.discordapp.com/icons/" + id + "/" + iconHash + ".png");
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return null;
@@ -937,7 +937,7 @@ public class ImplServer implements Server {
                     public byte[] call() throws Exception {
                         logger.debug("Trying to get icon from server {}", ImplServer.this);
                         if (iconHash == null) {
-                            logger.debug("Server {} seems to have no icon. Returning empty array!", ImplServer.this);
+                            logger.debug("Server {} has default icon. Returning empty array!", ImplServer.this);
                             return new byte[0];
                         }
                         URL url = getIconUrl();
