@@ -449,7 +449,7 @@ public interface Server {
     /**
      * Gets the url of the server icon.
      *
-     * @return The url of the server icon. <code>Null</code> if something went wrong.
+     * @return The url of the server icon. <code>Null</code> if the server has a default icon.
      */
     public URL getIconUrl();
 
