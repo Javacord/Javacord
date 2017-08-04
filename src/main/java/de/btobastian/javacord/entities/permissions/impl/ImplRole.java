@@ -518,6 +518,7 @@ public class ImplRole implements Role {
     public void setHoist(boolean hoist) {
         this.hoist = hoist;
     }
+    
     /**
      * Sets the mentionable of the role
      * 
@@ -527,6 +528,11 @@ public class ImplRole implements Role {
         this.mentionable = mentionable;
     }
     
+    /**
+     * Sets the managed of the role
+     * 
+     * @param managed The managed to set
+     */
     public void setManaged(boolean managed) {
         this.managed = managed;
     }
