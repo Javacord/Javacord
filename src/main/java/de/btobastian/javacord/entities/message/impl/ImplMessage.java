@@ -292,6 +292,42 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public Future<Void> pin(){
+        final ImplMessage message = this;
+        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                logger.debug("Trying to pin message (id: {}, author: {}, content: \"{}\")",
+                        getId(), getAuthor(), getContent());
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(null, RateLimitType.PRIVATE_MESSAGE, null, null);
+                } else {
+                    api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
+                }
+                HttpResponse<JsonNode> response = Unirest.put
+                        ("https://discordapp.com/api/channels/" + channelId + "/pins/" + getId())
+                        .header("authorization", api.getToken())
+                        .asJson();
+                api.checkResponse(response);
+                if (isPrivateMessage()) {
+                    api.checkRateLimit(response, RateLimitType.PRIVATE_MESSAGE, null, null);
+                } else {
+                    api.checkRateLimit(response, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
+                }
+                logger.debug("Pinned message (id: {}, author: {}, content: \"{}\")",
+                        getId(), getAuthor(), getContent());
+                synchronized (this) {
+                    if (message.isPinned())
+                        return null;
+                    else
+                        pinned = true;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
     public boolean isPinned() {
         return pinned;
     }
