@@ -52,316 +52,322 @@ import de.btobastian.javacord.utils.ratelimits.RateLimitType;
  */
 public class ImplVoiceChannel implements VoiceChannel {
 
-    /**
-     * The logger of this class.
-     */
-    private static final Logger logger = LoggerUtil.getLogger(ImplVoiceChannel.class);
+	/**
+	 * The logger of this class.
+	 */
+	private static final Logger logger = LoggerUtil.getLogger(ImplVoiceChannel.class);
 
-    private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
+	private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 
-    private final ImplDiscordAPI api;
+	private final ImplDiscordAPI api;
 
-    private final String id;
-    private String name;
-    private int position;
-    private final ImplServer server;
+	private final String id;
+	private String name;
+	private int position;
+	private final ImplServer server;
 
-    private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
-    private Set<User> connectedUsers = new HashSet<>();
-    /**
-     * Creates a new instance of this class.
-     *
-     * @param data A JSONObject containing all necessary data.
-     * @param server The server of the channel.
-     * @param api The api of this server.
-     */
-    public ImplVoiceChannel(JSONObject data, ImplServer server, ImplDiscordAPI api) {
-        this.api = api;
-        this.server = server;
+	private Set<User> connectedUsers = new HashSet<>();
 
-        id = data.getString("id");
-        name = data.getString("name");
-        position = data.getInt("position");
+	/**
+	 * Creates a new instance of this class.
+	 *
+	 * @param data
+	 *            A JSONObject containing all necessary data.
+	 * @param server
+	 *            The server of the channel.
+	 * @param api
+	 *            The api of this server.
+	 */
+	public ImplVoiceChannel(JSONObject data, ImplServer server, ImplDiscordAPI api) {
+		this.api = api;
+		this.server = server;
 
-        JSONArray permissionOverwrites = data.getJSONArray("permission_overwrites");
-        for (int i = 0; i < permissionOverwrites.length(); i++) {
-            JSONObject permissionOverwrite = permissionOverwrites.getJSONObject(i);
-            String id = permissionOverwrite.getString("id");
-            int allow = permissionOverwrite.getInt("allow");
-            int deny = permissionOverwrite.getInt("deny");
-            String type = permissionOverwrite.getString("type");
-            if (type.equals("role")) {
-                Role role = server.getRoleById(id);
-                if (role != null) {
-                    ((ImplRole) role).setOverwrittenPermissions(this, new ImplPermissions(allow, deny));
-                }
-            }
-            if (type.equals("member")) {
-                overwrittenPermissions.put(id, new ImplPermissions(allow, deny));
-            }
-        }
+		id = data.getString("id");
+		name = data.getString("name");
+		position = data.getInt("position");
 
-        server.addVoiceChannel(this);
-    }
+		JSONArray permissionOverwrites = data.getJSONArray("permission_overwrites");
+		for (int i = 0; i < permissionOverwrites.length(); i++) {
+			JSONObject permissionOverwrite = permissionOverwrites.getJSONObject(i);
+			String id = permissionOverwrite.getString("id");
+			int allow = permissionOverwrite.getInt("allow");
+			int deny = permissionOverwrite.getInt("deny");
+			String type = permissionOverwrite.getString("type");
+			if (type.equals("role")) {
+				Role role = server.getRoleById(id);
+				if (role != null) {
+					((ImplRole) role).setOverwrittenPermissions(this, new ImplPermissions(allow, deny));
+				}
+			}
+			if (type.equals("member")) {
+				overwrittenPermissions.put(id, new ImplPermissions(allow, deny));
+			}
+		}
 
-    @Override
-    public String getId() {
-        return id;
-    }
+		server.addVoiceChannel(this);
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	@Override
+	public String getId() {
+		return id;
+	}
 
-    @Override
-    public int getPosition() {
-        return position;
-    }
+	@Override
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public Server getServer() {
-        return server;
-    }
+	@Override
+	public int getPosition() {
+		return position;
+	}
 
-    @Override
-    public Future<Void> delete() {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Trying to delete voice channel {}", ImplVoiceChannel.this);
-                HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/channels/" + id)
-                        .header("authorization", api.getToken())
-                        .asJson();
-                api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
-                server.removeVoiceChannel(ImplVoiceChannel.this);
-                logger.info("Deleted voice channel {}", ImplVoiceChannel.this);
-                // call listener
-                api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        List<VoiceChannelDeleteListener> listeners =
-                                api.getListeners(VoiceChannelDeleteListener.class);
-                        synchronized (listeners) {
-                            for (VoiceChannelDeleteListener listener : listeners) {
-                                try {
-                                    listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
-                                } catch (Throwable t) {
-                                    logger.warn("Uncaught exception in VoiceChannelDeleteListener!", t);
-                                }
-                            }
-                        }
-                    }
-                });
-                return null;
-            }
-        });
-    }
+	@Override
+	public Server getServer() {
+		return server;
+	}
 
-    @Override
-    public InviteBuilder getInviteBuilder() {
-        return new ImplInviteBuilder(this, api);
-    }
+	@Override
+	public Future<Void> delete() {
+		return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				logger.debug("Trying to delete voice channel {}", ImplVoiceChannel.this);
+				HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/channels/" + id)
+						.header("authorization", api.getToken()).asJson();
+				api.checkResponse(response);
+				api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
+				server.removeVoiceChannel(ImplVoiceChannel.this);
+				logger.info("Deleted voice channel {}", ImplVoiceChannel.this);
+				// call listener
+				api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+					@Override
+					public void run() {
+						List<VoiceChannelDeleteListener> listeners = api.getListeners(VoiceChannelDeleteListener.class);
+						synchronized (listeners) {
+							for (VoiceChannelDeleteListener listener : listeners) {
+								try {
+									listener.onVoiceChannelDelete(api, ImplVoiceChannel.this);
+								} catch (Throwable t) {
+									logger.warn("Uncaught exception in VoiceChannelDeleteListener!", t);
+								}
+							}
+						}
+					}
+				});
+				return null;
+			}
+		});
+	}
 
-    @Override
-    public Permissions getOverwrittenPermissions(User user) {
-        Permissions permissions = overwrittenPermissions.get(user.getId());
-        return permissions == null ? emptyPermissions : permissions;
-    }
+	@Override
+	public InviteBuilder getInviteBuilder() {
+		return new ImplInviteBuilder(this, api);
+	}
 
-    @Override
-    public Permissions getOverwrittenPermissions(Role role) {
-        return role.getOverwrittenPermissions(this);
-    }
+	@Override
+	public Permissions getOverwrittenPermissions(User user) {
+		Permissions permissions = overwrittenPermissions.get(user.getId());
+		return permissions == null ? emptyPermissions : permissions;
+	}
 
-    @Override
-    public Future<Void> updateOverwrittenPermissions(final Role role, final Permissions permissions) {
-        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Updating permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
-                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
-                        .header("authorization", api.getToken())
-                        .header("Content-Type", "application/json")
-                        .body(new JSONObject()
-                                .put("allow", ((ImplPermissions) permissions).getAllowed())
-                                .put("deny", ((ImplPermissions) permissions).getDenied())
-                                .put("type", "role").toString())
-                        .asJson();
-                logger.debug("Updated permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
-                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                return null;
-            }
-        });
-    }
+	@Override
+	public Permissions getOverwrittenPermissions(Role role) {
+		return role.getOverwrittenPermissions(this);
+	}
 
-    @Override
-    public Future<Void> updateOverwrittenPermissions(final User user, final Permissions permissions) {
-        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Updating permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
-                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
-                        .header("authorization", api.getToken())
-                        .header("Content-Type", "application/json")
-                        .body(new JSONObject()
-                                .put("allow", ((ImplPermissions) permissions).getAllowed())
-                                .put("deny", ((ImplPermissions) permissions).getDenied())
-                                .put("type", "member").toString())
-                        .asJson();
-                logger.debug("Updated permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
-                        ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                return null;
-            }
-        });
-    }
+	@Override
+	public Future<Void> updateOverwrittenPermissions(final Role role, final Permissions permissions) {
+		return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				logger.debug("Updating permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
+						((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+				Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+						.header("authorization", api.getToken()).header("Content-Type", "application/json")
+						.body(new JSONObject().put("allow", ((ImplPermissions) permissions).getAllowed())
+								.put("deny", ((ImplPermissions) permissions).getDenied()).put("type", "role")
+								.toString())
+						.asJson();
+				logger.debug("Updated permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
+						((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+				return null;
+			}
+		});
+	}
 
-    @Override
-    public Future<Void> deleteOverwrittenPermissions(final Role role) {
-        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Deleting permissions in channel {} for role {}", this, role);
-                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
-                        .header("authorization", api.getToken())
-                        .asJson();
-                logger.debug("Deleted permissions in channel {} for role {}", this, role);
-                return null;
-            }
-        });
-    }
+	@Override
+	public Future<Void> updateOverwrittenPermissions(final User user, final Permissions permissions) {
+		return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				logger.debug("Updating permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
+						((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+				Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+						.header("authorization", api.getToken()).header("Content-Type", "application/json")
+						.body(new JSONObject().put("allow", ((ImplPermissions) permissions).getAllowed())
+								.put("deny", ((ImplPermissions) permissions).getDenied()).put("type", "member")
+								.toString())
+						.asJson();
+				logger.debug("Updated permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
+						((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
+				return null;
+			}
+		});
+	}
 
-    @Override
-    public Future<Void> deleteOverwrittenPermissions(final User user) {
-        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Deleting permissions in channel {} for user {}", this, user);
-                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
-                        .header("authorization", api.getToken())
-                        .asJson();
-                logger.debug("Deleted permissions in channel {} for user {}", this, user);
-                return null;
-            }
-        });
-    }
+	@Override
+	public Future<Void> deleteOverwrittenPermissions(final Role role) {
+		return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				logger.debug("Deleting permissions in channel {} for role {}", this, role);
+				Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+						.header("authorization", api.getToken()).asJson();
+				logger.debug("Deleted permissions in channel {} for role {}", this, role);
+				return null;
+			}
+		});
+	}
 
-    @Override
-    public Future<Void> updateName(final String newName) {
-        final JSONObject params = new JSONObject()
-                .put("name", newName);
-        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Trying to update voice channel {} (new name: {}, old name: {})",
-                        ImplVoiceChannel.this, newName, getName());
-                HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/channels/" + getId())
-                        .header("authorization", api.getToken())
-                        .header("Content-Type", "application/json")
-                        .body(params.toString())
-                        .asJson();
-                api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
-                String updatedName = response.getBody().getObject().getString("name");
-                logger.debug("Updated voice channel {} (new name: {}, old name: {})",
-                        ImplVoiceChannel.this, updatedName, getName());
-                // check name
-                if (!updatedName.equals(getName())) {
-                    final String oldName = getName();
-                    setName(updatedName);
-                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<VoiceChannelChangeNameListener> listeners =
-                                    api.getListeners(VoiceChannelChangeNameListener.class);
-                            synchronized (listeners) {
-                                for (VoiceChannelChangeNameListener listener : listeners) {
-                                    try {
-                                        listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
-                                    } catch (Throwable t) {
-                                        logger.warn("Uncaught exception in VocieChannelChangeNameListener!", t);
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                return null;
-            }
-        });
-    }
+	@Override
+	public Future<Void> deleteOverwrittenPermissions(final User user) {
+		return api.getThreadPool().getListeningExecutorService().submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				logger.debug("Deleting permissions in channel {} for user {}", this, user);
+				Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+						.header("authorization", api.getToken()).asJson();
+				logger.debug("Deleted permissions in channel {} for user {}", this, user);
+				return null;
+			}
+		});
+	}
 
-    /**
-     * Sets the name of the channel (no update!).
-     *
-     * @param name The name to set.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+	@Override
+	public Future<Void> updateName(final String newName) {
+		final JSONObject params = new JSONObject().put("name", newName);
+		return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				logger.debug("Trying to update voice channel {} (new name: {}, old name: {})", ImplVoiceChannel.this,
+						newName, getName());
+				HttpResponse<JsonNode> response = Unirest.patch("https://discordapp.com/api/channels/" + getId())
+						.header("authorization", api.getToken()).header("Content-Type", "application/json")
+						.body(params.toString()).asJson();
+				api.checkResponse(response);
+				api.checkRateLimit(response, RateLimitType.UNKNOWN, server, null);
+				String updatedName = response.getBody().getObject().getString("name");
+				logger.debug("Updated voice channel {} (new name: {}, old name: {})", ImplVoiceChannel.this,
+						updatedName, getName());
+				// check name
+				if (!updatedName.equals(getName())) {
+					final String oldName = getName();
+					setName(updatedName);
+					api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+						@Override
+						public void run() {
+							List<VoiceChannelChangeNameListener> listeners = api
+									.getListeners(VoiceChannelChangeNameListener.class);
+							synchronized (listeners) {
+								for (VoiceChannelChangeNameListener listener : listeners) {
+									try {
+										listener.onVoiceChannelChangeName(api, ImplVoiceChannel.this, oldName);
+									} catch (Throwable t) {
+										logger.warn("Uncaught exception in VocieChannelChangeNameListener!", t);
+									}
+								}
+							}
+						}
+					});
+				}
+				return null;
+			}
+		});
+	}
 
-    /**
-     * Sets the position of the channel (no update!).
-     *
-     * @param position The position to set.
-     */
-    public void setPosition(int position) {
-        this.position = position;
-    }
+	/**
+	 * Sets the name of the channel (no update!).
+	 *
+	 * @param name
+	 *            The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    /**
-     * Sets the overwritten permissions of an user.
-     *
-     * @param user The user which overwrites the permissions.
-     * @param permissions The overwritten permissions.
-     */
-    public void setOverwrittenPermissions(User user, Permissions permissions) {
-        overwrittenPermissions.put(user.getId(), permissions);
-    }
+	/**
+	 * Sets the position of the channel (no update!).
+	 *
+	 * @param position
+	 *            The position to set.
+	 */
+	public void setPosition(int position) {
+		this.position = position;
+	}
 
-    /**
-     * Adds a {@link User} to the set of connected Users.
-     *
-     * @param user
-     *            The connected user to add.
-     */
-    public void addConnectedUser(User user) {
-        this.connectedUsers.add(user);
-    }
+	/**
+	 * Sets the overwritten permissions of an user.
+	 *
+	 * @param user
+	 *            The user which overwrites the permissions.
+	 * @param permissions
+	 *            The overwritten permissions.
+	 */
+	public void setOverwrittenPermissions(User user, Permissions permissions) {
+		overwrittenPermissions.put(user.getId(), permissions);
+	}
 
-    /**
-     * Removes a {@link User} from the set of connected Users.
-     *
-     * @param user
-     *            The connected user to remove if found.
-     */
-    public void removeConnectedUser(User user) {
-        this.connectedUsers.remove(user);
-    }
+	/**
+	 * Removes the overwritten permissions of a user from the cache.
+	 *
+	 *
+	 * @param user
+	 *            The user, which permissions should be removed.
+	 */
+	public void removeOverwrittenPermissions(User user) {
+		overwrittenPermissions.remove(user.getId());
+	}
 
-    /**
-     * Returns a set of users connected to this channel.
-     * 
-     * @return the set of users connected to this channel.
-     */
-    public final Set<User> getConnectedUsers() {
-        return this.connectedUsers;
-    }
+	/**
+	 * Adds a {@link User} to the set of connected Users.
+	 *
+	 * @param user
+	 *            The connected user to add.
+	 */
+	public void addConnectedUser(User user) {
+		this.connectedUsers.add(user);
+	}
 
-    @Override
-    public String toString() {
-        return getName() + " (id: " + getId() + ")";
-    }
+	/**
+	 * Removes a {@link User} from the set of connected Users.
+	 *
+	 * @param user
+	 *            The connected user to remove if found.
+	 */
+	public void removeConnectedUser(User user) {
+		this.connectedUsers.remove(user);
+	}
 
-    @Override
-    public int hashCode() {
-        return getId().hashCode();
-    }
+	/**
+	 * Returns a set of users connected to this channel.
+	 * 
+	 * @return the set of users connected to this channel.
+	 */
+	public final Set<User> getConnectedUsers() {
+		return this.connectedUsers;
+	}
+
+	@Override
+	public String toString() {
+		return getName() + " (id: " + getId() + ")";
+	}
+
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
+	}
 
 }
