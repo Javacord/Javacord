@@ -193,7 +193,7 @@ public class ImplRole implements Role {
     }
     
     @Override
-    public Future<Void> updateMentionable(boolean Mentionable) {
+    public Future<Void> updateMentionable(boolean mentionable) {
         return update(name, color, hoist, permissions, managed, mentionable);
     }
     
