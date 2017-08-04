@@ -28,7 +28,7 @@ import de.btobastian.javacord.listener.Listener;
 public interface RoleChangeMentionableListener extends Listener {
 
     /**
-     * This method is called every time a role changed its color.
+     * This method is called every time a role changed its Mentionable.
      *
      * @param api The api.
      * @param role The role with the updated name.

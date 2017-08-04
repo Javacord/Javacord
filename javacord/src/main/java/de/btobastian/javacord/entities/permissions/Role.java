@@ -193,6 +193,8 @@ public interface Role {
      * @param color The new color of the role.
      * @param hoist The new hoist of the role.
      * @param permissions The new permissions of the role.
+     * @param managed The new managed of the role.
+     * @param mentionable The new mentionable of the role.
      * @return A future which tells us if the update was successful or not.
      */
 	Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean managed,
