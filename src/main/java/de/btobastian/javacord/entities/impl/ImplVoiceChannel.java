@@ -403,6 +403,7 @@ public class ImplVoiceChannel implements VoiceChannel {
      * 
      * @return the set of users connected to this channel.
      */
+    @Override
     public final Set<User> getConnectedUsers() {
         return this.connectedUsers;
     }
