@@ -35,7 +35,7 @@ public enum UserStatus {
     /**
      * The user is dnd
      */
-    DO_NOT_DISTURBE(),
+    DO_NOT_DISTURB(),
     /**
      * Ths user is offline.
      */
@@ -55,7 +55,7 @@ public enum UserStatus {
             case "idle":
                 return IDLE;
             case"dnd":
-                return DO_NOT_DISTURBE;
+                return DO_NOT_DISTURB;
             default:
                 return OFFLINE;
         }
