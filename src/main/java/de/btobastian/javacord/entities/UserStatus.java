@@ -32,7 +32,10 @@ public enum UserStatus {
      * The user is idle.
      */
     IDLE(),
-
+    /**
+     * The user is dnd
+     */
+    DO_NOT_DISTURBE(),
     /**
      * Ths user is offline.
      */
@@ -51,6 +54,8 @@ public enum UserStatus {
                 return ONLINE;
             case "idle":
                 return IDLE;
+            case"dnd":
+                return DO_NOT_DISTURBE;
             default:
                 return OFFLINE;
         }
