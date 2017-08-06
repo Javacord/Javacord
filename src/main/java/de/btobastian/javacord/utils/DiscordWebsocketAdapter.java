@@ -99,7 +99,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             logger.warn("An error occurred while setting ssl context", e);
         }
         try {
-            websocket = factory.createSocket(gateway + "?encoding=json&v=5");
+            websocket = factory.createSocket(gateway + "?encoding=json&v=6");
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
             websocket.connect();
@@ -424,7 +424,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 .put("op", 3)
                 .put("d", new JSONObject()
                         .put("game", game)
-                        .put("idle_since", api.isIdle() ? 1 : JSONObject.NULL));
+                        .put("since", api.isIdle() ? 1 : JSONObject.NULL));
         websocket.sendText(updateStatus.toString());
     }
 

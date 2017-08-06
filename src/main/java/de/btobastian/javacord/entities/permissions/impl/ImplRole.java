@@ -169,26 +169,31 @@ public class ImplRole implements Role {
 
     @Override
     public Future<Void> updatePermissions(Permissions permissions) {
-        return update(name, color, hoist, permissions);
+        return update(name, color, hoist, permissions, mentionable);
     }
 
     @Override
     public Future<Void> updateName(String name) {
-        return update(name, color, hoist, permissions);
+        return update(name, color, hoist, permissions, mentionable);
     }
 
     @Override
     public Future<Void> updateColor(Color color) {
-        return update(name, color, hoist, permissions);
+        return update(name, color, hoist, permissions, mentionable);
     }
 
     @Override
     public Future<Void> updateHoist(boolean hoist) {
-        return update(name, color, hoist, permissions);
+        return update(name, color, hoist, permissions, mentionable);
     }
-
+    
     @Override
-    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions) {
+    public Future<Void> updateMentionable(boolean mentionable) {
+        return update(name, color, hoist, permissions, mentionable);
+    }
+    
+    @Override
+    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean mentionable) {
         if (name == null) {
             name = getName();
         }
@@ -198,7 +203,7 @@ public class ImplRole implements Role {
         if (permissions == null) {
             permissions = getPermissions();
         }
-        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed());
+        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed(), mentionable);
     }
 
     /**
@@ -208,9 +213,10 @@ public class ImplRole implements Role {
      * @param color The new color of the role.
      * @param hoist The new hoist of the role.
      * @param allow The new permissions of the role.
+     * @param mentionable The new mentionable status of the role.
      * @return A future.
      */
-    private Future<Void> update(final String name, final int color, final boolean hoist, final int allow) {
+    private Future<Void> update(final String name, final int color, final boolean hoist, final int allow, final boolean mentionable) {
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -226,7 +232,8 @@ public class ImplRole implements Role {
                                 .put("name", name)
                                 .put("color", color & 0xFFFFFF)
                                 .put("hoist", hoist)
-                                .put("permissions", allow).toString())
+                                .put("permissions", allow)
+                                .put("mentionable", mentionable).toString())
                         .asJson();
                 api.checkResponse(response);
                 api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
@@ -318,6 +325,48 @@ public class ImplRole implements Role {
                                         listener.onRoleChangeHoist(api, ImplRole.this, !ImplRole.this.hoist);
                                     } catch (Throwable t) {
                                         logger.warn("Uncaught exception in RoleChangeHoistListener!", t);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                // update managed
+                if (ImplRole.this.managed != managed) {
+                    ImplRole.this.managed = managed;
+                    // call listener
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<RoleChangeManagedListener> listeners =
+                                    api.getListeners(RoleChangeManagedListener.class);
+                            synchronized (listeners) {
+                                for (RoleChangeManagedListener listener : listeners) {
+                                    try {
+                                        listener.onRoleChangeManaged(api, ImplRole.this, !ImplRole.this.managed);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in RoleChangeManagedListener!", t);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                // update mentionable
+                if (ImplRole.this.mentionable != mentionable) {
+                    ImplRole.this.mentionable = mentionable;
+                    // call listener
+                    api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<RoleChangeMentionableListener> listeners =
+                                    api.getListeners(RoleChangeMentionableListener.class);
+                            synchronized (listeners) {
+                                for (RoleChangeMentionableListener listener : listeners) {
+                                    try {
+                                        listener.onRoleChangeMentionable(api, ImplRole.this, !ImplRole.this.mentionable);
+                                    } catch (Throwable t) {
+                                        logger.warn("Uncaught exception in RoleChangeMentionableListener!", t);
                                     }
                                 }
                             }
@@ -461,6 +510,24 @@ public class ImplRole implements Role {
      */
     public void setHoist(boolean hoist) {
         this.hoist = hoist;
+    }
+    
+    /**
+     * Sets the mentionable of the role
+     * 
+     * @param mentionable The mentionable to set
+     */
+    public void setMentionable(boolean mentionable) {
+        this.mentionable = mentionable;
+    }
+    
+    /**
+     * Sets the managed of the role
+     * 
+     * @param managed The managed to set
+     */
+    public void setManaged(boolean managed) {
+        this.managed = managed;
     }
 
     @Override

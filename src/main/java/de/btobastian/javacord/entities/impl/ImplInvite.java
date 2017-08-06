@@ -75,7 +75,7 @@ public class ImplInvite implements Invite {
         this.serverName = data.getJSONObject("guild").getString("name");
         this.channelId = data.getJSONObject("channel").getString("id");
         this.channelName = data.getJSONObject("channel").getString("name");
-        this.voice = !data.getJSONObject("channel").getString("type").equals("text");
+        this.voice = data.getJSONObject("channel").getInt("type") == 2;
         if (data.has("max_age")) {
             this.maxAge = data.getInt("max_age");
         }
