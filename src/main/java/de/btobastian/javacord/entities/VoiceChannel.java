@@ -22,6 +22,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 
 import java.util.Calendar;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
@@ -157,4 +158,11 @@ public interface VoiceChannel {
      * @return A future which tells us whether the update was successful or not.
      */
     public Future<Void> update(String newName, int newPosition);
+
+    /**
+     * Returns a set of users connected to this channel.
+     *
+     * @return the set of users connected to this channel.
+     */
+    public Set<User> getConnectedUsers();
 }
