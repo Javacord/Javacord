@@ -57,17 +57,25 @@ public class ChannelCreateHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        boolean isPrivate = packet.getBoolean("is_private");
-        if (isPrivate) {
-            User recipient = api.getOrCreateUser(packet.getJSONObject("recipient"));
-            ((ImplUser) recipient).setUserChannelId(packet.getString("id"));
-            return;
-        }
-        Server server = api.getServerById(packet.getString("guild_id"));
-        if (packet.getString("type").equals("text")) {
-            handleServerTextChannel(packet, server);
-        } else {
-            handleServerVoiceChannel(packet, server);
+        int type = packet.getInt("type");
+        switch (type) {
+            case 0:
+                handleServerTextChannel(packet, api.getServerById(packet.getString("guild_id")));
+                break;
+            case 1:
+                User recipient = api.getOrCreateUser(packet.getJSONArray("recipients").getJSONObject(0));
+                ((ImplUser) recipient).setUserChannelId(packet.getString("id"));
+                break;
+            case 2:
+                handleServerVoiceChannel(packet, api.getServerById(packet.getString("guild_id")));
+                break;
+            case 3:
+                // TODO DM groups
+                break;
+            case 4:
+                break;
+            default:
+                break;
         }
     }
 

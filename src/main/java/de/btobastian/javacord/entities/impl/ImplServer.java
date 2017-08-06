@@ -124,11 +124,11 @@ public class ImplServer implements Server {
         JSONArray channels = data.getJSONArray("channels");
         for (int i = 0; i < channels.length(); i++) {
             JSONObject channelJson = channels.getJSONObject(i);
-            String type = channelJson.getString("type");
-            if (type.equals("text")) {
+            int type = channelJson.getInt("type");
+            if (type == 0) {
                 new ImplChannel(channels.getJSONObject(i), this, api);
             }
-            if (type.equals("voice")) {
+            if (type == 2) {
                 new ImplVoiceChannel(channels.getJSONObject(i), this, api);
             }
         }
