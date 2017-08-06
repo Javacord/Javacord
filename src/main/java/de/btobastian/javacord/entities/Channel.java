@@ -203,4 +203,11 @@ public interface Channel extends MessageReceiver {
      */
     public Future<Void> bulkDelete(Message... messages);
 
+    /**
+     * Gets a specific message from the channel.
+     *
+     * @param messageId The message to request
+     * @return A message
+     */
+    Future<Message> getMessage(String messageId);
 }
