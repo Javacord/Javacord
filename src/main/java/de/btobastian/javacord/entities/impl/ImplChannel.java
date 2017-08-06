@@ -724,6 +724,23 @@ public class ImplChannel implements Channel {
         return future;
     }
 
+    @Override
+    public Future<Message> getMessage(final String messageId) {
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+            @Override
+            public Message call() throws Exception {
+                logger.debug("Requesting message (channel id: {}, message id: {}", id, messageId);
+                String link = "https://discordapp.com/api/channels/" + id + "/messages/" + messageId;
+                HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, null, null);
+                JSONObject messageJson = response.getBody().getObject();
+                Message message = new ImplMessage(messageJson, api, null);
+                return message;
+            }
+        });
+    }
+
     /**
      * Sets the name of the channel (no update!).
      *
