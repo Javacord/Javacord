@@ -197,7 +197,7 @@ public interface Role {
      * @param mentionable The new mentionable of the role.
      * @return A future which tells us if the update was successful or not.
      */
-	Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean managed, boolean mentionable);
+    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean managed, boolean mentionable);
 
     /**
      * Deletes the role.
