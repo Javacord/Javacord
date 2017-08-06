@@ -169,36 +169,31 @@ public class ImplRole implements Role {
 
     @Override
     public Future<Void> updatePermissions(Permissions permissions) {
-        return update(name, color, hoist, permissions, managed, mentionable);
+        return update(name, color, hoist, permissions, mentionable);
     }
 
     @Override
     public Future<Void> updateName(String name) {
-        return update(name, color, hoist, permissions, managed, mentionable);
+        return update(name, color, hoist, permissions, mentionable);
     }
 
     @Override
     public Future<Void> updateColor(Color color) {
-        return update(name, color, hoist, permissions, managed, mentionable);
+        return update(name, color, hoist, permissions, mentionable);
     }
 
     @Override
     public Future<Void> updateHoist(boolean hoist) {
-        return update(name, color, hoist, permissions, managed, mentionable);
-    }
-
-    @Override
-    public Future<Void> updateManaged(boolean managed) {
-        return update(name, color, hoist, permissions, managed, mentionable);
+        return update(name, color, hoist, permissions, mentionable);
     }
     
     @Override
     public Future<Void> updateMentionable(boolean mentionable) {
-        return update(name, color, hoist, permissions, managed, mentionable);
+        return update(name, color, hoist, permissions, mentionable);
     }
     
     @Override
-    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean managed, boolean mentionable) {
+    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean mentionable) {
         if (name == null) {
             name = getName();
         }
@@ -208,7 +203,7 @@ public class ImplRole implements Role {
         if (permissions == null) {
             permissions = getPermissions();
         }
-        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed());
+        return update(name, color.getRGB(), hoist, ((ImplPermissions) permissions).getAllowed(), mentionable);
     }
 
     /**
@@ -218,11 +213,10 @@ public class ImplRole implements Role {
      * @param color The new color of the role.
      * @param hoist The new hoist of the role.
      * @param allow The new permissions of the role.
-     * @param managed The new managed status of the role.
      * @param mentionable The new mentionable status of the role.
      * @return A future.
      */
-    private Future<Void> update(final String name, final int color, final boolean hoist, final int allow) {
+    private Future<Void> update(final String name, final int color, final boolean hoist, final int allow, final boolean mentionable) {
         return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -239,7 +233,6 @@ public class ImplRole implements Role {
                                 .put("color", color & 0xFFFFFF)
                                 .put("hoist", hoist)
                                 .put("permissions", allow)
-                                .put("managed", managed)
                                 .put("mentionable", mentionable).toString())
                         .asJson();
                 api.checkResponse(response);

@@ -128,7 +128,7 @@ public interface Role {
     /**
      * Updates the permissions of this role.
      * If you want to update other things like name, color, etc. use
-     * {@link #update(String, Color, boolean, Permissions, boolean, boolean)} or your previous updates may be overwritten.
+     * {@link #update(String, Color, boolean, Permissions, boolean)} or your previous updates may be overwritten.
      *
      * @param permissions The permissions to set. Roles don't have the {@link PermissionState#NONE} so every
      *                    permission with this state will be replaced with {@link PermissionState#DENIED}.
@@ -139,7 +139,7 @@ public interface Role {
     /**
      * Updates the name of this role.
      * If you want to update other things like permissions, color, etc. use
-     * {@link #update(String, Color, boolean, Permissions, boolean, boolean)} or your previous updates may be overwritten.
+     * {@link #update(String, Color, boolean, Permissions, boolean)} or your previous updates may be overwritten.
      *
      * @param name The name to set.
      * @return A future which tells us if the update was successful or not.
@@ -149,7 +149,7 @@ public interface Role {
     /**
      * Updates the color of this role.
      * If you want to update other things like permissions, name, etc. use
-     * {@link #update(String, Color, boolean, Permissions, boolean, boolean)} or your previous updates may be overwritten.
+     * {@link #update(String, Color, boolean, Permissions, boolean)} or your previous updates may be overwritten.
      *
      * @param color The color to set.
      * @return A future which tells us if the update was successful or not.
@@ -159,27 +159,18 @@ public interface Role {
     /**
      * Updates the hoist of this role.
      * If you want to update other things like permissions, color, etc. use
-     * {@link #update(String, Color, boolean, Permissions, boolean, boolean)} or your previous updates may be overwritten.
+     * {@link #update(String, Color, boolean, Permissions, boolean)} or your previous updates may be overwritten.
      *
      * @param hoist The hoist to set.
      * @return A future which tells us if the update was successful or not.
      */
     public Future<Void> updateHoist(boolean hoist);
 
-    /**
-     * Updates the managed of this role.
-     * If you want to update other things like permissions, color, etc. use
-     * {@link #update(String, Color, boolean, Permissions, boolean, boolean)} or your previous updates may be overwritten.
-     * 
-     * @param managed The managed to set.
-     * @return A future which tells us if the update was successful or not.
-     */
-    public Future<Void> updateManaged(boolean managed);
     
     /**
      * Updates the mentionable of this role.
      * If you want to update other things like permissions, color, etc. use
-     * {@link #update(String, Color, boolean, Permissions, boolean, boolean)} or your previous updates may be overwritten.
+     * {@link #update(String, Color, boolean, Permissions, boolean)} or your previous updates may be overwritten.
      * 
      * @param mentionable The mentionable to set.
      * @return A future which tells us if the update was successful or not.
@@ -193,11 +184,10 @@ public interface Role {
      * @param color The new color of the role.
      * @param hoist The new hoist of the role.
      * @param permissions The new permissions of the role.
-     * @param managed The new managed of the role.
      * @param mentionable The new mentionable of the role.
      * @return A future which tells us if the update was successful or not.
      */
-    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean managed, boolean mentionable);
+    public Future<Void> update(String name, Color color, boolean hoist, Permissions permissions, boolean mentionable);
 
     /**
      * Deletes the role.
