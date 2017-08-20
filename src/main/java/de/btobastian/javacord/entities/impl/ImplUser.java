@@ -155,7 +155,7 @@ public class ImplUser implements User {
 
     @Override
     public boolean isYourself() {
-        return api.getYourself() == this;
+        return this.equals(api.getYourself());
     }
 
     @Override
