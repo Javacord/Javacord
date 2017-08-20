@@ -159,6 +159,18 @@ public class ImplUser implements User {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof User)) {
+            return false;
+        }
+        if (o == this) { // referentially the same object
+            return true;
+        }
+        User otherUser = (User) o;
+        return otherUser.getId().equals(this.getId());
+    }
+
+    @Override
     public Future<byte[]> getAvatarAsByteArray() {
         return getAvatarAsByteArray(null);
     }
