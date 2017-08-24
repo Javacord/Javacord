@@ -119,7 +119,6 @@ public class ImplInviteBuilder implements InviteBuilder {
                         logger.debug("Created invite for channel {} (max uses: {}, temporary: {}, max age: {}",
                                 textChannel == null ? voiceChannel : textChannel, maxUses, temporary,
                                 data.has("max_age") ? data.getInt("max_age") : -1);
-                        System.out.println(data.toString());
                         return new ImplInvite(api, data);
                     }
                 });
