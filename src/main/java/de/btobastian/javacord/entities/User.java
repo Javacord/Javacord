@@ -176,9 +176,9 @@ public interface User extends MessageReceiver {
     public UserStatus getStatus();
     
     /**
-     * Gets the status of the user.
+     * Get the user's current voice channel.
      *
-     * @return The status of the user.
+     * @return The user's current voice channel
      */
     public VoiceChannel getVoiceChannel();
 
