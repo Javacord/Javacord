@@ -417,14 +417,18 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         logger.debug("Updating status (game: {}, idle: {})", api.getGame() == null ? "none" : api.getGame(), api.isIdle());
         JSONObject game = new JSONObject();
         game.put("name", api.getGame() == null ? JSONObject.NULL : api.getGame());
+        game.put("type", api.getStreamingUrl() == null ? 0 : 1);
         if (api.getStreamingUrl() != null) {
-            game.put("url", api.getStreamingUrl()).put("type", 1);
+            game.put("url", api.getStreamingUrl());
         }
         JSONObject updateStatus = new JSONObject()
                 .put("op", 3)
                 .put("d", new JSONObject()
+                        .put("status", "online")
+                        .put("afk", false)
                         .put("game", game)
                         .put("since", api.isIdle() ? 1 : JSONObject.NULL));
+        logger.debug(updateStatus.toString(2));
         websocket.sendText(updateStatus.toString());
     }
 
