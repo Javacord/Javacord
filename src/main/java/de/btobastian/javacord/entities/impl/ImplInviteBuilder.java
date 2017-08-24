@@ -108,7 +108,7 @@ public class ImplInviteBuilder implements InviteBuilder {
                         }
                         String channelId = textChannel == null ? voiceChannel.getId() : textChannel.getId();
                         HttpResponse<JsonNode> response = Unirest
-                                .post("https://discordapp.com/api/channels/" + channelId + "/invites")
+                                .post("https://discordapp.com/api/v6/channels/" + channelId + "/invites")
                                 .header("authorization", api.getToken())
                                 .header("Content-Type", "application/json")
                                 .body(jsonParam.toString())
@@ -119,6 +119,7 @@ public class ImplInviteBuilder implements InviteBuilder {
                         logger.debug("Created invite for channel {} (max uses: {}, temporary: {}, max age: {}",
                                 textChannel == null ? voiceChannel : textChannel, maxUses, temporary,
                                 data.has("max_age") ? data.getInt("max_age") : -1);
+                        System.out.println(data.toString());
                         return new ImplInvite(api, data);
                     }
                 });
