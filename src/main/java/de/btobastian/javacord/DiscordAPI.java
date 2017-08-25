@@ -490,6 +490,8 @@ public interface DiscordAPI {
      * This value is <code>true</code> by default.
      * If it's set to <code>false</code> the list of servers ({@link #getServers()}) will be empty after connecting and
      * will be filled a few seconds later (depending on the amount of servers).
+     * 
+     * @return Whether the bot should wait for all servers to be loaded or not.
      */
     public boolean isWaitingForServersOnStartup();
 
