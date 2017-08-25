@@ -706,6 +706,12 @@ public class ImplDiscordAPI implements DiscordAPI {
         }
     }
 
+    @Override
+    public void setReconnectRatelimit(int attempts, int seconds) {
+        socketAdapter.setReconnectAttempts(attempts);
+        socketAdapter.setRatelimitResetIntervalInSeconds(seconds);
+    }
+
     /**
      * Gets a list with all unavailable servers.
      *

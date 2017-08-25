@@ -499,4 +499,14 @@ public interface DiscordAPI {
      */
     public void disconnect();
 
+    /**
+     * Sets the maximum reconnect attempts in a given time before the bot stops reconnecting.
+     * By default the bot stops reconnecting, if the connection failed more than 5 times in the last 5 minutes.
+     * It's not recommended to change these values!
+     *
+     * @param attempts The amount of attempts. Default: 5
+     * @param seconds The time, in which the attempts can happen in seconds. Default: 60*5
+     */
+    public void setReconnectRatelimit(int attempts, int seconds);
+
 }

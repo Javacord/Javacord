@@ -74,6 +74,12 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     private boolean reconnect = true;
 
+    // We allow 5 reconnects per 5 minutes.
+    // This limit should never be hit under normal conditions, but prevent reconnect loops.
+    private Queue<Long> ratelimitQueue = new LinkedList<>();
+    private int reconnectAttempts = 5;
+    private int ratelimitResetIntervalInSeconds = 5*60;
+
     public DiscordWebsocketAdapter(ImplDiscordAPI api, String gateway) {
         this.api = api;
         this.gateway = gateway;
@@ -149,6 +155,14 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         }
 
         if (reconnect) {
+            ratelimitQueue.offer(System.currentTimeMillis());
+            if (ratelimitQueue.size() > reconnectAttempts) {
+                long timestamp = ratelimitQueue.poll();
+                if (System.currentTimeMillis() - (1000*ratelimitResetIntervalInSeconds) < timestamp) {
+                    logger.error("Websocket connection failed more than {} times in the last {} seconds! Stopping reconnecting.", reconnectAttempts, ratelimitResetIntervalInSeconds);
+                    return;
+                }
+            }
             connect();
         }
     }
@@ -432,7 +446,25 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         websocket.sendText(updateStatus.toString());
     }
 
-    /* === ERROR LOGGING === */
+    /**
+     * Sets the reconnect reset interval in seconds.
+     *
+     * @param ratelimitResetIntervalInSeconds The reconnect reset interval in seconds.
+     */
+    public void setRatelimitResetIntervalInSeconds(int ratelimitResetIntervalInSeconds) {
+        this.ratelimitResetIntervalInSeconds = ratelimitResetIntervalInSeconds;
+    }
+
+    /**
+     * Sets the maximum reconnect attempts.
+     *
+     * @param reconnectAttempts The maximum reconnect attempts.
+     */
+    public void setReconnectAttempts(int reconnectAttempts) {
+        this.reconnectAttempts = reconnectAttempts;
+    }
+
+/* === ERROR LOGGING === */
 
     @Override
     public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
