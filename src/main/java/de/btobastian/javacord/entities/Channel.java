@@ -203,4 +203,12 @@ public interface Channel extends MessageReceiver {
      */
     public Future<Void> bulkDelete(Message... messages);
 
+    /**
+     * Gets a message in this channel by it's id. This method sends a request to Discord, if the given message is not cached.
+     *
+     * @param messageId The id of the message.
+     * @return A future which is guaranteed to contain a message, if a message with the given id exists, even if it's not cached.
+     */
+    public Future<Message> getMessageById(String messageId);
+
 }

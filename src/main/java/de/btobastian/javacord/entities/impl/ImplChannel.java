@@ -697,6 +697,36 @@ public class ImplChannel implements Channel {
         return bulkDelete(messageIds);
     }
 
+    @Override
+    public Future<Message> getMessageById(final String messageId) {
+        Message message = api.getMessageById(messageId);
+        if (message != null) {
+            return Futures.immediateFuture(message);
+        }
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+            @Override
+            public Message call() throws Exception {
+                logger.debug("Requesting message (channel id: {}, message id: {})", id, messageId);
+                HttpResponse<JsonNode> response =
+                        Unirest.get("https://discordapp.com/api/v6/channels/" + id + "/messages/" + messageId)
+                                .header("authorization", api.getToken())
+                                .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, null, ImplChannel.this);
+                Message message;
+                // Synchronize on api to prevent two method calls causing duplicate objects.
+                synchronized (api) {
+                    message = api.getMessageById(messageId);
+                    if (message == null) {
+                        message = new ImplMessage(response.getBody().getObject(), api, ImplChannel.this);
+                    }
+                    logger.debug("Got message (channel id: {}, message id: {}, message: {})", id, messageId, message);
+                }
+                return message;
+            }
+        });
+    }
+
     /**
      * Gets the message history.
      *
