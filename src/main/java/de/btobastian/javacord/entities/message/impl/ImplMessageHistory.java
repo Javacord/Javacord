@@ -119,8 +119,8 @@ public class ImplMessageHistory implements MessageHistory {
         logger.debug("Requesting part of message history (channel id: {}, message id: {}, before: {}, limit: {}",
                 channelId, messageId == null ? "none" : messageId, before, limit);
         String link = messageId == null ?
-                "https://discordapp.com/api/channels/" + channelId + "/messages?&limit=" + limit
-                : "https://discordapp.com/api/channels/" + channelId + "/messages?&"
+                "https://discordapp.com/api/v6/channels/" + channelId + "/messages?&limit=" + limit
+                : "https://discordapp.com/api/v6/channels/" + channelId + "/messages?&"
                 + (before ? "before" : "after") + "=" + messageId + "&limit=" + limit;
         HttpResponse<JsonNode> response = Unirest.get(link).header("authorization", api.getToken()).asJson();
         api.checkResponse(response);

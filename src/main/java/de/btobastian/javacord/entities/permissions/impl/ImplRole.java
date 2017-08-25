@@ -225,7 +225,7 @@ public class ImplRole implements Role {
                         ImplRole.this, name, getName(), color & 0xFFFFFF, getColor().getRGB() & 0xFFFFFF,
                         hoist, getHoist(), allow, permissions.getAllowed());
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/guilds/" + server.getId() + "/roles/" + id)
+                        .patch("https://discordapp.com/api/v6/guilds/" + server.getId() + "/roles/" + id)
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject()
@@ -385,7 +385,7 @@ public class ImplRole implements Role {
             public Void call() throws Exception {
                 logger.debug("Trying to delete role {}", ImplRole.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/guilds/" + getServer().getId() + "/roles/" + getId())
+                        .delete("https://discordapp.com/api/v6/guilds/" + getServer().getId() + "/roles/" + getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);

@@ -232,7 +232,7 @@ public class ImplServer implements Server {
             @Override
             public Void call() throws Exception {
                 logger.debug("Trying to delete server {}", ImplServer.this);
-                HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/guilds/" + id)
+                HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/v6/guilds/" + id)
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -266,7 +266,7 @@ public class ImplServer implements Server {
             public Void call() throws Exception {
                 logger.debug("Trying to leave server {}", ImplServer.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/users/@me/guilds/" + id)
+                        .delete("https://discordapp.com/api/v6/users/@me/guilds/" + id)
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -433,7 +433,7 @@ public class ImplServer implements Server {
                     public Invite[] call() throws Exception {
                         logger.debug("Trying to get invites for server {}", ImplServer.this);
                         HttpResponse<JsonNode> response = Unirest
-                                .get("https://discordapp.com/api/guilds/" + getId() + "/invites")
+                                .get("https://discordapp.com/api/v6/guilds/" + getId() + "/invites")
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
@@ -463,7 +463,7 @@ public class ImplServer implements Server {
             public Void call() throws Exception {
                 logger.debug("Trying to update roles in server {} (amount: {})", ImplServer.this, roles.length);
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" + user.getId())
+                        .patch("https://discordapp.com/api/v6/guilds/" + getId() + "/members/" + user.getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject().put("roles", roleIds).toString())
@@ -547,7 +547,7 @@ public class ImplServer implements Server {
                 logger.debug("Trying to ban an user from server {} (user id: {}, delete days: {})",
                         ImplServer.this, userId, deleteDays);
                 HttpResponse<JsonNode> response = Unirest
-                        .put("https://discordapp.com/api/guilds/" + getId() + "/bans/" + userId
+                        .put("https://discordapp.com/api/v6/guilds/" + getId() + "/bans/" + userId
                                 + "?delete-message-days=" + deleteDays)
                         .header("authorization", api.getToken())
                         .asJson();
@@ -586,7 +586,7 @@ public class ImplServer implements Server {
             public Void call() throws Exception {
                 logger.debug("Trying to unban an user from server {} (user id: {})", ImplServer.this, userId);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/guilds/" + getId() + "/bans/" + userId)
+                        .delete("https://discordapp.com/api/v6/guilds/" + getId() + "/bans/" + userId)
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -626,7 +626,7 @@ public class ImplServer implements Server {
                     public Ban[] call() throws Exception {
                         logger.debug("Trying to get bans for server {}", ImplServer.this);
                         HttpResponse<JsonNode> response = Unirest
-                                .get("https://discordapp.com/api/guilds/" + getId() + "/bans")
+                                .get("https://discordapp.com/api/v6/guilds/" + getId() + "/bans")
                                 .header("authorization", api.getToken())
                                 .asJson();
                         api.checkResponse(response);
@@ -658,7 +658,7 @@ public class ImplServer implements Server {
             public Void call() throws Exception {
                 logger.debug("Trying to kick an user from server {} (user id: {})", ImplServer.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/guilds/"+ getId() + "/members/" + userId)
+                        .delete("https://discordapp.com/api/v6/guilds/"+ getId() + "/members/" + userId)
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -701,7 +701,7 @@ public class ImplServer implements Server {
             public Role call() throws Exception {
                 logger.debug("Trying to create a role in server {}", ImplServer.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/guilds/" + getId() + "/roles")
+                        .post("https://discordapp.com/api/v6/guilds/" + getId() + "/roles")
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -768,7 +768,7 @@ public class ImplServer implements Server {
                         ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
                         getRegion().getKey());
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/guilds/" + getId())
+                        .patch("https://discordapp.com/api/v6/guilds/" + getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(params.toString())
@@ -842,7 +842,7 @@ public class ImplServer implements Server {
                 logger.debug("Trying to authorize bot with application id {} and permissions {}",
                         applicationId, permissions);
                 HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/oauth2/authorize?client_id=" + applicationId + "&scope=bot")
+                        .post("https://discordapp.com/api/v6/oauth2/authorize?client_id=" + applicationId + "&scope=bot")
                         .routeParam("id", applicationId)
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
@@ -897,9 +897,9 @@ public class ImplServer implements Server {
             @Override
             public Void call() throws Exception {
                 logger.debug("Trying to update nickname of user {} to {}", user, nickname);
-                String url = "https://discordapp.com/api/guilds/" + getId() + "/members/" + user.getId();
+                String url = "https://discordapp.com/api/v6/guilds/" + getId() + "/members/" + user.getId();
                 if (user.isYourself()) {
-                    url = "https://discordapp.com/api/guilds/" + getId() + "/members/@me/nick";
+                    url = "https://discordapp.com/api/v6/guilds/" + getId() + "/members/@me/nick";
                 }
                 HttpResponse<JsonNode> response = Unirest
                         .patch(url)
@@ -1178,7 +1178,7 @@ public class ImplServer implements Server {
     private Object createChannelBlocking(String name, boolean voice) throws Exception {
         logger.debug("Trying to create channel in server {} (name: {}, voice: {})", ImplServer.this, name, voice);
         JSONObject param = new JSONObject().put("name", name).put("type", voice ? "voice" : "text");
-        HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds/" + id + "/channels")
+        HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/v6/guilds/" + id + "/channels")
                 .header("authorization", api.getToken())
                 .header("Content-Type", "application/json")
                 .body(param.toString())

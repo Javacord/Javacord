@@ -140,7 +140,7 @@ public class ImplVoiceChannel implements VoiceChannel {
             public Void call() throws Exception {
                 logger.debug("Trying to delete voice channel {}", ImplVoiceChannel.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/channels/" + id)
+                        .delete("https://discordapp.com/api/v6/channels/" + id)
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -192,7 +192,7 @@ public class ImplVoiceChannel implements VoiceChannel {
             public Void call() throws Exception {
                 logger.debug("Updating permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
                         ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                Unirest.put("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + role.getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject()
@@ -214,7 +214,7 @@ public class ImplVoiceChannel implements VoiceChannel {
             public Void call() throws Exception {
                 logger.debug("Updating permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
                         ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                Unirest.put("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + user.getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject()
@@ -235,7 +235,7 @@ public class ImplVoiceChannel implements VoiceChannel {
             @Override
             public Void call() throws Exception {
                 logger.debug("Deleting permissions in channel {} for role {}", this, role);
-                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                Unirest.delete("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + role.getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 logger.debug("Deleted permissions in channel {} for role {}", this, role);
@@ -250,7 +250,7 @@ public class ImplVoiceChannel implements VoiceChannel {
             @Override
             public Void call() throws Exception {
                 logger.debug("Deleting permissions in channel {} for user {}", this, user);
-                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                Unirest.delete("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + user.getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 logger.debug("Deleted permissions in channel {} for user {}", this, user);
@@ -280,7 +280,7 @@ public class ImplVoiceChannel implements VoiceChannel {
                 logger.debug("Trying to update channel {} (new name: {}, old name: {}, new position: {}, old position: {})",
                         ImplVoiceChannel.this, newName, getName(), newPosition, getPosition());
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/channels/" + getId())
+                        .patch("https://discordapp.com/api/v6/channels/" + getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(params.toString())

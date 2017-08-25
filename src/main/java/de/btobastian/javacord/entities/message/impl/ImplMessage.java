@@ -305,7 +305,7 @@ public class ImplMessage implements Message {
                     api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
                 }
                 HttpResponse<JsonNode> response = Unirest.put
-                        ("https://discordapp.com/api/channels/" + channelId + "/pins/" + getId())
+                        ("https://discordapp.com/api/v6/channels/" + channelId + "/pins/" + getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -346,7 +346,7 @@ public class ImplMessage implements Message {
                     api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE_DELETE, null, getChannelReceiver());
                 }
                 HttpResponse<JsonNode> response = Unirest.delete
-                        ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                        ("https://discordapp.com/api/v6/channels/" + channelId + "/messages/" + getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -440,7 +440,7 @@ public class ImplMessage implements Message {
                     api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, getChannelReceiver());
                 }
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
+                        .patch("https://discordapp.com/api/v6/channels/" + channelId + "/messages/" + getId())
                         .header("authorization", api.getToken())
                         .header("content-type", "application/json")
                         .body(new JSONObject().put("content", content).toString())
@@ -502,7 +502,7 @@ public class ImplMessage implements Message {
             public Void call() throws Exception {
                 logger.debug("Trying to remove all reactions from message {}", ImplMessage.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions")
+                        .delete("https://discordapp.com/api/v6/channels/" + channelId + "/messages/" + getId() + "/reactions")
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -647,7 +647,7 @@ public class ImplMessage implements Message {
             public Void call() throws Exception {
                 logger.debug("Trying to add reaction to message with id {} (reaction: {})", getId(), reaction);
                 HttpResponse<JsonNode> response = Unirest
-                        .put("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId() + "/reactions/" + reaction + "/@me")
+                        .put("https://discordapp.com/api/v6/channels/" + channelId + "/messages/" + getId() + "/reactions/" + reaction + "/@me")
                         .header("authorization", api.getToken())
                         .header("content-type", "application/json")
                         .body("{}")

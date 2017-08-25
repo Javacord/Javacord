@@ -180,7 +180,7 @@ public class ImplReaction implements Reaction {
                 logger.debug("Trying to remove reactor {} from reaction {} of message {}", user, ImplReaction.this, message);
                 String reactionString = isCustomEmoji() ? getCustomEmoji().getName() + ":" + getCustomEmoji().getId() : getUnicodeEmoji();
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/channels/" + ((ImplMessage) message).getChannelId() + "/messages/" + message.getId() + "/reactions/" + reactionString + "/" + user.getId())
+                        .delete("https://discordapp.com/api/v6/channels/" + ((ImplMessage) message).getChannelId() + "/messages/" + message.getId() + "/reactions/" + reactionString + "/" + user.getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
