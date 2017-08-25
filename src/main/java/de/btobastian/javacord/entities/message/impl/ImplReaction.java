@@ -193,6 +193,8 @@ public class ImplReaction implements Reaction {
 
     /**
      * Increments the count.
+     *
+     * @param you If you are the one which used the reaction.
      */
     public void incrementCount(boolean you) {
         count++;
@@ -201,6 +203,8 @@ public class ImplReaction implements Reaction {
 
     /**
      * Decrements the count.
+     *
+     * @param you If you are the one which removed the reaction.
      */
     public void decrementCount(boolean you) {
         count--;
