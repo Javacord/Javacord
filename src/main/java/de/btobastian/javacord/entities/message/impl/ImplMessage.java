@@ -113,6 +113,7 @@ public class ImplMessage implements Message {
      *
      * @param data A JSONObject containing all necessary data.
      * @param api  The api of this server.
+     * @param receiver The receiver of the message.
      */
     public ImplMessage(JSONObject data, ImplDiscordAPI api, MessageReceiver receiver) {
         this.api = api;
