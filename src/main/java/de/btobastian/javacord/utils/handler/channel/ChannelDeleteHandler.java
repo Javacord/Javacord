@@ -69,6 +69,9 @@ public class ChannelDeleteHandler extends PacketHandler {
      */
     private void handleServerTextChannel(JSONObject packet, Server server) {
         final Channel channel = server.getChannelById(packet.getString("id"));
+        if (channel == null) {
+            return;
+        }
         ((ImplServer) server).removeChannel(channel);
         listenerExecutorService.submit(new Runnable() {
             @Override
@@ -95,6 +98,9 @@ public class ChannelDeleteHandler extends PacketHandler {
      */
     private void handleServerVoiceChannel(JSONObject packet, Server server) {
         final VoiceChannel channel = server.getVoiceChannelById(packet.getString("id"));
+        if (channel == null) {
+            return;
+        }
         ((ImplServer) server).removeVoiceChannel(channel);
         listenerExecutorService.submit(new Runnable() {
             @Override
