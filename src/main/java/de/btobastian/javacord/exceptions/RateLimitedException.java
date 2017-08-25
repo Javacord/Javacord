@@ -38,6 +38,7 @@ public class RateLimitedException extends Exception {
      * Creates a new instance of this class.
      *
      * @param message The message of the exception.
+     * @param retryAfter How long we should wait, till we can try again.
      * @param type The type of the rate limit.
      * @param server The server of the rate limit. Can be <code>null</code> for non-server related limits.
      * @param manager The rate limit manager.
