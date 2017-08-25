@@ -160,7 +160,7 @@ public interface Channel extends MessageReceiver {
 
     /**
      * Updates the position of the channel.
-     * If you want to update the name and topic too, use {@link #update(String, String, int).
+     * If you want to update the name and topic too, use {@link #update(String, String, int)}.
      * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
      *
      * @param newPosition The new topic of the channel.
