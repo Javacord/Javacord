@@ -76,6 +76,9 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 ((ImplVoiceChannel) user.getVoiceChannel()).removeConnectedUser(user);
             }
             final ImplVoiceChannel channel = (ImplVoiceChannel) api.getVoiceChannelById(channelId);
+            if (channel == null) {
+                return;
+            }
             channel.addConnectedUser(user);
             user.setVoiceChannel(channel);
             listenerExecutorService.submit(new Runnable() {

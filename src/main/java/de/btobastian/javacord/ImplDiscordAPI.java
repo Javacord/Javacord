@@ -272,7 +272,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                 while (serverIterator.hasNext()) {
                     Server server = serverIterator.next();
                     HttpResponse<JsonNode> response = Unirest
-                            .get("https://discordapp.com/api/guilds/" + server.getId() + "/members/" + id)
+                            .get("https://discordapp.com/api/v6/guilds/" + server.getId() + "/members/" + id)
                             .header("authorization", token)
                             .asJson();
                     // user does not exist
@@ -382,7 +382,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             // only the last 0-9 digits of the token should be visible.
             // We don't want someone being able to login to an account by reading the logs.
             logger.debug("Checking token {}", token.replaceAll(".{10}", "**********"));
-            HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/users/@me/guilds")
+            HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/v6/users/@me/guilds")
                     .header("authorization", token)
                     .asJson();
             if (response.getStatus() < 200 || response.getStatus() > 299) {
@@ -412,7 +412,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                 logger.debug("Trying to accept invite (code: {})", inviteCode);
                 final SettableFuture<Server> settableFuture;
                 synchronized (listenerLock) {
-                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/invite/" + inviteCode)
+                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/v6/invite/" + inviteCode)
                             .header("authorization", token)
                             .asJson();
                     checkResponse(response);
@@ -493,7 +493,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                 params.put("region", region == null ? Region.US_WEST.getKey() : region.getKey());
                 final SettableFuture<Server> settableFuture;
                 synchronized (listenerLock) {
-                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds")
+                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/v6/guilds")
                             .header("authorization", token)
                             .header("Content-Type", "application/json")
                             .body(params.toString())
@@ -567,7 +567,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             @Override
             public Void call() throws Exception {
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/users/@me")
+                        .patch("https://discordapp.com/api/v6/users/@me")
                         .header("authorization", token)
                         .header("Content-Type", "application/json")
                         .body(params.toString())
@@ -618,7 +618,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             public Invite call() throws Exception {
                 logger.debug("Trying to parse invite {} (parsed code: {})", invite, inviteCode);
                 HttpResponse<JsonNode> response = Unirest
-                        .get("https://discordapp.com/api/invite/" + inviteCode)
+                        .get("https://discordapp.com/api/v6/invite/" + inviteCode)
                         .header("authorization", token)
                         .asJson();
                 checkResponse(response);
@@ -639,7 +639,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             public Void call() throws Exception {
                 logger.debug("Trying to delete invite {}", inviteCode);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/invite/" + inviteCode)
+                        .delete("https://discordapp.com/api/v6/invite/" + inviteCode)
                         .header("authorization", token)
                         .asJson();
                 checkResponse(response);
@@ -704,6 +704,12 @@ public class ImplDiscordAPI implements DiscordAPI {
         if (socketAdapter != null) {
             socketAdapter.disconnect();
         }
+    }
+
+    @Override
+    public void setReconnectRatelimit(int attempts, int seconds) {
+        socketAdapter.setReconnectAttempts(attempts);
+        socketAdapter.setRatelimitResetIntervalInSeconds(seconds);
     }
 
     /**
@@ -777,7 +783,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     public String requestTokenBlocking() {
         try {
             logger.debug("Trying to request token (email: {}, password: {})", email, password.replaceAll(".", "*"));
-            HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/auth/login")
+            HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/v6/auth/login")
                     .header("User-Agent", Javacord.USER_AGENT)
                     .header("Content-Type", "application/json")
                     .body(new JSONObject().put("email", email).put("password", password).toString())
@@ -812,7 +818,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     public String requestGatewayBlocking() {
         try {
             logger.debug("Requesting gateway (token: {})", token.replaceAll(".{10}", "**********"));
-            HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/gateway")
+            HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/v6/gateway")
                     .header("authorization", token)
                     .asJson();
             if (response.getStatus() == 401) {

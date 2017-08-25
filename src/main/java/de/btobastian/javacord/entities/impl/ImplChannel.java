@@ -160,7 +160,7 @@ public class ImplChannel implements Channel {
             public Void call() throws Exception {
                 logger.debug("Trying to delete channel {}", ImplChannel.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/channels/" + id)
+                        .delete("https://discordapp.com/api/v6/channels/" + id)
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
@@ -187,7 +187,7 @@ public class ImplChannel implements Channel {
     public void type() {
         try {
             logger.debug("Sending typing state in channel {}", this);
-            Unirest.post("https://discordapp.com/api/channels/" + id + "/typing")
+            Unirest.post("https://discordapp.com/api/v6/channels/" + id + "/typing")
                     .header("authorization", api.getToken())
                     .asJson();
             logger.debug("Sent typing state in channel {}", this);
@@ -297,7 +297,7 @@ public class ImplChannel implements Channel {
                             body.put("nonce", nonce);
                         }
                         HttpResponse<JsonNode> response =
-                                Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
+                                Unirest.post("https://discordapp.com/api/v6/channels/" + id + "/messages")
                                         .header("authorization", api.getToken())
                                         .header("content-type", "application/json")
                                         .body(body.toString())
@@ -351,7 +351,7 @@ public class ImplChannel implements Channel {
                                 ImplChannel.this, file.getName(), comment);
                         api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         MultipartBody body = Unirest
-                                .post("https://discordapp.com/api/channels/" + id + "/messages")
+                                .post("https://discordapp.com/api/v6/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
                                 .field("file", file);
                         if (comment != null) {
@@ -388,7 +388,7 @@ public class ImplChannel implements Channel {
                                 ImplChannel.this, comment);
                         api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                         MultipartBody body = Unirest
-                                .post("https://discordapp.com/api/channels/" + id + "/messages")
+                                .post("https://discordapp.com/api/v6/channels/" + id + "/messages")
                                 .header("authorization", api.getToken())
                                 .field("file", inputStream, filename);
                         if (comment != null) {
@@ -425,7 +425,7 @@ public class ImplChannel implements Channel {
             public Void call() throws Exception {
                 logger.debug("Updating permissions in channel {} for role {} (allow: {}, deny: {})", this, role,
                         ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                Unirest.put("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + role.getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject()
@@ -447,7 +447,7 @@ public class ImplChannel implements Channel {
             public Void call() throws Exception {
                 logger.debug("Updating permissions in channel {} for user {} (allow: {}, deny: {})", this, user,
                         ((ImplPermissions) permissions).getAllowed(), ((ImplPermissions) permissions).getDenied());
-                Unirest.put("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                Unirest.put("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + user.getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(new JSONObject()
@@ -468,7 +468,7 @@ public class ImplChannel implements Channel {
             @Override
             public Void call() throws Exception {
                 logger.debug("Deleting permissions in channel {} for role {}", this, role);
-                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + role.getId())
+                Unirest.delete("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + role.getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 logger.debug("Deleted permissions in channel {} for role {}", this, role);
@@ -483,7 +483,7 @@ public class ImplChannel implements Channel {
             @Override
             public Void call() throws Exception {
                 logger.debug("Deleting permissions in channel {} for user {}", this, user);
-                Unirest.delete("https://discordapp.com/api/channels/" + getId() + "/permissions/" + user.getId())
+                Unirest.delete("https://discordapp.com/api/v6/channels/" + getId() + "/permissions/" + user.getId())
                         .header("authorization", api.getToken())
                         .asJson();
                 logger.debug("Deleted permissions in channel {} for user {}", this, user);
@@ -573,7 +573,7 @@ public class ImplChannel implements Channel {
                 logger.debug("Trying to update channel {} (new name: {}, old name: {}, new topic: {}, old topic: {}, new position: {}, old position: {})",
                         ImplChannel.this, newName, getName(), newTopic, getTopic(), newPosition, getPosition());
                 HttpResponse<JsonNode> response = Unirest
-                        .patch("https://discordapp.com/api/channels/" + getId())
+                        .patch("https://discordapp.com/api/v6/channels/" + getId())
                         .header("authorization", api.getToken())
                         .header("Content-Type", "application/json")
                         .body(params.toString())
@@ -674,7 +674,7 @@ public class ImplChannel implements Channel {
                 logger.debug("Bulk deleting messages in channel {} (ids: [{}])", this, Joiner.on(",").join(messages));
                 api.checkRateLimit(null, RateLimitType.SERVER_MESSAGE, null, ImplChannel.this);
                 HttpResponse<JsonNode> response =
-                        Unirest.post("https://discordapp.com/api/channels/" + getId() + "/messages/bulk-delete")
+                        Unirest.post("https://discordapp.com/api/v6/channels/" + getId() + "/messages/bulk-delete")
                                 .header("authorization", api.getToken())
                                 .header("Content-Type", "application/json")
                                 .body(new JSONObject()
@@ -695,6 +695,36 @@ public class ImplChannel implements Channel {
             messageIds[i] = messages[i].getId();
         }
         return bulkDelete(messageIds);
+    }
+
+    @Override
+    public Future<Message> getMessageById(final String messageId) {
+        Message message = api.getMessageById(messageId);
+        if (message != null) {
+            return Futures.immediateFuture(message);
+        }
+        return api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
+            @Override
+            public Message call() throws Exception {
+                logger.debug("Requesting message (channel id: {}, message id: {})", id, messageId);
+                HttpResponse<JsonNode> response =
+                        Unirest.get("https://discordapp.com/api/v6/channels/" + id + "/messages/" + messageId)
+                                .header("authorization", api.getToken())
+                                .asJson();
+                api.checkResponse(response);
+                api.checkRateLimit(response, RateLimitType.UNKNOWN, null, ImplChannel.this);
+                Message message;
+                // Synchronize on api to prevent two method calls causing duplicate objects.
+                synchronized (api) {
+                    message = api.getMessageById(messageId);
+                    if (message == null) {
+                        message = new ImplMessage(response.getBody().getObject(), api, ImplChannel.this);
+                    }
+                    logger.debug("Got message (channel id: {}, message id: {}, message: {})", id, messageId, message);
+                }
+                return message;
+            }
+        });
     }
 
     /**

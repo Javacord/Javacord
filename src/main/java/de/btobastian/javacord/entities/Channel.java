@@ -160,7 +160,7 @@ public interface Channel extends MessageReceiver {
 
     /**
      * Updates the position of the channel.
-     * If you want to update the name and topic too, use {@link #update(String, String, int).
+     * If you want to update the name and topic too, use {@link #update(String, String, int)}.
      * Otherwise the first update will be overridden (except you wait for it to finish using {@link Future#get()}).
      *
      * @param newPosition The new topic of the channel.
@@ -202,5 +202,13 @@ public interface Channel extends MessageReceiver {
      * @return A future which tells us whether the deletion was successful or not.
      */
     public Future<Void> bulkDelete(Message... messages);
+
+    /**
+     * Gets a message in this channel by it's id. This method sends a request to Discord, if the given message is not cached.
+     *
+     * @param messageId The id of the message.
+     * @return A future which is guaranteed to contain a message, if a message with the given id exists, even if it's not cached.
+     */
+    public Future<Message> getMessageById(String messageId);
 
 }

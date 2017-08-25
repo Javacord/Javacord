@@ -214,7 +214,7 @@ public class ImplCustomEmoji implements CustomEmoji {
             public Void call() throws Exception {
                 logger.debug("Trying to delete emoji {}", ImplCustomEmoji.this);
                 HttpResponse<JsonNode> response = Unirest
-                        .delete("https://discordapp.com/api/guilds/" + server.getId() + "/emojis/" + id)
+                        .delete("https://discordapp.com/api/v6/guilds/" + server.getId() + "/emojis/" + id)
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);

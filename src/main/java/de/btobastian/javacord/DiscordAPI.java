@@ -490,6 +490,8 @@ public interface DiscordAPI {
      * This value is <code>true</code> by default.
      * If it's set to <code>false</code> the list of servers ({@link #getServers()}) will be empty after connecting and
      * will be filled a few seconds later (depending on the amount of servers).
+     *
+     * @return Whether the bot should wait for all servers to be loaded or not.
      */
     public boolean isWaitingForServersOnStartup();
 
@@ -498,5 +500,15 @@ public interface DiscordAPI {
      * After disconnecting you should NOT use this instance again.
      */
     public void disconnect();
+
+    /**
+     * Sets the maximum reconnect attempts in a given time before the bot stops reconnecting.
+     * By default the bot stops reconnecting, if the connection failed more than 5 times in the last 5 minutes.
+     * It's not recommended to change these values!
+     *
+     * @param attempts The amount of attempts. Default: 5
+     * @param seconds The time, in which the attempts can happen in seconds. Default: 60*5
+     */
+    public void setReconnectRatelimit(int attempts, int seconds);
 
 }

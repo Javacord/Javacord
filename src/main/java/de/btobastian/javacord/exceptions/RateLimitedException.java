@@ -38,8 +38,10 @@ public class RateLimitedException extends Exception {
      * Creates a new instance of this class.
      *
      * @param message The message of the exception.
+     * @param retryAfter How long we should wait, till we can try again.
      * @param type The type of the rate limit.
      * @param server The server of the rate limit. Can be <code>null</code> for non-server related limits.
+     * @param channel The channel of the rate limit. Can be <code>null</code> for non-channel related limits.
      * @param manager The rate limit manager.
      */
     public RateLimitedException(String message, long retryAfter, RateLimitType type, Server server, Channel channel, RateLimitManager manager) {
@@ -91,6 +93,8 @@ public class RateLimitedException extends Exception {
 
     /**
      * Causes the current thread to wait until we can retry the request.
+     *
+     * @throws InterruptedException if we got interrupted.
      */
     public void waitTillRetry() throws InterruptedException {
         long time = manager.getRateLimit(type, server, channel);
