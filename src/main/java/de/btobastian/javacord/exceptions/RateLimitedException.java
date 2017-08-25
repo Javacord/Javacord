@@ -91,6 +91,8 @@ public class RateLimitedException extends Exception {
 
     /**
      * Causes the current thread to wait until we can retry the request.
+     *
+     * @throws InterruptedException if we got interrupted.
      */
     public void waitTillRetry() throws InterruptedException {
         long time = manager.getRateLimit(type, server, channel);
