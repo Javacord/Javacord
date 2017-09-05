@@ -830,38 +830,6 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Future<Void> authorizeBot(String applicationId) {
-        return authorizeBot(applicationId, null);
-    }
-
-    @Override
-    public Future<Void> authorizeBot(final String applicationId, final Permissions permissions) {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Trying to authorize bot with application id {} and permissions {}",
-                        applicationId, permissions);
-                HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/v6/oauth2/authorize?client_id=" + applicationId + "&scope=bot")
-                        .routeParam("id", applicationId)
-                        .header("authorization", api.getToken())
-                        .header("Content-Type", "application/json")
-                        .body(new JSONObject()
-                                .put("guild_id", getId())
-                                .put("permissions", ((ImplPermissions) permissions).getAllowed())
-                                .put("authorize", true)
-                                .toString())
-                        .asJson();
-                api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
-                logger.debug("Authorized bot with application id {} and permissions {}",
-                        applicationId, permissions);
-                return null;
-            }
-        });
-    }
-
-    @Override
     public Collection<CustomEmoji> getCustomEmojis() {
         return customEmojis.values();
     }

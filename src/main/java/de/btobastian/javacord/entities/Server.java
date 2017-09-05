@@ -380,23 +380,6 @@ public interface Server {
     public Future<User> getOwner();
 
     /**
-     * Authorizes a bot to join the server.
-     *
-     * @param applicationId The id of the bot's application.
-     * @return A future which tells us whether the authorization was successful or not.
-     */
-    public Future<Void> authorizeBot(String applicationId);
-
-    /**
-     * Authorizes a bot to join the server.
-     *
-     * @param applicationId The id of the bot's application.
-     * @param permissions The permissions the bot should get on join.
-     * @return A future which tells us whether the authorization was successful or not.
-     */
-    public Future<Void> authorizeBot(String applicationId, Permissions permissions);
-
-    /**
      * Gets a collection with all custom emojis on this server.
      *
      * @return A collection with all custom emojis on this server.
