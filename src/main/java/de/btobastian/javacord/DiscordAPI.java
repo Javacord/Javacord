@@ -511,4 +511,24 @@ public interface DiscordAPI {
      */
     public void setReconnectRatelimit(int attempts, int seconds);
 
+    /**
+     * Sets whether the bot should use lazy loading or not.
+     * Lazy loading means it doesn't load offline users on startup for large servers to improve performance.
+     * A server is considered as large, if it has more than 250 members.
+     * If this is changed after login in, it will only affect newly joined servers!
+     * Lazy loading is disabled by default.
+     *
+     * @param enabled Whether the bot should use lazy loading or not.
+     */
+    public void setLazyLoading(boolean enabled);
+
+    /**
+     * Checks whether lazy loading is enabled or not.
+     * Lazy loading means it doesn't load offline users on startup for large servers to improve performance.ce.
+     * A server is considered as large, if it has more than 250 members.
+     *
+     * @return Whether lazy loading is enabled or not.
+     */
+    public boolean isLazyLoading();
+
 }

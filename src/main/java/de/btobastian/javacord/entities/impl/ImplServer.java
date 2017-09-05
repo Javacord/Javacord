@@ -148,20 +148,17 @@ public class ImplServer implements Server {
         if (data.has("members")) {
             members = data.getJSONArray("members");
         }
-        for (int i = 0; i < members.length(); i++) {
-            User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
-            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
-                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
-            }
-            this.members.put(member.getId(), member);
+        addMembers(members);
 
-            JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
-            for (int j = 0; j < memberRoles.length(); j++) {
-                Role role = getRoleById(memberRoles.getString(j));
-                if (role != null) {
-                    ((ImplRole) role).addUserNoUpdate(member);
-                }
-            }
+        if (!api.isLazyLoading() && isLarge() && getMembers().size() < getMemberCount()) {
+            JSONObject requestGuildMembersPacket = new JSONObject()
+                    .put("op", 8)
+                    .put("d", new JSONObject()
+                            .put("guild_id", getId())
+                            .put("query","")
+                            .put("limit", 0));
+            logger.debug("Sending request guild members packet for server {}", this);
+            api.getSocketAdapter().getWebSocket().sendText(requestGuildMembersPacket.toString());
         }
 
         JSONArray voiceStates = new JSONArray();
@@ -170,22 +167,22 @@ public class ImplServer implements Server {
         }
         for (int i = 0; i < voiceStates.length(); ++i) {
             JSONObject voiceState = voiceStates.getJSONObject(i);
-            ImplUser user = null;
-            try {
-                user = (ImplUser) this.members.get(voiceState.getString("user_id"));
-            } catch (JSONException | NullPointerException e) {
+            if (!voiceState.has("user_id") || voiceState.isNull("user_id")) {
                 continue;
             }
-            VoiceChannel channel = null;
-            try {
-                channel = this.voiceChannels.get(voiceState.getString("channel_id"));
-            } catch (JSONException | NullPointerException e) {
+            User user = api.getCachedUserById(voiceState.getString("user_id"));
+            if (user == null) {
                 continue;
             }
-            if (channel != null) {
-                ((ImplVoiceChannel) channel).addConnectedUser(user);
-                user.setVoiceChannel(channel);
+            if (!voiceState.has("channel_id") || voiceState.isNull("channel_id")) {
+                continue;
             }
+            VoiceChannel channel = getVoiceChannelById(voiceState.getString("channel_id"));
+            if (channel == null) {
+                continue;
+            }
+            ((ImplVoiceChannel) channel).addConnectedUser(user);
+            ((ImplUser) user).setVoiceChannel(channel);
         }
 
         JSONArray presences = new JSONArray();
@@ -194,7 +191,7 @@ public class ImplServer implements Server {
         }
         for (int i = 0; i < presences.length(); i++) {
             JSONObject presence = presences.getJSONObject(i);
-            User user = api.getCachedUserById(presence.getJSONObject("user").getString("id"));
+            User user = api.getOrCreateUser(presence.getJSONObject("user"));
             if (user != null && presence.has("game") && !presence.isNull("game")) {
                 if (presence.getJSONObject("game").has("name") && !presence.getJSONObject("game").isNull("name")) {
                     ((ImplUser) user).setGame(presence.getJSONObject("game").getString("name"));
@@ -830,38 +827,6 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Future<Void> authorizeBot(String applicationId) {
-        return authorizeBot(applicationId, null);
-    }
-
-    @Override
-    public Future<Void> authorizeBot(final String applicationId, final Permissions permissions) {
-        return api.getThreadPool().getExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                logger.debug("Trying to authorize bot with application id {} and permissions {}",
-                        applicationId, permissions);
-                HttpResponse<JsonNode> response = Unirest
-                        .post("https://discordapp.com/api/v6/oauth2/authorize?client_id=" + applicationId + "&scope=bot")
-                        .routeParam("id", applicationId)
-                        .header("authorization", api.getToken())
-                        .header("Content-Type", "application/json")
-                        .body(new JSONObject()
-                                .put("guild_id", getId())
-                                .put("permissions", ((ImplPermissions) permissions).getAllowed())
-                                .put("authorize", true)
-                                .toString())
-                        .asJson();
-                api.checkResponse(response);
-                api.checkRateLimit(response, RateLimitType.UNKNOWN, ImplServer.this, null);
-                logger.debug("Authorized bot with application id {} and permissions {}",
-                        applicationId, permissions);
-                return null;
-            }
-        });
-    }
-
-    @Override
     public Collection<CustomEmoji> getCustomEmojis() {
         return customEmojis.values();
     }
@@ -1011,6 +976,29 @@ public class ImplServer implements Server {
      */
     public void addMember(User user) {
         members.put(user.getId(), user);
+    }
+
+    /**
+     * Adds members to the server.
+     *
+     * @param members An array of guild member objects.
+     */
+    public void addMembers(JSONArray members) {
+        for (int i = 0; i < members.length(); i++) {
+            User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
+            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
+                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
+            }
+            this.members.put(member.getId(), member);
+
+            JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
+            for (int j = 0; j < memberRoles.length(); j++) {
+                Role role = getRoleById(memberRoles.getString(j));
+                if (role != null) {
+                    ((ImplRole) role).addUserNoUpdate(member);
+                }
+            }
+        }
     }
 
     /**

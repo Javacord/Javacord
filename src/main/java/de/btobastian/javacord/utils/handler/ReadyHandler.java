@@ -57,9 +57,11 @@ public class ReadyHandler extends PacketHandler {
         for (int i = 0; i < privateChannels.length(); i++) {
             JSONObject privateChannel = privateChannels.getJSONObject(i);
             String id = privateChannel.getString("id");
-            User user = api.getOrCreateUser(privateChannel.getJSONObject("recipient"));
-            if (user != null) {
-                ((ImplUser) user).setUserChannelId(id);
+            if (privateChannel.has("recipient")) {
+                User user = api.getOrCreateUser(privateChannel.getJSONObject("recipient"));
+                if (user != null) {
+                    ((ImplUser) user).setUserChannelId(id);
+                }
             }
         }
 
