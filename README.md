@@ -1,21 +1,21 @@
-# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-2.0.17-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
+# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shieldscompatibleWiki-Home-red.svg" alt="Latest JavaDocs"></a>
 A multithreaded but simple to use library to create a Discord bot in Java.
 
 ##  Maven
 ```xml
 <repository>
   <id>javacord-repo</id>
-  <url>http://repo.bastian-oppermann.de</url>
+  <url>http://repo.javacord.org</url>
 </repository>
 ...
 <dependency>
   <groupId>de.btobastian.javacord</groupId>
   <artifactId>javacord</artifactId>
-  <version>2.0.17</version>
+  <version>3.0.0</version>
    <!-- This will use the shaded javacord which contains all required dependencies -->
   <classifier>shaded</classifier>
 </dependency>
-<!-- A SLF4J comaptible logging framework. I would recommend to use logback -->
+<!-- A SLF4J compatible logging framework. I would recommend to use logback -->
 <dependency>
   <groupId>ch.qos.logback</groupId>
   <artifactId>logback-classic</artifactId>
@@ -31,7 +31,7 @@ If you never used maven before you should take a look at the setup tutorial:
 
 ## Support
  
-* [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3)
+* [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3) (recommended)
 * [DiscordAPI #java_javacord channel](https://discord.gg/0SBTUU1wZTVXVKEo)
 
 ## Wiki
@@ -48,50 +48,50 @@ The javadocs can be found here: [JavaDocs](http://ci.ketrwu.de/job/Javacord/bran
 
 Thanks to ketrwu, too.
 
-## Examples
+## Logging in
 
-Creating a simple ping-pong bot:
+Logging in is very simple
 ```java
-package <package>;
+public class MyFirstBot {
 
-import com.google.common.util.concurrent.FutureCallback;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.listener.message.MessageCreateListener;
+    public static void main(String[] args) {
+        String token = args[0];
 
-/**
- * A simple ping-pong bot.
- */
-public class MyPingPongBot {
-
-    public MyPingPongBot(String token) {
-        // See "How to get the token" below
-        DiscordAPI api = Javacord.getApi(token, true);
-        // connect
-        api.connect(new FutureCallback<DiscordAPI>() {
-            @Override
-            public void onSuccess(DiscordAPI api) {
-                // register listener
-                api.registerListener(new MessageCreateListener() {
-                    @Override
-                    public void onMessageCreate(DiscordAPI api, Message message) {
-                        // check the content of the message
-                        if (message.getContent().equalsIgnoreCase("ping")) {
-                            // reply to the message
-                            message.reply("pong");
-                        }
-                    }
-                });
+        new DiscordApiBuilder().setToken(token).login().whenComplete((api, throwable) -> {
+            if (throwable != null) {
+                // Login failed
+                throwable.printStackTrace();
+                return;
             }
 
-            @Override
-            public void onFailure(Throwable t) {
-                t.printStackTrace();
-            }
+            // Login successful
+            api.getChannelById("123").ifPresent(channel -> channel.sendMessage("I'm online now!"));
         });
     }
 
 }
 ```
+
+You can also login blocking:
+```java
+public class MyFirstBot {
+
+    public static void main(String[] args) {
+        String token = args[0];
+
+        try {
+            DiscordApi api = new DiscordApiBuilder().setToken(token).login().get();
+            // Login successful
+            api.getChannelById("123").ifPresent(channel -> channel.sendMessage("Hi!"));
+        } catch (InterruptedException | ExecutionException e) {
+            // Login failed
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+
 More examples can be found in the wiki: [Examples](https://github.com/BtoBastian/Javacord/wiki/Examples)
 
 ## How to get the token

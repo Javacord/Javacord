@@ -3,14 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.btobastian.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>2.0.17</version>
+    <version>3.0.0</version>
     <name>Javacord</name>
     <description>A multithreaded but simple to use discord java api.</description>
 
     <properties>
-        <!-- Javacord supports Java 7 AND Java 8 -->
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
 
     <dependencies>
