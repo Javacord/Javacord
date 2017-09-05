@@ -74,6 +74,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     private boolean reconnect = true;
 
+    private long lastGuildMembersChunkReceived = System.currentTimeMillis();
+
     // We allow 5 reconnects per 5 minutes.
     // This limit should never be hit under normal conditions, but prevent reconnect loops.
     private Queue<Long> ratelimitQueue = new LinkedList<>();
@@ -184,6 +186,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     logger.debug("Received unknown packet of type {} (packet: {})", type, packet.toString());
                 }
 
+                if (type.equals("GUILD_MEMBERS_CHUNK")) {
+                    lastGuildMembersChunkReceived = System.currentTimeMillis();
+                }
                 if (type.equals("RESUMED")) {
                     // We are the one who send the first heartbeat
                     heartbeatAckReceived = true;
@@ -205,8 +210,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                                     try {
                                         Thread.sleep(1500);
                                     } catch (InterruptedException ignored) { }
-                                    if (api.getServers().size() <= amount) {
-                                        break; // 1.5 without new servers becoming available
+                                    if (api.getServers().size() <= amount && lastGuildMembersChunkReceived + 1500 < System.currentTimeMillis()) {
+                                        break; // 1.5 seconds without new servers becoming available and no GUILD_MEMBERS_CHUNK packet
                                     }
                                     amount = api.getServers().size();
                                 }
@@ -381,6 +386,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         addHandler(new GuildDeleteHandler(api));
         addHandler(new GuildMemberAddHandler(api));
         addHandler(new GuildMemberRemoveHandler(api));
+        addHandler(new GuildMembersChunkHandler(api));
         addHandler(new GuildMemberUpdateHandler(api));
         addHandler(new GuildUpdateHandler(api));
 

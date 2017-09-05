@@ -148,20 +148,17 @@ public class ImplServer implements Server {
         if (data.has("members")) {
             members = data.getJSONArray("members");
         }
-        for (int i = 0; i < members.length(); i++) {
-            User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
-            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
-                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
-            }
-            this.members.put(member.getId(), member);
+        addMembers(members);
 
-            JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
-            for (int j = 0; j < memberRoles.length(); j++) {
-                Role role = getRoleById(memberRoles.getString(j));
-                if (role != null) {
-                    ((ImplRole) role).addUserNoUpdate(member);
-                }
-            }
+        if (!api.isLazyLoading() && isLarge() && getMembers().size() < getMemberCount()) {
+            JSONObject requestGuildMembersPacket = new JSONObject()
+                    .put("op", 8)
+                    .put("d", new JSONObject()
+                            .put("guild_id", getId())
+                            .put("query","")
+                            .put("limit", 0));
+            logger.debug("Sending request guild members packet for server {}", this);
+            api.getSocketAdapter().getWebSocket().sendText(requestGuildMembersPacket.toString());
         }
 
         JSONArray voiceStates = new JSONArray();
@@ -979,6 +976,29 @@ public class ImplServer implements Server {
      */
     public void addMember(User user) {
         members.put(user.getId(), user);
+    }
+
+    /**
+     * Adds members to the server.
+     *
+     * @param members An array of guild member objects.
+     */
+    public void addMembers(JSONArray members) {
+        for (int i = 0; i < members.length(); i++) {
+            User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
+            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
+                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
+            }
+            this.members.put(member.getId(), member);
+
+            JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
+            for (int j = 0; j < memberRoles.length(); j++) {
+                Role role = getRoleById(memberRoles.getString(j));
+                if (role != null) {
+                    ((ImplRole) role).addUserNoUpdate(member);
+                }
+            }
+        }
     }
 
     /**

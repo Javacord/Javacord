@@ -87,6 +87,7 @@ public class ImplDiscordAPI implements DiscordAPI {
     private boolean autoReconnect = true;
 
     private boolean waitForServersOnStartup = true;
+    private boolean lazyLoading = false;
 
     private User you = null;
 
@@ -710,6 +711,16 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void setReconnectRatelimit(int attempts, int seconds) {
         socketAdapter.setReconnectAttempts(attempts);
         socketAdapter.setRatelimitResetIntervalInSeconds(seconds);
+    }
+
+    @Override
+    public void setLazyLoading(boolean enabled) {
+        this.lazyLoading = enabled;
+    }
+
+    @Override
+    public boolean isLazyLoading() {
+        return lazyLoading;
     }
 
     /**
