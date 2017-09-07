@@ -13,7 +13,7 @@ public class DiscordApiBuilder {
     private String token = null;
 
     /**
-     * The account type which.
+     * The account type of the account with the given token.
      */
     private AccountType accountType = AccountType.BOT;
 
@@ -41,7 +41,7 @@ public class DiscordApiBuilder {
     public CompletableFuture<DiscordApi> login() {
         CompletableFuture<DiscordApi> future = new CompletableFuture<>();
         if (token == null) {
-            future.completeExceptionally(new IllegalArgumentException("You can not login without a token!"));
+            future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
         // TODO login process
