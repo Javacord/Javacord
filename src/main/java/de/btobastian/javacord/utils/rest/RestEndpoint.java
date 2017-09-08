@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.utils;
+package de.btobastian.javacord.utils.rest;
 
 import de.btobastian.javacord.Javacord;
 
 /**
  * This enum contains all endpoints which we may use.
  */
-public enum RestEndpoints {
+public enum RestEndpoint {
 
     GATEWAY("/gateway"),
     GATEWAY_BOT("/gateway/bot");
@@ -33,7 +33,7 @@ public enum RestEndpoints {
      */
     private final String endpointUrl;
 
-    RestEndpoints(String endpointUrl) {
+    RestEndpoint(String endpointUrl) {
         this.endpointUrl = endpointUrl;
     }
 
