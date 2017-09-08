@@ -18,6 +18,8 @@
  */
 package de.btobastian.javacord;
 
+import de.btobastian.javacord.impl.ImplDiscordApi;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -62,8 +64,7 @@ public class DiscordApiBuilder {
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
-        // TODO login process
-        future.complete(null);
+        future.complete(new ImplDiscordApi(accountType, token));
         return future;
     }
 

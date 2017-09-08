@@ -40,13 +40,27 @@ public enum RestEndpoint {
      */
     private final int majorParameterPosition;
 
+    /**
+     * Whether the endpoint is global or not.
+     */
+    private boolean global;
+
     RestEndpoint(String endpointUrl) {
-        this(endpointUrl, -1);
+        this(endpointUrl, -1, false);
+    }
+
+    RestEndpoint(String endpointUrl, boolean global) {
+        this(endpointUrl, -1, global);
     }
 
     RestEndpoint(String endpointUrl, int majorParameterPosition) {
+        this(endpointUrl, majorParameterPosition, false);
+    }
+
+    RestEndpoint(String endpointUrl, int majorParameterPosition, boolean global) {
         this.endpointUrl = endpointUrl;
         this.majorParameterPosition = majorParameterPosition;
+        this.global = global;
     }
 
     /**
@@ -73,14 +87,32 @@ public enum RestEndpoint {
     }
 
     /**
+     * Checks if the endpoint is global.
+     *
+     * @return Whether the endpoint is global or not.
+     */
+    public boolean isGlobal() {
+        return global;
+    }
+
+    /**
+     * Sets whether this endpoint is global or not.
+     *
+     * @param global If the endpoint is global.
+     */
+    public void setGlobal(boolean global) {
+        this.global = global;
+    }
+
+    /**
      * Gets the full url of the endpoint.
      *
      * @param parameters The parameters of the url. E.g. for channel ids.
      * @return The full url of the endpoint.
      */
-    public String getFullUrl(Object... parameters) {
+    public String getFullUrl(String... parameters) {
         String url = "https://discordapp.com/api/v" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION + getEndpointUrl();
-        return String.format(url, parameters);
+        return String.format(url, (Object[]) parameters);
     }
 
 }

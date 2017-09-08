@@ -18,9 +18,35 @@
  */
 package de.btobastian.javacord;
 
+import de.btobastian.javacord.utils.ThreadPool;
+import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
+
 /**
  * This class is the most important class for your bot, containing all important methods, like registering listener.
  */
 public interface DiscordApi {
+
+    /**
+     * Gets the used token.
+     * The returned token already includes the {@link AccountType#getTokenPrefix()}, so you can use it directly in the
+     * authentication header for custom REST calls.
+     *
+     * @return The used token.
+     */
+    public String getToken();
+
+    /**
+     * Gets the thread pool which is internally used.
+     *
+     * @return The internally used thread pool.
+     */
+    public ThreadPool getThreadPool();
+
+    /**
+     * Gets the ratelimit manager for this bot.
+     *
+     * @return The ratelimit manager for this bot.
+     */
+    public RatelimitManager getRatelimitManager();
 
 }
