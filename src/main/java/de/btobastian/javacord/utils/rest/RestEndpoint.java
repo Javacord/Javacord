@@ -20,6 +20,8 @@ package de.btobastian.javacord.utils.rest;
 
 import de.btobastian.javacord.Javacord;
 
+import java.util.Optional;
+
 /**
  * This enum contains all endpoints which we may use.
  */
@@ -33,8 +35,32 @@ public enum RestEndpoint {
      */
     private final String endpointUrl;
 
+    /**
+     * The position of the major parameter starting with <code>0</code> or <code>-1</code> if no major parameter exists.
+     */
+    private final int majorParameterPosition;
+
     RestEndpoint(String endpointUrl) {
+        this(endpointUrl, -1);
+    }
+
+    RestEndpoint(String endpointUrl, int majorParameterPosition) {
         this.endpointUrl = endpointUrl;
+        this.majorParameterPosition = majorParameterPosition;
+    }
+
+    /**
+     * Gets the major parameter position of the endpoint.
+     * If an endpoint has a major parameter, it means that the ratelimits for this endpoint are based on this parameter.
+     * The position starts counting at <code>0</code>!
+     *
+     * @return An optional which is present, if the endpoint has a major parameter.
+     */
+    public Optional<Integer> getMajorParameterPosition() {
+        if (majorParameterPosition >= 0) {
+            return Optional.of(majorParameterPosition);
+        }
+        return Optional.empty();
     }
 
     /**
