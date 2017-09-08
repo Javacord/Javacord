@@ -20,13 +20,6 @@
             <version>20140107</version>
         </dependency>
 
-        <!-- Guava for lot's of cool stuff (e.g. FutureCallbacks) -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>20.0</version>
-        </dependency>
-
         <!-- Unirest for REST-calls -->
         <dependency>
             <groupId>com.mashape.unirest</groupId>
