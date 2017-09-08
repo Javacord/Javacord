@@ -40,6 +40,13 @@ public class Javacord {
      */
     public static final String USER_AGENT = "DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")";
 
+    /**
+     * The gateway protocol version from Discord which we are using.
+     * A list with all protocol versions can be found
+     * <a href="https://discordapp.com/developers/docs/topics/gateway#gateway-protocol-versions">here</a>.
+     */
+    public static final String DISCORD_GATEWAY_PROTOCOL_VERSION = "6";
+
     static {
         Unirest.setDefaultHeader("User-Agent", USER_AGENT);
     }
