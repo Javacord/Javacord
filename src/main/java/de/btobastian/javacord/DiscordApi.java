@@ -37,35 +37,35 @@ public interface DiscordApi {
      *
      * @return The used token.
      */
-    public String getToken();
+    String getToken();
 
     /**
      * Gets the thread pool which is internally used.
      *
      * @return The internally used thread pool.
      */
-    public ThreadPool getThreadPool();
+    ThreadPool getThreadPool();
 
     /**
      * Gets the ratelimit manager for this bot.
      *
      * @return The ratelimit manager for this bot.
      */
-    public RatelimitManager getRatelimitManager();
+    RatelimitManager getRatelimitManager();
 
     /**
      * Gets the websocket adapter which is used to connect to Discord.
      *
      * @return The websocket adapter.
      */
-    public WebSocketAdapter getWebSocketAdapter();
+    WebSocketAdapter getWebSocketAdapter();
 
     /**
      * Updates the game of this bot, represented as "Playing Half-Life 3" for example.
      *
      * @param name The name of the game.
      */
-    public void updateGame(String name);
+    void updateGame(String name);
 
     /**
      * Updates the game of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
@@ -75,7 +75,7 @@ public interface DiscordApi {
      * @param name The name of the game.
      * @param streamingUrl The streaming url of the game.
      */
-    public void updateGame(String name, String streamingUrl);
+    void updateGame(String name, String streamingUrl);
 
     /**
      * Gets the game which should be displayed.
@@ -85,13 +85,13 @@ public interface DiscordApi {
      *
      * @return The game which should be displayed.
      */
-    public Optional<Game> getGame();
+    Optional<Game> getGame();
 
     /**
      * Disconnects the bot.
      * After disconnecting you should NOT use this instance again.
      */
-    public void disconnect();
+    void disconnect();
 
     /**
      * Sets the maximum reconnect attempts in a given time before the bot stops reconnecting.
@@ -101,6 +101,6 @@ public interface DiscordApi {
      * @param attempts The amount of attempts. Default: 5.
      * @param seconds The time, in which the attempts can happen in seconds. Default: 300.
      */
-    public void setReconnectRatelimit(int attempts, int seconds);
+    void setReconnectRatelimit(int attempts, int seconds);
 
 }

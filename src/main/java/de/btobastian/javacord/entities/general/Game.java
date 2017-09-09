@@ -30,20 +30,20 @@ public interface Game {
      *
      * @return The type of the game.
      */
-    public GameType getType();
+    GameType getType();
 
     /**
      * Gets the name of the game.
      *
      * @return The name of the game.
      */
-    public String getName();
+    String getName();
 
     /**
      * Gets the streaming url of the game.
      *
      * @return The streaming url of the game.
      */
-    public Optional<String> getStreamingUrl();
+    Optional<String> getStreamingUrl();
 
 }
