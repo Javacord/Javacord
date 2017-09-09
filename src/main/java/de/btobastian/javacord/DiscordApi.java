@@ -18,8 +18,12 @@
  */
 package de.btobastian.javacord;
 
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import de.btobastian.javacord.entities.general.Game;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
+
+import java.util.Optional;
 
 /**
  * This class is the most important class for your bot, containing all important methods, like registering listener.
@@ -48,5 +52,55 @@ public interface DiscordApi {
      * @return The ratelimit manager for this bot.
      */
     public RatelimitManager getRatelimitManager();
+
+    /**
+     * Gets the websocket adapter which is used to connect to Discord.
+     *
+     * @return The websocket adapter.
+     */
+    public WebSocketAdapter getWebSocketAdapter();
+
+    /**
+     * Updates the game of this bot, represented as "Playing Half-Life 3" for example.
+     *
+     * @param name The name of the game.
+     */
+    public void updateGame(String name);
+
+    /**
+     * Updates the game of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
+     * The update might not be visible immediately as it's through the websocket and only a limited amount of
+     * game status changes is allowed per minute.
+     *
+     * @param name The name of the game.
+     * @param streamingUrl The streaming url of the game.
+     */
+    public void updateGame(String name, String streamingUrl);
+
+    /**
+     * Gets the game which should be displayed.
+     * This might not be the game which is really displayed in the client, but it's the game which Javacord is trying
+     * to set for your bot, so it might change in the client a few seconds afterwards. If you want the game which
+     * is currently displayed, get the user object for your bot and get the game from this object.
+     *
+     * @return The game which should be displayed.
+     */
+    public Optional<Game> getGame();
+
+    /**
+     * Disconnects the bot.
+     * After disconnecting you should NOT use this instance again.
+     */
+    public void disconnect();
+
+    /**
+     * Sets the maximum reconnect attempts in a given time before the bot stops reconnecting.
+     * By default the bot stops reconnecting, if the connection failed more than 5 times in the last 5 minutes.
+     * It's not recommended to change these values!
+     *
+     * @param attempts The amount of attempts. Default: 5.
+     * @param seconds The time, in which the attempts can happen in seconds. Default: 300.
+     */
+    public void setReconnectRatelimit(int attempts, int seconds);
 
 }

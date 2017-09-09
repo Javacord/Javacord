@@ -64,7 +64,7 @@ public class DiscordApiBuilder {
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
-        future.complete(new ImplDiscordApi(accountType, token));
+        new ImplDiscordApi(accountType, token, future);
         return future;
     }
 
