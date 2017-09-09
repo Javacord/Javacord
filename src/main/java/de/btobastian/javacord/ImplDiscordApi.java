@@ -16,12 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.impl;
+package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
 import com.neovisionaries.ws.client.WebSocketAdapter;
-import de.btobastian.javacord.AccountType;
-import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.general.Game;
 import de.btobastian.javacord.entities.general.GameType;
 import de.btobastian.javacord.entities.general.impl.ImplGame;

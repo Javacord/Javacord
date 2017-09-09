@@ -18,8 +18,6 @@
  */
 package de.btobastian.javacord;
 
-import de.btobastian.javacord.impl.ImplDiscordApi;
-
 import java.util.concurrent.CompletableFuture;
 
 /**
