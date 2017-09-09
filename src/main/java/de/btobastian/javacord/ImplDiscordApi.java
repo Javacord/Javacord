@@ -52,7 +52,7 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * The ratelimit manager for this bot.
      */
-    private final RatelimitManager ratelimitManager = new RatelimitManager();
+    private final RatelimitManager ratelimitManager = new RatelimitManager(this);
 
     /**
      * The websocket adapter used to connect to Discord.

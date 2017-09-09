@@ -129,7 +129,7 @@ public class RatelimitBucket {
         if (rateLimitRemaining > 0) {
             return 0;
         }
-        return rateLimitResetTimestamp - ((int) (System.currentTimeMillis() / 1000)) + 1;
+        return rateLimitResetTimestamp - ((int) (System.currentTimeMillis() / 1000));
     }
 
     @Override
@@ -152,4 +152,10 @@ public class RatelimitBucket {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        String str = "Endpoint: " + (endpoint == null ? "global" : endpoint.getEndpointUrl());
+        str += ", Major url parameter:" + (majorUrlParameter == null ? "none" : majorUrlParameter);
+        return str;
+    }
 }

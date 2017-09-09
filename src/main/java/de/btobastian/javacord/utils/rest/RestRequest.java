@@ -23,7 +23,10 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import de.btobastian.javacord.DiscordApi;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -40,6 +43,7 @@ public class RestRequest {
     private boolean includeAuthorizationHeader = true;
     private int ratelimitRetries = 5;
     private String[] urlParameters = new String[0];
+    private String body = null;
 
     private int retryCounter = 0;
 
@@ -94,6 +98,16 @@ public class RestRequest {
         return urlParameters;
     }
 
+
+    /**
+     * Gets the body of this request.
+     *
+     * @return The body of this request.
+     */
+    public Optional<String> getBody() {
+        return Optional.ofNullable(body);
+    }
+
     /**
      * Gets the major url parameter of this request.
      * If an request has a major parameter, it means that the ratelimits for this request are based on this parameter.
@@ -133,6 +147,37 @@ public class RestRequest {
             throw new IllegalArgumentException("Retries cannot be less than 0!");
         }
         this.ratelimitRetries = retries;
+        return this;
+    }
+
+    /**
+     * Sets the body of the request.
+     *
+     * @param body The body of the request.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest setBody(JSONObject body) {
+        return setBody(body.toString());
+    }
+
+    /**
+     * Sets the body of the request.
+     *
+     * @param body The body of the request.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest setBody(JSONArray body) {
+        return setBody(body.toString());
+    }
+
+    /**
+     * Sets the body of the request.
+     *
+     * @param body The body of the request.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest setBody(String body) {
+        this.body = body;
         return this;
     }
 
@@ -210,6 +255,10 @@ public class RestRequest {
         }
         if (includeAuthorizationHeader) {
             request.header("authorization", api.getToken());
+        }
+        if (body != null && request instanceof HttpRequestWithBody) {
+            request.header("content-type", "application/json");
+            ((HttpRequestWithBody) request).body(body);
         }
         return request.asJson();
     }
