@@ -152,7 +152,7 @@ public class RatelimitManager {
                             long discordTimestamp = OffsetDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
                                     .toInstant().toEpochMilli();
                             timeOffset = currentTime - discordTimestamp;
-                            System.out.println("Offset: " + timeOffset);
+                            logger.debug("Calculated an offset of " + timeOffset + " to the Discord time.");
                         }
                     }
 
