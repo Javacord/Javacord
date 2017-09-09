@@ -85,7 +85,7 @@ public class ImplDiscordApi implements DiscordApi {
 
         new RestRequest(this, HttpMethod.GET, endpoint).execute().whenComplete((res, t) -> {
             if (t != null) {
-                logger.error("Could not request gateway to connect to discord!", t);
+                ready.completeExceptionally(t);
                 return;
             }
 
