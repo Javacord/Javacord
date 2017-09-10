@@ -18,12 +18,21 @@
  */
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.DiscordApi;
+
 import java.time.Instant;
 
 /**
  * This class represents a Discord entity.
  */
 public interface DiscordEntity {
+
+    /**
+     * Gets the discord api instance.
+     *
+     * @return The discord api instance.
+     */
+    DiscordApi getApi();
 
     /**
      * Gets the id of Discord entity.

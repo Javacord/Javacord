@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities.impl;
 
+import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerChannel;
@@ -94,6 +95,11 @@ public class ImplServer implements Server {
      */
     public void addChannelToCache(ServerChannel channel) {
         channels.put(channel.getId(), channel);
+    }
+
+    @Override
+    public DiscordApi getApi() {
+        return null;
     }
 
     @Override

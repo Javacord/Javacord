@@ -29,7 +29,11 @@ public enum RestEndpoint {
 
     GATEWAY("/gateway"),
     GATEWAY_BOT("/gateway/bot"),
-    MESSAGE("/channels/%s/messages", 0);
+    MESSAGE("/channels/%s/messages", 0),
+    /**
+     * This is the same endpoint as {@link RestEndpoint#MESSAGE}, but it has an different ratelimit bucket!
+     */
+    MESSAGE_DELETE("/channels/%s/messages", 0);
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
@@ -107,13 +111,21 @@ public enum RestEndpoint {
 
     /**
      * Gets the full url of the endpoint.
+     * Parameters which are "too much" are added to the end.
      *
      * @param parameters The parameters of the url. E.g. for channel ids.
      * @return The full url of the endpoint.
      */
     public String getFullUrl(String... parameters) {
         String url = "https://discordapp.com/api/v" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION + getEndpointUrl();
-        return String.format(url, (Object[]) parameters);
+        url = String.format(url, (Object[]) parameters);
+        int parameterAmount = getEndpointUrl().split("%s").length - 1;
+        if (parameters.length > parameterAmount) {
+            for (int i = parameterAmount; i < parameters.length; i++) {
+                url += "/" + parameters[i];
+            }
+        }
+        return url;
     }
 
 }

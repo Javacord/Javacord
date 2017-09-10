@@ -18,6 +18,7 @@
  */
 package de.btobastian.javacord.entities.message.impl;
 
+import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
@@ -64,6 +65,11 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public DiscordApi getApi() {
+        return null;
+    }
+
+    @Override
     public long getId() {
         return id;
     }
@@ -73,10 +79,15 @@ public class ImplMessage implements Message {
         return content;
     }
 
+    @Override
+    public TextChannel getChannel() {
+        return channel;
+    }
 
     @Override
     public int compareTo(Message otherMessage) {
         // TODO
         return 0;
     }
+
 }
