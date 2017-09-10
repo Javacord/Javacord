@@ -26,6 +26,13 @@ import de.btobastian.javacord.entities.Server;
 public interface ServerChannel extends Channel {
 
     /**
+     * Gets the name of the channel.
+     *
+     * @return The name of the channel.
+     */
+    String getName();
+
+    /**
      * Gets the server of the channel.
      *
      * @return The server of the channel.

@@ -18,16 +18,25 @@
  */
 package de.btobastian.javacord.entities.impl;
 
-import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The implementation of {@link de.btobastian.javacord.entities.Server}.
  */
 public class ImplServer implements Server {
 
+    /**
+     * The discord api instance.
+     */
     private final ImplDiscordApi api;
 
     /**
@@ -41,18 +50,47 @@ public class ImplServer implements Server {
     private String name;
 
     /**
+     * A map with all channels of the server.
+     */
+    private final ConcurrentHashMap<Long, ServerChannel> channels = new ConcurrentHashMap<>();
+
+    /**
      * Creates a new server object.
      *
-     * @param api The api of the bot.
+     * @param api The discord api instance.
      * @param data The json data of the server.
      */
-    public ImplServer(DiscordApi api, JSONObject data) {
-        this.api = (ImplDiscordApi) api;
+    public ImplServer(ImplDiscordApi api, JSONObject data) {
+        this.api = api;
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
 
-        ((ImplDiscordApi) api).addServerToCache(this);
+        if (data.has("channels")) {
+            JSONArray channels = data.getJSONArray("channels");
+            for (int i = 0; i < channels.length(); i++) {
+                JSONObject channel = channels.getJSONObject(i);
+                switch (channel.getInt("type")) {
+                    case 0:
+                        new ImplServerTextChannel(api, this, channel);
+                        break;
+                    case 2:
+                        // TODO create server voice channel
+                        break;
+                }
+            }
+        }
+
+        api.addServerToCache(this);
+    }
+
+    /**
+     * Adds a channel to the cache.
+     *
+     * @param channel The channel to add.
+     */
+    public void addChannelToCache(ServerChannel channel) {
+        channels.put(channel.getId(), channel);
     }
 
     @Override
@@ -64,4 +102,15 @@ public class ImplServer implements Server {
     public String getName() {
         return name;
     }
+
+    @Override
+    public Collection<ServerChannel> getChannels() {
+        return channels.values();
+    }
+
+    @Override
+    public Optional<ServerChannel> getChannelById(long id) {
+        return Optional.ofNullable(channels.get(id));
+    }
+
 }
