@@ -29,7 +29,7 @@ public enum RestEndpoint {
 
     GATEWAY("/gateway"),
     GATEWAY_BOT("/gateway/bot"),
-    MESSAGE("/channels/%s/messages", 1);
+    MESSAGE("/channels/%s/messages", 0);
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
