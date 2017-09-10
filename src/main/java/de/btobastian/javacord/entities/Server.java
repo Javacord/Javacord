@@ -21,11 +21,9 @@ package de.btobastian.javacord.entities;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.listeners.message.MessageCreateListener;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -144,5 +142,19 @@ public interface Server extends DiscordEntity {
             return Optional.empty();
         }
     }
+
+    /**
+     * Adds a listener, which listens to message creates in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageCreateListener(MessageCreateListener listener);
+
+    /**
+     * Gets a list with all registered message create listeners.
+     *
+     * @return A list with all registered message create listeners.
+     */
+    List<MessageCreateListener> getMessageCreateListeners();
 
 }

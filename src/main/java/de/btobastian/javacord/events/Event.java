@@ -16,30 +16,36 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.entities.channels;
+package de.btobastian.javacord.events;
 
-import de.btobastian.javacord.entities.message.Messageable;
-import de.btobastian.javacord.listeners.message.MessageCreateListener;
-
-import java.util.List;
+import de.btobastian.javacord.DiscordApi;
 
 /**
- * This class represents a text channel.
+ * The basic event.
  */
-public interface TextChannel extends Channel, Messageable {
+public abstract class Event {
 
     /**
-     * Adds a listener, which listens to message creates in this channel.
-     *
-     * @param listener The listener to add.
+     * The api instance of the event.
      */
-    void addMessageCreateListener(MessageCreateListener listener);
+    protected final DiscordApi api;
 
     /**
-     * Gets a list with all registered message create listeners.
+     * Creates a new event instance.
      *
-     * @return A list with all registered message create listeners.
+     * @param api The api instance of the event.
      */
-    List<MessageCreateListener> getMessageCreateListeners();
+    public Event(DiscordApi api) {
+        this.api = api;
+    }
+
+    /**
+     * Gets the api instance of the event.
+     *
+     * @return The api instance of the event.
+     */
+    public DiscordApi getApi() {
+        return api;
+    }
 
 }

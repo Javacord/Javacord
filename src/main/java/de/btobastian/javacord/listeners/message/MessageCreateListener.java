@@ -16,30 +16,21 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.entities.channels;
+package de.btobastian.javacord.listeners.message;
 
-import de.btobastian.javacord.entities.message.Messageable;
-import de.btobastian.javacord.listeners.message.MessageCreateListener;
-
-import java.util.List;
+import de.btobastian.javacord.events.message.MessageCreateEvent;
 
 /**
- * This class represents a text channel.
+ * This listener listens to message creations.
  */
-public interface TextChannel extends Channel, Messageable {
+@FunctionalInterface
+public interface MessageCreateListener {
 
     /**
-     * Adds a listener, which listens to message creates in this channel.
+     * This method if called every time a message got created.
      *
-     * @param listener The listener to add.
+     * @param event The event.
      */
-    void addMessageCreateListener(MessageCreateListener listener);
-
-    /**
-     * Gets a list with all registered message create listeners.
-     *
-     * @return A list with all registered message create listeners.
-     */
-    List<MessageCreateListener> getMessageCreateListeners();
+    void onMessageCreate(MessageCreateEvent event);
 
 }

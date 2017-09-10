@@ -24,6 +24,7 @@ import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplGame;
+import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -32,9 +33,7 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -87,6 +86,9 @@ public class ImplDiscordApi implements DiscordApi {
      * A set with all unavailable servers.
      */
     private final HashSet<Long> unavailableServers = new HashSet<>();
+
+    // All listeners
+    private final ArrayList<MessageCreateListener> messageCreateListeners = new ArrayList<>();
 
     public ImplDiscordApi(AccountType accountType, String token, CompletableFuture<DiscordApi> ready) {
         this.accountType = accountType;
@@ -201,5 +203,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public Collection<Server> getServers() {
         return servers.values();
+    }
+
+    @Override
+    public void addMessageCreateListener(MessageCreateListener listener) {
+        messageCreateListeners.add(listener);
+    }
+
+    @Override
+    public List<MessageCreateListener> getMessageCreateListeners() {
+        return Collections.unmodifiableList(messageCreateListeners);
     }
 }

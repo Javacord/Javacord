@@ -22,10 +22,12 @@ import com.neovisionaries.ws.client.WebSocketAdapter;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -317,5 +319,19 @@ public interface DiscordApi {
             return Optional.empty();
         }
     }
+
+    /**
+     * Adds a listener, which listens to global message creates.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageCreateListener(MessageCreateListener listener);
+
+    /**
+     * Gets a list with all registered message create listeners.
+     *
+     * @return A list with all registered message create listeners.
+     */
+    List<MessageCreateListener> getMessageCreateListeners();
 
 }

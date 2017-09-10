@@ -40,7 +40,7 @@ public abstract class PacketHandler {
     private final String type;
     private final boolean async;
     private ExecutorService executorService;
-    private final ExecutorService listenerExecutorService;
+    protected final ExecutorService listenerExecutorService;
 
     /**
      * Creates a new instance of this class.

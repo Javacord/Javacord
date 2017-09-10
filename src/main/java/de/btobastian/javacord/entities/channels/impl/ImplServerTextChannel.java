@@ -26,10 +26,14 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -56,6 +60,9 @@ public class ImplServerTextChannel implements ServerTextChannel {
      * The server of the channel.
      */
     private final ImplServer server;
+
+    // All listeners
+    private final ArrayList<MessageCreateListener> messageCreateListeners = new ArrayList<>();
 
     /**
      * Creates a new server text channel object.
@@ -121,4 +128,15 @@ public class ImplServerTextChannel implements ServerTextChannel {
     public String getMentionTag() {
         return "<#" + getId() + ">";
     }
+
+    @Override
+    public void addMessageCreateListener(MessageCreateListener listener) {
+        messageCreateListeners.add(listener);
+    }
+
+    @Override
+    public List<MessageCreateListener> getMessageCreateListeners() {
+        return Collections.unmodifiableList(messageCreateListeners);
+    }
+
 }

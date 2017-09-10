@@ -22,11 +22,11 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
+import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -53,6 +53,9 @@ public class ImplServer implements Server {
      * A map with all channels of the server.
      */
     private final ConcurrentHashMap<Long, ServerChannel> channels = new ConcurrentHashMap<>();
+
+    // All listeners
+    private final ArrayList<MessageCreateListener> messageCreateListeners = new ArrayList<>();
 
     /**
      * Creates a new server object.
@@ -111,6 +114,16 @@ public class ImplServer implements Server {
     @Override
     public Optional<ServerChannel> getChannelById(long id) {
         return Optional.ofNullable(channels.get(id));
+    }
+
+    @Override
+    public void addMessageCreateListener(MessageCreateListener listener) {
+        messageCreateListeners.add(listener);
+    }
+
+    @Override
+    public List<MessageCreateListener> getMessageCreateListeners() {
+        return Collections.unmodifiableList(messageCreateListeners);
     }
 
 }
