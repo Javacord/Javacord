@@ -31,7 +31,7 @@ public interface DiscordEntity {
      * @return The id of Discord entity.
      * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
      */
-    String getId();
+    long getId();
 
     /**
      * Gets the creation date of the Discord entity, calculated from the id.
@@ -40,19 +40,9 @@ public interface DiscordEntity {
      * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
      */
     default Instant getCreationDate() {
-        long timestamp;
-        try {
-            timestamp = Long.parseLong(getId());
-        } catch (NumberFormatException e) {
-            throw new IllegalStateException("The id is not a valid snowflake!");
-        }
-
         // The first 42 bits (of the total 64) are the timestamp
-        timestamp = timestamp >> 22;
         // Discord starts its counter at the first second of 2015
-        timestamp += 1420070400000L;
-
-        return Instant.ofEpochMilli(timestamp);
+        return Instant.ofEpochMilli((getId() >> 22) + 1420070400000L);
     }
 
 }
