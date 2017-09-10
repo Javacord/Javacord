@@ -578,7 +578,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                         newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"),
                         newAvatar != null);
                 ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
-                if (response.getBody().getObject().has("email")) {
+                if (response.getBody().getObject().has("email") && !response.getBody().getObject().isNull("email")) {
                     setEmail(response.getBody().getObject().getString("email"));
                 }
                 setToken(response.getBody().getObject().getString("token"), token.startsWith("Bot "));
