@@ -21,6 +21,7 @@ package de.btobastian.javacord;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
@@ -133,5 +134,188 @@ public interface DiscordApi {
      * @return A collection with all servers the bot is in.
      */
     Collection<Server> getServers();
+
+    /**
+     * Gets a channel by it's id.
+     *
+     * @param id The id of the channel.
+     * @return The channel with the given id.
+     */
+    default Optional<Channel> getChannelById(long id) {
+        return getServers().stream()
+                .filter(server -> server.getChannelById(id).isPresent())
+                .map(server -> (Channel) server.getChannelById(id).orElse(null))
+                .findAny();
+    }
+
+    /**
+     * Gets a channel by it's id.
+     *
+     * @param id The id of the channel.
+     * @return The channel with the given id.
+     */
+    default Optional<Channel> getChannelById(String id) {
+        try {
+            return getChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a text channel by it's id.
+     *
+     * @param id The id of the text channel.
+     * @return The text channel with the given id.
+     */
+    default Optional<TextChannel> getTextChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof TextChannel)
+                .map(channel -> (TextChannel) channel);
+    }
+
+    /**
+     * Gets a text channel by it's id.
+     *
+     * @param id The id of the text channel.
+     * @return The text channel with the given id.
+     */
+    default Optional<TextChannel> getTextChannelById(String id) {
+        try {
+            return getTextChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a voice channel by it's id.
+     *
+     * @param id The id of the voice channel.
+     * @return The voice channel with the given id.
+     */
+    default Optional<VoiceChannel> getVoiceChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof VoiceChannel)
+                .map(channel -> (VoiceChannel) channel);
+    }
+
+    /**
+     * Gets a voice channel by it's id.
+     *
+     * @param id The id of the voice channel.
+     * @return The voice channel with the given id.
+     */
+    default Optional<VoiceChannel> getVoiceChannelById(String id) {
+        try {
+            return getVoiceChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a server text channel by it's id.
+     *
+     * @param id The id of the server text channel.
+     * @return The server text channel with the given id.
+     */
+    default Optional<ServerTextChannel> getServerTextChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ServerTextChannel)
+                .map(channel -> (ServerTextChannel) channel);
+    }
+
+    /**
+     * Gets a server text channel by it's id.
+     *
+     * @param id The id of the server text channel.
+     * @return The server text channel with the given id.
+     */
+    default Optional<ServerTextChannel> getServerTextChannelById(String id) {
+        try {
+            return getServerTextChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a server voice channel by it's id.
+     *
+     * @param id The id of the server voice channel.
+     * @return The server voice channel with the given id.
+     */
+    default Optional<ServerVoiceChannel> getServerVoiceChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ServerVoiceChannel)
+                .map(channel -> (ServerVoiceChannel) channel);
+    }
+
+    /**
+     * Gets a server voice channel by it's id.
+     *
+     * @param id The id of the server voice channel.
+     * @return The server voice channel with the given id.
+     */
+    default Optional<ServerVoiceChannel> getServerVoiceChannelById(String id) {
+        try {
+            return getServerVoiceChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a private channel by it's id.
+     *
+     * @param id The id of the private channel.
+     * @return The private channel with the given id.
+     */
+    default Optional<PrivateChannel> getPrivateChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof PrivateChannel)
+                .map(channel -> (PrivateChannel) channel);
+    }
+
+    /**
+     * Gets a private channel by it's id.
+     *
+     * @param id The id of the private channel.
+     * @return The private channel with the given id.
+     */
+    default Optional<PrivateChannel> getPrivateChannelById(String id) {
+        try {
+            return getPrivateChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a group channel by it's id.
+     *
+     * @param id The id of the group channel.
+     * @return The group channel with the given id.
+     */
+    default Optional<GroupChannel> getGroupChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof GroupChannel)
+                .map(channel -> (GroupChannel) channel);
+    }
+
+    /**
+     * Gets a group channel by it's id.
+     *
+     * @param id The id of the group channel.
+     * @return The group channel with the given id.
+     */
+    default Optional<GroupChannel> getGroupChannelById(String id) {
+        try {
+            return getGroupChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
 
 }
