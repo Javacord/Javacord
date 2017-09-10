@@ -65,7 +65,7 @@ public class MyFirstBot {
             }
 
             // Login successful
-            api.getChannelById("123").ifPresent(channel -> channel.sendMessage("I'm online now!"));
+            api.getTextChannelById("123").ifPresent(channel -> channel.sendMessage("I'm online now!"));
         });
     }
 
@@ -79,14 +79,9 @@ public class MyFirstBot {
     public static void main(String[] args) {
         String token = args[0];
 
-        try {
-            DiscordApi api = new DiscordApiBuilder().setToken(token).login().get();
-            // Login successful
-            api.getChannelById("123").ifPresent(channel -> channel.sendMessage("Hi!"));
-        } catch (InterruptedException | ExecutionException e) {
-            // Login failed
-            e.printStackTrace();
-        }
+        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+        // Login successful
+        api.getTextChannelById("123").ifPresent(channel -> channel.sendMessage("I'm online now!"));
     }
 
 }
