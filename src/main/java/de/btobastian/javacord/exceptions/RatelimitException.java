@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.utils.exceptions;
+package de.btobastian.javacord.exceptions;
 
 /**
  * When we encounter a rate limit and ran out of retires.

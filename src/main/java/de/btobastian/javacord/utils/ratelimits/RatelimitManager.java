@@ -21,7 +21,7 @@ package de.btobastian.javacord.utils.ratelimits;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.utils.exceptions.RatelimitException;
+import de.btobastian.javacord.exceptions.RatelimitException;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.slf4j.Logger;

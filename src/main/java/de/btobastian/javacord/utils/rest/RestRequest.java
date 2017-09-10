@@ -25,8 +25,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.utils.exceptions.BadResponseException;
-import de.btobastian.javacord.utils.exceptions.RatelimitException;
+import de.btobastian.javacord.exceptions.BadResponseException;
+import de.btobastian.javacord.exceptions.RatelimitException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
