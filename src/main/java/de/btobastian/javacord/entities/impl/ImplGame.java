@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-package de.btobastian.javacord.entities.general.impl;
+package de.btobastian.javacord.entities.impl;
 
-import de.btobastian.javacord.entities.general.Game;
-import de.btobastian.javacord.entities.general.GameType;
+import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.entities.GameType;
 
 import java.util.Optional;
 
 /**
- * The implementation of {@link de.btobastian.javacord.entities.general.Game}.
+ * The implementation of {@link Game}.
  */
 public class ImplGame implements Game {
 

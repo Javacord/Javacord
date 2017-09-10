@@ -20,9 +20,9 @@ package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
 import com.neovisionaries.ws.client.WebSocketAdapter;
-import de.btobastian.javacord.entities.general.Game;
-import de.btobastian.javacord.entities.general.GameType;
-import de.btobastian.javacord.entities.general.impl.ImplGame;
+import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;

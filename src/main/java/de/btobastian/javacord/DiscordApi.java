@@ -19,7 +19,7 @@
 package de.btobastian.javacord;
 
 import com.neovisionaries.ws.client.WebSocketAdapter;
-import de.btobastian.javacord.entities.general.Game;
+import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 

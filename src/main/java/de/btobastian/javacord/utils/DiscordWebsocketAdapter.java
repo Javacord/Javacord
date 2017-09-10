@@ -21,7 +21,7 @@ package de.btobastian.javacord.utils;
 import com.neovisionaries.ws.client.*;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
-import de.btobastian.javacord.entities.general.Game;
+import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
