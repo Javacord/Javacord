@@ -18,11 +18,19 @@
  */
 package de.btobastian.javacord.entities.channels.impl;
 
+import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link ServerTextChannel}.
@@ -77,6 +85,34 @@ public class ImplServerTextChannel implements ServerTextChannel {
     }
 
     @Override
+    public CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
+        CompletableFuture<Message> future = new CompletableFuture<>();
+        JSONObject body = new JSONObject()
+                .put("content", content == null ? "" : content)
+                .put("tts", tts)
+                .put("mentions", new String[0]);
+        if (embed != null) {
+            body.put("embed", embed.toJSONObject());
+        }
+        if (nonce != null) {
+            body.put("nonce", nonce);
+        }
+        new RestRequest(api, HttpMethod.POST, RestEndpoint.MESSAGE)
+                .setUrlParameters(String.valueOf(id))
+                .setBody(body)
+                .execute().whenComplete((response, throwable) ->
+        {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+                return;
+            }
+            future.complete(new ImplMessage(api, this, response.getBody().getObject()));
+        });
+        return future;
+    }
+
+
+    @Override
     public Server getServer() {
         return server;
     }
@@ -85,5 +121,4 @@ public class ImplServerTextChannel implements ServerTextChannel {
     public String getMentionTag() {
         return "<#" + getId() + ">";
     }
-
 }

@@ -18,7 +18,7 @@
  */
 package de.btobastian.javacord.entities.channels;
 
-import de.btobastian.javacord.entities.Messageable;
+import de.btobastian.javacord.entities.message.Messageable;
 
 /**
  * This class represents a text channel.

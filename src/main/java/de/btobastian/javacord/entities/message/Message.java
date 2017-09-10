@@ -24,4 +24,12 @@ import de.btobastian.javacord.entities.DiscordEntity;
  * This class represents a Discord message.
  */
 public interface Message extends DiscordEntity, Comparable<Message> {
+
+    /**
+     * Gets the content of the message.
+     *
+     * @return The content of the message.
+     */
+    public String getContent();
+
 }

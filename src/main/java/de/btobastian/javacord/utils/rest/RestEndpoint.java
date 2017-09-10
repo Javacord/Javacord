@@ -28,7 +28,8 @@ import java.util.Optional;
 public enum RestEndpoint {
 
     GATEWAY("/gateway"),
-    GATEWAY_BOT("/gateway/bot");
+    GATEWAY_BOT("/gateway/bot"),
+    MESSAGE("/channels/%s/messages");
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
