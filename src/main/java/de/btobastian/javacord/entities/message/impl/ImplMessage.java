@@ -66,7 +66,7 @@ public class ImplMessage implements Message {
 
     @Override
     public DiscordApi getApi() {
-        return null;
+        return api;
     }
 
     @Override

@@ -99,7 +99,7 @@ public class ImplServer implements Server {
 
     @Override
     public DiscordApi getApi() {
-        return null;
+        return api;
     }
 
     @Override

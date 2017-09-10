@@ -77,7 +77,7 @@ public class ImplServerTextChannel implements ServerTextChannel {
 
     @Override
     public DiscordApi getApi() {
-        return null;
+        return api;
     }
 
     @Override
