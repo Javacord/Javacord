@@ -26,6 +26,7 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.utils.exceptions.BadResponseException;
+import de.btobastian.javacord.utils.exceptions.RatelimitException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -263,7 +264,12 @@ public class RestRequest {
         }
         HttpResponse<JsonNode> response = request.asJson();
         if (response.getStatus() >= 300 || response.getStatus() < 200) {
-            throw new BadResponseException("Received non-OK response from Discord!", response);
+            switch (response.getStatus()) {
+                case 401:
+                    throw new RatelimitException("Received 429 from Discord!");
+                default:
+                    throw new BadResponseException("Received a " + response.getStatus() + " response from Discord!", response);
+            }
         }
         return response;
     }
