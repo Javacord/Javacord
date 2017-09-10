@@ -20,9 +20,11 @@ package de.btobastian.javacord;
 
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -102,5 +104,34 @@ public interface DiscordApi {
      * @param seconds The time, in which the attempts can happen in seconds. Default: 300.
      */
     void setReconnectRatelimit(int attempts, int seconds);
+
+    /**
+     * Gets a server by it's id.
+     *
+     * @param id The id of the server.
+     * @return The server with the given id.
+     */
+    Optional<Server> getServerById(long id);
+
+    /**
+     * Gets a server by it's id.
+     *
+     * @param id The id of the server.
+     * @return The server with the given id.
+     */
+    default Optional<Server> getServerById(String id) {
+        try {
+            return getServerById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a collection with all servers the bot is in.
+     *
+     * @return A collection with all servers the bot is in.
+     */
+    Collection<Server> getServers();
 
 }

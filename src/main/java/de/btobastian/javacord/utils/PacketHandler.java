@@ -19,6 +19,7 @@
 package de.btobastian.javacord.utils;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public abstract class PacketHandler {
      */
     private static final Logger logger = LoggerUtil.getLogger(PacketHandler.class);
 
-    private final DiscordApi api;
+    protected final ImplDiscordApi api;
     private final String type;
     private final boolean async;
     private ExecutorService executorService;
@@ -49,7 +50,7 @@ public abstract class PacketHandler {
      * @param type The type of packet the class handles.
      */
     public PacketHandler(DiscordApi api, boolean async, String type) {
-        this.api = api;
+        this.api = (ImplDiscordApi) api;
         this.async = async;
         this.type = type;
         if (async) {

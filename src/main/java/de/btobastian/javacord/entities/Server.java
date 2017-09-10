@@ -23,4 +23,11 @@ package de.btobastian.javacord.entities;
  */
 public interface Server extends DiscordEntity {
 
+    /**
+     * Gets the name of the server.
+     *
+     * @return The name of the server.
+     */
+    String getName();
+
 }

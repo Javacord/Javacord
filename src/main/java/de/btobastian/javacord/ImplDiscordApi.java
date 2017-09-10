@@ -22,6 +22,7 @@ import com.mashape.unirest.http.HttpMethod;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -31,8 +32,11 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.slf4j.Logger;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The implementation of {@link DiscordApi}.
@@ -74,6 +78,16 @@ public class ImplDiscordApi implements DiscordApi {
      */
     private Game game;
 
+    /**
+     * A map which contains all servers.
+     */
+    private final ConcurrentHashMap<Long, Server> servers = new ConcurrentHashMap<>();
+
+    /**
+     * A set with all unavailable servers.
+     */
+    private final HashSet<Long> unavailableServers = new HashSet<>();
+
     public ImplDiscordApi(AccountType accountType, String token, CompletableFuture<DiscordApi> ready) {
         this.accountType = accountType;
         this.token = accountType.getTokenPrefix() + token;
@@ -101,6 +115,24 @@ public class ImplDiscordApi implements DiscordApi {
                 }
             });
         });
+    }
+
+    /**
+     * Adds the given server to cache.
+     *
+     * @param server The server to add.
+     */
+    public void addServerToCache(Server server) {
+        servers.put(server.getId(), server);
+    }
+
+    /**
+     * Gets a set with all unavailable servers.
+     *
+     * @return A set with all unavailable servers.
+     */
+    public HashSet<Long> getUnavailableServers() {
+        return unavailableServers;
     }
 
     @Override
@@ -159,5 +191,15 @@ public class ImplDiscordApi implements DiscordApi {
     public void setReconnectRatelimit(int attempts, int seconds) {
         websocketAdapter.setReconnectAttempts(attempts);
         websocketAdapter.setRatelimitResetIntervalInSeconds(seconds);
+    }
+
+    @Override
+    public Optional<Server> getServerById(long id) {
+        return Optional.ofNullable(servers.get(id));
+    }
+
+    @Override
+    public Collection<Server> getServers() {
+        return servers.values();
     }
 }

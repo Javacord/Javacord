@@ -23,6 +23,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
+import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -190,31 +191,20 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     sessionId = packet.getJSONObject("d").getString("session_id");
-                    // TODO
-                    /*
-                    if (api.isWaitingForServersOnStartup()) {
-                        // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
-                        api.getThreadPool().getSingleThreadExecutorService("startupWait").submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                int amount = api.getServers().size();
-                                for (;;) {
-                                    try {
-                                        Thread.sleep(1500);
-                                    } catch (InterruptedException ignored) { }
-                                    if (api.getServers().size() <= amount && lastGuildMembersChunkReceived + 1500 < System.currentTimeMillis()) {
-                                        break; // 1.5 seconds without new servers becoming available and no GUILD_MEMBERS_CHUNK packet
-                                    }
-                                    amount = api.getServers().size();
-                                }
-                                ready.set(true);
+                    // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
+                    api.getThreadPool().getSingleThreadExecutorService("startupWait").submit(() -> {
+                        int amount = api.getServers().size();
+                        for (;;) {
+                            try {
+                                Thread.sleep(1500);
+                            } catch (InterruptedException ignored) { }
+                            if (api.getServers().size() <= amount && lastGuildMembersChunkReceived + 1500 < System.currentTimeMillis()) {
+                                break; // 1.5 seconds without new servers becoming available and no GUILD_MEMBERS_CHUNK packet
                             }
-                        });
-                    } else {
-                        ready.set(true);
-                    }
-                    */
-                    ready.complete(true);
+                            amount = api.getServers().size();
+                        }
+                        ready.complete(true);
+                    });
                     logger.debug("Received READY packet");
                 } else if (type.equals("READY")) {
                     heartbeatAckReceived = true;
@@ -351,6 +341,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     private void registerHandlers() {
         // general
         addHandler(new ReadyHandler(api));
+
+        // servers
+        addHandler(new GuildCreateHandler(api));
     }
 
     /**

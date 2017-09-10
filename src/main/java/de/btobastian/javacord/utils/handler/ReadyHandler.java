@@ -19,6 +19,8 @@
 package de.btobastian.javacord.utils.handler;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,11 +45,10 @@ public class ReadyHandler extends PacketHandler {
         for (int i = 0; i < guilds.length(); i++) {
             JSONObject guild = guilds.getJSONObject(i);
             if (guild.has("unavailable") && guild.getBoolean("unavailable")) {
-                // add guild to the list of unavailable servers
-                // TODO
+                api.getUnavailableServers().add(Long.valueOf(guild.getString("id")));
                 continue;
             }
-            // TODO create Server object
+            new ImplServer(api, guild);
         }
 
         JSONArray privateChannels = packet.getJSONArray("private_channels");
