@@ -28,6 +28,11 @@ import de.btobastian.javacord.entities.permissions.Role;
 public class RoleChangeMentionableEvent extends RoleEvent {
 
     /**
+     * The old mentionable value.
+     */
+    private final boolean oldMentionable;
+
+    /**
      * Creates a new RoleCreateEvent
      *
      * @param api The api instance of the event.
@@ -37,6 +42,24 @@ public class RoleChangeMentionableEvent extends RoleEvent {
      */
     public RoleChangeMentionableEvent(DiscordApi api, Server server, Role role, boolean oldMentionable) {
         super(api, server, role);
+        this.oldMentionable = oldMentionable;
     }
 
+    /**
+     * Gets the old Mentionable flag of the role.
+     *
+     * @return The old mentionable flag of the role.
+     */
+    public boolean getOldMentionableFlag() {
+        return oldMentionable;
+    }
+
+    /**
+     * Gets the new Mentionable flag of the role.
+     *
+     * @return The new mentionable flag of the role.
+     */
+    public boolean getNewMentionableFlag() {
+        return !oldMentionable;
+    }
 }
