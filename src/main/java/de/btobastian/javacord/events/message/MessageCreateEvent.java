@@ -20,36 +20,20 @@ package de.btobastian.javacord.events.message;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.events.Event;
 
 /**
  * A message create event.
  */
-public class MessageCreateEvent extends Event {
-
-    /**
-     * The created message.
-     */
-    private final Message message;
+public class MessageCreateEvent extends CertainMessageEvent {
 
     /**
      * Creates a new event instance.
      *
-     * @param api The api instance of the event.
+     * @param api The discord api instance.
      * @param message The created message.
      */
     public MessageCreateEvent(DiscordApi api, Message message) {
-        super(api);
-        this.message = message;
-    }
-
-    /**
-     * Gets the created message.
-     *
-     * @return The created message.
-     */
-    public Message getMessage() {
-        return message;
+        super(api, message);
     }
 
 }
