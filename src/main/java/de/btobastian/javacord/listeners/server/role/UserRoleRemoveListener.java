@@ -3,13 +3,13 @@ package de.btobastian.javacord.listeners.server.role;
 import de.btobastian.javacord.events.server.role.UserRoleRemoveEvent;
 
 /**
- * This listener listens to role hoist changes.
+ * This listener listens to users being removed from a role.
  */
 @FunctionalInterface
 public interface UserRoleRemoveListener {
 
     /**
-     * This method is called every time the role is removed from a user.
+     * This method is called every time a user is removed from a role.
      *
      * @param event The event.
      */
