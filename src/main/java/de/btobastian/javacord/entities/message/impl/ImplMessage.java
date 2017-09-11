@@ -22,7 +22,10 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.embed.Embed;
 import org.json.JSONObject;
+
+import java.util.Optional;
 
 /**
  * The implementation of {@link Message}.
@@ -82,6 +85,12 @@ public class ImplMessage implements Message {
     @Override
     public TextChannel getChannel() {
         return channel;
+    }
+
+    @Override
+    public Optional<Embed> getEmbed() {
+        // TODO
+        return Optional.empty();
     }
 
     @Override

@@ -24,6 +24,7 @@ import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
@@ -48,6 +49,13 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The text channel of the message.
      */
     TextChannel getChannel();
+
+    /**
+     * Gets the embed of the message.
+     *
+     * @return The embed of the message.
+     */
+    Optional<Embed> getEmbed();
 
     /**
      * Gets the server text channel of the message.
