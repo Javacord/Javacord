@@ -1,6 +1,6 @@
 package de.btobastian.javacord.listeners.user;
 
-import de.btobastian.javacord.events.user.UserChangeGameEvent;
+import de.btobastian.javacord.events.user.UserChangeNameEvent;
 
 /**
  * This listener listens to user name changes.
@@ -13,6 +13,6 @@ public interface UserChangeNameListener {
      *
      * @param event The event.
      */
-    void onUserChangeName(UserChangeGameEvent event);
+    void onUserChangeName(UserChangeNameEvent event);
 
 }
