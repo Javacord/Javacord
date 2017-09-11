@@ -33,7 +33,7 @@ public class RoleChangeMentionableEvent extends RoleEvent {
      * @param api The api instance of the event.
      * @param server The server of the event.
      * @param role The role of the event.
-     * @param oldMentionable The mentionable of the event.
+     * @param oldMentionable The old mentionable flag of the role.
      */
     public RoleChangeMentionableEvent(DiscordApi api, Server server, Role role, boolean oldMentionable) {
         super(api, server, role);
