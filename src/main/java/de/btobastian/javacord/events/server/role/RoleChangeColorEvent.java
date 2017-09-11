@@ -25,7 +25,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import java.awt.*;
 
 /**
- * A Role Change Color event.
+ * A role change color event.
  */
 public class RoleChangeColorEvent extends RoleEvent {
 
@@ -35,12 +35,12 @@ public class RoleChangeColorEvent extends RoleEvent {
     private final Color oldColor;
 
     /**
-     * Creates a new RoleChangeColorEvent
+     * Creates a new role change color event.
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
      * @param role The role of the event.
-     * @param oldColor The old Color of the role.
+     * @param oldColor The old color of the role.
      */
     public RoleChangeColorEvent(DiscordApi api, Server server, Role role, Color oldColor) {
         super(api, server, role);
@@ -48,18 +48,18 @@ public class RoleChangeColorEvent extends RoleEvent {
     }
 
     /**
-     * Gets the old Color of the role.
+     * Gets the old color of the role.
      *
-     * @return The old Color of the role.
+     * @return The old color of the role.
      */
     public Color getOldColor() {
         return oldColor;
     }
 
     /**
-     * Gets the new Color of the role.
+     * Gets the new color of the role.
      *
-     * @return The new Color of the role.
+     * @return The new color of the role.
      */
     public Color getNewColor() {
         // TODO: return getRole().getColor();

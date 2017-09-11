@@ -24,12 +24,12 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
- * A User Role Remove Event
+ * A user role remove event.
  */
 public class UserRoleRemoveEvent extends UserRoleEvent {
 
     /**
-     * Creates a new UserRoleRemoveEvent
+     * Creates a new user role remove event.
      *
      * @param api The api instance of the event.
      * @param server The server of the event.

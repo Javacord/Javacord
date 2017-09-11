@@ -23,7 +23,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
- * A Role Change Name event.
+ * A role change name.
  */
 public class RoleChangeNameEvent extends RoleEvent {
 
@@ -33,7 +33,7 @@ public class RoleChangeNameEvent extends RoleEvent {
     private final String oldName;
 
     /**
-     * Creates a new RoleChangeNameEvent
+     * Creates a new role change name.
      *
      * @param api The api instance of the event.
      * @param server The server of the event.

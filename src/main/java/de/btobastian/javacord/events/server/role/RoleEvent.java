@@ -46,7 +46,7 @@ public abstract class RoleEvent extends ServerEvent {
     }
 
     /**
-     * Gets the Role of the event.
+     * Gets the role of the event.
      *
      * @return The role of the event.
      */

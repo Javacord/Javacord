@@ -23,12 +23,12 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
- * A Role create event.
+ * A role create event.
  */
 public class RoleCreateEvent extends RoleEvent {
 
     /**
-     * Creates a new RoleCreateEvent
+     * Creates a new role create event
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
