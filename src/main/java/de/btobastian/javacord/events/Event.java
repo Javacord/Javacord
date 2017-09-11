@@ -31,7 +31,7 @@ public abstract class Event {
     protected final DiscordApi api;
 
     /**
-     * Creates a new event instance.
+     * Creates a new event.
      *
      * @param api The api instance of the event.
      */
