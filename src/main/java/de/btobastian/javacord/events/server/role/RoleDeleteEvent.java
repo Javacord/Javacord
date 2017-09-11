@@ -23,12 +23,12 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
- * A Role delete event.
+ * A role delete event.
  */
 public class RoleDeleteEvent extends RoleEvent {
 
     /**
-     * Creates a new RoleDeleteEvent
+     * Creates a new role delete event.
      *
      * @param api The api instance of the event.
      * @param server The server of the event.

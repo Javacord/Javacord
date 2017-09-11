@@ -23,17 +23,17 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
- * A Role create event.
+ * A role change mentionable event.
  */
 public class RoleChangeMentionableEvent extends RoleEvent {
 
     /**
-     * The old mentionable value.
+     * The old mentionable flag value.
      */
     private final boolean oldMentionable;
 
     /**
-     * Creates a new RoleChangeMentionableEvent
+     * Creates a new role change mentionable event.
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
@@ -46,7 +46,7 @@ public class RoleChangeMentionableEvent extends RoleEvent {
     }
 
     /**
-     * Gets the old Mentionable flag of the role.
+     * Gets the old mentionable flag of the role.
      *
      * @return The old mentionable flag of the role.
      */
@@ -55,7 +55,7 @@ public class RoleChangeMentionableEvent extends RoleEvent {
     }
 
     /**
-     * Gets the new Mentionable flag of the role.
+     * Gets the new mentionable flag of the role.
      *
      * @return The new mentionable flag of the role.
      */

@@ -23,7 +23,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
- * A Role Change Managed event.
+ * A role change managed event.
  */
 public class RoleChangeManagedEvent extends RoleEvent {
 
@@ -33,7 +33,7 @@ public class RoleChangeManagedEvent extends RoleEvent {
     private final boolean oldManaged;
 
     /**
-     * Creates a new RoleChangeManagedEvent
+     * Creates a new role change managed event.
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
@@ -46,18 +46,18 @@ public class RoleChangeManagedEvent extends RoleEvent {
     }
 
     /**
-     * Gets the old Managed flag of the role.
+     * Gets the old managed flag of the role.
      *
-     * @return The old Managed flag of the role.
+     * @return The old managed flag of the role.
      */
     public boolean getOldManagedFlag() {
         return oldManaged;
     }
 
     /**
-     * Gets the new Managed flag of the role.
+     * Gets the new managed flag of the role.
      *
-     * @return The new Managed flag of the role.
+     * @return The new managed flag of the role.
      */
     public boolean getNewManagedFlag() {
         return !oldManaged;

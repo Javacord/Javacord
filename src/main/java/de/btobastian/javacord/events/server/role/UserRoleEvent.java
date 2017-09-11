@@ -24,7 +24,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
- * A User role event.
+ * A user role event.
  */
 public abstract class UserRoleEvent extends RoleEvent {
 
@@ -34,7 +34,7 @@ public abstract class UserRoleEvent extends RoleEvent {
     private final User user;
 
     /**
-     * Creates a new UserRoleEvent
+     * Creates a new user role event.
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
