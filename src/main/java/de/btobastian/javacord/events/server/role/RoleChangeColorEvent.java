@@ -59,7 +59,7 @@ public class RoleChangeColorEvent extends RoleEvent {
     /**
      * Gets the new color of the role.
      *
-     * @return The new clor of the role.
+     * @return The new color of the role.
      */
     public Color getNewColor() {
         // TODO: return getRole().getColor();
