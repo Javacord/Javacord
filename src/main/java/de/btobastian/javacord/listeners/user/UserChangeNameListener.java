@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.user.UserChangeNameEvent;
 public interface UserChangeNameListener {
 
     /**
-     * This method is called every time a user changed it's name.
+     * This method is called every time a user changes their name.
      *
      * @param event The event.
      */
