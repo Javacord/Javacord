@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.RoleChangeManagedEvent;
 public interface RoleChangeManagedListener {
 
     /**
-     * This method is called every time a roles managed flag changes.
+     * This method is called every time a role's managed flag changes.
      *
      * @param event The event.
      */

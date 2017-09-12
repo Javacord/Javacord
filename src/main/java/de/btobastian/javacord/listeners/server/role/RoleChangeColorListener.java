@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.RoleChangeColorEvent;
 public interface RoleChangeColorListener {
 
     /**
-     * This method is called every time a roles color changes.
+     * This method is called every time a role's color changes.
      *
      * @param event The event.
      */

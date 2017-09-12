@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.message.MessageEditEvent;
 public interface MessageEditListener {
 
     /**
-     * This method is called every time a message got edited.
+     * This method is called every time a message is edited.
      *
      * @param event The event.
      */

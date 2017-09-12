@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.RoleChangeHoistEvent;
 public interface RoleChangeHoistListener {
 
     /**
-     * This method is called every time a roles hoist changes.
+     * This method is called every time a role's hoist changes.
      *
      * @param event The event.
      */

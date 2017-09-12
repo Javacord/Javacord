@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.RoleChangeNameEvent;
 public interface RoleChangeNameListener {
 
     /**
-     * This method is called every time a roles name changes.
+     * This method is called every time a role's name changes.
      *
      * @param event The event.
      */

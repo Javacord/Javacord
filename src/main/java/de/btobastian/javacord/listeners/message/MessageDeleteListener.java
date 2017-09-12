@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.message.MessageDeleteEvent;
 public interface MessageDeleteListener {
 
     /**
-     * This method is called every time a message got deleted.
+     * This method is called every time a message is deleted.
      *
      * @param event The event.
      */

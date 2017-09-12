@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.RoleChangeMentionableEvent;
 public interface RoleChangeMentionableListener {
 
     /**
-     * This method is called every time a roles mentionable flag changes.
+     * This method is called every time a role's mentionable flag changes.
      *
      * @param event The event.
      */
