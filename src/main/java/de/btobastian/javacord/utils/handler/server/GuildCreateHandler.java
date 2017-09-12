@@ -3,10 +3,15 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.events.server.ServerJoinEvent;
+import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles the guild create packet.
@@ -38,12 +43,14 @@ public class GuildCreateHandler extends PacketHandler {
             new ImplServer(api, packet);
             return;
         }
-        if (api.getServerById(id) != null) {
-            // TODO update information
-            return;
-        }
+
         final Server server = new ImplServer(api, packet);
-        // TODO throw event
+        ServerJoinEvent event = new ServerJoinEvent(api, server);
+        listenerExecutorService.submit(() -> {
+            List<ServerJoinListener> listeners = new ArrayList<>();
+            listeners.addAll(api.getServerJoinListeners());
+            listeners.forEach(listener -> listener.onServerJoin(event));
+        });
     }
 
 }
