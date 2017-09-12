@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.RoleDeleteEvent;
 public interface RoleDeleteListener {
 
     /**
-     * This method is called every time a role is deleted.
+     * This method is called every time a role got deleted.
      *
      * @param event The event.
      */

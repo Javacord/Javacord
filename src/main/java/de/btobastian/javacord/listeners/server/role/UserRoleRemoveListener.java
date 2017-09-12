@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.UserRoleRemoveEvent;
 public interface UserRoleRemoveListener {
 
     /**
-     * This method is called every time a user is removed from a role.
+     * This method is called every time a user got removed from a role.
      *
      * @param event The event.
      */

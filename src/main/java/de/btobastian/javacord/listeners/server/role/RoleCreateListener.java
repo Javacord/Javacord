@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.RoleCreateEvent;
 public interface RoleCreateListener {
 
     /**
-     * This method is called every time a role is created.
+     * This method is called every time a role got created.
      *
      * @param event The event.
      */

@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.role.UserRoleAddEvent;
 public interface UserRoleAddListener {
 
     /**
-     * This method is called every time a user is added to a role.
+     * This method is called every time a user got added to a role.
      *
      * @param event The event.
      */

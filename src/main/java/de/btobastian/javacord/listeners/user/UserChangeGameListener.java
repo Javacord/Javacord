@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.user.UserChangeGameEvent;
 public interface UserChangeGameListener {
 
     /**
-     * This method is called every time a user changes their game.
+     * This method is called every time a user changed their game.
      *
      * @param event The event
      */

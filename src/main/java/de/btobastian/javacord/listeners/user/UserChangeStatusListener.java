@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.user.UserChangeStatusEvent;
 public interface UserChangeStatusListener {
 
     /**
-     * This method is called every time a user changes their status.
+     * This method is called every time a user changed their status.
      *
      * @param event The event.
      */

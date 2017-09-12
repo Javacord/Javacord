@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.ServerChangeOwnerEvent;
 public interface ServerChangeOwnerListener {
 
     /**
-     * This method is called every time a server changes owner.
+     * This method is called every time a server's owner changed.
      *
      * @param event The event.
      */

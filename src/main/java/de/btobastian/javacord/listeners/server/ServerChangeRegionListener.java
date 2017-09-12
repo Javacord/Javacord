@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
 public interface ServerChangeRegionListener {
 
     /**
-     * This method is called every time a server changes region.
+     * This method is called every time a server's region changed.
      *
      * @param event The event.
      */
