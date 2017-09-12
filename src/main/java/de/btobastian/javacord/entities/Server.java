@@ -24,6 +24,49 @@ public interface Server extends DiscordEntity {
     String getName();
 
     /**
+     * Gets the region of the server.
+     *
+     * @return The region of the server.
+     */
+    Region getRegion();
+
+    /**
+     * Gets the nickname of a user.
+     *
+     * @param user The user to check.
+     * @return The nickname of the user.
+     */
+    Optional<String> getNickname(User user);
+
+    /**
+     * Gets a collection with all members of the server.
+     *
+     * @return A collection with all members of the server.
+     */
+    Collection<User> getMembers();
+
+    /**
+     * Checks if the server if considered large.
+     *
+     * @return Whether the server is large or not.
+     */
+    boolean isLarge();
+
+    /**
+     * Gets the amount of members in this server.
+     *
+     * @return The amount of members in this server.
+     */
+    int getMemberCount();
+
+    /**
+     * Gets the owner of the server.
+     *
+     * @return The owner of the server.
+     */
+    User getOwner();
+
+    /**
      * Gets a collection with all channels of the server.
      *
      * @return A collection with all channels of the server.

@@ -1,10 +1,11 @@
 package de.btobastian.javacord;
 
-import com.neovisionaries.ws.client.WebSocketAdapter;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
@@ -45,7 +46,7 @@ public interface DiscordApi {
      *
      * @return The websocket adapter.
      */
-    WebSocketAdapter getWebSocketAdapter();
+    DiscordWebsocketAdapter getWebSocketAdapter();
 
     /**
      * Updates the game of this bot, represented as "Playing Half-Life 3" for example.
@@ -91,12 +92,49 @@ public interface DiscordApi {
     void setReconnectRatelimit(int attempts, int seconds);
 
     /**
+     * Gets a collection with all users the bot knows of.
+     *
+     * @return A collection with all users the bot knows of.
+     */
+    Collection<User> getUsers();
+
+    /**
+     * Gets a user by it's id.
+     *
+     * @param id The id of the user.
+     * @return The user with the given id.
+     */
+    default Optional<User> getUserById(long id) {
+        return getUsers().stream()
+                .filter(user -> user.getId() == id)
+                .findAny();
+    }
+
+    /**
+     * Gets a user by it's id.
+     *
+     * @param id The id of the user.
+     * @return The user with the given id.
+     */
+    default Optional<User> getUserById(String id) {
+        try {
+            return getUserById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Gets a server by it's id.
      *
      * @param id The id of the server.
      * @return The server with the given id.
      */
-    Optional<Server> getServerById(long id);
+    default Optional<Server> getServerById(long id) {
+        return getServers().stream()
+                .filter(server -> server.getId() == id)
+                .findAny();
+    }
 
     /**
      * Gets a server by it's id.

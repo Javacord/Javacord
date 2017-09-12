@@ -1,11 +1,12 @@
 package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
-import com.neovisionaries.ws.client.WebSocketAdapter;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplGame;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -13,6 +14,7 @@ import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -59,6 +61,11 @@ public class ImplDiscordApi implements DiscordApi {
      * The game which is currently displayed. May be <code>null</code>.
      */
     private Game game;
+
+    /**
+     * A map which contains all users.
+     */
+    private final ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
 
     /**
      * A map which contains all servers.
@@ -113,12 +120,37 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
-     * Adds the given server to cache.
+     * Adds the given server to the cache.
      *
      * @param server The server to add.
      */
     public void addServerToCache(Server server) {
         servers.put(server.getId(), server);
+    }
+
+    /**
+     * Adds the given user to the cache.
+     *
+     * @param user The user to add.
+     */
+    public void addUserToCache(User user) {
+        users.put(user.getId(), user);
+    }
+
+    /**
+     * Gets a user or creates a new one from the given data.
+     *
+     * @param data The json data of the user.
+     * @return The user.
+     */
+    public User getOrCreateUser(JSONObject data) {
+        long id = Long.parseLong(data.getString("id"));
+        return getUserById(id).orElseGet(() -> {
+            if (!data.has("username")) {
+                throw new IllegalStateException("Couldn't get or created user. Please inform the developer!");
+            }
+            return new ImplUser(this, data);
+        });
     }
 
     /**
@@ -175,7 +207,7 @@ public class ImplDiscordApi implements DiscordApi {
      *       so for the end user it is in fact never null.
      */
     @Override
-    public WebSocketAdapter getWebSocketAdapter() {
+    public DiscordWebsocketAdapter getWebSocketAdapter() {
         return websocketAdapter;
     }
 
@@ -210,6 +242,16 @@ public class ImplDiscordApi implements DiscordApi {
     public void setReconnectRatelimit(int attempts, int seconds) {
         websocketAdapter.setReconnectAttempts(attempts);
         websocketAdapter.setRatelimitResetIntervalInSeconds(seconds);
+    }
+
+    @Override
+    public Collection<User> getUsers() {
+        return users.values();
+    }
+
+    @Override
+    public Optional<User> getUserById(long id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override

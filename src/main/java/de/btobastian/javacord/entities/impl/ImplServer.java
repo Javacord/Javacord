@@ -2,12 +2,16 @@ package de.btobastian.javacord.entities.impl;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +24,11 @@ import java.util.stream.Collectors;
  * The implementation of {@link de.btobastian.javacord.entities.Server}.
  */
 public class ImplServer implements Server {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplServer.class);
 
     /**
      * The discord api instance.
@@ -37,9 +46,39 @@ public class ImplServer implements Server {
     private String name;
 
     /**
+     * The region of the server.
+     */
+    private Region region;
+
+    /**
+     * Whether the server is considered as large or not.
+     */
+    private boolean large;
+
+    /**
+     * The id of the owner.
+     */
+    private long ownerId;
+
+    /**
+     * The amount of members in this server.
+     */
+    private int memberCount = -1;
+
+    /**
      * A map with all channels of the server.
      */
     private final ConcurrentHashMap<Long, ServerChannel> channels = new ConcurrentHashMap<>();
+
+    /**
+     * A map with all members of the server.
+     */
+    private final ConcurrentHashMap<Long, User> members = new ConcurrentHashMap<>();
+
+    /**
+     * A map with all nicknames. The key is the user id.
+     */
+    private final ConcurrentHashMap<Long, String> nicknames = new ConcurrentHashMap<>();
 
     /**
      * A map which contains all listeners.
@@ -58,6 +97,10 @@ public class ImplServer implements Server {
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
+        region = Region.getRegionByKey(data.getString("region"));
+        large = data.getBoolean("large");
+        memberCount = data.getInt("member_count");
+        ownerId = Long.parseLong(data.getString("owner_id"));
 
         if (data.has("channels")) {
             JSONArray channels = data.getJSONArray("channels");
@@ -74,6 +117,23 @@ public class ImplServer implements Server {
             }
         }
 
+        JSONArray members = new JSONArray();
+        if (data.has("members")) {
+            members = data.getJSONArray("members");
+        }
+        addMembers(members);
+
+        if (isLarge() && getMembers().size() < getMemberCount()) {
+            JSONObject requestGuildMembersPacket = new JSONObject()
+                    .put("op", 8)
+                    .put("d", new JSONObject()
+                            .put("guild_id", String.valueOf(getId()))
+                            .put("query","")
+                            .put("limit", 0));
+            logger.debug("Sending request guild members packet for server {}", this);
+            this.api.getWebSocketAdapter().getWebSocket().sendText(requestGuildMembersPacket.toString());
+        }
+
         api.addServerToCache(this);
     }
 
@@ -84,6 +144,35 @@ public class ImplServer implements Server {
      */
     public void addChannelToCache(ServerChannel channel) {
         channels.put(channel.getId(), channel);
+    }
+
+    /**
+     * Adds a user to the server.
+     *
+     * @param user The user to add.
+     */
+    public void addMember(User user) {
+        members.put(user.getId(), user);
+    }
+
+    /**
+     * Adds members to the server.
+     *
+     * @param members An array of guild member objects.
+     */
+    public void addMembers(JSONArray members) {
+        for (int i = 0; i < members.length(); i++) {
+            User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
+            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
+                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
+            }
+            addMember(member);
+
+            JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
+            for (int j = 0; j < memberRoles.length(); j++) {
+                // TODO add to roles
+            }
+        }
     }
 
     /**
@@ -123,6 +212,37 @@ public class ImplServer implements Server {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Region getRegion() {
+        return region;
+    }
+
+    @Override
+    public Optional<String> getNickname(User user) {
+        return Optional.ofNullable(nicknames.get(user.getId()));
+    }
+
+    @Override
+    public Collection<User> getMembers() {
+        return members.values();
+    }
+
+    @Override
+    public boolean isLarge() {
+        return large;
+    }
+
+    @Override
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    @Override
+    public User getOwner() {
+        return api.getUserById(ownerId)
+                .orElseThrow(() -> new IllegalStateException("Owner of server " + toString() + " is not cached!"));
     }
 
     @Override
