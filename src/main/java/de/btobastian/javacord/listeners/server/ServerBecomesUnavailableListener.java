@@ -1,6 +1,6 @@
 package de.btobastian.javacord.listeners.server;
 
-import de.btobastian.javacord.events.server.ServerBecomesAvailableEvent;
+import de.btobastian.javacord.events.server.ServerBecomesUnavailableEvent;
 
 /**
  * This listener listens to servers becoming available.
@@ -16,5 +16,5 @@ public interface ServerBecomesUnavailableListener {
      *
      * @param event The event.
      */
-    void onServerBecomesUnavailable(ServerBecomesAvailableEvent event);
+    void onServerBecomesUnavailable(ServerBecomesUnavailableEvent event);
 }

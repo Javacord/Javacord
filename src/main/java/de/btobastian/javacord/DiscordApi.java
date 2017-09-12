@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
+import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -390,5 +391,19 @@ public interface DiscordApi {
      * @return A list with all registered server becomes available listeners.
      */
     List<ServerBecomesAvailableListener> getServerBecomesAvailableListeners();
+
+    /**
+     * Adds a listener, which listens to servers becoming unavailable.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerBecomesUnavailableListener(ServerBecomesUnavailableListener listener);
+
+    /**
+     * Gets a list with all registered server becomes unavailable listeners.
+     *
+     * @return A list with all registered server becomes unavailable listeners.
+     */
+    List<ServerBecomesUnavailableListener> getServerBecomesUnavailableListeners();
 
 }

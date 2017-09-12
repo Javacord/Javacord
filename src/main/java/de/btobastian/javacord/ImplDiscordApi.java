@@ -9,6 +9,7 @@ import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
+import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -128,6 +129,15 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public void addServerToCache(Server server) {
         servers.put(server.getId(), server);
+    }
+
+    /**
+     * Removes the given server from the cache.
+     *
+     * @param serverId The id of the server to remove.
+     */
+    public void removeServerFromCache(long serverId) {
+        servers.remove(serverId);
     }
 
     /**
@@ -308,5 +318,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerBecomesAvailableListener> getServerBecomesAvailableListeners() {
         return getListeners(ServerBecomesAvailableListener.class);
+    }
+
+    @Override
+    public void addServerBecomesUnavailableListener(ServerBecomesUnavailableListener listener) {
+        addListener(ServerBecomesUnavailableListener.class, listener);
+    }
+
+    @Override
+    public List<ServerBecomesUnavailableListener> getServerBecomesUnavailableListeners() {
+        return getListeners(ServerBecomesUnavailableListener.class);
     }
 }

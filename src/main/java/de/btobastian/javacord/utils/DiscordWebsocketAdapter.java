@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
 import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
+import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.GuildMembersChunkHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
@@ -328,6 +329,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
         // servers
         addHandler(new GuildCreateHandler(api));
+        addHandler(new GuildDeleteHandler(api));
         addHandler(new GuildMembersChunkHandler(api));
 
         // message
