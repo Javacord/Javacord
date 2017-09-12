@@ -20,7 +20,9 @@ package de.btobastian.javacord.utils.handler.server;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.events.server.ServerBecomesUnavailableEvent;
+import de.btobastian.javacord.events.server.ServerLeaveEvent;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -59,7 +61,13 @@ public class GuildDeleteHandler extends PacketHandler {
             return;
         }
         api.getServerById(serverId).ifPresent(server -> {
-            // TODO throw ServerLeaveEvent
+            ServerLeaveEvent event = new ServerLeaveEvent(api, server);
+            listenerExecutorService.submit(() -> {
+                List<ServerLeaveListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerLeaveListeners());
+                listeners.addAll(api.getServerLeaveListeners());
+                listeners.forEach(listener -> listener.onServerLeave(event));
+            });
         });
         api.removeServerFromCache(serverId);
     }

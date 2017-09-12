@@ -8,6 +8,7 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
@@ -377,6 +378,20 @@ public interface DiscordApi {
      * @return A list with all registered server join listeners.
      */
     List<ServerJoinListener> getServerJoinListeners();
+
+    /**
+     * Adds a listener, which listens to server leaves.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerLeaveListener(ServerLeaveListener listener);
+
+    /**
+     * Gets a list with all registered server leaves listeners.
+     *
+     * @return A list with all registered server leaves listeners.
+     */
+    List<ServerLeaveListener> getServerLeaveListeners();
 
     /**
      * Adds a listener, which listens to servers becoming available.

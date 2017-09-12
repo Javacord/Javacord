@@ -5,6 +5,7 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -185,6 +186,20 @@ public interface Server extends DiscordEntity {
      * @return A list with all registered message create listeners.
      */
     List<MessageCreateListener> getMessageCreateListeners();
+
+    /**
+     * Adds a listener, which listens to you leaving this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerLeaveListener(ServerLeaveListener listener);
+
+    /**
+     * Gets a list with all registered server leaves listeners.
+     *
+     * @return A list with all registered server leaves listeners.
+     */
+    List<ServerLeaveListener> getServerLeaveListeners();
 
     /**
      * Adds a listener, which listens to this server becoming unavailable.
