@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message;
 
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.DiscordEntity;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
@@ -38,6 +39,14 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The embed of the message.
      */
     Optional<Embed> getEmbed();
+
+    /**
+     * Gets the user author of the message.
+     * The author is not present, if it's a webhook for example.
+     *
+     * @return The user author of the message.
+     */
+    Optional<User> getAuthor();
 
     /**
      * Gets the server text channel of the message.

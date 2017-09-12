@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.impl;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
@@ -44,6 +45,8 @@ public class ImplMessage implements Message {
      */
     private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
+    private final User userAuthor;
+
     /**
      * Creates a new message object.
      *
@@ -57,6 +60,13 @@ public class ImplMessage implements Message {
 
         id = Long.parseLong(data.getString("id"));
         content = data.getString("content");
+
+        if (data.has("webhook_id")) {
+            userAuthor = null;
+        } else {
+            userAuthor = api.getOrCreateUser(data.getJSONObject("author"));
+        }
+
     }
 
     /**
@@ -107,6 +117,11 @@ public class ImplMessage implements Message {
     public Optional<Embed> getEmbed() {
         // TODO
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<User> getAuthor() {
+        return Optional.ofNullable(userAuthor);
     }
 
     @Override
