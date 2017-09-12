@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
+import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
@@ -111,7 +112,7 @@ public class ImplServer implements Server {
                         new ImplServerTextChannel(api, this, channel);
                         break;
                     case 2:
-                        // TODO create server voice channel
+                        new ImplServerVoiceChannel(api, this, channel);
                         break;
                 }
             }
