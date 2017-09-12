@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.message.MessageCreateEvent;
 public interface MessageCreateListener {
 
     /**
-     * This method if called every time a message got created.
+     * This method is called every time a message got created.
      *
      * @param event The event.
      */
