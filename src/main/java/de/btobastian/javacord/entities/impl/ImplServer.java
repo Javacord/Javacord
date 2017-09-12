@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -286,5 +287,15 @@ public class ImplServer implements Server {
     @Override
     public List<ServerBecomesUnavailableListener> getServerBecomesUnavailableListeners() {
         return getListeners(ServerBecomesUnavailableListener.class);
+    }
+
+    @Override
+    public void addUserStartTypingListener(UserStartTypingListener listener) {
+        addListener(UserStartTypingListener.class, listener);
+    }
+
+    @Override
+    public List<UserStartTypingListener> getUserStartTypingListeners() {
+        return getListeners(UserStartTypingListener.class);
     }
 }

@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -113,5 +114,15 @@ public class ImplUser implements User {
     @Override
     public List<MessageCreateListener> getMessageCreateListeners() {
         return getListeners(MessageCreateListener.class);
+    }
+
+    @Override
+    public void addUserStartTypingListener(UserStartTypingListener listener) {
+        addListener(UserStartTypingListener.class, listener);
+    }
+
+    @Override
+    public List<UserStartTypingListener> getUserStartTypingListeners() {
+        return getListeners(UserStartTypingListener.class);
     }
 }

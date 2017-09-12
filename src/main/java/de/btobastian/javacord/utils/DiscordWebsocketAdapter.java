@@ -10,6 +10,7 @@ import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
 import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.GuildMembersChunkHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
+import de.btobastian.javacord.utils.handler.user.TypingStartHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -338,6 +339,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
         // user
         addHandler(new PresenceUpdateHandler(api));
+        addHandler(new TypingStartHandler(api));
     }
 
     /**

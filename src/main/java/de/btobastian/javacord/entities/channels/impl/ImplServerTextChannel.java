@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -118,6 +119,16 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public List<MessageCreateListener> getMessageCreateListeners() {
         return getListeners(MessageCreateListener.class);
+    }
+
+    @Override
+    public void addUserStartTypingListener(UserStartTypingListener listener) {
+        addListener(UserStartTypingListener.class, listener);
+    }
+
+    @Override
+    public List<UserStartTypingListener> getUserStartTypingListeners() {
+        return getListeners(UserStartTypingListener.class);
     }
 
 }

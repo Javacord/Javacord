@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,5 +42,19 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return A list with all registered message create listeners.
      */
     List<MessageCreateListener> getMessageCreateListeners();
+
+    /**
+     * Adds a listener, which listens to this user starting to type.
+     *
+     * @param listener The listener to add.
+     */
+    void addUserStartTypingListener(UserStartTypingListener listener);
+
+    /**
+     * Gets a list with all registered user starts typing listeners.
+     *
+     * @return A list with all registered user starts typing listeners.
+     */
+    List<UserStartTypingListener> getUserStartTypingListeners();
 
 }
