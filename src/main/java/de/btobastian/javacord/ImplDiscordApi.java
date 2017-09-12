@@ -140,6 +140,24 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
+     * Adds a server id to the list with unavailable servers.
+     *
+     * @param serverId The id of the server.
+     */
+    public void addUnavailableServerToCache(long serverId) {
+        unavailableServers.add(serverId);
+    }
+
+    /**
+     * Removes a server id from the list with unavailable servers.
+     *
+     * @param serverId The id of the server.
+     */
+    public void removeUnavailableServerToCache(long serverId) {
+        unavailableServers.remove(serverId);
+    }
+
+    /**
      * Gets a user or creates a new one from the given data.
      *
      * @param data The json data of the user.
@@ -153,15 +171,6 @@ public class ImplDiscordApi implements DiscordApi {
             }
             return new ImplUser(this, data);
         });
-    }
-
-    /**
-     * Gets a set with all unavailable servers.
-     *
-     * @return A set with all unavailable servers.
-     */
-    public HashSet<Long> getUnavailableServers() {
-        return unavailableServers;
     }
 
     /**
@@ -244,6 +253,11 @@ public class ImplDiscordApi implements DiscordApi {
     public void setReconnectRatelimit(int attempts, int seconds) {
         websocketAdapter.setReconnectAttempts(attempts);
         websocketAdapter.setRatelimitResetIntervalInSeconds(seconds);
+    }
+
+    @Override
+    public Collection<Long> getUnavailableServers() {
+        return Collections.unmodifiableCollection(unavailableServers);
     }
 
     @Override

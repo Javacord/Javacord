@@ -41,7 +41,7 @@ public class GuildCreateHandler extends PacketHandler {
         }
         long id = Long.valueOf(packet.getString("id"));
         if (api.getUnavailableServers().contains(id)) {
-            api.getUnavailableServers().remove(id);
+            api.removeUnavailableServerToCache(id);
             Server server = new ImplServer(api, packet);
             ServerBecomesAvailableEvent event = new ServerBecomesAvailableEvent(api, server);
             listenerExecutorService.submit(() -> {

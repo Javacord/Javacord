@@ -94,6 +94,13 @@ public interface DiscordApi {
     void setReconnectRatelimit(int attempts, int seconds);
 
     /**
+     * Gets a collection with the ids of all unavailable servers.
+     *
+     * @return A collection with the ids of all unavailable servers.
+     */
+    Collection<Long> getUnavailableServers();
+
+    /**
      * Gets a collection with all users the bot knows of.
      *
      * @return A collection with all users the bot knows of.

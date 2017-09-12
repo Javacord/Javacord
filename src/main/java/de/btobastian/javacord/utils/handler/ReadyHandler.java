@@ -26,7 +26,7 @@ public class ReadyHandler extends PacketHandler {
         for (int i = 0; i < guilds.length(); i++) {
             JSONObject guild = guilds.getJSONObject(i);
             if (guild.has("unavailable") && guild.getBoolean("unavailable")) {
-                api.getUnavailableServers().add(Long.valueOf(guild.getString("id")));
+                api.addUnavailableServerToCache(Long.valueOf(guild.getString("id")));
                 continue;
             }
             new ImplServer(api, guild);
