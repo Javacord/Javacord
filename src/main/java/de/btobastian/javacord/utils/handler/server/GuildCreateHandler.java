@@ -3,7 +3,9 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.events.server.ServerBecomesAvailableEvent;
 import de.btobastian.javacord.events.server.ServerJoinEvent;
+import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -40,11 +42,17 @@ public class GuildCreateHandler extends PacketHandler {
         long id = Long.valueOf(packet.getString("id"));
         if (api.getUnavailableServers().contains(id)) {
             api.getUnavailableServers().remove(id);
-            new ImplServer(api, packet);
+            Server server = new ImplServer(api, packet);
+            ServerBecomesAvailableEvent event = new ServerBecomesAvailableEvent(api, server);
+            listenerExecutorService.submit(() -> {
+                List<ServerBecomesAvailableListener> listeners = new ArrayList<>();
+                listeners.addAll(api.getServerBecomesAvailableListeners());
+                listeners.forEach(listener -> listener.onServerBecomesAvailable(event));
+            });
             return;
         }
 
-        final Server server = new ImplServer(api, packet);
+        Server server = new ImplServer(api, packet);
         ServerJoinEvent event = new ServerJoinEvent(api, server);
         listenerExecutorService.submit(() -> {
             List<ServerJoinListener> listeners = new ArrayList<>();

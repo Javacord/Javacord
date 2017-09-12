@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -283,5 +284,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerJoinListener> getServerJoinListeners() {
         return getListeners(ServerJoinListener.class);
+    }
+
+    @Override
+    public void addServerBecomesAvailableListener(ServerBecomesAvailableListener listener) {
+        addListener(ServerBecomesAvailableListener.class, listener);
+    }
+
+    @Override
+    public List<ServerBecomesAvailableListener> getServerBecomesAvailableListeners() {
+        return getListeners(ServerBecomesAvailableListener.class);
     }
 }
