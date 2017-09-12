@@ -9,8 +9,9 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link ServerTextChannel}.
@@ -37,8 +38,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
      */
     private final ImplServer server;
 
-    // All listeners
-    private final ArrayList<MessageCreateListener> messageCreateListeners = new ArrayList<>();
+    /**
+     * A map which contains all listeners.
+     * The key is the class of the listener.
+     */
+    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
     /**
      * Creates a new server text channel object.
@@ -55,6 +59,30 @@ public class ImplServerTextChannel implements ServerTextChannel {
         name = data.getString("name");
 
         server.addChannelToCache(this);
+    }
+
+    /**
+     * Adds a listener.
+     *
+     * @param clazz The listener class.
+     * @param listener The listener to add.
+     */
+    private void addListener(Class<?> clazz, Object listener) {
+        List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
+        classListeners.add(listener);
+    }
+
+    /**
+     * Gets all listeners of the given class.
+     *
+     * @param clazz The class of the listener.
+     * @param <T> The class of the listener.
+     * @return A list with all listeners of the given type.
+     */
+    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
+    private <T> List<T> getListeners(Class<?> clazz) {
+        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
+        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -84,12 +112,12 @@ public class ImplServerTextChannel implements ServerTextChannel {
 
     @Override
     public void addMessageCreateListener(MessageCreateListener listener) {
-        messageCreateListeners.add(listener);
+        addListener(MessageCreateListener.class, listener);
     }
 
     @Override
     public List<MessageCreateListener> getMessageCreateListeners() {
-        return Collections.unmodifiableList(messageCreateListeners);
+        return getListeners(MessageCreateListener.class);
     }
 
 }

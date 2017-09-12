@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link DiscordApi}.
@@ -69,9 +70,19 @@ public class ImplDiscordApi implements DiscordApi {
      */
     private final HashSet<Long> unavailableServers = new HashSet<>();
 
-    // All listeners
-    private final ArrayList<MessageCreateListener> messageCreateListeners = new ArrayList<>();
+    /**
+     * A map which contains all listeners.
+     * The key is the class of the listener.
+     */
+    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
+    /**
+     * Creates a new discord api instance.
+     *
+     * @param accountType The account type of the instance.
+     * @param token The token used to connect without any account type specific prefix.
+     * @param ready The future which will be completed when the connection to Discord was successful.
+     */
     public ImplDiscordApi(AccountType accountType, String token, CompletableFuture<DiscordApi> ready) {
         this.accountType = accountType;
         this.token = accountType.getTokenPrefix() + token;
@@ -117,6 +128,30 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public HashSet<Long> getUnavailableServers() {
         return unavailableServers;
+    }
+
+    /**
+     * Adds a listener.
+     *
+     * @param clazz The listener class.
+     * @param listener The listener to add.
+     */
+    private void addListener(Class<?> clazz, Object listener) {
+        List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
+        classListeners.add(listener);
+    }
+
+    /**
+     * Gets all listeners of the given class.
+     *
+     * @param clazz The class of the listener.
+     * @param <T> The class of the listener.
+     * @return A list with all listeners of the given type.
+     */
+    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
+    private <T> List<T> getListeners(Class<?> clazz) {
+        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
+        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -189,11 +224,12 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void addMessageCreateListener(MessageCreateListener listener) {
-        messageCreateListeners.add(listener);
+        addListener(MessageCreateListener.class, listener);
     }
 
     @Override
     public List<MessageCreateListener> getMessageCreateListeners() {
-        return Collections.unmodifiableList(messageCreateListeners);
+        return getListeners(MessageCreateListener.class);
     }
+
 }
