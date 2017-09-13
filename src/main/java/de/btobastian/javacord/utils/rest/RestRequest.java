@@ -14,11 +14,12 @@ import org.json.JSONObject;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * This class is used to wrap a rest request.
  */
-public class RestRequest {
+public class RestRequest<T> {
 
     private final DiscordApi api;
     private final HttpMethod method;
@@ -115,7 +116,7 @@ public class RestRequest {
      * @param parameters The parameters.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest setUrlParameters(String... parameters) {
+    public RestRequest<T> setUrlParameters(String... parameters) {
         this.urlParameters = parameters;
         return this;
     }
@@ -126,7 +127,7 @@ public class RestRequest {
      * @param retries The amount of ratelimit retries.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest setRatelimitRetries(int retries) {
+    public RestRequest<T> setRatelimitRetries(int retries) {
         if (retries < 0) {
             throw new IllegalArgumentException("Retries cannot be less than 0!");
         }
@@ -140,7 +141,7 @@ public class RestRequest {
      * @param body The body of the request.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest setBody(JSONObject body) {
+    public RestRequest<T> setBody(JSONObject body) {
         return setBody(body.toString());
     }
 
@@ -150,7 +151,7 @@ public class RestRequest {
      * @param body The body of the request.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest setBody(JSONArray body) {
+    public RestRequest<T> setBody(JSONArray body) {
         return setBody(body.toString());
     }
 
@@ -160,7 +161,7 @@ public class RestRequest {
      * @param body The body of the request.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest setBody(String body) {
+    public RestRequest<T> setBody(String body) {
         this.body = body;
         return this;
     }
@@ -171,7 +172,7 @@ public class RestRequest {
      * @param includeAuthorizationHeader Whether the authorization header should be included or not.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest includeAuthorizationHeader(boolean includeAuthorizationHeader) {
+    public RestRequest<T> includeAuthorizationHeader(boolean includeAuthorizationHeader) {
         this.includeAuthorizationHeader = includeAuthorizationHeader;
         return this;
     }
@@ -188,11 +189,24 @@ public class RestRequest {
     /**
      * Executes the request. This will automatically retry if we hit a ratelimit.
      *
-     * @return A future which will contain the response of the request.
+     * @param function A function which processes the rest response to the requested object.
+     * @return A future which will contain the output of the function.
      */
-    public CompletableFuture<HttpResponse<JsonNode>> execute() {
+    public CompletableFuture<T> execute(Function<HttpResponse<JsonNode>, T> function) {
         api.getRatelimitManager().queueRequest(this);
-        return result;
+        CompletableFuture<T> future = new CompletableFuture<>();
+        result.whenComplete((response, throwable) -> {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+                return;
+            }
+            try {
+                future.complete(function.apply(response));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
     }
 
     /**

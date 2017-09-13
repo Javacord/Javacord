@@ -22,7 +22,6 @@ public interface TextChannel extends Channel, Messageable {
 
     @Override
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
-        CompletableFuture<Message> future = new CompletableFuture<>();
         JSONObject body = new JSONObject()
                 .put("content", content == null ? "" : content)
                 .put("tts", tts)
@@ -33,18 +32,10 @@ public interface TextChannel extends Channel, Messageable {
         if (nonce != null) {
             body.put("nonce", nonce);
         }
-        new RestRequest(getApi(), HttpMethod.POST, RestEndpoint.MESSAGE)
+        return new RestRequest<Message>(getApi(), HttpMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(body)
-                .execute()
-                .whenComplete((response, throwable) -> {
-                    if (throwable != null) {
-                        future.completeExceptionally(throwable);
-                        return;
-                    }
-                    future.complete(new ImplMessage((ImplDiscordApi) getApi(), this, response.getBody().getObject()));
-                });
-        return future;
+                .execute(res -> new ImplMessage((ImplDiscordApi) getApi(), this, res.getBody().getObject()));
     }
 
     /**

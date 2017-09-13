@@ -104,24 +104,24 @@ public class ImplDiscordApi implements DiscordApi {
             endpoint = RestEndpoint.GATEWAY;
         }
 
-        new RestRequest(this, HttpMethod.GET, endpoint).execute().whenComplete((res, t) -> {
-            if (t != null) {
-                ready.completeExceptionally(t);
-                return;
-            }
+        new RestRequest<String>(this, HttpMethod.GET, endpoint)
+                .execute(res -> res.getBody().getObject().getString("url"))
+                .whenComplete((gateway, t) -> {
+                    if (t != null) {
+                        ready.completeExceptionally(t);
+                        return;
+                    }
 
-            String gateway = res.getBody().getObject().getString("url");
-
-            websocketAdapter = new DiscordWebsocketAdapter(this, gateway);
-            websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
-                if (readyReceived) {
-                    ready.complete(this);
-                } else {
-                    ready.completeExceptionally(
-                            new IllegalStateException("Websocket closed before READY packet was received!"));
-                }
-            });
-        });
+                    websocketAdapter = new DiscordWebsocketAdapter(this, gateway);
+                    websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
+                        if (readyReceived) {
+                            ready.complete(this);
+                        } else {
+                            ready.completeExceptionally(
+                                    new IllegalStateException("Websocket closed before READY packet was received!"));
+                        }
+                    });
+                });
     }
 
     /**

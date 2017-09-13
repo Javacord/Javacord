@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.function.Function;
 
 /**
  * This class manages ratelimits and keeps track of them.
@@ -27,7 +28,7 @@ public class RatelimitManager {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private final Set<RatelimitBucket> buckets = ConcurrentHashMap.newKeySet();
-    private final HashMap<RatelimitBucket, ConcurrentLinkedQueue<RestRequest>> queues = new HashMap<>();
+    private final HashMap<RatelimitBucket, ConcurrentLinkedQueue<RestRequest<?>>> queues = new HashMap<>();
 
     private final DiscordApi api;
 
@@ -47,11 +48,11 @@ public class RatelimitManager {
 
     /**
      * Adds a request to the queue based on the ratelimit bucket.
-     * This method is automatically called when using {@link RestRequest#execute()}!
+     * This method is automatically called when using {@link RestRequest#execute(Function)}!
      *
      * @param request The request to queue.
      */
-    public void queueRequest(RestRequest request) {
+    public void queueRequest(RestRequest<?> request) {
         // Get the bucket for the current request type.
         RatelimitBucket bucket = buckets
                 .parallelStream()
@@ -63,7 +64,7 @@ public class RatelimitManager {
         buckets.add(bucket);
 
         // Get the queue for the current bucket or create a new one if there's no one already
-        ConcurrentLinkedQueue<RestRequest> queue = queues.computeIfAbsent(bucket, k -> new ConcurrentLinkedQueue<>());
+        ConcurrentLinkedQueue<RestRequest<?>> queue = queues.computeIfAbsent(bucket, k -> new ConcurrentLinkedQueue<>());
 
         // Add the request to the queue and check if there's already a scheduler working on the queue
         boolean startScheduler = false;
@@ -108,7 +109,7 @@ public class RatelimitManager {
                         logger.warn("We got interrupted while waiting for a rate limit!", e);
                     }
                 }
-                RestRequest restRequest = queue.poll();
+                RestRequest<?> restRequest = queue.poll();
                 try {
                     HttpResponse<JsonNode> response = restRequest.executeBlocking();
 

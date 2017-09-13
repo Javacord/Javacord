@@ -84,19 +84,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        new RestRequest(getApi(), HttpMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
                 .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()))
                 .setRatelimitRetries(25)
-                .execute()
-                .whenComplete((response, throwable) -> {
-                    if (throwable != null) {
-                        future.completeExceptionally(throwable);
-                        return;
-                    }
-                    future.complete(null);
-                });
-        return future;
+                .execute(res -> null);
     }
 
 }
