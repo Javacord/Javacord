@@ -5,9 +5,9 @@ import com.mashape.unirest.http.JsonNode;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 /**
- * When we encounter a rate limit and ran out of retires.
+ * When we are not allowed to perform an action.
  */
-public class RatelimitException extends DiscordException {
+public class MissingPermissionsException extends DiscordException {
 
     /**
      * Creates a new instance of this class.
@@ -16,7 +16,7 @@ public class RatelimitException extends DiscordException {
      * @param response The response which caused the exception.
      * @param request The request.
      */
-    public RatelimitException(String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
+    public MissingPermissionsException(String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
         super(message, response, request);
     }
 

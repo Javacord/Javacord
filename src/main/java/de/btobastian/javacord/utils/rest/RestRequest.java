@@ -7,7 +7,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.exceptions.BadResponseException;
+import de.btobastian.javacord.exceptions.CannotMessageUserException;
+import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.RatelimitException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -260,11 +261,21 @@ public class RestRequest<T> {
         }
         HttpResponse<JsonNode> response = request.asJson();
         if (response.getStatus() >= 300 || response.getStatus() < 200) {
+            if (!response.getBody().isArray() && response.getBody().getObject().has("code")) {
+                int code = response.getBody().getObject().getInt("code");
+                String message = response.getBody().getObject().has("message")
+                        ? null : response.getBody().getObject().getString("message");
+                switch (code) {
+                    case 50007:
+                        throw new CannotMessageUserException(
+                                message == null ? "Cannot send message to this user" : message, response, this);
+                }
+            }
             switch (response.getStatus()) {
                 case 401:
-                    throw new RatelimitException("Received 429 from Discord!");
+                    throw new RatelimitException("Received 429 from Discord!", response, this);
                 default:
-                    throw new BadResponseException("Received a " + response.getStatus() + " response from Discord with body " + response.getBody().toString() + "!", response);
+                    throw new DiscordException("Received a " + response.getStatus() + " response from Discord with body " + response.getBody().toString() + "!", response, this);
             }
         }
         return response;

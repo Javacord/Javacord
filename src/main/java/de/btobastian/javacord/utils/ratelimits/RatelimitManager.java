@@ -93,7 +93,7 @@ public class RatelimitManager {
                         queue.removeIf(req -> {
                             if (req.incrementRetryCounter()) {
                                 req.getResult().completeExceptionally(
-                                        new RatelimitException("You have been ratelimited and ran out of retires!")
+                                        new RatelimitException("You have been ratelimited and ran out of retires!", null, req)
                                 );
                                 return true;
                             }
