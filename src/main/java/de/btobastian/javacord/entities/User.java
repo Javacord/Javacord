@@ -1,11 +1,13 @@
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents a user.
@@ -28,6 +30,23 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     default Optional<String> getNickname(Server server) {
         return server.getNickname(this);
     }
+
+    /**
+     * Gets the private channel with the user.
+     * This will only be present, if there was an conversation with the user in the past or you manually opened a
+     * private channel with the given user, using {@link #openPrivateChannel()}.
+     *
+     * @return The private channel with the user.
+     */
+    Optional<PrivateChannel> getPrivateChannel();
+
+    /**
+     * Opens a new private channel with the given user.
+     * If there's already a private channel with the user, it will just return the one which already exists.
+     *
+     * @return The new (or old) private channel with the user.
+     */
+    CompletableFuture<PrivateChannel> openPrivateChannel();
 
     /**
      * Adds a listener, which listens to message creates from this user.

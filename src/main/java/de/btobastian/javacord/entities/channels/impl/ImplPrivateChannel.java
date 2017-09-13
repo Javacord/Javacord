@@ -1,30 +1,23 @@
-package de.btobastian.javacord.entities.impl;
+package de.btobastian.javacord.entities.channels.impl;
 
-import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
-import de.btobastian.javacord.utils.rest.RestEndpoint;
-import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * The implementation of {@link User}.
+ * The implementation of {@link PrivateChannel}.
  */
-public class ImplUser implements User {
+public class ImplPrivateChannel implements PrivateChannel {
 
     /**
      * The discord api instance.
@@ -32,19 +25,14 @@ public class ImplUser implements User {
     private final ImplDiscordApi api;
 
     /**
-     * The id of the user.
+     * The id of the channel.
      */
     private final long id;
 
     /**
-     * The name of the user.
+     * The recipient of the private channel.
      */
-    private String name;
-
-    /**
-     * The private channel with the given user.
-     */
-    private PrivateChannel channel = null;
+    private final ImplUser recipient;
 
     /**
      * A map which contains all listeners.
@@ -53,27 +41,17 @@ public class ImplUser implements User {
     private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
     /**
-     * Creates a new user.
+     * Creates a new private channel.
      *
      * @param api The discord api instance.
-     * @param data The json data of the user.
+     * @param data The json data of the channel.
      */
-    public ImplUser(ImplDiscordApi api, JSONObject data) {
+    public ImplPrivateChannel(ImplDiscordApi api, JSONObject data) {
         this.api = api;
+        this.recipient = (ImplUser) api.getOrCreateUser(data.getJSONArray("recipients").getJSONObject(0));
 
         id = Long.parseLong(data.getString("id"));
-        name = data.getString("username");
-
-        api.addUserToCache(this);
-    }
-
-    /**
-     * Sets the private channel with the user.
-     *
-     * @param channel The channel to set.
-     */
-    public void setChannel(PrivateChannel channel) {
-        this.channel = channel;
+        recipient.setChannel(this);
     }
 
     /**
@@ -101,28 +79,6 @@ public class ImplUser implements User {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Optional<PrivateChannel> getPrivateChannel() {
-        return Optional.ofNullable(channel);
-    }
-
-    @Override
-    public CompletableFuture<PrivateChannel> openPrivateChannel() {
-        if (channel != null) {
-            CompletableFuture<PrivateChannel> future = new CompletableFuture<>();
-            future.complete(channel);
-            return future;
-        }
-        return new RestRequest<PrivateChannel>(api, HttpMethod.POST, RestEndpoint.USER_CHANNEL)
-                .setBody(new JSONObject().put("recipient_id", String.valueOf(getId())))
-                .execute(res -> new ImplPrivateChannel(api, res.getBody().getObject()));
-    }
-
-    @Override
     public DiscordApi getApi() {
         return api;
     }
@@ -133,16 +89,8 @@ public class ImplUser implements User {
     }
 
     @Override
-    public String getMentionTag() {
-        return "<@" + getId() + ">";
-    }
-
-    @Override
-    public CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
-        return openPrivateChannel().thenApplyAsync(
-                channel -> channel.sendMessage(content, embed, tts, nonce).join(),
-                api.getThreadPool().getExecutorService()
-        );
+    public User getRecipient() {
+        return recipient;
     }
 
     @Override

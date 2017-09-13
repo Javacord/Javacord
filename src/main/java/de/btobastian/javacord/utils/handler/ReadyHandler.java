@@ -1,6 +1,7 @@
 package de.btobastian.javacord.utils.handler;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
@@ -32,12 +33,13 @@ public class ReadyHandler extends PacketHandler {
             new ImplServer(api, guild);
         }
 
-        JSONArray privateChannels = packet.getJSONArray("private_channels");
-        for (int i = 0; i < privateChannels.length(); i++) {
-            JSONObject privateChannel = privateChannels.getJSONObject(i);
-            String id = privateChannel.getString("id");
-            if (privateChannel.has("recipient")) {
-                // TODO Create private channel object
+        // Private channels array is empty for bots, see
+        // https://github.com/hammerandchisel/discord-api-docs/issues/184
+        if (packet.has("private_channels")) {
+            JSONArray privateChannels = packet.getJSONArray("private_channels");
+            for (int i = 0; i < privateChannels.length(); i++) {
+                JSONObject privateChannel = privateChannels.getJSONObject(i);
+                new ImplPrivateChannel(api, privateChannel);
             }
         }
 

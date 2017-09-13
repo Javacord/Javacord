@@ -17,6 +17,7 @@ import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class is the most important class for your bot, containing all important methods, like registering listener.
@@ -170,15 +171,30 @@ public interface DiscordApi {
     Collection<Server> getServers();
 
     /**
+     * Gets a collection with all channels of the bot.
+     *
+     * @return A collection with all channels of the bot.
+     */
+    default Collection<Channel> getChannels() {
+        Collection<Channel> channels = getUsers().parallelStream()
+                .map(User::getPrivateChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(privateChannel -> (Channel) privateChannel)
+                .collect(Collectors.toList());
+        getServers().stream().forEach(server -> channels.addAll(server.getChannels()));
+        return channels;
+    }
+
+    /**
      * Gets a channel by it's id.
      *
      * @param id The id of the channel.
      * @return The channel with the given id.
      */
     default Optional<Channel> getChannelById(long id) {
-        return getServers().stream()
-                .filter(server -> server.getChannelById(id).isPresent())
-                .map(server -> (Channel) server.getChannelById(id).orElse(null))
+        return getChannels().parallelStream()
+                .filter(channel -> channel.getId() == id)
                 .findAny();
     }
 

@@ -15,7 +15,8 @@ public enum RestEndpoint {
     /**
      * This is the same endpoint as {@link RestEndpoint#MESSAGE}, but it has an different ratelimit bucket!
      */
-    MESSAGE_DELETE("/channels/%s/messages", 0);
+    MESSAGE_DELETE("/channels/%s/messages", 0),
+    USER_CHANNEL("/users/@me/channels");
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
