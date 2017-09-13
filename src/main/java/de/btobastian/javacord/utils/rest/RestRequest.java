@@ -264,7 +264,7 @@ public class RestRequest<T> {
                 case 401:
                     throw new RatelimitException("Received 429 from Discord!");
                 default:
-                    throw new BadResponseException("Received a " + response.getStatus() + " response from Discord!", response);
+                    throw new BadResponseException("Received a " + response.getStatus() + " response from Discord with body " + response.getBody().toString() + "!", response);
             }
         }
         return response;
