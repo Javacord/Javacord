@@ -164,4 +164,9 @@ public class ImplUser implements User {
     public List<UserStartTypingListener> getUserStartTypingListeners() {
         return getListeners(UserStartTypingListener.class);
     }
+
+    @Override
+    public boolean isYourself() {
+        return api.getYourself().isPresent() && api.getYourself().get() == this;
+    }
 }

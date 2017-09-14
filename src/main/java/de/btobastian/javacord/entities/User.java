@@ -76,4 +76,12 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     List<UserStartTypingListener> getUserStartTypingListeners();
 
+    /**
+     *  Gets if the user is the bot account running the api.
+     *
+     *  @return if the User instance is the bot account running the api.
+     */
+    boolean isYourself();
+
+
 }
