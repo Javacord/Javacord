@@ -6,11 +6,14 @@ import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
@@ -112,10 +115,10 @@ public class ImplServer implements Server {
                 JSONObject channel = channels.getJSONObject(i);
                 switch (channel.getInt("type")) {
                     case 0:
-                        new ImplServerTextChannel(api, this, channel);
+                        getOrCreateServerTextChannel(channel);
                         break;
                     case 2:
-                        new ImplServerVoiceChannel(api, this, channel);
+                        getOrCreateServerVoiceChannel(channel);
                         break;
                 }
             }
@@ -148,6 +151,42 @@ public class ImplServer implements Server {
      */
     public void addChannelToCache(ServerChannel channel) {
         channels.put(channel.getId(), channel);
+    }
+
+    /**
+     * Gets or creates a server text channel.
+     *
+     * @param data The json data of the channel.
+     * @return The server text channel.
+     */
+    public ServerTextChannel getOrCreateServerTextChannel(JSONObject data) {
+        long id = Long.parseLong(data.getString("id"));
+        int type = data.getInt("type");
+        synchronized (this) {
+            if (type == 0) {
+                return getTextChannelById(id).orElse(new ImplServerTextChannel(api, this, data));
+            }
+        }
+        // Invalid channel type
+        return null;
+    }
+
+    /**
+     * Gets or creates a server voice channel.
+     *
+     * @param data The json data of the channel.
+     * @return The server voice channel.
+     */
+    public ServerVoiceChannel getOrCreateServerVoiceChannel(JSONObject data) {
+        long id = Long.parseLong(data.getString("id"));
+        int type = data.getInt("type");
+        synchronized (this) {
+            if (type == 2) {
+                return getVoiceChannelById(id).orElse(new ImplServerVoiceChannel(api, this, data));
+            }
+        }
+        // Invalid channel type
+        return null;
     }
 
     /**
@@ -297,5 +336,15 @@ public class ImplServer implements Server {
     @Override
     public List<UserStartTypingListener> getUserStartTypingListeners() {
         return getListeners(UserStartTypingListener.class);
+    }
+
+    @Override
+    public void addServerChannelCreateListener(ServerChannelCreateListener listener) {
+        addListener(ServerChannelCreateListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelCreateListener> getServerChannelCreateListeners() {
+        return getListeners(ServerChannelCreateListener.class);
     }
 }

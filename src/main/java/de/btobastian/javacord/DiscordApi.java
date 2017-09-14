@@ -10,6 +10,7 @@ import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -596,5 +597,19 @@ public interface DiscordApi {
      * @return A list with all registered user starts typing listeners.
      */
     List<UserStartTypingListener> getUserStartTypingListeners();
+
+    /**
+     * Adds a listener, which listens to server channel creations.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelCreateListener(ServerChannelCreateListener listener);
+
+    /**
+     * Gets a list with all registered server channel create listeners.
+     *
+     * @return A list with all registered server channel create listeners.
+     */
+    List<ServerChannelCreateListener> getServerChannelCreateListeners();
 
 }

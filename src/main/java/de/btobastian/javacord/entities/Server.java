@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
 import java.util.ArrayList;
@@ -229,5 +230,19 @@ public interface Server extends DiscordEntity {
      * @return A list with all registered user starts typing listeners.
      */
     List<UserStartTypingListener> getUserStartTypingListeners();
+
+    /**
+     * Adds a listener, which listens to server channel creations in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelCreateListener(ServerChannelCreateListener listener);
+
+    /**
+     * Gets a list with all registered server channel create listeners.
+     *
+     * @return A list with all registered server channel create listeners.
+     */
+    List<ServerChannelCreateListener> getServerChannelCreateListeners();
 
 }

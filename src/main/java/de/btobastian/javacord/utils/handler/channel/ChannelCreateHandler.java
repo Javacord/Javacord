@@ -1,11 +1,18 @@
 package de.btobastian.javacord.utils.handler.channel;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.events.server.channel.ServerChannelCreateEvent;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles the channel create packet.
@@ -45,7 +52,17 @@ public class ChannelCreateHandler extends PacketHandler {
      * @param channel The channel data.
      */
     private void handleServerTextChannel(JSONObject channel) {
-
+        long serverId = Long.parseLong(channel.getString("guild_id"));
+        api.getServerById(serverId).ifPresent(server -> {
+            ServerTextChannel textChannel = ((ImplServer) server).getOrCreateServerTextChannel(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEvent(api, server, textChannel);
+            listenerExecutorService.submit(() -> {
+                List<ServerChannelCreateListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChannelCreateListeners());
+                listeners.addAll(api.getServerChannelCreateListeners());
+                listeners.forEach(listener -> listener.onServerChannelCreate(event));
+            });
+        });
     }
 
     /**
