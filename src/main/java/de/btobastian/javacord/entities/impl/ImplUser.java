@@ -10,6 +10,7 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
@@ -128,7 +129,7 @@ public class ImplUser implements User {
     @Override
     public CompletableFuture<PrivateChannel> openPrivateChannel() {
         if (channel != null) {
-            CompletableFuture<PrivateChannel> future = new CompletableFuture<>();
+            CompletableFuture<PrivateChannel> future = new JavacordCompletableFuture<>();
             future.complete(channel);
             return future;
         }

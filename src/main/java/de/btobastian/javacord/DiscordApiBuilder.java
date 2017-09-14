@@ -1,5 +1,7 @@
 package de.btobastian.javacord;
 
+import de.btobastian.javacord.utils.JavacordCompletableFuture;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -39,7 +41,7 @@ public class DiscordApiBuilder {
      * @return A {@link CompletableFuture} which contains the DiscordApi.
      */
     public CompletableFuture<DiscordApi> login() {
-        CompletableFuture<DiscordApi> future = new CompletableFuture<>();
+        CompletableFuture<DiscordApi> future = new JavacordCompletableFuture<>();
         if (token == null) {
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;

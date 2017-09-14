@@ -3,6 +3,7 @@ package de.btobastian.javacord.events.message;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.utils.JavacordCompletableFuture;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +40,7 @@ public abstract class OptionalMessageEvent extends MessageEvent {
      * @return The message either from the cache or directly from Discord.
      */
     public CompletableFuture<Message> requestMessage() {
-        CompletableFuture<Message> future = new CompletableFuture<>();
+        CompletableFuture<Message> future = new JavacordCompletableFuture<>();
         Optional<Message> message = getMessage();
         message.ifPresent(future::complete);
         if (!message.isPresent()) {
