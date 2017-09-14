@@ -43,7 +43,7 @@ public class ReadyHandler extends PacketHandler {
             }
         }
 
-        // TODO api.setYourself(api.getOrCreateUser(packet.getJSONObject("user")));
+        api.setYourself(api.getOrCreateUser(packet.getJSONObject("user")));
     }
 
 }
