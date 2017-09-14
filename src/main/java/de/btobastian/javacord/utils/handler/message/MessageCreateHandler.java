@@ -3,7 +3,6 @@ package de.btobastian.javacord.utils.handler.message;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.events.message.MessageCreateEvent;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -36,7 +35,7 @@ public class MessageCreateHandler extends PacketHandler {
     @Override
     public void handle(JSONObject packet) {
         api.getTextChannelById(packet.getString("channel_id")).ifPresent(channel -> {
-            Message message = new ImplMessage(api, channel, packet);
+            Message message = api.getOrCreateMessage(channel, packet);
             MessageCreateEvent event = new MessageCreateEvent(api, message);
             listenerExecutorService.submit(() -> {
                 List<MessageCreateListener> listeners = new ArrayList<>();

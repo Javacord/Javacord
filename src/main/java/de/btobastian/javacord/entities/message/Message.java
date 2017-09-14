@@ -49,6 +49,20 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     Optional<User> getAuthor();
 
     /**
+     * Checks if the message is kept in cache forever.
+     *
+     * @return Whether the message is kept in cache forever or not.
+     */
+    boolean isCachedForever();
+
+    /**
+     * Sets if the the message is kept in cache forever.
+     *
+     * @param cachedForever  Whether the message should be kept in cache forever or not.
+     */
+    void setCachedForever(boolean cachedForever);
+
+    /**
      * Gets the server text channel of the message.
      * Only present if the message was sent in a server.
      *

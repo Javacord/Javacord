@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -45,7 +46,15 @@ public class ImplMessage implements Message {
      */
     private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
+    /**
+     * The user author of the message. Can be <code>null</code> if the author is a webhook for example.
+     */
     private final User userAuthor;
+
+    /**
+     * If the message should be cached forever or not.
+     */
+    private boolean cacheForever = false;
 
     /**
      * Creates a new message object.
@@ -67,6 +76,10 @@ public class ImplMessage implements Message {
             userAuthor = api.getOrCreateUser(data.getJSONObject("author"));
         }
 
+        ImplMessageCache cache = (ImplMessageCache) channel.getMessageCache();
+        if (cache.getCapacity() != 0 && cache.getStorageTimeInSeconds() != 0) {
+            cache.addMessage(this);
+        }
     }
 
     /**
@@ -125,9 +138,31 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public int compareTo(Message otherMessage) {
-        // TODO
-        return 0;
+    public boolean isCachedForever() {
+        return cacheForever;
     }
 
+    @Override
+    public void setCachedForever(boolean cachedForever) {
+        this.cacheForever = cachedForever;
+        if (cachedForever) {
+            // Just make sure it's in the cache
+            ((ImplMessageCache) channel.getMessageCache()).addMessage(this);
+        }
+    }
+
+    @Override
+    public int compareTo(Message otherMessage) {
+        return otherMessage.getCreationDate().compareTo(getCreationDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return String.valueOf(getId()).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Message && ((Message) obj).getId() == getId();
+    }
 }

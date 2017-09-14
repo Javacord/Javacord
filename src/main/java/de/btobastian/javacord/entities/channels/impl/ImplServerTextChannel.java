@@ -7,6 +7,8 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.cache.ImplMessageCache;
+import de.btobastian.javacord.utils.cache.MessageCache;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -40,6 +42,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     private final ImplServer server;
 
     /**
+     * The message cache of the server text channel.
+     */
+    private final ImplMessageCache messageCache;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -55,6 +62,8 @@ public class ImplServerTextChannel implements ServerTextChannel {
     public ImplServerTextChannel(ImplDiscordApi api, ImplServer server, JSONObject data) {
         this.api = api;
         this.server = server;
+        this.messageCache = new ImplMessageCache(
+                api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds());
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
@@ -104,6 +113,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public Server getServer() {
         return server;
+    }
+
+    @Override
+    public MessageCache getMessageCache() {
+        return messageCache;
     }
 
     @Override

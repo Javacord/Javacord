@@ -4,6 +4,7 @@ import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
@@ -53,6 +54,32 @@ public interface DiscordApi {
      * @return The websocket adapter.
      */
     DiscordWebsocketAdapter getWebSocketAdapter();
+
+    /**
+     * Sets the cache size of all caches.
+     * This settings are applied on a per-channel basis.
+     * It overrides all previous settings, so it's recommended to directly set it after logging in, if you want to
+     * change apply some channel specific channel settings, too.
+     * Please notice that the cache is cleared only once every minute!
+     *
+     * @param capacity The capacity of the message cache.
+     * @param storageTimeInSeconds The maximum age of cached messages.
+     */
+    void setMessageCacheSize(int capacity, int storageTimeInSeconds);
+
+    /**
+     * Gets the default message cache capacity which is applied for every newly created channel.
+     *
+     * @return The default message cache capacity which is applied for every newly created channel.
+     */
+    int getDefaultMessageCacheCapacity();
+
+    /**
+     * Gets the default maximum age of cached messages.
+     *
+     * @return The default maximum age of cached messages.
+     */
+    int getDefaultMessageCacheStorageTimeInSeconds();
 
     /**
      * Updates the game of this bot, represented as "Playing Half-Life 3" for example.
@@ -117,12 +144,8 @@ public interface DiscordApi {
      * @param id The id of the user.
      * @return The user with the given id.
      */
-    default Optional<User> getUserById(long id) {
-        return getUsers().stream()
-                .filter(user -> user.getId() == id)
-                .findAny();
-    }
-
+    Optional<User> getUserById(long id);
+    
     /**
      * Gets a user by it's id.
      *
@@ -150,6 +173,42 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all cached messages.
+     *
+     * @return A collection with all cached messages.
+     */
+    Collection<Message> getCachedMessages();
+
+    /**
+     * Gets a cached message by it's id.
+     *
+     * @param id The id of the message.
+     * @return The cached message.
+     */
+    Optional<Message> getCachedMessageById(long id);
+
+    /**
+     * Gets a cached message by it's id.
+     *
+     * @param id The id of the message.
+     * @return The cached message.
+     */
+    default Optional<Message> getCachedMessageById(String id) {
+        try {
+            return getCachedMessageById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a collection with all servers the bot is in.
+     *
+     * @return A collection with all servers the bot is in.
+     */
+    Collection<Server> getServers();
+
+    /**
      * Gets a server by it's id.
      *
      * @param id The id of the server.
@@ -162,13 +221,6 @@ public interface DiscordApi {
             return Optional.empty();
         }
     }
-
-    /**
-     * Gets a collection with all servers the bot is in.
-     *
-     * @return A collection with all servers the bot is in.
-     */
-    Collection<Server> getServers();
 
     /**
      * Gets a collection with all channels of the bot.

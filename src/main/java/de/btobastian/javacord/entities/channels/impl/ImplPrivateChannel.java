@@ -7,6 +7,8 @@ import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.cache.ImplMessageCache;
+import de.btobastian.javacord.utils.cache.MessageCache;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -35,6 +37,11 @@ public class ImplPrivateChannel implements PrivateChannel {
     private final ImplUser recipient;
 
     /**
+     * The message cache of the private channel.
+     */
+    private final ImplMessageCache messageCache;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -49,6 +56,8 @@ public class ImplPrivateChannel implements PrivateChannel {
     public ImplPrivateChannel(ImplDiscordApi api, JSONObject data) {
         this.api = api;
         this.recipient = (ImplUser) api.getOrCreateUser(data.getJSONArray("recipients").getJSONObject(0));
+        this.messageCache = new ImplMessageCache(
+                api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds());
 
         id = Long.parseLong(data.getString("id"));
         recipient.setChannel(this);
@@ -91,6 +100,11 @@ public class ImplPrivateChannel implements PrivateChannel {
     @Override
     public User getRecipient() {
         return recipient;
+    }
+
+    @Override
+    public MessageCache getMessageCache() {
+        return messageCache;
     }
 
     @Override

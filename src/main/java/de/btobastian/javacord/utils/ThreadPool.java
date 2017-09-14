@@ -12,24 +12,27 @@ public class ThreadPool {
     private static final int KEEP_ALIVE_TIME = 60;
     private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
-    private ExecutorService executorService = null;
+    private final ExecutorService executorService = new ThreadPoolExecutor(
+            CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME, TIME_UNIT, new SynchronousQueue<>());
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(CORE_POOL_SIZE);
     private final ConcurrentHashMap<String, ExecutorService> executorServiceSingeThreads = new ConcurrentHashMap<>();
 
     /**
-     * Creates a new instance of this class.
-     */
-    public ThreadPool() {
-        executorService = new ThreadPoolExecutor(
-                CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME, TIME_UNIT, new SynchronousQueue<>());
-    }
-
-    /**
-     * Gets the used executor service instance.
+     * Gets the used executor service.
      *
-     * @return The used executor service instance.
+     * @return The used executor service.
      */
     public ExecutorService getExecutorService() {
         return executorService;
+    }
+
+    /**
+     * Gets the used scheduler.
+     *
+     * @return The used scheduler.
+     */
+    public ScheduledExecutorService getScheduler() {
+        return scheduler;
     }
 
     /**

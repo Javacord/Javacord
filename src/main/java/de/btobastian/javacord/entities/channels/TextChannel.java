@@ -5,9 +5,9 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
-import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
@@ -35,8 +35,15 @@ public interface TextChannel extends Channel, Messageable {
         return new RestRequest<Message>(getApi(), HttpMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(body)
-                .execute(res -> new ImplMessage((ImplDiscordApi) getApi(), this, res.getBody().getObject()));
+                .execute(res -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, res.getBody().getObject()));
     }
+
+    /**
+     * Gets the message cache for the channel.
+     *
+     * @return The message cache for the channel.
+     */
+    MessageCache getMessageCache();
 
     /**
      * Adds a listener, which listens to message creates in this channel.

@@ -5,8 +5,11 @@ import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
@@ -15,6 +18,7 @@ import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
+import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -68,6 +72,16 @@ public class ImplDiscordApi implements DiscordApi {
     private Game game;
 
     /**
+     * The default message cache capacity which is applied for every newly created channel.
+     */
+    private int defaultMessageCacheCapacity = 50;
+
+    /**
+     * The default maximum age of cached messages.
+     */
+    private int defaultMessageCacheStorageTimeInSeconds = 60*60*12;
+
+    /**
      * A map which contains all users.
      */
     private final ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
@@ -81,6 +95,17 @@ public class ImplDiscordApi implements DiscordApi {
      * A set with all unavailable servers.
      */
     private final HashSet<Long> unavailableServers = new HashSet<>();
+
+    /**
+     * A map with all cached messages.
+     * Removal of messages is handled by the {@link ImplMessageCache} class.
+     */
+    private final ConcurrentHashMap<Long, Message> messages = new ConcurrentHashMap<>();
+
+    /**
+     * An addition map which contains weak references of messages.
+     */
+    private final WeakHashMap<Long, Message> weakMessages = new WeakHashMap<>();
 
     /**
      * A map which contains all listeners.
@@ -170,6 +195,24 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
+     * Adds a message to the cache.
+     *
+     * @param message The message to add.
+     */
+    public void addMessageToCache(Message message) {
+        messages.put(message.getId(), message);
+    }
+
+    /**
+     * Removes a message from the cache.
+     *
+     * @param id The message to remove.
+     */
+    public void removeMessageFromCache(long id) {
+        messages.remove(id);
+    }
+
+    /**
      * Gets a user or creates a new one from the given data.
      *
      * @param data The json data of the user.
@@ -177,12 +220,28 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public User getOrCreateUser(JSONObject data) {
         long id = Long.parseLong(data.getString("id"));
-        return getUserById(id).orElseGet(() -> {
-            if (!data.has("username")) {
-                throw new IllegalStateException("Couldn't get or created user. Please inform the developer!");
-            }
-            return new ImplUser(this, data);
-        });
+        synchronized (this) {
+            return getUserById(id).orElseGet(() -> {
+                if (!data.has("username")) {
+                    throw new IllegalStateException("Couldn't get or created user. Please inform the developer!");
+                }
+                return new ImplUser(this, data);
+            });
+        }
+    }
+
+    /**
+     * Gets or creates new message object.
+     *
+     * @param channel The channel of the message.
+     * @param data The data of the message.
+     * @return The message for the given json object.
+     */
+    public Message getOrCreateMessage(TextChannel channel, JSONObject data) {
+        long id = Long.parseLong(data.getString("id"));
+        synchronized (weakMessages) {
+            return weakMessages.computeIfAbsent(id, key -> new ImplMessage(this, channel, data));
+        }
     }
 
     /**
@@ -235,6 +294,29 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public void setMessageCacheSize(int capacity, int storageTimeInSeconds) {
+        this.defaultMessageCacheCapacity = capacity;
+        this.defaultMessageCacheStorageTimeInSeconds = storageTimeInSeconds;
+        getChannels().stream()
+                .filter(channel -> channel instanceof TextChannel)
+                .map(channel -> (TextChannel) channel)
+                .forEach(channel -> {
+                    channel.getMessageCache().setCapacity(capacity);
+                    channel.getMessageCache().setStorageTimeInSeconds(storageTimeInSeconds);
+                });
+    }
+
+    @Override
+    public int getDefaultMessageCacheCapacity() {
+        return defaultMessageCacheCapacity;
+    }
+
+    @Override
+    public int getDefaultMessageCacheStorageTimeInSeconds() {
+        return defaultMessageCacheStorageTimeInSeconds;
+    }
+
+    @Override
     public void updateGame(String name) {
         updateGame(name, null);
     }
@@ -283,13 +365,23 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public Optional<Server> getServerById(long id) {
-        return Optional.ofNullable(servers.get(id));
+    public Collection<Message> getCachedMessages() {
+        return messages.values();
+    }
+
+    @Override
+    public Optional<Message> getCachedMessageById(long id) {
+        return Optional.ofNullable(messages.get(id));
     }
 
     @Override
     public Collection<Server> getServers() {
         return servers.values();
+    }
+
+    @Override
+    public Optional<Server> getServerById(long id) {
+        return Optional.ofNullable(servers.get(id));
     }
 
     @Override
