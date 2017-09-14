@@ -6,6 +6,7 @@ import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
+import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
 import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
 import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
@@ -340,6 +341,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
         // channel
         addHandler(new ChannelCreateHandler(api));
+        addHandler(new ChannelDeleteHandler(api));
 
         // user
         addHandler(new PresenceUpdateHandler(api));

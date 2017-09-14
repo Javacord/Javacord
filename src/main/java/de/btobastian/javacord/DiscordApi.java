@@ -11,6 +11,7 @@ import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -611,5 +612,19 @@ public interface DiscordApi {
      * @return A list with all registered server channel create listeners.
      */
     List<ServerChannelCreateListener> getServerChannelCreateListeners();
+
+    /**
+     * Adds a listener, which listens to server channel deletions.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelDeleteListener(ServerChannelDeleteListener listener);
+
+    /**
+     * Gets a list with all registered server channel delete listeners.
+     *
+     * @return A list with all registered server channel delete listeners.
+     */
+    List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
 
 }

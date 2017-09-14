@@ -14,6 +14,7 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
@@ -151,6 +152,15 @@ public class ImplServer implements Server {
      */
     public void addChannelToCache(ServerChannel channel) {
         channels.put(channel.getId(), channel);
+    }
+
+    /**
+     * Removes a channel from the cache.
+     *
+     * @param channelId The if of the channel to remove.
+     */
+    public void removeChannelFromCache(long channelId) {
+        channels.remove(channelId);
     }
 
     /**
@@ -346,5 +356,15 @@ public class ImplServer implements Server {
     @Override
     public List<ServerChannelCreateListener> getServerChannelCreateListeners() {
         return getListeners(ServerChannelCreateListener.class);
+    }
+
+    @Override
+    public void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
+        addListener(ServerChannelDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
+        return getListeners(ServerChannelDeleteListener.class);
     }
 }

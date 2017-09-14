@@ -5,6 +5,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -104,5 +105,14 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
         return server;
     }
 
+    @Override
+    public void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
+        addListener(ServerChannelDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
+        return getListeners(ServerChannelDeleteListener.class);
+    }
 
 }
