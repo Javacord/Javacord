@@ -1,7 +1,6 @@
 package de.btobastian.javacord.utils.handler.channel;
 
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.PacketHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -31,10 +30,22 @@ public class ChannelCreateHandler extends PacketHandler {
     public void handle(JSONObject packet) {
         int type = packet.getInt("type");
         switch (type) {
+            case 0:
+                handleServerTextChannel(packet);
+                break;
             case 1:
                 handlePrivateChannel(packet);
                 break;
         }
+    }
+
+    /**
+     * Handles server channel creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleServerTextChannel(JSONObject channel) {
+
     }
 
     /**
@@ -47,7 +58,7 @@ public class ChannelCreateHandler extends PacketHandler {
         // https://github.com/hammerandchisel/discord-api-docs/issues/184
         ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.getJSONArray("recipients").getJSONObject(0));
         if (!recipient.getPrivateChannel().isPresent()) {
-            new ImplPrivateChannel(api, channel);
+            recipient.getOrCreateChannel(channel);
         }
     }
 

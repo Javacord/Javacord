@@ -77,6 +77,21 @@ public class ImplUser implements User {
     }
 
     /**
+     * Gets or creates a new private channel.
+     *
+     * @param data The data of the private channel.
+     * @return The private channel for the given data.
+     */
+    public PrivateChannel getOrCreateChannel(JSONObject data) {
+        synchronized (this) {
+            if (channel != null) {
+                return channel;
+            }
+            return new ImplPrivateChannel(api, data);
+        }
+    }
+
+    /**
      * Adds a listener.
      *
      * @param clazz The listener class.
@@ -119,7 +134,7 @@ public class ImplUser implements User {
         }
         return new RestRequest<PrivateChannel>(api, HttpMethod.POST, RestEndpoint.USER_CHANNEL)
                 .setBody(new JSONObject().put("recipient_id", String.valueOf(getId())))
-                .execute(res -> new ImplPrivateChannel(api, res.getBody().getObject()));
+                .execute(res -> getOrCreateChannel(res.getBody().getObject()));
     }
 
     @Override
