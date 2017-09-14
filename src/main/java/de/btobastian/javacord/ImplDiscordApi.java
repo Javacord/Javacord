@@ -82,6 +82,16 @@ public class ImplDiscordApi implements DiscordApi {
     private int defaultMessageCacheStorageTimeInSeconds = 60*60*12;
 
     /**
+     * The current shard of the bot.
+     */
+    private final int currentShard;
+
+    /**
+     * The total amount of shards.
+     */
+    private final int totalShards;
+
+    /**
      * A map which contains all users.
      */
     private final ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
@@ -120,9 +130,17 @@ public class ImplDiscordApi implements DiscordApi {
      * @param token The token used to connect without any account type specific prefix.
      * @param ready The future which will be completed when the connection to Discord was successful.
      */
-    public ImplDiscordApi(AccountType accountType, String token, CompletableFuture<DiscordApi> ready) {
+    public ImplDiscordApi(
+            AccountType accountType,
+            String token,
+            int currentShard,
+            int totalShards,
+            CompletableFuture<DiscordApi> ready
+    ){
         this.accountType = accountType;
         this.token = accountType.getTokenPrefix() + token;
+        this.currentShard = currentShard;
+        this.totalShards = totalShards;
 
         RestEndpoint endpoint = RestEndpoint.GATEWAY_BOT;
         if (accountType == AccountType.CLIENT) {
@@ -314,6 +332,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public int getDefaultMessageCacheStorageTimeInSeconds() {
         return defaultMessageCacheStorageTimeInSeconds;
+    }
+
+    @Override
+    public int getCurrentShard() {
+        return currentShard;
+    }
+
+    @Override
+    public int getTotalShards() {
+        return totalShards;
     }
 
     @Override

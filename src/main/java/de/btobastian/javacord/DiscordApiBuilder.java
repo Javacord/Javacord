@@ -44,7 +44,7 @@ public class DiscordApiBuilder {
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
-        new ImplDiscordApi(accountType, token, future);
+        new ImplDiscordApi(accountType, token, currentShard, totalShards, future);
         return future;
     }
 

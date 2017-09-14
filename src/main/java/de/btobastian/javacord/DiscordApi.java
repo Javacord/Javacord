@@ -83,6 +83,20 @@ public interface DiscordApi {
     int getDefaultMessageCacheStorageTimeInSeconds();
 
     /**
+     * Gets the current shard of the bot, starting with <code>0</code>.
+     *
+     * @return The current shard of the bot.
+     */
+    int getCurrentShard();
+
+    /**
+     * Gets the total amount of shards. If the total amount is <code>0</code> sharding is disabled.
+     *
+     * @return The total amount of shards.
+     */
+    int getTotalShards();
+
+    /**
      * Updates the game of this bot, represented as "Playing Half-Life 3" for example.
      *
      * @param name The name of the game.

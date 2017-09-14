@@ -319,6 +319,9 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                                 .put("$referring_domain", ""))
                         .put("compress", true)
                         .put("large_threshold", 250));
+        if (api.getTotalShards() > 1) {
+            identifyPacket.getJSONObject("d").put("shard", new int[]{api.getCurrentShard(), api.getTotalShards()});
+        }
         logger.debug("Sending identify packet");
         websocket.sendText(identifyPacket.toString());
     }
