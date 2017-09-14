@@ -6,7 +6,9 @@ import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 /**
  * This class is extended by all PacketHandlers.
@@ -72,6 +74,23 @@ public abstract class PacketHandler {
      * @param packet The packet (the "d"-object).
      */
     protected abstract void handle(JSONObject packet);
+
+    /**
+     * Dispatches an event in a the listener thread.
+     *
+     * @param listeners The listeners for the event.
+     * @param consumer The consumer which consumes the listeners and calls the event.
+     * @param <T> The listener class.
+     */
+    protected <T> void dispatchEvent(List<T> listeners, Consumer<T> consumer) {
+        listenerExecutorService.submit(() -> listeners.stream().forEach(listener -> {
+            try {
+                consumer.accept(listener);
+            } catch (Throwable t) {
+                logger.error("An error occurred while calling a listener method!", t);
+            }
+        }));
+    }
 
     /**
      * Gets the type of packet the handler handles.

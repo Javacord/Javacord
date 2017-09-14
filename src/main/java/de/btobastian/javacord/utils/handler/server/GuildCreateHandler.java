@@ -5,13 +5,8 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerBecomesAvailableEvent;
 import de.btobastian.javacord.events.server.ServerJoinEvent;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles the guild create packet.
@@ -37,21 +32,16 @@ public class GuildCreateHandler extends PacketHandler {
             api.removeUnavailableServerToCache(id);
             Server server = new ImplServer(api, packet);
             ServerBecomesAvailableEvent event = new ServerBecomesAvailableEvent(api, server);
-            listenerExecutorService.submit(() -> {
-                List<ServerBecomesAvailableListener> listeners = new ArrayList<>();
-                listeners.addAll(api.getServerBecomesAvailableListeners());
-                listeners.forEach(listener -> listener.onServerBecomesAvailable(event));
-            });
+
+            dispatchEvent(
+                    api.getServerBecomesAvailableListeners(), listener -> listener.onServerBecomesAvailable(event));
             return;
         }
 
         Server server = new ImplServer(api, packet);
         ServerJoinEvent event = new ServerJoinEvent(api, server);
-        listenerExecutorService.submit(() -> {
-            List<ServerJoinListener> listeners = new ArrayList<>();
-            listeners.addAll(api.getServerJoinListeners());
-            listeners.forEach(listener -> listener.onServerJoin(event));
-        });
+
+        dispatchEvent(api.getServerJoinListeners(), listener -> listener.onServerJoin(event));
     }
 
 }

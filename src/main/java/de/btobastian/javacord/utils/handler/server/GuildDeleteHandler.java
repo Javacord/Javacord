@@ -50,24 +50,24 @@ public class GuildDeleteHandler extends PacketHandler {
             api.addUnavailableServerToCache(serverId);
             api.getServerById(serverId).ifPresent(server -> {
                 ServerBecomesUnavailableEvent event = new ServerBecomesUnavailableEvent(api, server);
-                listenerExecutorService.submit(() -> {
-                    List<ServerBecomesUnavailableListener> listeners = new ArrayList<>();
-                    listeners.addAll(server.getServerBecomesUnavailableListeners());
-                    listeners.addAll(api.getServerBecomesUnavailableListeners());
-                    listeners.forEach(listener -> listener.onServerBecomesUnavailable(event));
-                });
+
+                List<ServerBecomesUnavailableListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerBecomesUnavailableListeners());
+                listeners.addAll(api.getServerBecomesUnavailableListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerBecomesUnavailable(event));
             });
             api.removeServerFromCache(serverId);
             return;
         }
         api.getServerById(serverId).ifPresent(server -> {
             ServerLeaveEvent event = new ServerLeaveEvent(api, server);
-            listenerExecutorService.submit(() -> {
-                List<ServerLeaveListener> listeners = new ArrayList<>();
-                listeners.addAll(server.getServerLeaveListeners());
-                listeners.addAll(api.getServerLeaveListeners());
-                listeners.forEach(listener -> listener.onServerLeave(event));
-            });
+
+            List<ServerLeaveListener> listeners = new ArrayList<>();
+            listeners.addAll(server.getServerLeaveListeners());
+            listeners.addAll(api.getServerLeaveListeners());
+
+            dispatchEvent(listeners, listener -> listener.onServerLeave(event));
         });
         api.removeServerFromCache(serverId);
     }

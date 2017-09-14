@@ -49,13 +49,14 @@ public class ChannelDeleteHandler extends PacketHandler {
         long serverId = Long.parseLong(channel.getString("guild_id"));
         api.getServerById(serverId).ifPresent(server -> server.getTextChannelById(serverId).ifPresent(textChannel -> {
             ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(api, server, textChannel);
-            listenerExecutorService.submit(() -> {
-                List<ServerChannelDeleteListener> listeners = new ArrayList<>();
-                listeners.addAll(textChannel.getServerChannelDeleteListeners());
-                listeners.addAll(server.getServerChannelDeleteListeners());
-                listeners.addAll(api.getServerChannelDeleteListeners());
-                listeners.forEach(listener -> listener.onServerChannelDelete(event));
-            });
+
+            List<ServerChannelDeleteListener> listeners = new ArrayList<>();
+            listeners.addAll(textChannel.getServerChannelDeleteListeners());
+            listeners.addAll(server.getServerChannelDeleteListeners());
+            listeners.addAll(api.getServerChannelDeleteListeners());
+
+            dispatchEvent(listeners, listener -> listener.onServerChannelDelete(event));
+
             ((ImplServer) server).removeChannelFromCache(textChannel.getId());
         }));
     }
@@ -69,13 +70,14 @@ public class ChannelDeleteHandler extends PacketHandler {
         long serverId = Long.parseLong(channel.getString("guild_id"));
         api.getServerById(serverId).ifPresent(server -> server.getVoiceChannelById(serverId).ifPresent(voiceChannel -> {
             ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(api, server, voiceChannel);
-            listenerExecutorService.submit(() -> {
-                List<ServerChannelDeleteListener> listeners = new ArrayList<>();
-                listeners.addAll(voiceChannel.getServerChannelDeleteListeners());
-                listeners.addAll(server.getServerChannelDeleteListeners());
-                listeners.addAll(api.getServerChannelDeleteListeners());
-                listeners.forEach(listener -> listener.onServerChannelDelete(event));
-            });
+
+            List<ServerChannelDeleteListener> listeners = new ArrayList<>();
+            listeners.addAll(voiceChannel.getServerChannelDeleteListeners());
+            listeners.addAll(server.getServerChannelDeleteListeners());
+            listeners.addAll(api.getServerChannelDeleteListeners());
+
+            dispatchEvent(listeners, listener -> listener.onServerChannelDelete(event));
+
             ((ImplServer) server).removeChannelFromCache(voiceChannel.getId());
         }));
     }

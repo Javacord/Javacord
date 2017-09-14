@@ -30,16 +30,16 @@ public class MessageCreateHandler extends PacketHandler {
         api.getTextChannelById(packet.getString("channel_id")).ifPresent(channel -> {
             Message message = api.getOrCreateMessage(channel, packet);
             MessageCreateEvent event = new MessageCreateEvent(api, message);
-            listenerExecutorService.submit(() -> {
-                List<MessageCreateListener> listeners = new ArrayList<>();
-                listeners.addAll(channel.getMessageCreateListeners());
-                if (channel instanceof ServerTextChannel) {
-                    listeners.addAll(((ServerTextChannel) channel).getServer().getMessageCreateListeners());
-                }
-                message.getAuthor().ifPresent(user -> listeners.addAll(user.getMessageCreateListeners()));
-                listeners.addAll(api.getMessageCreateListeners());
-                listeners.forEach(listener -> listener.onMessageCreate(event));
-            });
+
+            List<MessageCreateListener> listeners = new ArrayList<>();
+            listeners.addAll(channel.getMessageCreateListeners());
+            if (channel instanceof ServerTextChannel) {
+                listeners.addAll(((ServerTextChannel) channel).getServer().getMessageCreateListeners());
+            }
+            message.getAuthor().ifPresent(user -> listeners.addAll(user.getMessageCreateListeners()));
+            listeners.addAll(api.getMessageCreateListeners());
+
+            dispatchEvent(listeners, listener -> listener.onMessageCreate(event));
         });
     }
 

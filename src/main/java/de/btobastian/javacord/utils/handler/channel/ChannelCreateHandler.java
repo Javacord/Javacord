@@ -53,12 +53,12 @@ public class ChannelCreateHandler extends PacketHandler {
         api.getServerById(serverId).ifPresent(server -> {
             ServerTextChannel textChannel = ((ImplServer) server).getOrCreateServerTextChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEvent(api, server, textChannel);
-            listenerExecutorService.submit(() -> {
-                List<ServerChannelCreateListener> listeners = new ArrayList<>();
-                listeners.addAll(server.getServerChannelCreateListeners());
-                listeners.addAll(api.getServerChannelCreateListeners());
-                listeners.forEach(listener -> listener.onServerChannelCreate(event));
-            });
+
+            List<ServerChannelCreateListener> listeners = new ArrayList<>();
+            listeners.addAll(server.getServerChannelCreateListeners());
+            listeners.addAll(api.getServerChannelCreateListeners());
+
+            dispatchEvent(listeners, listener -> listener.onServerChannelCreate(event));
         });
     }
 
@@ -72,12 +72,12 @@ public class ChannelCreateHandler extends PacketHandler {
         api.getServerById(serverId).ifPresent(server -> {
             ServerVoiceChannel voiceChannel = ((ImplServer) server).getOrCreateServerVoiceChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEvent(api, server, voiceChannel);
-            listenerExecutorService.submit(() -> {
-                List<ServerChannelCreateListener> listeners = new ArrayList<>();
-                listeners.addAll(server.getServerChannelCreateListeners());
-                listeners.addAll(api.getServerChannelCreateListeners());
-                listeners.forEach(listener -> listener.onServerChannelCreate(event));
-            });
+
+            List<ServerChannelCreateListener> listeners = new ArrayList<>();
+            listeners.addAll(server.getServerChannelCreateListeners());
+            listeners.addAll(api.getServerChannelCreateListeners());
+
+            dispatchEvent(listeners, listener -> listener.onServerChannelCreate(event));
         });
     }
 
