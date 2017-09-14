@@ -452,4 +452,16 @@ public interface DiscordApi {
      */
     List<UserStartTypingListener> getUserStartTypingListeners();
 
+    /**
+     * Gets yourself
+     *
+     * @return Yourself.
+     */
+    Optional<User> getYourself();
+
+    /**
+     * Sets yourself
+     */
+    void setYourself(User yourself);
+
 }

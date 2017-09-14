@@ -89,6 +89,11 @@ public class ImplDiscordApi implements DiscordApi {
     private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
     /**
+     * Yourself.
+     */
+    private User you;
+
+    /**
      * Creates a new discord api instance.
      *
      * @param accountType The account type of the instance.
@@ -350,5 +355,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<UserStartTypingListener> getUserStartTypingListeners() {
         return getListeners(UserStartTypingListener.class);
+    }
+
+    @Override
+    public Optional<User> getYourself() {
+        return Optional.ofNullable(you);
+    }
+
+    @Override
+    public void setYourself(User yourself){
+        this.you = yourself;
     }
 }
