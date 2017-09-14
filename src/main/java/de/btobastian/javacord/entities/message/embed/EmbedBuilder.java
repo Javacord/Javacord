@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +14,11 @@ import java.util.List;
  */
 public class EmbedBuilder {
 
+    // General embed stuff
     private String title = null;
     private String description = null;
     private String url = null;
+    private Instant timestamp = null;
     private Color color = null;
 
     // Footer
@@ -37,7 +41,7 @@ public class EmbedBuilder {
     private List<Object[]> fields = new ArrayList<>();
 
     /**
-     * Class constructor.
+     * Creates a new embed builder.
      */
     public EmbedBuilder() {
         // Default constructor
@@ -47,7 +51,7 @@ public class EmbedBuilder {
      * Sets the title of the embed.
      *
      * @param title The title of the embed.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setTitle(String title) {
         this.title = title;
@@ -58,7 +62,7 @@ public class EmbedBuilder {
      * Sets the description of the embed.
      *
      * @param description The description of the embed.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setDescription(String description) {
         this.description = description;
@@ -69,7 +73,7 @@ public class EmbedBuilder {
      * Sets the url of the embed.
      *
      * @param url The url of the embed.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setUrl(String url) {
         this.url = url;
@@ -77,10 +81,31 @@ public class EmbedBuilder {
     }
 
     /**
+     * Sets the current time as timestamp of the embed.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setTimestamp() {
+        this.timestamp = Instant.now();
+        return this;
+    }
+
+    /**
+     * Sets the timestamp of the embed.
+     *
+     * @param timestamp The timestamp to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
+        return this;
+    }
+
+    /**
      * Sets the color of the embed.
      *
      * @param color The color of the embed.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setColor(Color color) {
         this.color = color;
@@ -91,7 +116,7 @@ public class EmbedBuilder {
      * Sets the footer of the embed.
      *
      * @param text The text of the footer.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text) {
         return setFooter(text, null);
@@ -102,7 +127,7 @@ public class EmbedBuilder {
      *
      * @param text The text of the footer.
      * @param iconUrl The url of the footer's icon.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, String iconUrl) {
         footerText = text;
@@ -114,7 +139,7 @@ public class EmbedBuilder {
      * Sets the image of the embed.
      *
      * @param url The url of the image.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(String url) {
         imageUrl = url;
@@ -125,7 +150,7 @@ public class EmbedBuilder {
      * Sets the author if the embed.
      *
      * @param name The name of the author.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name) {
         return setAuthor(name, null, null);
@@ -137,7 +162,7 @@ public class EmbedBuilder {
      * @param name The name of the author.
      * @param url The url of the author.
      * @param iconUrl The url of the author's icon.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, String iconUrl) {
         authorName = name;
@@ -150,7 +175,7 @@ public class EmbedBuilder {
      * Sets the thumbnail of the embed.
      *
      * @param url The url of the thumbnail.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(String url) {
         thumbnailUrl = url;
@@ -163,7 +188,7 @@ public class EmbedBuilder {
      * @param name The name of the field.
      * @param value The value of the field.
      * @param inline Whether the field should be inline or not.
-     * @return This object to reuse it.
+     * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder addField(String name, String value, boolean inline) {
         fields.add(new Object[]{name, value, inline});
@@ -190,9 +215,14 @@ public class EmbedBuilder {
         if (color != null) {
             object.put("color", color.getRGB() & 0xFFFFFF);
         }
-        if (footerText != null) {
+        if (timestamp != null) {
+            object.put("timestamp", DateTimeFormatter.ISO_INSTANT.format(timestamp));
+        }
+        if (footerText != null || footerIconUrl != null) {
             JSONObject footer = new JSONObject();
-            footer.put("text", footerText);
+            if (footerText != null) {
+                footer.put("text", footerText);
+            }
             if (footerIconUrl != null) {
                 footer.put("icon_url", footerIconUrl);
             }

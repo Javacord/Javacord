@@ -6,10 +6,13 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,6 +60,11 @@ public class ImplMessage implements Message {
     private boolean cacheForever = false;
 
     /**
+     * A list with all embeds.
+     */
+    private final ArrayList<Embed> embeds = new ArrayList<>();
+
+    /**
      * Creates a new message object.
      *
      * @param api The discord api instance.
@@ -79,6 +87,12 @@ public class ImplMessage implements Message {
         ImplMessageCache cache = (ImplMessageCache) channel.getMessageCache();
         if (cache.getCapacity() != 0 && cache.getStorageTimeInSeconds() != 0) {
             cache.addMessage(this);
+        }
+
+        JSONArray embeds = data.getJSONArray("embeds");
+        for (int i = 0; i < embeds.length(); i++) {
+            Embed embed = new ImplEmbed(embeds.getJSONObject(i));
+            this.embeds.add(embed);
         }
     }
 
@@ -127,9 +141,8 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public Optional<Embed> getEmbed() {
-        // TODO
-        return Optional.empty();
+    public List<Embed> getEmbeds() {
+        return Collections.unmodifiableList(embeds);
     }
 
     @Override

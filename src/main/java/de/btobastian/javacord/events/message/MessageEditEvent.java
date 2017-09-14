@@ -5,6 +5,7 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,9 +19,9 @@ public class MessageEditEvent extends OptionalMessageEvent {
     private final String newContent;
 
     /**
-     * The new embed of the message. May be <code>null</code>.
+     * The new embeds of the message.
      */
-    private final Embed newEmbed;
+    private final List<Embed> newEmbeds;
 
     /**
      * Creates a new message edit event.
@@ -28,11 +29,13 @@ public class MessageEditEvent extends OptionalMessageEvent {
      * @param api The discord api instance.
      * @param messageId The id of the message.
      * @param channel The text channel in which the message was sent.
+     * @param newContent The new content of the message.
+     * @param newEmbeds The new embeds of the message.
      */
-    public MessageEditEvent(DiscordApi api, long messageId, TextChannel channel, String newContent, Embed newEmbed) {
+    public MessageEditEvent(DiscordApi api, long messageId, TextChannel channel, String newContent, List<Embed> newEmbeds) {
         super(api, messageId, channel);
         this.newContent = newContent;
-        this.newEmbed = newEmbed;
+        this.newEmbeds = newEmbeds;
     }
 
     /**
@@ -54,23 +57,21 @@ public class MessageEditEvent extends OptionalMessageEvent {
     }
 
     /**
-     * Gets the new embed of the message. May not be present, if the new message does not have an embed.
+     * Gets the new embeds of the message.
      *
-     * @return The new embed of the message.
+     * @return The new embeds of the message.
      */
-    public Optional<Embed> getNewEmbed() {
-        return Optional.ofNullable(newEmbed);
+    public List<Embed> getNewEmbeds() {
+        return newEmbeds;
     }
 
     /**
-     * Gets the old embed of the message.
-     * The outer optional is only present, if the old message is in the cache.
-     * The inner optional is only present, if the old message had an embed.
+     * Gets the old embeds of the message. It will only be present, if the message is in the cache.
      *
-     * @return The old embed of the message.
+     * @return The old embeds of the message.
      */
-    public Optional<Optional<Embed>> getOldEmbed() {
-        return getMessage().map(Message::getEmbed);
+    public Optional<List<Embed>> getOldEmbeds() {
+        return getMessage().map(Message::getEmbeds);
     }
 
 }

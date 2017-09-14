@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,11 +35,11 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     TextChannel getChannel();
 
     /**
-     * Gets the embed of the message.
+     * Gets a list with all embeds of the message.
      *
-     * @return The embed of the message.
+     * @return A list with all embeds of the message.
      */
-    Optional<Embed> getEmbed();
+    List<Embed> getEmbeds();
 
     /**
      * Gets the user author of the message.

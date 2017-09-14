@@ -63,7 +63,10 @@ public class ImplMessageCache implements MessageCache {
                 return;
             }
             // Add the message in the correct order
-            int pos = -Collections.binarySearch(messages, message) - 1;
+            int pos = Collections.binarySearch(messages, message);
+            if (pos < 0) {
+                pos = -pos-1;
+            }
             messages.add(pos, message);
         }
     }
