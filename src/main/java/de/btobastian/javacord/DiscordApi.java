@@ -15,6 +15,7 @@ import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -161,18 +162,6 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server by it's id.
-     *
-     * @param id The id of the server.
-     * @return The server with the given id.
-     */
-    default Optional<Server> getServerById(long id) {
-        return getServers().stream()
-                .filter(server -> server.getId() == id)
-                .findAny();
-    }
-
-    /**
      * Gets a collection with all cached messages.
      *
      * @return A collection with all cached messages.
@@ -214,6 +203,18 @@ public interface DiscordApi {
      * @param id The id of the server.
      * @return The server with the given id.
      */
+    default Optional<Server> getServerById(long id) {
+        return getServers().stream()
+                .filter(server -> server.getId() == id)
+                .findAny();
+    }
+
+    /**
+     * Gets a server by it's id.
+     *
+     * @param id The id of the server.
+     * @return The server with the given id.
+     */
     default Optional<Server> getServerById(String id) {
         try {
             return getServerById(Long.valueOf(id));
@@ -228,13 +229,91 @@ public interface DiscordApi {
      * @return A collection with all channels of the bot.
      */
     default Collection<Channel> getChannels() {
-        Collection<Channel> channels = getUsers().parallelStream()
+        Collection<Channel> channels = new ArrayList<>();
+        channels.addAll(getPrivateChannels());
+        channels.addAll(getServerChannels());
+        channels.addAll(getGroupChannels());
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all group channels of the bot.
+     *
+     * @return A collection with all group channels of the bot.
+     */
+    default Collection<GroupChannel> getGroupChannels() {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Gets a collection with all private channels of the bot.
+     *
+     * @return A collection with all private channels of the bot.
+     */
+    default Collection<PrivateChannel> getPrivateChannels() {
+        return getUsers().stream()
                 .map(User::getPrivateChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(privateChannel -> (Channel) privateChannel)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all server channels of the bot.
+     *
+     * @return A collection with all server channels of the bot.
+     */
+    default Collection<ServerChannel> getServerChannels() {
+        Collection<ServerChannel> channels = new ArrayList<>();
         getServers().stream().forEach(server -> channels.addAll(server.getChannels()));
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all server text channels of the bot.
+     *
+     * @return A collection with all server text channels of the bot.
+     */
+    default Collection<ServerTextChannel> getServerTextChannels() {
+        Collection<ServerTextChannel> channels = new ArrayList<>();
+        getServers().stream().forEach(server -> channels.addAll(server.getTextChannels()));
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all server voice channels of the bot.
+     *
+     * @return A collection with all server voice channels of the bot.
+     */
+    default Collection<ServerVoiceChannel> getServerVoiceChannels() {
+        Collection<ServerVoiceChannel> channels = new ArrayList<>();
+        getServers().stream().forEach(server -> channels.addAll(server.getVoiceChannels()));
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all text channels of the bot.
+     *
+     * @return A collection with all text channels of the bot.
+     */
+    default Collection<TextChannel> getTextChannels() {
+        Collection<TextChannel> channels = new ArrayList<>();
+        channels.addAll(getPrivateChannels());
+        channels.addAll(getServerTextChannels());
+        channels.addAll(getGroupChannels());
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all voice channels of the bot.
+     *
+     * @return A collection with all voice channels of the bot.
+     */
+    default Collection<VoiceChannel> getVoiceChannels() {
+        Collection<VoiceChannel> channels = new ArrayList<>();
+        channels.addAll(getPrivateChannels());
+        channels.addAll(getServerVoiceChannels());
+        channels.addAll(getGroupChannels());
         return channels;
     }
 
@@ -245,7 +324,7 @@ public interface DiscordApi {
      * @return The channel with the given id.
      */
     default Optional<Channel> getChannelById(long id) {
-        return getChannels().parallelStream()
+        return getChannels().stream()
                 .filter(channel -> channel.getId() == id)
                 .findAny();
     }
@@ -271,9 +350,9 @@ public interface DiscordApi {
      * @return The text channel with the given id.
      */
     default Optional<TextChannel> getTextChannelById(long id) {
-        return getChannelById(id)
-                .filter(channel -> channel instanceof TextChannel)
-                .map(channel -> (TextChannel) channel);
+        return getTextChannels().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
     }
 
     /**
@@ -297,9 +376,9 @@ public interface DiscordApi {
      * @return The voice channel with the given id.
      */
     default Optional<VoiceChannel> getVoiceChannelById(long id) {
-        return getChannelById(id)
-                .filter(channel -> channel instanceof VoiceChannel)
-                .map(channel -> (VoiceChannel) channel);
+        return getVoiceChannels().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
     }
 
     /**
@@ -323,9 +402,9 @@ public interface DiscordApi {
      * @return The server text channel with the given id.
      */
     default Optional<ServerTextChannel> getServerTextChannelById(long id) {
-        return getChannelById(id)
-                .filter(channel -> channel instanceof ServerTextChannel)
-                .map(channel -> (ServerTextChannel) channel);
+        return getServerTextChannels().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
     }
 
     /**
@@ -349,9 +428,9 @@ public interface DiscordApi {
      * @return The server voice channel with the given id.
      */
     default Optional<ServerVoiceChannel> getServerVoiceChannelById(long id) {
-        return getChannelById(id)
-                .filter(channel -> channel instanceof ServerVoiceChannel)
-                .map(channel -> (ServerVoiceChannel) channel);
+        return getServerVoiceChannels().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
     }
 
     /**
@@ -375,9 +454,9 @@ public interface DiscordApi {
      * @return The private channel with the given id.
      */
     default Optional<PrivateChannel> getPrivateChannelById(long id) {
-        return getChannelById(id)
-                .filter(channel -> channel instanceof PrivateChannel)
-                .map(channel -> (PrivateChannel) channel);
+        return getPrivateChannels().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
     }
 
     /**
@@ -401,9 +480,9 @@ public interface DiscordApi {
      * @return The group channel with the given id.
      */
     default Optional<GroupChannel> getGroupChannelById(long id) {
-        return getChannelById(id)
-                .filter(channel -> channel instanceof GroupChannel)
-                .map(channel -> (GroupChannel) channel);
+        return getGroupChannels().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
     }
 
     /**
