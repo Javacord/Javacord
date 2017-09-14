@@ -8,9 +8,7 @@ import de.btobastian.javacord.events.server.ServerJoinEvent;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +17,6 @@ import java.util.List;
  * Handles the guild create packet.
  */
 public class GuildCreateHandler extends PacketHandler {
-
-    /**
-     * The logger of this class.
-     */
-    private static final Logger logger = LoggerUtil.getLogger(GuildCreateHandler.class);
 
     /**
      * Creates a new instance of this class.
