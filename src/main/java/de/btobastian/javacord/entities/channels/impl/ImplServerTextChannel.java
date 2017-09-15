@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
@@ -154,5 +155,15 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
         return getListeners(ServerChannelDeleteListener.class);
+    }
+
+    @Override
+    public void addMessageDeleteListener(MessageDeleteListener listener) {
+        addListener(MessageDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners() {
+        return getListeners(MessageDeleteListener.class);
     }
 }

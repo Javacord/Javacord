@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
@@ -125,5 +126,15 @@ public class ImplPrivateChannel implements PrivateChannel {
     @Override
     public List<UserStartTypingListener> getUserStartTypingListeners() {
         return getListeners(UserStartTypingListener.class);
+    }
+
+    @Override
+    public void addMessageDeleteListener(MessageDeleteListener listener) {
+        addListener(MessageDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners() {
+        return getListeners(MessageDeleteListener.class);
     }
 }

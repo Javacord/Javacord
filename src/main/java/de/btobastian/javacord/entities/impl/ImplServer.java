@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -366,5 +367,15 @@ public class ImplServer implements Server {
     @Override
     public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
         return getListeners(ServerChannelDeleteListener.class);
+    }
+
+    @Override
+    public void addMessageDeleteListener(MessageDeleteListener listener) {
+        addListener(MessageDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners() {
+        return getListeners(MessageDeleteListener.class);
     }
 }

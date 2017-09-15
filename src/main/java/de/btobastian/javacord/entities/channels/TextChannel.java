@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -72,5 +73,19 @@ public interface TextChannel extends Channel, Messageable {
      * @return A list with all registered user starts typing listeners.
      */
     List<UserStartTypingListener> getUserStartTypingListeners();
+
+    /**
+     * Adds a listener, which listens to message deletions in this channel.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageDeleteListener(MessageDeleteListener listener);
+
+    /**
+     * Gets a list with all registered message delete listeners.
+     *
+     * @return A list with all registered message delete listeners.
+     */
+    List<MessageDeleteListener> getMessageDeleteListeners();
 
 }

@@ -77,8 +77,15 @@ public class ImplMessageCache implements MessageCache {
     public void clean() {
         Instant minAge = Instant.ofEpochMilli(System.currentTimeMillis() - storageTimeInSeconds * 100);
         synchronized (messages) {
-            long foreverCachedAmount = messages.stream().filter(Message::isCachedForever).count();
             Iterator<Message> iterator = messages.iterator();
+            // Remove all deleted messages from the cache
+            while (iterator.hasNext()) {
+                if (iterator.next().isDeleted()) {
+                    iterator.remove();
+                }
+            }
+            long foreverCachedAmount = messages.stream().filter(Message::isCachedForever).count();
+            iterator = messages.iterator();
             while (iterator.hasNext()) {
                 Message message = iterator.next();
                 if (message.isCachedForever()) {

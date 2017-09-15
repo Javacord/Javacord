@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handles the channel create packet.
+ * Handles the channel delete packet.
  */
 public class ChannelDeleteHandler extends PacketHandler {
 

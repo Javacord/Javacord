@@ -5,9 +5,11 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
+import de.btobastian.javacord.utils.handler.ResumedHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
+import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
 import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.GuildMembersChunkHandler;
@@ -182,15 +184,34 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     sessionId = packet.getJSONObject("d").getString("session_id");
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("startupWait").submit(() -> {
-                        int amount = api.getServers().size();
-                        for (;;) {
-                            try {
-                                Thread.sleep(1500);
-                            } catch (InterruptedException ignored) { }
-                            if (api.getServers().size() <= amount && lastGuildMembersChunkReceived + 1500 < System.currentTimeMillis()) {
-                                break; // 1.5 seconds without new servers becoming available and no GUILD_MEMBERS_CHUNK packet
+                        boolean allUsersLoaded = false;
+                        boolean allServersLoaded = false;
+                        int lastUnavailableServerAmount = 0;
+                        int sameUnavailableServerCounter = 0;
+                        while (!allServersLoaded || !allUsersLoaded) {
+                            if (api.getUnavailableServers().size() == lastUnavailableServerAmount) {
+                                sameUnavailableServerCounter++;
+                            } else {
+                                lastUnavailableServerAmount = api.getUnavailableServers().size();
+                                sameUnavailableServerCounter = 0;
                             }
-                            amount = api.getServers().size();
+                            allServersLoaded = api.getUnavailableServers().isEmpty();
+                            if (allServersLoaded) {
+                                allUsersLoaded = !api.getServers().stream()
+                                        .filter(server -> server.getMemberCount() != server.getMembers().size())
+                                        .findAny().isPresent();
+                            }
+                            if (sameUnavailableServerCounter > 20
+                                    && lastGuildMembersChunkReceived + 5000 < System.currentTimeMillis()) {
+                                // It has been more than two seconds since no more servers became available and more
+                                // than five seconds since the last guild member chunk event was received. We
+                                // can assume that this will not change anytime soon, most likely because Discord
+                                // itself has some issues. Let's break the loop!
+                                break;
+                            }
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException ignored) { }
                         }
                         ready.complete(true);
                     });
@@ -210,7 +231,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 break;
             case 9:
                 // Invalid session :(
-                logger.info("Could not resume session. Reconnecting now...");
+                logger.info("Could not resume session. Reconnecting in 5 seconds...");
+                Thread.sleep(5000);
                 sendIdentify(websocket);
                 break;
             case 10:
@@ -333,6 +355,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     private void registerHandlers() {
         // general
         addHandler(new ReadyHandler(api));
+        addHandler(new ResumedHandler(api));
 
         // servers
         addHandler(new GuildCreateHandler(api));
@@ -349,6 +372,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
         // message
         addHandler(new MessageCreateHandler(api));
+        addHandler(new MessageDeleteHandler(api));
     }
 
     /**

@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
@@ -634,5 +635,19 @@ public interface DiscordApi {
      * @return A list with all registered server channel delete listeners.
      */
     List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to message deletions.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageDeleteListener(MessageDeleteListener listener);
+
+    /**
+     * Gets a list with all registered message delete listeners.
+     *
+     * @return A list with all registered message delete listeners.
+     */
+    List<MessageDeleteListener> getMessageDeleteListeners();
 
 }
