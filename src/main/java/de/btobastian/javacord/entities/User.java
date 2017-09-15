@@ -50,7 +50,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     CompletableFuture<PrivateChannel> openPrivateChannel();
 
     /**
-     * Gets Whether this user is the user connected to the Discord API.
+     * Gets whether this user is the user connected to the Discord API.
      * Calls {@link DiscordApi#getYourself()} to get the connected user.
      *
      * @return Whether the user is the user representing the account connected to the Discord API.
