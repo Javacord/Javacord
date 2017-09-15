@@ -210,7 +210,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 break;
             case 9:
                 // Invalid session :(
-                logger.info("Could not resume session. Reconnecting now...");
+                logger.info("Could not resume session. Reconnecting in 5 seconds...");
+                Thread.sleep(5000);
                 sendIdentify(websocket);
                 break;
             case 10:
