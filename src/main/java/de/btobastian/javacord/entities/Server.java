@@ -4,6 +4,7 @@ import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -259,5 +260,19 @@ public interface Server extends DiscordEntity {
      * @return A list with all registered server channel delete listeners.
      */
     List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to message deletions in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageDeleteListener(MessageDeleteListener listener);
+
+    /**
+     * Gets a list with all registered message delete listeners.
+     *
+     * @return A list with all registered message delete listeners.
+     */
+    List<MessageDeleteListener> getMessageDeleteListeners();
 
 }

@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,6 +61,11 @@ public class ImplMessage implements Message {
     private boolean cacheForever = false;
 
     /**
+     * As soon as we receive a message delete event, we mark the message as deleted.
+     */
+    private boolean deleted = false;
+
+    /**
      * A list with all embeds.
      */
     private final ArrayList<Embed> embeds = new ArrayList<>();
@@ -94,6 +100,15 @@ public class ImplMessage implements Message {
             Embed embed = new ImplEmbed(embeds.getJSONObject(i));
             this.embeds.add(embed);
         }
+    }
+
+    /**
+     * Sets the deleted flag of the message.
+     *
+     * @param deleted The deleted flag.
+     */
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     /**
@@ -165,6 +180,11 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    @Override
     public int compareTo(Message otherMessage) {
         return otherMessage.getCreationDate().compareTo(getCreationDate());
     }
@@ -177,5 +197,15 @@ public class ImplMessage implements Message {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Message && ((Message) obj).getId() == getId();
+    }
+
+    @Override
+    public void addMessageDeleteListener(MessageDeleteListener listener) {
+        addListener(MessageDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners() {
+        return getListeners(MessageDeleteListener.class);
     }
 }

@@ -8,6 +8,8 @@ import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
@@ -64,6 +66,14 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     void setCachedForever(boolean cachedForever);
 
     /**
+     * Whether this message is deleted or not.
+     * Deleted messages might still be in the cache for not more than 60 seconds.
+     *
+     * @return Whether the message is deleted or not.
+     */
+    boolean isDeleted();
+
+    /**
      * Gets the server text channel of the message.
      * Only present if the message was sent in a server.
      *
@@ -102,7 +112,24 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
                 .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()))
                 .setRatelimitRetries(25)
-                .execute(res -> null);
+                .execute(res -> {
+                    ((ImplMessage) this).setDeleted(true);
+                    return null;
+                });
     }
+
+    /**
+     * Adds a listener, which listens to this message being deleted.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageDeleteListener(MessageDeleteListener listener);
+
+    /**
+     * Gets a list with all registered message delete listeners.
+     *
+     * @return A list with all registered message delete listeners.
+     */
+    List<MessageDeleteListener> getMessageDeleteListeners();
 
 }

@@ -14,6 +14,11 @@ import java.util.concurrent.CompletableFuture;
 public abstract class OptionalMessageEvent extends MessageEvent {
 
     /**
+     * The message of the event. Might be <code>null</code>.
+     */
+    private final Message message;
+
+    /**
      * Creates a new optional message event.
      *
      * @param api The discord api instance.
@@ -22,6 +27,7 @@ public abstract class OptionalMessageEvent extends MessageEvent {
      */
     public OptionalMessageEvent(DiscordApi api, long messageId, TextChannel channel) {
         super(api, messageId, channel);
+        message = api.getCachedMessageById(messageId).orElse(null);
     }
 
     /**
@@ -30,8 +36,7 @@ public abstract class OptionalMessageEvent extends MessageEvent {
      * @return The message from the cache.
      */
     public Optional<Message> getMessage() {
-        // TODO
-        return Optional.empty();
+        return Optional.ofNullable(message);
     }
 
     /**
