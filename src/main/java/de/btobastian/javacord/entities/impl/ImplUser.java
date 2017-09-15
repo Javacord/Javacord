@@ -139,6 +139,11 @@ public class ImplUser implements User {
     }
 
     @Override
+    public boolean isYourself(){
+        return this == api.getYourself();
+    }
+
+    @Override
     public DiscordApi getApi() {
         return api;
     }

@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -47,6 +48,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return The new (or old) private channel with the user.
      */
     CompletableFuture<PrivateChannel> openPrivateChannel();
+
+    /**
+     * Gets Whether this user is the user connected to the Discord API.
+     * Calls {@link DiscordApi#getYourself()} to get the connected user.
+     *
+     * @return Whether the user is the user representing the account connected to the Discord API.
+     */
+    boolean isYourself();
 
     /**
      * Adds a listener, which listens to message creates from this user.

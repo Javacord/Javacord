@@ -94,6 +94,11 @@ public class ImplDiscordApi implements DiscordApi {
     private final int totalShards;
 
     /**
+     * A user representing the connected account.
+     */
+    private User you;
+
+    /**
      * A map which contains all users.
      */
     private final ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
@@ -366,6 +371,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public Optional<Game> getGame() {
         return Optional.ofNullable(game);
+    }
+
+    @Override
+    public User getYourself(){
+        return you;
+    }
+
+    public void setYourself(User yourself){
+        you = yourself;
     }
 
     @Override
