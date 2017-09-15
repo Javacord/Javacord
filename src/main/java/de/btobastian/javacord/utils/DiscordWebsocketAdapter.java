@@ -182,15 +182,34 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     sessionId = packet.getJSONObject("d").getString("session_id");
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("startupWait").submit(() -> {
-                        int amount = api.getServers().size();
-                        for (;;) {
-                            try {
-                                Thread.sleep(1500);
-                            } catch (InterruptedException ignored) { }
-                            if (api.getServers().size() <= amount && lastGuildMembersChunkReceived + 1500 < System.currentTimeMillis()) {
-                                break; // 1.5 seconds without new servers becoming available and no GUILD_MEMBERS_CHUNK packet
+                        boolean allUsersLoaded = false;
+                        boolean allServersLoaded = false;
+                        int lastUnavailableServerAmount = 0;
+                        int sameUnavailableServerCounter = 0;
+                        while (!allServersLoaded || !allUsersLoaded) {
+                            if (api.getUnavailableServers().size() == lastUnavailableServerAmount) {
+                                sameUnavailableServerCounter++;
+                            } else {
+                                lastUnavailableServerAmount = api.getUnavailableServers().size();
+                                sameUnavailableServerCounter = 0;
                             }
-                            amount = api.getServers().size();
+                            allServersLoaded = api.getUnavailableServers().isEmpty();
+                            if (allServersLoaded) {
+                                allUsersLoaded = !api.getServers().stream()
+                                        .filter(server -> server.getMemberCount() != server.getMembers().size())
+                                        .findAny().isPresent();
+                            }
+                            if (sameUnavailableServerCounter > 20
+                                    && lastGuildMembersChunkReceived + 5000 < System.currentTimeMillis()) {
+                                // It has been more than two seconds since no more servers became available and more
+                                // than five seconds since the last guild member chunk event was received. We
+                                // can assume that this will not change anytime soon, most likely because Discord
+                                // itself has some issues. Let's break the loop!
+                                break;
+                            }
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException ignored) { }
                         }
                         ready.complete(true);
                     });
