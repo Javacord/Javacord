@@ -36,6 +36,16 @@ public class ThreadPool {
     }
 
     /**
+     * Shutdowns the thread pool.
+     * This method is called automatically after disconnecting.
+     */
+    public void shutdown() {
+        executorService.shutdown();
+        scheduler.shutdown();
+        executorServiceSingeThreads.values().forEach(ExecutorService::shutdown);
+    }
+
+    /**
      * Gets an executor service which only uses a single thread.
      *
      * @param id The id of the executor service. Will create a new one if the id is used the first time.

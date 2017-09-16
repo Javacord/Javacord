@@ -382,6 +382,7 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public void disconnect() {
         websocketAdapter.disconnect();
+        threadPool.shutdown();
     }
 
     @Override
