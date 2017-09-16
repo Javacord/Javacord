@@ -95,7 +95,7 @@ public class ImplDiscordApi implements DiscordApi {
     private final int totalShards;
 
     /**
-     * A user representing the connected account.
+     * The user of the connected account.
      */
     private User you;
 
@@ -239,6 +239,15 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
+     * Sets the user of the connected account.
+     *
+     * @param yourself The user of the connected account.
+     */
+    public void setYourself(User yourself){
+        you = yourself;
+    }
+
+    /**
      * Gets a user or creates a new one from the given data.
      *
      * @param data The json data of the user.
@@ -377,10 +386,6 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public User getYourself(){
         return you;
-    }
-
-    public void setYourself(User yourself){
-        you = yourself;
     }
 
     @Override

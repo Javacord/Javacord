@@ -127,10 +127,10 @@ public interface DiscordApi {
     Optional<Game> getGame();
 
     /**
-     * Gets a user representing the account connected to the Discord API.
-     * This may be a bot user (for normal bots), or a regular user (for self-bots).
+     * Gets a user of the connected account.
+     * This may be a bot user (for normal bots), or a regular user (for client-bots).
      *
-     * @return A user representing the connected account.
+     * @return The user of the connected account.
      */
     User getYourself();
 
