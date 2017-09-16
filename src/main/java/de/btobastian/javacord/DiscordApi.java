@@ -127,6 +127,14 @@ public interface DiscordApi {
     Optional<Game> getGame();
 
     /**
+     * Gets a user of the connected account.
+     * This may be a bot user (for normal bots), or a regular user (for client-bots).
+     *
+     * @return The user of the connected account.
+     */
+    User getYourself();
+
+    /**
      * Disconnects the bot.
      * After disconnecting you should NOT use this instance again.
      */

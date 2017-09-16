@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -29,6 +30,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default Optional<String> getNickname(Server server) {
         return server.getNickname(this);
+    }
+
+    /**
+     * Gets if this user is the user of the connected account.
+     *
+     * @return Whether this user is the user of the connected account or not.
+     * @see DiscordApi#getYourself()
+     */
+    default boolean isYourself() {
+        return this == getApi().getYourself();
     }
 
     /**
