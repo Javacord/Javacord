@@ -58,7 +58,6 @@ public class ImplMessageCache implements MessageCache {
      */
     public void addMessage(Message message) {
         synchronized (messages) {
-            api.addMessageToCache(message);
             if (messages.contains(message)) {
                 return;
             }
@@ -92,7 +91,6 @@ public class ImplMessageCache implements MessageCache {
                     continue;
                 }
                 if (messages.size() > capacity + foreverCachedAmount || message.getCreationDate().isBefore(minAge)) {
-                    api.removeMessageFromCache(message.getId());
                     iterator.remove();
                 } else {
                     // No need to keep iterating as the list is ordered.

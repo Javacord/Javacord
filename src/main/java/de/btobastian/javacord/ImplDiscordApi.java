@@ -21,7 +21,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListen
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
-import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -29,9 +28,12 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -111,14 +113,10 @@ public class ImplDiscordApi implements DiscordApi {
 
     /**
      * A map with all cached messages.
-     * Removal of messages is handled by the {@link ImplMessageCache} class.
+     * The values use weak references as the strong references are hold inside the
+     * {@link de.btobastian.javacord.utils.cache.MessageCache} classes.
      */
-    private final ConcurrentHashMap<Long, Message> messages = new ConcurrentHashMap<>();
-
-    /**
-     * An addition map which contains weak references of messages.
-     */
-    private final WeakHashMap<Long, Message> weakMessages = new WeakHashMap<>();
+    private final ConcurrentHashMap<Long, WeakReference<Message>> weakMessages = new ConcurrentHashMap<>();
 
     /**
      * A map which contains all listeners.
@@ -167,6 +165,10 @@ public class ImplDiscordApi implements DiscordApi {
                                     new IllegalStateException("Websocket closed before READY packet was received!"));
                         }
                     });
+
+                    getThreadPool().getScheduler().scheduleAtFixedRate(
+                            () -> weakMessages.entrySet().removeIf(entry -> entry.getValue().get() == null)
+                            , 30, 30, TimeUnit.SECONDS);
                 });
     }
 
@@ -216,24 +218,6 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
-     * Adds a message to the cache.
-     *
-     * @param message The message to add.
-     */
-    public void addMessageToCache(Message message) {
-        messages.put(message.getId(), message);
-    }
-
-    /**
-     * Removes a message from the cache.
-     *
-     * @param id The message to remove.
-     */
-    public void removeMessageFromCache(long id) {
-        messages.remove(id);
-    }
-
-    /**
      * Gets a user or creates a new one from the given data.
      *
      * @param data The json data of the user.
@@ -261,7 +245,14 @@ public class ImplDiscordApi implements DiscordApi {
     public Message getOrCreateMessage(TextChannel channel, JSONObject data) {
         long id = Long.parseLong(data.getString("id"));
         synchronized (weakMessages) {
-            return weakMessages.computeIfAbsent(id, key -> new ImplMessage(this, channel, data));
+            WeakReference<Message> value = weakMessages.get(id);
+            Message message = value != null ? value.get() : null;
+            if (message == null) {
+                weakMessages.remove(id);
+                message = new ImplMessage(this, channel, data);
+                weakMessages.put(id, new WeakReference<>(message));
+            }
+            return message;
         }
     }
 
@@ -397,12 +388,16 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public Collection<Message> getCachedMessages() {
-        return messages.values();
+        return weakMessages.values().stream()
+                .map(Reference::get)
+                .filter(message -> message != null)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
     public Optional<Message> getCachedMessageById(long id) {
-        return Optional.ofNullable(messages.get(id));
+        WeakReference<Message> message = weakMessages.get(id);
+        return Optional.ofNullable(message == null ? null : message.get());
     }
 
     @Override
