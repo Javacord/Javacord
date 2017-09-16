@@ -202,6 +202,7 @@ public class ImplMessage implements Message {
     @Override
     public void addMessageDeleteListener(MessageDeleteListener listener) {
         addListener(MessageDeleteListener.class, listener);
+        setCachedForever(true);
     }
 
     @Override
