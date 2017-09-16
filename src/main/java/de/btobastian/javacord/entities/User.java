@@ -33,6 +33,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     }
 
     /**
+     * Gets if this user is the user of the connected account.
+     *
+     * @return Whether this user is the user of the connected account or not.
+     * @see DiscordApi#getYourself()
+     */
+    default boolean isYourself() {
+        return this == getApi().getYourself();
+    }
+
+    /**
      * Gets the private channel with the user.
      * This will only be present, if there was an conversation with the user in the past or you manually opened a
      * private channel with the given user, using {@link #openPrivateChannel()}.
@@ -48,14 +58,6 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return The new (or old) private channel with the user.
      */
     CompletableFuture<PrivateChannel> openPrivateChannel();
-
-    /**
-     * Gets whether this user is the user connected to the Discord API.
-     * Calls {@link DiscordApi#getYourself()} to get the connected user.
-     *
-     * @return Whether the user is the user representing the account connected to the Discord API.
-     */
-    boolean isYourself();
 
     /**
      * Adds a listener, which listens to message creates from this user.
