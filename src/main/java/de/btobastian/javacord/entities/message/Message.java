@@ -8,11 +8,13 @@ import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Optional;
@@ -102,6 +104,47 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default Optional<GroupChannel> getGroupChannel() {
         return Optional.ofNullable(getChannel() instanceof GroupChannel ? (GroupChannel) getChannel() : null);
+    }
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param content The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> edit(String content) {
+        return edit(content, null);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> edit(EmbedBuilder embed) {
+        return edit(null, embed);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param content The new content of the message.
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> edit(String content, EmbedBuilder embed) {
+        JSONObject body = new JSONObject();
+        if (content != null) {
+            body.put("content", content);
+        }
+        if (embed != null) {
+            body.put("embed", embed.toJSONObject());
+        }
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.MESSAGE)
+                .setUrlParameters(String.valueOf(getChannel().getId()) ,String.valueOf(getId()))
+                .setBody(body)
+                .execute(res -> null);
     }
 
     /**
