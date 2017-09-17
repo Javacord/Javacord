@@ -12,6 +12,7 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
+import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
@@ -518,5 +519,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<MessageDeleteListener> getMessageDeleteListeners() {
         return getListeners(MessageDeleteListener.class);
+    }
+
+    @Override
+    public void addMessageEditListener(MessageEditListener listener) {
+        addListener(MessageEditListener.class, listener);
+    }
+
+    @Override
+    public List<MessageEditListener> getMessageEditListeners() {
+        return getListeners(MessageEditListener.class);
     }
 }

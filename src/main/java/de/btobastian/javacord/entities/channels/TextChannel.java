@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
+import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -87,5 +88,19 @@ public interface TextChannel extends Channel, Messageable {
      * @return A list with all registered message delete listeners.
      */
     List<MessageDeleteListener> getMessageDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to message edits in this channel.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageEditListener(MessageEditListener listener);
+
+    /**
+     * Gets a list with all registered message edit listeners.
+     *
+     * @return A list with all registered message edit listeners.
+     */
+    List<MessageEditListener> getMessageEditListeners();
 
 }

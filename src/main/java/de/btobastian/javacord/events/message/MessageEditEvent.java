@@ -2,9 +2,9 @@ package de.btobastian.javacord.events.message;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +19,19 @@ public class MessageEditEvent extends OptionalMessageEvent {
     private final String newContent;
 
     /**
+     * The old content of the message. May be <code>null</code>!
+     */
+    private final String oldContent;
+
+    /**
      * The new embeds of the message.
      */
     private final List<Embed> newEmbeds;
+
+    /**
+     * The old embeds of the message. May be <code>null</code>!
+     */
+    private final List<Embed> oldEmbeds;
 
     /**
      * Creates a new message edit event.
@@ -31,11 +41,18 @@ public class MessageEditEvent extends OptionalMessageEvent {
      * @param channel The text channel in which the message was sent.
      * @param newContent The new content of the message.
      * @param newEmbeds The new embeds of the message.
+     * @param oldContent The old content of the message.
+     * @param oldEmbeds The old embeds of the message.
      */
-    public MessageEditEvent(DiscordApi api, long messageId, TextChannel channel, String newContent, List<Embed> newEmbeds) {
+    public MessageEditEvent(
+            DiscordApi api, long messageId, TextChannel channel, String newContent, List<Embed> newEmbeds,
+            String oldContent, List<Embed> oldEmbeds)
+    {
         super(api, messageId, channel);
         this.newContent = newContent;
         this.newEmbeds = newEmbeds;
+        this.oldContent = oldContent;
+        this.oldEmbeds = oldEmbeds;
     }
 
     /**
@@ -44,7 +61,7 @@ public class MessageEditEvent extends OptionalMessageEvent {
      * @return The new content of the message.
      */
     public String getNewContent() {
-        return newContent;
+        return newContent == null ? "" : newContent;
     }
 
     /**
@@ -53,7 +70,7 @@ public class MessageEditEvent extends OptionalMessageEvent {
      * @return The old content of the message.
      */
     public Optional<String> getOldContent() {
-        return getMessage().map(Message::getContent);
+        return Optional.ofNullable(oldContent);
     }
 
     /**
@@ -62,7 +79,7 @@ public class MessageEditEvent extends OptionalMessageEvent {
      * @return The new embeds of the message.
      */
     public List<Embed> getNewEmbeds() {
-        return newEmbeds;
+        return newEmbeds == null ? Collections.emptyList() : newEmbeds;
     }
 
     /**
@@ -71,7 +88,7 @@ public class MessageEditEvent extends OptionalMessageEvent {
      * @return The old embeds of the message.
      */
     public Optional<List<Embed>> getOldEmbeds() {
-        return getMessage().map(Message::getEmbeds);
+        return Optional.ofNullable(oldEmbeds);
     }
 
 }

@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
+import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,7 +43,7 @@ public class ImplMessage implements Message {
     /**
      * The content of the message.
      */
-    private final String content;
+    private String content;
 
     /**
      * A map which contains all listeners.
@@ -68,7 +69,7 @@ public class ImplMessage implements Message {
     /**
      * A list with all embeds.
      */
-    private final ArrayList<Embed> embeds = new ArrayList<>();
+    private List<Embed> embeds = new ArrayList<>();
 
     /**
      * Creates a new message object.
@@ -100,6 +101,24 @@ public class ImplMessage implements Message {
             Embed embed = new ImplEmbed(embeds.getJSONObject(i));
             this.embeds.add(embed);
         }
+    }
+
+    /**
+     * Sets the content of the message.
+     *
+     * @param content The content to set.
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * Sets the embeds of the message.
+     *
+     * @param embeds The embeds to set.
+     */
+    public void setEmbeds(List<Embed> embeds) {
+        this.embeds = embeds;
     }
 
     /**
@@ -208,5 +227,15 @@ public class ImplMessage implements Message {
     @Override
     public List<MessageDeleteListener> getMessageDeleteListeners() {
         return getListeners(MessageDeleteListener.class);
+    }
+
+    @Override
+    public void addMessageEditListener(MessageEditListener listener) {
+        addListener(MessageEditListener.class, listener);
+    }
+
+    @Override
+    public List<MessageEditListener> getMessageEditListeners() {
+        return getListeners(MessageEditListener.class);
     }
 }

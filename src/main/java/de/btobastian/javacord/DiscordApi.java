@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
+import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
@@ -649,5 +650,19 @@ public interface DiscordApi {
      * @return A list with all registered message delete listeners.
      */
     List<MessageDeleteListener> getMessageDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to message edits.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageEditListener(MessageEditListener listener);
+
+    /**
+     * Gets a list with all registered message edit listeners.
+     *
+     * @return A list with all registered message edit listeners.
+     */
+    List<MessageEditListener> getMessageEditListeners();
 
 }

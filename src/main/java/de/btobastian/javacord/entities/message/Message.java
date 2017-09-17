@@ -10,6 +10,7 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
+import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
@@ -131,5 +132,19 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A list with all registered message delete listeners.
      */
     List<MessageDeleteListener> getMessageDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to this message being edited.
+     *
+     * @param listener The listener to add.
+     */
+    void addMessageEditListener(MessageEditListener listener);
+
+    /**
+     * Gets a list with all registered message edit listeners.
+     *
+     * @return A list with all registered message edit listeners.
+     */
+    List<MessageEditListener> getMessageEditListeners();
 
 }
