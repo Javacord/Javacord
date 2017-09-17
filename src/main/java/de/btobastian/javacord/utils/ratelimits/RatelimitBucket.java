@@ -1,10 +1,14 @@
 package de.btobastian.javacord.utils.ratelimits;
 
+import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 
 import java.util.Optional;
 
 public class RatelimitBucket {
+
+    private final ImplDiscordApi api;
 
     private final RestEndpoint endpoint;
     private final String majorUrlParameter;
@@ -14,11 +18,12 @@ public class RatelimitBucket {
 
     private boolean hasActiveScheduler = false;
 
-    public RatelimitBucket(RestEndpoint endpoint) {
-        this(endpoint, null);
+    public RatelimitBucket(DiscordApi api, RestEndpoint endpoint) {
+        this(api, endpoint, null);
     }
 
-    public RatelimitBucket(RestEndpoint endpoint, String majorUrlParameter) {
+    public RatelimitBucket(DiscordApi api, RestEndpoint endpoint, String majorUrlParameter) {
+        this.api = (ImplDiscordApi) api;
         if (endpoint.isGlobal()) {
             endpoint = null;
         }
@@ -39,7 +44,8 @@ public class RatelimitBucket {
         }
         boolean endpointSame = this.endpoint == endpoint;
         boolean majorUrlParameterBothNull = this.majorUrlParameter == null && majorUrlParameter == null;
-        boolean majorUrlParameterEqual = this.majorUrlParameter != null && this.majorUrlParameter.equals(majorUrlParameter);
+        boolean majorUrlParameterEqual =
+                this.majorUrlParameter != null && this.majorUrlParameter.equals(majorUrlParameter);
 
         return endpointSame && (majorUrlParameterBothNull || majorUrlParameterEqual);
     }
@@ -78,10 +84,8 @@ public class RatelimitBucket {
      * @return Whether you can send requests without being ratelimited or not.
      */
     public boolean hasSpace() {
-        if (rateLimitResetTimestamp < System.currentTimeMillis() / 1000) {
-            return true;
-        }
-        return rateLimitRemaining > 0;
+        long timestamp = (System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset())) / 1000;
+        return rateLimitRemaining > 0 || rateLimitResetTimestamp < timestamp;
     }
 
     /**
@@ -111,7 +115,8 @@ public class RatelimitBucket {
         if (rateLimitRemaining > 0) {
             return 0;
         }
-        return rateLimitResetTimestamp - ((int) (System.currentTimeMillis() / 1000));
+        long timestamp = System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset());
+        return (int) (rateLimitResetTimestamp * 1000 - timestamp);
     }
 
     @Override

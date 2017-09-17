@@ -54,13 +54,14 @@ public class RatelimitManager {
                 .parallelStream()
                 .filter(b -> b.equals(request.getEndpoint(), request.getMajorUrlParameter().orElse(null)))
                 .findAny()
-                .orElse(new RatelimitBucket(request.getEndpoint(), request.getMajorUrlParameter().orElse(null)));
+                .orElse(new RatelimitBucket(api, request.getEndpoint(), request.getMajorUrlParameter().orElse(null)));
 
         // Add bucket to list with buckets
         buckets.add(bucket);
 
         // Get the queue for the current bucket or create a new one if there's no one already
-        ConcurrentLinkedQueue<RestRequest<?>> queue = queues.computeIfAbsent(bucket, k -> new ConcurrentLinkedQueue<>());
+        ConcurrentLinkedQueue<RestRequest<?>> queue =
+                queues.computeIfAbsent(bucket, k -> new ConcurrentLinkedQueue<>());
 
         // Add the request to the queue and check if there's already a scheduler working on the queue
         boolean startScheduler = false;
@@ -89,8 +90,8 @@ public class RatelimitManager {
                         queue.removeIf(req -> {
                             if (req.incrementRetryCounter()) {
                                 req.getResult().completeExceptionally(
-                                        new RatelimitException("You have been ratelimited and ran out of retires!"
-                                                , null, req)
+                                        new RatelimitException("You have been ratelimited and ran out of retires!",
+                                                null, req)
                                 );
                                 return true;
                             }
@@ -101,8 +102,7 @@ public class RatelimitManager {
                         }
                     }
                     try {
-                        Thread.sleep(bucket.getTimeTillSpaceGetsAvailable() * 1000
-                                + (api.getTimeOffset() == null ? 0 : api.getTimeOffset()));
+                        Thread.sleep(bucket.getTimeTillSpaceGetsAvailable());
                     } catch (InterruptedException e) {
                         logger.warn("We got interrupted while waiting for a rate limit!", e);
                     }
@@ -132,7 +132,7 @@ public class RatelimitManager {
                         if (date != null) {
                             long discordTimestamp = OffsetDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
                                     .toInstant().toEpochMilli();
-                            api.setTimeOffset(currentTime - discordTimestamp);
+                            api.setTimeOffset((discordTimestamp - currentTime));
                             logger.debug("Calculated an offset of " + api.getTimeOffset() + " to the Discord time.");
                         }
                     }
