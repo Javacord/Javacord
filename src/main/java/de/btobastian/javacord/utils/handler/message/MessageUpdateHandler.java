@@ -36,8 +36,10 @@ public class MessageUpdateHandler extends PacketHandler {
      */
     public MessageUpdateHandler(DiscordApi api) {
         super(api, true, "MESSAGE_UPDATE");
+        long offset = this.api.getTimeOffset() == null ? 0 : this.api.getTimeOffset();
         api.getThreadPool().getScheduler().scheduleAtFixedRate(
-                () -> lastKnownEditTimestamps.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue() > 5000)
+                () -> lastKnownEditTimestamps.entrySet().removeIf(
+                        entry -> System.currentTimeMillis() + offset - entry.getValue() > 5000)
                 , 1, 1, TimeUnit.MINUTES);
     }
 
@@ -51,7 +53,8 @@ public class MessageUpdateHandler extends PacketHandler {
 
             MessageEditEvent editEvent = null;
             if (packet.has("edited_timestamp") && !packet.isNull("edited_timestamp")) {
-                long editTimestamp = OffsetDateTime.parse(packet.getString("edited_timestamp")).toInstant().toEpochMilli();
+                long editTimestamp = 
+                        OffsetDateTime.parse(packet.getString("edited_timestamp")).toInstant().toEpochMilli();
                 long lastKnownEditTimestamp = lastKnownEditTimestamps.getOrDefault(messageId, 0L);
                 lastKnownEditTimestamps.put(messageId, editTimestamp);
 
