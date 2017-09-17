@@ -160,6 +160,7 @@ public class ImplDiscordApi implements DiscordApi {
         }
 
         new RestRequest<String>(this, HttpMethod.GET, endpoint)
+                .includeAuthorizationHeader(accountType == AccountType.BOT)
                 .execute(res -> res.getBody().getObject().getString("url"))
                 .whenComplete((gateway, t) -> {
                     if (t != null) {
