@@ -9,6 +9,7 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
+import de.btobastian.javacord.exceptions.MissingPermissionsException;
 import de.btobastian.javacord.exceptions.RatelimitException;
 import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import org.json.JSONArray;
@@ -275,8 +276,14 @@ public class RestRequest<T> {
             switch (response.getStatus()) {
                 case 401:
                     throw new RatelimitException("Received 429 from Discord!", response, this);
+                case 403:
+                    throw new MissingPermissionsException(
+                            "Received a " + response.getStatus() + " response from Discord with body "
+                                    + response.getBody().toString() + "!", response, this);
                 default:
-                    throw new DiscordException("Received a " + response.getStatus() + " response from Discord with body " + response.getBody().toString() + "!", response, this);
+                    throw new DiscordException(
+                            "Received a " + response.getStatus() + " response from Discord with body "
+                                    + response.getBody().toString() + "!", response, this);
             }
         }
         return response;
