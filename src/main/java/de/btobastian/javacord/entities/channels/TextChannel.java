@@ -41,6 +41,19 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Displays the "xyz is typing..." message.
+     * The message automatically disappears after 5 seconds or after sending a message.
+     *
+     * @return A future to check for exceptions.
+     */
+    default CompletableFuture<Void> type() {
+        return new RestRequest<Void>(getApi(), HttpMethod.POST, RestEndpoint.CHANNEL_TYPING)
+                .setRatelimitRetries(0)
+                .setUrlParameters(String.valueOf(getId()))
+                .execute(res -> null);
+    }
+
+    /**
      * Gets the message cache for the channel.
      *
      * @return The message cache for the channel.
