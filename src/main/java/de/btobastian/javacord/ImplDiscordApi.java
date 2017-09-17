@@ -103,6 +103,11 @@ public class ImplDiscordApi implements DiscordApi {
     private User you;
 
     /**
+     * The time offset between the Discord time and our local time.
+     */
+    private Long timeOffset = null;
+
+    /**
      * A map which contains all users.
      */
     private final ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
@@ -230,6 +235,25 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public void setYourself(User yourself){
         you = yourself;
+    }
+
+    /**
+     * Gets the time offset between the Discord time and our local time.
+     * Might be <code>null</code> if it hasn't been calculated yet.
+     *
+     * @return The time offset between the Discord time and our local time.
+     */
+    public Long getTimeOffset() {
+        return timeOffset;
+    }
+
+    /**
+     * Sets the time offset between the Discord time and our local time.
+     *
+     * @param timeOffset The time offset to set.
+     */
+    public void setTimeOffset(Long timeOffset) {
+        this.timeOffset = timeOffset;
     }
 
     /**

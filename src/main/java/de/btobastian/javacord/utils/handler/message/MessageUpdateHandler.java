@@ -56,9 +56,10 @@ public class MessageUpdateHandler extends PacketHandler {
                 lastKnownEditTimestamps.put(messageId, editTimestamp);
 
                 boolean isMostLikelyAnEdit = true;
+                long offset = api.getTimeOffset() == null ? 0 : api.getTimeOffset();
                 if (editTimestamp == lastKnownEditTimestamp) {
                     isMostLikelyAnEdit = false;
-                } else if (System.currentTimeMillis() - editTimestamp > 5000) {
+                } else if (System.currentTimeMillis() + offset - editTimestamp > 5000) {
                     isMostLikelyAnEdit = false;
                 }
 

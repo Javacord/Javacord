@@ -3,6 +3,7 @@ package de.btobastian.javacord.utils.ratelimits;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.exceptions.RatelimitException;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -30,12 +31,7 @@ public class RatelimitManager {
     private final Set<RatelimitBucket> buckets = ConcurrentHashMap.newKeySet();
     private final HashMap<RatelimitBucket, ConcurrentLinkedQueue<RestRequest<?>>> queues = new HashMap<>();
 
-    private final DiscordApi api;
-
-    /**
-     * The time offset between the Discord time and our local time.
-     */
-    private Long timeOffset = null;
+    private final ImplDiscordApi api;
 
     /**
      * Creates a new ratelimit manager for the given api.
@@ -43,7 +39,7 @@ public class RatelimitManager {
      * @param api The api instance of the bot.
      */
     public RatelimitManager(DiscordApi api) {
-        this.api = api;
+        this.api = (ImplDiscordApi) api;
     }
 
     /**
@@ -93,7 +89,8 @@ public class RatelimitManager {
                         queue.removeIf(req -> {
                             if (req.incrementRetryCounter()) {
                                 req.getResult().completeExceptionally(
-                                        new RatelimitException("You have been ratelimited and ran out of retires!", null, req)
+                                        new RatelimitException("You have been ratelimited and ran out of retires!"
+                                                , null, req)
                                 );
                                 return true;
                             }
@@ -104,7 +101,8 @@ public class RatelimitManager {
                         }
                     }
                     try {
-                        Thread.sleep(bucket.getTimeTillSpaceGetsAvailable() * 1000 + (timeOffset == null ? 0 : timeOffset));
+                        Thread.sleep(bucket.getTimeTillSpaceGetsAvailable() * 1000
+                                + (api.getTimeOffset() == null ? 0 : api.getTimeOffset()));
                     } catch (InterruptedException e) {
                         logger.warn("We got interrupted while waiting for a rate limit!", e);
                     }
@@ -127,15 +125,15 @@ public class RatelimitManager {
                         bucket.getEndpoint().ifPresent(endpoint -> endpoint.setGlobal(true));
                     }
 
-                    if (timeOffset == null) {
+                    if (api.getTimeOffset() == null) {
                         // Discord sends the date in their header in the format RFC_1123_DATE_TIME
                         // We use this header to calculate a possible offset between our local time and the discord time
                         String date = response.getHeaders().getFirst("Date");
                         if (date != null) {
                             long discordTimestamp = OffsetDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
                                     .toInstant().toEpochMilli();
-                            timeOffset = currentTime - discordTimestamp;
-                            logger.debug("Calculated an offset of " + timeOffset + " to the Discord time.");
+                            api.setTimeOffset(currentTime - discordTimestamp);
+                            logger.debug("Calculated an offset of " + api.getTimeOffset() + " to the Discord time.");
                         }
                     }
 
