@@ -109,7 +109,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     }
 
     @Override
-    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
+                               WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
         if (closedByServer) {
             logger.info("Websocket closed with reason {} and code {} by server!",
                     serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
@@ -144,7 +145,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             if (ratelimitQueue.size() > reconnectAttempts) {
                 long timestamp = ratelimitQueue.poll();
                 if (System.currentTimeMillis() - (1000*ratelimitResetIntervalInSeconds) < timestamp) {
-                    logger.error("Websocket connection failed more than {} times in the last {} seconds! Stopping reconnecting.", reconnectAttempts, ratelimitResetIntervalInSeconds);
+                    logger.error("Websocket connection failed more than {} times in the last {} seconds!" +
+                            " Stopping reconnecting.", reconnectAttempts, ratelimitResetIntervalInSeconds);
                     return;
                 }
             }
@@ -447,7 +449,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         switch (cause.getMessage()) {
             case "Flushing frames to the server failed: Connection closed by remote host":
             case "Flushing frames to the server failed: Socket is closed":
-            case "Flushing frames to the server failed: Connection has been shutdown: javax.net.ssl.SSLException: java.net.SocketException: Connection reset":
+            case "Flushing frames to the server failed: Connection has been shutdown: javax.net.ssl.SSLException:" +
+                    " java.net.SocketException: Connection reset":
             case "An I/O error occurred while a frame was being read from the web socket: Connection reset":
                 break;
             default:

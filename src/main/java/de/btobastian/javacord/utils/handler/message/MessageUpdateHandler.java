@@ -53,7 +53,7 @@ public class MessageUpdateHandler extends PacketHandler {
 
             MessageEditEvent editEvent = null;
             if (packet.has("edited_timestamp") && !packet.isNull("edited_timestamp")) {
-                long editTimestamp = 
+                long editTimestamp =
                         OffsetDateTime.parse(packet.getString("edited_timestamp")).toInstant().toEpochMilli();
                 long lastKnownEditTimestamp = lastKnownEditTimestamps.getOrDefault(messageId, 0L);
                 lastKnownEditTimestamps.put(messageId, editTimestamp);
@@ -106,7 +106,8 @@ public class MessageUpdateHandler extends PacketHandler {
                 }
 
                 if (isMostLikelyAnEdit) {
-                    editEvent = new MessageEditEvent(api, messageId, channel, newContent, newEmbeds, oldContent, oldEmbeds);
+                    editEvent =
+                            new MessageEditEvent(api, messageId, channel, newContent, newEmbeds, oldContent, oldEmbeds);
                 }
             }
 
