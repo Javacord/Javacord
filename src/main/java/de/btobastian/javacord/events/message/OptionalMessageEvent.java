@@ -43,15 +43,15 @@ public abstract class OptionalMessageEvent extends MessageEvent {
      * Requests a message from Discord, if it's not cached.
      *
      * @return The message either from the cache or directly from Discord.
+     * @see TextChannel#getMessageById(long)
      */
     public CompletableFuture<Message> requestMessage() {
-        CompletableFuture<Message> future = new JavacordCompletableFuture<>();
         Optional<Message> message = getMessage();
-        message.ifPresent(future::complete);
         if (!message.isPresent()) {
-            // TODO request message
-            future.completeExceptionally(new IllegalStateException("Not implemented atm!"));
+            getChannel().getMessageById(getMessageId());
         }
+        CompletableFuture<Message> future = new JavacordCompletableFuture<>();
+        message.ifPresent(future::complete);
         return future;
     }
 

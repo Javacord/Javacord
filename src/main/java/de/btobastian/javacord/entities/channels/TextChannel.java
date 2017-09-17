@@ -54,6 +54,34 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Gets a message by it's id.
+     *
+     * @param id The id of the message.
+     * @return The message with the given id.
+     */
+    default CompletableFuture<Message> getMessageById(long id) {
+        return getApi().getCachedMessageById(id)
+                .map(CompletableFuture::completedFuture)
+                .orElseGet(() -> new RestRequest<Message>(getApi(), HttpMethod.GET, RestEndpoint.MESSAGE)
+                .setUrlParameters(String.valueOf(getId()), String.valueOf(id))
+                .execute(res -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, res.getBody().getObject())));
+    }
+
+    /**
+     * Gets a message by it's id.
+     *
+     * @param id The id of the message.
+     * @return The message with the given id.
+     */
+    default CompletableFuture<Message> getMessageById(String id) {
+        try {
+            return getMessageById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return getMessageById(-1);
+        }
+    }
+
+    /**
      * Gets the message cache for the channel.
      *
      * @return The message cache for the channel.

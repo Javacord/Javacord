@@ -3,7 +3,14 @@ package de.btobastian.javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.channels.Channel;
+import de.btobastian.javacord.entities.channels.GroupChannel;
+import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.channels.VoiceChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -23,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -214,6 +222,30 @@ public interface DiscordApi {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a message by it's id.
+     *
+     * @param id The id of the message.
+     * @param channel The channel of the message.
+     * @return The message with the given id.
+     * @see TextChannel#getMessageById(long)
+     */
+    default CompletableFuture<Message> getMessageById(long id, TextChannel channel) {
+        return channel.getMessageById(id);
+    }
+
+    /**
+     * Gets a message by it's id.
+     *
+     * @param id The id of the message.
+     * @param channel The channel of the message.
+     * @return The message with the given id.
+     * @see TextChannel#getMessageById(String)
+     */
+    default CompletableFuture<Message> getMessageById(String id, TextChannel channel) {
+        return channel.getMessageById(id);
     }
 
     /**
