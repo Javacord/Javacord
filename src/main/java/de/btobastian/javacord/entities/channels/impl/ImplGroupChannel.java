@@ -13,6 +13,7 @@ import de.btobastian.javacord.utils.cache.MessageCache;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,6 +38,11 @@ public class ImplGroupChannel implements GroupChannel {
      * The name of the channel.
      */
     private String name;
+
+    /**
+     * The icon id of the channel.
+     */
+    private String iconId;
 
     /**
      * The recipients of the group channel.
@@ -71,6 +77,7 @@ public class ImplGroupChannel implements GroupChannel {
 
         id = Long.parseLong(data.getString("id"));
         name = data.has("name") && !data.isNull("name") ? data.getString("name") : null;
+        iconId = data.has("icon") && !data.isNull("icon") ? data.getString("icon") : null;
 
         api.addGroupChannelToCache(this);
     }
@@ -116,8 +123,15 @@ public class ImplGroupChannel implements GroupChannel {
 
     @Override
     public Optional<URL> getIconUrl() {
-        // TODO
-        return Optional.empty();
+        if (iconId == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new URL("https://cdn.discordapp.com/channel-icons/" + getId() + "/" + iconId + ".png"));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            return null;
+        }
     }
 
     @Override
