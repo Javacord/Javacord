@@ -5,6 +5,7 @@ import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
@@ -118,6 +119,11 @@ public class ImplDiscordApi implements DiscordApi {
     private final ConcurrentHashMap<Long, Server> servers = new ConcurrentHashMap<>();
 
     /**
+     * A map which contains all group channels.
+     */
+    private final ConcurrentHashMap<Long, GroupChannel> groupChannels = new ConcurrentHashMap<>();
+
+    /**
      * A set with all unavailable servers.
      */
     private final HashSet<Long> unavailableServers = new HashSet<>();
@@ -209,6 +215,15 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public void addUserToCache(User user) {
         users.put(user.getId(), user);
+    }
+
+    /**
+     * Adds a group channel to the cache.
+     *
+     * @param channel The channel to add.
+     */
+    public void addGroupChannelToCache(GroupChannel channel) {
+        groupChannels.put(channel.getId(), channel);
     }
 
     /**
@@ -454,6 +469,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public Optional<Server> getServerById(long id) {
         return Optional.ofNullable(servers.get(id));
+    }
+
+    @Override
+    public Collection<GroupChannel> getGroupChannels() {
+        return groupChannels.values();
+    }
+
+    @Override
+    public Optional<GroupChannel> getGroupChannelById(long id) {
+        return Optional.ofNullable(groupChannels.get(id));
     }
 
     @Override

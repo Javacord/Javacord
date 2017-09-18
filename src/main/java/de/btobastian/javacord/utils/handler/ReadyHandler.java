@@ -1,6 +1,7 @@
 package de.btobastian.javacord.utils.handler;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.channels.impl.ImplGroupChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -38,9 +39,16 @@ public class ReadyHandler extends PacketHandler {
         if (packet.has("private_channels")) {
             JSONArray privateChannels = packet.getJSONArray("private_channels");
             for (int i = 0; i < privateChannels.length(); i++) {
-                // TODO this also contains group channels -> Use ImplGroupChannel instead if it's one
-                JSONObject privateChannel = privateChannels.getJSONObject(i);
-                new ImplPrivateChannel(api, privateChannel);
+                JSONObject channel = privateChannels.getJSONObject(i);
+                switch (channel.getInt("type")) {
+                    case 1:
+                        new ImplPrivateChannel(api, channel);
+                        break;
+                    case 3:
+                        new ImplGroupChannel(api, channel);
+                        break;
+                }
+
             }
         }
 

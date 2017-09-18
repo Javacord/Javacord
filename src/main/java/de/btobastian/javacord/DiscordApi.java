@@ -3,14 +3,7 @@ package de.btobastian.javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.Channel;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.channels.VoiceChannel;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -299,9 +292,7 @@ public interface DiscordApi {
      *
      * @return A collection with all group channels of the bot.
      */
-    default Collection<GroupChannel> getGroupChannels() {
-        return new ArrayList<>();
-    }
+    Collection<GroupChannel> getGroupChannels();
 
     /**
      * Gets a collection with all private channels of the bot.
