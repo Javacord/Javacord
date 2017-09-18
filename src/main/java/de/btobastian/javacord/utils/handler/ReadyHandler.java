@@ -38,6 +38,7 @@ public class ReadyHandler extends PacketHandler {
         if (packet.has("private_channels")) {
             JSONArray privateChannels = packet.getJSONArray("private_channels");
             for (int i = 0; i < privateChannels.length(); i++) {
+                // TODO this also contains group channels -> Use ImplGroupChannel instead if it's one
                 JSONObject privateChannel = privateChannels.getJSONObject(i);
                 new ImplPrivateChannel(api, privateChannel);
             }
