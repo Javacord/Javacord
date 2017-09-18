@@ -10,6 +10,7 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
+import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -27,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -98,6 +100,11 @@ public class ImplServer implements Server {
     private final ConcurrentHashMap<Long, String> nicknames = new ConcurrentHashMap<>();
 
     /**
+     * A list with all custom emojis from this server.
+     */
+    private final Collection<CustomEmoji> customEmojis = new ArrayList<>();
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -152,6 +159,12 @@ public class ImplServer implements Server {
                             .put("limit", 0));
             logger.debug("Sending request guild members packet for server {}", this);
             this.api.getWebSocketAdapter().getWebSocket().sendText(requestGuildMembersPacket.toString());
+        }
+
+        JSONArray emojis = data.has("emojis") ? data.getJSONArray("emojis") : new JSONArray();
+        for (int i = 0; i < emojis.length(); i++) {
+            CustomEmoji emoji = api.getOrCreateCustomEmoji(emojis.getJSONObject(i));
+            this.customEmojis.add(emoji);
         }
 
         api.addServerToCache(this);
@@ -321,6 +334,11 @@ public class ImplServer implements Server {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return null;
         }
+    }
+
+    @Override
+    public Collection<CustomEmoji> getCustomEmojis() {
+        return Collections.unmodifiableCollection(customEmojis);
     }
 
     @Override

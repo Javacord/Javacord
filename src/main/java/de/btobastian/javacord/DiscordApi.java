@@ -3,8 +3,16 @@ package de.btobastian.javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.channels.Channel;
+import de.btobastian.javacord.entities.channels.GroupChannel;
+import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.channels.VoiceChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -275,6 +283,47 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all known custom emojis.
+     *
+     * @return A collection with all known custom emojis.
+     */
+    Collection<CustomEmoji> getCustomEmojis();
+
+    /**
+     * Gets a custom emoji in this server by it's id.
+     *
+     * @param id The id of the emoji.
+     * @return The emoji with the given id.
+     */
+    default Optional<CustomEmoji> getCustomEmojiById(long id) {
+        return getCustomEmojis().stream().filter(emoji -> emoji.getId() == id).findAny();
+    }
+
+    /**
+     * Gets a custom emoji in this server by it's id.
+     *
+     * @param id The id of the emoji.
+     * @return The emoji with the given id.
+     */
+    default Optional<CustomEmoji> getCustomEmojiById(String id) {
+        try {
+            return getCustomEmojiById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a list of all reactions with the given name in the server.
+     *
+     * @param name The name of the reaction.
+     * @return A list of all reactions with the given name in this server.
+     */
+    default List<CustomEmoji> getCustomEmojisByName(String name) {
+        return getCustomEmojis().stream().filter(emoji -> emoji.getName().equals(name)).collect(Collectors.toList());
+    }
+
+    /**
      * Gets a collection with all channels of the bot.
      *
      * @return A collection with all channels of the bot.
@@ -314,7 +363,7 @@ public interface DiscordApi {
      */
     default Collection<ServerChannel> getServerChannels() {
         Collection<ServerChannel> channels = new ArrayList<>();
-        getServers().stream().forEach(server -> channels.addAll(server.getChannels()));
+        getServers().forEach(server -> channels.addAll(server.getChannels()));
         return channels;
     }
 
@@ -325,7 +374,7 @@ public interface DiscordApi {
      */
     default Collection<ServerTextChannel> getServerTextChannels() {
         Collection<ServerTextChannel> channels = new ArrayList<>();
-        getServers().stream().forEach(server -> channels.addAll(server.getTextChannels()));
+        getServers().forEach(server -> channels.addAll(server.getTextChannels()));
         return channels;
     }
 
@@ -336,7 +385,7 @@ public interface DiscordApi {
      */
     default Collection<ServerVoiceChannel> getServerVoiceChannels() {
         Collection<ServerVoiceChannel> channels = new ArrayList<>();
-        getServers().stream().forEach(server -> channels.addAll(server.getVoiceChannels()));
+        getServers().forEach(server -> channels.addAll(server.getVoiceChannels()));
         return channels;
     }
 

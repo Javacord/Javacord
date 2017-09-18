@@ -36,7 +36,7 @@ public class ImplMessage implements Message {
     private final TextChannel channel;
 
     /**
-     * The id of the server.
+     * The id of the message.
      */
     private final long id;
 

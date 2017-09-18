@@ -10,6 +10,8 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -32,7 +34,13 @@ import org.slf4j.Logger;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -127,6 +135,11 @@ public class ImplDiscordApi implements DiscordApi {
      * A set with all unavailable servers.
      */
     private final HashSet<Long> unavailableServers = new HashSet<>();
+
+    /**
+     * A map with all known custom emoji.
+     */
+    private final ConcurrentHashMap<Long, CustomEmoji> customEmojis = new ConcurrentHashMap<>();
 
     /**
      * A map with all cached messages.
@@ -291,7 +304,18 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
-     * Gets or creates new message object.
+     * Gets or creates a new custom emoji object.
+     *
+     * @param data The data of the emoji.
+     * @return The emoji for the given json object.
+     */
+    public CustomEmoji getOrCreateCustomEmoji(JSONObject data) {
+        long id = Long.parseLong(data.getString("id"));
+        return customEmojis.computeIfAbsent(id, key -> new ImplCustomEmoji(this, data));
+    }
+
+    /**
+     * Gets or creates a new message object.
      *
      * @param channel The channel of the message.
      * @param data The data of the message.
@@ -451,7 +475,7 @@ public class ImplDiscordApi implements DiscordApi {
     public Collection<Message> getCachedMessages() {
         return weakMessages.values().stream()
                 .map(Reference::get)
-                .filter(message -> message != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -469,6 +493,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public Optional<Server> getServerById(long id) {
         return Optional.ofNullable(servers.get(id));
+    }
+
+    @Override
+    public Collection<CustomEmoji> getCustomEmojis() {
+        return customEmojis.values();
+    }
+
+    @Override
+    public Optional<CustomEmoji> getCustomEmojiById(long id) {
+        return Optional.ofNullable(customEmojis.get(id));
     }
 
     @Override
