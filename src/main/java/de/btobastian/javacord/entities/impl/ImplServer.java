@@ -163,7 +163,7 @@ public class ImplServer implements Server {
 
         JSONArray emojis = data.has("emojis") ? data.getJSONArray("emojis") : new JSONArray();
         for (int i = 0; i < emojis.length(); i++) {
-            CustomEmoji emoji = api.getOrCreateCustomEmoji(emojis.getJSONObject(i));
+            CustomEmoji emoji = api.getOrCreateCustomEmoji(this, emojis.getJSONObject(i));
             this.customEmojis.add(emoji);
         }
 

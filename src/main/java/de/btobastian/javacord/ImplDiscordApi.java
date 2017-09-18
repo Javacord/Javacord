@@ -309,9 +309,9 @@ public class ImplDiscordApi implements DiscordApi {
      * @param data The data of the emoji.
      * @return The emoji for the given json object.
      */
-    public CustomEmoji getOrCreateCustomEmoji(JSONObject data) {
+    public CustomEmoji getOrCreateCustomEmoji(Server server, JSONObject data) {
         long id = Long.parseLong(data.getString("id"));
-        return customEmojis.computeIfAbsent(id, key -> new ImplCustomEmoji(this, data));
+        return customEmojis.computeIfAbsent(id, key -> new ImplCustomEmoji(this, server, data));
     }
 
     /**
