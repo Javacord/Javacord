@@ -3,8 +3,10 @@ package de.btobastian.javacord.entities.channels;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -79,6 +81,87 @@ public interface TextChannel extends Channel, Messageable {
         } catch (NumberFormatException e) {
             return getMessageById(-1);
         }
+    }
+
+    /**
+     * Gets the history of messages in this channel.
+     *
+     * @param limit The limit of messages to get.
+     * @return The history.
+     */
+    default CompletableFuture<MessageHistory> getHistory(int limit) {
+        return ImplMessageHistory.getHistory(this, limit);
+    }
+
+    /**
+     * Gets the history of messages before a given message in this channel.
+     *
+     * @param limit The limit of messages to get.
+     * @param before Get messages before the message with this id.
+     * @return The history.
+     */
+    default CompletableFuture<MessageHistory> getHistoryBefore(int limit, long before) {
+        return ImplMessageHistory.getHistoryBefore(this, limit, before);
+    }
+
+    /**
+     * Gets the history of messages before a given message in this channel.
+     *
+     * @param limit The limit of messages to get.
+     * @param before Get messages before this message.
+     * @return The history.
+     */
+    default CompletableFuture<MessageHistory> getHistoryBefore(int limit, Message before) {
+        return getHistoryBefore(limit, before.getId());
+    }
+
+    /**
+     * Gets the history of messages after a given message in this channel.
+     *
+     * @param limit The limit of messages to get.
+     * @param after Get messages after the message with this id.
+     * @return The history.
+     */
+    default CompletableFuture<MessageHistory> getHistoryAfter(int limit, long after) {
+        return ImplMessageHistory.getHistoryAfter(this, limit, after);
+    }
+
+    /**
+     * Gets the history of messages after a given message in this channel.
+     *
+     * @param limit The limit of messages to get.
+     * @param after Get messages after this message.
+     * @return The history.
+     */
+    default CompletableFuture<MessageHistory> getHistoryAfter(int limit, Message after) {
+        return getHistoryAfter(limit, after.getId());
+    }
+    /**
+     * Gets the history of messages around a given message in this channel.
+     * Half of the message will be older than the given message and half of the message will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param limit The limit of messages to get.
+     * @param around Get messages around the message with this id.
+     * @return The history.
+     */
+    default CompletableFuture<MessageHistory> getHistoryAround(int limit, long around) {
+        return ImplMessageHistory.getHistoryAround(this, limit, around);
+    }
+
+    /**
+     * Gets the history of messages around a given message in this channel.
+     * Half of the message will be older than the given message and half of the message will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param limit The limit of messages to get.
+     * @param around Get messages around this message.
+     * @return The history.
+     */
+    default CompletableFuture<MessageHistory> getHistoryAround(int limit, Message around) {
+        return getHistoryAround(limit, around.getId());
     }
 
     /**

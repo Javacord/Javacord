@@ -15,6 +15,8 @@ import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -31,6 +33,7 @@ public class RestRequest<T> {
     private boolean includeAuthorizationHeader = true;
     private int ratelimitRetries = 5;
     private String[] urlParameters = new String[0];
+    private List<String[]> queryParameters = new ArrayList<>();
     private String body = null;
 
     private int retryCounter = 0;
@@ -86,7 +89,6 @@ public class RestRequest<T> {
         return urlParameters;
     }
 
-
     /**
      * Gets the body of this request.
      *
@@ -111,6 +113,18 @@ public class RestRequest<T> {
             return Optional.empty();
         }
         return Optional.of(urlParameters[majorParameterPosition.get()]);
+    }
+
+    /**
+     * Adds a query parameter to the url.
+     *
+     * @param key The key of the parameter.
+     * @param value The value of the parameter.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest<T> addQueryParameter(String key, String value) {
+        this.queryParameters.add(new String[]{key, value});
+        return this;
     }
 
     /**
@@ -253,6 +267,9 @@ public class RestRequest<T> {
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported http method!");
+        }
+        for (String[] queryParameter : queryParameters) {
+            request.queryString(queryParameter[0], queryParameter[1]);
         }
         if (includeAuthorizationHeader) {
             request.header("authorization", api.getToken());

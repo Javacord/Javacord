@@ -163,6 +163,42 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Gets the history of messages before this message.
+     *
+     * @param limit The limit of messages to get.
+     * @return The history.
+     * @see TextChannel#getHistoryBefore(int, long)
+     */
+    default CompletableFuture<MessageHistory> getHistoryBefore(int limit) {
+        return getChannel().getHistoryBefore(limit, this);
+    }
+
+    /**
+     * Gets the history of messages after this message.
+     *
+     * @param limit The limit of messages to get.
+     * @return The history.
+     * @see TextChannel#getHistoryAfter(int, long)
+     */
+    default CompletableFuture<MessageHistory> getHistoryAfter(int limit) {
+        return getChannel().getHistoryAfter(limit, this);
+    }
+
+    /**
+     * Gets the history of messages around this message.
+     * Half of the message will be older than the given message and half of the message will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param limit The limit of messages to get.
+     * @return The history.
+     * @see TextChannel#getHistoryAround(int, long)
+     */
+    default CompletableFuture<MessageHistory> getHistoryAround(int limit) {
+        return getChannel().getHistoryAround(limit, this);
+    }
+
+    /**
      * Adds a listener, which listens to this message being deleted.
      *
      * @param listener The listener to add.
