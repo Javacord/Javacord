@@ -1,7 +1,6 @@
 package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.utils.JavacordCompletableFuture;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -18,7 +17,7 @@ public interface AvatarHolder extends DiscordEntity {
      * @return The url of the avatar.
      */
     default URL getAvatarUrl() {
-        return ((IconHolder) this).getIconUrl().orElseThrow(() -> new InvalidStateException(
+        return ((IconHolder) this).getIconUrl().orElseThrow(() -> new IllegalStateException(
                 "Something happened which should never happen. Please contact the developer!"));
     }
 
@@ -34,7 +33,7 @@ public interface AvatarHolder extends DiscordEntity {
                 future.completeExceptionally(throwable);
                 return;
             }
-            future.complete(bytes.orElseThrow(() -> new InvalidStateException(
+            future.complete(bytes.orElseThrow(() -> new IllegalStateException(
                             "Something happened which should never happen. Please contact the developer!")));
         });
         return future;
@@ -52,7 +51,7 @@ public interface AvatarHolder extends DiscordEntity {
                 future.completeExceptionally(throwable);
                 return;
             }
-            future.complete(icon.orElseThrow(() -> new InvalidStateException(
+            future.complete(icon.orElseThrow(() -> new IllegalStateException(
                     "Something happened which should never happen. Please contact the developer!")));
         });
         return future;
