@@ -23,6 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -76,6 +78,11 @@ public class ImplServer implements Server {
     private int memberCount = -1;
 
     /**
+     * The icon id of the server. Might be <code>null</code>.
+     */
+    private String iconId;
+
+    /**
      * A map with all channels of the server.
      */
     private final ConcurrentHashMap<Long, ServerChannel> channels = new ConcurrentHashMap<>();
@@ -111,6 +118,9 @@ public class ImplServer implements Server {
         large = data.getBoolean("large");
         memberCount = data.getInt("member_count");
         ownerId = Long.parseLong(data.getString("owner_id"));
+        if (data.has("icon") && !data.isNull("icon")) {
+            iconId = data.getString("icon");
+        }
 
         if (data.has("channels")) {
             JSONArray channels = data.getJSONArray("channels");
@@ -298,6 +308,19 @@ public class ImplServer implements Server {
     public User getOwner() {
         return api.getUserById(ownerId)
                 .orElseThrow(() -> new IllegalStateException("Owner of server " + toString() + " is not cached!"));
+    }
+
+    @Override
+    public Optional<URL> getIconUrl() {
+        if (iconId == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconId + ".png"));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            return null;
+        }
     }
 
     @Override

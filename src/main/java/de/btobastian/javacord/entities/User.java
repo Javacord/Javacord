@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a user.
  */
-public interface User extends DiscordEntity, Messageable, Mentionable {
+public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHolder {
 
     /**
      * Gets the name of the user.

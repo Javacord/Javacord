@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.impl;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.IconHolder;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
@@ -15,6 +16,8 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link User}.
  */
-public class ImplUser implements User {
+public class ImplUser implements User, IconHolder {
 
     /**
      * The discord api instance.
@@ -54,6 +57,16 @@ public class ImplUser implements User {
     private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
     /**
+     * The avatar id of the user. Might be <code>null</code>!
+     */
+    private String avatarId = null;
+
+    /**
+     * The discriminator of the user.
+     */
+    private String discriminator;
+
+    /**
      * Creates a new user.
      *
      * @param api The discord api instance.
@@ -64,6 +77,10 @@ public class ImplUser implements User {
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("username");
+        discriminator = data.getString("discriminator");
+        if (data.has("avatar") && !data.isNull("avatar")) {
+            avatarId = data.getString("avatar");
+        }
 
         api.addUserToCache(this);
     }
@@ -151,6 +168,22 @@ public class ImplUser implements User {
     @Override
     public String getMentionTag() {
         return "<@" + getId() + ">";
+    }
+
+    @Override
+    public Optional<URL> getIconUrl() {
+        String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
+        if (avatarId != null) {
+            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
+                    (avatarId.startsWith("a_") ? ".gif" : ".png");
+
+        }
+        try {
+            return Optional.of(new URL(url));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
+            return null;
+        }
     }
 
     @Override

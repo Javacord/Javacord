@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * The class represents a Discord server, sometimes also called guild.
  */
-public interface Server extends DiscordEntity {
+public interface Server extends DiscordEntity, IconHolder {
 
     /**
      * Gets the name of the server.
