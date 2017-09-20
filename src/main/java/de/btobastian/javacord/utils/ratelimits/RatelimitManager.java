@@ -13,7 +13,11 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -80,74 +84,81 @@ public class RatelimitManager {
         if (!startScheduler) {
             return;
         }
-
         // Start a scheduler to work off the queue
         scheduler.schedule(() -> api.getThreadPool().getExecutorService().submit(() -> {
-            while (!queue.isEmpty()) {
-                if (!bucket.hasSpace()) {
-                    synchronized (queue) {
-                        // Remove if we retried to often
-                        queue.removeIf(req -> {
-                            if (req.incrementRetryCounter()) {
-                                req.getResult().completeExceptionally(
-                                        new RatelimitException("You have been ratelimited and ran out of retires!",
-                                                null, req)
-                                );
-                                return true;
+            try {
+                while (!queue.isEmpty()) {
+                    if (!bucket.hasSpace()) {
+                        synchronized (queue) {
+                            // Remove if we retried to often
+                            queue.removeIf(req -> {
+                                if (req.incrementRetryCounter()) {
+                                    req.getResult().completeExceptionally(
+                                            new RatelimitException("You have been ratelimited and ran out of retires!",
+                                                    null, req)
+                                    );
+                                    return true;
+                                }
+                                return false;
+                            });
+                            if (queue.isEmpty()) {
+                                break;
                             }
-                            return false;
-                        });
-                        if (queue.isEmpty()) {
-                            break;
+                        }
+                        try {
+                            int sleepTime = bucket.getTimeTillSpaceGetsAvailable();
+                            if (sleepTime > 0) {
+                                Thread.sleep(sleepTime);
+                            }
+                        } catch (InterruptedException e) {
+                            logger.warn("We got interrupted while waiting for a rate limit!", e);
                         }
                     }
+                    RestRequest<?> restRequest = queue.poll();
                     try {
-                        Thread.sleep(bucket.getTimeTillSpaceGetsAvailable());
-                    } catch (InterruptedException e) {
-                        logger.warn("We got interrupted while waiting for a rate limit!", e);
-                    }
-                }
-                RestRequest<?> restRequest = queue.poll();
-                try {
-                    HttpResponse<JsonNode> response = restRequest.executeBlocking();
+                        HttpResponse<JsonNode> response = restRequest.executeBlocking();
 
-                    long currentTime = System.currentTimeMillis();
+                        long currentTime = System.currentTimeMillis();
 
-                    restRequest.getResult().complete(response);
+                        restRequest.getResult().complete(response);
 
-                    String remaining = response.getHeaders().getFirst("X-RateLimit-Remaining");
-                    String reset = response.getHeaders().getFirst("X-RateLimit-Reset");
-                    String global = response.getHeaders().getFirst("X-RateLimit-Global");
+                        String remaining = response.getHeaders().getFirst("X-RateLimit-Remaining");
+                        String reset = response.getHeaders().getFirst("X-RateLimit-Reset");
+                        String global = response.getHeaders().getFirst("X-RateLimit-Global");
 
 
-                    if (global != null && global.equals("true")) {
-                        // Mark the endpoint as global
-                        bucket.getEndpoint().ifPresent(endpoint -> endpoint.setGlobal(true));
-                    }
-
-                    if (api.getTimeOffset() == null) {
-                        // Discord sends the date in their header in the format RFC_1123_DATE_TIME
-                        // We use this header to calculate a possible offset between our local time and the discord time
-                        String date = response.getHeaders().getFirst("Date");
-                        if (date != null) {
-                            long discordTimestamp = OffsetDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
-                                    .toInstant().toEpochMilli();
-                            api.setTimeOffset((discordTimestamp - currentTime));
-                            logger.debug("Calculated an offset of " + api.getTimeOffset() + " to the Discord time.");
+                        if (global != null && global.equals("true")) {
+                            // Mark the endpoint as global
+                            bucket.getEndpoint().ifPresent(endpoint -> endpoint.setGlobal(true));
                         }
-                    }
 
-                    bucket.setRateLimitRemaining(Integer.parseInt(remaining));
-                    bucket.setRateLimitResetTimestamp(Integer.parseInt(reset));
-                } catch (Exception e) {
-                    restRequest.getResult().completeExceptionally(e);
+                        if (api.getTimeOffset() == null) {
+                            // Discord sends the date in their header in the format RFC_1123_DATE_TIME
+                            // We use this header to calculate a possible offset between our local time and the discord time
+                            String date = response.getHeaders().getFirst("Date");
+                            if (date != null) {
+                                long discordTimestamp = OffsetDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
+                                        .toInstant().toEpochMilli();
+                                api.setTimeOffset((discordTimestamp - currentTime));
+                                logger.debug("Calculated an offset of " + api.getTimeOffset() + " to the Discord time.");
+                            }
+                        }
+
+                        bucket.setRateLimitRemaining(Integer.parseInt(remaining));
+                        bucket.setRateLimitResetTimestamp(Integer.parseInt(reset));
+                    } catch (Exception e) {
+                        restRequest.getResult().completeExceptionally(e);
+                    }
+                    queue.peek();
                 }
-                queue.peek();
+            } catch (Throwable t) {
+                logger.error("Exception in RatelimitManager! Please contact the developer!", t);
+            } finally {
+                synchronized (bucket) {
+                    bucket.setHasActiveScheduler(false);
+                }
             }
-            synchronized (bucket) {
-                bucket.setHasActiveScheduler(false);
-            }
-        }), bucket.getTimeTillSpaceGetsAvailable(), TimeUnit.SECONDS);
+        }), bucket.getTimeTillSpaceGetsAvailable(), TimeUnit.MILLISECONDS);
     }
 
 }

@@ -84,8 +84,7 @@ public class RatelimitBucket {
      * @return Whether you can send requests without being ratelimited or not.
      */
     public boolean hasSpace() {
-        long timestamp = (System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset())) / 1000;
-        return rateLimitRemaining > 0 || rateLimitResetTimestamp < timestamp;
+        return rateLimitRemaining > 0 || getTimeTillSpaceGetsAvailable() <= 0;
     }
 
     /**
