@@ -16,6 +16,8 @@ import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
@@ -34,13 +36,7 @@ import org.slf4j.Logger;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -613,5 +609,25 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<MessageEditListener> getMessageEditListeners() {
         return getListeners(MessageEditListener.class);
+    }
+
+    @Override
+    public void addReactionAddListener(ReactionAddListener listener) {
+        addListener(ReactionAddListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners() {
+        return getListeners(ReactionAddListener.class);
+    }
+
+    @Override
+    public void addReactionRemoveListener(ReactionRemoveListener listener) {
+        addListener(ReactionRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return getListeners(ReactionRemoveListener.class);
     }
 }

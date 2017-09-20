@@ -3,19 +3,14 @@ package de.btobastian.javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.Channel;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.channels.VoiceChannel;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
@@ -737,4 +732,31 @@ public interface DiscordApi {
      */
     List<MessageEditListener> getMessageEditListeners();
 
+    /**
+     * Adds a listener, which listens to reactions being added.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionAddListener(ReactionAddListener listener);
+
+    /**
+     * Gets a list with all registered reaction add listeners.
+     *
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being removed.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionRemoveListener(ReactionRemoveListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove listeners.
+     *
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners();
 }

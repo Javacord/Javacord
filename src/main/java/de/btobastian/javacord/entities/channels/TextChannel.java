@@ -10,6 +10,8 @@ import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -226,5 +228,33 @@ public interface TextChannel extends Channel, Messageable {
      * @return A list with all registered message edit listeners.
      */
     List<MessageEditListener> getMessageEditListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being added in this channel.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionAddListener(ReactionAddListener listener);
+
+    /**
+     * Gets a list with all registered reaction add listeners.
+     *
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being removed in this channel.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionRemoveListener(ReactionRemoveListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove listeners.
+     *
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners();
 
 }

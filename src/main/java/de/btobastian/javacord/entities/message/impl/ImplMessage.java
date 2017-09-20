@@ -5,10 +5,14 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
+import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -72,6 +76,11 @@ public class ImplMessage implements Message {
     private List<Embed> embeds = new ArrayList<>();
 
     /**
+     * A list with all reactions.
+     */
+    private List<Reaction> reactions = new ArrayList<>();
+
+    /**
      * Creates a new message object.
      *
      * @param api The discord api instance.
@@ -96,10 +105,16 @@ public class ImplMessage implements Message {
             cache.addMessage(this);
         }
 
-        JSONArray embeds = data.getJSONArray("embeds");
-        for (int i = 0; i < embeds.length(); i++) {
-            Embed embed = new ImplEmbed(embeds.getJSONObject(i));
-            this.embeds.add(embed);
+        JSONArray embedsJson = data.has("embeds") ? data.getJSONArray("embeds") : new JSONArray();
+        for (int i = 0; i < embedsJson.length(); i++) {
+            Embed embed = new ImplEmbed(embedsJson.getJSONObject(i));
+            embeds.add(embed);
+        }
+
+        JSONArray reactionsJson = data.has("reactions") ? data.getJSONArray("reactions") : new JSONArray();
+        for (int i = 0; i < reactionsJson.length(); i++) {
+            Reaction reaction = new ImplReaction(api, reactionsJson.getJSONObject(i));
+            reactions.add(reaction);
         }
     }
 
@@ -128,6 +143,32 @@ public class ImplMessage implements Message {
      */
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    /**
+     * Adds an emoji to the list of reactions.
+     *
+     * @param emoji The emoji.
+     * @param you Whether this reaction is used by you or not.
+     */
+    public void addReaction(Emoji emoji, boolean you) {
+        Optional<Reaction> reaction = reactions.stream().filter(r -> emoji == r.getEmoji()).findAny();
+        reaction.ifPresent(r -> ((ImplReaction) r).incrementCount(you));
+        if (!reaction.isPresent()) {
+            reactions.add(new ImplReaction(api, emoji, 1, you));
+        }
+    }
+
+    /**
+     * Removes an emoji from the list of reactions.
+     *
+     * @param emoji The emoji.
+     * @param you Whether this reaction is used by you or not.
+     */
+    public void removeReaction(Emoji emoji, boolean you) {
+        Optional<Reaction> reaction = reactions.stream().filter(r -> emoji == r.getEmoji()).findAny();
+        reaction.ifPresent(r -> ((ImplReaction) r).decrementCount(you));
+        reactions.removeIf(r -> r.getCount() <= 0);
     }
 
     /**
@@ -204,6 +245,11 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public List<Reaction> getReactions() {
+        return Collections.unmodifiableList(reactions);
+    }
+
+    @Override
     public int compareTo(Message otherMessage) {
         return otherMessage.getCreationDate().compareTo(getCreationDate());
     }
@@ -237,5 +283,25 @@ public class ImplMessage implements Message {
     @Override
     public List<MessageEditListener> getMessageEditListeners() {
         return getListeners(MessageEditListener.class);
+    }
+
+    @Override
+    public void addReactionAddListener(ReactionAddListener listener) {
+        addListener(ReactionAddListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners() {
+        return getListeners(ReactionAddListener.class);
+    }
+
+    @Override
+    public void addReactionRemoveListener(ReactionRemoveListener listener) {
+        addListener(ReactionRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return getListeners(ReactionRemoveListener.class);
     }
 }

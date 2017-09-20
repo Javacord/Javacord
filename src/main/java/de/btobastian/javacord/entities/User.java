@@ -4,6 +4,8 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
 import java.util.List;
@@ -86,5 +88,33 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return A list with all registered user starts typing listeners.
      */
     List<UserStartTypingListener> getUserStartTypingListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being added by this user.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionAddListener(ReactionAddListener listener);
+
+    /**
+     * Gets a list with all registered reaction add listeners.
+     *
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being removed by this user.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionRemoveListener(ReactionRemoveListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove listeners.
+     *
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners();
 
 }

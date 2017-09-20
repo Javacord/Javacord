@@ -9,9 +9,12 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
@@ -75,6 +78,44 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return Whether the message is deleted or not.
      */
     boolean isDeleted();
+
+    /**
+     * Gets a list with all reactions of the message.
+     *
+     * @return A list which contains all reactions of the message.
+     */
+    List<Reaction> getReactions();
+
+    /**
+     * Adds a unicode reaction to the message.
+     *
+     * @param unicodeEmoji The unicode emoji string.
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> addReaction(String unicodeEmoji) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
+                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()), unicodeEmoji, "@me")
+                .setRatelimitRetries(25)
+                .execute(res -> null);
+    }
+
+    /**
+     * Adds a reaction to the message.
+     *
+     * @param emoji The emoji.
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> addReaction(Emoji emoji) {
+        String value = emoji.asUnicodeEmoji().orElse(
+                emoji.asCustomEmoji()
+                        .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
+                        .orElseThrow(() -> new IllegalArgumentException("Emoji with both types not being present!"))
+        );
+        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
+                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()), value, "@me")
+                .setRatelimitRetries(50)
+                .execute(res -> null);
+    }
 
     /**
      * Gets the server text channel of the message.
@@ -225,5 +266,33 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A list with all registered message edit listeners.
      */
     List<MessageEditListener> getMessageEditListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being added to this message.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionAddListener(ReactionAddListener listener);
+
+    /**
+     * Gets a list with all registered reaction add listeners.
+     *
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being removed from this message.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionRemoveListener(ReactionRemoveListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove listeners.
+     *
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners();
 
 }

@@ -14,6 +14,8 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -26,11 +28,7 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -429,5 +427,25 @@ public class ImplServer implements Server {
     @Override
     public List<MessageEditListener> getMessageEditListeners() {
         return getListeners(MessageEditListener.class);
+    }
+
+    @Override
+    public void addReactionAddListener(ReactionAddListener listener) {
+        addListener(ReactionAddListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners() {
+        return getListeners(ReactionAddListener.class);
+    }
+
+    @Override
+    public void addReactionRemoveListener(ReactionRemoveListener listener) {
+        addListener(ReactionRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return getListeners(ReactionRemoveListener.class);
     }
 }

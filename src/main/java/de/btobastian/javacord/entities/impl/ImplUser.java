@@ -10,6 +10,8 @@ import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -212,5 +214,25 @@ public class ImplUser implements User, IconHolder {
     @Override
     public List<UserStartTypingListener> getUserStartTypingListeners() {
         return getListeners(UserStartTypingListener.class);
+    }
+
+    @Override
+    public void addReactionAddListener(ReactionAddListener listener) {
+        addListener(ReactionAddListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners() {
+        return getListeners(ReactionAddListener.class);
+    }
+
+    @Override
+    public void addReactionRemoveListener(ReactionRemoveListener listener) {
+        addListener(ReactionRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return getListeners(ReactionRemoveListener.class);
     }
 }

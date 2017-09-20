@@ -7,6 +7,8 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -331,5 +333,33 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered message edit listeners.
      */
     List<MessageEditListener> getMessageEditListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being added on this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionAddListener(ReactionAddListener listener);
+
+    /**
+     * Gets a list with all registered reaction add listeners.
+     *
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners();
+
+    /**
+     * Adds a listener, which listens to reactions being removed on this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addReactionRemoveListener(ReactionRemoveListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove listeners.
+     *
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners();
 
 }

@@ -8,6 +8,8 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
@@ -176,5 +178,25 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public List<MessageEditListener> getMessageEditListeners() {
         return getListeners(MessageEditListener.class);
+    }
+
+    @Override
+    public void addReactionAddListener(ReactionAddListener listener) {
+        addListener(ReactionAddListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners() {
+        return getListeners(ReactionAddListener.class);
+    }
+
+    @Override
+    public void addReactionRemoveListener(ReactionRemoveListener listener) {
+        addListener(ReactionRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return getListeners(ReactionRemoveListener.class);
     }
 }

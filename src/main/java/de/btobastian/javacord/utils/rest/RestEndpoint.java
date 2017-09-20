@@ -17,7 +17,8 @@ public enum RestEndpoint {
      */
     MESSAGE_DELETE("/channels/%s/messages", 0),
     CHANNEL_TYPING("/channels/%s/typing", 0),
-    USER_CHANNEL("/users/@me/channels");
+    USER_CHANNEL("/users/@me/channels"),
+    REACTION("/channels/%s/messages/%s/reactions/%s", 0);
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
@@ -103,7 +104,7 @@ public enum RestEndpoint {
     public String getFullUrl(String... parameters) {
         String url = "https://discordapp.com/api/v" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION + getEndpointUrl();
         url = String.format(url, (Object[]) parameters);
-        int parameterAmount = getEndpointUrl().split("%s").length - 1;
+        int parameterAmount = getEndpointUrl().split("%s").length - (getEndpointUrl().endsWith("%s") ? 0 : 1);
         if (parameters.length > parameterAmount) {
             for (int i = parameterAmount; i < parameters.length; i++) {
                 url += "/" + parameters[i];
