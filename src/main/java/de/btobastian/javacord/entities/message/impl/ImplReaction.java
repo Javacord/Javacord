@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.message.impl;
 
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
@@ -10,6 +11,11 @@ import org.json.JSONObject;
  * The implementation of {@link Reaction}.
  */
 public class ImplReaction implements Reaction {
+
+    /**
+     * The message of the reaction.
+     */
+    private final Message message;
 
     /**
      * The emoji of the reaction.
@@ -29,10 +35,11 @@ public class ImplReaction implements Reaction {
     /**
      * Creates a new reaction.
      *
-     * @param api The discord api instance.
+     * @param message The message, the reaction belongs to.
      * @param data The json data of the reaction.
      */
-    public ImplReaction(ImplDiscordApi api, JSONObject data) {
+    public ImplReaction(Message message, JSONObject data) {
+        this.message = message;
         this.count = data.getInt("count");
         this.containsYou = data.getBoolean("me");
 
@@ -40,19 +47,20 @@ public class ImplReaction implements Reaction {
         if (!emojiJson.has("id") || emojiJson.isNull("id")) {
             emoji = ImplUnicodeEmoji.fromString(emojiJson.getString("name"));
         } else {
-            emoji = api.getOrCreateCustomEmoji(null, emojiJson);
+            emoji = ((ImplDiscordApi) message.getApi()).getOrCreateCustomEmoji(null, emojiJson);
         }
     }
 
     /**
      * Creates a new reaction.
      *
-     * @param api The discord api instance.
+     * @param message The message, the reaction belongs to.
      * @param emoji The emoji of the reaction.
      * @param count The amount of users who used this reaction.
      * @param you Whether this reaction is used by you or not.
      */
-    public ImplReaction(ImplDiscordApi api, Emoji emoji, int count, boolean you) {
+    public ImplReaction(Message message, Emoji emoji, int count, boolean you) {
+        this.message = message;
         this.emoji = emoji;
         this.count = count;
         this.containsYou = you;
@@ -80,6 +88,11 @@ public class ImplReaction implements Reaction {
         if (you) {
             containsYou = false;
         }
+    }
+
+    @Override
+    public Message getMessage() {
+        return message;
     }
 
     @Override

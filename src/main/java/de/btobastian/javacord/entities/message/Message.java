@@ -109,7 +109,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         String value = emoji.asUnicodeEmoji().orElse(
                 emoji.asCustomEmoji()
                         .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
-                        .orElseThrow(() -> new IllegalArgumentException("Emoji with both types not being present!"))
+                        .orElse("UNKNOWN")
         );
         return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()), value, "@me")

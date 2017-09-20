@@ -1,9 +1,14 @@
 package de.btobastian.javacord.events.message.reaction;
 
+import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestRequest;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A reaction add event.
@@ -37,4 +42,26 @@ public class ReactionAddEvent extends SingleReactionEvent {
     public User getUser() {
         return user;
     }
+
+    /**
+     * Removes the added reaction.
+     *
+     * @return A future to tell us if the action was successful.
+     */
+    public CompletableFuture<Void> removeReaction() {
+        String value = getEmoji().asUnicodeEmoji().orElse(
+                getEmoji().asCustomEmoji()
+                        .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
+                        .orElse("UNKNOWN")
+        );
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.REACTION)
+                .setUrlParameters(
+                        String.valueOf(getChannel().getId()),
+                        String.valueOf(getMessageId()),
+                        value,
+                        user.isYourself() ? "@me" : String.valueOf(user.getId()))
+                .setRatelimitRetries(25)
+                .execute(res -> null);
+    }
+
 }

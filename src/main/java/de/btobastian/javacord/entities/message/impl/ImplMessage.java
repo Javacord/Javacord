@@ -113,7 +113,7 @@ public class ImplMessage implements Message {
 
         JSONArray reactionsJson = data.has("reactions") ? data.getJSONArray("reactions") : new JSONArray();
         for (int i = 0; i < reactionsJson.length(); i++) {
-            Reaction reaction = new ImplReaction(api, reactionsJson.getJSONObject(i));
+            Reaction reaction = new ImplReaction(this, reactionsJson.getJSONObject(i));
             reactions.add(reaction);
         }
     }
@@ -155,7 +155,7 @@ public class ImplMessage implements Message {
         Optional<Reaction> reaction = reactions.stream().filter(r -> emoji == r.getEmoji()).findAny();
         reaction.ifPresent(r -> ((ImplReaction) r).incrementCount(you));
         if (!reaction.isPresent()) {
-            reactions.add(new ImplReaction(api, emoji, 1, you));
+            reactions.add(new ImplReaction(this, emoji, 1, you));
         }
     }
 
