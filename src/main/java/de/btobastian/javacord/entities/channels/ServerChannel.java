@@ -1,9 +1,13 @@
 package de.btobastian.javacord.entities.channels;
 
+import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents a server channel.
@@ -37,5 +41,16 @@ public interface ServerChannel extends Channel {
      * @return A list with all registered server channel delete listeners.
      */
     List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
+
+    /**
+     * Deletes the channel.
+     *
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete() {
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.CHANNEL)
+                .setUrlParameters(String.valueOf(getId()))
+                .execute(res -> null);
+    }
 
 }

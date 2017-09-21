@@ -18,6 +18,7 @@ public enum RestEndpoint {
     MESSAGE_DELETE("/channels/%s/messages", 0),
     CHANNEL_TYPING("/channels/%s/typing", 0),
     USER_CHANNEL("/users/@me/channels"),
+    CHANNEL("/channels/%s", 0),
     REACTION("/channels/%s/messages/%s/reactions/%s", 0);
 
     /**
