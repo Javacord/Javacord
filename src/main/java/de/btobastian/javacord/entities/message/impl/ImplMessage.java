@@ -5,6 +5,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageType;
 import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
@@ -48,6 +49,11 @@ public class ImplMessage implements Message {
      * The content of the message.
      */
     private String content;
+
+    /**
+     * The type of the message.
+     */
+    private final MessageType type;
 
     /**
      * A map which contains all listeners.
@@ -94,10 +100,11 @@ public class ImplMessage implements Message {
         id = Long.parseLong(data.getString("id"));
         content = data.getString("content");
 
-        if (data.has("webhook_id")) {
-            userAuthor = null;
-        } else {
+        type = MessageType.byType(data.getInt("type"), data.has("webhook_id"));
+        if (!data.has("webhook_id")) {
             userAuthor = api.getOrCreateUser(data.getJSONObject("author"));
+        } else {
+            userAuthor = null;
         }
 
         ImplMessageCache cache = (ImplMessageCache) channel.getMessageCache();
@@ -208,6 +215,11 @@ public class ImplMessage implements Message {
     @Override
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public MessageType getType() {
+        return type;
     }
 
     @Override

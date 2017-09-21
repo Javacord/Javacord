@@ -36,6 +36,13 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     String getContent();
 
     /**
+     * Gets the type of the message.
+     *
+     * @return The type of the message.
+     */
+    MessageType getType();
+
+    /**
      * Gets the text channel of the message.
      *
      * @return The text channel of the message.
