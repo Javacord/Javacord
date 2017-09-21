@@ -1,7 +1,6 @@
 package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.Javacord;
-import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -39,7 +38,7 @@ public interface IconHolder extends DiscordEntity {
      * @return The icon of the entity as byte array.
      */
     default CompletableFuture<Optional<byte[]>> getIconAsByteArray() {
-        CompletableFuture<Optional<byte[]>> future = new JavacordCompletableFuture<>();
+        CompletableFuture<Optional<byte[]>> future = new CompletableFuture<>();
         getApi().getThreadPool().getExecutorService().submit(() -> {
            try {
                logger.debug("Trying to get icon for entity {}", this);
@@ -80,7 +79,7 @@ public interface IconHolder extends DiscordEntity {
      * @return The icon of the entity.
      */
     default CompletableFuture<Optional<BufferedImage>> getIcon() {
-        CompletableFuture<Optional<BufferedImage>> future = new JavacordCompletableFuture<>();
+        CompletableFuture<Optional<BufferedImage>> future = new CompletableFuture<>();
         getIconAsByteArray().whenComplete((bytes, throwable) -> {
             if (throwable != null) {
                 future.completeExceptionally(throwable);

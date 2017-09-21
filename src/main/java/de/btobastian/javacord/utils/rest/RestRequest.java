@@ -11,7 +11,6 @@ import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.MissingPermissionsException;
 import de.btobastian.javacord.exceptions.RatelimitException;
-import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,7 +37,7 @@ public class RestRequest<T> {
 
     private int retryCounter = 0;
 
-    private final CompletableFuture<HttpResponse<JsonNode>> result = new JavacordCompletableFuture<>();
+    private final CompletableFuture<HttpResponse<JsonNode>> result = new CompletableFuture<>();
 
     /**
      * Creates a new instance of this class.
@@ -211,7 +210,7 @@ public class RestRequest<T> {
      */
     public CompletableFuture<T> execute(Function<HttpResponse<JsonNode>, T> function) {
         api.getRatelimitManager().queueRequest(this);
-        CompletableFuture<T> future = new JavacordCompletableFuture<>();
+        CompletableFuture<T> future = new CompletableFuture<>();
         result.whenComplete((response, throwable) -> {
             if (throwable != null) {
                 future.completeExceptionally(throwable);

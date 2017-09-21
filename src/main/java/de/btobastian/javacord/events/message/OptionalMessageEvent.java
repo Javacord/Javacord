@@ -3,7 +3,6 @@ package de.btobastian.javacord.events.message;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.utils.JavacordCompletableFuture;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -50,7 +49,7 @@ public abstract class OptionalMessageEvent extends MessageEvent {
         if (!message.isPresent()) {
             getChannel().getMessageById(getMessageId());
         }
-        CompletableFuture<Message> future = new JavacordCompletableFuture<>();
+        CompletableFuture<Message> future = new CompletableFuture<>();
         message.ifPresent(future::complete);
         return future;
     }

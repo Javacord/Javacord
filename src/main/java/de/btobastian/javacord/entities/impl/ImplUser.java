@@ -13,7 +13,6 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
-import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
@@ -148,7 +147,7 @@ public class ImplUser implements User, IconHolder {
     @Override
     public CompletableFuture<PrivateChannel> openPrivateChannel() {
         if (channel != null) {
-            CompletableFuture<PrivateChannel> future = new JavacordCompletableFuture<>();
+            CompletableFuture<PrivateChannel> future = new CompletableFuture<>();
             future.complete(channel);
             return future;
         }

@@ -57,22 +57,20 @@ public class MyFirstBot {
     public static void main(String[] args) {
         String token = args[0];
 
-        new DiscordApiBuilder().setToken(token).login().whenComplete((api, throwable) -> {
-            if (throwable != null) {
-                // Login failed
-                throwable.printStackTrace();
-                return;
-            }
-
+        new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
             // Login successful
-            api.getTextChannelById("123").ifPresent(channel -> channel.sendMessage("I'm online now!"));
+            api.getTextChannelById(123L).ifPresent(channel -> channel.sendMessage("I'm online now!"));
+        }).exceptionally(throwable -> {
+            // Login failed
+            throwable.printStackTrace();
+            return null;
         });
     }
 
 }
 ```
 
-You can also login blocking:
+You can also login blocking which throws an exception, if the login failed:
 ```java
 public class MyFirstBot {
 

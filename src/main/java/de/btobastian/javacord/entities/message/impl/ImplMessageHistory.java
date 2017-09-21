@@ -5,7 +5,6 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
-import de.btobastian.javacord.utils.JavacordCompletableFuture;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONArray;
@@ -87,7 +86,7 @@ public class ImplMessageHistory implements MessageHistory {
      * @return The history.
      */
     public static CompletableFuture<MessageHistory> getHistoryAround(TextChannel channel, int limit, long around) {
-        JavacordCompletableFuture<MessageHistory> future = new JavacordCompletableFuture<>();
+        CompletableFuture<MessageHistory> future = new CompletableFuture<>();
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
                 ImplMessageHistory history = new ImplMessageHistory(channel);
@@ -151,7 +150,7 @@ public class ImplMessageHistory implements MessageHistory {
      */
     private static CompletableFuture<MessageHistory> getHistory(TextChannel channel, int limit, long before, long after)
     {
-        JavacordCompletableFuture<MessageHistory> future = new JavacordCompletableFuture<>();
+        CompletableFuture<MessageHistory> future = new CompletableFuture<>();
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
                 ImplMessageHistory history = new ImplMessageHistory(channel);

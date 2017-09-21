@@ -44,7 +44,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     private final DiscordApi api;
     private final HashMap<String, PacketHandler> handlers = new HashMap<>();
-    private final CompletableFuture<Boolean> ready = new JavacordCompletableFuture<>();
+    private final CompletableFuture<Boolean> ready = new CompletableFuture<>();
     private final String gateway;
 
     private WebSocket websocket = null;

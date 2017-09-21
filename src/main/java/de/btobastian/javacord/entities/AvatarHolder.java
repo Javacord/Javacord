@@ -1,7 +1,5 @@
 package de.btobastian.javacord.entities;
 
-import de.btobastian.javacord.utils.JavacordCompletableFuture;
-
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +25,7 @@ public interface AvatarHolder extends DiscordEntity {
      * @return The avatar of the entity as byte array.
      */
     default CompletableFuture<byte[]> getAvatarAsByteArray() {
-        CompletableFuture<byte[]> future = new JavacordCompletableFuture<>();
+        CompletableFuture<byte[]> future = new CompletableFuture<>();
         ((IconHolder) this).getIconAsByteArray().whenComplete((bytes, throwable) -> {
             if (throwable != null) {
                 future.completeExceptionally(throwable);
@@ -45,7 +43,7 @@ public interface AvatarHolder extends DiscordEntity {
      * @return The avatar of the entity.
      */
     default CompletableFuture<BufferedImage> getAvatar() {
-        CompletableFuture<BufferedImage> future = new JavacordCompletableFuture<>();
+        CompletableFuture<BufferedImage> future = new CompletableFuture<>();
         ((IconHolder) this).getIcon().whenComplete((icon, throwable) -> {
             if (throwable != null) {
                 future.completeExceptionally(throwable);
