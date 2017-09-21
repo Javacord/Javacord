@@ -19,6 +19,20 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHolder {
 
+    @Override
+    default String getMentionTag() {
+        return "<@" + getId() + ">";
+    }
+
+    /**
+     * Gets the mention tag, to mention the user with it's nickname, instead of it's normal name.
+     *
+     * @return The mention tag, to mention the user with it's nickname.
+     */
+    default String getNicknameMentionTag() {
+        return "<@!" + getId() + ">";
+    }
+
     /**
      * Gets the name of the user.
      *

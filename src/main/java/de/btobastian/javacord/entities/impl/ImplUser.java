@@ -169,11 +169,6 @@ public class ImplUser implements User, IconHolder {
     }
 
     @Override
-    public String getMentionTag() {
-        return "<@" + getId() + ">";
-    }
-
-    @Override
     public Optional<URL> getIconUrl() {
         String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
         if (avatarId != null) {
