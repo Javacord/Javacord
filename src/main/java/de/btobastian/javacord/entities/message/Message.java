@@ -125,6 +125,17 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Deletes all reactions on this message.
+     *
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> removeAllReactions() {
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.REACTION)
+                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()))
+                .execute(res -> null);
+    }
+
+    /**
      * Gets the server text channel of the message.
      * Only present if the message was sent in a server.
      *
