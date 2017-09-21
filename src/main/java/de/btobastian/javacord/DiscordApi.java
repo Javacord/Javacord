@@ -11,10 +11,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -759,4 +756,33 @@ public interface DiscordApi {
      * @return A list with all registered reaction remove listeners.
      */
     List<ReactionRemoveListener> getReactionRemoveListeners();
+
+    /**
+     * Adds a listener, which listens to users joining servers.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerMemberAddListener(ServerMemberAddListener listener);
+
+    /**
+     * Gets a list with all registered server member add listeners.
+     *
+     * @return A list with all registered server member add listeners.
+     */
+    List<ServerMemberAddListener> getServerMemberAddListeners();
+
+    /**
+     * Adds a listener, which listens to users leaving servers.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerMemberRemoveListener(ServerMemberRemoveListener listener);
+
+    /**
+     * Gets a list with all registered server member remove listeners.
+     *
+     * @return A list with all registered server member remove listeners.
+     */
+    List<ServerMemberRemoveListener> getServerMemberRemoveListeners();
+
 }

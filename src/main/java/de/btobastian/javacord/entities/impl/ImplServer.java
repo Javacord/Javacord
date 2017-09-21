@@ -18,6 +18,8 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -223,12 +225,32 @@ public class ImplServer implements Server {
     }
 
     /**
-     * Adds a user to the server.
+     * Removes a member from the server.
      *
-     * @param user The user to add.
+     * @param user The user to remove.
      */
-    public void addMember(User user) {
+    public void removeMember(User user) {
+        members.remove(user.getId());
+        nicknames.remove(user.getId());
+        // TODO remove from roles
+    }
+
+    /**
+     * Adds a member to the server.
+     *
+     * @param member The user to add.
+     */
+    public void addMember(JSONObject member) {
+        User user = api.getOrCreateUser(member.getJSONObject("user"));
         members.put(user.getId(), user);
+        if (member.has("nick") && !member.isNull("nick")) {
+            nicknames.put(user.getId(), member.getString("nick"));
+        }
+
+        JSONArray memberRoles = member.getJSONArray("roles");
+        for (int j = 0; j < memberRoles.length(); j++) {
+            // TODO add to roles
+        }
     }
 
     /**
@@ -238,16 +260,7 @@ public class ImplServer implements Server {
      */
     public void addMembers(JSONArray members) {
         for (int i = 0; i < members.length(); i++) {
-            User member = api.getOrCreateUser(members.getJSONObject(i).getJSONObject("user"));
-            if (members.getJSONObject(i).has("nick") && !members.getJSONObject(i).isNull("nick")) {
-                nicknames.put(member.getId(), members.getJSONObject(i).getString("nick"));
-            }
-            addMember(member);
-
-            JSONArray memberRoles = members.getJSONObject(i).getJSONArray("roles");
-            for (int j = 0; j < memberRoles.length(); j++) {
-                // TODO add to roles
-            }
+            addMember(members.getJSONObject(i));
         }
     }
 
@@ -447,5 +460,25 @@ public class ImplServer implements Server {
     @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getListeners(ReactionRemoveListener.class);
+    }
+
+    @Override
+    public void addServerMemberAddListener(ServerMemberAddListener listener) {
+        addListener(ServerMemberAddListener.class, listener);
+    }
+
+    @Override
+    public List<ServerMemberAddListener> getServerMemberAddListeners() {
+        return getListeners(ServerMemberAddListener.class);
+    }
+
+    @Override
+    public void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
+        addListener(ServerMemberRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
+        return getListeners(ServerMemberRemoveListener.class);
     }
 }

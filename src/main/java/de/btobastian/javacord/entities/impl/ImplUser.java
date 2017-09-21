@@ -12,6 +12,8 @@ import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
+import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -233,5 +235,25 @@ public class ImplUser implements User, IconHolder {
     @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getListeners(ReactionRemoveListener.class);
+    }
+
+    @Override
+    public void addServerMemberAddListener(ServerMemberAddListener listener) {
+        addListener(ServerMemberAddListener.class, listener);
+    }
+
+    @Override
+    public List<ServerMemberAddListener> getServerMemberAddListeners() {
+        return getListeners(ServerMemberAddListener.class);
+    }
+
+    @Override
+    public void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
+        addListener(ServerMemberRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
+        return getListeners(ServerMemberRemoveListener.class);
     }
 }

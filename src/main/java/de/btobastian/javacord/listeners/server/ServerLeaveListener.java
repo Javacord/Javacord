@@ -10,10 +10,10 @@ import de.btobastian.javacord.events.server.ServerLeaveEvent;
 @FunctionalInterface
 public interface ServerLeaveListener {
 
-        /**
-         * This method is called every time you leave a server.
-         *
-         * @param event the event.
-         */
-        void onServerLeave(ServerLeaveEvent event);
-        }
+    /**
+     * This method is called every time you leave a server.
+     *
+     * @param event the event.
+     */
+    void onServerLeave(ServerLeaveEvent event);
+}

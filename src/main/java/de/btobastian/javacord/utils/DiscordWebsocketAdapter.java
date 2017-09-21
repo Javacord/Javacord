@@ -13,9 +13,7 @@ import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionAddHandler;
 import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionRemoveHandler;
-import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
-import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMembersChunkHandler;
+import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.TypingStartHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -366,6 +364,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         addHandler(new GuildCreateHandler(api));
         addHandler(new GuildDeleteHandler(api));
         addHandler(new GuildMembersChunkHandler(api));
+        addHandler(new GuildMemberAddHandler(api));
+        addHandler(new GuildMemberRemoveHandler(api));
 
         // channel
         addHandler(new ChannelCreateHandler(api));

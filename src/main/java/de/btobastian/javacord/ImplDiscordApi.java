@@ -18,10 +18,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -629,5 +626,25 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getListeners(ReactionRemoveListener.class);
+    }
+
+    @Override
+    public void addServerMemberAddListener(ServerMemberAddListener listener) {
+        addListener(ServerMemberAddListener.class, listener);
+    }
+
+    @Override
+    public List<ServerMemberAddListener> getServerMemberAddListeners() {
+        return getListeners(ServerMemberAddListener.class);
+    }
+
+    @Override
+    public void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
+        addListener(ServerMemberRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
+        return getListeners(ServerMemberRemoveListener.class);
     }
 }
