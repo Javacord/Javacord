@@ -41,6 +41,13 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     String getName();
 
     /**
+     * Gets the discriminator of the user.
+     *
+     * @return The discriminator of the user.
+     */
+    String getDiscriminator();
+
+    /**
      * Gets the nickname of the user in the given server.
      *
      * @param server The server to check.
