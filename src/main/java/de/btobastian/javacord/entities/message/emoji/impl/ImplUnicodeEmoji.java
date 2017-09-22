@@ -42,6 +42,11 @@ public class ImplUnicodeEmoji implements Emoji {
     }
 
     @Override
+    public String getMentionTag() {
+        return emoji;
+    }
+
+    @Override
     public Optional<String> asUnicodeEmoji() {
         return Optional.of(emoji);
     }

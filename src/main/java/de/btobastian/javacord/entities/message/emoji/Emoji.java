@@ -1,11 +1,13 @@
 package de.btobastian.javacord.entities.message.emoji;
 
+import de.btobastian.javacord.entities.Mentionable;
+
 import java.util.Optional;
 
 /**
  * This class represents an emoji which can be a custom emoji or a unicode emoji.
  */
-public interface Emoji {
+public interface Emoji extends Mentionable {
 
     /**
      * Gets the emoji as unicode emoji.

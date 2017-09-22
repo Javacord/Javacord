@@ -26,6 +26,11 @@ public interface CustomEmoji extends DiscordEntity, Emoji {
     Optional<Server> getServer();
 
     @Override
+    default String getMentionTag() {
+        return "<:" + getName() + ":" + getId() + ">";
+    }
+
+    @Override
     default Optional<String> asUnicodeEmoji() {
         return Optional.empty();
     }
