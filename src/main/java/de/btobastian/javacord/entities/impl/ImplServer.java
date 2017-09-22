@@ -343,7 +343,7 @@ public class ImplServer implements Server {
             return Optional.of(new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconId + ".png"));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
-            return null;
+            return Optional.empty();
         }
     }
 
