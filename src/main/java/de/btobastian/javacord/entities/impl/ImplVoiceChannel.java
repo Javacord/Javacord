@@ -68,6 +68,7 @@ public class ImplVoiceChannel implements VoiceChannel {
     private String name;
     private int position;
     private final ImplServer server;
+    private String parentId = null;
 
     private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
@@ -86,6 +87,9 @@ public class ImplVoiceChannel implements VoiceChannel {
         id = data.getString("id");
         name = data.getString("name");
         position = data.getInt("position");
+        if (data.has("parent_id")) {
+            parentId = data.getString("parent_id");
+        }
 
         JSONArray permissionOverwrites = data.getJSONArray("permission_overwrites");
         for (int i = 0; i < permissionOverwrites.length(); i++) {
@@ -396,6 +400,11 @@ public class ImplVoiceChannel implements VoiceChannel {
      */
     public void removeConnectedUser(User user) {
         this.connectedUsers.remove(user);
+    }
+
+    @Override
+    public String getParentId() {
+        return parentId;
     }
 
     /**
