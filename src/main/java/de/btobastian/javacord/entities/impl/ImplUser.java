@@ -180,7 +180,7 @@ public class ImplUser implements User, IconHolder {
             return Optional.of(new URL(url));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
-            return null;
+            return Optional.empty();
         }
     }
 
