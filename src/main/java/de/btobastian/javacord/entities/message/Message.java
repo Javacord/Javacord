@@ -5,10 +5,12 @@ import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -22,6 +24,8 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class represents a Discord message.
@@ -34,6 +38,54 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The content of the message.
      */
     String getContent();
+
+    /**
+     * Gets the readable content of the message, which replaces all mentions etc. with the actual name.
+     * The replacement happens as following:
+     * <ul>
+     * <li><b>User mentions</b>:
+     * <code>@nickname</code> if the user has a nickname, <code>@name</code> if the user has no nickname,
+     * <code>@invalid-user</code> if the user is not in the server.
+     * <li><b>Channel mentions</b>:
+     * <code>#name</code> if the text channel exists in the server, otherwise <code>#deleted-channel</code>
+     * <li><b>Custom emoji</b>:
+     * <code>:name:</code>. If the emoji is known, the real name is used, otherwise the name from the mention tag.
+     * </ul>
+     *
+     * @return The readable content of the message.
+     */
+    default String getReadableContent() {
+        String content = getContent();
+        Matcher userMention = Pattern.compile("<@!?([0-9]+)>").matcher(content);
+        while (userMention.find()) {
+            String userId = userMention.group(1);
+            String userName = getChannel().asServerChannel().map(c -> {
+                Optional<User> user = c.getServer().getMembers().stream()
+                        .filter(u -> userId.equals(String.valueOf(u.getId()))).findAny();
+                return user.map(u -> u.getNickname(c.getServer()).orElse(u.getName())).orElse("invalid-user");
+            }).orElse("invalid-user");
+            content = userMention.replaceFirst("@" + userName);
+            userMention.reset(content);
+        }
+        Matcher channelMention = Pattern.compile("<#([0-9]+)>").matcher(content);
+        while (channelMention.find()) {
+            String channelId = channelMention.group(1);
+            String channelName = getChannel().asServerChannel().map(c ->
+                c.getServer().getTextChannelById(channelId).map(ServerChannel::getName).orElse("deleted-channel")
+            ).orElse("deleted-channel");
+            content = channelMention.replaceFirst("#" + channelName);
+            channelMention.reset(content);
+        }
+        Matcher customEmoji = Pattern.compile("<:([0-9a-zA-Z]+):([0-9]+)>").matcher(content);
+        while (customEmoji.find()) {
+            String emojiId = customEmoji.group(2);
+            String name = getApi().getCustomEmojiById(emojiId).map(CustomEmoji::getName).orElse(customEmoji.group(1));
+            content = customEmoji.replaceFirst(":" + name + ":");
+            customEmoji.reset(content);
+        }
+        // TODO mention roles
+        return content;
+    }
 
     /**
      * Gets the type of the message.
