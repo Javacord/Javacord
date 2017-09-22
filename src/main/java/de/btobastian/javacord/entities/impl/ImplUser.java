@@ -142,6 +142,11 @@ public class ImplUser implements User, IconHolder {
     }
 
     @Override
+    public String getDiscriminator() {
+        return discriminator;
+    }
+
+    @Override
     public Optional<PrivateChannel> getPrivateChannel() {
         return Optional.ofNullable(channel);
     }
