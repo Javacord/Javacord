@@ -3,11 +3,7 @@ package de.btobastian.javacord.entities.message;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -144,6 +140,27 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A list which contains all reactions of the message.
      */
     List<Reaction> getReactions();
+
+    /**
+     * Gets a reaction by it's emoji.
+     *
+     * @param emoji The emoji of the reaction.
+     * @return The reaction for the given emoji.
+     */
+    default Optional<Reaction> getReactionByEmoji(Emoji emoji) {
+        return getReactions().stream().filter(reaction -> reaction.getEmoji() == emoji).findAny();
+    }
+
+    /**
+     * Gets a reaction by it's unicode emoji.
+     *
+     * @param unicodeEmoji The unicode emoji of the reaction.
+     * @return The reaction for the given emoji.
+     */
+    default Optional<Reaction> getReactionByEmoji(String unicodeEmoji) {
+        return getReactions().stream()
+                .filter(reaction -> unicodeEmoji.equals(reaction.getEmoji().asUnicodeEmoji().orElse(null))).findAny();
+    }
 
     /**
      * Adds a unicode reaction to the message.
