@@ -60,7 +60,7 @@ public class MyFirstBot {
         new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
             // Login successful
             api.getTextChannelById(123L).ifPresent(channel -> channel.sendMessage("I'm online now!"));
-        }).exceptionally(Javacord.EXCEPTION_LOGGER);
+        }).exceptionally(Javacord.exceptionLogger());
     }
 
 }
