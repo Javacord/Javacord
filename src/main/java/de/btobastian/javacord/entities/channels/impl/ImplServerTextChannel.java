@@ -10,6 +10,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
@@ -74,6 +75,15 @@ public class ImplServerTextChannel implements ServerTextChannel {
         name = data.getString("name");
 
         server.addChannelToCache(this);
+    }
+
+    /**
+     * Sets the name of the channel.
+     *
+     * @param name The new name of the channel.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -198,5 +208,15 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getListeners(ReactionRemoveListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
+        addListener(ServerChannelChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
+        return getListeners(ServerChannelChangeNameListener.class);
     }
 }

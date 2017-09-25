@@ -26,6 +26,7 @@ import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -1120,5 +1121,19 @@ public interface DiscordApi {
      * @return A list with all registered server change name listeners.
      */
     List<ServerChangeNameListener> getServerChangeNameListeners();
+
+    /**
+     * Adds a listener, which listens to server channel name changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener);
+
+    /**
+     * Gets a list with all registered server channel change name listeners.
+     *
+     * @return A list with all registered server channel change name listeners.
+     */
+    List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners();
 
 }

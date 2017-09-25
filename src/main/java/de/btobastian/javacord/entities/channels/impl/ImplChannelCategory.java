@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import org.json.JSONObject;
 
@@ -61,6 +62,15 @@ public class ImplChannelCategory implements ChannelCategory {
         name = data.getString("name");
 
         server.addChannelToCache(this);
+    }
+
+    /**
+     * Sets the name of the channel.
+     *
+     * @param name The new name of the channel.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -121,6 +131,16 @@ public class ImplChannelCategory implements ChannelCategory {
     @Override
     public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
         return getListeners(ServerChannelDeleteListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
+        addListener(ServerChannelChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
+        return getListeners(ServerChannelChangeNameListener.class);
     }
 
 }

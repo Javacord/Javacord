@@ -18,7 +18,12 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.*;
+import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -29,7 +34,11 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -519,5 +528,15 @@ public class ImplServer implements Server {
     @Override
     public List<ServerChangeNameListener> getServerChangeNameListeners() {
         return getListeners(ServerChangeNameListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
+        addListener(ServerChannelChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
+        return getListeners(ServerChannelChangeNameListener.class);
     }
 }
