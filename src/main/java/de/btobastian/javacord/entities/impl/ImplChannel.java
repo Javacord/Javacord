@@ -79,6 +79,7 @@ public class ImplChannel implements Channel {
     private final String id;
     private String name;
     private String topic = null;
+    private String parentId = null;
     private int position;
     private final ImplServer server;
 
@@ -101,6 +102,9 @@ public class ImplChannel implements Channel {
             topic = data.getString("topic");
         } catch (JSONException ignored) { }
         position = data.getInt("position");
+        if (data.has("parent_id")) {
+            parentId = data.getString("parent_id");
+        }
 
         JSONArray permissionOverwrites = data.getJSONArray("permission_overwrites");
         for (int i = 0; i < permissionOverwrites.length(); i++) {
@@ -799,6 +803,20 @@ public class ImplChannel implements Channel {
      */
     public void removeOverwrittenPermissions(User user) {
         overwrittenPermissions.remove(user.getId());
+    }
+
+    @Override
+    public String getParentId() {
+        return parentId;
+    }
+
+    /**
+     * Sets the parent id of the channel (no update!).
+     *
+     * @param parentId The id of the parent category
+     */
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 
     @Override

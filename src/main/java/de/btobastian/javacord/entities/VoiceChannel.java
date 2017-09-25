@@ -165,4 +165,12 @@ public interface VoiceChannel {
      * @return the set of users connected to this channel.
      */
     public Set<User> getConnectedUsers();
+
+    /**
+     * Gets the id of the parent category.
+     *
+     * @return The id of the parent category
+     */
+    public String getParentId();
+
 }

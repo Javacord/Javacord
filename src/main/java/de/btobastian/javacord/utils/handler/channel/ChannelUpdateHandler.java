@@ -221,6 +221,12 @@ public class ChannelUpdateHandler extends PacketHandler {
                 }
             }
         }
+
+        String parentId = packet.get("parent_id") == null ? null : packet.getString("parent_id");
+
+        if (!channel.getParentId().equals(parentId)) {
+            ((ImplChannel) channel).setParentId(parentId);
+        }
     }
 
     /**
@@ -346,6 +352,12 @@ public class ChannelUpdateHandler extends PacketHandler {
                     });
                 }
             }
+        }
+
+        String parentId = packet.get("parent_id") == null ? null : packet.getString("parent_id");
+
+        if (!channel.getParentId().equals(parentId)) {
+            ((ImplVoiceChannel) channel).setParentId(parentId);
         }
     }
 
