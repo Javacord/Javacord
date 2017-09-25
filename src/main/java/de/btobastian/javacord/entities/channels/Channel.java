@@ -46,6 +46,18 @@ public interface Channel extends DiscordEntity {
     }
 
     /**
+     * Gets the channel as channel category.
+     *
+     * @return The channel as channel category.
+     */
+    default Optional<ChannelCategory> asChannelCategory() {
+        if (this instanceof ChannelCategory) {
+            return Optional.of((ChannelCategory) this);
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Gets the channel as server text channel.
      *
      * @return The channel as server text channel.

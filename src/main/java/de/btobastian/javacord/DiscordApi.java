@@ -1026,4 +1026,18 @@ public interface DiscordApi {
      */
     List<ServerMemberRemoveListener> getServerMemberRemoveListeners();
 
+    /**
+     * Adds a listener, which listens to server name changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChangeNameListener(ServerChangeNameListener listener);
+
+    /**
+     * Gets a list with all registered server change name listeners.
+     *
+     * @return A list with all registered server change name listeners.
+     */
+    List<ServerChangeNameListener> getServerChangeNameListeners();
+
 }

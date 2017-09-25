@@ -366,6 +366,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         addHandler(new GuildMembersChunkHandler(api));
         addHandler(new GuildMemberAddHandler(api));
         addHandler(new GuildMemberRemoveHandler(api));
+        addHandler(new GuildUpdateHandler(api));
 
         // channel
         addHandler(new ChannelCreateHandler(api));

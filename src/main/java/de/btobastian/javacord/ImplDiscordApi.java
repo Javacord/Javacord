@@ -717,4 +717,14 @@ public class ImplDiscordApi implements DiscordApi {
     public List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
         return getListeners(ServerMemberRemoveListener.class);
     }
+
+    @Override
+    public void addServerChangeNameListener(ServerChangeNameListener listener) {
+        addListener(ServerChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeNameListener> getServerChangeNameListeners() {
+        return getListeners(ServerChangeNameListener.class);
+    }
 }

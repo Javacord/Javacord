@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
@@ -9,10 +10,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -127,6 +125,18 @@ public interface Server extends DiscordEntity, IconHolder {
     Collection<ServerChannel> getChannels();
 
     /**
+     * Gets a collection with all channel categories of the server.
+     *
+     * @return A collection with all channel categories of the server.
+     */
+    default Collection<ChannelCategory> getChannelCategories() {
+        return getChannels().stream()
+                .filter(channel -> channel instanceof ChannelCategory)
+                .map(channel -> (ChannelCategory) channel)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
      * Gets a collection with all text channels of the server.
      *
      * @return A collection with all text channels of the server.
@@ -167,6 +177,32 @@ public interface Server extends DiscordEntity, IconHolder {
     default Optional<ServerChannel> getChannelById(String id) {
         try {
             return getChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a channel category by it's id.
+     *
+     * @param id The id of the channel category.
+     * @return The channel category with the given id.
+     */
+    default Optional<ChannelCategory> getChannelCategoryById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ChannelCategory)
+                .map(channel -> (ChannelCategory) channel);
+    }
+
+    /**
+     * Gets a channel category by it's id.
+     *
+     * @param id The id of the channel category.
+     * @return The channel category with the given id.
+     */
+    default Optional<ChannelCategory> getChannelCategoryById(String id) {
+        try {
+            return getChannelCategoryById(Long.valueOf(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -391,5 +427,19 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered server member remove listeners.
      */
     List<ServerMemberRemoveListener> getServerMemberRemoveListeners();
+
+    /**
+     * Adds a listener, which listens to server name changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChangeNameListener(ServerChangeNameListener listener);
+
+    /**
+     * Gets a list with all registered server change name listeners.
+     *
+     * @return A list with all registered server change name listeners.
+     */
+    List<ServerChangeNameListener> getServerChangeNameListeners();
 
 }

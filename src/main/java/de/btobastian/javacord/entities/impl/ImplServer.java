@@ -5,9 +5,11 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.impl.ImplChannelCategory;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -16,10 +18,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -140,6 +139,9 @@ public class ImplServer implements Server {
                     case 2:
                         getOrCreateServerVoiceChannel(channel);
                         break;
+                    case 4:
+                        getOrCreateChannelCategory(channel);
+                        break;
                 }
             }
         }
@@ -186,6 +188,24 @@ public class ImplServer implements Server {
      */
     public void removeChannelFromCache(long channelId) {
         channels.remove(channelId);
+    }
+
+    /**
+     * Gets or creates a channel category.
+     *
+     * @param data The json data of the channel.
+     * @return The server text channel.
+     */
+    public ChannelCategory getOrCreateChannelCategory(JSONObject data) {
+        long id = Long.parseLong(data.getString("id"));
+        int type = data.getInt("type");
+        synchronized (this) {
+            if (type == 4) {
+                return getChannelCategoryById(id).orElse(new ImplChannelCategory(api, this, data));
+            }
+        }
+        // Invalid channel type
+        return null;
     }
 
     /**
@@ -262,6 +282,15 @@ public class ImplServer implements Server {
         for (int i = 0; i < members.length(); i++) {
             addMember(members.getJSONObject(i));
         }
+    }
+
+    /**
+     * Sets the name of the server.
+     *
+     * @param name The name of the server.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -480,5 +509,15 @@ public class ImplServer implements Server {
     @Override
     public List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
         return getListeners(ServerMemberRemoveListener.class);
+    }
+
+    @Override
+    public void addServerChangeNameListener(ServerChangeNameListener listener) {
+        addListener(ServerChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeNameListener> getServerChangeNameListeners() {
+        return getListeners(ServerChangeNameListener.class);
     }
 }

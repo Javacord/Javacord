@@ -1,6 +1,7 @@
 package de.btobastian.javacord.utils.handler.channel;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
@@ -40,7 +41,29 @@ public class ChannelCreateHandler extends PacketHandler {
             case 2:
                 handleServerVoiceChannel(packet);
                 break;
+            case 4:
+                handleChannelCategory(packet);
+                break;
         }
+    }
+
+    /**
+     * Handles channel category creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleChannelCategory(JSONObject channel) {
+        long serverId = Long.parseLong(channel.getString("guild_id"));
+        api.getServerById(serverId).ifPresent(server -> {
+            ChannelCategory textChannel = ((ImplServer) server).getOrCreateChannelCategory(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEvent(api, server, textChannel);
+
+            List<ServerChannelCreateListener> listeners = new ArrayList<>();
+            listeners.addAll(server.getServerChannelCreateListeners());
+            listeners.addAll(api.getServerChannelCreateListeners());
+
+            dispatchEvent(listeners, listener -> listener.onServerChannelCreate(event));
+        });
     }
 
     /**
