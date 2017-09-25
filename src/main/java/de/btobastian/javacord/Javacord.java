@@ -2,10 +2,21 @@ package de.btobastian.javacord;
 
 import com.mashape.unirest.http.Unirest;
 
+import java.util.function.Function;
+
 /**
  * This class contains some static information about Javacord.
  */
 public class Javacord {
+
+    /**
+     * This function can be used in the {@link java.util.concurrent.CompletableFuture#exceptionally(Function)} method.
+     * It just prints the exception and is doing nothing else.
+     */
+    public static final Function<Throwable, ? extends Void> EXCEPTION_LOGGER = throwable -> {
+        throwable.printStackTrace();
+        return null;
+    };
 
     /**
      * The current javacord version.
