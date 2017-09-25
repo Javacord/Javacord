@@ -56,4 +56,8 @@ public class ImplUnicodeEmoji implements Emoji {
         return Optional.empty();
     }
 
+    @Override
+    public String toString() {
+        return String.format("UnicodeEmoji (emoji: %s)", emoji);
+    }
 }

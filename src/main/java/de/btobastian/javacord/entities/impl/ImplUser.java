@@ -198,6 +198,11 @@ public class ImplUser implements User, IconHolder {
     }
 
     @Override
+    public String toString() {
+        return String.format("User (id: %s, name: %s)", getId(), getName());
+    }
+
+    @Override
     public void addMessageCreateListener(MessageCreateListener listener) {
         addListener(MessageCreateListener.class, listener);
     }

@@ -109,4 +109,10 @@ public class ImplReaction implements Reaction {
     public boolean containsYou() {
         return containsYou;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Reaction (message id: %s, emoji: %s, count: %s)", getMessage().getId(), getEmoji(), getCount());
+    }
 }

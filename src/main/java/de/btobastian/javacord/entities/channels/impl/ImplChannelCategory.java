@@ -124,6 +124,11 @@ public class ImplChannelCategory implements ChannelCategory {
     }
 
     @Override
+    public String toString() {
+        return String.format("ChannelCategory (id: %s, name: %s)", getId(), getName());
+    }
+
+    @Override
     public void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
         addListener(ServerChannelDeleteListener.class, listener);
     }

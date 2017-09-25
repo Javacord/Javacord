@@ -401,6 +401,11 @@ public class ImplServer implements Server {
     }
 
     @Override
+    public String toString() {
+        return String.format("Server (id: %s, name: %s)", getId(), getName());
+    }
+
+    @Override
     public void addMessageCreateListener(MessageCreateListener listener) {
         addListener(MessageCreateListener.class, listener);
     }

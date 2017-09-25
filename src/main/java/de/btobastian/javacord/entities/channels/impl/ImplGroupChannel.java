@@ -17,7 +17,11 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -144,6 +148,11 @@ public class ImplGroupChannel implements GroupChannel {
     @Override
     public Optional<String> getName() {
         return Optional.ofNullable(name);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("GroupChannel (id: %s, name: %s)", getId(), getName());
     }
 
     @Override

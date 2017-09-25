@@ -76,4 +76,9 @@ public class ImplCustomEmoji implements CustomEmoji {
     public Optional<Server> getServer() {
         return Optional.ofNullable(server);
     }
+
+    @Override
+    public String toString() {
+        return String.format("CustomEmoji (id: %s, name: %s)", getId(), getName());
+    }
 }

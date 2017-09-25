@@ -111,6 +111,12 @@ public class ImplPrivateChannel implements PrivateChannel {
         return messageCache;
     }
 
+
+    @Override
+    public String toString() {
+        return String.format("PrivateChannel (id: %s, recipient: %s)", getId(), getRecipient());
+    }
+
     @Override
     public void addMessageCreateListener(MessageCreateListener listener) {
         addListener(MessageCreateListener.class, listener);

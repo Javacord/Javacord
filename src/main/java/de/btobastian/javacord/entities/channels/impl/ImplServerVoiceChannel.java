@@ -116,6 +116,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     }
 
     @Override
+    public String toString() {
+        return String.format("ServerVoiceChannel (id: %s, name: %s)", getId(), getName());
+    }
+
+    @Override
     public void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
         addListener(ServerChannelDeleteListener.class, listener);
     }

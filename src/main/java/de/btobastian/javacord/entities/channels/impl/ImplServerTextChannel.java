@@ -141,6 +141,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     }
 
     @Override
+    public String toString() {
+        return String.format("ServerTextChannel (id: %s, name: %s)", getId(), getName());
+    }
+
+    @Override
     public void addMessageCreateListener(MessageCreateListener listener) {
         addListener(MessageCreateListener.class, listener);
     }
