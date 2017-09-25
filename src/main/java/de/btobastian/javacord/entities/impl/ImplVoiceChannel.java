@@ -408,6 +408,15 @@ public class ImplVoiceChannel implements VoiceChannel {
     }
 
     /**
+     * Sets the parent id of the channel (no update!).
+     *
+     * @param parentId The id of the parent category
+     */
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    /**
      * Returns a set of users connected to this channel.
      * 
      * @return the set of users connected to this channel.

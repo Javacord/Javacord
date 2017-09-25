@@ -211,4 +211,11 @@ public interface Channel extends MessageReceiver {
      */
     public Future<Message> getMessageById(String messageId);
 
+    /**
+     * Gets the id of the parent category.
+     *
+     * @return The id of the parent category
+     */
+    public String getParentId();
+
 }
