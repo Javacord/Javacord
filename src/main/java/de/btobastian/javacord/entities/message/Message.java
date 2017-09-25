@@ -127,6 +127,16 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     void setCachedForever(boolean cachedForever);
 
     /**
+     * Checks if the information of this message is still valid.
+     * If the message got removed from cache but you stored this objects somewhere it might have outdated content.
+     *
+     * @return Whether the information of this message is still valid or not.
+     */
+    default boolean isValid() {
+        return getApi().getCachedMessageById(getId()).orElse(null) == this;
+    }
+
+    /**
      * Whether this message is deleted or not.
      * Deleted messages might still be in the cache for not more than 60 seconds.
      *
@@ -331,55 +341,71 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      *
      * @param listener The listener to add.
      */
-    void addMessageDeleteListener(MessageDeleteListener listener);
+    default void addMessageDeleteListener(MessageDeleteListener listener) {
+        getApi().addMessageDeleteListener(getId(), listener);
+    }
 
     /**
      * Gets a list with all registered message delete listeners.
      *
      * @return A list with all registered message delete listeners.
      */
-    List<MessageDeleteListener> getMessageDeleteListeners();
+    default List<MessageDeleteListener> getMessageDeleteListeners() {
+        return getApi().getMessageDeleteListeners(getId());
+    }
 
     /**
      * Adds a listener, which listens to this message being edited.
      *
      * @param listener The listener to add.
      */
-    void addMessageEditListener(MessageEditListener listener);
+    default void addMessageEditListener(MessageEditListener listener) {
+        getApi().addMessageEditListener(getId(), listener);
+    }
 
     /**
      * Gets a list with all registered message edit listeners.
      *
      * @return A list with all registered message edit listeners.
      */
-    List<MessageEditListener> getMessageEditListeners();
+    default List<MessageEditListener> getMessageEditListeners() {
+        return getApi().getMessageEditListeners(getId());
+    }
 
     /**
      * Adds a listener, which listens to reactions being added to this message.
      *
      * @param listener The listener to add.
      */
-    void addReactionAddListener(ReactionAddListener listener);
+    default void addReactionAddListener(ReactionAddListener listener) {
+        getApi().addReactionAddListener(getId(), listener);
+    }
 
     /**
      * Gets a list with all registered reaction add listeners.
      *
      * @return A list with all registered reaction add listeners.
      */
-    List<ReactionAddListener> getReactionAddListeners();
+    default List<ReactionAddListener> getReactionAddListeners() {
+        return getApi().getReactionAddListeners(getId());
+    }
 
     /**
      * Adds a listener, which listens to reactions being removed from this message.
      *
      * @param listener The listener to add.
      */
-    void addReactionRemoveListener(ReactionRemoveListener listener);
+    default void addReactionRemoveListener(ReactionRemoveListener listener) {
+        getApi().addReactionRemoveListener(getId(), listener);
+    }
 
     /**
      * Gets a list with all registered reaction remove listeners.
      *
      * @return A list with all registered reaction remove listeners.
      */
-    List<ReactionRemoveListener> getReactionRemoveListeners();
+    default List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return getApi().getReactionRemoveListeners(getId());
+    }
 
 }

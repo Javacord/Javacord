@@ -35,10 +35,8 @@ public class MessageDeleteHandler extends PacketHandler {
 
             List<MessageDeleteListener> listeners = new ArrayList<>();
             api.getCachedMessageById(messageId)
-                    .ifPresent(message -> {
-                        listeners.addAll(message.getMessageDeleteListeners());
-                        ((ImplMessage) message).setDeleted(true);
-                    });
+                    .ifPresent(message -> ((ImplMessage) message).setDeleted(true));
+            listeners.addAll(api.getMessageDeleteListeners(messageId));
             listeners.addAll(channel.getMessageDeleteListeners());
             if (channel instanceof ServerTextChannel) {
                 listeners.addAll(((ServerTextChannel) channel).getServer().getMessageDeleteListeners());

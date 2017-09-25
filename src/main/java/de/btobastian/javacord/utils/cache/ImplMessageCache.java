@@ -3,6 +3,7 @@ package de.btobastian.javacord.utils.cache;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.impl.ImplMessage;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ public class ImplMessageCache implements MessageCache {
      */
     public void addMessage(Message message) {
         synchronized (messages) {
+            api.addMessageToCache(message);
             if (messages.contains(message)) {
                 return;
             }
@@ -74,7 +76,7 @@ public class ImplMessageCache implements MessageCache {
      * Cleans the cache.
      */
     public void clean() {
-        Instant minAge = Instant.ofEpochMilli(System.currentTimeMillis() - storageTimeInSeconds * 100);
+        Instant minAge = Instant.ofEpochMilli(System.currentTimeMillis() - storageTimeInSeconds * 1000);
         synchronized (messages) {
             Iterator<Message> iterator = messages.iterator();
             // Remove all deleted messages from the cache
@@ -86,12 +88,13 @@ public class ImplMessageCache implements MessageCache {
             long foreverCachedAmount = messages.stream().filter(Message::isCachedForever).count();
             iterator = messages.iterator();
             while (iterator.hasNext()) {
-                Message message = iterator.next();
+                ImplMessage message = (ImplMessage) iterator.next();
                 if (message.isCachedForever()) {
                     continue;
                 }
                 if (messages.size() > capacity + foreverCachedAmount || message.getCreationDate().isBefore(minAge)) {
                     iterator.remove();
+                    message.setKeepCached(false);
                 } else {
                     // No need to keep iterating as the list is ordered.
                     // If we don't remove an element now, we will also not remove the next element.

@@ -31,8 +31,6 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -136,16 +134,21 @@ public class ImplDiscordApi implements DiscordApi {
 
     /**
      * A map with all cached messages.
-     * The values use weak references as the strong references are hold inside the
-     * {@link de.btobastian.javacord.utils.cache.MessageCache} classes.
      */
-    private final ConcurrentHashMap<Long, WeakReference<Message>> weakMessages = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Message> messages = new ConcurrentHashMap<>();
 
     /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
     private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
+
+    /**
+     * A map which contains all message listeners.
+     * The key is the id of the message.
+     */
+    private final ConcurrentHashMap<Long, Map<Class<?>, List<Object>>> messageListeners =
+            new ConcurrentHashMap<>();
 
     /**
      * Creates a new discord api instance.
@@ -191,7 +194,7 @@ public class ImplDiscordApi implements DiscordApi {
                     });
 
                     getThreadPool().getScheduler().scheduleAtFixedRate(
-                            () -> weakMessages.entrySet().removeIf(entry -> entry.getValue().get() == null)
+                            () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
                             , 30, 30, TimeUnit.SECONDS);
                 });
     }
@@ -316,16 +319,47 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public Message getOrCreateMessage(TextChannel channel, JSONObject data) {
         long id = Long.parseLong(data.getString("id"));
-        synchronized (weakMessages) {
-            WeakReference<Message> value = weakMessages.get(id);
-            Message message = value != null ? value.get() : null;
-            if (message == null) {
-                weakMessages.remove(id);
-                message = new ImplMessage(this, channel, data);
-                weakMessages.put(id, new WeakReference<>(message));
-            }
-            return message;
-        }
+        // The constructor already adds the message to the cache.
+        // If we use #computeIfAbsent() here, it would cause a deadlock
+        return messages.getOrDefault(id, new ImplMessage(this, channel, data));
+    }
+
+    /**
+     * Adds a message to the cache.
+     *
+     * @param message The message to add.
+     */
+    public void addMessageToCache(Message message) {
+        messages.computeIfAbsent(message.getId(), key -> message);
+    }
+
+    /**
+     * Adds a message listener.
+     *
+     * @param messageId The id of the message.
+     * @param clazz The listener class.
+     * @param listener The listener to add.
+     */
+    public void addMessageListener(long messageId, Class<?> clazz, Object listener) {
+        Map<Class<?>, List<Object>> messageListeners =
+                this.messageListeners.computeIfAbsent(messageId, key -> new ConcurrentHashMap<>());
+        List<Object> classListeners = messageListeners.computeIfAbsent(clazz, c -> new ArrayList<>());
+        classListeners.add(listener);
+    }
+
+    /**
+     * Gets all message listeners of the given class.
+     *
+     * @param messageId The id of the message.
+     * @param clazz The class of the listener.
+     * @param <T> The class of the listener.
+     * @return A list with all message listeners of the given type.
+     */
+    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
+    public  <T> List<T> getMessageListeners(long messageId, Class<?> clazz) {
+        List<Object> classListeners =
+                messageListeners.getOrDefault(messageId, Collections.emptyMap()).getOrDefault(clazz, new ArrayList<>());
+        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -466,16 +500,12 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public Collection<Message> getCachedMessages() {
-        return weakMessages.values().stream()
-                .map(Reference::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(ArrayList::new));
+        return messages.values();
     }
 
     @Override
     public Optional<Message> getCachedMessageById(long id) {
-        WeakReference<Message> message = weakMessages.get(id);
-        return Optional.ofNullable(message == null ? null : message.get());
+        return Optional.ofNullable(messages.get(id));
     }
 
     @Override
@@ -594,8 +624,18 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public void addMessageDeleteListener(long messageId, MessageDeleteListener listener) {
+        addMessageListener(messageId, MessageDeleteListener.class, listener);
+    }
+
+    @Override
     public List<MessageDeleteListener> getMessageDeleteListeners() {
         return getListeners(MessageDeleteListener.class);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners(long messageId) {
+        return getMessageListeners(messageId, MessageDeleteListener.class);
     }
 
     @Override
@@ -604,8 +644,18 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public void addMessageEditListener(long messageId, MessageEditListener listener) {
+        addMessageListener(messageId, MessageEditListener.class, listener);
+    }
+
+    @Override
     public List<MessageEditListener> getMessageEditListeners() {
         return getListeners(MessageEditListener.class);
+    }
+
+    @Override
+    public List<MessageEditListener> getMessageEditListeners(long messageId) {
+        return getMessageListeners(messageId, MessageEditListener.class);
     }
 
     @Override
@@ -614,8 +664,18 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public void addReactionAddListener(long messageId, ReactionAddListener listener) {
+        addMessageListener(messageId, ReactionAddListener.class, listener);
+    }
+
+    @Override
     public List<ReactionAddListener> getReactionAddListeners() {
         return getListeners(ReactionAddListener.class);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners(long messageId) {
+        return getMessageListeners(messageId, ReactionAddListener.class);
     }
 
     @Override
@@ -624,8 +684,18 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public void addReactionRemoveListener(long messageId, ReactionRemoveListener listener) {
+        addMessageListener(messageId, ReactionRemoveListener.class, listener);
+    }
+
+    @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getListeners(ReactionRemoveListener.class);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners(long messageId) {
+        return getMessageListeners(messageId, ReactionRemoveListener.class);
     }
 
     @Override

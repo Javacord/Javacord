@@ -10,10 +10,6 @@ import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
-import de.btobastian.javacord.listeners.message.MessageDeleteListener;
-import de.btobastian.javacord.listeners.message.MessageEditListener;
-import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
-import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link Message}.
@@ -56,12 +50,6 @@ public class ImplMessage implements Message {
     private final MessageType type;
 
     /**
-     * A map which contains all listeners.
-     * The key is the class of the listener.
-     */
-    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
-
-    /**
      * The user author of the message. Can be <code>null</code> if the author is a webhook for example.
      */
     private final User userAuthor;
@@ -75,6 +63,16 @@ public class ImplMessage implements Message {
      * As soon as we receive a message delete event, we mark the message as deleted.
      */
     private boolean deleted = false;
+
+    /**
+     * Whether the message should be kept in cache or not.
+     */
+    private boolean keepCached = true;
+
+    /**
+     * We use the counter to make sure a message is cached for at least 2 minutes!
+     */
+    private byte keepCachedCounter = 0;
 
     /**
      * A list with all embeds.
@@ -108,9 +106,7 @@ public class ImplMessage implements Message {
         }
 
         ImplMessageCache cache = (ImplMessageCache) channel.getMessageCache();
-        if (cache.getCapacity() != 0 && cache.getStorageTimeInSeconds() != 0) {
-            cache.addMessage(this);
-        }
+        cache.addMessage(this);
 
         JSONArray embedsJson = data.has("embeds") ? data.getJSONArray("embeds") : new JSONArray();
         for (int i = 0; i < embedsJson.length(); i++) {
@@ -123,6 +119,29 @@ public class ImplMessage implements Message {
             Reaction reaction = new ImplReaction(this, reactionsJson.getJSONObject(i));
             reactions.add(reaction);
         }
+    }
+
+    /**
+     * Checks if the message should be kept in cache.
+     *
+     * @return Whether the message should be kept in cache or not.
+     */
+    public boolean keepCached() {
+        if (keepCachedCounter <= 5) {
+            // keepCached() is checked every 30 seconds.
+            // This makes sure, that messages are cached for at least 2 minutes!
+            keepCachedCounter++;
+        }
+        return keepCached || keepCachedCounter <= 5;
+    }
+
+    /**
+     * Sets if the message should be kept in cache.
+     *
+     * @param keepCached Whether the message should be kept in cache or not.
+     */
+    public void setKeepCached(boolean keepCached) {
+        this.keepCached = keepCached;
     }
 
     /**
@@ -176,30 +195,6 @@ public class ImplMessage implements Message {
         Optional<Reaction> reaction = reactions.stream().filter(r -> emoji == r.getEmoji()).findAny();
         reaction.ifPresent(r -> ((ImplReaction) r).decrementCount(you));
         reactions.removeIf(r -> r.getCount() <= 0);
-    }
-
-    /**
-     * Adds a listener.
-     *
-     * @param clazz The listener class.
-     * @param listener The listener to add.
-     */
-    private void addListener(Class<?> clazz, Object listener) {
-        List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
-        classListeners.add(listener);
-    }
-
-    /**
-     * Gets all listeners of the given class.
-     *
-     * @param clazz The class of the listener.
-     * @param <T> The class of the listener.
-     * @return A list with all listeners of the given type.
-     */
-    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    private <T> List<T> getListeners(Class<?> clazz) {
-        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
-        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -274,46 +269,5 @@ public class ImplMessage implements Message {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Message && ((Message) obj).getId() == getId();
-    }
-
-    @Override
-    public void addMessageDeleteListener(MessageDeleteListener listener) {
-        addListener(MessageDeleteListener.class, listener);
-        setCachedForever(true);
-    }
-
-    @Override
-    public List<MessageDeleteListener> getMessageDeleteListeners() {
-        return getListeners(MessageDeleteListener.class);
-    }
-
-    @Override
-    public void addMessageEditListener(MessageEditListener listener) {
-        addListener(MessageEditListener.class, listener);
-    }
-
-    @Override
-    public List<MessageEditListener> getMessageEditListeners() {
-        return getListeners(MessageEditListener.class);
-    }
-
-    @Override
-    public void addReactionAddListener(ReactionAddListener listener) {
-        addListener(ReactionAddListener.class, listener);
-    }
-
-    @Override
-    public List<ReactionAddListener> getReactionAddListeners() {
-        return getListeners(ReactionAddListener.class);
-    }
-
-    @Override
-    public void addReactionRemoveListener(ReactionRemoveListener listener) {
-        addListener(ReactionRemoveListener.class, listener);
-    }
-
-    @Override
-    public List<ReactionRemoveListener> getReactionRemoveListeners() {
-        return getListeners(ReactionRemoveListener.class);
     }
 }

@@ -124,11 +124,7 @@ public class MessageUpdateHandler extends PacketHandler {
      */
     private void dispatchEditEvent(MessageEditEvent event) {
         List<MessageEditListener> listeners = new ArrayList<>();
-        event.getMessage()
-                .ifPresent(message -> {
-                    listeners.addAll(message.getMessageEditListeners());
-                    ((ImplMessage) message).setDeleted(true);
-                });
+        listeners.addAll(api.getMessageEditListeners(event.getMessageId()));
         listeners.addAll(event.getChannel().getMessageEditListeners());
         if (event.getChannel() instanceof ServerTextChannel) {
             listeners.addAll(((ServerTextChannel) event.getChannel()).getServer().getMessageEditListeners());
