@@ -25,6 +25,7 @@ import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -160,37 +161,40 @@ public interface Server extends DiscordEntity, IconHolder {
     Collection<ServerChannel> getChannels();
 
     /**
-     * Gets a collection with all channel categories of the server.
+     * Gets a sorted list (by position) with all channel categories of the server.
      *
-     * @return A collection with all channel categories of the server.
+     * @return A sorted list (by position) with all channel categories of the server.
      */
-    default Collection<ChannelCategory> getChannelCategories() {
+    default List<ChannelCategory> getChannelCategories() {
         return getChannels().stream()
                 .filter(channel -> channel instanceof ChannelCategory)
+                .sorted(Comparator.comparingInt(ServerChannel::getPosition))
                 .map(channel -> (ChannelCategory) channel)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
-     * Gets a collection with all text channels of the server.
+     * Gets a sorted list (by position) with all text channels of the server.
      *
-     * @return A collection with all text channels of the server.
+     * @return A sorted list (by position) with all text channels of the server.
      */
-    default Collection<ServerTextChannel> getTextChannels() {
+    default List<ServerTextChannel> getTextChannels() {
         return getChannels().stream()
                 .filter(channel -> channel instanceof ServerTextChannel)
+                .sorted(Comparator.comparingInt(ServerChannel::getPosition))
                 .map(channel -> (ServerTextChannel) channel)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
-     * Gets a collection with all voice channels of the server.
+     * Gets a sorted list (by position) with all voice channels of the server.
      *
-     * @return A collection with all voice channels of the server.
+     * @return A sorted list (by position) with all voice channels of the server.
      */
-    default Collection<ServerVoiceChannel> getVoiceChannels() {
+    default List<ServerVoiceChannel> getVoiceChannels() {
         return getChannels().stream()
                 .filter(channel -> channel instanceof ServerVoiceChannel)
+                .sorted(Comparator.comparingInt(ServerChannel::getPosition))
                 .map(channel -> (ServerVoiceChannel) channel)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
