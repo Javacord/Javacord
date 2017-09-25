@@ -3,7 +3,15 @@ package de.btobastian.javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.channels.Channel;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
+import de.btobastian.javacord.entities.channels.GroupChannel;
+import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.channels.VoiceChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -11,7 +19,13 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.*;
+import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
+import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
+import de.btobastian.javacord.listeners.server.ServerJoinListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -19,7 +33,11 @@ import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -357,6 +375,17 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all channel categories of the bot.
+     *
+     * @return A collection with all channel categories of the bot.
+     */
+    default Collection<ChannelCategory> getChannelCategories() {
+        Collection<ChannelCategory> channels = new ArrayList<>();
+        getServers().forEach(server -> channels.addAll(server.getChannelCategories()));
+        return channels;
+    }
+
+    /**
      * Gets a collection with all server text channels of the bot.
      *
      * @return A collection with all server text channels of the bot.
@@ -477,6 +506,58 @@ public interface DiscordApi {
     default Optional<VoiceChannel> getVoiceChannelById(String id) {
         try {
             return getVoiceChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a server channel by it's id.
+     *
+     * @param id The id of the server channel.
+     * @return The server channel with the given id.
+     */
+    default Optional<ServerChannel> getServerChannelById(long id) {
+        return getServerChannels().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
+    }
+
+    /**
+     * Gets a server channel by it's id.
+     *
+     * @param id The id of the server channel.
+     * @return The server channel with the given id.
+     */
+    default Optional<ServerChannel> getServerChannelById(String id) {
+        try {
+            return getServerChannelById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a channel category by it's id.
+     *
+     * @param id The id of the channel category.
+     * @return The channel category with the given id.
+     */
+    default Optional<ChannelCategory> getChannelCategoryById(long id) {
+        return getChannelCategories().stream()
+                .filter(channel -> channel.getId() == id)
+                .findAny();
+    }
+
+    /**
+     * Gets a channel category by it's id.
+     *
+     * @param id The id of the channel category.
+     * @return The channel category with the given id.
+     */
+    default Optional<ChannelCategory> getChannelCategoryById(String id) {
+        try {
+            return getChannelCategoryById(Long.valueOf(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
