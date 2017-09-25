@@ -42,6 +42,11 @@ public class ImplChannelCategory implements ChannelCategory {
     private final ImplServer server;
 
     /**
+     * The position of the channel.
+     */
+    private int position;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -60,6 +65,7 @@ public class ImplChannelCategory implements ChannelCategory {
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
+        position = data.getInt("position");
 
         server.addChannelToCache(this);
     }
@@ -115,6 +121,11 @@ public class ImplChannelCategory implements ChannelCategory {
     @Override
     public Server getServer() {
         return server;
+    }
+
+    @Override
+    public int getPosition() {
+        return position;
     }
 
     @Override

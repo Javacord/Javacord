@@ -40,6 +40,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     private final ImplServer server;
 
     /**
+     * The position of the channel.
+     */
+    private int position;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -55,6 +60,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     public ImplServerVoiceChannel(ImplDiscordApi api, ImplServer server, JSONObject data) {
         this.api = api;
         this.server = server;
+        position = data.getInt("position");
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
@@ -113,6 +119,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     @Override
     public Server getServer() {
         return server;
+    }
+
+    @Override
+    public int getPosition() {
+        return position;
     }
 
     @Override

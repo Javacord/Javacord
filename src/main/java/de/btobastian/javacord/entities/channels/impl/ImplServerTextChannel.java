@@ -48,6 +48,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     private final ImplServer server;
 
     /**
+     * The position of the channel.
+     */
+    private int position;
+
+    /**
      * The message cache of the server text channel.
      */
     private final ImplMessageCache messageCache;
@@ -73,6 +78,7 @@ public class ImplServerTextChannel implements ServerTextChannel {
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
+        position = data.getInt("position");
 
         server.addChannelToCache(this);
     }
@@ -128,6 +134,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public Server getServer() {
         return server;
+    }
+
+    @Override
+    public int getPosition() {
+        return position;
     }
 
     @Override

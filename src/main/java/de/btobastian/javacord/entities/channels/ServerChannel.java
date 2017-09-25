@@ -30,6 +30,13 @@ public interface ServerChannel extends Channel {
     Server getServer();
 
     /**
+     * Gets the position of the channel.
+     *
+     * @return The position of the channel.
+     */
+    int getPosition();
+
+    /**
      * Deletes the channel.
      *
      * @return A future to tell us if the deletion was successful.
