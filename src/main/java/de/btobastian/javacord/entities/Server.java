@@ -1,9 +1,12 @@
 package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.entities.channels.ChannelCategory;
+import de.btobastian.javacord.entities.channels.ChannelCategoryBuilder;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannelBuilder;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannelBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -120,6 +123,33 @@ public interface Server extends DiscordEntity, IconHolder {
      */
     default List<CustomEmoji> getCustomEmojisByName(String name) {
         return getCustomEmojis().stream().filter(emoji -> emoji.getName().equals(name)).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a new channel category builder.
+     *
+     * @return The builder to create a new channel category.
+     */
+    default ChannelCategoryBuilder getChannelCategoryBuilder() {
+        return new ChannelCategoryBuilder(this);
+    }
+
+    /**
+     * Gets a new server text channel builder.
+     *
+     * @return The builder to create a new server text channel.
+     */
+    default ServerTextChannelBuilder getTextChannelBuilder() {
+        return new ServerTextChannelBuilder(this);
+    }
+
+    /**
+     * Gets a new server voice channel builder.
+     *
+     * @return The builder to create a new server voice channel.
+     */
+    default ServerVoiceChannelBuilder getVoiceChannelBuilder() {
+        return new ServerVoiceChannelBuilder(this);
     }
 
     /**
