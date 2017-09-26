@@ -16,6 +16,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameLi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -1132,5 +1133,19 @@ public interface DiscordApi {
      * @return A list with all registered server channel change position listeners.
      */
     List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
+
+    /**
+     * Adds a listener, which listens to custom emoji creations.
+     *
+     * @param listener The listener to add.
+     */
+    void addCustomEmojiCreateListener(CustomEmojiCreateListener listener);
+
+    /**
+     * Gets a list with all registered custom emoji create listeners.
+     *
+     * @return A list with all registered custom emoji create listeners.
+     */
+    List<CustomEmojiCreateListener> getCustomEmojiCreateListeners();
 
 }

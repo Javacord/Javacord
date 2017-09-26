@@ -23,6 +23,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameLi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
@@ -168,7 +169,7 @@ public class ImplServer implements Server {
         JSONArray emojis = data.has("emojis") ? data.getJSONArray("emojis") : new JSONArray();
         for (int i = 0; i < emojis.length(); i++) {
             CustomEmoji emoji = api.getOrCreateCustomEmoji(this, emojis.getJSONObject(i));
-            this.customEmojis.add(emoji);
+            addCustomEmoji(emoji);
         }
 
         api.addServerToCache(this);
@@ -190,6 +191,24 @@ public class ImplServer implements Server {
      */
     public void removeChannelFromCache(long channelId) {
         channels.remove(channelId);
+    }
+
+    /**
+     * Adds a custom emoji.
+     *
+     * @param emoji The emoji to add.
+     */
+    public void addCustomEmoji(CustomEmoji emoji) {
+        customEmojis.add(emoji);
+    }
+
+    /**
+     * Removes a custom emoji.
+     *
+     * @param emoji The emoji to remove.
+     */
+    public void removeCustomEmoji(CustomEmoji emoji) {
+        customEmojis.remove(emoji);
     }
 
     /**
@@ -546,5 +565,15 @@ public class ImplServer implements Server {
     @Override
     public List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
         return getListeners(ServerChannelChangePositionListener.class);
+    }
+
+    @Override
+    public void addCustomEmojiCreateListener(CustomEmojiCreateListener listener) {
+        addListener(CustomEmojiCreateListener.class, listener);
+    }
+
+    @Override
+    public List<CustomEmojiCreateListener> getCustomEmojiCreateListeners() {
+        return getListeners(CustomEmojiCreateListener.class);
     }
 }
