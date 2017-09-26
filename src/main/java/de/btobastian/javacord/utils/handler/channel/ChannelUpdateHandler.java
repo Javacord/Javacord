@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -222,9 +223,9 @@ public class ChannelUpdateHandler extends PacketHandler {
             }
         }
 
-        String parentId = packet.get("parent_id") == null ? null : packet.getString("parent_id");
+        String parentId = packet.isNull("parent_id") ? null : packet.getString("parent_id");
 
-        if (!channel.getParentId().equals(parentId)) {
+        if (!Objects.deepEquals(channel.getParentId(), parentId)) {
             ((ImplChannel) channel).setParentId(parentId);
         }
     }
@@ -354,9 +355,9 @@ public class ChannelUpdateHandler extends PacketHandler {
             }
         }
 
-        String parentId = packet.get("parent_id") == null ? null : packet.getString("parent_id");
+        String parentId = packet.isNull("parent_id") ? null : packet.getString("parent_id");
 
-        if (!channel.getParentId().equals(parentId)) {
+        if (!Objects.deepEquals(channel.getParentId(), parentId)) {
             ((ImplVoiceChannel) channel).setParentId(parentId);
         }
     }

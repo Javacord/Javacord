@@ -102,7 +102,7 @@ public class ImplChannel implements Channel {
             topic = data.getString("topic");
         } catch (JSONException ignored) { }
         position = data.getInt("position");
-        if (data.has("parent_id")) {
+        if (data.has("parent_id") && !data.isNull("parent_id")) {
             parentId = data.getString("parent_id");
         }
 

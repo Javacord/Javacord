@@ -18,23 +18,9 @@
  */
 package de.btobastian.javacord.entities.impl;
 
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-
-import de.btobastian.javacord.utils.SnowflakeUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.entities.Server;
@@ -48,7 +34,19 @@ import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangeNameListen
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelChangePositionListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelDeleteListener;
 import de.btobastian.javacord.utils.LoggerUtil;
+import de.btobastian.javacord.utils.SnowflakeUtil;
 import de.btobastian.javacord.utils.ratelimits.RateLimitType;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 /**
  * The implementation of the voice channel interface.
@@ -87,7 +85,7 @@ public class ImplVoiceChannel implements VoiceChannel {
         id = data.getString("id");
         name = data.getString("name");
         position = data.getInt("position");
-        if (data.has("parent_id")) {
+        if (data.has("parent_id") && !data.isNull("parent_id")) {
             parentId = data.getString("parent_id");
         }
 
