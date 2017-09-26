@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import org.json.JSONObject;
 
@@ -75,6 +76,15 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the position of the channel.
+     *
+     * @param position The new position of the channel.
+     */
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     /**
@@ -149,6 +159,16 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     @Override
     public List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
         return getListeners(ServerChannelChangeNameListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
+        addListener(ServerChannelChangePositionListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
+        return getListeners(ServerChannelChangePositionListener.class);
     }
 
 }

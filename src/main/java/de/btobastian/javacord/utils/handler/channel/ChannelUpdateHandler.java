@@ -5,7 +5,9 @@ import de.btobastian.javacord.entities.channels.impl.ImplChannelCategory;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeNameEvent;
+import de.btobastian.javacord.events.server.channel.ServerChannelChangePositionEvent;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -72,6 +74,24 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getServerChannelChangeNameListeners());
 
                 dispatchEvent(listeners, listener -> listener.onServerChannelChangeName(event));
+            }
+
+            int oldPosition = c.getPosition();
+            int newPosition = channel.getInt("position");
+            if (oldPosition != newPosition) {
+                c.asChannelCategory().ifPresent(cc -> ((ImplChannelCategory) cc).setPosition(newPosition));
+                c.asServerTextChannel().ifPresent(stc -> ((ImplServerTextChannel) stc).setPosition(newPosition));
+                c.asServerVoiceChannel().ifPresent(svc -> ((ImplServerVoiceChannel) svc).setPosition(newPosition));
+
+                ServerChannelChangePositionEvent event =
+                        new ServerChannelChangePositionEvent(api, c.getServer(), c, newPosition, oldPosition);
+
+                List<ServerChannelChangePositionListener> listeners = new ArrayList<>();
+                listeners.addAll(c.getServerChannelChangePositionListeners());
+                listeners.addAll(c.getServer().getServerChannelChangePositionListeners());
+                listeners.addAll(api.getServerChannelChangePositionListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChannelChangePosition(event));
             }
         });
     }

@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.channels;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -62,7 +63,7 @@ public interface ServerChannel extends Channel {
     List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
 
     /**
-     * Adds a listener, which listens to server channel name changes.
+     * Adds a listener, which listens this server channel name changes.
      *
      * @param listener The listener to add.
      */
@@ -74,5 +75,19 @@ public interface ServerChannel extends Channel {
      * @return A list with all registered server channel change name listeners.
      */
     List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners();
+
+    /**
+     * Adds a listener, which listens this server channel position changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener);
+
+    /**
+     * Gets a list with all registered server channel change position listeners.
+     *
+     * @return A list with all registered server channel change position listeners.
+     */
+    List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
 
 }

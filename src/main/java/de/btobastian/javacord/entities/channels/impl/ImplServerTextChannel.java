@@ -11,6 +11,7 @@ import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
@@ -90,6 +91,15 @@ public class ImplServerTextChannel implements ServerTextChannel {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the position of the channel.
+     *
+     * @param position The new position of the channel.
+     */
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     /**
@@ -234,5 +244,15 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
         return getListeners(ServerChannelChangeNameListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
+        addListener(ServerChannelChangePositionListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
+        return getListeners(ServerChannelChangePositionListener.class);
     }
 }

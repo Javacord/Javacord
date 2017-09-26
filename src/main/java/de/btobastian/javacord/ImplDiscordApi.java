@@ -18,14 +18,9 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -38,13 +33,7 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -749,5 +738,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
         return getListeners(ServerChannelChangeNameListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
+        addListener(ServerChannelChangePositionListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
+        return getListeners(ServerChannelChangePositionListener.class);
     }
 }

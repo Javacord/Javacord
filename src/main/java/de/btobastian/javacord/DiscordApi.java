@@ -3,15 +3,7 @@ package de.btobastian.javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.Channel;
-import de.btobastian.javacord.entities.channels.ChannelCategory;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.channels.VoiceChannel;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -19,14 +11,9 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -34,11 +21,7 @@ import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -1135,5 +1118,19 @@ public interface DiscordApi {
      * @return A list with all registered server channel change name listeners.
      */
     List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners();
+
+    /**
+     * Adds a listener, which listens to server channel position changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener);
+
+    /**
+     * Gets a list with all registered server channel change position listeners.
+     *
+     * @return A list with all registered server channel change position listeners.
+     */
+    List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
 
 }
