@@ -25,6 +25,8 @@ public class ServerChannelChangeNameEvent extends ServerChannelEvent {
      * @param api The api instance of the event.
      * @param server The server of the event.
      * @param channel The channel of the event.
+     * @param newName The new name of the channel.
+     * @param oldName The old name of the channel.
      */
     public ServerChannelChangeNameEvent(
             DiscordApi api, Server server, ServerChannel channel, String newName, String oldName) {
