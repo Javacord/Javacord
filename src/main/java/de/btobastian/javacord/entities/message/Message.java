@@ -179,10 +179,12 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the action was successful.
      */
     default CompletableFuture<Void> addReaction(String unicodeEmoji) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
+        RestRequest<Void> request = new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()), unicodeEmoji, "@me")
-                .setRatelimitRetries(25)
-                .execute(res -> null);
+                .setRatelimitRetries(50);
+        getServerTextChannel().map(ServerChannel::getServer).map(DiscordEntity::getId).map(String::valueOf)
+                .ifPresent(request::setCustomMajorParam);
+        return request.execute(res -> null);
     }
 
     /**
@@ -197,10 +199,12 @@ public interface Message extends DiscordEntity, Comparable<Message> {
                         .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
                         .orElse("UNKNOWN")
         );
-        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
+        RestRequest<Void> request = new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()), value, "@me")
-                .setRatelimitRetries(50)
-                .execute(res -> null);
+                .setRatelimitRetries(50);
+        getServerTextChannel().map(ServerChannel::getServer).map(DiscordEntity::getId).map(String::valueOf)
+                .ifPresent(request::setCustomMajorParam);
+        return request.execute(res -> null);
     }
 
     /**
@@ -209,9 +213,11 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> removeAllReactions() {
-        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.REACTION)
-                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()))
-                .execute(res -> null);
+        RestRequest<Void> request = new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.REACTION)
+                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()));
+        getServerTextChannel().map(ServerChannel::getServer).map(DiscordEntity::getId).map(String::valueOf)
+                .ifPresent(request::setCustomMajorParam);
+        return request.execute(res -> null);
     }
 
     /**

@@ -40,6 +40,11 @@ public class RestRequest<T> {
     private final CompletableFuture<HttpResponse<JsonNode>> result = new CompletableFuture<>();
 
     /**
+     * The custom major parameter if it's not included in the url (e.g. for reactions)
+     */
+    private String customMajorParam = null;
+
+    /**
      * Creates a new instance of this class.
      *
      * @param api The api which will be used to execute the request.
@@ -104,6 +109,9 @@ public class RestRequest<T> {
      * @return The major url parameter used for ratelimits.
      */
     public Optional<String> getMajorUrlParameter() {
+        if (customMajorParam != null) {
+            return Optional.of(customMajorParam);
+        }
         Optional<Integer> majorParameterPosition = endpoint.getMajorParameterPosition();
         if (!majorParameterPosition.isPresent()) {
             return Optional.empty();
@@ -148,6 +156,17 @@ public class RestRequest<T> {
             throw new IllegalArgumentException("Retries cannot be less than 0!");
         }
         this.ratelimitRetries = retries;
+        return this;
+    }
+
+    /**
+     * Sets a custom major parameter.
+     *
+     * @param customMajorParam The custom parameter to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest<T> setCustomMajorParam(String customMajorParam) {
+        this.customMajorParam = customMajorParam;
         return this;
     }
 

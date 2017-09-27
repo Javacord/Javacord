@@ -2,7 +2,9 @@ package de.btobastian.javacord.entities.message;
 
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -53,18 +55,20 @@ public interface Reaction {
     default CompletableFuture<List<User>> getUsers() {
         String value = getEmoji().asUnicodeEmoji().orElse(
                 getEmoji().asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
-        return new RestRequest<List<User>>(getMessage().getApi(), HttpMethod.GET, RestEndpoint.REACTION)
+        RestRequest<List<User>> request = new RestRequest<List<User>>(getMessage().getApi(), HttpMethod.GET, RestEndpoint.REACTION)
                 .setUrlParameters(
                         String.valueOf(getMessage().getChannel().getId()), String.valueOf(getMessage().getId()), value)
-                .setRatelimitRetries(25)
-                .execute(res -> {
-                    List<User> users = new ArrayList<>();
-                    JSONArray usersJson = res.getBody().getArray();
-                    for (int i = 0; i < usersJson.length(); i++) {
-                        users.add(((ImplDiscordApi) getMessage().getApi()).getOrCreateUser(usersJson.getJSONObject(i)));
-                    }
-                    return users;
-                });
+                .setRatelimitRetries(25);
+        getMessage().getServerTextChannel().map(ServerChannel::getServer).map(DiscordEntity::getId).map(String::valueOf)
+                .ifPresent(request::setCustomMajorParam);
+        return request.execute(res -> {
+            List<User> users = new ArrayList<>();
+            JSONArray usersJson = res.getBody().getArray();
+            for (int i = 0; i < usersJson.length(); i++) {
+                users.add(((ImplDiscordApi) getMessage().getApi()).getOrCreateUser(usersJson.getJSONObject(i)));
+            }
+            return users;
+        });
     }
 
     /**
@@ -76,14 +80,16 @@ public interface Reaction {
     default CompletableFuture<Void> removeUser(User user) {
         String value = getEmoji().asUnicodeEmoji().orElse(
                 getEmoji().asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
-        return new RestRequest<Void>(getMessage().getApi(), HttpMethod.DELETE, RestEndpoint.REACTION)
+        RestRequest<Void> request = new RestRequest<Void>(getMessage().getApi(), HttpMethod.DELETE, RestEndpoint.REACTION)
                 .setUrlParameters(
                         String.valueOf(getMessage().getChannel().getId()),
                         String.valueOf(getMessage().getId()),
                         value,
                         user.isYourself() ? "@me" : String.valueOf(user.getId()))
-                .setRatelimitRetries(25)
-                .execute(res -> null);
+                .setRatelimitRetries(25);
+        getMessage().getServerTextChannel().map(ServerChannel::getServer).map(DiscordEntity::getId).map(String::valueOf)
+                .ifPresent(request::setCustomMajorParam);
+        return request.execute(res -> null);
     }
 
 }
