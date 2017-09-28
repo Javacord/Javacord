@@ -4,8 +4,10 @@ import com.mashape.unirest.http.HttpMethod;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.request.body.MultipartBody;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
@@ -14,6 +16,8 @@ import de.btobastian.javacord.exceptions.RatelimitException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +42,16 @@ public class RestRequest<T> {
     private int retryCounter = 0;
 
     private final CompletableFuture<HttpResponse<JsonNode>> result = new CompletableFuture<>();
+
+    /**
+     * This consumer is called to add a file to the request.
+     */
+    private Function<HttpRequestWithBody, MultipartBody> fileSupplier = request -> null;
+
+    /**
+     * This consumer is called to add fields to the request.
+     */
+    private List<Function<MultipartBody, MultipartBody>> fieldSupplier = new ArrayList<>();
 
     /**
      * The custom major parameter if it's not included in the url (e.g. for reactions)
@@ -142,6 +156,44 @@ public class RestRequest<T> {
      */
     public RestRequest<T> setUrlParameters(String... parameters) {
         this.urlParameters = parameters;
+        return this;
+    }
+
+    /**
+     * Adds a field to the request.
+     *
+     * @param name The name of the field.
+     * @param file The file.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest<T> addField(String name, File file) {
+        fileSupplier = request -> request.field(name, file);
+        return this;
+    }
+
+    /**
+     * Adds a field to the request.
+     *
+     * @param name The name of the field.
+     * @param stream The stream of the data.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest<T> addField(String name, InputStream stream, String fileName) {
+        fileSupplier = request -> request.field(name, stream, fileName);
+        return this;
+    }
+
+    /**
+     * Adds a field to the request.
+     * This will only work, if a file was added, too!
+     *
+     * @param name The name of the field.
+     * @param value The value of the field.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest<T> addField(String name, String value) {
+        fieldSupplier.add(request -> request.field(name, value));
         return this;
     }
 
@@ -260,7 +312,7 @@ public class RestRequest<T> {
      * @throws Exception If something went wrong while executing the request.
      */
     public HttpResponse<JsonNode> executeBlocking() throws Exception {
-        HttpRequest request;
+        BaseRequest request;
         switch (method) {
             case GET:
                 request = Unirest.get(endpoint.getFullUrl(urlParameters));
@@ -287,14 +339,22 @@ public class RestRequest<T> {
                 throw new IllegalArgumentException("Unsupported http method!");
         }
         for (String[] queryParameter : queryParameters) {
-            request.queryString(queryParameter[0], queryParameter[1]);
+            ((HttpRequest) request).queryString(queryParameter[0], queryParameter[1]);
         }
         if (includeAuthorizationHeader) {
-            request.header("authorization", api.getToken());
+            ((HttpRequest) request).header("authorization", api.getToken());
         }
-        if (body != null && request instanceof HttpRequestWithBody) {
-            request.header("content-type", "application/json");
-            ((HttpRequestWithBody) request).body(body);
+        if (request instanceof HttpRequestWithBody) {
+            if (fileSupplier.apply(Unirest.post("")) != null) {
+                MultipartBody multipartBody = fileSupplier.apply((HttpRequestWithBody) request);
+                for (Function<MultipartBody, MultipartBody> func : fieldSupplier) {
+                    multipartBody = func.apply(multipartBody);
+                }
+                request = multipartBody;
+            } else if (body != null) {
+                ((HttpRequestWithBody) request).body(body);
+                ((HttpRequest) request).header("content-type", "application/json");
+            }
         }
         HttpResponse<JsonNode> response = request.asJson();
         if (response.getStatus() >= 300 || response.getStatus() < 200) {

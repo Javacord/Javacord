@@ -14,10 +14,13 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.MessageCache;
+import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,8 +29,14 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface TextChannel extends Channel, Messageable {
 
+    /**
+     * The logger of this class.
+     */
+    Logger logger = LoggerUtil.getLogger(TextChannel.class);
+
     @Override
-    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
+    default CompletableFuture<Message> sendMessage(
+            String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
         JSONObject body = new JSONObject()
                 .put("content", content == null ? "" : content)
                 .put("tts", tts)
@@ -38,10 +47,15 @@ public interface TextChannel extends Channel, Messageable {
         if (nonce != null) {
             body.put("nonce", nonce);
         }
-        return new RestRequest<Message>(getApi(), HttpMethod.POST, RestEndpoint.MESSAGE)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(body)
-                .execute(res -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, res.getBody().getObject()));
+        RestRequest<Message> request = new RestRequest<Message>(getApi(), HttpMethod.POST, RestEndpoint.MESSAGE)
+                .setUrlParameters(String.valueOf(getId()));
+        if (stream != null && fileName != null) {
+            request.addField("file", stream, fileName);
+            request.addField("payload_json", body.toString());
+        } else {
+            request.setBody(body);
+        }
+        return request.execute(res -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, res.getBody().getObject()));
     }
 
     /**

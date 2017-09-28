@@ -19,6 +19,7 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -190,9 +191,10 @@ public class ImplUser implements User, IconHolder {
     }
 
     @Override
-    public CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
+    public CompletableFuture<Message> sendMessage(
+            String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
         return openPrivateChannel().thenApplyAsync(
-                channel -> channel.sendMessage(content, embed, tts, nonce).join(),
+                channel -> channel.sendMessage(content, embed, tts, nonce, stream, fileName).join(),
                 api.getThreadPool().getExecutorService()
         );
     }

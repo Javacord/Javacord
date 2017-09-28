@@ -12,16 +12,14 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
+import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -29,6 +27,11 @@ import java.util.stream.Collectors;
  * The implementation of {@link GroupChannel}.
  */
 public class ImplGroupChannel implements GroupChannel {
+
+    /**
+     * The logger of this class.
+     */
+    Logger logger = LoggerUtil.getLogger(ImplGroupChannel.class);
 
     /**
      * The discord api instance.

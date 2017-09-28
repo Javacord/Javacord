@@ -6,6 +6,10 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -23,6 +27,26 @@ public class MessageBuilder {
      * The embed of the message. Might be <code>null</code>.
      */
     private EmbedBuilder embed = null;
+
+    /**
+     * If the message should be text to speech or not.
+     */
+    private boolean tts = false;
+
+    /**
+     * The nonce of the message.
+     */
+    private String nonce = null;
+
+    /**
+     * The stream for the file.
+     */
+    private InputStream stream = null;
+
+    /**
+     * The name of the file.
+     */
+    private String fileName = null;
 
     /**
      * Creates a new message builder.
@@ -132,6 +156,58 @@ public class MessageBuilder {
         return this;
     }
 
+
+    /**
+     * Sets if the message should be text to speech.
+     *
+     * @param tts Whether the message should be text to speech or not.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder setTts(boolean tts) {
+        this.tts = tts;
+        return this;
+    }
+
+    /**
+     * Sets the file of the message.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder setFile(InputStream stream, String fileName) {
+        this.stream = stream;
+        this.fileName = fileName;
+        return this;
+    }
+
+    /**
+     * Sets the file of the message.
+     *
+     * @param file The file.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder setFile(File file) {
+        try {
+            this.stream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("The provided file couldn't be found!");
+        }
+        this.fileName = file.getName();
+        return this;
+    }
+
+    /**
+     * Sets the nonce of the message.
+     *
+     * @param nonce The nonce to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder setNonce(String nonce) {
+        this.nonce = nonce;
+        return this;
+    }
+
     /**
      * Gets the {@link StringBuilder} which is used to build the message.
      *
@@ -148,11 +224,7 @@ public class MessageBuilder {
      * @return The sent message.
      */
     public CompletableFuture<Message> send(TextChannel channel) {
-        if (embed != null) {
-            return channel.sendMessage(toString(), embed, false, null);
-        }
-
-        return channel.sendMessage(toString());
+        return channel.sendMessage(toString(), embed, tts, nonce, stream, fileName);
     }
 
     @Override
