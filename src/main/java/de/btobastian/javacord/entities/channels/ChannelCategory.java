@@ -7,6 +7,11 @@ import java.util.List;
  */
 public interface ChannelCategory extends ServerChannel {
 
+    @Override
+    default ChannelType getType() {
+        return ChannelType.CHANNEL_CATEGORY;
+    }
+
     /**
      * Gets a sorted (by position) list of all channels in the category.
      *

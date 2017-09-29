@@ -10,6 +10,13 @@ import java.util.Optional;
 public interface Channel extends DiscordEntity {
 
     /**
+     * Gets the type of the channel.
+     *
+     * @return The type of the channel.
+     */
+    ChannelType getType();
+
+    /**
      * Gets the channel as group channel.
      *
      * @return The channel as group channel.

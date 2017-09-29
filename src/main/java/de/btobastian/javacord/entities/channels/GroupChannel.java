@@ -11,6 +11,11 @@ import java.util.Optional;
  */
 public interface GroupChannel extends TextChannel, VoiceChannel, IconHolder {
 
+    @Override
+    default ChannelType getType() {
+        return ChannelType.GROUP_CHANNEL;
+    }
+
     /**
      * Gets the members of the group channel.
      *

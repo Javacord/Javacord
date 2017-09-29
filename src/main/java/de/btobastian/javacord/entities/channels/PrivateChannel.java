@@ -8,6 +8,11 @@ import de.btobastian.javacord.entities.User;
  */
 public interface PrivateChannel extends TextChannel, VoiceChannel {
 
+    @Override
+    default ChannelType getType() {
+        return ChannelType.PRIVATE_CHANNEL;
+    }
+
     /**
      * Gets the recipient of the private channel.
      * A private channel always consists of yourself and one other user.
