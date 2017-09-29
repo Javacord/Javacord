@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.message;
 
 import com.mashape.unirest.http.HttpMethod;
+import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.*;
@@ -27,6 +28,248 @@ import java.util.regex.Pattern;
  * This class represents a Discord message.
  */
 public interface Message extends DiscordEntity, Comparable<Message> {
+
+    /**
+     * Deletes the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId) {
+        return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setRatelimitRetries(25)
+                .execute(res -> {
+                    api.getCachedMessageById(messageId).ifPresent(msg -> ((ImplMessage) msg).setDeleted(true));
+                    return null;
+                });
+    }
+
+    /**
+     * Deletes the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> delete(DiscordApi api, String channelId, String messageId) {
+        try {
+            return delete(api, Long.parseLong(channelId), Long.parseLong(messageId));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, String content) {
+        return edit(api, channelId, messageId, content, null);
+    }
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, String content) {
+        return edit(api, channelId, messageId, content, null);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder embed) {
+        return edit(api, channelId, messageId, null, embed);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, EmbedBuilder embed) {
+        return edit(api, channelId, messageId, null, embed);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(
+            DiscordApi api, long channelId, long messageId, String content, EmbedBuilder embed) {
+        JSONObject body = new JSONObject();
+        if (content != null) {
+            body.put("content", content);
+        }
+        if (embed != null) {
+            body.put("embed", embed.toJSONObject());
+        }
+        return new RestRequest<Void>(api, HttpMethod.PATCH, RestEndpoint.MESSAGE)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setBody(body)
+                .execute(res -> null);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(
+            DiscordApi api, String channelId, String messageId, String content, EmbedBuilder embed) {
+        try {
+            return edit(api, Long.parseLong(channelId), Long.parseLong(messageId), content, embed);
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Adds a unicode reaction to the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param unicodeEmoji The unicode emoji string.
+     * @return A future to tell us if the action was successful.
+     */
+    static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, String unicodeEmoji) {
+        return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.REACTION)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), unicodeEmoji, "@me")
+                .setRatelimitRetries(50)
+                .execute(res -> null);
+    }
+
+    /**
+     * Adds a unicode reaction to the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param unicodeEmoji The unicode emoji string.
+     * @return A future to tell us if the action was successful.
+     */
+    static CompletableFuture<Void> addReaction(
+            DiscordApi api, String channelId, String messageId, String unicodeEmoji) {
+        try {
+            return addReaction(api, Long.parseLong(channelId), Long.parseLong(messageId), unicodeEmoji);
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Adds a reaction to the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji.
+     * @return A future to tell us if the action was successful.
+     */
+    static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, Emoji emoji) {
+        String value = emoji.asUnicodeEmoji().orElse(
+                emoji.asCustomEmoji()
+                        .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
+                        .orElse("UNKNOWN")
+        );
+        return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.REACTION)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), value, "@me")
+                .setRatelimitRetries(50)
+                .execute(res -> null);
+    }
+
+    /**
+     * Adds a reaction to the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji.
+     * @return A future to tell us if the action was successful.
+     */
+    static CompletableFuture<Void> addReaction(DiscordApi api, String channelId, String messageId, Emoji emoji) {
+        try {
+            return addReaction(api, Long.parseLong(channelId), Long.parseLong(messageId), emoji);
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Deletes all reactions on this message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> removeAllReactions(DiscordApi api, long channelId, long messageId) {
+        return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.REACTION)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .execute(res -> null);
+    }
+
+    /**
+     * Deletes all reactions on this message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> removeAllReactions(DiscordApi api, String channelId, String messageId) {
+        try {
+            return removeAllReactions(api, Long.parseLong(channelId), Long.parseLong(messageId));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
 
     /**
      * Gets the content of the message.
@@ -179,10 +422,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the action was successful.
      */
     default CompletableFuture<Void> addReaction(String unicodeEmoji) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
-                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()), unicodeEmoji, "@me")
-                .setRatelimitRetries(50)
-                .execute(res -> null);
+        return Message.addReaction(getApi(), getChannel().getId(), getId(), unicodeEmoji);
     }
 
     /**
@@ -192,15 +432,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the action was successful.
      */
     default CompletableFuture<Void> addReaction(Emoji emoji) {
-        String value = emoji.asUnicodeEmoji().orElse(
-                emoji.asCustomEmoji()
-                        .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
-                        .orElse("UNKNOWN")
-        );
-        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.REACTION)
-                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()), value, "@me")
-                .setRatelimitRetries(50)
-                .execute(res -> null);
+        return Message.addReaction(getApi(), getChannel().getId(), getId(), emoji);
     }
 
     /**
@@ -209,9 +441,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> removeAllReactions() {
-        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.REACTION)
-                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()))
-                .execute(res -> null);
+        return Message.removeAllReactions(getApi(), getChannel().getId(), getId());
     }
 
     /**
@@ -272,17 +502,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> edit(String content, EmbedBuilder embed) {
-        JSONObject body = new JSONObject();
-        if (content != null) {
-            body.put("content", content);
-        }
-        if (embed != null) {
-            body.put("embed", embed.toJSONObject());
-        }
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.MESSAGE)
-                .setUrlParameters(String.valueOf(getChannel().getId()) ,String.valueOf(getId()))
-                .setBody(body)
-                .execute(res -> null);
+        return Message.edit(getApi(), getChannel().getId(), getId(), content, embed);
     }
 
     /**
@@ -291,13 +511,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
-        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
-                .setUrlParameters(String.valueOf(getChannel().getId()), String.valueOf(getId()))
-                .setRatelimitRetries(25)
-                .execute(res -> {
-                    ((ImplMessage) this).setDeleted(true);
-                    return null;
-                });
+       return Message.delete(getApi(), getChannel().getId(), getId());
     }
 
     /**
