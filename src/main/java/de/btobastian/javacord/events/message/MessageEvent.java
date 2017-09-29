@@ -116,12 +116,30 @@ public abstract class MessageEvent extends Event {
     }
 
     /**
-     * Deletes all reactions on the message involved in the event..
+     * Deletes all reactions on the message involved in the event.
      *
      * @return A future to tell us if the deletion was successful.
      */
     public CompletableFuture<Void> removeAllReactionsFromMessage() {
         return Message.removeAllReactions(getApi(), getChannel().getId(), getMessageId());
+    }
+
+    /**
+     * Pins the message involved in the event.
+     *
+     * @return A future to tell us if the pin was successful.
+     */
+    public CompletableFuture<Void> pinMessage() {
+        return Message.pin(getApi(), getChannel().getId(), getMessageId());
+    }
+
+    /**
+     * Unpins the message involved in the event.
+     *
+     * @return A future to tell us if the action was successful.
+     */
+    public CompletableFuture<Void> unpinMessage() {
+        return Message.unpin(getApi(), getChannel().getId(), getMessageId());
     }
 
 }

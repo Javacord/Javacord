@@ -272,6 +272,70 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Pins this message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the pin was successful.
+     */
+    static CompletableFuture<Void> pin(DiscordApi api, long channelId, long messageId) {
+        return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.PINS)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .execute(res -> null);
+    }
+
+    /**
+     * Pins this message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the pin was successful.
+     */
+    static CompletableFuture<Void> pin(DiscordApi api, String channelId, String messageId) {
+        try {
+            return pin(api, Long.parseLong(channelId), Long.parseLong(messageId));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Unpins this message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the action was successful.
+     */
+    static CompletableFuture<Void> unpin(DiscordApi api, long channelId, long messageId) {
+        return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.PINS)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .execute(res -> null);
+    }
+
+    /**
+     * Unpins this message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to tell us if the action was successful.
+     */
+    static CompletableFuture<Void> unpin(DiscordApi api, String channelId, String messageId) {
+        try {
+            return unpin(api, Long.parseLong(channelId), Long.parseLong(messageId));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
      * Gets the content of the message.
      *
      * @return The content of the message.
@@ -519,6 +583,24 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default CompletableFuture<Void> delete() {
        return Message.delete(getApi(), getChannel().getId(), getId());
+    }
+
+    /**
+     * Pins this message.
+     *
+     * @return A future to tell us if the pin was successful.
+     */
+    default CompletableFuture<Void> pin() {
+        return Message.pin(getApi(), getChannel().getId(), getId());
+    }
+
+    /**
+     * Unpins this message.
+     *
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> unpin() {
+        return Message.unpin(getApi(), getChannel().getId(), getId());
     }
 
     /**
