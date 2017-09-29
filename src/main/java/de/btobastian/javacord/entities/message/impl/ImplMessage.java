@@ -5,6 +5,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageType;
 import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.Embed;
@@ -85,6 +86,11 @@ public class ImplMessage implements Message {
     private List<Reaction> reactions = new ArrayList<>();
 
     /**
+     * The attachments of the message.
+     */
+    private List<MessageAttachment> attachments = new ArrayList<>();
+
+    /**
      * Creates a new message object.
      *
      * @param api The discord api instance.
@@ -118,6 +124,12 @@ public class ImplMessage implements Message {
         for (int i = 0; i < reactionsJson.length(); i++) {
             Reaction reaction = new ImplReaction(this, reactionsJson.getJSONObject(i));
             reactions.add(reaction);
+        }
+
+        JSONArray attachmentsJson = data.has("attachments") ? data.getJSONArray("attachments") : new JSONArray();
+        for (int i = 0; i < attachmentsJson.length(); i++) {
+            MessageAttachment attachment = new ImplMessageAttachment(this, attachmentsJson.getJSONObject(i));
+            attachments.add(attachment);
         }
     }
 
@@ -210,6 +222,11 @@ public class ImplMessage implements Message {
     @Override
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public List<MessageAttachment> getAttachments() {
+        return Collections.unmodifiableList(attachments);
     }
 
     @Override

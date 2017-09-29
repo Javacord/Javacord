@@ -279,6 +279,13 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     String getContent();
 
     /**
+     * Gets the attachments of the message.
+     *
+     * @return The attachments of the message.
+     */
+    List<MessageAttachment> getAttachments();
+
+    /**
      * Gets the readable content of the message, which replaces all mentions etc. with the actual name.
      * The replacement happens as following:
      * <ul>

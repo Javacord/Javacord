@@ -15,9 +15,11 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -33,6 +35,11 @@ import java.util.stream.Collectors;
  * The implementation of {@link User}.
  */
 public class ImplUser implements User, IconHolder {
+
+    /**
+     * The logger of this class.
+     */
+    Logger logger = LoggerUtil.getLogger(ImplUser.class);
 
     /**
      * The discord api instance.
