@@ -61,8 +61,6 @@ public interface TextChannel extends Channel, Messageable {
             request.setBody(body);
         }
 
-        getApi().getChannelById(123L).ifPresent(channel -> channel.asTextChannel().isPresent());
-
         return request.execute(res -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, res.getBody().getObject()));
     }
 
