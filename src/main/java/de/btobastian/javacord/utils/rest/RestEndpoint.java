@@ -16,6 +16,7 @@ public enum RestEndpoint {
      * This is the same endpoint as {@link RestEndpoint#MESSAGE}, but it has an different ratelimit bucket!
      */
     MESSAGE_DELETE("/channels/%s/messages", 0),
+    MESSAGES_BULK_DELETE("/channels/%s/messages/bulk-delete", 0),
     CHANNEL_TYPING("/channels/%s/typing", 0),
     USER_CHANNEL("/users/@me/channels"),
     CHANNEL("/channels/%s", 0),

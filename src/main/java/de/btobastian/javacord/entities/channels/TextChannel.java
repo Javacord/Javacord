@@ -21,8 +21,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 /**
  * This class represents a text channel.
@@ -65,13 +70,83 @@ public interface TextChannel extends Channel, Messageable {
      * Displays the "xyz is typing..." message.
      * The message automatically disappears after 5 seconds or after sending a message.
      *
-     * @return A future to check for exceptions.
+     * @return A future to tell us if the action was successful.
      */
     default CompletableFuture<Void> type() {
         return new RestRequest<Void>(getApi(), HttpMethod.POST, RestEndpoint.CHANNEL_TYPING)
                 .setRatelimitRetries(0)
                 .setUrlParameters(String.valueOf(getId()))
                 .execute(res -> null);
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * Any message given that is invalid will count towards the minimum and maximum message count
+     * (currently 2 and 100 respectively). Additionally, duplicated messages will only be counted once.
+     * If a message is older than 2 weeks, the method will fail.
+     *
+     * @param messages The messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> bulkDelete(Iterable<Message> messages) {
+        Collection<Long> messageIds = new HashSet<>();
+        messages.forEach(message -> messageIds.add(message.getId()));
+        return bulkDelete(messageIds.stream().mapToLong(value -> value).toArray());
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * Any message id given that do not exist or are invalid will count towards the minimum and maximum message count
+     * (currently 2 and 100 respectively). Additionally, duplicated ids will only be counted once.
+     * If a message is older than 2 weeks, the method will fail.
+     *
+     * @param messageIds The ids of the messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> bulkDelete(long... messageIds) {
+        Collection<String> messageStringIds = LongStream.of(messageIds).boxed()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+        return new RestRequest<Void>(getApi(), HttpMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
+                .setRatelimitRetries(0)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject().put("messages", messageStringIds))
+                .execute(res -> null);
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * Any message id given that do not exist or are invalid will count towards the minimum and maximum message count
+     * (currently 2 and 100 respectively). Additionally, duplicated ids will only be counted once.
+     * If a message is older than 2 weeks, the method will fail.
+     *
+     * @param messageIds The ids of the messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> bulkDelete(String... messageIds) {
+        long[] messageLongIds = Arrays.asList(messageIds).stream().filter(s -> {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                Long.parseLong(s);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }).mapToLong(Long::parseLong).toArray();
+        return bulkDelete(messageLongIds);
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * Any message given that is invalid will count towards the minimum and maximum message count
+     * (currently 2 and 100 respectively). Additionally, duplicated messages will only be counted once.
+     * If a message is older than 2 weeks, the method will fail.
+     *
+     * @param messages The messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> bulkDelete(Message... messages) {
+        return bulkDelete(Arrays.asList(messages).stream().mapToLong(Message::getId).toArray());
     }
 
     /**
