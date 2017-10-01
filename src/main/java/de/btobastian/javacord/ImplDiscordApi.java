@@ -24,6 +24,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -759,5 +760,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<CustomEmojiCreateListener> getCustomEmojiCreateListeners() {
         return getListeners(CustomEmojiCreateListener.class);
+    }
+
+    @Override
+    public void addUserChangeGameListener(UserChangeGameListener listener) {
+        addListener(UserChangeGameListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeGameListener> getUserChangeGameListeners() {
+        return getListeners(UserChangeGameListener.class);
     }
 }

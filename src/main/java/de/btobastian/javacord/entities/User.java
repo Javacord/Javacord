@@ -8,11 +8,14 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a user.
@@ -67,6 +70,18 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return The status of the user.
      */
     UserStatus getStatus();
+
+    /**
+     * Gets all mutual servers with this user.
+     *
+     * @return All mutual servers with this user.
+     */
+    default Collection<Server> getMutualServers() {
+        // TODO This is probably not the most efficient way to do it
+        return getApi().getServers().stream()
+                .filter(server -> server.getMembers().contains(this))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Gets the nickname of the user in the given server.
@@ -188,5 +203,19 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return A list with all registered server member remove listeners.
      */
     List<ServerMemberRemoveListener> getServerMemberRemoveListeners();
+
+    /**
+     * Adds a listener, which listens to this user's game changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addUserChangeGameListener(UserChangeGameListener listener);
+
+    /**
+     * Gets a list with all registered user change game listeners.
+     *
+     * @return A list with all registered custom emoji create listeners.
+     */
+    List<UserChangeGameListener> getUserChangeGameListeners();
 
 }

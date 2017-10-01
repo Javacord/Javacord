@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.impl;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,4 +43,25 @@ public class ImplGame implements Game {
         return type;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ImplGame)) {
+            return false;
+        }
+        ImplGame otherGame = (ImplGame) obj;
+        return Objects.deepEquals(name, otherGame.name) && Objects.deepEquals(streamingUrl, otherGame.streamingUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 42;
+        int typeHash = type.hashCode();
+        int nameHash = name == null ? 0 : name.hashCode();
+        int streamingUrlHash = streamingUrl == null ? 0 : streamingUrl.hashCode();
+
+        hash = hash * 11 + typeHash;
+        hash = hash * 17 + nameHash;
+        hash = hash * 19 + streamingUrlHash;
+        return hash;
+    }
 }

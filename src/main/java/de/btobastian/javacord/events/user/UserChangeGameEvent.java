@@ -12,6 +12,11 @@ import java.util.Optional;
 public class UserChangeGameEvent extends UserEvent {
 
     /**
+     * The new game of the user.
+     */
+    private final Game newGame;
+
+    /**
      * The old game of the user.
      */
     private final Game oldGame;
@@ -21,10 +26,12 @@ public class UserChangeGameEvent extends UserEvent {
      *
      * @param api The api instance of the event.
      * @param user The user of the event.
+     * @param newGame The new game of the user.
      * @param oldGame The old game of the user.
      */
-    public UserChangeGameEvent(DiscordApi api, User user, Game oldGame) {
+    public UserChangeGameEvent(DiscordApi api, User user, Game newGame, Game oldGame) {
         super(api, user);
+        this.newGame = newGame;
         this.oldGame = oldGame;
     }
 
@@ -43,8 +50,7 @@ public class UserChangeGameEvent extends UserEvent {
      * @return The new game of the user.
      */
     public Optional<Game> getNewGame() {
-        // TODO return getUser().getGame();
-        return Optional.empty();
+        return Optional.ofNullable(newGame);
     }
 
 }

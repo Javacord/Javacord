@@ -21,11 +21,18 @@ package de.btobastian.javacord.utils.handler.user;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.events.user.UserChangeGameEvent;
+import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Handles the presence update packet.
@@ -46,22 +53,37 @@ public class PresenceUpdateHandler extends PacketHandler {
         long userId = Long.parseLong(packet.getJSONObject("user").getString("id"));
         api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
             if (packet.has("game")) {
-                Game game = null;
+                Game newGame = null;
                 if (!packet.isNull("game")) {
                     int gameType = packet.getJSONObject("game").getInt("type");
                     String name = packet.getJSONObject("game").getString("name");
                     String streamingUrl =
                             packet.getJSONObject("game").has("url") && !packet.getJSONObject("game").isNull("url") ?
                             packet.getJSONObject("game").getString("url") : null;
-                    game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
+                    newGame = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
                 }
-                user.setGame(game);
+                Game oldGame = user.getGame().orElse(null);
+                user.setGame(newGame);
+                if (!Objects.deepEquals(newGame, oldGame)) {
+                    dispatchGameChangeEvent(user, newGame, oldGame);
+                }
             }
             if (packet.has("status")) {
                 UserStatus status = UserStatus.fromString(packet.optString("status"));
                 user.setStatus(status);
             }
         });
+    }
+
+    private void dispatchGameChangeEvent(User user, Game newGame, Game oldGame) {
+        UserChangeGameEvent event = new UserChangeGameEvent(api, user, newGame, oldGame);
+
+        List<UserChangeGameListener> listeners = new ArrayList<>();
+        listeners.addAll(user.getUserChangeGameListeners());
+        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeGameListeners()));
+        listeners.addAll(api.getUserChangeGameListeners());
+
+        dispatchEvent(listeners, listener -> listener.onUserChangeGame(event));
     }
 
 }
