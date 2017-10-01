@@ -9,6 +9,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
+import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
 import java.util.Collection;
@@ -217,5 +218,19 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return A list with all registered custom emoji create listeners.
      */
     List<UserChangeGameListener> getUserChangeGameListeners();
+
+    /**
+     * Adds a listener, which listens to this user's status changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addUserChangeStatusListener(UserChangeStatusListener listener);
+
+    /**
+     * Gets a list with all registered user change status listeners.
+     *
+     * @return A list with all registered custom emoji create listeners.
+     */
+    List<UserChangeStatusListener> getUserChangeStatusListeners();
 
 }

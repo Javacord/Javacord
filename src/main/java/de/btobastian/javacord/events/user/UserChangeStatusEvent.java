@@ -10,6 +10,11 @@ import de.btobastian.javacord.entities.UserStatus;
 public class UserChangeStatusEvent extends UserEvent {
 
     /**
+     * The new status of the user.
+     */
+    private final UserStatus newStatus;
+
+    /**
      * The old status of the user.
      */
     private final UserStatus oldStatus;
@@ -19,10 +24,12 @@ public class UserChangeStatusEvent extends UserEvent {
      *
      * @param api The api instance of the event.
      * @param user The user of the event.
+     * @param newStatus The new status of the user.
      * @param oldStatus The old status of the user.
      */
-    public UserChangeStatusEvent(DiscordApi api, User user, UserStatus oldStatus) {
+    public UserChangeStatusEvent(DiscordApi api, User user, UserStatus newStatus, UserStatus oldStatus) {
         super(api, user);
+        this.newStatus = newStatus;
         this.oldStatus = oldStatus;
     }
 
@@ -41,8 +48,7 @@ public class UserChangeStatusEvent extends UserEvent {
      * @return The new status of the user.
      */
     public UserStatus getNewStatus() {
-        // TODO return getUser().getStatus();
-        return UserStatus.INVISIBLE;
+        return newStatus;
     }
 
 }

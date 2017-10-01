@@ -14,6 +14,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListen
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
+import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
 import java.util.*;
@@ -525,5 +526,20 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered custom emoji create listeners.
      */
     List<UserChangeGameListener> getUserChangeGameListeners();
+
+    /**
+     * Adds a listener, which listens to status changes of users in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addUserChangeStatusListener(UserChangeStatusListener listener);
+
+    /**
+     * Gets a list with all registered user change status listeners.
+     *
+     * @return A list with all registered custom emoji create listeners.
+     */
+    List<UserChangeStatusListener> getUserChangeStatusListeners();
+
 
 }

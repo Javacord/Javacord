@@ -26,7 +26,9 @@ import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.events.user.UserChangeGameEvent;
+import de.btobastian.javacord.events.user.UserChangeStatusEvent;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
+import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -65,17 +67,21 @@ public class PresenceUpdateHandler extends PacketHandler {
                 Game oldGame = user.getGame().orElse(null);
                 user.setGame(newGame);
                 if (!Objects.deepEquals(newGame, oldGame)) {
-                    dispatchGameChangeEvent(user, newGame, oldGame);
+                    dispatchUserGameChangeEvent(user, newGame, oldGame);
                 }
             }
             if (packet.has("status")) {
-                UserStatus status = UserStatus.fromString(packet.optString("status"));
-                user.setStatus(status);
+                UserStatus newStatus = UserStatus.fromString(packet.optString("status"));
+                UserStatus oldStatus = user.getStatus();
+                user.setStatus(newStatus);
+                if (newStatus != oldStatus) {
+                    dispatchUserStatusChangeEvent(user, newStatus, oldStatus);
+                }
             }
         });
     }
 
-    private void dispatchGameChangeEvent(User user, Game newGame, Game oldGame) {
+    private void dispatchUserGameChangeEvent(User user, Game newGame, Game oldGame) {
         UserChangeGameEvent event = new UserChangeGameEvent(api, user, newGame, oldGame);
 
         List<UserChangeGameListener> listeners = new ArrayList<>();
@@ -84,6 +90,17 @@ public class PresenceUpdateHandler extends PacketHandler {
         listeners.addAll(api.getUserChangeGameListeners());
 
         dispatchEvent(listeners, listener -> listener.onUserChangeGame(event));
+    }
+
+    private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {
+        UserChangeStatusEvent event = new UserChangeStatusEvent(api, user, newStatus, oldStatus);
+
+        List<UserChangeStatusListener> listeners = new ArrayList<>();
+        listeners.addAll(user.getUserChangeStatusListeners());
+        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeStatusListeners()));
+        listeners.addAll(api.getUserChangeStatusListeners());
+
+        dispatchEvent(listeners, listener -> listener.onUserChangeStatus(event));
     }
 
 }
