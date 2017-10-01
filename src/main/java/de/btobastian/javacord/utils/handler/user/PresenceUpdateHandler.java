@@ -49,7 +49,9 @@ public class PresenceUpdateHandler extends PacketHandler {
                 if (!packet.isNull("game")) {
                     int gameType = packet.getJSONObject("game").getInt("type");
                     String name = packet.getJSONObject("game").getString("name");
-                    String streamingUrl = packet.getJSONObject("game").getString("url");
+                    String streamingUrl =
+                            packet.getJSONObject("game").has("url") && !packet.getJSONObject("game").isNull("url") ?
+                            packet.getJSONObject("game").getString("url") : null;
                     game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
                 }
                 user.setGame(game);
