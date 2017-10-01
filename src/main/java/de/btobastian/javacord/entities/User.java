@@ -48,6 +48,13 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     String getDiscriminator();
 
     /**
+     * Checks if the user is a bot account.
+     *
+     * @return Whether the user is a bot account or not.
+     */
+    boolean isBot();
+
+    /**
      * Gets the nickname of the user in the given server.
      *
      * @param server The server to check.

@@ -78,6 +78,11 @@ public class ImplUser implements User, IconHolder {
     private String discriminator;
 
     /**
+     * Whether the user is a bot account or not.
+     */
+    private final boolean bot;
+
+    /**
      * Creates a new user.
      *
      * @param api The discord api instance.
@@ -92,6 +97,7 @@ public class ImplUser implements User, IconHolder {
         if (data.has("avatar") && !data.isNull("avatar")) {
             avatarId = data.getString("avatar");
         }
+        bot = data.has("bot") && data.getBoolean("bot");
 
         api.addUserToCache(this);
     }
@@ -152,6 +158,11 @@ public class ImplUser implements User, IconHolder {
     @Override
     public String getDiscriminator() {
         return discriminator;
+    }
+
+    @Override
+    public boolean isBot() {
+        return bot;
     }
 
     @Override
