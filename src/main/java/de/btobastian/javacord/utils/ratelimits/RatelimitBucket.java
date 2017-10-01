@@ -13,7 +13,7 @@ public class RatelimitBucket {
     private final RestEndpoint endpoint;
     private final String majorUrlParameter;
 
-    private int rateLimitResetTimestamp = 0;
+    private long rateLimitResetTimestamp = 0;
     private int rateLimitRemaining = 1;
 
     private boolean hasActiveScheduler = false;
@@ -101,7 +101,7 @@ public class RatelimitBucket {
      *
      * @param rateLimitResetTimestamp The rateLimit reset timestamp.
      */
-    public void setRateLimitResetTimestamp(int rateLimitResetTimestamp) {
+    public void setRateLimitResetTimestamp(long rateLimitResetTimestamp) {
         this.rateLimitResetTimestamp = rateLimitResetTimestamp;
     }
 
@@ -115,7 +115,7 @@ public class RatelimitBucket {
             return 0;
         }
         long timestamp = System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset());
-        return (int) (rateLimitResetTimestamp * 1000 - timestamp);
+        return (int) (rateLimitResetTimestamp - timestamp);
     }
 
     @Override

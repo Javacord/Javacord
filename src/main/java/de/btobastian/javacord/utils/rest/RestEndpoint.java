@@ -21,7 +21,7 @@ public enum RestEndpoint {
     USER_CHANNEL("/users/@me/channels"),
     CHANNEL("/channels/%s", 0),
     SERVER_CHANNEL("/guilds/%s/channels", 0),
-    REACTION("/channels/%s/messages/%s/reactions/%s"),
+    REACTION("/channels/%s/messages/%s/reactions/%s", 0),
     PINS("/channels/%s/pins", 0);
 
     /**

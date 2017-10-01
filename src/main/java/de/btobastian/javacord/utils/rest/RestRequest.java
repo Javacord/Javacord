@@ -12,7 +12,6 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.MissingPermissionsException;
-import de.btobastian.javacord.exceptions.RatelimitException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -369,8 +368,9 @@ public class RestRequest<T> {
                 }
             }
             switch (response.getStatus()) {
-                case 401:
-                    throw new RatelimitException("Received 429 from Discord!", response, this);
+                case 429:
+                    // A 429 will be handled in the RatelimitManager class
+                    return response;
                 case 403:
                     throw new MissingPermissionsException(
                             "Received a " + response.getStatus() + " response from Discord with body "
