@@ -2,9 +2,7 @@ package de.btobastian.javacord.entities.impl;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
-import de.btobastian.javacord.entities.Region;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
@@ -170,6 +168,27 @@ public class ImplServer implements Server {
         for (int i = 0; i < emojis.length(); i++) {
             CustomEmoji emoji = api.getOrCreateCustomEmoji(this, emojis.getJSONObject(i));
             addCustomEmoji(emoji);
+        }
+
+        JSONArray presences = data.has("presences") ? data.getJSONArray("presences") : new JSONArray();
+        for (int i = 0; i < presences.length(); i++) {
+            JSONObject presence = presences.getJSONObject(i);
+            long userId = Long.parseLong(presence.getJSONObject("user").getString("id"));
+            api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
+                if (presence.has("game")) {
+                    Game game = null;
+                    if (!presence.isNull("game")) {
+                        int gameType = presence.getJSONObject("game").getInt("type");
+                        String name = presence.getJSONObject("game").getString("name");
+                        String streamingUrl =
+                                presence.getJSONObject("game").has("url") &&
+                                !presence.getJSONObject("game").isNull("url") ?
+                                presence.getJSONObject("game").getString("url") : null;
+                        game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
+                    }
+                    user.setGame(game);
+                }
+            });
         }
 
         api.addServerToCache(this);
