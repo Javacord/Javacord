@@ -188,6 +188,10 @@ public class ImplServer implements Server {
                     }
                     user.setGame(game);
                 }
+                if (presence.has("status")) {
+                    UserStatus status = UserStatus.fromString(presence.optString("status"));
+                    user.setStatus(status);
+                }
             });
         }
 

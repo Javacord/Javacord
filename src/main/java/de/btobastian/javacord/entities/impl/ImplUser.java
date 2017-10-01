@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.IconHolder;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.message.Message;
@@ -89,6 +90,11 @@ public class ImplUser implements User, IconHolder {
     private Game game = null;
 
     /**
+     * The status of the user.
+     */
+    private UserStatus status = UserStatus.OFFLINE;
+
+    /**
      * Creates a new user.
      *
      * @param api The discord api instance.
@@ -124,6 +130,15 @@ public class ImplUser implements User, IconHolder {
      */
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    /**
+     * Sets the status of the user.
+     *
+     * @param status The status to set.
+     */
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     /**
@@ -183,6 +198,11 @@ public class ImplUser implements User, IconHolder {
     @Override
     public Optional<Game> getGame() {
         return Optional.ofNullable(game);
+    }
+
+    @Override
+    public UserStatus getStatus() {
+        return status;
     }
 
     @Override

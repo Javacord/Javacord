@@ -62,6 +62,13 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     Optional<Game> getGame();
 
     /**
+     * Gets the status of the user.
+     *
+     * @return The status of the user.
+     */
+    UserStatus getStatus();
+
+    /**
      * Gets the nickname of the user in the given server.
      *
      * @param server The server to check.

@@ -21,6 +21,7 @@ package de.btobastian.javacord.utils.handler.user;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -55,6 +56,10 @@ public class PresenceUpdateHandler extends PacketHandler {
                     game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
                 }
                 user.setGame(game);
+            }
+            if (packet.has("status")) {
+                UserStatus status = UserStatus.fromString(packet.optString("status"));
+                user.setStatus(status);
             }
         });
     }
