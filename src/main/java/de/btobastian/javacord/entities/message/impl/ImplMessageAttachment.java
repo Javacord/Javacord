@@ -132,4 +132,9 @@ public class ImplMessageAttachment implements MessageAttachment {
     public Optional<Integer> getWidth() {
         return Optional.ofNullable(width);
     }
+
+    @Override
+    public String toString() {
+        return String.format("MessageAttachment (file name: %s, url: %s)", getFileName(), getUrl().toString());
+    }
 }
