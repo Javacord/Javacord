@@ -19,4 +19,11 @@ public interface ChannelCategory extends ServerChannel {
      */
     List<ServerChannel> getChannels();
 
+    /**
+     * Checks is the category is "not safe for work".
+     *
+     * @return Whether the category is "not safe for work" or not.
+     */
+    boolean isNsfw();
+
 }

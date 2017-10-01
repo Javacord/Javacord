@@ -48,6 +48,11 @@ public class ImplChannelCategory implements ChannelCategory {
     private int position;
 
     /**
+     * Whether the category is "not safe for work" or not.
+     */
+    private boolean nsfw = false;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -67,6 +72,7 @@ public class ImplChannelCategory implements ChannelCategory {
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
         position = data.getInt("position");
+        nsfw = data.has("nsfw") && data.getBoolean("nsfw");
 
         server.addChannelToCache(this);
     }
@@ -121,6 +127,11 @@ public class ImplChannelCategory implements ChannelCategory {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public boolean isNsfw() {
+        return nsfw;
     }
 
     @Override

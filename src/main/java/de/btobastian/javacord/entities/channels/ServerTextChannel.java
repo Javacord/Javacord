@@ -12,4 +12,11 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
         return ChannelType.SERVER_TEXT_CHANNEL;
     }
 
+    /**
+     * Checks is the channel is "not safe for work".
+     *
+     * @return Whether the channel is "not safe for work" or not.
+     */
+    boolean isNsfw();
+
 }

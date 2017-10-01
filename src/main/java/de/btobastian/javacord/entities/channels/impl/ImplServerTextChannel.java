@@ -59,6 +59,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     private final ImplMessageCache messageCache;
 
     /**
+     * Whether the channel is "not safe for work" or not.
+     */
+    private boolean nsfw = false;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -80,6 +85,7 @@ public class ImplServerTextChannel implements ServerTextChannel {
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
         position = data.getInt("position");
+        nsfw = data.has("nsfw") && data.getBoolean("nsfw");
 
         server.addChannelToCache(this);
     }
@@ -134,6 +140,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public boolean isNsfw() {
+        return nsfw;
     }
 
     @Override
