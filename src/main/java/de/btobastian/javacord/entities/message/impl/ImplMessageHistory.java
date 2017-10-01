@@ -160,7 +160,6 @@ public class ImplMessageHistory implements MessageHistory {
                     Message[] msgArray;
                     if (step == 0) {
                         msgArray = history.request(limit == 100 ? 100 : limit % 100, before, after, -1).join();
-                        System.out.println(msgArray.length);
                     } else {
                         msgArray = history.request(
                                 100,
@@ -168,7 +167,6 @@ public class ImplMessageHistory implements MessageHistory {
                                 after != -1 ? history.getNewestMessage().getId() : -1,
                                 -1
                         ).join();
-                        System.out.println(msgArray.length);
                     }
                     history.messages.addAll(Arrays.asList(msgArray));
                     history.messages.sort(Comparable::compareTo);
