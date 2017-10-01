@@ -19,6 +19,10 @@
 package de.btobastian.javacord.utils.handler.user;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.impl.ImplGame;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -38,7 +42,19 @@ public class PresenceUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
-        // TODO
+        long userId = Long.parseLong(packet.getJSONObject("user").getString("id"));
+        api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
+            if (packet.has("game")) {
+                Game game = null;
+                if (!packet.isNull("game")) {
+                    int gameType = packet.getJSONObject("game").getInt("type");
+                    String name = packet.getJSONObject("game").getString("name");
+                    String streamingUrl = packet.getJSONObject("game").getString("url");
+                    game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
+                }
+                user.setGame(game);
+            }
+        });
     }
 
 }

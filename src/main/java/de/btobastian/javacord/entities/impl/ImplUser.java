@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.impl;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.IconHolder;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
@@ -83,6 +84,11 @@ public class ImplUser implements User, IconHolder {
     private final boolean bot;
 
     /**
+     * The game of the user.
+     */
+    private Game game = null;
+
+    /**
      * Creates a new user.
      *
      * @param api The discord api instance.
@@ -109,6 +115,15 @@ public class ImplUser implements User, IconHolder {
      */
     public void setChannel(PrivateChannel channel) {
         this.channel = channel;
+    }
+
+    /**
+     * Sets the game of the user.
+     *
+     * @param game The game to set.
+     */
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     /**
@@ -163,6 +178,11 @@ public class ImplUser implements User, IconHolder {
     @Override
     public boolean isBot() {
         return bot;
+    }
+
+    @Override
+    public Optional<Game> getGame() {
+        return Optional.ofNullable(game);
     }
 
     @Override

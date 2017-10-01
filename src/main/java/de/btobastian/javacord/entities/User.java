@@ -55,6 +55,13 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     boolean isBot();
 
     /**
+     * Gets the game of the user.
+     *
+     * @return The game of the user.
+     */
+    Optional<Game> getGame();
+
+    /**
      * Gets the nickname of the user in the given server.
      *
      * @param server The server to check.
