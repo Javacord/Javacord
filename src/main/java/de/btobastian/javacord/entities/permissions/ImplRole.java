@@ -3,10 +3,14 @@ package de.btobastian.javacord.entities.permissions;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 
 /**
@@ -50,6 +54,11 @@ public class ImplRole implements Role {
     private boolean hoist;
 
     /**
+     * A collection with all users with this role.
+     */
+    private final Collection<User> users = new HashSet<>();
+
+    /**
      * Creates a new role object.
      *
      * @param api The discord api instance.
@@ -62,6 +71,24 @@ public class ImplRole implements Role {
         this.id = Long.parseLong(data.getString("id"));
         this.name = data.getString("name");
         this.position = data.getInt("position");
+    }
+
+    /**
+     * Adds a user to the role.
+     *
+     * @param user The user to add.
+     */
+    public void addUserToCache(User user) {
+        users.add(user);
+    }
+
+    /**
+     * Removes a user from the role.
+     *
+     * @param user The user to remove.
+     */
+    public void removeUserFromCache(User user) {
+        users.remove(user);
     }
 
     @Override
@@ -97,6 +124,14 @@ public class ImplRole implements Role {
     @Override
     public boolean isDisplayedSeparately() {
         return hoist;
+    }
+
+    @Override
+    public Collection<User> getUsers() {
+        if (getName().equals("@everyone")) {
+            return getServer().getMembers();
+        }
+        return Collections.unmodifiableCollection(users);
     }
 
     @Override

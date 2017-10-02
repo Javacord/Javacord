@@ -2,12 +2,7 @@ package de.btobastian.javacord.entities.impl;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.GameType;
-import de.btobastian.javacord.entities.Region;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.UserStatus;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
@@ -23,11 +18,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -43,12 +34,7 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -170,6 +156,12 @@ public class ImplServer implements Server {
             }
         }
 
+        JSONArray roles = data.has("roles") ? data.getJSONArray("roles") : new JSONArray();
+        for (int i = 0; i < roles.length(); i++) {
+            Role role = new ImplRole(api, this, roles.getJSONObject(i));
+            this.roles.put(role.getId(), role);
+        }
+
         JSONArray members = new JSONArray();
         if (data.has("members")) {
             members = data.getJSONArray("members");
@@ -191,12 +183,6 @@ public class ImplServer implements Server {
         for (int i = 0; i < emojis.length(); i++) {
             CustomEmoji emoji = api.getOrCreateCustomEmoji(this, emojis.getJSONObject(i));
             addCustomEmoji(emoji);
-        }
-
-        JSONArray roles = data.has("roles") ? data.getJSONArray("roles") : new JSONArray();
-        for (int i = 0; i < roles.length(); i++) {
-            Role role = new ImplRole(api, this, roles.getJSONObject(i));
-            this.roles.put(role.getId(), role);
         }
 
         JSONArray presences = data.has("presences") ? data.getJSONArray("presences") : new JSONArray();
@@ -325,7 +311,7 @@ public class ImplServer implements Server {
     public void removeMember(User user) {
         members.remove(user.getId());
         nicknames.remove(user.getId());
-        // TODO remove from roles
+        getRoles().forEach(role -> ((ImplRole) role).removeUserFromCache(user));
     }
 
     /**
@@ -341,8 +327,9 @@ public class ImplServer implements Server {
         }
 
         JSONArray memberRoles = member.getJSONArray("roles");
-        for (int j = 0; j < memberRoles.length(); j++) {
-            // TODO add to roles
+        for (int i = 0; i < memberRoles.length(); i++) {
+            long roleId = Long.parseLong(memberRoles.getString(i));
+            getRoleById(roleId).map(role -> ((ImplRole) role)).ifPresent(role -> role.addUserToCache(user));
         }
     }
 

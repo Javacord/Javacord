@@ -1,12 +1,6 @@
 package de.btobastian.javacord.entities;
 
-import de.btobastian.javacord.entities.channels.ChannelCategory;
-import de.btobastian.javacord.entities.channels.ChannelCategoryBuilder;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannelBuilder;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannelBuilder;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -14,11 +8,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -28,11 +18,7 @@ import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -117,6 +103,18 @@ public interface Server extends DiscordEntity, IconHolder {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a sorted list (by position) with all roles of the user in the server.
+     *
+     * @param user The user.
+     * @return A sorted list (by position) with all roles of the user in the server.
+     */
+    default List<Role> getRolesOf(User user) {
+        return getRoles().stream()
+                .filter(role -> role.getUsers().contains(user))
+                .collect(Collectors.toList());
     }
 
     /**

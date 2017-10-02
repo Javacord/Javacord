@@ -3,8 +3,10 @@ package de.btobastian.javacord.entities.permissions;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -46,6 +48,13 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return Whether this role is pinned in the user listing or not.
      */
     boolean isDisplayedSeparately();
+
+    /**
+     * Gets a collection with all users who have this role.
+     *
+     * @return A collection with all users who have this role.
+     */
+    Collection<User> getUsers();
 
     @Override
     default String getMentionTag() {

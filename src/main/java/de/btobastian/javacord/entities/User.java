@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
@@ -92,6 +93,17 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      */
     default Optional<String> getNickname(Server server) {
         return server.getNickname(this);
+    }
+
+    /**
+     * Gets a sorted list (by position) with all roles of the user in the given server.
+     *
+     * @param server The server.
+     * @return A sorted list (by position) with all roles of the user in the given server.
+     * @see Server#getRolesOf(User)
+     */
+    default List<Role> getRoles(Server server) {
+        return server.getRolesOf(this);
     }
 
     /**
