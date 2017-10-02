@@ -9,6 +9,11 @@ import de.btobastian.javacord.entities.permissions.Permissions;
  */
 public class ImplPermissions implements Permissions {
 
+    /**
+     * A permissions object with all permission types being {@link PermissionState#NONE}.
+     */
+    public static final Permissions EMPTY_PERMISSIONS = new ImplPermissions(0, 0);
+
     private final int allowed;
     private int denied;
 
