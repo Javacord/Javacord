@@ -159,7 +159,7 @@ public class ImplMessageHistory implements MessageHistory {
                 while (step < (double) limit / 100D) {
                     Message[] msgArray;
                     if (step == 0) {
-                        msgArray = history.request(limit == 100 ? 100 : limit % 100, before, after, -1).join();
+                        msgArray = history.request((limit % 100) == 0 ? 100 : limit % 100, before, after, -1).join();
                     } else {
                         msgArray = history.request(
                                 100,
