@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.channels.impl;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -20,6 +21,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -64,6 +66,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     private boolean nsfw = false;
 
     /**
+     * The parent id of the channel.
+     */
+    private long parentId;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -86,6 +93,7 @@ public class ImplServerTextChannel implements ServerTextChannel {
         name = data.getString("name");
         position = data.getInt("position");
         nsfw = data.has("nsfw") && data.getBoolean("nsfw");
+        parentId = Long.valueOf(data.optString("parent_id", "-1"));
 
         server.addChannelToCache(this);
     }
@@ -145,6 +153,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public boolean isNsfw() {
         return nsfw;
+    }
+
+    @Override
+    public Optional<ChannelCategory> getCategory() {
+        return getServer().getChannelCategoryById(parentId);
     }
 
     @Override

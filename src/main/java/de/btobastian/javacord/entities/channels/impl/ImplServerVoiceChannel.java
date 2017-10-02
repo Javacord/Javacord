@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.channels.impl;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     private int position;
 
     /**
+     * The parent id of the channel.
+     */
+    private long parentId;
+
+    /**
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
@@ -65,6 +72,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
 
         id = Long.parseLong(data.getString("id"));
         name = data.getString("name");
+        parentId = Long.valueOf(data.optString("parent_id", "-1"));
 
         server.addChannelToCache(this);
     }
@@ -134,6 +142,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     @Override
     public int getPosition() {
         return position;
+    }
+
+    @Override
+    public Optional<ChannelCategory> getCategory() {
+        return getServer().getChannelCategoryById(parentId);
     }
 
     @Override

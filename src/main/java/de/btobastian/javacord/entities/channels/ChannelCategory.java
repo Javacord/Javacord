@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.channels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +18,16 @@ public interface ChannelCategory extends ServerChannel {
      *
      * @return The channels in the category.
      */
-    List<ServerChannel> getChannels();
+    default List<ServerChannel> getChannels() {
+        List<ServerChannel> channels = new ArrayList<>();
+        getServer().getTextChannels().stream()
+                .filter(channel -> channel.getCategory().orElse(null) == this)
+                .forEach(channels::add);
+        getServer().getVoiceChannels().stream()
+                .filter(channel -> channel.getCategory().orElse(null) == this)
+                .forEach(channels::add);
+        return channels;
+    }
 
     /**
      * Checks is the category is "not safe for work".

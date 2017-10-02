@@ -4,7 +4,6 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
-import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
@@ -12,7 +11,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListen
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -147,12 +145,6 @@ public class ImplChannelCategory implements ChannelCategory {
     @Override
     public int getPosition() {
         return position;
-    }
-
-    @Override
-    public List<ServerChannel> getChannels() {
-        // TODO
-        return Collections.emptyList();
     }
 
     @Override
