@@ -106,6 +106,32 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
+     * Gets a sorted list (by position) with all roles with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the roles.
+     * @return A sorted list (by position) with all roles with the given name.
+     */
+    default List<Role> getRolesByName(String name) {
+        return getRoles().stream()
+                .filter(role -> role.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a sorted list (by position) with all roles with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the roles.
+     * @return A sorted list (by position) with all roles with the given name.
+     */
+    default List<Role> getRolesByNameIgnoreCase(String name) {
+        return getRoles().stream()
+                .filter(role -> role.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Gets a sorted list (by position) with all roles of the user in the server.
      *
      * @param user The user.
@@ -207,13 +233,29 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
-     * Gets a list of all reactions with the given name in the server.
+     * Gets a collection of all custom emojis with the given name in the server.
+     * This method is case sensitive!
      *
-     * @param name The name of the reaction.
-     * @return A list of all reactions with the given name in this server.
+     * @param name The name of the custom emojis.
+     * @return A collection of all custom emojis with the given name in this server.
      */
-    default List<CustomEmoji> getCustomEmojisByName(String name) {
-        return getCustomEmojis().stream().filter(emoji -> emoji.getName().equals(name)).collect(Collectors.toList());
+    default Collection<CustomEmoji> getCustomEmojisByName(String name) {
+        return getCustomEmojis().stream()
+                .filter(emoji -> emoji.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection of all custom emojis with the given name in the server.
+     * This method is case insensitive!
+     *
+     * @param name The name of the custom emojis.
+     * @return A collection of all custom emojis with the given name in this server.
+     */
+    default Collection<CustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
+        return getCustomEmojis().stream()
+                .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -312,6 +354,32 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
+     * Gets a collection with all channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the channels.
+     * @return A collection with all channels with the given name.
+     */
+    default Collection<ServerChannel> getChannelsByName(String name) {
+        return getChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the channels.
+     * @return A collection with all channels with the given name.
+     */
+    default Collection<ServerChannel> getChannelsByNameIgnoreCase(String name) {
+        return getChannels().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Gets a channel category by it's id.
      *
      * @param id The id of the channel category.
@@ -335,6 +403,32 @@ public interface Server extends DiscordEntity, IconHolder {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a sorted list (by position) with all channel categories with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the channel categories.
+     * @return A sorted list (by position) with all channel categories with the given name.
+     */
+    default List<ChannelCategory> getChannelCategoriesByName(String name) {
+        return getChannelCategories().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a sorted list (by position) with all channel categories with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the channel categories.
+     * @return A sorted list (by position) with all channel categories with the given name.
+     */
+    default List<ChannelCategory> getChannelCategoriesByNameIgnoreCase(String name) {
+        return getChannelCategories().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -364,6 +458,32 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
+     * Gets a sorted list (by position) with all text channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the text channels.
+     * @return A sorted list (by position) with all text channels with the given name.
+     */
+    default List<ServerTextChannel> getTextChannelsByName(String name) {
+        return getTextChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a sorted list (by position) with all text channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the text channels.
+     * @return A sorted list (by position) with all text channels with the given name.
+     */
+    default List<ServerTextChannel> getTextChannelsByNameIgnoreCase(String name) {
+        return getTextChannels().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Gets a voice channel by it's id.
      *
      * @param id The id of the voice channel.
@@ -387,6 +507,32 @@ public interface Server extends DiscordEntity, IconHolder {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a sorted list (by position) with all voice channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the voice channels.
+     * @return A sorted list (by position) with all voice channels with the given name.
+     */
+    default List<ServerVoiceChannel> getVoiceChannelsByName(String name) {
+        return getVoiceChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a sorted list (by position) with all voice channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the voice channels.
+     * @return A sorted list (by position) with all voice channels with the given name.
+     */
+    default List<ServerVoiceChannel> getVoiceChannelsByNameIgnoreCase(String name) {
+        return getVoiceChannels().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
     }
 
     /**

@@ -3,15 +3,7 @@ package de.btobastian.javacord;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.Channel;
-import de.btobastian.javacord.entities.channels.ChannelCategory;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.channels.VoiceChannel;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -20,13 +12,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -39,12 +25,7 @@ import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -211,6 +192,32 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all users with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the users.
+     * @return A collection with all users with the given name.
+     */
+    default Collection<User> getUsersByName(String name) {
+        return getUsers().stream()
+                .filter(user -> user.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all users with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the users.
+     * @return A collection with all users with the given name.
+     */
+    default Collection<User> getUsersByNameIgnoreCase(String name) {
+        return getUsers().stream()
+                .filter(user -> user.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Gets a collection with all cached messages.
      *
      * @return A collection with all cached messages.
@@ -297,6 +304,32 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all servers with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the servers.
+     * @return A collection with all servers with the given name.
+     */
+    default Collection<Server> getServersByName(String name) {
+        return getServers().stream()
+                .filter(server -> server.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all servers with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the servers.
+     * @return A collection with all servers with the given name.
+     */
+    default Collection<Server> getServersByNameIgnoreCase(String name) {
+        return getServers().stream()
+                .filter(server -> server.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Gets a collection with all known custom emojis.
      *
      * @return A collection with all known custom emojis.
@@ -328,15 +361,30 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a list of all reactions with the given name in the server.
+     * Gets a list of all custom emojis with the given name in the server.
+     * This method is case sensitive!
      *
-     * @param name The name of the reaction.
-     * @return A list of all reactions with the given name in this server.
+     * @param name The name of the custom emojis.
+     * @return A list of all custom emojis with the given name in this server.
      */
     default List<CustomEmoji> getCustomEmojisByName(String name) {
-        return getCustomEmojis().stream().filter(emoji -> emoji.getName().equals(name)).collect(Collectors.toList());
+        return getCustomEmojis().stream()
+                .filter(emoji -> emoji.getName().equals(name))
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Gets a list of all custom emojis with the given name in the server.
+     * This method is case insensitive!
+     *
+     * @param name The name of the custom emojis.
+     * @return A list of all custom emojis with the given name in this server.
+     */
+    default List<CustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
+        return getCustomEmojis().stream()
+                .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Gets a collection with all roles the bot knows.
@@ -375,6 +423,32 @@ public interface DiscordApi {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a collection with all roles with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the roles.
+     * @return A collection with all roles with the given name.
+     */
+    default Collection<Role> getRolesByName(String name) {
+        return getRoles().stream()
+                .filter(role -> role.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all roles with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the roles.
+     * @return A collection with all roles with the given name.
+     */
+    default Collection<Role> getRolesByNameIgnoreCase(String name) {
+        return getRoles().stream()
+                .filter(role -> role.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -507,6 +581,34 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all channels with the given name.
+     */
+    default Collection<Channel> getChannelsByName(String name) {
+        Collection<Channel> channels = new HashSet<>();
+        channels.addAll(getServerChannelsByName(name));
+        channels.addAll(getGroupChannelsByName(name));
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all channels with the given name.
+     */
+    default Collection<Channel> getChannelsByNameIgnoreCase(String name) {
+        Collection<Channel> channels = new HashSet<>();
+        channels.addAll(getServerChannelsByNameIgnoreCase(name));
+        channels.addAll(getGroupChannelsByNameIgnoreCase(name));
+        return channels;
+    }
+
+    /**
      * Gets a text channel by it's id.
      *
      * @param id The id of the text channel.
@@ -530,6 +632,34 @@ public interface DiscordApi {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a collection with all text channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the text channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all text channels with the given name.
+     */
+    default Collection<TextChannel> getTextChannelsByName(String name) {
+        Collection<TextChannel> channels = new HashSet<>();
+        channels.addAll(getServerTextChannelsByName(name));
+        channels.addAll(getGroupChannelsByName(name));
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all text channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the text channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all text channels with the given name.
+     */
+    default Collection<TextChannel> getTextChannelsByNameIgnoreCase(String name) {
+        Collection<TextChannel> channels = new HashSet<>();
+        channels.addAll(getServerTextChannelsByNameIgnoreCase(name));
+        channels.addAll(getGroupChannelsByNameIgnoreCase(name));
+        return channels;
     }
 
     /**
@@ -559,6 +689,34 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all voice channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the voice channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all voice channels with the given name.
+     */
+    default Collection<VoiceChannel> getVoiceChannelsByName(String name) {
+        Collection<VoiceChannel> channels = new HashSet<>();
+        channels.addAll(getServerVoiceChannelsByName(name));
+        channels.addAll(getGroupChannelsByName(name));
+        return channels;
+    }
+
+    /**
+     * Gets a collection with all voice channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the voice channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all voice channels with the given name.
+     */
+    default Collection<VoiceChannel> getVoiceChannelsByNameIgnoreCase(String name) {
+        Collection<VoiceChannel> channels = new HashSet<>();
+        channels.addAll(getServerVoiceChannelsByNameIgnoreCase(name));
+        channels.addAll(getGroupChannelsByNameIgnoreCase(name));
+        return channels;
+    }
+
+    /**
      * Gets a server channel by it's id.
      *
      * @param id The id of the server channel.
@@ -582,6 +740,32 @@ public interface DiscordApi {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a collection with all server channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the server channels.
+     * @return A collection with all server channels with the given name.
+     */
+    default Collection<ServerChannel> getServerChannelsByName(String name) {
+        return getServerChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all server channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the server channels.
+     * @return A collection with all server channels with the given name.
+     */
+    default Collection<ServerChannel> getServerChannelsByNameIgnoreCase(String name) {
+        return getServerChannels().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -611,6 +795,32 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all channel categories with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the channel categories.
+     * @return A collection with all channel categories with the given name.
+     */
+    default Collection<ChannelCategory> getChannelCategoriesByName(String name) {
+        return getChannelCategories().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all channel categories with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the channel categories.
+     * @return A collection with all channel categories with the given name.
+     */
+    default Collection<ChannelCategory> getChannelCategoriesByNameIgnoreCase(String name) {
+        return getChannelCategories().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Gets a server text channel by it's id.
      *
      * @param id The id of the server text channel.
@@ -637,6 +847,32 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all server text channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the server text channels.
+     * @return A collection with all server text channels with the given name.
+     */
+    default Collection<ServerTextChannel> getServerTextChannelsByName(String name) {
+        return getServerTextChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all server text channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the server text channels.
+     * @return A collection with all server text channels with the given name.
+     */
+    default Collection<ServerTextChannel> getServerTextChannelsByNameIgnoreCase(String name) {
+        return getServerTextChannels().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Gets a server voice channel by it's id.
      *
      * @param id The id of the server voice channel.
@@ -660,6 +896,32 @@ public interface DiscordApi {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a collection with all server voice channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the server voice channels.
+     * @return A collection with all server voice channels with the given name.
+     */
+    default Collection<ServerVoiceChannel> getServerVoiceChannelsByName(String name) {
+        return getServerVoiceChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all server voice channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the server voice channels.
+     * @return A collection with all server voice channels with the given name.
+     */
+    default Collection<ServerVoiceChannel> getServerVoiceChannelsByNameIgnoreCase(String name) {
+        return getServerVoiceChannels().stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -712,6 +974,38 @@ public interface DiscordApi {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a collection with all group channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the group channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all group channels with the given name.
+     */
+    default Collection<GroupChannel> getGroupChannelsByName(String name) {
+        return getGroupChannels().stream()
+                .filter(channel -> Objects.deepEquals(channel.getName().orElse(null), name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all server channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the group channels. Can be <code>null</code> to search for group channels without name.
+     * @return A collection with all group channels with the given name.
+     */
+    default Collection<GroupChannel> getGroupChannelsByNameIgnoreCase(String name) {
+        return getGroupChannels().stream()
+                .filter(channel -> {
+                    String channelName = channel.getName().orElse(null);
+                    if (name == null || channelName == null) {
+                        return Objects.deepEquals(channelName, name);
+                    }
+                    return name.equalsIgnoreCase(channelName);
+                })
+                .collect(Collectors.toList());
     }
 
     /**
