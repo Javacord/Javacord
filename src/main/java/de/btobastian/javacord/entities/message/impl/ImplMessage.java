@@ -270,7 +270,7 @@ public class ImplMessage implements Message {
 
     @Override
     public List<Reaction> getReactions() {
-        return Collections.unmodifiableList(reactions);
+        return new ArrayList<>(reactions);
     }
 
     @Override
