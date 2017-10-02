@@ -1,10 +1,12 @@
-package de.btobastian.javacord.entities.permissions;
+package de.btobastian.javacord.entities.permissions.impl;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.permissions.Permissions;
+import de.btobastian.javacord.entities.permissions.Role;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -46,12 +48,17 @@ public class ImplRole implements Role {
     /**
      * The color of the role.
      */
-    private Color color;
+    private int color;
 
     /**
      * Whether this role is pinned in the user listing or not.
      */
     private boolean hoist;
+
+    /**
+     * The permissions of the role.
+     */
+    private ImplPermissions permissions;
 
     /**
      * A collection with all users with this role.
@@ -71,6 +78,9 @@ public class ImplRole implements Role {
         this.id = Long.parseLong(data.getString("id"));
         this.name = data.getString("name");
         this.position = data.getInt("position");
+        this.color = data.optInt("color", 0);
+        this.hoist = data.optBoolean("hoist", false);
+        this.permissions = new ImplPermissions(data.getInt("permissions"), 0);
     }
 
     /**
@@ -118,7 +128,7 @@ public class ImplRole implements Role {
 
     @Override
     public Optional<Color> getColor() {
-        return Optional.ofNullable(color);
+        return Optional.ofNullable(color == 0 ? null : new Color(color));
     }
 
     @Override
@@ -132,6 +142,11 @@ public class ImplRole implements Role {
             return getServer().getMembers();
         }
         return Collections.unmodifiableCollection(users);
+    }
+
+    @Override
+    public Permissions getPermissions() {
+        return permissions;
     }
 
     @Override

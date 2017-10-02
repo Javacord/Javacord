@@ -2,7 +2,7 @@ package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
-import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.*;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -115,6 +115,64 @@ public interface Server extends DiscordEntity, IconHolder {
         return getRoles().stream()
                 .filter(role -> role.getUsers().contains(user))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets the permissions of a user.
+     *
+     * @param user The user.
+     * @return The permissions of the user.
+     */
+    default Permissions getPermissionsOf(User user) {
+        PermissionsBuilder builder = new PermissionsBuilder();
+        getAllowedPermissionsOf(user).forEach(type -> builder.setState(type, PermissionState.ALLOWED));
+        return builder.build();
+    }
+
+    /**
+     * Get the allowed permissions of a given user.
+     *
+     * @param user The user.
+     * @return The allowed permissions of the given user.
+     */
+    default Collection<PermissionType> getAllowedPermissionsOf(User user) {
+        Collection<PermissionType> allowed = new HashSet<>();
+        if (getOwner() == user) {
+            allowed.addAll(Arrays.asList(PermissionType.values()));
+        } else {
+            getRolesOf(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
+        }
+        return allowed;
+    }
+
+    /**
+     * Get the unset permissions of a given user.
+     *
+     * @param user The user.
+     * @return The unset permissions of the given user.
+     */
+    default Collection<PermissionType> getUnsetPermissionsOf(User user) {
+        Collection<PermissionType> unset = new HashSet<>();
+        if (getOwner() == user) {
+            return unset;
+        }
+        getRolesOf(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
+        return unset;
+    }
+
+    /**
+     * Checks if a user has a given permission.
+     * Remember, that some permissions affect others!
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
+     * This method also do not take into account overwritten permissions in some channels!
+     *
+     * @param user The user.
+     * @param permission The permission to check.
+     * @return Whether the user has the permission or not.
+     */
+    default boolean hasPermission(User user, PermissionType permission) {
+        return getAllowedPermissionsOf(user).contains(permission);
     }
 
     /**

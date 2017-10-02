@@ -6,8 +6,10 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a Discord role, e.g. "moderator".
@@ -55,6 +57,35 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return A collection with all users who have this role.
      */
     Collection<User> getUsers();
+
+    /**
+     * Gets the permissions of the role.
+     *
+     * @return The permissions of the role.
+     */
+    Permissions getPermissions();
+
+    /**
+     * Gets the allowed permissions of the role.
+     *
+     * @return The allowed permissions of the role.
+     */
+    default Collection<PermissionType> getAllowedPermissions() {
+        return Arrays.stream(PermissionType.values())
+                .filter(type -> getPermissions().getState(type) == PermissionState.ALLOWED)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets the unset permissions of the role.
+     *
+     * @return The unset permissions of the role.
+     */
+    default Collection<PermissionType> getUnsetPermissions() {
+        return Arrays.stream(PermissionType.values())
+                .filter(type -> getPermissions().getState(type) == PermissionState.NONE)
+                .collect(Collectors.toSet());
+    }
 
     @Override
     default String getMentionTag() {
