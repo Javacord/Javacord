@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -122,6 +123,15 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Sets the position of the role.
+     *
+     * @param position The position to set.
+     */
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    /**
      * Adds a listener.
      *
      * @param clazz The listener class.
@@ -206,5 +216,15 @@ public class ImplRole implements Role {
     @Override
     public java.util.List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
         return getListeners(RoleChangePermissionsListener.class);
+    }
+
+    @Override
+    public void addRoleChangePositionListener(RoleChangePositionListener listener) {
+        addListener(RoleChangePositionListener.class, listener);
+    }
+
+    @Override
+    public List<RoleChangePositionListener> getRoleChangePositionListeners() {
+        return getListeners(RoleChangePositionListener.class);
     }
 }

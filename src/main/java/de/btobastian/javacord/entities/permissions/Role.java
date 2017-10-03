@@ -5,6 +5,7 @@ import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -93,8 +94,6 @@ public interface Role extends DiscordEntity, Mentionable {
         return "<@&" + getId() + ">";
     }
 
-
-
     /**
      * Adds a listener, which listens to permission changes of this role.
      *
@@ -108,5 +107,19 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return A list with all registered role change permissions listeners.
      */
     java.util.List<RoleChangePermissionsListener> getRoleChangePermissionsListeners();
+
+    /**
+     * Adds a listener, which listens to position changes of this role.
+     *
+     * @param listener The listener to add.
+     */
+    void addRoleChangePositionListener(RoleChangePositionListener listener);
+
+    /**
+     * Gets a list with all registered role change position listeners.
+     *
+     * @return A list with all registered role change position listeners.
+     */
+    java.util.List<RoleChangePositionListener> getRoleChangePositionListeners();
 
 }

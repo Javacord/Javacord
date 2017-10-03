@@ -5,7 +5,9 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.events.server.role.RoleChangePermissionsEvent;
+import de.btobastian.javacord.events.server.role.RoleChangePositionEvent;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONObject;
 
@@ -45,6 +47,21 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getRoleChangePermissionsListeners());
 
                 dispatchEvent(listeners, listener -> listener.onRoleChangePermissions(event));
+            }
+
+            int oldPosition = role.getPosition();
+            int newPosition = roleJson.getInt("position");
+            if (oldPosition != newPosition) {
+                role.setPosition(newPosition);
+
+                RoleChangePositionEvent event = new RoleChangePositionEvent(api, role, newPosition, oldPosition);
+
+                List<RoleChangePositionListener> listeners = new ArrayList<>();
+                listeners.addAll(role.getRoleChangePositionListeners());
+                listeners.addAll(role.getServer().getRoleChangePositionListeners());
+                listeners.addAll(api.getRoleChangePositionListeners());
+
+                dispatchEvent(listeners, listener -> listener.onRoleChangePosition(event));
             }
         });
     }

@@ -34,6 +34,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListen
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -671,5 +672,15 @@ public class ImplServer implements Server {
     @Override
     public List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
         return getListeners(RoleChangePermissionsListener.class);
+    }
+
+    @Override
+    public void addRoleChangePositionListener(RoleChangePositionListener listener) {
+        addListener(RoleChangePositionListener.class, listener);
+    }
+
+    @Override
+    public List<RoleChangePositionListener> getRoleChangePositionListeners() {
+        return getListeners(RoleChangePositionListener.class);
     }
 }
