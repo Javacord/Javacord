@@ -4,6 +4,7 @@ import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -91,5 +92,21 @@ public interface Role extends DiscordEntity, Mentionable {
     default String getMentionTag() {
         return "<@&" + getId() + ">";
     }
+
+
+
+    /**
+     * Adds a listener, which listens to permission changes of this role.
+     *
+     * @param listener The listener to add.
+     */
+    void addRoleChangePermissionsListener(RoleChangePermissionsListener listener);
+
+    /**
+     * Gets a list with all registered role change permissions listeners.
+     *
+     * @return A list with all registered role change permissions listeners.
+     */
+    java.util.List<RoleChangePermissionsListener> getRoleChangePermissionsListeners();
 
 }

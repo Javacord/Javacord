@@ -7,13 +7,18 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link Role}.
@@ -66,6 +71,12 @@ public class ImplRole implements Role {
     private final Collection<User> users = new HashSet<>();
 
     /**
+     * A map which contains all listeners.
+     * The key is the class of the listener.
+     */
+    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
+
+    /**
      * Creates a new role object.
      *
      * @param api The discord api instance.
@@ -99,6 +110,39 @@ public class ImplRole implements Role {
      */
     public void removeUserFromCache(User user) {
         users.remove(user);
+    }
+
+    /**
+     * Sets the permissions of the role.
+     *
+     * @param permissions The permissions to set.
+     */
+    public void setPermissions(ImplPermissions permissions) {
+        this.permissions = permissions;
+    }
+
+    /**
+     * Adds a listener.
+     *
+     * @param clazz The listener class.
+     * @param listener The listener to add.
+     */
+    private void addListener(Class<?> clazz, Object listener) {
+        List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
+        classListeners.add(listener);
+    }
+
+    /**
+     * Gets all listeners of the given class.
+     *
+     * @param clazz The class of the listener.
+     * @param <T> The class of the listener.
+     * @return A list with all listeners of the given type.
+     */
+    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
+    private <T> List<T> getListeners(Class<?> clazz) {
+        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
+        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -152,5 +196,15 @@ public class ImplRole implements Role {
     @Override
     public String toString() {
         return String.format("Role (id: %s, name: %s, server: %s)", getId(), getName(), getServer());
+    }
+
+    @Override
+    public void addRoleChangePermissionsListener(RoleChangePermissionsListener listener) {
+        addListener(RoleChangePermissionsListener.class, listener);
+    }
+
+    @Override
+    public java.util.List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
+        return getListeners(RoleChangePermissionsListener.class);
     }
 }

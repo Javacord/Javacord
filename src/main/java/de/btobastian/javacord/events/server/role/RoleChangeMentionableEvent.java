@@ -1,7 +1,6 @@
 package de.btobastian.javacord.events.server.role;
 
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.permissions.Role;
 
 /**
@@ -18,12 +17,11 @@ public class RoleChangeMentionableEvent extends RoleEvent {
      * Creates a new role change mentionable event.
      *
      * @param api The api instance of the event.
-     * @param server The server of the event.
      * @param role The role of the event.
      * @param oldMentionable The old mentionable flag of the role.
      */
-    public RoleChangeMentionableEvent(DiscordApi api, Server server, Role role, boolean oldMentionable) {
-        super(api, server, role);
+    public RoleChangeMentionableEvent(DiscordApi api, Role role, boolean oldMentionable) {
+        super(api, role);
         this.oldMentionable = oldMentionable;
     }
 

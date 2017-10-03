@@ -28,6 +28,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -810,5 +811,18 @@ public interface Server extends DiscordEntity, IconHolder {
      */
     List<UserChangeStatusListener> getUserChangeStatusListeners();
 
+    /**
+     * Adds a listener, which listens to role permission changes in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addRoleChangePermissionsListener(RoleChangePermissionsListener listener);
+
+    /**
+     * Gets a list with all registered role change permissions listeners.
+     *
+     * @return A list with all registered role change permissions listeners.
+     */
+    List<RoleChangePermissionsListener> getRoleChangePermissionsListeners();
 
 }
