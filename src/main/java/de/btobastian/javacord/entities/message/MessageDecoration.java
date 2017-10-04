@@ -34,8 +34,8 @@ public enum MessageDecoration {
     UNDERLINE_BOLD("__**"),
     UNDERLINE_BOLD_ITALICS("__***");
 
-    private String prefix;
-    private String suffix;
+    private final String prefix;
+    private final String suffix;
 
     private MessageDecoration(String prefix) {
         this.prefix = prefix;

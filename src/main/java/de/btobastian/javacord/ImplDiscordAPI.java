@@ -27,6 +27,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.impl.ImplApplication;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
@@ -41,11 +42,13 @@ import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.user.UserChangeNameListener;
 import de.btobastian.javacord.utils.DiscordWebsocket;
+import de.btobastian.javacord.utils.LoggerUtil;
 import de.btobastian.javacord.utils.ThreadPool;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.java_websocket.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
 import javax.net.ssl.SSLContext;
@@ -65,6 +68,11 @@ import java.util.concurrent.Future;
  * The implementation of {@link DiscordAPI}.
  */
 public class ImplDiscordAPI implements DiscordAPI {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplDiscordAPI.class);
 
     private final ThreadPool pool;
 
@@ -103,6 +111,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             synchronized (listenerLock) { // be sure to read the guild id before trying to check for waiting listeners
                 SettableFuture<Server> future = waitingForListener.get(server.getId());
                 if (future != null) {
+                    logger.debug("Joined or created server {}. We were waiting for this server!", server);
                     waitingForListener.remove(server.getId());
                     future.set(server);
                 }
@@ -134,6 +143,10 @@ public class ImplDiscordAPI implements DiscordAPI {
     @Override
     public void connectBlocking() {
         if (token == null || !checkTokenBlocking(token)) {
+            if (email == null || password == null) {
+                logger.warn("No valid token provided AND missing email or password. Connecting not possible!");
+                return;
+            }
             token = requestTokenBlocking();
         }
         String gateway = requestGatewayBlocking();
@@ -142,7 +155,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
             socket.connect();
         } catch (URISyntaxException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.warn("Something went wrong while connecting. Please contact the developer!", e);
             return;
         }
         try {
@@ -150,7 +163,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                 throw new IllegalStateException("Socket closed before ready packet was received!");
             }
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            logger.warn("Something went wrong while connecting. Please contact the developer!", e);
         }
     }
 
@@ -242,6 +255,7 @@ public class ImplDiscordAPI implements DiscordAPI {
         return getThreadPool().getListeningExecutorService().submit(new Callable<User>() {
             @Override
             public User call() throws Exception {
+                logger.debug("Trying request/find user with id {} who isn't cached", id);
                 User user = null;
                 Iterator<Server> serverIterator = getServers().iterator();
                 while (serverIterator.hasNext()) {
@@ -265,6 +279,11 @@ public class ImplDiscordAPI implements DiscordAPI {
                             ((ImplRole) server.getRoleById(roleIds.getString(i))).addUserNoUpdate(user);
                         }
                     }
+                }
+                if (user != null) {
+                    logger.debug("Found user {} with id {}", user, id);
+                } else {
+                    logger.debug("No user with id {} was found", id);
                 }
                 return user;
             }
@@ -342,19 +361,24 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void setToken(String token) {
-        this.token = token;
+    public void setToken(String token, boolean bot) {
+        this.token = bot ? "Bot " + token : token;
     }
 
     @Override
     public boolean checkTokenBlocking(String token) {
         try {
+            // only the last 0-9 digits of the token should be visible.
+            // We don't want someone being able to login to an account by reading the logs.
+            logger.debug("Checking token {}", token.replaceAll(".{10}", "**********"));
             HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/users/@me/guilds")
                     .header("authorization", token)
                     .asJson();
             if (response.getStatus() < 200 || response.getStatus() > 299) {
+                logger.debug("Checked token {} (valid: {})", token.replaceAll(".{10}", "**********"), false);
                 return false;
             }
+            logger.debug("Checked token {} (valid: {})", token.replaceAll(".{10}", "**********"), true);
             return true;
         } catch (UnirestException e) {
             return false;
@@ -371,6 +395,7 @@ public class ImplDiscordAPI implements DiscordAPI {
         ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
             @Override
             public Server call() throws Exception {
+                logger.debug("Trying to accept invite (code: {})", inviteCode);
                 final SettableFuture<Server> settableFuture;
                 synchronized (listenerLock) {
                     HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/invite/" + inviteCode)
@@ -381,6 +406,8 @@ public class ImplDiscordAPI implements DiscordAPI {
                     if (getServerById(guildId) != null) {
                         throw new IllegalStateException("Already member of this server!");
                     }
+                    logger.info("Accepted invite and waiting for listener to be called (code: {}, server id: {})"
+                            , inviteCode, guildId);
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
                 }
@@ -434,6 +461,8 @@ public class ImplDiscordAPI implements DiscordAPI {
         ListenableFuture<Server> future = getThreadPool().getListeningExecutorService().submit(new Callable<Server>() {
             @Override
             public Server call() throws Exception {
+                logger.debug("Trying to create server (name: {}, region: {}, icon: {}",
+                        name, region == null ? "null" : region.getKey(), icon != null);
                 if (name == null || name.length() < 2 || name.length() > 100) {
                     throw new IllegalArgumentException("Name must be 2-100 characters long!");
                 }
@@ -457,6 +486,9 @@ public class ImplDiscordAPI implements DiscordAPI {
                             .asJson();
                     checkResponse(response);
                     String guildId = response.getBody().getObject().getString("id");
+                    logger.info("Created server and waiting for listener to be called " +
+                            "(name: {}, region: {}, icon: {}, server id: {})"
+                            , name, region == null ? "null" : region.getKey(), icon != null, guildId);
                     settableFuture = SettableFuture.create();
                     waitingForListener.put(guildId, settableFuture);
                 }
@@ -496,7 +528,9 @@ public class ImplDiscordAPI implements DiscordAPI {
 
     @Override
     public Future<Exception> updateProfile(
-            String newUsername, String newEmail, final String newPassword, BufferedImage newAvatar) {
+            final String newUsername, String newEmail, final String newPassword, final BufferedImage newAvatar) {
+        logger.debug("Trying to update profile (username: {}, email: {}, password: {}, change avatar: {}",
+                newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"), newAvatar != null);
         String avatarString = getYourself().getAvatarId();
         if (newAvatar != null) {
             try {
@@ -524,9 +558,12 @@ public class ImplDiscordAPI implements DiscordAPI {
                             .body(params.toString())
                             .asJson();
                     checkResponse(response);
+                    logger.info("Updated profile (username: {}, email: {}, password: {}, change avatar: {}",
+                            newUsername, email, newPassword == null ? "null" : newPassword.replaceAll(".", "*"),
+                            newAvatar != null);
                     ((ImplUser) getYourself()).setAvatarId(response.getBody().getObject().getString("avatar"));
                     setEmail(response.getBody().getObject().getString("email"));
-                    setToken(response.getBody().getObject().getString("token"));
+                    setToken(response.getBody().getObject().getString("token"), token.startsWith("Bot "));
                     final String oldName = getYourself().getName();
                     ((ImplUser) getYourself()).setName(response.getBody().getObject().getString("username"));
                     if (newPassword != null) {
@@ -561,16 +598,18 @@ public class ImplDiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public Future<Invite> parseInvite(String invite, FutureCallback<Invite> callback) {
+    public Future<Invite> parseInvite(final String invite, FutureCallback<Invite> callback) {
         final String inviteCode = invite.replace("https://discord.gg/", "").replace("http://discord.gg/", "");
         ListenableFuture<Invite> future = getThreadPool().getListeningExecutorService().submit(new Callable<Invite>() {
             @Override
             public Invite call() throws Exception {
+                logger.debug("Trying to parse invite {} (parsed code: {})", invite, inviteCode);
                 HttpResponse<JsonNode> response = Unirest
                         .get("https://discordapp.com/api/invite/" + inviteCode)
                         .header("authorization", token)
                         .asJson();
                 checkResponse(response);
+                logger.debug("Parsed invite {} (parsed code: {})", invite, inviteCode);
                 return new ImplInvite(ImplDiscordAPI.this, response.getBody().getObject());
             }
         });
@@ -585,12 +624,14 @@ public class ImplDiscordAPI implements DiscordAPI {
         return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to delete invite {}", inviteCode);
                 try {
                     HttpResponse<JsonNode> response = Unirest
                             .delete("https://discordapp.com/api/invite/" + inviteCode)
                             .header("authorization", token)
                             .asJson();
                     checkResponse(response);
+                    logger.info("Deleted invite {}", inviteCode);
                 } catch (Exception e) {
                     return e;
                 }
@@ -640,16 +681,222 @@ public class ImplDiscordAPI implements DiscordAPI {
         return autoReconnect;
     }
 
+    @Override
+    public Future<String> convertToBotAccount(String ownerToken) {
+        return convertToBotAccount(null, ownerToken);
+    }
+
+    @Override
+    public Future<String> convertToBotAccount(final String applicationId, final String ownerToken) {
+        return getThreadPool().getExecutorService().submit(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                String id = applicationId;
+                logger.debug("Trying to convert account to bot account (application id: {}, owner token: {}",
+                        id, ownerToken.replaceAll(".{10}", "**********"));
+                if (applicationId == null) {
+                    logger.debug("Trying to create application for owner");
+                    HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
+                            .header("content-type", "application/json")
+                            .header("authorization", ownerToken)
+                            .body(new JSONObject()
+                                    .put("name", getYourself().getName())
+                                    .toString())
+                            .asJson();
+                    checkResponse(response);
+                    Application application = new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
+                    logger.debug("Created application for owner (application: {})", application);
+                    id = application.getId();
+                }
+                HttpResponse<JsonNode> response = Unirest
+                        .post("https://discordapp.com/api/oauth2/applications/" + id + "/bot")
+                        .header("content-type", "application/json")
+                        .header("authorization", ownerToken)
+                        .body(new JSONObject().put("token", getToken()).toString())
+                        .asJson();
+                setToken(response.getBody().getObject().getString("token"), true);
+                logger.info("Converted account into bot account (id: {}, new token: {})",
+                        id, getToken().replaceAll(".{10}", "**********"));
+                return id;
+            }
+        });
+    }
+
+    @Override
+    public Future<Collection<Application>> getApplications() {
+        return getApplications(null);
+    }
+
+    @Override
+    public Future<Collection<Application>> getApplications(FutureCallback<Collection<Application>> callback) {
+        ListenableFuture<Collection<Application>> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Collection<Application>>() {
+                    @Override
+                    public Collection<Application> call() throws Exception {
+                        logger.debug("Trying to get applications");
+                        HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/oauth2/applications")
+                                .header("authorization", token)
+                                .asJson();
+                        checkResponse(response);
+                        JSONArray jsonApplications = response.getBody().getArray();
+                        Set<Application> applications = new HashSet<>();
+                        for (int i = 0; i < jsonApplications.length(); i++) {
+                            applications.add(
+                                    new ImplApplication(ImplDiscordAPI.this, jsonApplications.getJSONObject(i)));
+                        }
+                        logger.debug("Got applications (amount: {})", applications.size());
+                        return applications;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Application> createApplication(String name) {
+        return createApplication(name, null);
+    }
+
+    @Override
+    public Future<Application> createApplication(final String name, FutureCallback<Application> callback) {
+        ListenableFuture<Application> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
+                    @Override
+                    public Application call() throws Exception {
+                        logger.debug("Trying to create application with name {}", name);
+                        HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/oauth2/applications")
+                                .header("content-type", "application/json")
+                                .header("authorization", getToken())
+                                .body(new JSONObject()
+                                        .put("name", name)
+                                        .toString())
+                                .asJson();
+                        checkResponse(response);
+                        Application application =
+                                new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
+                        logger.debug("Created application {}", application);
+                        return application;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Application> getApplication(String id) {
+        return getApplication(id, null);
+    }
+
+    @Override
+    public Future<Application> getApplication(final String id, FutureCallback<Application> callback) {
+        ListenableFuture<Application> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
+                    @Override
+                    public Application call() throws Exception {
+                        logger.debug("Trying to get application with id {}", id);
+                        HttpResponse<JsonNode> response = Unirest
+                                .get("https://discordapp.com/api/oauth2/applications/" + id)
+                                .header("Authorization", token)
+                                .asJson();
+                        checkResponse(response);
+                        Application application =
+                                new ImplApplication(ImplDiscordAPI.this, response.getBody().getObject());
+                        logger.debug("Got application {}", application);
+                        return application;
+
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
+    @Override
+    public Future<Exception> deleteApplication(final String id) {
+        return getThreadPool().getExecutorService().submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                try {
+                    logger.debug("Trying to delete application with id {}", id);
+                    HttpResponse<JsonNode> response = Unirest
+                            .delete("https://discordapp.com/api/oauth2/applications/" + id)
+                            .header("Authorization", getToken())
+                            .asJson();
+                    checkResponse(response);
+                    logger.debug("Deleted application with id {}", id);
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Future<Application> createBot(String name) {
+        return createBot(name, null, null);
+    }
+
+    @Override
+    public Future<Application> createBot(String name, FutureCallback<Application> callback) {
+        return createBot(name, null, callback);
+    }
+
+    @Override
+    public Future<Application> createBot(String name, String applicationId) {
+        return createBot(name, applicationId, null);
+    }
+
+    @Override
+    public Future<Application> createBot(
+            final String name, final String applicationId, FutureCallback<Application> callback) {
+        ListenableFuture<Application> future =
+                getThreadPool().getListeningExecutorService().submit(new Callable<Application>() {
+                    @Override
+                    public Application call() throws Exception {
+                        ImplApplication application;
+                        if (applicationId == null) {
+                            application = (ImplApplication) createApplication(name).get();
+                        } else {
+                            application = (ImplApplication) getApplication(applicationId).get();
+                        }
+                        HttpResponse<JsonNode> response = Unirest
+                                .post("https://discordapp.com/api/oauth2/applications/" + application.getId() + "/bot")
+                                .header("Authorization", getToken())
+                                .header("content-type", "application/json")
+                                .body(new JSONObject().toString())
+                                .asJson();
+                        checkResponse(response);
+                        User bot = getOrCreateUser(response.getBody().getObject());
+                        String botToken = response.getBody().getObject().getString("token");
+                        application.setBot(bot);
+                        application.setBotToken(botToken);
+                        return application;
+                    }
+                });
+        if (callback != null) {
+            Futures.addCallback(future, callback);
+        }
+        return future;
+    }
+
     /**
      * Tries to reconnect to the given gateway.
      *
      * @param gateway The gateway to reconnect to.
      */
     public void reconnectBlocking(String gateway) {
+        logger.debug("Trying to reconnect to gateway {}", gateway);
         try {
             socket.closeBlocking();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn(
+                    "We were interrupted when we tried to close the current socket. Please contact the developer!", e);
         }
         if (token == null || !checkTokenBlocking(token)) {
             token = requestTokenBlocking();
@@ -659,7 +906,7 @@ public class ImplDiscordAPI implements DiscordAPI {
             socket.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(SSLContext.getDefault()));
             socket.connect();
         } catch (URISyntaxException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.warn("Reconnect failed. Please contact the developer!", e);
             return;
         }
         try {
@@ -667,7 +914,7 @@ public class ImplDiscordAPI implements DiscordAPI {
                 throw new IllegalStateException("Socket closed before ready packet was received!");
             }
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            logger.warn("Reconnect failed. Please contact the developer!", e);
         }
     }
 
@@ -742,6 +989,7 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public String requestTokenBlocking() {
         try {
+            logger.debug("Trying to request token (email: {}, password: {})", email, password.replaceAll(".", "*"));
             HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/auth/login")
                     .field("email", email)
                     .field("password", password)
@@ -757,9 +1005,13 @@ public class ImplDiscordAPI implements DiscordAPI {
             if (jsonResponse.has("password") || jsonResponse.has("email")) {
                 throw new IllegalArgumentException("Wrong email or password!");
             }
-            return jsonResponse.getString("token");
+            String token = jsonResponse.getString("token");
+            logger.debug("Requested token {} (email: {}, password: {})",
+                    token.replaceAll(".{10}", "**********"), email, password.replaceAll(".", "*"));
+            return token;
         } catch (UnirestException e) {
-            e.printStackTrace();
+            logger.warn("Couldn't request token (email: {}, password: {}). Please contact the developer!",
+                    email, password.replaceAll(".", "*"), e);
             return null;
         }
     }
@@ -771,6 +1023,7 @@ public class ImplDiscordAPI implements DiscordAPI {
      */
     public String requestGatewayBlocking() {
         try {
+            logger.debug("Requesting gateway (token: {})", token.replaceAll(".{10}", "**********"));
             HttpResponse<JsonNode> response = Unirest.get("https://discordapp.com/api/gateway")
                     .header("authorization", token)
                     .asJson();
@@ -781,7 +1034,9 @@ public class ImplDiscordAPI implements DiscordAPI {
                 throw new IllegalStateException("Received http status code " + response.getStatus()
                         + " with message " + response.getStatusText() + " and body " + response.getBody());
             }
-            return response.getBody().getObject().getString("url");
+            String gateway = response.getBody().getObject().getString("url");
+            logger.debug("Requested gateway {} (token: {})", gateway, token.replaceAll(".{10}", "**********"));
+            return gateway;
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
@@ -847,8 +1102,12 @@ public class ImplDiscordAPI implements DiscordAPI {
      * @throws Exception If the response has problems (status code not between 200 and 300).
      */
     public void checkResponse(HttpResponse<JsonNode> response) throws Exception {
+        String message = "";
+        if (response.getBody() != null && !response.getBody().isArray() && response.getBody().getObject().has("message")) {
+            message = " " + response.getBody().getObject().getString("message");
+        }
         if (response.getStatus() == 403) {
-            throw new PermissionsException("Missing permissions!");
+            throw new PermissionsException("Missing permissions!" + message);
         }
         if (response.getBody() != null && !response.getBody().isArray() && response.getBody().getObject().has("retry_after")) {
             long retryAfter = response.getBody().getObject().getLong("retry_after");
@@ -890,4 +1149,5 @@ public class ImplDiscordAPI implements DiscordAPI {
     public void setSocket(DiscordWebsocket socket) {
         this.socket = socket;
     }
+
 }

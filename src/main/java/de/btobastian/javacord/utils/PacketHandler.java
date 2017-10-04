@@ -20,6 +20,7 @@ package de.btobastian.javacord.utils;
 
 import de.btobastian.javacord.ImplDiscordAPI;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.concurrent.ExecutorService;
 
@@ -28,9 +29,14 @@ import java.util.concurrent.ExecutorService;
  */
 public abstract class PacketHandler {
 
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(PacketHandler.class);
+
     protected final ImplDiscordAPI api;
     private final String type;
-    private boolean async;
+    private final boolean async;
     private ExecutorService executorService;
     protected final ExecutorService listenerExecutorService;
 
@@ -64,8 +70,8 @@ public abstract class PacketHandler {
                     try {
                         handle(packet);
                     } catch (Exception e) {
-                        System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
-                        e.printStackTrace();
+                        logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
+                                getType(), packet.toString(), e);
                     }
                 }
             });
@@ -73,8 +79,8 @@ public abstract class PacketHandler {
             try {
                 handle(packet);
             } catch (Exception e) {
-                System.out.println("An error occurred for packet " + getType() + ": " + packet.toString());
-                e.printStackTrace();
+                logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
+                        getType(), packet.toString(), e);
             }
         }
     }
@@ -102,10 +108,7 @@ public abstract class PacketHandler {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof  PacketHandler) {
-            return ((PacketHandler) obj).getType().equals(getType());
-        }
-        return false;
+        return obj instanceof PacketHandler && ((PacketHandler) obj).getType().equals(getType());
     }
 
 }

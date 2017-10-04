@@ -126,4 +126,18 @@ public interface User extends MessageReceiver {
      */
     public String getMentionTag();
 
+    /**
+     * Gets the discriminator of the user.
+     *
+     * @return The discriminator of the user.
+     */
+    public String getDiscriminator();
+
+    /**
+     * Checks whether the user is a bot or not.
+     *
+     * @return Whether the user is a bot or not.
+     */
+    public boolean isBot();
+
 }

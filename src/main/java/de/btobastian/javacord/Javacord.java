@@ -31,8 +31,13 @@ public class Javacord {
      */
     public static final String VERSION = "2.0.8";
 
+    /**
+     * The github url of javacord.
+     */
+    public static final String GITHUB_URL = "https://github.com/BtoBastian/Javacord";
+
     static {
-        Unirest.setDefaultHeader("User-Agent", "Javacord " + VERSION);
+        Unirest.setDefaultHeader("User-Agent", "Javacord DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")");
     }
 
     private Javacord() { }
@@ -64,6 +69,21 @@ public class Javacord {
         DiscordAPI api = getApi();
         api.setEmail(email);
         api.setPassword(password);
+        return api;
+    }
+
+    /**
+     * Gets a new instance of DiscordAPI.
+     *
+     * The only way to login to a bot is by using the token.
+     *
+     * @param token The token which is required to login.
+     * @param bot Whether the token is the token of a bot account or a normal account.
+     * @return A new instance of DiscordAPI.
+     */
+    public static DiscordAPI getApi(String token, boolean bot) {
+        DiscordAPI api = getApi();
+        api.setToken(token, bot);
         return api;
     }
 

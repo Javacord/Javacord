@@ -27,7 +27,9 @@ import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.ImplDiscordAPI;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.InviteBuilder;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -36,6 +38,11 @@ import java.util.concurrent.Future;
  * The implementation of the invite builder interface.
  */
 public class ImplInviteBuilder implements InviteBuilder {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplInviteBuilder.class);
 
     private final ImplDiscordAPI api;
     private final ImplChannel textChannel;
@@ -86,6 +93,8 @@ public class ImplInviteBuilder implements InviteBuilder {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Invite>() {
                     @Override
                     public Invite call() throws Exception {
+                        logger.debug("Trying to create invite for channel {} (max uses: {}, temporary: {}, max age: {}",
+                                textChannel == null ? voiceChannel : textChannel, maxUses, temporary, maxAge);
                         JSONObject jsonParam = new JSONObject();
                         if (maxUses > 0) {
                             jsonParam.put("max_uses", maxUses);
@@ -104,7 +113,11 @@ public class ImplInviteBuilder implements InviteBuilder {
                                 .body(jsonParam.toString())
                                 .asJson();
                         api.checkResponse(response);
-                        return new ImplInvite(api, response.getBody().getObject());
+                        JSONObject data = response.getBody().getObject();
+                        logger.debug("Created invite for channel {} (max uses: {}, temporary: {}, max age: {}",
+                                textChannel == null ? voiceChannel : textChannel, maxUses, temporary,
+                                data.has("max_age") ? data.getInt("max_age") : -1);
+                        return new ImplInvite(api, data);
                     }
                 });
         if (callback != null) {

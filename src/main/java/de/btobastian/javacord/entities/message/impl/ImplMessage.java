@@ -35,9 +35,11 @@ import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.message.MessageDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.text.ParseException;
@@ -51,6 +53,11 @@ import java.util.concurrent.Future;
  * The implementation of the user interface.
  */
 public class ImplMessage implements Message {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplMessage.class);
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private static final SimpleDateFormat FORMAT_ALTERNATIVE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -96,7 +103,7 @@ public class ImplMessage implements Message {
                         try {
                             calendar.setTime(FORMAT_ALTERNATIVE_TWO.parse(time.substring(0, time.length() - 9)));
                         } catch (ParseException e) {
-                            e.printStackTrace();
+                            logger.warn("Could not parse timestamp {}. Please contact the developer!", time, e);
                         }
                     }
                 }
@@ -202,12 +209,16 @@ public class ImplMessage implements Message {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug("Trying to delete message (id: {}, author: {}, content: \"{}\")",
+                            getId(), getAuthor(), getContent());
                     HttpResponse<JsonNode> response = Unirest.delete
                             ("https://discordapp.com/api/channels/" + channelId + "/messages/" + getId())
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
                     api.removeMessage(message);
+                    logger.debug("Deleted message (id: {}, author: {}, content: \"{}\")",
+                            getId(), getAuthor(), getContent());
                     // call listener
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
@@ -255,6 +266,8 @@ public class ImplMessage implements Message {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        logger.debug("Trying to reply to message with id {} and content \"{}\" from {}" +
+                                " (content: \"{}\", tts: {})", getId(), getContent(), getAuthor(), content, tts);
                         api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
@@ -266,6 +279,9 @@ public class ImplMessage implements Message {
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
                         api.checkResponse(response);
+                        logger.debug(
+                                "Replied to message with id {} and content \"{}\" from {} (content: \"{}\", tts: {})",
+                                getId(), getContent(), getAuthor(), content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -287,6 +303,9 @@ public class ImplMessage implements Message {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        logger.debug(
+                                "Trying to reply a file to message with id {} and content \"{}\" from {} (name: {})",
+                                getId(), getContent(), getAuthor(), file.getName());
                         api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + channelId + "/messages")
@@ -294,6 +313,8 @@ public class ImplMessage implements Message {
                                         .field("file", file)
                                         .asJson();
                         api.checkResponse(response);
+                        logger.debug("Replied a file to message with id {} and content \"{}\" from {} (name: {})",
+                                getId(), getContent(), getAuthor(), file.getName());
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });

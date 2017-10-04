@@ -43,9 +43,11 @@ import de.btobastian.javacord.listener.Listener;
 import de.btobastian.javacord.listener.channel.ChannelChangeNameListener;
 import de.btobastian.javacord.listener.channel.ChannelChangeTopicListener;
 import de.btobastian.javacord.listener.channel.ChannelDeleteListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.List;
@@ -58,6 +60,11 @@ import java.util.concurrent.Future;
  */
 public class ImplChannel implements Channel {
 
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplChannel.class);
+
     private static final Permissions emptyPermissions = new ImplPermissions(0, 0);
 
     private final ImplDiscordAPI api;
@@ -68,7 +75,7 @@ public class ImplChannel implements Channel {
     private int position;
     private final ImplServer server;
 
-    private ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Permissions> overwrittenPermissions = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of this class.
@@ -140,12 +147,14 @@ public class ImplChannel implements Channel {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug("Trying to delete channel {}", ImplChannel.this);
                     HttpResponse<JsonNode> response = Unirest
                             .delete("https://discordapp.com/api/channels/:id" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
                     server.removeChannel(ImplChannel.this);
+                    logger.info("Deleted channel {}", ImplChannel.this);
                     // call listener
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
@@ -169,11 +178,13 @@ public class ImplChannel implements Channel {
     @Override
     public void type() {
         try {
+            logger.debug("Sending typing state in channel {}", this);
             Unirest.post("https://discordapp.com/api/channels/" + id + "/typing")
                     .header("authorization", api.getToken())
                     .asJson();
+            logger.debug("Sent typing state in channel {}", this);
         } catch (UnirestException e) {
-            e.printStackTrace();
+            logger.warn("Couldn't send typing state in channel {}. Please contact the developer!", this, e);
         }
     }
 
@@ -204,6 +215,8 @@ public class ImplChannel implements Channel {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        logger.debug("Trying to send message in channel {} (content: \"{}\", tts: {})",
+                                ImplChannel.this, content, tts);
                         api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
@@ -215,6 +228,8 @@ public class ImplChannel implements Channel {
                                                 .put("mentions", new String[0]).toString())
                                         .asJson();
                         api.checkResponse(response);
+                        logger.debug("Sent message in channel {} (content: \"{}\", tts: {})",
+                                ImplChannel.this, content, tts);
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -236,6 +251,7 @@ public class ImplChannel implements Channel {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<Message>() {
                     @Override
                     public Message call() throws Exception {
+                        logger.debug("Trying to send file in channel {} (name: {})", ImplChannel.this, file.getName());
                         api.checkRateLimit();
                         HttpResponse<JsonNode> response =
                                 Unirest.post("https://discordapp.com/api/channels/" + id + "/messages")
@@ -243,6 +259,7 @@ public class ImplChannel implements Channel {
                                         .field("file", file)
                                         .asJson();
                         api.checkResponse(response);
+                        logger.debug("Sent file in channel {} (name: {})", ImplChannel.this, file.getName());
                         return new ImplMessage(response.getBody().getObject(), api, receiver);
                     }
                 });
@@ -328,13 +345,15 @@ public class ImplChannel implements Channel {
     }
 
     @Override
-    public Future<Exception> update(String newName, String newTopic) {
+    public Future<Exception> update(final String newName, final String newTopic) {
         final JSONObject params = new JSONObject()
                 .put("name", newName)
                 .put("topic", newTopic);
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to update channel {} (new name: {}, old name: {}, new topic: {}, old topic: {})",
+                        ImplChannel.this, newName, getName(), newTopic, getTopic());
                 try {
                     HttpResponse<JsonNode> response = Unirest
                             .patch("https://discordapp.com/api/channels/" + getId())
@@ -343,6 +362,8 @@ public class ImplChannel implements Channel {
                             .body(params.toString())
                             .asJson();
                     api.checkResponse(response);
+                    logger.info("Updated channel {} (new name: {}, old name: {}, new topic: {}, old topic: {})",
+                            ImplChannel.this, newName, getName(), newTopic, getTopic());
                     String updatedName = response.getBody().getObject().getString("name");
                     String updatedTopic = null;
                     if (response.getBody().getObject().has("topic")

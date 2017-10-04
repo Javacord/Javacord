@@ -35,8 +35,10 @@ import de.btobastian.javacord.listener.server.*;
 import de.btobastian.javacord.listener.user.UserRoleAddListener;
 import de.btobastian.javacord.listener.user.UserRoleRemoveListener;
 import de.btobastian.javacord.listener.voicechannel.VoiceChannelCreateListener;
+import de.btobastian.javacord.utils.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -52,6 +54,11 @@ import java.util.concurrent.Future;
  */
 public class ImplServer implements Server {
 
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplServer.class);
+
     private final ImplDiscordAPI api;
 
     private final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
@@ -63,7 +70,7 @@ public class ImplServer implements Server {
     private String name;
     private Region region;
     private int memberCount;
-    private boolean large;
+    private final boolean large;
 
     /**
      * Creates a new instance of this class.
@@ -153,11 +160,13 @@ public class ImplServer implements Server {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug("Trying to delete server {}", ImplServer.this);
                     HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
                     api.getServerMap().remove(id);
+                    logger.info("Deleted server {}", ImplServer.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
@@ -183,11 +192,13 @@ public class ImplServer implements Server {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug("Trying to leave server {}", ImplServer.this);
                     HttpResponse<JsonNode> response = Unirest.delete("https://discordapp.com/api/users/@me/guilds/" + id)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
                     api.getServerMap().remove(id);
+                    logger.info("Left server {}", ImplServer.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
@@ -269,6 +280,8 @@ public class ImplServer implements Server {
                     @Override
                     public Channel call() throws Exception {
                         final Channel channel = (Channel) createChannelBlocking(name, false);
+                        logger.info("Created channel in server {} (name: {}, voice: {}, id: {})",
+                                ImplServer.this, channel.getName(), false, channel.getId());
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
@@ -301,6 +314,8 @@ public class ImplServer implements Server {
                     @Override
                     public VoiceChannel call() throws Exception {
                         final VoiceChannel channel = (VoiceChannel) createChannelBlocking(name, true);
+                        logger.info("Created channel in server {} (name: {}, voice: {}, id: {})",
+                                ImplServer.this, channel.getName(), true, channel.getId());
                         api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                             @Override
                             public void run() {
@@ -332,6 +347,7 @@ public class ImplServer implements Server {
                 new Callable<Invite[]>() {
                     @Override
                     public Invite[] call() throws Exception {
+                        logger.debug("Trying to get invites for server {}", ImplServer.this);
                         HttpResponse<JsonNode> response = Unirest
                                 .get("https://discordapp.com/api/guilds/" + getId() + "/invites")
                                 .header("authorization", api.getToken())
@@ -341,6 +357,7 @@ public class ImplServer implements Server {
                         for (int i = 0; i < response.getBody().getArray().length(); i++) {
                             invites[i] = new ImplInvite(api, response.getBody().getArray().getJSONObject(i));
                         }
+                        logger.debug("Got invites for server {} (amount: {})", ImplServer.this, invites.length);
                         return invites;
                     }
                 });
@@ -359,9 +376,10 @@ public class ImplServer implements Server {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to update roles in server {} (amount: {})", ImplServer.this, roles.length);
                 try {
                     HttpResponse<JsonNode> response = Unirest
-                            .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" +user.getId())
+                            .patch("https://discordapp.com/api/guilds/" + getId() + "/members/" + user.getId())
                             .header("authorization", api.getToken())
                             .header("Content-Type", "application/json")
                             .body(new JSONObject().put("roles", roleIds).toString())
@@ -406,6 +424,7 @@ public class ImplServer implements Server {
                             });
                         }
                     }
+                    logger.debug("Updated roles in server {} (amount: {})", ImplServer.this, getRoles().size());
                 } catch (Exception e) {
                     return e;
                 }
@@ -435,6 +454,8 @@ public class ImplServer implements Server {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug("Trying to ban an user from server {} (user id: {}, delete days: {})",
+                            ImplServer.this, userId, deleteDays);
                     HttpResponse<JsonNode> response = Unirest
                             .put("https://discordapp.com/api/guilds/:guild_id/bans/" + userId
                                     + "?delete-message-days=" + deleteDays)
@@ -445,6 +466,8 @@ public class ImplServer implements Server {
                     if (user != null) {
                         removeMember(user);
                     }
+                    logger.info("Banned an user from server {} (user id: {}, delete days: {})",
+                            ImplServer.this, userId, deleteDays);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
@@ -469,12 +492,14 @@ public class ImplServer implements Server {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to unban an user from server {} (user id: {})", ImplServer.this, userId);
                 try {
                     HttpResponse<JsonNode> response = Unirest
                             .delete("https://discordapp.com/api/guilds/" + getId() + "/bans/" + userId)
                             .header("authorization", api.getToken())
                             .asJson();
                     api.checkResponse(response);
+                    logger.info("Unbanned an user from server {} (user id: {})", ImplServer.this, userId);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
@@ -506,6 +531,7 @@ public class ImplServer implements Server {
                 api.getThreadPool().getListeningExecutorService().submit(new Callable<User[]>() {
                     @Override
                     public User[] call() throws Exception {
+                        logger.debug("Trying to get bans for server {}", ImplServer.this);
                         HttpResponse<JsonNode> response = Unirest
                                 .get("https://discordapp.com/api/guilds/" + getId() + "/bans")
                                 .header("authorization", api.getToken())
@@ -516,6 +542,7 @@ public class ImplServer implements Server {
                         for (int i = 0; i < bannedUsersJson.length(); i++) {
                             bannedUsers[i] = api.getOrCreateUser(bannedUsersJson.getJSONObject(i));
                         }
+                        logger.debug("Got bans for server {} (amount: {})", ImplServer.this, bannedUsers.length);
                         return bannedUsers;
                     }
                 });
@@ -535,6 +562,7 @@ public class ImplServer implements Server {
         return api.getThreadPool().getExecutorService().submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
+                logger.debug("Trying to kick an user from server {} (user id: {})", ImplServer.this);
                 try {
                     HttpResponse<JsonNode> response = Unirest
                             .delete("https://discordapp.com/api/guilds/"+ getId() + "/members/" + userId)
@@ -545,6 +573,7 @@ public class ImplServer implements Server {
                     if (user != null) {
                         removeMember(user);
                     }
+                    logger.info("Kicked an user from server {} (user id: {})", ImplServer.this);
                     api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                         @Override
                         public void run() {
@@ -575,12 +604,15 @@ public class ImplServer implements Server {
         ListenableFuture<Role> future = api.getThreadPool().getListeningExecutorService().submit(new Callable<Role>() {
             @Override
             public Role call() throws Exception {
+                logger.debug("Trying to create a role in server {}", ImplServer.this);
                 HttpResponse<JsonNode> response = Unirest
                         .post("https://discordapp.com/api/guilds/" + getId() + "/roles")
                         .header("authorization", api.getToken())
                         .asJson();
                 api.checkResponse(response);
                 final Role role = new ImplRole(response.getBody().getObject(), ImplServer.this, api);
+                logger.info("Created role in server {} (name: {}, id: {})",
+                        ImplServer.this, role.getName(), role.getId());
                 api.getThreadPool().getSingleThreadExecutorService("listeners").submit(new Runnable() {
                     @Override
                     public void run() {
@@ -617,7 +649,7 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Future<Exception> update(String newName, Region newRegion, BufferedImage newIcon) {
+    public Future<Exception> update(final String newName, final Region newRegion, BufferedImage newIcon) {
         final JSONObject params = new JSONObject();
         if (newName == null) {
             params.put("name", getName());
@@ -632,6 +664,10 @@ public class ImplServer implements Server {
             @Override
             public Exception call() throws Exception {
                 try {
+                    logger.debug(
+                            "Trying to update server {} (new name: {}, old name: {}, new region: {}, old region: {}",
+                            ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
+                            getRegion().getKey());
                     HttpResponse<JsonNode> response = Unirest
                             .patch("https://discordapp.com/api/guilds/" + getId())
                             .header("authorization", api.getToken())
@@ -639,6 +675,9 @@ public class ImplServer implements Server {
                             .body(params.toString())
                             .asJson();
                     api.checkResponse(response);
+                    logger.debug("Updated server {} (new name: {}, old name: {}, new region: {}, old region: {}",
+                            ImplServer.this, newName, getName(), newRegion == null ? "null" : newRegion.getKey(),
+                            getRegion().getKey());
 
                     String name = response.getBody().getObject().getString("name");
                     if (!getName().equals(name)) {
@@ -801,6 +840,7 @@ public class ImplServer implements Server {
      * @throws Exception If something went wrong.
      */
     private Object createChannelBlocking(String name, boolean voice) throws Exception {
+        logger.debug("Trying to create channel in server {} (name: {}, voice: {})", ImplServer.this, name, voice);
         JSONObject param = new JSONObject().put("name", name).put("type", voice ? "voice" : "text");
         HttpResponse<JsonNode> response = Unirest.post("https://discordapp.com/api/guilds/" + id + "/channels")
                 .header("authorization", api.getToken())
