@@ -4,6 +4,7 @@ import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 
@@ -121,5 +122,20 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return A list with all registered role change position listeners.
      */
     java.util.List<RoleChangePositionListener> getRoleChangePositionListeners();
+
+    /**
+     * Adds a listener, which listens to overwritten permission changes of this role.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+
+    /**
+     * Gets a list with all registered server channel change overwritten permissions listeners.
+     *
+     * @return A list with all registered server channel change overwritten permissions listeners.
+     */
+    java.util.List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+
 
 }

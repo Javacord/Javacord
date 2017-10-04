@@ -29,6 +29,7 @@ import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
@@ -682,5 +683,16 @@ public class ImplServer implements Server {
     @Override
     public List<RoleChangePositionListener> getRoleChangePositionListeners() {
         return getListeners(RoleChangePositionListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener) {
+        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+        return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
 }

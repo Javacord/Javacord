@@ -24,6 +24,7 @@ import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
@@ -839,4 +840,19 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered role change position listeners.
      */
     List<RoleChangePositionListener> getRoleChangePositionListeners();
+
+    /**
+     * Adds a listener, which listens to overwritten permission changes in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+
+    /**
+     * Gets a list with all registered server channel change overwritten permissions listeners.
+     *
+     * @return A list with all registered server channel change overwritten permissions listeners.
+     */
+    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+
 }

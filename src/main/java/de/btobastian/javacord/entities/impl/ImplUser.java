@@ -16,6 +16,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -342,5 +343,16 @@ public class ImplUser implements User, IconHolder {
     @Override
     public List<UserChangeStatusListener> getUserChangeStatusListeners() {
         return getListeners(UserChangeStatusListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener) {
+        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+        return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
 }

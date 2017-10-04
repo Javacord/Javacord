@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import org.json.JSONArray;
@@ -128,6 +129,24 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     }
 
     /**
+     * Gets the overwritten role permissions.
+     *
+     * @return The overwritten role permissions.
+     */
+    public ConcurrentHashMap<Long, Permissions> getOverwrittenRolePermissions() {
+        return overwrittenRolePermissions;
+    }
+
+    /**
+     * Gets the overwritten user permissions.
+     *
+     * @return The overwritten user permissions.
+     */
+    public ConcurrentHashMap<Long, Permissions> getOverwrittenUserPermissions() {
+        return overwrittenUserPermissions;
+    }
+
+    /**
      * Adds a listener.
      *
      * @param clazz The listener class.
@@ -226,4 +245,14 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
         return getListeners(ServerChannelChangePositionListener.class);
     }
 
+    @Override
+    public void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener) {
+        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+        return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
+    }
 }

@@ -9,6 +9,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -244,5 +245,20 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return A list with all registered custom emoji create listeners.
      */
     List<UserChangeStatusListener> getUserChangeStatusListeners();
+
+    /**
+     * Adds a listener, which listens to overwritten permission changes of this user.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+
+    /**
+     * Gets a list with all registered server channel change overwritten permissions listeners.
+     *
+     * @return A list with all registered server channel change overwritten permissions listeners.
+     */
+    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+
 
 }

@@ -16,6 +16,7 @@ import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -147,6 +148,24 @@ public class ImplServerTextChannel implements ServerTextChannel {
      */
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    /**
+     * Gets the overwritten role permissions.
+     *
+     * @return The overwritten role permissions.
+     */
+    public ConcurrentHashMap<Long, Permissions> getOverwrittenRolePermissions() {
+        return overwrittenRolePermissions;
+    }
+
+    /**
+     * Gets the overwritten user permissions.
+     *
+     * @return The overwritten user permissions.
+     */
+    public ConcurrentHashMap<Long, Permissions> getOverwrittenUserPermissions() {
+        return overwrittenUserPermissions;
     }
 
     /**
@@ -321,5 +340,16 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
         return getListeners(ServerChannelChangePositionListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener) {
+        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+        return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
 }

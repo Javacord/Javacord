@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import org.json.JSONObject;
@@ -226,5 +227,16 @@ public class ImplRole implements Role {
     @Override
     public List<RoleChangePositionListener> getRoleChangePositionListeners() {
         return getListeners(RoleChangePositionListener.class);
+    }
+
+    @Override
+    public void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener) {
+        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+        return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
 }

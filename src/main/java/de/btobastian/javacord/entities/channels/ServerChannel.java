@@ -10,6 +10,7 @@ import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -200,5 +201,20 @@ public interface ServerChannel extends Channel {
      * @return A list with all registered server channel change position listeners.
      */
     List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
+
+    /**
+     * Adds a listener, which listens to overwritten permission changes of this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+
+    /**
+     * Gets a list with all registered server channel change overwritten permissions listeners.
+     *
+     * @return A list with all registered server channel change overwritten permissions listeners.
+     */
+    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+
 
 }

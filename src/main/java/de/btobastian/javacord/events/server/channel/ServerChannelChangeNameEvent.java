@@ -1,7 +1,5 @@
 package de.btobastian.javacord.events.server.channel;
 
-import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 
 /**
@@ -22,15 +20,12 @@ public class ServerChannelChangeNameEvent extends ServerChannelEvent {
     /**
      * Creates a new server channel change name event.
      *
-     * @param api The api instance of the event.
-     * @param server The server of the event.
      * @param channel The channel of the event.
      * @param newName The new name of the channel.
      * @param oldName The old name of the channel.
      */
-    public ServerChannelChangeNameEvent(
-            DiscordApi api, Server server, ServerChannel channel, String newName, String oldName) {
-        super(api, server, channel);
+    public ServerChannelChangeNameEvent(ServerChannel channel, String newName, String oldName) {
+        super(channel);
         this.newName = newName;
         this.oldName = oldName;
     }

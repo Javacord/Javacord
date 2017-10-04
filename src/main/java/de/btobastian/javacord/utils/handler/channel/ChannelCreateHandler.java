@@ -56,7 +56,7 @@ public class ChannelCreateHandler extends PacketHandler {
         long serverId = Long.parseLong(channel.getString("guild_id"));
         api.getServerById(serverId).ifPresent(server -> {
             ChannelCategory textChannel = ((ImplServer) server).getOrCreateChannelCategory(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEvent(api, server, textChannel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEvent(textChannel);
 
             List<ServerChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerChannelCreateListeners());
@@ -75,7 +75,7 @@ public class ChannelCreateHandler extends PacketHandler {
         long serverId = Long.parseLong(channel.getString("guild_id"));
         api.getServerById(serverId).ifPresent(server -> {
             ServerTextChannel textChannel = ((ImplServer) server).getOrCreateServerTextChannel(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEvent(api, server, textChannel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEvent(textChannel);
 
             List<ServerChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerChannelCreateListeners());
@@ -94,7 +94,7 @@ public class ChannelCreateHandler extends PacketHandler {
         long serverId = Long.parseLong(channel.getString("guild_id"));
         api.getServerById(serverId).ifPresent(server -> {
             ServerVoiceChannel voiceChannel = ((ImplServer) server).getOrCreateServerVoiceChannel(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEvent(api, server, voiceChannel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEvent(voiceChannel);
 
             List<ServerChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerChannelCreateListeners());

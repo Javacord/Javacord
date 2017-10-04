@@ -48,7 +48,7 @@ public class ChannelDeleteHandler extends PacketHandler {
     private void handleServerTextChannel(JSONObject channel) {
         long serverId = Long.parseLong(channel.getString("guild_id"));
         api.getServerById(serverId).ifPresent(server -> server.getTextChannelById(serverId).ifPresent(textChannel -> {
-            ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(api, server, textChannel);
+            ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(textChannel);
 
             List<ServerChannelDeleteListener> listeners = new ArrayList<>();
             listeners.addAll(textChannel.getServerChannelDeleteListeners());
@@ -69,7 +69,7 @@ public class ChannelDeleteHandler extends PacketHandler {
     private void handleServerVoiceChannel(JSONObject channel) {
         long serverId = Long.parseLong(channel.getString("guild_id"));
         api.getServerById(serverId).ifPresent(server -> server.getVoiceChannelById(serverId).ifPresent(voiceChannel -> {
-            ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(api, server, voiceChannel);
+            ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(voiceChannel);
 
             List<ServerChannelDeleteListener> listeners = new ArrayList<>();
             listeners.addAll(voiceChannel.getServerChannelDeleteListeners());
