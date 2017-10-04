@@ -31,6 +31,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListen
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
+import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -854,5 +855,19 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+
+    /**
+     * Adds a listener, which listens to role creations in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addRoleCreateListener(RoleCreateListener listener);
+
+    /**
+     * Gets a list with all registered role create listeners.
+     *
+     * @return A list with all registered role create listeners.
+     */
+    List<RoleCreateListener> getRoleCreateListeners();
 
 }

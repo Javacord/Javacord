@@ -36,6 +36,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListen
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
+import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
@@ -267,6 +268,23 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Gets or create a new role.
+     *
+     * @param data The json data of the role.
+     * @return The role.
+     */
+    public Role getOrCreateRole(JSONObject data) {
+        long id = Long.parseLong(data.getString("id"));
+        synchronized (this) {
+            return getRoleById(id).orElseGet(() -> {
+                Role role = new ImplRole(api, this, data);
+                this.roles.put(role.getId(), role);
+                return role;
+            });
+        }
+    }
+
+    /**
      * Gets or creates a channel category.
      *
      * @param data The json data of the channel.
@@ -277,7 +295,7 @@ public class ImplServer implements Server {
         int type = data.getInt("type");
         synchronized (this) {
             if (type == 4) {
-                return getChannelCategoryById(id).orElse(new ImplChannelCategory(api, this, data));
+                return getChannelCategoryById(id).orElseGet(() -> new ImplChannelCategory(api, this, data));
             }
         }
         // Invalid channel type
@@ -295,7 +313,7 @@ public class ImplServer implements Server {
         int type = data.getInt("type");
         synchronized (this) {
             if (type == 0) {
-                return getTextChannelById(id).orElse(new ImplServerTextChannel(api, this, data));
+                return getTextChannelById(id).orElseGet(() -> new ImplServerTextChannel(api, this, data));
             }
         }
         // Invalid channel type
@@ -313,7 +331,7 @@ public class ImplServer implements Server {
         int type = data.getInt("type");
         synchronized (this) {
             if (type == 2) {
-                return getVoiceChannelById(id).orElse(new ImplServerVoiceChannel(api, this, data));
+                return getVoiceChannelById(id).orElseGet(() -> new ImplServerVoiceChannel(api, this, data));
             }
         }
         // Invalid channel type
@@ -694,5 +712,15 @@ public class ImplServer implements Server {
     @Override
     public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
+    }
+
+    @Override
+    public void addRoleCreateListener(RoleCreateListener listener) {
+        addListener(RoleCreateListener.class, listener);
+    }
+
+    @Override
+    public List<RoleCreateListener> getRoleCreateListeners() {
+        return getListeners(RoleCreateListener.class);
     }
 }
