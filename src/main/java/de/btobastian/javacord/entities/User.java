@@ -1,8 +1,16 @@
 package de.btobastian.javacord.entities;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.message.Messageable;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
@@ -13,12 +21,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwr
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * This class represents a user.
@@ -259,6 +261,38 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+    /**
+     * Single permission test for user using global permissions
+     * This takes roles into account.
+     * @param type - The expected permission type
+     * @param Server - The Server
+     */
+    default boolean hasPermission(PermissionType type, Server theServer) {
+    	return theServer.getAllowedPermissionsOf(this).contains(type);
+    }
+    /**
+     * Single permission test for user, including overwritten permissions
+     * @see {@link ServerChannel#getEffectiveAllowedPermissions(User)}
+     * @param type - The expected permission type
+     * @param chan - The ServerChannel instance
+     */
+    default boolean hasPermission(PermissionType type, ServerChannel chan) {
+    	return chan.getEffectiveAllowedPermissions(this).contains(type);
+    }
+    /**
+     * Determines if a user has higher power than another VIA Role positions.
+     * @param theServer - Server to test roles on
+     * @param user - The user to check against
+     * @return True if this user is higher than the param user.
+     */
+	default boolean isHigherThan(Server theServer,User user) {
+		if (this.hasPermission(PermissionType.ADMINISTRATOR, theServer))
+			return true;
 
-
+		Role thisUser = this.getRoles(theServer).get(this.getRoles(theServer).size());
+		Role question = user.getRoles(theServer).get(user.getRoles(theServer).size());
+		List<Role> fullRoles = theServer.getRoles();
+		return fullRoles.indexOf(thisUser) >= fullRoles.indexOf(question);
+		
+	}
 }

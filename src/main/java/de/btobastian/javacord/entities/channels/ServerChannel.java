@@ -215,6 +215,17 @@ public interface ServerChannel extends Channel {
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
-
-
+   
+    /**
+     * Determines whether a user using the following criteria: <br/> <br/> 
+     * <b>{@link ServerTextChannel}:</b> Checks if a user may read messages.
+     * <br>
+     * <b>{@link ServerVoiceChannel}:</b> Checks if a user may connect.
+     * <br/>
+     * <b>{@link ChannelCategory}:</b> Checks if a user can see at least one child channel.
+     * @param user - The user object to test upon
+     * @return True if user can,false otherwise
+     */
+    public boolean canSee(User user);
+    
 }

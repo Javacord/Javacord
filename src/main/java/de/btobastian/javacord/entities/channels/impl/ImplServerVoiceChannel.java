@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
@@ -255,4 +256,9 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
+
+	@Override
+	public boolean canSee(User user) {
+		return user.hasPermission(PermissionType.ADMINISTRATOR, this) || user.hasPermission(PermissionType.VOICE_CONNECT, this);
+	}
 }

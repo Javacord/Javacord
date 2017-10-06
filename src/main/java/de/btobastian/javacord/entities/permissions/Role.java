@@ -137,5 +137,5 @@ public interface Role extends DiscordEntity, Mentionable {
      */
     java.util.List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
 
-
+    
 }
