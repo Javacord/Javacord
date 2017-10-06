@@ -28,7 +28,10 @@ public class ServerTextChannelBuilder {
      * The category of the channel.
      */
     private ChannelCategory category = null;
-
+    /**
+     * If channel is NSFW
+     */
+    private boolean nsfw = false;
     /**
      * Creates a new server text channel builder.
      *
@@ -58,8 +61,17 @@ public class ServerTextChannelBuilder {
     public ServerTextChannelBuilder setCategory(ChannelCategory category) {
         this.category = category;
         return this;
+       
     }
-
+    /**
+     * Sets if channel is NSFW
+     * @param nsfw - Value of NSFW
+     * @return Current instance to allow chaining.
+     */
+    public ServerTextChannelBuilder setNSFW(boolean nsfw) {
+    	this.nsfw = nsfw;
+    	return this;
+    }
     /**
      * Creates the server text channel.
      *
@@ -75,6 +87,7 @@ public class ServerTextChannelBuilder {
         if (category != null) {
             body.put("parent_id", String.valueOf(category.getId()));
         }
+        body.put("nsfw", nsfw);
         return new RestRequest<ServerTextChannel>(server.getApi(), HttpMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)

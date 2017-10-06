@@ -800,6 +800,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
 	 */
 	default boolean canAddReaction(User user, Emoji emote) {
 		ServerTextChannel STC = this.getServerTextChannel().get();
+		
 		if (!STC.canAddNewRections(user)) {
 			return false;
 		} else if (emote.isUnicodeEmoji()) {

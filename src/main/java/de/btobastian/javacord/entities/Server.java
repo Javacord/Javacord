@@ -981,6 +981,7 @@ public interface Server extends DiscordEntity, IconHolder {
 	 * @return True if admin can, False otherwise
 	 */
 	default boolean canKickUser(User admin, User subject) {
+	
 		return canBanUsers(admin) && admin.isHigherThan(this, subject);
 	}
 	
