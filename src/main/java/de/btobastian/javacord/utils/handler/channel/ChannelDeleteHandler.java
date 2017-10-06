@@ -1,6 +1,7 @@
 package de.btobastian.javacord.utils.handler.channel;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.channel.ServerChannelDeleteEvent;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
@@ -37,48 +38,51 @@ public class ChannelDeleteHandler extends PacketHandler {
             case 2:
                 handleServerVoiceChannel(packet);
                 break;
+            case 4:
+                handleCategory(packet);
+                break;
         }
     }
 
     /**
      * Handles server text channel deletion.
      *
-     * @param channel The channel data.
+     * @param channelJson The channel data.
      */
-    private void handleServerTextChannel(JSONObject channel) {
-        long serverId = Long.parseLong(channel.getString("guild_id"));
-        api.getServerById(serverId).ifPresent(server -> server.getTextChannelById(serverId).ifPresent(textChannel -> {
-            ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(textChannel);
+    private void handleCategory(JSONObject channelJson) {
+        long serverId = Long.parseLong(channelJson.getString("guild_id"));
+        long channelId = Long.parseLong(channelJson.getString("id"));
+        api.getServerById(serverId).ifPresent(server -> server.getChannelCategoryById(channelId).ifPresent(channel -> {
+            dispatchServerChannelDeleteEvent(channel);
+            ((ImplServer) server).removeChannelFromCache(channel.getId());
+        }));
+    }
 
-            List<ServerChannelDeleteListener> listeners = new ArrayList<>();
-            listeners.addAll(textChannel.getServerChannelDeleteListeners());
-            listeners.addAll(server.getServerChannelDeleteListeners());
-            listeners.addAll(api.getServerChannelDeleteListeners());
-
-            dispatchEvent(listeners, listener -> listener.onServerChannelDelete(event));
-
-            ((ImplServer) server).removeChannelFromCache(textChannel.getId());
+    /**
+     * Handles server text channel deletion.
+     *
+     * @param channelJson The channel data.
+     */
+    private void handleServerTextChannel(JSONObject channelJson) {
+        long serverId = Long.parseLong(channelJson.getString("guild_id"));
+        long channelId = Long.parseLong(channelJson.getString("id"));
+        api.getServerById(serverId).ifPresent(server -> server.getTextChannelById(channelId).ifPresent(channel -> {
+            dispatchServerChannelDeleteEvent(channel);
+            ((ImplServer) server).removeChannelFromCache(channel.getId());
         }));
     }
 
     /**
      * Handles server voice channel deletion.
      *
-     * @param channel The channel data.
+     * @param channelJson The channel data.
      */
-    private void handleServerVoiceChannel(JSONObject channel) {
-        long serverId = Long.parseLong(channel.getString("guild_id"));
-        api.getServerById(serverId).ifPresent(server -> server.getVoiceChannelById(serverId).ifPresent(voiceChannel -> {
-            ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(voiceChannel);
-
-            List<ServerChannelDeleteListener> listeners = new ArrayList<>();
-            listeners.addAll(voiceChannel.getServerChannelDeleteListeners());
-            listeners.addAll(server.getServerChannelDeleteListeners());
-            listeners.addAll(api.getServerChannelDeleteListeners());
-
-            dispatchEvent(listeners, listener -> listener.onServerChannelDelete(event));
-
-            ((ImplServer) server).removeChannelFromCache(voiceChannel.getId());
+    private void handleServerVoiceChannel(JSONObject channelJson) {
+        long serverId = Long.parseLong(channelJson.getString("guild_id"));
+        long channelId = Long.parseLong(channelJson.getString("id"));
+        api.getServerById(serverId).ifPresent(server -> server.getVoiceChannelById(channelId).ifPresent(channel -> {
+            dispatchServerChannelDeleteEvent(channel);
+            ((ImplServer) server).removeChannelFromCache(channel.getId());
         }));
     }
 
@@ -89,6 +93,22 @@ public class ChannelDeleteHandler extends PacketHandler {
      */
     private void handlePrivateChannel(JSONObject channel) {
         // TODO handle private channel deletion -> only for client bots
+    }
+
+    /**
+     * Dispatches a server channel delete event.
+     *
+     * @param channel The channel of the event.
+     */
+    private void dispatchServerChannelDeleteEvent(ServerChannel channel) {
+        ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(channel);
+
+        List<ServerChannelDeleteListener> listeners = new ArrayList<>();
+        listeners.addAll(channel.getServerChannelDeleteListeners());
+        listeners.addAll(channel.getServer().getServerChannelDeleteListeners());
+        listeners.addAll(api.getServerChannelDeleteListeners());
+
+        dispatchEvent(listeners, listener -> listener.onServerChannelDelete(event));
     }
 
 }

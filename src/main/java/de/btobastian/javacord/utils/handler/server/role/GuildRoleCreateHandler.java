@@ -38,7 +38,6 @@ public class GuildRoleCreateHandler extends PacketHandler {
 
             dispatchEvent(listeners, listener -> listener.onRoleCreate(event));
         });
-        // TODO update positions of old roles -> +1 for every role, besides @everyone
     }
 
 }
