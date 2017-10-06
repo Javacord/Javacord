@@ -56,4 +56,12 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
 				|| (user.hasPermission(PermissionType.READ_MESSAGES, this)
 						&& user.hasPermission(PermissionType.READ_MESSAGE_HISTORY, this));
 	}
+	/**
+	 * Checks if user can add reactions in this channel
+	 * @param user - The user
+	 * @return True if they can
+	 */
+	default boolean canAddNewRections(User user) {
+		return user.isAdmin(this) || user.hasPermission(PermissionType.ADD_REACTIONS, this);
+	}
 }
