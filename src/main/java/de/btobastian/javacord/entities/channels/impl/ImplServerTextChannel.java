@@ -223,7 +223,7 @@ public class ImplServerTextChannel implements ServerTextChannel {
     }
 
     @Override
-    public int getPosition() {
+    public int getRawPosition() {
         return position;
     }
 

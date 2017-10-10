@@ -195,7 +195,7 @@ public class ImplChannelCategory implements ChannelCategory {
     }
 
     @Override
-    public int getPosition() {
+    public int getRawPosition() {
         return position;
     }
 

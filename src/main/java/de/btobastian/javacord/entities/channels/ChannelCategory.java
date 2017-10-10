@@ -1,6 +1,9 @@
 package de.btobastian.javacord.entities.channels;
 
+import de.btobastian.javacord.entities.impl.ImplServer;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -20,11 +23,17 @@ public interface ChannelCategory extends ServerChannel {
      */
     default List<ServerChannel> getChannels() {
         List<ServerChannel> channels = new ArrayList<>();
-        getServer().getTextChannels().stream()
+        ((ImplServer) getServer()).getUnorderedChannels().stream()
+                .filter(channel -> channel.asServerTextChannel().isPresent())
+                .map(channel -> channel.asServerTextChannel().get())
                 .filter(channel -> channel.getCategory().orElse(null) == this)
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .forEach(channels::add);
-        getServer().getVoiceChannels().stream()
+        ((ImplServer) getServer()).getUnorderedChannels().stream()
+                .filter(channel -> channel.asServerVoiceChannel().isPresent())
+                .map(channel -> channel.asServerVoiceChannel().get())
                 .filter(channel -> channel.getCategory().orElse(null) == this)
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .forEach(channels::add);
         return channels;
     }

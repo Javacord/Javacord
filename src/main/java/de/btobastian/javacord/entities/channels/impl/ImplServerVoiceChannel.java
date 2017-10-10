@@ -191,7 +191,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     }
 
     @Override
-    public int getPosition() {
+    public int getRawPosition() {
         return position;
     }
 

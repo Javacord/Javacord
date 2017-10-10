@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannelBuilder;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannelBuilder;
+import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.PermissionState;
 import de.btobastian.javacord.entities.permissions.PermissionType;
@@ -313,11 +314,11 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
-     * Gets a collection with all channels of the server.
+     * Gets a sorted list (by position) with all channels of the server.
      *
-     * @return A collection with all channels of the server.
+     * @return A sorted list (by position) with all channels of the server.
      */
-    Collection<ServerChannel> getChannels();
+    List<ServerChannel> getChannels();
 
     /**
      * Gets a sorted list (by position) with all channel categories of the server.
@@ -325,9 +326,9 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A sorted list (by position) with all channel categories of the server.
      */
     default List<ChannelCategory> getChannelCategories() {
-        return getChannels().stream()
+        return ((ImplServer) this).getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ChannelCategory)
-                .sorted(Comparator.comparingInt(ServerChannel::getPosition))
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .map(channel -> (ChannelCategory) channel)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -338,9 +339,9 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A sorted list (by position) with all text channels of the server.
      */
     default List<ServerTextChannel> getTextChannels() {
-        return getChannels().stream()
+        return ((ImplServer) this).getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerTextChannel)
-                .sorted(Comparator.comparingInt(ServerChannel::getPosition))
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .map(channel -> (ServerTextChannel) channel)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -351,9 +352,9 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A sorted list (by position) with all voice channels of the server.
      */
     default List<ServerVoiceChannel> getVoiceChannels() {
-        return getChannels().stream()
+        return ((ImplServer) this).getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerVoiceChannel)
-                .sorted(Comparator.comparingInt(ServerChannel::getPosition))
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .map(channel -> (ServerVoiceChannel) channel)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -381,26 +382,26 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
-     * Gets a collection with all channels with the given name.
+     * Gets a sorted list (by position) with all channels with the given name.
      * This method is case sensitive!
      *
      * @param name The name of the channels.
-     * @return A collection with all channels with the given name.
+     * @return A sorted list (by position) with all channels with the given name.
      */
-    default Collection<ServerChannel> getChannelsByName(String name) {
+    default List<ServerChannel> getChannelsByName(String name) {
         return getChannels().stream()
                 .filter(channel -> channel.getName().equals(name))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Gets a collection with all channels with the given name.
+     * Gets a sorted list (by position) with all channels with the given name.
      * This method is case insensitive!
      *
      * @param name The name of the channels.
-     * @return A collection with all channels with the given name.
+     * @return A sorted list (by position) with all channels with the given name.
      */
-    default Collection<ServerChannel> getChannelsByNameIgnoreCase(String name) {
+    default List<ServerChannel> getChannelsByNameIgnoreCase(String name) {
         return getChannels().stream()
                 .filter(channel -> channel.getName().equalsIgnoreCase(name))
                 .collect(Collectors.toList());

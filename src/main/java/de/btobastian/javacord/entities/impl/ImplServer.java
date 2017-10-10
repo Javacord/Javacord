@@ -389,6 +389,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Gets an unordered collection with all channels in the server.
+     *
+     * @return An unordered collection with all channels in the server.
+     */
+    public Collection<ServerChannel> getUnorderedChannels() {
+        return channels.values();
+    }
+
+    /**
      * Adds a listener.
      *
      * @param clazz The listener class.
@@ -489,8 +498,26 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Collection<ServerChannel> getChannels() {
-        return channels.values();
+    public List<ServerChannel> getChannels() {
+        Collection<ServerChannel> channelsUnordered = this.channels.values();
+        List<ServerChannel> channels = new ArrayList<>();
+        channelsUnordered.stream()
+                .filter(channel -> !channel.asChannelCategory().isPresent())
+                .filter(channel -> channel.asServerTextChannel().isPresent())
+                .filter(channel -> !channel.asServerTextChannel().get().getCategory().isPresent())
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .forEachOrdered(channels::add);
+        channelsUnordered.stream()
+                .filter(channel -> !channel.asChannelCategory().isPresent())
+                .filter(channel -> channel.asServerVoiceChannel().isPresent())
+                .filter(channel -> !channel.asServerVoiceChannel().get().getCategory().isPresent())
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .forEachOrdered(channels::add);
+        getChannelCategories().forEach(category -> {
+                    channels.add(category);
+                    channels.addAll(category.getChannels());
+                });
+        return channels;
     }
 
     @Override

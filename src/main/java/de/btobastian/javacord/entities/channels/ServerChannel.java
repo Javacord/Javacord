@@ -43,11 +43,23 @@ public interface ServerChannel extends Channel {
     Server getServer();
 
     /**
-     * Gets the position of the channel.
+     * Gets the raw position of the channel.
+     * This is the positions sent from Discord and might not be unique and have gaps.
+     * Also every channel type (text, voice and category) has it's own position counter.
      *
-     * @return The position of the channel.
+     * @return The raw position of the channel.
      */
-    int getPosition();
+    int getRawPosition();
+
+    /**
+     * Gets the real position of the channel.
+     * Returns <code>-1</code> if the channel is deleted.
+     *
+     * @return The real position of the channel.
+     */
+    default int getPosition() {
+        return getServer().getChannels().indexOf(this);
+    }
 
     /**
      * Gets the overwritten permissions of a user in this channel.
