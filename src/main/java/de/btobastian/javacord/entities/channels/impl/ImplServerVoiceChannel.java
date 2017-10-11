@@ -1,5 +1,14 @@
 package de.btobastian.javacord.entities.channels.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
@@ -15,14 +24,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameLi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link ServerVoiceChannel}.
@@ -192,7 +193,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     }
 
     @Override
-    public int getPosition() {
+    public int getRawPosition() {
         return position;
     }
 
@@ -256,9 +257,9 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
-
 	@Override
 	public boolean canSee(User user) {
 		return user.hasPermission(PermissionType.ADMINISTRATOR, this) || user.hasPermission(PermissionType.VOICE_CONNECT, this);
 	}
 }
+

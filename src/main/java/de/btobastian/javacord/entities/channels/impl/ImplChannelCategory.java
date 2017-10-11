@@ -196,7 +196,7 @@ public class ImplChannelCategory implements ChannelCategory {
     }
 
     @Override
-    public int getPosition() {
+    public int getRawPosition() {
         return position;
     }
 
@@ -255,7 +255,6 @@ public class ImplChannelCategory implements ChannelCategory {
     public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
-
 	@Override
 	public boolean canSee(User user) {
 		return (user.hasPermission(PermissionType.ADMINISTRATOR, this) || this.getChannels().stream().anyMatch(channel -> {
@@ -263,3 +262,4 @@ public class ImplChannelCategory implements ChannelCategory {
 		}));
 	}
 }
+

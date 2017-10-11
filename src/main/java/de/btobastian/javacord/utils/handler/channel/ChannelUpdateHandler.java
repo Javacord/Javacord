@@ -90,7 +90,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChannelChangeName(event));
             }
 
-            int oldPosition = c.getPosition();
+            int oldPosition = c.getRawPosition();
             int newPosition = channel.getInt("position");
             if (oldPosition != newPosition) {
                 c.asChannelCategory().ifPresent(cc -> ((ImplChannelCategory) cc).setPosition(newPosition));
