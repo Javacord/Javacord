@@ -12,8 +12,10 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.MissingPermissionsException;
+import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.InputStream;
@@ -27,6 +29,11 @@ import java.util.function.Function;
  * This class is used to wrap a rest request.
  */
 public class RestRequest<T> {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(RestRequest.class);
 
     private final DiscordApi api;
     private final HttpMethod method;
@@ -355,7 +362,11 @@ public class RestRequest<T> {
                 ((HttpRequest) request).header("content-type", "application/json");
             }
         }
+        logger.debug("Trying to send {} request to {}{}",
+                method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
         HttpResponse<JsonNode> response = request.asJson();
+        logger.debug("Sent {} request to {} and received status code {} with response {}",
+                method.name(), endpoint.getFullUrl(urlParameters), response.getStatus(), response.getBody().toString());
         if (response.getStatus() >= 300 || response.getStatus() < 200) {
             if (!response.getBody().isArray() && response.getBody().getObject().has("code")) {
                 int code = response.getBody().getObject().getInt("code");
