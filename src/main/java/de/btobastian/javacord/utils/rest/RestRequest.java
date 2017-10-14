@@ -365,8 +365,10 @@ public class RestRequest<T> {
         logger.debug("Trying to send {} request to {}{}",
                 method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
         HttpResponse<JsonNode> response = request.asJson();
-        logger.debug("Sent {} request to {} and received status code {} with response {}",
-                method.name(), endpoint.getFullUrl(urlParameters), response.getStatus(), response.getBody().toString());
+        logger.debug("Sent {} request to {} and received status code {} with{} body{}",
+                method.name(), endpoint.getFullUrl(urlParameters), response.getStatus(),
+                response.getBody() == null ? " empty" : "",
+                response.getBody() == null ? "" : " " + response.getBody().toString());
         if (response.getStatus() >= 300 || response.getStatus() < 200) {
             if (!response.getBody().isArray() && response.getBody().getObject().has("code")) {
                 int code = response.getBody().getObject().getInt("code");
