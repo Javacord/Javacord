@@ -355,4 +355,5 @@ public class ImplUser implements User, IconHolder {
     public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
+    
 }

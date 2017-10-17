@@ -870,5 +870,81 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered role create listeners.
      */
     List<RoleCreateListener> getRoleCreateListeners();
+	/**
+	 * Returns whether a user can create a channel
+	 * 
+	 * @param user
+	 *            - The user to test
+	 * @return True if they can, false otherwise
+	 */
+	default boolean canCreateChannels(User user) {
+		return user.hasPermission(PermissionType.ADMINISTRATOR, this)
+				|| user.hasPermission(PermissionType.MANAGE_CHANNELS, this);
+	}
 
+	/**
+	 * Determines if a user can view the audit log
+	 * 
+	 * @param user
+	 *            - The user object
+	 * @return True if the user can, False otherwise
+	 */
+	default boolean canViewAuditLogs(User user) {
+		return user.hasPermission(PermissionType.ADMINISTRATOR, this)
+				|| user.hasPermission(PermissionType.VIEW_AUDIT_LOG, this);
+	}
+
+	/**
+	 * Determines if a user can ban members in a general context
+	 * 
+	 * @param admin
+	 *            - The administrator
+	 * @return True if the user can, False otherwise
+	 * 
+	 * @see {@link User#isHigherThan(Server, User)}
+	 */
+	default boolean canBanUsers(User admin) {
+		return admin.hasPermission(PermissionType.ADMINISTRATOR, this)
+				|| admin.hasPermission(PermissionType.BAN_MEMBERS, this);
+	}
+
+	/**
+	 * Returns if a user may ban specific user
+	 * 
+	 * @param admin
+	 *            - The Administrator User
+	 * @param person
+	 *            - The person to test upon
+	 * @return True if they can, False otherwise
+	 */
+	default boolean canBanUser(User admin, User person) {
+		return canBanUsers(admin) && admin.isHigherThan(this, person);
+	}
+
+	/**
+	 * Determines if a user can kick users in a general context.
+	 * 
+	 * @param admin
+	 *            - The administrator user
+	 * @return True if user can, False otherwise
+	 */
+	default boolean canKickUsers(User admin) {
+		return admin.hasPermission(PermissionType.ADMINISTRATOR, this)
+				|| admin.hasPermission(PermissionType.KICK_MEMBERS, this);
+	}
+
+	/**
+	 * Determines if certain user can ban another
+	 * 
+	 * @param admin
+	 *            - The administrator
+	 * @param subject
+	 *            - The subject
+	 * @return True if admin can, False otherwise
+	 */
+	default boolean canKickUser(User admin, User subject) {
+	
+		return canBanUsers(admin) && admin.isHigherThan(this, subject);
+	}
 }
+

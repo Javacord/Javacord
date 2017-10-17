@@ -12,35 +12,56 @@ import java.util.Optional;
  */
 public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionable {
 
-    @Override
-    default ChannelType getType() {
-        return ChannelType.SERVER_TEXT_CHANNEL;
-    }
+	@Override
+	default ChannelType getType() {
+		return ChannelType.SERVER_TEXT_CHANNEL;
+	}
 
-    /**
-     * Checks is the channel is "not safe for work".
-     *
-     * @return Whether the channel is "not safe for work" or not.
-     */
-    boolean isNsfw();
+	/**
+	 * Checks is the channel is "not safe for work".
+	 *
+	 * @return Whether the channel is "not safe for work" or not.
+	 */
+	boolean isNsfw();
 
-    /**
-     * Gets the category of the channel.
-     *
-     * @return The category of the channel.
-     */
-    Optional<ChannelCategory> getCategory();
+	/**
+	 * Gets the category of the channel.
+	 *
+	 * @return The category of the channel.
+	 */
+	Optional<ChannelCategory> getCategory();
 
-    /**
-     * Checks if the given user can send messages in this channel.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can write messages or not.
-     */
-    default boolean canWrite(User user) {
-        Collection<PermissionType> allowed = getEffectiveAllowedPermissions(user);
-        return allowed.contains(PermissionType.ADMINISTRATOR) ||
-                allowed.contains(PermissionType.READ_MESSAGES) && allowed.contains(PermissionType.SEND_MESSAGES);
-    }
+	/**
+	 * Checks if the given user can send messages in this channel.
+	 *
+	 * @param user
+	 *            The user to check.
+	 * @return Whether the given user can write messages or not.
+	 */
+	default boolean canWrite(User user) {
+		Collection<PermissionType> allowed = getEffectiveAllowedPermissions(user);
+		return allowed.contains(PermissionType.ADMINISTRATOR)
+				|| allowed.contains(PermissionType.READ_MESSAGES) && allowed.contains(PermissionType.SEND_MESSAGES);
+	}
 
+	/**
+	 * Checks if user can read the message history.
+	 * 
+	 * @param user
+	 *            - The user object
+	 * @return True if user can, False otherwise
+	 */
+	default boolean canReadHistory(User user) {
+		return user.hasPermission(PermissionType.ADMINISTRATOR, this)
+				|| (user.hasPermission(PermissionType.READ_MESSAGES, this)
+						&& user.hasPermission(PermissionType.READ_MESSAGE_HISTORY, this));
+	}
+	/**
+	 * Checks if user can add reactions in this channel
+	 * @param user - The user
+	 * @return True if they can
+	 */
+	default boolean canAddNewRections(User user) {
+		return user.isAdmin(this) || user.hasPermission(PermissionType.ADD_REACTIONS, this);
+	}
 }

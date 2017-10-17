@@ -1,6 +1,17 @@
 package de.btobastian.javacord.entities.channels;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.mashape.unirest.http.HttpMethod;
+
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionState;
@@ -15,13 +26,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * This class represents a server channel.
@@ -227,6 +231,49 @@ public interface ServerChannel extends Channel {
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
-
-
+    /**
+	 * Determines whether a user using the following criteria: <br/>
+	 * <br/>
+	 * <b>{@link ServerTextChannel}:</b> Checks if a user may read messages. <br>
+	 * <b>{@link ServerVoiceChannel}:</b> Checks if a user may connect. <br/>
+	 * <b>{@link ChannelCategory}:</b> Checks if a user can see at least one child
+	 * channel.
+	 * 
+	 * @param user
+	 *            - The user object to test upon
+	 * @return True if user can,false otherwise
+	 */
+	public boolean canSee(User user);
+	/**
+	 * Updates overwritten permissions of a role
+	 * @param role - The Role
+	 * @param perms - The permissions object
+	 * @return - The completed rest request
+	 */
+	default CompletableFuture<Void> setOverwrittenPermissions(Role role, Permissions perms) {
+		JSONObject body = new JSONObject();
+		JSONArray overwrites = new JSONArray();
+		JSONObject temp = new JSONObject();
+		temp.put("type", "role");
+		temp.put("id", role.getId());
+			temp.put("allow", ((ImplPermissions) perms).getAllowed());
+			temp.put("deny", ((ImplPermissions) perms).getDenied());
+			overwrites.put(temp);
+			body.put("permission_overwrites", overwrites);
+		return new RestRequest<Void>(this.getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+				.setUrlParameters(String.valueOf(getId())).setBody(body).execute(res -> null);
+	}
+	default CompletableFuture<Void> setOverwrittenPermissions(User user, Permissions perms) {
+		JSONObject body = new JSONObject();
+		JSONArray overwrites = new JSONArray();
+		JSONObject temp = new JSONObject();
+		temp.put("type", "member");
+		temp.put("id", user.getId());
+			temp.put("allow", ((ImplPermissions) perms).getAllowed());
+			temp.put("deny", ((ImplPermissions) perms).getDenied());
+			overwrites.put(temp);
+			body.put("permission_overwrites", overwrites);
+		return new RestRequest<Void>(this.getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+				.setUrlParameters(String.valueOf(getId())).setBody(body).execute(res -> null);
+	}
 }

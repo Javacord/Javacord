@@ -1,12 +1,27 @@
 package de.btobastian.javacord.entities.channels;
 
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
+import org.json.JSONObject;
+import org.slf4j.Logger;
+
 import com.mashape.unirest.http.HttpMethod;
+
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -17,17 +32,6 @@ import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 /**
  * This class represents a text channel.
@@ -346,5 +350,5 @@ public interface TextChannel extends Channel, Messageable {
      * @return A list with all registered reaction remove listeners.
      */
     List<ReactionRemoveListener> getReactionRemoveListeners();
-
+   
 }

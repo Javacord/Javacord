@@ -1,5 +1,14 @@
 package de.btobastian.javacord.entities.channels.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
@@ -7,6 +16,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
@@ -22,14 +32,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListen
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link ServerTextChannel}.
@@ -352,4 +354,8 @@ public class ImplServerTextChannel implements ServerTextChannel {
     public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
+	@Override
+	public boolean canSee(User user) {
+		return user.hasPermission(PermissionType.ADMINISTRATOR, this) || user.hasPermission(PermissionType.READ_MESSAGES, this);
+	}
 }
