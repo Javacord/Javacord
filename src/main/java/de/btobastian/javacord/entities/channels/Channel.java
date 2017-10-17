@@ -94,7 +94,7 @@ public interface Channel extends DiscordEntity {
      * @return The channel as text channel.
      */
     default Optional<TextChannel> asTextChannel() {
-        if (this instanceof GroupChannel) {
+        if (this instanceof TextChannel) {
             return Optional.of((TextChannel) this);
         }
         return Optional.empty();
