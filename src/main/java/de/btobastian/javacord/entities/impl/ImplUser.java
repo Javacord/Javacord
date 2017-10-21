@@ -155,7 +155,19 @@ public class ImplUser implements User {
 
     @Override
     public boolean isYourself() {
-        return api.getYourself() == this;
+        return this.equals(api.getYourself());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof User)) {
+            return false;
+        }
+        if (o == this) { // referentially the same object
+            return true;
+        }
+        User otherUser = (User) o;
+        return otherUser.getId().equals(this.getId());
     }
 
     @Override
