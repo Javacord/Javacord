@@ -76,6 +76,21 @@ public interface ServerChannel extends Channel {
     }
 
     /**
+     * Updates the position of the channel.
+     *
+     * @param position The new position of the channel.
+     *                 If you want to update the position based on other channels, make sure to use
+     *                 {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updatePosition(int position) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject().put("position", position))
+                .execute(res -> null);
+    }
+
+    /**
      * Gets the overwritten permissions of a user in this channel.
      *
      * @param user The user.
