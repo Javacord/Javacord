@@ -264,6 +264,19 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
+     * Updates the region of the server.
+     *
+     * @param region The new region of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateRegion(Region region) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject().put("region", region == null ? JSONObject.NULL : region.getKey()))
+                .execute(res -> null);
+    }
+
+    /**
      * Checks if a user has a given permission.
      * Remember, that some permissions affect others!
      * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
