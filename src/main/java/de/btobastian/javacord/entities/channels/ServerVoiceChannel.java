@@ -26,7 +26,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
     Optional<ChannelCategory> getCategory();
 
     /**
-     * Updates the user limit of the void channel.
+     * Updates the user limit of the voice channel.
      *
      * @param limit The limit to set.
      * @return A future to check if the update was successful.
@@ -36,6 +36,15 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(new JSONObject().put("user_limit", limit))
                 .execute(res -> null);
+    }
+
+    /**
+     * Removes the user limit of the voice channel.
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeUserLimit() {
+        return updateUserLimit(0);
     }
 
 }
