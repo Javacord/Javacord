@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities;
 
+import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ChannelCategoryBuilder;
 import de.btobastian.javacord.entities.channels.ServerChannel;
@@ -36,6 +37,9 @@ import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestRequest;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +48,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -213,6 +218,38 @@ public interface Server extends DiscordEntity, IconHolder {
         getRolesOf(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
         return unset;
     }
+
+    /**
+     * Changes the nickname of the given user.
+     *
+     * @param user The user.
+     * @param nickname The new nickname of the user.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateNickname(User user, String nickname) {
+        if (user.isYourself()) {
+            return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.OWN_NICKNAME)
+                    .setUrlParameters(String.valueOf(getId()))
+                    .setBody(new JSONObject().put("nick", nickname == null ? JSONObject.NULL : nickname))
+                    .execute(res -> null);
+        } else {
+            return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER_MEMBER)
+                    .setUrlParameters(String.valueOf(getId()), String.valueOf(user.getId()))
+                    .setBody(new JSONObject().put("nick", nickname == null ? JSONObject.NULL : nickname))
+                    .execute(res -> null);
+        }
+    }
+
+    /**
+     * Removes the nickname of the given user.
+     *
+     * @param user The user.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> resetNickname(User user) {
+        return updateNickname(user, null);
+    }
+
 
     /**
      * Checks if a user has a given permission.

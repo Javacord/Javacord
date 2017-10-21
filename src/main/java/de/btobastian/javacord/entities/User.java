@@ -87,6 +87,27 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     }
 
     /**
+     * Changes the nickname of the user in the given server.
+     *
+     * @param server The server.
+     * @param nickname The new nickname of the user.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateNickname(Server server, String nickname) {
+        return server.updateNickname(this, nickname);
+    }
+
+    /**
+     * Removes the nickname of the user in the given server.
+     *
+     * @param server The server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> resetNickname(Server server) {
+        return server.resetNickname(this);
+    }
+
+    /**
      * Gets the nickname of the user in the given server.
      *
      * @param server The server to check.
@@ -259,6 +280,5 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
-
 
 }

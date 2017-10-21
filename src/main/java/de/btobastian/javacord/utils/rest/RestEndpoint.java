@@ -22,7 +22,9 @@ public enum RestEndpoint {
     CHANNEL("/channels/%s", 0),
     SERVER_CHANNEL("/guilds/%s/channels", 0),
     REACTION("/channels/%s/messages/%s/reactions/%s", 0),
-    PINS("/channels/%s/pins", 0);
+    PINS("/channels/%s/pins", 0),
+    SERVER_MEMBER("/guilds/%s/members/%s", 0),
+    OWN_NICKNAME("/guilds/%s/members/@me/nick", 0);
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
