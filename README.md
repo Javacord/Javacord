@@ -1,6 +1,13 @@
 # Javacord <a href="#"><img src="https://img.shields.io/badge/Version-2.0.17-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
 A multithreaded but simple to use library to create a Discord bot in Java.
 
+## IMPORTANT
+
+This library currently gets rewritten!
+It's not recommended to start developing a new bot with Javacord 2.x.x.
+You can either take a look at one of the other libraries ([JDA](https://github.com/DV8FromTheWorld/JDA) and [Discord4J](https://github.com/austinv11/Discord4J)) or test Javacord 3 which is currently in development, but already useable.
+Feel free to join the Javacord Discord server ([Invite link](https://discord.gg/0qJ2jjyneLEgG7y3)) if you are interested in Javacord 3!
+
 ##  Maven
 ```xml
 <repository>
