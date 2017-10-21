@@ -277,6 +277,21 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
+     * Transfers the ownership of the server to an other user.
+     * You must be the owner of this server in order to transfer it!
+     *
+     * @param newOwner The new owner of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> transferOwnership(User newOwner) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject()
+                        .put("owner_id", newOwner == null ? JSONObject.NULL : String.valueOf(newOwner.getId())))
+                .execute(res -> null);
+    }
+
+    /**
      * Checks if a user has a given permission.
      * Remember, that some permissions affect others!
      * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
