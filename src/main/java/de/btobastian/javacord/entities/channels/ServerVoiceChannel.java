@@ -47,4 +47,27 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
         return updateUserLimit(0);
     }
 
+    /**
+     * Updates the category of the channel.
+     *
+     * @param category The new category of the channel.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateCategory(ChannelCategory category) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject()
+                        .put("parent_id", category == null ? JSONObject.NULL : String.valueOf(category.getId())))
+                .execute(res -> null);
+    }
+
+    /**
+     * Removes the channel from its current category.
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeCategory() {
+        return updateCategory(null);
+    }
+
 }

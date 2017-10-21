@@ -5,6 +5,7 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents a channel category.
@@ -44,5 +45,51 @@ public interface ChannelCategory extends ServerChannel {
      * @return Whether the category is "not safe for work" or not.
      */
     boolean isNsfw();
+
+    /**
+     * Adds a channel to this category.
+     *
+     * @param channel The channel to add.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> addChannel(ServerTextChannel channel) {
+        return channel.updateCategory(this);
+    }
+
+    /**
+     * Adds a channel to this category.
+     *
+     * @param channel The channel to add.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> addChannel(ServerVoiceChannel channel) {
+        return channel.updateCategory(this);
+    }
+
+    /**
+     * Removes a channel from this category.
+     *
+     * @param channel The channel to remove.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeChannel(ServerTextChannel channel) {
+        if (channel.getCategory().orElse(null) == this) {
+            return channel.removeCategory();
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Removes a channel from this category.
+     *
+     * @param channel The channel to remove.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeChannel(ServerVoiceChannel channel) {
+        if (channel.getCategory().orElse(null) == this) {
+            return channel.removeCategory();
+        }
+        return CompletableFuture.completedFuture(null);
+    }
 
 }
