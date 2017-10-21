@@ -250,6 +250,18 @@ public interface Server extends DiscordEntity, IconHolder {
         return updateNickname(user, null);
     }
 
+    /**
+     * Updates the name of the server.
+     *
+     * @param name The new name of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateName(String name) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject().put("name", name == null ? JSONObject.NULL : name))
+                .execute(res -> null);
+    }
 
     /**
      * Checks if a user has a given permission.
