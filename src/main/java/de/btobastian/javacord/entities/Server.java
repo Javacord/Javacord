@@ -277,6 +277,19 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
+     * Sets the afk timeout (in seconds) of the server.
+     *
+     * @param seconds The timeout in seconds.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAfkTimeout(int seconds) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject().put("afk_timeout", seconds))
+                .execute(res -> null);
+    }
+
+    /**
      * Transfers the ownership of the server to an other user.
      * You must be the owner of this server in order to transfer it!
      *
