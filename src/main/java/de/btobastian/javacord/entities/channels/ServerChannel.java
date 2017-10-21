@@ -15,6 +15,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +60,19 @@ public interface ServerChannel extends Channel {
      */
     default int getPosition() {
         return getServer().getChannels().indexOf(this);
+    }
+
+    /**
+     * Updates the name of the channel.
+     *
+     * @param name The new name of the channel.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateName(String name) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject().put("name", name == null ? JSONObject.NULL : name))
+                .execute(res -> null);
     }
 
     /**
