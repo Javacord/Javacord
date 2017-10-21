@@ -37,6 +37,19 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     Optional<ChannelCategory> getCategory();
 
     /**
+     * Updates the topic of the channel.
+     *
+     * @param topic The new topic of the channel.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateTopic(String topic) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+                .setUrlParameters(String.valueOf(getId()))
+                .setBody(new JSONObject().put("topic", topic == null ? JSONObject.NULL : topic))
+                .execute(res -> null);
+    }
+
+    /**
      * Updates the nsfw (not safe for work) flag of the channel.
      *
      * @param nsfw The new nsfw flag to set.
