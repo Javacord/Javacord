@@ -44,13 +44,6 @@
 
     <build>
         <plugins>
-            <!-- The JavaDocs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
-            </plugin>
-
             <!-- Maven shade plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -68,24 +61,36 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Include source -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.0.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Include JavaDocs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-
-        <extensions>
-            <!-- We upload our repo using ftp -->
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-                <version>1.0-beta-6</version>
-            </extension>
-        </extensions>
     </build>
-
-    <distributionManagement>
-        <!-- The javacord repository -->
-        <repository>
-            <id>javacord-repo</id>
-            <name>Javacord Repository</name>
-            <url>ftp://bastian-oppermann.de/</url>
-        </repository>
-    </distributionManagement>
 </project>
