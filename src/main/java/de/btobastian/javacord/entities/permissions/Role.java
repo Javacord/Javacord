@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.permissions;
 
+import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
@@ -7,11 +8,14 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +71,17 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return The permissions of the role.
      */
     Permissions getPermissions();
+
+    /**
+     * Deletes the role.
+     *
+     * @return A future to check if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete() {
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.ROLE)
+                .setUrlParameters(String.valueOf(getServer().getId()), String.valueOf(getId()))
+                .execute(res -> null);
+    }
 
     /**
      * Gets the allowed permissions of the role.

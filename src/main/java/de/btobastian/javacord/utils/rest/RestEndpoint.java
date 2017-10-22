@@ -20,6 +20,7 @@ public enum RestEndpoint {
     CHANNEL_TYPING("/channels/%s/typing", 0),
     USER_CHANNEL("/users/@me/channels"),
     CHANNEL("/channels/%s", 0),
+    ROLE("/guilds/%s/roles/%s", 0),
     SERVER("/guilds/%s", 0),
     SERVER_CHANNEL("/guilds/%s/channels", 0),
     REACTION("/channels/%s/messages/%s/reactions/%s", 0),
