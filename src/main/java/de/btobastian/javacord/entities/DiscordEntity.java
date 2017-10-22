@@ -25,6 +25,15 @@ public interface DiscordEntity {
     long getId();
 
     /**
+     * Gets the id of the Discord entity as a string.
+     *
+     * @return The id of the Discord entity as a string.
+     */
+    default String getIdAsString() {
+        return String.valueOf(getId());
+    }
+
+    /**
      * Gets the creation date of the Discord entity, calculated from the id.
      *
      * @return The creation date of the Discord entity.
