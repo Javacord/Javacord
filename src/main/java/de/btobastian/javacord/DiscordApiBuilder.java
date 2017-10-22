@@ -18,11 +18,6 @@ public class DiscordApiBuilder {
     private AccountType accountType = AccountType.BOT;
 
     /**
-     * Whether lazy loading should be enabled or not.
-     */
-    private boolean lazyLoading = false;
-
-    /**
      * The current shard starting with <code>0</code>.
      */
     private int currentShard = 0;
@@ -58,20 +53,6 @@ public class DiscordApiBuilder {
      */
     public DiscordApiBuilder setToken(String token) {
         this.token = token;
-        return this;
-    }
-
-    /**
-     * Sets whether the bot should use lazy loading or not.
-     * Lazy loading means it doesn't load offline users on startup for large servers to improve performance.
-     * A server is considered as large, if it has more than 250 members.
-     * Lazy loading is disabled by default.
-     *
-     * @param enabled Whether lazy loading should be used or not.
-     * @return The current instance in order to chain call methods.
-     */
-    public DiscordApiBuilder setLazyLoading(boolean enabled) {
-        this.lazyLoading = enabled;
         return this;
     }
 
