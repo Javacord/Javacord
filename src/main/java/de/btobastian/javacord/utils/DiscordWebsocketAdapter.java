@@ -1,10 +1,6 @@
 package de.btobastian.javacord.utils;
 
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
+import com.neovisionaries.ws.client.*;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Game;
@@ -18,13 +14,7 @@ import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionAddHandler;
 import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionRemoveHandler;
-import de.btobastian.javacord.utils.handler.server.GuildCreateHandler;
-import de.btobastian.javacord.utils.handler.server.GuildDeleteHandler;
-import de.btobastian.javacord.utils.handler.server.GuildEmojisUpdateHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMemberAddHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMemberRemoveHandler;
-import de.btobastian.javacord.utils.handler.server.GuildMembersChunkHandler;
-import de.btobastian.javacord.utils.handler.server.GuildUpdateHandler;
+import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
@@ -38,14 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -386,6 +369,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         addHandler(new GuildMembersChunkHandler(api));
         addHandler(new GuildMemberAddHandler(api));
         addHandler(new GuildMemberRemoveHandler(api));
+        addHandler(new GuildMemberUpdateHandler(api));
         addHandler(new GuildUpdateHandler(api));
 
         // role

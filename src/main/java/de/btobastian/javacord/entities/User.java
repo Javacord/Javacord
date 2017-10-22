@@ -11,6 +11,7 @@ import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
+import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 
@@ -280,5 +281,19 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+
+    /**
+     * Adds a listener, which listens to nickname changes of this user.
+     *
+     * @param listener The listener to add.
+     */
+    void addUserChangeNicknameListener(UserChangeNicknameListener listener);
+
+    /**
+     * Gets a list with all registered user change nickname listeners.
+     *
+     * @return A list with all registered user change nickname listeners.
+     */
+    List<UserChangeNicknameListener> getUserChangeNicknameListeners();
 
 }

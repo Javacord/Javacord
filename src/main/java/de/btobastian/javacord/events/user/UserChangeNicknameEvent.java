@@ -12,12 +12,17 @@ import java.util.Optional;
 public class UserChangeNicknameEvent extends UserEvent {
 
     /**
+     * The new nickname of the user.
+     */
+    private final String newNickname;
+
+    /**
      * The old nickname of the user.
      */
     private final String oldNickname;
 
     /**
-     * The server in which the user changed his nickname.
+     * The server in which the user changed its nickname.
      */
     private final Server server;
 
@@ -26,13 +31,33 @@ public class UserChangeNicknameEvent extends UserEvent {
      *
      * @param api The api instance of the event.
      * @param user The user of the event.
+     * @param server The server in which the user changed its nickname.
+     * @param newNickname The new nickname of the user.
      * @param oldNickname The old nickname of the user.
-     * @param server The server in which the user changed his nickname.
      */
-    public UserChangeNicknameEvent(DiscordApi api, User user, String oldNickname, Server server) {
+    public UserChangeNicknameEvent(DiscordApi api, User user, Server server, String newNickname, String oldNickname) {
         super(api, user);
-        this.oldNickname = oldNickname;
         this.server = server;
+        this.newNickname = newNickname;
+        this.oldNickname = oldNickname;
+    }
+
+    /**
+     * Gets the server in which the user changed its nickname.
+     *
+     * @return The server in which the user changed its nickname.
+     */
+    public Server getServer() {
+        return server;
+    }
+
+    /**
+     * Gets the new nickname of the user.
+     *
+     * @return The new nickname of the user.
+     */
+    public Optional<String> getNewNickname() {
+        return Optional.ofNullable(newNickname);
     }
 
     /**
@@ -42,16 +67,6 @@ public class UserChangeNicknameEvent extends UserEvent {
      */
     public Optional<String> getOldNickname() {
         return Optional.ofNullable(oldNickname);
-    }
-
-    /**
-     * Gets the new nickname of the user.
-     *
-     * @return The new nickname of the user.
-     */
-    public Optional<String> getNewNickname() {
-        // TODO return getUser().getNickname(server);
-        return Optional.empty();
     }
 
 }

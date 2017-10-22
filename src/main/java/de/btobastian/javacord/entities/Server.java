@@ -1,53 +1,30 @@
 package de.btobastian.javacord.entities;
 
 import com.mashape.unirest.http.HttpMethod;
-import de.btobastian.javacord.entities.channels.ChannelCategory;
-import de.btobastian.javacord.entities.channels.ChannelCategoryBuilder;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannelBuilder;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannelBuilder;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
-import de.btobastian.javacord.entities.permissions.PermissionState;
-import de.btobastian.javacord.entities.permissions.PermissionType;
-import de.btobastian.javacord.entities.permissions.Permissions;
-import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
-import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.*;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.server.*;
+import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
+import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -960,5 +937,19 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered role create listeners.
      */
     List<RoleCreateListener> getRoleCreateListeners();
+
+    /**
+     * Adds a listener, which listens to user nickname changes in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addUserChangeNicknameListener(UserChangeNicknameListener listener);
+
+    /**
+     * Gets a list with all registered user change nickname listeners.
+     *
+     * @return A list with all registered user change nickname listeners.
+     */
+    List<UserChangeNicknameListener> getUserChangeNicknameListeners();
 
 }
