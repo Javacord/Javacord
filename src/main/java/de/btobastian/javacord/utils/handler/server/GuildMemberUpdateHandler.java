@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Handles the guild member add packet.
+ * Handles the guild member update packet.
  */
 public class GuildMemberUpdateHandler extends PacketHandler {
 
