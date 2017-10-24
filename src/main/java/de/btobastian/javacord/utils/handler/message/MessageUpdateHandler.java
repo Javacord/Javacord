@@ -53,6 +53,9 @@ public class MessageUpdateHandler extends PacketHandler {
 
             MessageEditEvent editEvent = null;
             if (packet.has("edited_timestamp") && !packet.isNull("edited_timestamp")) {
+                message.ifPresent(msg ->
+                        msg.setLastEditTime(OffsetDateTime.parse(packet.getString("edited_timestamp")).toInstant()));
+                
                 long editTimestamp =
                         OffsetDateTime.parse(packet.getString("edited_timestamp")).toInstant().toEpochMilli();
                 long lastKnownEditTimestamp = lastKnownEditTimestamps.getOrDefault(messageId, 0L);

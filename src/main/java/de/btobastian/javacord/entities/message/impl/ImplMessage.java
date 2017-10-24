@@ -15,6 +15,8 @@ import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +51,11 @@ public class ImplMessage implements Message {
      * The type of the message.
      */
     private final MessageType type;
+
+    /**
+     * Gets the last edit time.
+     */
+    private Instant lastEditTime = null;
 
     /**
      * The user author of the message. Can be <code>null</code> if the author is a webhook for example.
@@ -103,6 +110,9 @@ public class ImplMessage implements Message {
 
         id = Long.parseLong(data.getString("id"));
         content = data.getString("content");
+
+        lastEditTime = data.has("edited_timestamp") && !data.isNull("edited_timestamp") ?
+                OffsetDateTime.parse(data.getString("edited_timestamp")).toInstant() : null;
 
         type = MessageType.byType(data.getInt("type"), data.has("webhook_id"));
         if (!data.has("webhook_id")) {
@@ -166,6 +176,15 @@ public class ImplMessage implements Message {
     }
 
     /**
+     * Sets the last edit time of the message.
+     *
+     * @param lastEditTime The last edit time of the message.
+     */
+    public void setLastEditTime(Instant lastEditTime) {
+        this.lastEditTime = lastEditTime;
+    }
+
+    /**
      * Sets the embeds of the message.
      *
      * @param embeds The embeds to set.
@@ -222,6 +241,11 @@ public class ImplMessage implements Message {
     @Override
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public Optional<Instant> getLastEditTime() {
+        return Optional.ofNullable(lastEditTime);
     }
 
     @Override

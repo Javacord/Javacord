@@ -4,7 +4,11 @@ import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.channels.GroupChannel;
+import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -18,6 +22,7 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -341,6 +346,13 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The content of the message.
      */
     String getContent();
+
+    /**
+     * Gets the last time the message was edited.
+     *
+     * @return The last time the message was edited.
+     */
+    Optional<Instant> getLastEditTime();
 
     /**
      * Gets the attachments of the message.
