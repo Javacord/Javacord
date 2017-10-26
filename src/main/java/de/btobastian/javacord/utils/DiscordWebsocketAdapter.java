@@ -16,6 +16,7 @@ import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionAddH
 import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionRemoveHandler;
 import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
+import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.TypingStartHandler;
@@ -374,6 +375,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
         // role
         addHandler(new GuildRoleCreateHandler(api));
+        addHandler(new GuildRoleDeleteHandler(api));
         addHandler(new GuildRoleUpdateHandler(api));
 
         // emoji

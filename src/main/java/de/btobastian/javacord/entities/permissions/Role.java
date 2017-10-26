@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
+import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
@@ -143,7 +144,8 @@ public interface Role extends DiscordEntity, Mentionable {
      *
      * @param listener The listener to add.
      */
-    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+    void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
@@ -151,6 +153,20 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     java.util.List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+
+    /**
+     * Adds a listener, which listens to this role being deleted.
+     *
+     * @param listener The listener to add.
+     */
+    void addRoleDeleteListener(RoleDeleteListener listener);
+
+    /**
+     * Gets a list with all registered role delete listeners.
+     *
+     * @return A list with all registered role delete listeners.
+     */
+    java.util.List<RoleDeleteListener> getRoleDeleteListeners();
 
 
 }

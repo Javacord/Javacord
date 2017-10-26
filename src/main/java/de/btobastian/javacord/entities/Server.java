@@ -16,6 +16,7 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
+import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -937,6 +938,20 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return A list with all registered role create listeners.
      */
     List<RoleCreateListener> getRoleCreateListeners();
+
+    /**
+     * Adds a listener, which listens to role deletions in this server.
+     *
+     * @param listener The listener to add.
+     */
+    void addRoleDeleteListener(RoleDeleteListener listener);
+
+    /**
+     * Gets a list with all registered role delete listeners.
+     *
+     * @return A list with all registered role delete listeners.
+     */
+    List<RoleDeleteListener> getRoleDeleteListeners();
 
     /**
      * Adds a listener, which listens to user nickname changes in this server.

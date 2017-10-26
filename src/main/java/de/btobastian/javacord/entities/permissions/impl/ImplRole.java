@@ -10,15 +10,12 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
+import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -238,5 +235,15 @@ public class ImplRole implements Role {
     @Override
     public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
+    }
+
+    @Override
+    public void addRoleDeleteListener(RoleDeleteListener listener) {
+        addListener(RoleDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<RoleDeleteListener> getRoleDeleteListeners() {
+        return getListeners(RoleDeleteListener.class);
     }
 }

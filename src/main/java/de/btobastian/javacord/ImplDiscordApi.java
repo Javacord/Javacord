@@ -24,6 +24,7 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
+import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -823,6 +824,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<RoleCreateListener> getRoleCreateListeners() {
         return getListeners(RoleCreateListener.class);
+    }
+
+    @Override
+    public void addRoleDeleteListener(RoleDeleteListener listener) {
+        addListener(RoleDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<RoleDeleteListener> getRoleDeleteListeners() {
+        return getListeners(RoleDeleteListener.class);
     }
 
     @Override

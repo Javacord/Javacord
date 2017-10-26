@@ -24,6 +24,7 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
+import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -226,10 +227,19 @@ public class ImplServer implements Server {
     /**
      * Removes a channel from the cache.
      *
-     * @param channelId The if of the channel to remove.
+     * @param channelId The id of the channel to remove.
      */
     public void removeChannelFromCache(long channelId) {
         channels.remove(channelId);
+    }
+
+    /**
+     * Removes a role from the cache.
+     *
+     * @param roleId The id of the role to remove.
+     */
+    public void removeRole(long roleId) {
+        roles.remove(roleId);
     }
 
     /**
@@ -746,6 +756,16 @@ public class ImplServer implements Server {
     @Override
     public List<RoleCreateListener> getRoleCreateListeners() {
         return getListeners(RoleCreateListener.class);
+    }
+
+    @Override
+    public void addRoleDeleteListener(RoleDeleteListener listener) {
+        addListener(RoleDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<RoleDeleteListener> getRoleDeleteListeners() {
+        return getListeners(RoleDeleteListener.class);
     }
 
     @Override
