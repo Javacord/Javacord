@@ -1,9 +1,18 @@
 package de.btobastian.javacord;
 
+import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.channels.Channel;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
+import de.btobastian.javacord.entities.channels.GroupChannel;
+import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.channels.VoiceChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -12,8 +21,18 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.*;
-import de.btobastian.javacord.listeners.server.channel.*;
+import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
+import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
+import de.btobastian.javacord.listeners.server.ServerJoinListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
@@ -26,8 +45,16 @@ import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -156,6 +183,17 @@ public interface DiscordApi {
      * @param seconds The time, in which the attempts can happen in seconds. Default: 300.
      */
     void setReconnectRatelimit(int attempts, int seconds);
+
+    /**
+     * Gets the application info of the bot.
+     * The method only works for bot accounts.
+     *
+     * @return The application info of the bot.
+     */
+    default CompletableFuture<ApplicationInfo> getApplicationInfo() {
+        return new RestRequest<ApplicationInfo>(this, HttpMethod.GET, RestEndpoint.SELF_INFO)
+                .execute(res -> new ImplApplicationInfo(this, res.getBody().getObject()));
+    }
 
     /**
      * Gets a collection with the ids of all unavailable servers.
