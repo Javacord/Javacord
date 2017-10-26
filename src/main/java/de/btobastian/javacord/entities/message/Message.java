@@ -359,6 +359,22 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     List<MessageAttachment> getAttachments();
 
     /**
+     * Gets the display name of the message author, like it's displayed in the client.
+     * For this method it doesn't matter if the author is a webhook or a user.
+     *
+     * @return The display name of the message author.
+     */
+    default String getAuthorDisplayName() {
+        Optional<Server> server = getServer();
+        Optional<User> user = getAuthor();
+        if (user.isPresent()) {
+            return server.map(s -> user.get().getDisplayName(s)).orElseGet(() -> user.get().getName());
+        }
+        // TODO return webhook name
+        return "Webhook";
+    }
+
+    /**
      * Gets the readable content of the message, which replaces all mentions etc. with the actual name.
      * The replacement happens as following:
      * <ul>
