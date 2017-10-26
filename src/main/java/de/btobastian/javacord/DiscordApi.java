@@ -1,6 +1,7 @@
 package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
+import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
@@ -13,8 +14,10 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.channels.VoiceChannel;
+import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -92,6 +95,28 @@ public interface DiscordApi {
      * @return The websocket adapter.
      */
     DiscordWebsocketAdapter getWebSocketAdapter();
+
+    /**
+     * Creates an invite link for the this bot.
+     * The method only works for bot accounts!
+     *
+     * @return An invite link for this bot.
+     */
+    default CompletableFuture<String> createBotInvite() {
+        return getApplicationInfo().thenApply(info -> new BotInviteBuilder(info.getClientId()).build());
+    }
+
+    /**
+     * Creates an invite link for the this bot.
+     * The method only works for bot accounts!
+     *
+     * @param permissions The permissions which should be granted to the bot.
+     * @return An invite link for this bot.
+     */
+    default CompletableFuture<String> createBotInvite(Permissions permissions) {
+        return getApplicationInfo()
+                .thenApply(info -> new BotInviteBuilder(info.getClientId()).setPermissions(permissions).build());
+    }
 
     /**
      * Sets the cache size of all caches.
