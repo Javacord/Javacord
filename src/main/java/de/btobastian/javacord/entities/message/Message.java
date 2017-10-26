@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.message;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
@@ -555,6 +556,15 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default Optional<GroupChannel> getGroupChannel() {
         return Optional.ofNullable(getChannel() instanceof GroupChannel ? (GroupChannel) getChannel() : null);
+    }
+
+    /**
+     * Gets the server of the message.
+     *
+     * @return The server of the message.
+     */
+    default Optional<Server> getServer() {
+        return getServerTextChannel().map(ServerChannel::getServer);
     }
 
     /**
