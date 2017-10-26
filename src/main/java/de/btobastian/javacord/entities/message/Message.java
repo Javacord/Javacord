@@ -561,10 +561,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
-     * Gets the private channel of the message.
-     * Only present if the message was sent in a private conversation.
+     * Gets the group channel of the message.
+     * Only present if the message was sent in a group channel.
      *
-     * @return The private channel.
+     * @return The group channel.
      */
     default Optional<GroupChannel> getGroupChannel() {
         return Optional.ofNullable(getChannel() instanceof GroupChannel ? (GroupChannel) getChannel() : null);
