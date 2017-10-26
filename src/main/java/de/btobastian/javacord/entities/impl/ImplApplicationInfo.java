@@ -1,5 +1,7 @@
-package de.btobastian.javacord;
+package de.btobastian.javacord.entities.impl;
 
+import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.User;
 import org.json.JSONObject;
 

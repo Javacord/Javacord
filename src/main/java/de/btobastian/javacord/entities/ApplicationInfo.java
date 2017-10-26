@@ -1,6 +1,4 @@
-package de.btobastian.javacord;
-
-import de.btobastian.javacord.entities.User;
+package de.btobastian.javacord.entities;
 
 import java.util.Optional;
 
