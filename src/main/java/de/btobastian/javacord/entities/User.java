@@ -88,6 +88,17 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     }
 
     /**
+     * Gets the display name of the user.
+     * If the user has a nickname, it will return the nickname, otherwise it will return the "normal" name.
+     *
+     * @param server The server.
+     * @return The display name of the user.
+     */
+    default String getDisplayName(Server server) {
+        return server.getNickname(this).orElseGet(this::getName);
+    }
+
+    /**
      * Changes the nickname of the user in the given server.
      *
      * @param server The server.
