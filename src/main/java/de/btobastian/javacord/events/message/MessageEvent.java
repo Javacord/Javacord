@@ -1,12 +1,15 @@
 package de.btobastian.javacord.events.message;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.events.Event;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -53,6 +56,15 @@ public abstract class MessageEvent extends Event {
      */
     public TextChannel getChannel() {
         return channel;
+    }
+
+    /**
+     * Gets the server of the message.
+     *
+     * @return The server of the message.
+     */
+    public Optional<Server> getServer() {
+        return getChannel().asServerChannel().map(ServerChannel::getServer);
     }
 
     /**
