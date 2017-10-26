@@ -261,7 +261,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     /**
      * Gets a list with all registered user change game listeners.
      *
-     * @return A list with all registered custom emoji create listeners.
+     * @return A list with all registered user change game listeners.
      */
     List<UserChangeGameListener> getUserChangeGameListeners();
 
@@ -275,7 +275,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
     /**
      * Gets a list with all registered user change status listeners.
      *
-     * @return A list with all registered custom emoji create listeners.
+     * @return A list with all registered user change status listeners.
      */
     List<UserChangeStatusListener> getUserChangeStatusListeners();
 
