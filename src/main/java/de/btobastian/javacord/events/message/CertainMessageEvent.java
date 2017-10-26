@@ -32,5 +32,5 @@ public abstract class CertainMessageEvent extends MessageEvent {
     public Message getMessage() {
         return message;
     }
-
+    
 }

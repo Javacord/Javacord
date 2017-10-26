@@ -5,11 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -353,7 +349,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      *
      * @return The last time the message was edited.
      */
-    Optional<Instant> getLastEditTime();
+    Optional<Instant> getLastEditTimestamp();
 
     /**
      * Gets the attachments of the message.

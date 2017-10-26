@@ -244,7 +244,7 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public Optional<Instant> getLastEditTime() {
+    public Optional<Instant> getLastEditTimestamp() {
         return Optional.ofNullable(lastEditTime);
     }
 
@@ -299,7 +299,7 @@ public class ImplMessage implements Message {
 
     @Override
     public int compareTo(Message otherMessage) {
-        return otherMessage.getCreationDate().compareTo(getCreationDate());
+        return otherMessage.getCreationTimestamp().compareTo(getCreationTimestamp());
     }
 
     @Override

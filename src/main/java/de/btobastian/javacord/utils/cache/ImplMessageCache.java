@@ -92,7 +92,7 @@ public class ImplMessageCache implements MessageCache {
                 if (message.isCachedForever()) {
                     continue;
                 }
-                if (messages.size() > capacity + foreverCachedAmount || message.getCreationDate().isBefore(minAge)) {
+                if (messages.size() > capacity + foreverCachedAmount || message.getCreationTimestamp().isBefore(minAge)) {
                     iterator.remove();
                     message.setKeepCached(false);
                 } else {
