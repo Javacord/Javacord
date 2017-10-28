@@ -3,11 +3,7 @@ package de.btobastian.javacord.entities.channels;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.permissions.PermissionState;
-import de.btobastian.javacord.entities.permissions.PermissionType;
-import de.btobastian.javacord.entities.permissions.Permissions;
-import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
-import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.*;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
@@ -188,6 +184,18 @@ public interface ServerChannel extends Channel {
         return Arrays.stream(PermissionType.values())
                 .filter(type -> effectivePermissions.getState(type) == PermissionState.DENIED)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Checks if the user has a given set of permissions.
+     *
+     * @param user The user to check.
+     * @param type The permission type(s) to check.
+     * @return Whether the user has all given permissions of not.
+     * @see #getEffectiveAllowedPermissions(User)
+     */
+    default boolean hasPermissions(User user, PermissionType... type) {
+        return getEffectiveAllowedPermissions(user).containsAll(Arrays.asList(type));
     }
 
     /**

@@ -8,7 +8,6 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -92,9 +91,8 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @return Whether the given user can write messages or not.
      */
     default boolean canWrite(User user) {
-        Collection<PermissionType> allowed = getEffectiveAllowedPermissions(user);
-        return allowed.contains(PermissionType.ADMINISTRATOR) ||
-                allowed.contains(PermissionType.READ_MESSAGES) && allowed.contains(PermissionType.SEND_MESSAGES);
+        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
+                hasPermissions(user, PermissionType.READ_MESSAGES, PermissionType.SEND_MESSAGES);
     }
 
 }

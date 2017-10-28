@@ -198,6 +198,18 @@ public interface Server extends DiscordEntity, IconHolder {
     }
 
     /**
+     * Checks if the user has a given set of permissions.
+     *
+     * @param user The user to check.
+     * @param type The permission type(s) to check.
+     * @return Whether the user has all given permissions of not.
+     * @see #getAllowedPermissionsOf(User)
+     */
+    default boolean hasPermissions(User user, PermissionType... type) {
+        return getAllowedPermissionsOf(user).containsAll(Arrays.asList(type));
+    }
+
+    /**
      * Changes the nickname of the given user.
      *
      * @param user The user.
