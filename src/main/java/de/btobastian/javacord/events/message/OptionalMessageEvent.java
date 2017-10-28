@@ -47,11 +47,9 @@ public abstract class OptionalMessageEvent extends MessageEvent {
     public CompletableFuture<Message> requestMessage() {
         Optional<Message> message = getMessage();
         if (!message.isPresent()) {
-            getChannel().getMessageById(getMessageId());
+            return getChannel().getMessageById(getMessageId());
         }
-        CompletableFuture<Message> future = new CompletableFuture<>();
-        message.ifPresent(future::complete);
-        return future;
+        return CompletableFuture.completedFuture(this.message);
     }
 
 }
