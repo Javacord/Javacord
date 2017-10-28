@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
@@ -671,6 +672,22 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default CompletableFuture<MessageHistory> getHistoryAround(int limit) {
         return getChannel().getHistoryAround(limit, this);
+    }
+
+    /**
+     * Checks if the given user is allowed to add <b>new</b> reactions to the message.
+     *
+     * @param user The user to check.
+     * @return Whether the user is allowed to add <b>new</b> reactions to the message or not.
+     */
+    default boolean canAddReactions(User user) {
+        Optional<ServerTextChannel> channel = getServerTextChannel();
+        return !channel.isPresent()
+                || channel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || channel.get().hasPermissions(user,
+                    PermissionType.READ_MESSAGES,
+                    PermissionType.READ_MESSAGE_HISTORY,
+                    PermissionType.ADD_REACTIONS);
     }
 
     /**
