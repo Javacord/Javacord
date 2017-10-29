@@ -32,7 +32,7 @@ public class ImplEmbedAuthor implements EmbedAuthor {
     public ImplEmbedAuthor(JSONObject data) {
         name = data.has("name") ? data.getString("name") : null;
         url = data.has("url") && !data.isNull("url") ? data.getString("url") : null;
-        iconUrl = data.has("icon_url") && data.isNull("icon_url") ? data.getString("icon_url") : null;
+        iconUrl = data.has("icon_url") && !data.isNull("icon_url") ? data.getString("icon_url") : null;
         proxyIconUrl = data.has("proxy_icon_url") && !data.isNull("proxy_icon_url")
                 ? data.getString("proxy_icon_url") : null;
     }
