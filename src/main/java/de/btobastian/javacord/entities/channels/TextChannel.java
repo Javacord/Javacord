@@ -2,11 +2,13 @@ package de.btobastian.javacord.entities.channels;
 
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -21,10 +23,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -262,6 +261,30 @@ public interface TextChannel extends Channel, Messageable {
      * @return The message cache for the channel.
      */
     MessageCache getMessageCache();
+
+    /**
+     * Checks if the given user is allowed to add <b>new</b> reactions to messages in this channel.
+     *
+     * @param user The user to check.
+     * @return Whether the user is allowed to add <b>new</b> reactions to message in this channel or not.
+     */
+    default boolean canAddNewReactions(User user) {
+        Optional<PrivateChannel> privateChannel = asPrivateChannel();
+        if (privateChannel.isPresent()) {
+            return user.isYourself() || privateChannel.get().getRecipient() == user;
+        }
+        Optional<GroupChannel> groupChannel = asGroupChannel();
+        if (groupChannel.isPresent()) {
+            return user.isYourself() || groupChannel.get().getMembers().contains(user);
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermissions(user,
+                PermissionType.READ_MESSAGES,
+                PermissionType.READ_MESSAGE_HISTORY,
+                PermissionType.ADD_REACTIONS);
+    }
 
     /**
      * Adds a listener, which listens to message creates in this channel.
