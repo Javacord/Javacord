@@ -18,8 +18,18 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.*;
-import de.btobastian.javacord.listeners.server.channel.*;
+import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
+import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
+import de.btobastian.javacord.listeners.server.ServerJoinListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
@@ -38,7 +48,13 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -352,10 +368,10 @@ public class ImplDiscordApi implements DiscordApi {
      * @param listener The listener to add.
      */
     public void addObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
-        Map<Long, Map<Class<?>, List<Object>>> messageListener =
+        Map<Long, Map<Class<?>, List<Object>>> objectListener =
                 objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
         Map<Class<?>, List<Object>> listeners =
-                messageListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
+                objectListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
         List<Object> classListeners = listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
         classListeners.add(listener);
     }
@@ -369,7 +385,7 @@ public class ImplDiscordApi implements DiscordApi {
      * @return A list with all object listeners of the given type.
      */
     @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    public  <T> List<T> getObjectListeners(Class<?> objectClass, long objectId, Class<?> listenerClass) {
+    public <T> List<T> getObjectListeners(Class<?> objectClass, long objectId, Class<?> listenerClass) {
         Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
         if (objectListener == null) {
             return Collections.emptyList();
@@ -378,7 +394,7 @@ public class ImplDiscordApi implements DiscordApi {
         if (listeners == null) {
             return Collections.emptyList();
         }
-        List<Object> classListeners = this.listeners.getOrDefault(listenerClass, Collections.emptyList());
+        List<Object> classListeners = listeners.getOrDefault(listenerClass, Collections.emptyList());
         return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
 
