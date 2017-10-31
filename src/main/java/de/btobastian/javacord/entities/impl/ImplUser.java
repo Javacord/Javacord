@@ -11,16 +11,6 @@ import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
-import de.btobastian.javacord.listeners.message.MessageCreateListener;
-import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
-import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
-import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
-import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
-import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -30,12 +20,8 @@ import org.slf4j.Logger;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link User}.
@@ -66,12 +52,6 @@ public class ImplUser implements User, IconHolder {
      * The private channel with the given user.
      */
     private PrivateChannel channel = null;
-
-    /**
-     * A map which contains all listeners.
-     * The key is the class of the listener.
-     */
-    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
     /**
      * The avatar id of the user. Might be <code>null</code>!
@@ -160,30 +140,6 @@ public class ImplUser implements User, IconHolder {
         }
     }
 
-    /**
-     * Adds a listener.
-     *
-     * @param clazz The listener class.
-     * @param listener The listener to add.
-     */
-    private void addListener(Class<?> clazz, Object listener) {
-        List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
-        classListeners.add(listener);
-    }
-
-    /**
-     * Gets all listeners of the given class.
-     *
-     * @param clazz The class of the listener.
-     * @param <T> The class of the listener.
-     * @return A list with all listeners of the given type.
-     */
-    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    private <T> List<T> getListeners(Class<?> clazz) {
-        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
-        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
-    }
-
     @Override
     public String getName() {
         return name;
@@ -266,104 +222,4 @@ public class ImplUser implements User, IconHolder {
         return String.format("User (id: %s, name: %s)", getId(), getName());
     }
 
-    @Override
-    public void addMessageCreateListener(MessageCreateListener listener) {
-        addListener(MessageCreateListener.class, listener);
-    }
-
-    @Override
-    public List<MessageCreateListener> getMessageCreateListeners() {
-        return getListeners(MessageCreateListener.class);
-    }
-
-    @Override
-    public void addUserStartTypingListener(UserStartTypingListener listener) {
-        addListener(UserStartTypingListener.class, listener);
-    }
-
-    @Override
-    public List<UserStartTypingListener> getUserStartTypingListeners() {
-        return getListeners(UserStartTypingListener.class);
-    }
-
-    @Override
-    public void addReactionAddListener(ReactionAddListener listener) {
-        addListener(ReactionAddListener.class, listener);
-    }
-
-    @Override
-    public List<ReactionAddListener> getReactionAddListeners() {
-        return getListeners(ReactionAddListener.class);
-    }
-
-    @Override
-    public void addReactionRemoveListener(ReactionRemoveListener listener) {
-        addListener(ReactionRemoveListener.class, listener);
-    }
-
-    @Override
-    public List<ReactionRemoveListener> getReactionRemoveListeners() {
-        return getListeners(ReactionRemoveListener.class);
-    }
-
-    @Override
-    public void addServerMemberAddListener(ServerMemberAddListener listener) {
-        addListener(ServerMemberAddListener.class, listener);
-    }
-
-    @Override
-    public List<ServerMemberAddListener> getServerMemberAddListeners() {
-        return getListeners(ServerMemberAddListener.class);
-    }
-
-    @Override
-    public void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
-        addListener(ServerMemberRemoveListener.class, listener);
-    }
-
-    @Override
-    public List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
-        return getListeners(ServerMemberRemoveListener.class);
-    }
-
-    @Override
-    public void addUserChangeGameListener(UserChangeGameListener listener) {
-        addListener(UserChangeGameListener.class, listener);
-    }
-
-    @Override
-    public List<UserChangeGameListener> getUserChangeGameListeners() {
-        return getListeners(UserChangeGameListener.class);
-    }
-
-    @Override
-    public void addUserChangeStatusListener(UserChangeStatusListener listener) {
-        addListener(UserChangeStatusListener.class, listener);
-    }
-
-    @Override
-    public List<UserChangeStatusListener> getUserChangeStatusListeners() {
-        return getListeners(UserChangeStatusListener.class);
-    }
-
-    @Override
-    public void addServerChannelChangeOverwrittenPermissionsListener(
-            ServerChannelChangeOverwrittenPermissionsListener listener) {
-        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
-    }
-
-    @Override
-    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
-        return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
-    }
-
-    @Override
-    public void addUserChangeNicknameListener(UserChangeNicknameListener listener) {
-        addListener(UserChangeNicknameListener.class, listener);
-    }
-
-    @Override
-    public List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
-        return getListeners(UserChangeNicknameListener.class);
-    }
 }

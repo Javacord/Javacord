@@ -291,83 +291,112 @@ public interface TextChannel extends Channel, Messageable {
      *
      * @param listener The listener to add.
      */
-    void addMessageCreateListener(MessageCreateListener listener);
+    default void addMessageCreateListener(MessageCreateListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                TextChannel.class, getId(), MessageCreateListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered message create listeners.
      *
      * @return A list with all registered message create listeners.
      */
-    List<MessageCreateListener> getMessageCreateListeners();
+    default List<MessageCreateListener> getMessageCreateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId(), MessageCreateListener.class);
+    }
 
     /**
      * Adds a listener, which listens to users starting to type in this channel.
      *
      * @param listener The listener to add.
      */
-    void addUserStartTypingListener(UserStartTypingListener listener);
+    default void addUserStartTypingListener(UserStartTypingListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                TextChannel.class, getId(), UserStartTypingListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered user starts typing listeners.
      *
      * @return A list with all registered user starts typing listeners.
      */
-    List<UserStartTypingListener> getUserStartTypingListeners();
+    default List<UserStartTypingListener> getUserStartTypingListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                TextChannel.class, getId(), UserStartTypingListener.class);
+    }
 
     /**
      * Adds a listener, which listens to message deletions in this channel.
      *
      * @param listener The listener to add.
      */
-    void addMessageDeleteListener(MessageDeleteListener listener);
+    default void addMessageDeleteListener(MessageDeleteListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                TextChannel.class, getId(), MessageDeleteListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered message delete listeners.
      *
      * @return A list with all registered message delete listeners.
      */
-    List<MessageDeleteListener> getMessageDeleteListeners();
+    default List<MessageDeleteListener> getMessageDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId(), MessageDeleteListener.class);
+    }
 
     /**
      * Adds a listener, which listens to message edits in this channel.
      *
      * @param listener The listener to add.
      */
-    void addMessageEditListener(MessageEditListener listener);
+    default void addMessageEditListener(MessageEditListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(TextChannel.class, getId(), MessageEditListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered message edit listeners.
      *
      * @return A list with all registered message edit listeners.
      */
-    List<MessageEditListener> getMessageEditListeners();
+    default List<MessageEditListener> getMessageEditListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId(), MessageEditListener.class);
+    }
 
     /**
      * Adds a listener, which listens to reactions being added in this channel.
      *
      * @param listener The listener to add.
      */
-    void addReactionAddListener(ReactionAddListener listener);
+    default void addReactionAddListener(ReactionAddListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(TextChannel.class, getId(), ReactionAddListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered reaction add listeners.
      *
      * @return A list with all registered reaction add listeners.
      */
-    List<ReactionAddListener> getReactionAddListeners();
+    default List<ReactionAddListener> getReactionAddListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId(), ReactionAddListener.class);
+    }
 
     /**
      * Adds a listener, which listens to reactions being removed in this channel.
      *
      * @param listener The listener to add.
      */
-    void addReactionRemoveListener(ReactionRemoveListener listener);
+    default void addReactionRemoveListener(ReactionRemoveListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                TextChannel.class, getId(), ReactionRemoveListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered reaction remove listeners.
      *
      * @return A list with all registered reaction remove listeners.
      */
-    List<ReactionRemoveListener> getReactionRemoveListeners();
+    default List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId(), ReactionRemoveListener.class);
+    }
 
 }

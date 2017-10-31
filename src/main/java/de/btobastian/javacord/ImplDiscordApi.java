@@ -151,10 +151,13 @@ public class ImplDiscordApi implements DiscordApi {
     private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
     /**
-     * A map which contains all message listeners.
-     * The key is the id of the message.
+     * A map which contains all listeners which are assigned to a specific object instead of being global.
+     * The key of the outer map is the class which the listener was registered to (e.g. Message.class).
+     * The key of the first inner map is the id of the object.
+     * The key of the second inner map is the class of the listener.
+     * The final value is the listener itself.
      */
-    private final ConcurrentHashMap<Long, Map<Class<?>, List<Object>>> messageListeners =
+    private final ConcurrentHashMap<Class<?>, Map<Long, Map<Class<?>, List<Object>>>> objectListeners =
             new ConcurrentHashMap<>();
 
     /**
@@ -341,31 +344,41 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
-     * Adds a message listener.
+     * Adds a object listener.
      *
-     * @param messageId The id of the message.
-     * @param clazz The listener class.
+     * @param objectClass The class of the object.
+     * @param objectId The id of the object.
+     * @param listenerClass The listener class.
      * @param listener The listener to add.
      */
-    public void addMessageListener(long messageId, Class<?> clazz, Object listener) {
-        Map<Class<?>, List<Object>> messageListeners =
-                this.messageListeners.computeIfAbsent(messageId, key -> new ConcurrentHashMap<>());
-        List<Object> classListeners = messageListeners.computeIfAbsent(clazz, c -> new ArrayList<>());
+    public void addObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
+        Map<Long, Map<Class<?>, List<Object>>> messageListener =
+                objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
+        Map<Class<?>, List<Object>> listeners =
+                messageListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
+        List<Object> classListeners = listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
         classListeners.add(listener);
     }
 
     /**
      * Gets all message listeners of the given class.
      *
-     * @param messageId The id of the message.
-     * @param clazz The class of the listener.
-     * @param <T> The class of the listener.
-     * @return A list with all message listeners of the given type.
+     * @param objectClass The class of the object.
+     * @param objectId The id of the object.
+     * @param <T> The listener class.
+     * @return A list with all object listeners of the given type.
      */
     @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    public  <T> List<T> getMessageListeners(long messageId, Class<?> clazz) {
-        List<Object> classListeners =
-                messageListeners.getOrDefault(messageId, Collections.emptyMap()).getOrDefault(clazz, new ArrayList<>());
+    public  <T> List<T> getObjectListeners(Class<?> objectClass, long objectId, Class<?> listenerClass) {
+        Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
+        if (objectListener == null) {
+            return Collections.emptyList();
+        }
+        Map<Class<?>, List<Object>> listeners = objectListener.get(objectId);
+        if (listeners == null) {
+            return Collections.emptyList();
+        }
+        List<Object> classListeners = this.listeners.getOrDefault(listenerClass, Collections.emptyList());
         return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -632,7 +645,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void addMessageDeleteListener(long messageId, MessageDeleteListener listener) {
-        addMessageListener(messageId, MessageDeleteListener.class, listener);
+        addObjectListener(Message.class, messageId, MessageDeleteListener.class, listener);
     }
 
     @Override
@@ -642,7 +655,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public List<MessageDeleteListener> getMessageDeleteListeners(long messageId) {
-        return getMessageListeners(messageId, MessageDeleteListener.class);
+        return getObjectListeners(Message.class, messageId, MessageDeleteListener.class);
     }
 
     @Override
@@ -652,7 +665,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void addMessageEditListener(long messageId, MessageEditListener listener) {
-        addMessageListener(messageId, MessageEditListener.class, listener);
+        addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
     }
 
     @Override
@@ -662,7 +675,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public List<MessageEditListener> getMessageEditListeners(long messageId) {
-        return getMessageListeners(messageId, MessageEditListener.class);
+        return getObjectListeners(Message.class, messageId, MessageEditListener.class);
     }
 
     @Override
@@ -672,7 +685,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void addReactionAddListener(long messageId, ReactionAddListener listener) {
-        addMessageListener(messageId, ReactionAddListener.class, listener);
+        addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
     }
 
     @Override
@@ -682,7 +695,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public List<ReactionAddListener> getReactionAddListeners(long messageId) {
-        return getMessageListeners(messageId, ReactionAddListener.class);
+        return getObjectListeners(Message.class, messageId, ReactionAddListener.class);
     }
 
     @Override
@@ -692,7 +705,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void addReactionRemoveListener(long messageId, ReactionRemoveListener listener) {
-        addMessageListener(messageId, ReactionRemoveListener.class, listener);
+        addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
     }
 
     @Override
@@ -702,7 +715,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners(long messageId) {
-        return getMessageListeners(messageId, ReactionRemoveListener.class);
+        return getObjectListeners(Message.class, messageId, ReactionRemoveListener.class);
     }
 
     @Override

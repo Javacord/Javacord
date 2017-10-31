@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.channels;
 
 import com.mashape.unirest.http.HttpMethod;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.*;
@@ -224,56 +225,80 @@ public interface ServerChannel extends Channel {
      *
      * @param listener The listener to add.
      */
-    void addServerChannelDeleteListener(ServerChannelDeleteListener listener);
+    default void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerChannel.class, getId(), ServerChannelDeleteListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server channel delete listeners.
      *
      * @return A list with all registered server channel delete listeners.
      */
-    List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
+    default List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerChannel.class, getId(), ServerChannelDeleteListener.class);
+    }
 
     /**
      * Adds a listener, which listens this server channel name changes.
      *
      * @param listener The listener to add.
      */
-    void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener);
+    default void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerChannel.class, getId(), ServerChannelChangeNameListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server channel change name listeners.
      *
      * @return A list with all registered server channel change name listeners.
      */
-    List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners();
+    default List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerChannel.class, getId(), ServerChannelChangeNameListener.class);
+    }
 
     /**
      * Adds a listener, which listens this server channel position changes.
      *
      * @param listener The listener to add.
      */
-    void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener);
+    default void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerChannel.class, getId(), ServerChannelChangePositionListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server channel change position listeners.
      *
      * @return A list with all registered server channel change position listeners.
      */
-    List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
+    default List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerChannel.class, getId(), ServerChannelChangePositionListener.class);
+    }
 
     /**
      * Adds a listener, which listens to overwritten permission changes of this server.
      *
      * @param listener The listener to add.
      */
-    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+    default void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
      *
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
-    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+    default List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
+    }
 
 
 }

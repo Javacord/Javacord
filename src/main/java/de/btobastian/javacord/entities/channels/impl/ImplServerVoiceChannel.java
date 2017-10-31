@@ -10,18 +10,11 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link ServerVoiceChannel}.
@@ -67,12 +60,6 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
      * A map with all overwritten role permissions.
      */
     private final ConcurrentHashMap<Long, Permissions> overwrittenRolePermissions = new ConcurrentHashMap<>();
-
-    /**
-     * A map which contains all listeners.
-     * The key is the class of the listener.
-     */
-    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
 
     /**
      * Creates a new server voice channel object.
@@ -146,30 +133,6 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
         return overwrittenUserPermissions;
     }
 
-    /**
-     * Adds a listener.
-     *
-     * @param clazz The listener class.
-     * @param listener The listener to add.
-     */
-    private void addListener(Class<?> clazz, Object listener) {
-        List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
-        classListeners.add(listener);
-    }
-
-    /**
-     * Gets all listeners of the given class.
-     *
-     * @param clazz The class of the listener.
-     * @param <T> The class of the listener.
-     * @return A list with all listeners of the given type.
-     */
-    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    private <T> List<T> getListeners(Class<?> clazz) {
-        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
-        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
-    }
-
     @Override
     public DiscordApi getApi() {
         return api;
@@ -215,44 +178,4 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
         return String.format("ServerVoiceChannel (id: %s, name: %s)", getId(), getName());
     }
 
-    @Override
-    public void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
-        addListener(ServerChannelDeleteListener.class, listener);
-    }
-
-    @Override
-    public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
-        return getListeners(ServerChannelDeleteListener.class);
-    }
-
-    @Override
-    public void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
-        addListener(ServerChannelChangeNameListener.class, listener);
-    }
-
-    @Override
-    public List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
-        return getListeners(ServerChannelChangeNameListener.class);
-    }
-
-    @Override
-    public void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
-        addListener(ServerChannelChangePositionListener.class, listener);
-    }
-
-    @Override
-    public List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
-        return getListeners(ServerChannelChangePositionListener.class);
-    }
-
-    @Override
-    public void addServerChannelChangeOverwrittenPermissionsListener(
-            ServerChannelChangeOverwrittenPermissionsListener listener) {
-        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
-    }
-
-    @Override
-    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
-        return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
-    }
 }

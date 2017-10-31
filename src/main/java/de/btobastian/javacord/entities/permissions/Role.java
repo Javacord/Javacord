@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.permissions;
 
 import com.mashape.unirest.http.HttpMethod;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
@@ -116,57 +117,77 @@ public interface Role extends DiscordEntity, Mentionable {
      *
      * @param listener The listener to add.
      */
-    void addRoleChangePermissionsListener(RoleChangePermissionsListener listener);
+    default void addRoleChangePermissionsListener(RoleChangePermissionsListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                Role.class, getId(), RoleChangePermissionsListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered role change permissions listeners.
      *
      * @return A list with all registered role change permissions listeners.
      */
-    java.util.List<RoleChangePermissionsListener> getRoleChangePermissionsListeners();
+    default java.util.List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangePermissionsListener.class);
+    }
 
     /**
      * Adds a listener, which listens to position changes of this role.
      *
      * @param listener The listener to add.
      */
-    void addRoleChangePositionListener(RoleChangePositionListener listener);
+    default void addRoleChangePositionListener(RoleChangePositionListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(), RoleChangePositionListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered role change position listeners.
      *
      * @return A list with all registered role change position listeners.
      */
-    java.util.List<RoleChangePositionListener> getRoleChangePositionListeners();
+    default java.util.List<RoleChangePositionListener> getRoleChangePositionListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangePositionListener.class);
+    }
 
     /**
      * Adds a listener, which listens to overwritten permission changes of this role.
      *
      * @param listener The listener to add.
      */
-    void addServerChannelChangeOverwrittenPermissionsListener(
-            ServerChannelChangeOverwrittenPermissionsListener listener);
+    default void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                Role.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
      *
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
-    java.util.List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+    default java.util.List<ServerChannelChangeOverwrittenPermissionsListener>
+            getServerChannelChangeOverwrittenPermissionsListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                Role.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
+    }
 
     /**
      * Adds a listener, which listens to this role being deleted.
      *
      * @param listener The listener to add.
      */
-    void addRoleDeleteListener(RoleDeleteListener listener);
+    default void addRoleDeleteListener(RoleDeleteListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(), RoleDeleteListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered role delete listeners.
      *
      * @return A list with all registered role delete listeners.
      */
-    java.util.List<RoleDeleteListener> getRoleDeleteListeners();
+    default java.util.List<RoleDeleteListener> getRoleDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleDeleteListener.class);
+    }
 
 
 }

@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -172,139 +173,183 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      *
      * @param listener The listener to add.
      */
-    void addMessageCreateListener(MessageCreateListener listener);
+    default void addMessageCreateListener(MessageCreateListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), MessageCreateListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered message create listeners.
      *
      * @return A list with all registered message create listeners.
      */
-    List<MessageCreateListener> getMessageCreateListeners();
+    default List<MessageCreateListener> getMessageCreateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), MessageCreateListener.class);
+    }
 
     /**
      * Adds a listener, which listens to this user starting to type.
      *
      * @param listener The listener to add.
      */
-    void addUserStartTypingListener(UserStartTypingListener listener);
+    default void addUserStartTypingListener(UserStartTypingListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserStartTypingListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered user starts typing listeners.
      *
      * @return A list with all registered user starts typing listeners.
      */
-    List<UserStartTypingListener> getUserStartTypingListeners();
+    default List<UserStartTypingListener> getUserStartTypingListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserStartTypingListener.class);
+    }
 
     /**
      * Adds a listener, which listens to reactions being added by this user.
      *
      * @param listener The listener to add.
      */
-    void addReactionAddListener(ReactionAddListener listener);
+    default void addReactionAddListener(ReactionAddListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ReactionAddListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered reaction add listeners.
      *
      * @return A list with all registered reaction add listeners.
      */
-    List<ReactionAddListener> getReactionAddListeners();
+    default List<ReactionAddListener> getReactionAddListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ReactionAddListener.class);
+    }
 
     /**
      * Adds a listener, which listens to reactions being removed by this user.
      *
      * @param listener The listener to add.
      */
-    void addReactionRemoveListener(ReactionRemoveListener listener);
+    default void addReactionRemoveListener(ReactionRemoveListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ReactionRemoveListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered reaction remove listeners.
      *
      * @return A list with all registered reaction remove listeners.
      */
-    List<ReactionRemoveListener> getReactionRemoveListeners();
+    default List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ReactionRemoveListener.class);
+    }
 
     /**
      * Adds a listener, which listens to this user joining known servers.
      *
      * @param listener The listener to add.
      */
-    void addServerMemberAddListener(ServerMemberAddListener listener);
+    default void addServerMemberAddListener(ServerMemberAddListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ServerMemberAddListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server member add listeners.
      *
      * @return A list with all registered server member add listeners.
      */
-    List<ServerMemberAddListener> getServerMemberAddListeners();
+    default List<ServerMemberAddListener> getServerMemberAddListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberAddListener.class);
+    }
 
     /**
      * Adds a listener, which listens to this user leaving known servers.
      *
      * @param listener The listener to add.
      */
-    void addServerMemberRemoveListener(ServerMemberRemoveListener listener);
+    default void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ServerMemberRemoveListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server member remove listeners.
      *
      * @return A list with all registered server member remove listeners.
      */
-    List<ServerMemberRemoveListener> getServerMemberRemoveListeners();
+    default List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberRemoveListener.class);
+    }
 
     /**
      * Adds a listener, which listens to this user's game changes.
      *
      * @param listener The listener to add.
      */
-    void addUserChangeGameListener(UserChangeGameListener listener);
+    default void addUserChangeGameListener(UserChangeGameListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserChangeGameListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered user change game listeners.
      *
      * @return A list with all registered user change game listeners.
      */
-    List<UserChangeGameListener> getUserChangeGameListeners();
+    default List<UserChangeGameListener> getUserChangeGameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeGameListener.class);
+    }
 
     /**
      * Adds a listener, which listens to this user's status changes.
      *
      * @param listener The listener to add.
      */
-    void addUserChangeStatusListener(UserChangeStatusListener listener);
+    default void addUserChangeStatusListener(UserChangeStatusListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserChangeStatusListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered user change status listeners.
      *
      * @return A list with all registered user change status listeners.
      */
-    List<UserChangeStatusListener> getUserChangeStatusListeners();
+    default List<UserChangeStatusListener> getUserChangeStatusListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeStatusListener.class);
+    }
 
     /**
      * Adds a listener, which listens to overwritten permission changes of this user.
      *
      * @param listener The listener to add.
      */
-    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+    default void addServerChannelChangeOverwrittenPermissionsListener(
+            ServerChannelChangeOverwrittenPermissionsListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
      *
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
-    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
+    default List<ServerChannelChangeOverwrittenPermissionsListener>
+            getServerChannelChangeOverwrittenPermissionsListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                User.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
+    }
 
     /**
      * Adds a listener, which listens to nickname changes of this user.
      *
      * @param listener The listener to add.
      */
-    void addUserChangeNicknameListener(UserChangeNicknameListener listener);
+    default void addUserChangeNicknameListener(UserChangeNicknameListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserChangeNicknameListener.class, listener);
+    }
 
     /**
      * Gets a list with all registered user change nickname listeners.
      *
      * @return A list with all registered user change nickname listeners.
      */
-    List<UserChangeNicknameListener> getUserChangeNicknameListeners();
+    default List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeNicknameListener.class);
+    }
 
 }
