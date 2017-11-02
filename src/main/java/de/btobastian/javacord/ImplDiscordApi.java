@@ -360,6 +360,24 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
+     * Sets the current game, along with type and streaming Url.
+     *
+     * @param name The name of the game.
+     * @param type The game's type.
+     * @param streamingUrl The Url used for streaming.
+     */
+    private void updateGame(String name, GameType type, String streamingUrl){
+        if (name == null) {
+            game = null;
+        } else if (streamingUrl == null) {
+            game = new ImplGame(type, name, null);
+        } else {
+            game = new ImplGame(type, name, streamingUrl);
+        }
+        websocketAdapter.updateStatus();
+    }
+
+    /**
      * Adds a object listener.
      *
      * @param objectClass The class of the object.
@@ -482,19 +500,17 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void updateGame(String name) {
-        updateGame(name, null);
+        updateGame(name, GameType.GAME, null);
+    }
+
+    @Override
+    public void updateGame(String name, GameType type) {
+        updateGame(name, type, null);
     }
 
     @Override
     public void updateGame(String name, String streamingUrl) {
-        if (name == null) {
-            game = null;
-        } else if (streamingUrl == null) {
-            game = new ImplGame(GameType.GAME, name, null);
-        } else {
-            game = new ImplGame(GameType.STREAMING, name, streamingUrl);
-        }
-        websocketAdapter.updateStatus();
+        updateGame(name, GameType.STREAMING, streamingUrl);
     }
 
     @Override

@@ -15,7 +15,17 @@ public enum GameType {
     /**
      * Represents streaming a game, represented as "Streaming Half-Life 3" for example.
      */
-    STREAMING(1);
+    STREAMING(1),
+
+    /**
+     * Represents listening to an application, represented as "Listening to Half-Life 3" for example.
+     */
+    LISTENING(2),
+
+    /**
+     * Represents watching an application, represented as "Watching Half-Life 3", for example.
+     */
+    WATCHING(3);
 
     private final int id;
 

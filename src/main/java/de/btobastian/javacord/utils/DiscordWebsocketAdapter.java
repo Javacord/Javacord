@@ -438,7 +438,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         logger.debug("Updating status (game: {})", game.isPresent() ? game.get().getName() : "none");
         JSONObject gameJson = new JSONObject();
         gameJson.put("name", game.isPresent() ? game.get().getName() : JSONObject.NULL);
-        gameJson.put("type", game.isPresent() ? game.get().getType().getId() : 0);
+        gameJson.put("type", game.map(g -> g.getType().getId()).orElse(0));
         game.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> gameJson.put("url", url)));
         JSONObject updateStatus = new JSONObject()
                 .put("op", 3)

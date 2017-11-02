@@ -1,10 +1,7 @@
 package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
-import de.btobastian.javacord.entities.ApplicationInfo;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.Channel;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.GroupChannel;
@@ -164,6 +161,14 @@ public interface DiscordApi {
      * @param name The name of the game.
      */
     void updateGame(String name);
+
+    /**
+     * Updates the game of this bot with any type.
+     *
+     * @param name The name of the game.
+     * @param type The type of the game.
+     */
+    void updateGame(String name, GameType type);
 
     /**
      * Updates the game of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
