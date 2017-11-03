@@ -58,6 +58,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -109,6 +110,11 @@ public class ImplDiscordApi implements DiscordApi {
      * The default maximum age of cached messages.
      */
     private int defaultMessageCacheStorageTimeInSeconds = 60*60*12;
+
+    /**
+     * The function to calculate the reconnect delay.
+     */
+    private Function<Integer, Integer> reconnectDelayProvider;
 
     /**
      * The current shard of the bot.
@@ -194,6 +200,8 @@ public class ImplDiscordApi implements DiscordApi {
         this.token = accountType.getTokenPrefix() + token;
         this.currentShard = currentShard;
         this.totalShards = totalShards;
+        this.reconnectDelayProvider = x ->
+                (int) Math.round(Math.pow(x, 1.5)-(1/(1/(0.1*x)+1))*Math.pow(x,1.5))*totalShards;
 
         RestEndpoint endpoint = RestEndpoint.GATEWAY_BOT;
         if (accountType == AccountType.CLIENT) {
@@ -223,6 +231,20 @@ public class ImplDiscordApi implements DiscordApi {
                             () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
                             , 30, 30, TimeUnit.SECONDS);
                 });
+    }
+
+    /**
+     * Purges all cached entities.
+     * This method is only meant to be called after receiving a READY packet.
+     */
+    public void purgeCache() {
+        users.clear();
+        servers.clear();
+        groupChannels.clear();
+        unavailableServers.clear();
+        customEmojis.clear();
+        messages.clear();
+        timeOffset = null;
     }
 
     /**
@@ -530,9 +552,16 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void setReconnectRatelimit(int attempts, int seconds) {
-        websocketAdapter.setReconnectAttempts(attempts);
-        websocketAdapter.setRatelimitResetIntervalInSeconds(seconds);
+    public void setReconnectDelay(Function<Integer, Integer> reconnectDelayProvider) {
+        this.reconnectDelayProvider = reconnectDelayProvider;
+    }
+
+    @Override
+    public int getReconnectDelay(int attempt) {
+        if (attempt < 0) {
+            throw new IllegalArgumentException("attempt must be 1 or greater");
+        }
+        return reconnectDelayProvider.apply(attempt);
     }
 
     @Override
