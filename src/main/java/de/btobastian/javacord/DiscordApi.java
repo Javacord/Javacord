@@ -5,15 +5,7 @@ import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.Channel;
-import de.btobastian.javacord.entities.channels.ChannelCategory;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.channels.VoiceChannel;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -24,18 +16,8 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.server.*;
+import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
@@ -51,14 +33,9 @@ import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -200,14 +177,46 @@ public interface DiscordApi {
     void disconnect();
 
     /**
-     * Sets the maximum reconnect attempts in a given time before the bot stops reconnecting.
-     * By default the bot stops reconnecting, if the connection failed more than 5 times in the last 5 minutes.
-     * It's not recommended to change these values!
+     * Sets a function which is used to get the delay between reconnects.
      *
-     * @param attempts The amount of attempts. Default: 5.
-     * @param seconds The time, in which the attempts can happen in seconds. Default: 300.
+     * @param reconnectDelayProvider A function which get's the amount of reconnects (starting with <code>1</code>) as
+     *                               the parameter and should return the delay in seconds to wait for the next reconnect
+     *                               attempt. By default the function reconnect delay is calculated using the following
+     *                               equation: <code>f(x): (x^1.5-(1/(1/(0.1*x)+1))*x^1.5)*shardCount</code>.
+     *                               This would result in a delay which looks like this for a bot with 1 shard:
+     *                               <table>
+     *                                  <tr>
+     *                                      <th>Attempt</th>
+     *                                      <th>Delay</th>
+     *                                  </tr>
+     *                                  <tr><td>1</td><td>1</td></tr>
+     *                                  <tr><td>2</td><td>2</td></tr>
+     *                                  <tr><td>3</td><td>4</td></tr>
+     *                                  <tr><td>4</td><td>6</td></tr>
+     *                                  <tr><td>5</td><td>7</td></tr>
+     *                                  <tr><td>...</td><td>...</td></tr>
+     *                                  <tr><td>10</td><td>16</td></tr>
+     *                                  <tr><td>15</td><td>23</td></tr>
+     *                                  <tr><td>20</td><td>30</td></tr>
+     *                                  <tr><td>...</td><td>...</td></tr>
+     *                                  <tr><td>50</td><td>59</td></tr>
+     *                                  <tr><td>100</td><td>91</td></tr>
+     *                                  <tr><td>150</td><td>115</td></tr>
+     *                                  <tr><td>...</td><td>...</td></tr>
+     *                               </table>
+     *                               Too many reconnect attempts may cause a token reset (usually 1000 per day), so you
+     *                               should always make sure to not provide a function which might exceed this limit.
+     *                               You should also make sure to take into account the amount of shards!
      */
-    void setReconnectRatelimit(int attempts, int seconds);
+    void setReconnectDelay(Function<Integer, Integer> reconnectDelayProvider);
+
+    /**
+     * Gets the reconnect delay for a given amount of attempts.
+     *
+     * @param attempt The amount of attempts (starting with <code>1</code>)
+     * @return The reconnect delay in seconds.
+     */
+    int getReconnectDelay(int attempt);
 
     /**
      * Gets the application info of the bot.

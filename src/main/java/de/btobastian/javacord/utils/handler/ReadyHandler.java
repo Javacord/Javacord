@@ -24,6 +24,9 @@ public class ReadyHandler extends PacketHandler {
 
     @Override
     public void handle(JSONObject packet) {
+        // Purge the cache first
+        api.purgeCache();
+
         JSONArray guilds = packet.getJSONArray("guilds");
         for (int i = 0; i < guilds.length(); i++) {
             JSONObject guild = guilds.getJSONObject(i);

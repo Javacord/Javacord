@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -64,11 +65,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     private long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
-    // We allow 5 reconnects per 5 minutes.
-    // This limit should never be hit under normal conditions, but prevent reconnect loops.
-    private Queue<Long> ratelimitQueue = new LinkedList<>();
-    private int reconnectAttempts = 5;
-    private int ratelimitResetIntervalInSeconds = 5*60;
+    // A reconnect attempt counter
+    private int reconnectAttempt = 0;
 
     public DiscordWebsocketAdapter(DiscordApi api, String gateway) {
         this.api = api;
@@ -101,6 +99,13 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             websocket.connect();
         } catch (IOException | WebSocketException e) {
             logger.warn("An error occurred while connecting to websocket", e);
+            if (reconnect) {
+                reconnectAttempt++;
+                logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
+                // Reconnect after a (short?) delay depending on the amount of reconnect attempts
+                api.getThreadPool().getScheduler()
+                        .schedule(this::connect, api.getReconnectDelay(reconnectAttempt), TimeUnit.SECONDS);
+            }
         }
     }
 
@@ -124,7 +129,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             switch (clientCloseFrame == null ? -1 : clientCloseFrame.getCloseCode()) {
                 case 1002:
                 case 1008:
-                    logger.debug("Websocket closed! Trying to resume connection.");
+                    logger.debug("Websocket closed!");
                     break;
                 default:
                     logger.info("Websocket closed with reason {} and code {} by client!",
@@ -146,16 +151,11 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         }
 
         if (reconnect) {
-            ratelimitQueue.offer(System.currentTimeMillis());
-            if (ratelimitQueue.size() > reconnectAttempts) {
-                long timestamp = ratelimitQueue.poll();
-                if (System.currentTimeMillis() - (1000*ratelimitResetIntervalInSeconds) < timestamp) {
-                    logger.error("Websocket connection failed more than {} times in the last {} seconds!" +
-                            " Stopping reconnecting.", reconnectAttempts, ratelimitResetIntervalInSeconds);
-                    return;
-                }
-            }
-            connect();
+            reconnectAttempt++;
+            logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
+            // Reconnect after a (short?) delay depending on the amount of reconnect attempts
+            api.getThreadPool().getScheduler()
+                    .schedule(this::connect, api.getReconnectDelay(reconnectAttempt), TimeUnit.SECONDS);
         }
     }
 
@@ -180,12 +180,14 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     lastGuildMembersChunkReceived = System.currentTimeMillis();
                 }
                 if (type.equals("RESUMED")) {
+                    reconnectAttempt = 0;
                     // We are the one who send the first heartbeat
                     heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     logger.debug("Received RESUMED packet");
                 }
-                if (type.equals("READY") && sessionId == null) {
+                if (type.equals("READY")) {
+                    reconnectAttempt = 0;
                     // We are the one who send the first heartbeat
                     heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
@@ -224,9 +226,6 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                         ready.complete(true);
                     });
                     logger.debug("Received READY packet");
-                } else if (type.equals("READY")) {
-                    heartbeatAckReceived = true;
-                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                 }
                 break;
             case 1:
@@ -448,24 +447,6 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                         .put("game", gameJson)
                         .put("since", JSONObject.NULL));
         websocket.sendText(updateStatus.toString());
-    }
-
-    /**
-     * Sets the reconnect reset interval in seconds.
-     *
-     * @param ratelimitResetIntervalInSeconds The reconnect reset interval in seconds.
-     */
-    public void setRatelimitResetIntervalInSeconds(int ratelimitResetIntervalInSeconds) {
-        this.ratelimitResetIntervalInSeconds = ratelimitResetIntervalInSeconds;
-    }
-
-    /**
-     * Sets the maximum reconnect attempts.
-     *
-     * @param reconnectAttempts The maximum reconnect attempts.
-     */
-    public void setReconnectAttempts(int reconnectAttempts) {
-        this.reconnectAttempts = reconnectAttempts;
     }
 
     @Override
