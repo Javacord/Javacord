@@ -59,6 +59,10 @@ public enum GameType {
                 return GAME;
             case 1:
                 return STREAMING;
+            case 2:
+                return LISTENING;
+            case 3:
+                return WATCHING;
             default:
                 return GAME;
         }
