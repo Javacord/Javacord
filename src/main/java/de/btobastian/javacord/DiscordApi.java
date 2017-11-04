@@ -1,10 +1,7 @@
 package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
-import de.btobastian.javacord.entities.ApplicationInfo;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
 import de.btobastian.javacord.entities.message.Message;
