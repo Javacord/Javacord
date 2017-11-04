@@ -18,18 +18,8 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.server.*;
+import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
@@ -48,13 +38,7 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -187,6 +171,8 @@ public class ImplDiscordApi implements DiscordApi {
      *
      * @param accountType The account type of the instance.
      * @param token The token used to connect without any account type specific prefix.
+     * @param currentShard The current shard the bot should connect to.
+     * @param totalShards  The total amount of shards.
      * @param ready The future which will be completed when the connection to Discord was successful.
      */
     public ImplDiscordApi(
@@ -350,6 +336,7 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * Gets or creates a new custom emoji object.
      *
+     * @param server The server of the emoji.
      * @param data The data of the emoji.
      * @return The emoji for the given json object.
      */
@@ -421,6 +408,7 @@ public class ImplDiscordApi implements DiscordApi {
      *
      * @param objectClass The class of the object.
      * @param objectId The id of the object.
+     * @param listenerClass The listener class.
      * @param <T> The listener class.
      * @return A list with all object listeners of the given type.
      */

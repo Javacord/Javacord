@@ -20,6 +20,7 @@ public class CustomEmojiCreateEvent extends ServerEvent {
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
+     * @param emoji The created emoji.
      */
     public CustomEmojiCreateEvent(DiscordApi api, Server server, CustomEmoji emoji) {
         super(api, server);

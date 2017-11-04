@@ -32,8 +32,9 @@ public class ServerChannelChangeOverwrittenPermissionsEvent extends ServerChanne
      * Creates a new server channel create event.
      *
      * @param channel The channel of the event.
-     * @param oldPermissions The old overwritten permissions.
      * @param newPermissions The new overwritten permissions.
+     * @param oldPermissions The old overwritten permissions.
+     * @param entity The entity which permissions got changed.
      */
     public ServerChannelChangeOverwrittenPermissionsEvent(
             ServerChannel channel, Permissions newPermissions, Permissions oldPermissions, DiscordEntity entity) {

@@ -40,6 +40,9 @@ public class Javacord {
     /**
      * This function can be used in the {@link java.util.concurrent.CompletableFuture#exceptionally(Function)} method.
      * It just prints the exception and is doing nothing else.
+     *
+     * @param <T> The return type of the function.
+     * @return A function which prints the given throwable and returns null.
      */
     public static <T> Function<Throwable, T> exceptionLogger() {
         return throwable -> {
