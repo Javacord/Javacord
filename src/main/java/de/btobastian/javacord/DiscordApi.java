@@ -143,6 +143,14 @@ public interface DiscordApi {
     void updateGame(String name);
 
     /**
+     * Updates the game of this bot with any type.
+     *
+     * @param name The name of the game.
+     * @param type The type of the game.
+     */
+    void updateGame(String name, GameType type);
+
+    /**
      * Updates the game of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
      * The update might not be visible immediately as it's through the websocket and only a limited amount of
      * game status changes is allowed per minute.
