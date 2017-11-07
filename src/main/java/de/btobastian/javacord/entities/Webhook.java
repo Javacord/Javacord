@@ -1,8 +1,12 @@
 package de.btobastian.javacord.entities;
 
+import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents a webhook.
@@ -58,5 +62,16 @@ public interface Webhook extends DiscordEntity, IconHolder {
      * @return The secure token of the webhook.
      */
     String getToken();
+
+    /**
+     * Deletes the webhook.
+     *
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete() {
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(res -> null);
+    }
 
 }
