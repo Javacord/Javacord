@@ -36,7 +36,7 @@ public class MessageCreateHandler extends PacketHandler {
             if (channel instanceof ServerTextChannel) {
                 listeners.addAll(((ServerTextChannel) channel).getServer().getMessageCreateListeners());
             }
-            message.getAuthor().ifPresent(user -> listeners.addAll(user.getMessageCreateListeners()));
+            message.getUserAuthor().ifPresent(user -> listeners.addAll(user.getMessageCreateListeners()));
             listeners.addAll(api.getMessageCreateListeners());
 
             dispatchEvent(listeners, listener -> listener.onMessageCreate(event));
