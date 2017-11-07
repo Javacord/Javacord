@@ -4,6 +4,7 @@ import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.*;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -24,6 +25,7 @@ import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -293,6 +295,24 @@ public interface Server extends DiscordEntity, IconHolder {
                 .setBody(new JSONObject()
                         .put("owner_id", newOwner == null ? JSONObject.NULL : String.valueOf(newOwner.getId())))
                 .execute(res -> null);
+    }
+
+    /**
+     * Gets a list of all webhooks in this server.
+     *
+     * @return A list of all webhooks in this server.
+     */
+    default CompletableFuture<List<Webhook>> getWebhooks() {
+        return new RestRequest<List<Webhook>>(getApi(), HttpMethod.GET, RestEndpoint.SERVER_WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(res -> {
+                    List<Webhook> webhooks = new ArrayList<>();
+                    JSONArray webhooksJson = res.getBody().getArray();
+                    for (int i = 0; i < webhooksJson.length(); i++) {
+                        webhooks.add(new ImplWebhook(getApi(), webhooksJson.getJSONObject(i)));
+                    }
+                    return webhooks;
+                });
     }
 
     /**

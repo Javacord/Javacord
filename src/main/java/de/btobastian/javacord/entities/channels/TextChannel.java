@@ -3,6 +3,8 @@ package de.btobastian.javacord.entities.channels;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.Webhook;
+import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.entities.message.Messageable;
@@ -19,6 +21,7 @@ import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -284,6 +287,24 @@ public interface TextChannel extends Channel, Messageable {
                 PermissionType.READ_MESSAGES,
                 PermissionType.READ_MESSAGE_HISTORY,
                 PermissionType.ADD_REACTIONS);
+    }
+
+    /**
+     * Gets a list of all webhooks in this channel.
+     *
+     * @return A list of all webhooks in this channel.
+     */
+    default CompletableFuture<List<Webhook>> getWebhooks() {
+        return new RestRequest<List<Webhook>>(getApi(), HttpMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(res -> {
+                    List<Webhook> webhooks = new ArrayList<>();
+                    JSONArray webhooksJson = res.getBody().getArray();
+                    for (int i = 0; i < webhooksJson.length(); i++) {
+                        webhooks.add(new ImplWebhook(getApi(), webhooksJson.getJSONObject(i)));
+                    }
+                    return webhooks;
+                });
     }
 
     /**

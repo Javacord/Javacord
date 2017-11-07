@@ -27,7 +27,10 @@ public enum RestEndpoint {
     PINS("/channels/%s/pins", 0),
     SERVER_MEMBER("/guilds/%s/members/%s", 0),
     OWN_NICKNAME("/guilds/%s/members/@me/nick", 0),
-    SELF_INFO("/oauth2/applications/@me");
+    SELF_INFO("/oauth2/applications/@me"),
+    CHANNEL_WEBHOOK("/channels/%s/webhooks", 0),
+    SERVER_WEBHOOK("/guilds/%s/webhooks", 0),
+    WEBHOOK("/webhooks/%s");
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
