@@ -4,6 +4,7 @@ import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
+import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Permissions;
@@ -232,6 +233,18 @@ public interface DiscordApi {
     default CompletableFuture<ApplicationInfo> getApplicationInfo() {
         return new RestRequest<ApplicationInfo>(this, HttpMethod.GET, RestEndpoint.SELF_INFO)
                 .execute(res -> new ImplApplicationInfo(this, res.getBody().getObject()));
+    }
+
+    /**
+     * Gets a webhook by it's id.
+     *
+     * @param id The id of the webhook.
+     * @return The webhook with the given id.
+     */
+    default CompletableFuture<Webhook> getWebhookById(long id) {
+        return new RestRequest<Webhook>(this, HttpMethod.GET, RestEndpoint.WEBHOOK)
+                .setUrlParameters(String.valueOf(id))
+                .execute(res -> new ImplWebhook(this, res.getBody().getObject()));
     }
 
     /**
