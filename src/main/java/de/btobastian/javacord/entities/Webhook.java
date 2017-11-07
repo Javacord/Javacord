@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities;
 
 import com.mashape.unirest.http.HttpMethod;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -86,6 +87,19 @@ public interface Webhook extends DiscordEntity, IconHolder {
         return new RestRequest<Webhook>(getApi(), HttpMethod.PATCH, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
                 .setBody(new JSONObject().put("name", name))
+                .execute(res -> new ImplWebhook(getApi(), res.getBody().getObject()));
+    }
+
+    /**
+     * Updates the channel of the webhook.
+     *
+     * @param channel The new channel of the webhook.
+     * @return The updated webhook. The current object won't get updated!
+     */
+    default CompletableFuture<Webhook> updateChannel(ServerTextChannel channel) {
+        return new RestRequest<Webhook>(getApi(), HttpMethod.PATCH, RestEndpoint.WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .setBody(new JSONObject().put("channel_id", channel.getId()))
                 .execute(res -> new ImplWebhook(getApi(), res.getBody().getObject()));
     }
 
