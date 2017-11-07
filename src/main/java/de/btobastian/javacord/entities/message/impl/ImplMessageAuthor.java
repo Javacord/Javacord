@@ -37,7 +37,7 @@ public class ImplMessageAuthor implements MessageAuthor, IconHolder {
         this.id = Long.parseLong(data.getString("id"));
         this.name = data.getString("username");
         this.discriminator = data.getString("discriminator");
-        this.avatarId = data.getString("avatar");
+        this.avatarId = data.has("avatar") && !data.isNull("avatar") ? data.getString("avatar") : null;
 
         this.webhookId = webhookId;
     }
