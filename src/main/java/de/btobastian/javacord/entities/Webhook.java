@@ -8,7 +8,7 @@ import java.util.Optional;
  * This class represents a webhook.
  * Webhook objects won't receive any updates!
  */
-public interface Webhook extends DiscordEntity {
+public interface Webhook extends DiscordEntity, IconHolder {
 
     /**
      * Gets the server id of the webhook.
