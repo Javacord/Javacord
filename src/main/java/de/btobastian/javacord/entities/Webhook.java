@@ -6,8 +6,16 @@ import java.util.Optional;
 
 /**
  * This class represents a webhook.
+ * Webhook objects won't receive any updates!
  */
 public interface Webhook extends DiscordEntity {
+
+    /**
+     * Gets the server id of the webhook.
+     *
+     * @return The server id of the webhook.
+     */
+    Optional<Long> getServerId();
 
     /**
      * Gets the server of the webhook.
@@ -17,11 +25,18 @@ public interface Webhook extends DiscordEntity {
     Optional<Server> getServer();
 
     /**
+     * Gets the channel id of the webhook.
+     *
+     * @return The channel id of the webhook.
+     */
+    long getChannelId();
+
+    /**
      * Gets the channel of the webhook.
      *
      * @return The channel of the webhook.
      */
-    TextChannel getChannel();
+    Optional<TextChannel> getChannel();
 
     /**
      * Gets the creator of the webhook.
