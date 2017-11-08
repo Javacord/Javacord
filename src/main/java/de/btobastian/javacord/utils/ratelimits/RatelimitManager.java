@@ -110,15 +110,15 @@ public class RatelimitManager {
                             logger.warn("We got interrupted while waiting for a rate limit!", e);
                         }
                     }
-                    RestRequest<?> restRequest = queue.poll();
-                    boolean peek = true;
+                    RestRequest<?> restRequest = queue.peek();
+                    boolean remove = true;
                     try {
                         HttpResponse<JsonNode> response = restRequest.executeBlocking();
 
                         long currentTime = System.currentTimeMillis();
 
                         if (response.getStatus() == 429) {
-                            peek = false;
+                            remove = false;
                             logger.debug("Received a 429 response from Discord! Recalculating time offset...");
                             api.setTimeOffset(null);
 
@@ -147,8 +147,8 @@ public class RatelimitManager {
                     } catch (Exception e) {
                         restRequest.getResult().completeExceptionally(e);
                     }
-                    if (peek) {
-                        queue.peek();
+                    if (remove) {
+                        queue.poll();
                     }
                 }
             } catch (Throwable t) {
