@@ -43,7 +43,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId) {
         return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .setRatelimitRetries(25)
+                .setRatelimitRetries(250)
                 .execute(res -> {
                     api.getCachedMessageById(messageId).ifPresent(msg -> ((ImplMessage) msg).setDeleted(true));
                     return null;
@@ -178,7 +178,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, String unicodeEmoji) {
         return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), unicodeEmoji, "@me")
-                .setRatelimitRetries(50)
+                .setRatelimitRetries(500)
                 .execute(res -> null);
     }
 
@@ -219,7 +219,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         );
         return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), value, "@me")
-                .setRatelimitRetries(50)
+                .setRatelimitRetries(500)
                 .execute(res -> null);
     }
 

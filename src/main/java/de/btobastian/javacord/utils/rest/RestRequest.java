@@ -40,7 +40,7 @@ public class RestRequest<T> {
     private final RestEndpoint endpoint;
 
     private boolean includeAuthorizationHeader = true;
-    private int ratelimitRetries = 5;
+    private int ratelimitRetries = 50;
     private String[] urlParameters = new String[0];
     private List<String[]> queryParameters = new ArrayList<>();
     private String body = null;

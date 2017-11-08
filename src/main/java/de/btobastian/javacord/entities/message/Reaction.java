@@ -33,7 +33,7 @@ public interface Reaction {
         return new RestRequest<List<User>>(api, HttpMethod.GET, RestEndpoint.REACTION)
                 .setUrlParameters(
                         String.valueOf(channelId), String.valueOf(messageId), value)
-                .setRatelimitRetries(25)
+                .setRatelimitRetries(250)
                 .execute(res -> {
                     List<User> users = new ArrayList<>();
                     JSONArray usersJson = res.getBody().getArray();
@@ -82,7 +82,7 @@ public interface Reaction {
                         String.valueOf(messageId),
                         value,
                         user.isYourself() ? "@me" : String.valueOf(user.getId()))
-                .setRatelimitRetries(25)
+                .setRatelimitRetries(250)
                 .execute(res -> null);
     }
 
