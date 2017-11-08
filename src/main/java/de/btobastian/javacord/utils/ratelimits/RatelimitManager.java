@@ -80,6 +80,10 @@ public class RatelimitManager {
         if (!startScheduler) {
             return;
         }
+        int delay = bucket.getTimeTillSpaceGetsAvailable();
+        if (delay > 0) {
+            logger.debug("Delaying requests to {} for {}ms to prevent hitting ratelimits", bucket, delay);
+        }
         // Start a scheduler to work off the queue
         scheduler.schedule(() -> api.getThreadPool().getExecutorService().submit(() -> {
             try {
@@ -104,6 +108,7 @@ public class RatelimitManager {
                         try {
                             int sleepTime = bucket.getTimeTillSpaceGetsAvailable();
                             if (sleepTime > 0) {
+                                logger.debug("Delaying requests to {} for {}ms to prevent hitting ratelimits", bucket, sleepTime);
                                 Thread.sleep(sleepTime);
                             }
                         } catch (InterruptedException e) {
@@ -158,7 +163,7 @@ public class RatelimitManager {
                     bucket.setHasActiveScheduler(false);
                 }
             }
-        }), bucket.getTimeTillSpaceGetsAvailable(), TimeUnit.MILLISECONDS);
+        }), delay, TimeUnit.MILLISECONDS);
     }
 
     private void calculateOffset(long currentTime, HttpResponse<?> response) {
