@@ -1,8 +1,21 @@
 package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
-import de.btobastian.javacord.entities.*;
-import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.ApplicationInfo;
+import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.Webhook;
+import de.btobastian.javacord.entities.channels.Channel;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
+import de.btobastian.javacord.entities.channels.GroupChannel;
+import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerChannel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.TextChannel;
+import de.btobastian.javacord.entities.channels.VoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
@@ -14,8 +27,18 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.*;
-import de.btobastian.javacord.listeners.server.channel.*;
+import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
+import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
+import de.btobastian.javacord.listeners.server.ServerJoinListener;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
@@ -31,7 +54,13 @@ import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -97,7 +126,7 @@ public interface DiscordApi {
      * Sets the cache size of all caches.
      * This settings are applied on a per-channel basis.
      * It overrides all previous settings, so it's recommended to directly set it after logging in, if you want to
-     * change apply some channel specific channel settings, too.
+     * change some channel specific cache settings, too.
      * Please notice that the cache is cleared only once every minute!
      *
      * @param capacity The capacity of the message cache.
