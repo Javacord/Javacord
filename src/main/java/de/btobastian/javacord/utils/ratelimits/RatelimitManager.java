@@ -153,7 +153,7 @@ public class RatelimitManager {
                         restRequest.getResult().completeExceptionally(e);
                     }
                     if (remove) {
-                        queue.poll();
+                        queue.remove(restRequest);
                     }
                 }
             } catch (Throwable t) {
