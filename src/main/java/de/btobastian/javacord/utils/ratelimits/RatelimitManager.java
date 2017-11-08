@@ -122,6 +122,10 @@ public class RatelimitManager {
 
                         long currentTime = System.currentTimeMillis();
 
+                        if (api.getTimeOffset() == null) {
+                            calculateOffset(currentTime, response);
+                        }
+
                         if (response.getStatus() == 429) {
                             remove = false;
                             logger.debug("Received a 429 response from Discord! Recalculating time offset...");
@@ -129,12 +133,16 @@ public class RatelimitManager {
 
                             int retryAfter = response.getBody().getObject().getInt("retry_after");
                             bucket.setRateLimitRemaining(0);
-                            bucket.setRateLimitResetTimestamp(System.currentTimeMillis() + retryAfter);
+                            bucket.setRateLimitResetTimestamp(currentTime + retryAfter);
                         } else {
                             restRequest.getResult().complete(response);
 
                             String remaining = response.getHeaders().getFirst("X-RateLimit-Remaining");
-                            String reset = response.getHeaders().getFirst("X-RateLimit-Reset");
+                            long reset = restRequest
+                                    .getEndpoint()
+                                    .getHardcodedRatelimit()
+                                    .map(ratelimit -> currentTime + api.getTimeOffset() + ratelimit)
+                                    .orElseGet(() -> Long.parseLong(response.getHeaders().getFirst("X-RateLimit-Reset")) * 1000);
                             String global = response.getHeaders().getFirst("X-RateLimit-Global");
 
                             if (global != null && global.equals("true")) {
@@ -143,11 +151,7 @@ public class RatelimitManager {
                             }
 
                             bucket.setRateLimitRemaining(Integer.parseInt(remaining));
-                            bucket.setRateLimitResetTimestamp(Long.parseLong(reset) * 1000);
-                        }
-
-                        if (api.getTimeOffset() == null) {
-                            calculateOffset(currentTime, response);
+                            bucket.setRateLimitResetTimestamp(reset);
                         }
                     } catch (Exception e) {
                         restRequest.getResult().completeExceptionally(e);
