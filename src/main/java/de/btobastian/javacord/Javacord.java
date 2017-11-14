@@ -1,6 +1,8 @@
 package de.btobastian.javacord;
 
 import com.mashape.unirest.http.Unirest;
+import de.btobastian.javacord.utils.logging.LoggerUtil;
+import org.slf4j.Logger;
 
 import java.util.function.Function;
 
@@ -8,6 +10,11 @@ import java.util.function.Function;
  * This class contains some static information about Javacord.
  */
 public class Javacord {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(Javacord.class);
 
     /**
      * The current javacord version.
@@ -46,7 +53,7 @@ public class Javacord {
      */
     public static <T> Function<Throwable, T> exceptionLogger() {
         return throwable -> {
-            throwable.printStackTrace();
+            logger.error("Caught unhandled exception!", throwable);
             return null;
         };
     }
