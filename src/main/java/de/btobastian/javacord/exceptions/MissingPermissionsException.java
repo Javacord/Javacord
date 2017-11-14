@@ -12,12 +12,14 @@ public class MissingPermissionsException extends DiscordException {
     /**
      * Creates a new instance of this class.
      *
+     * @param origin The origin of the exception.
      * @param message The message of the exception.
      * @param response The response which caused the exception.
      * @param request The request.
      */
-    public MissingPermissionsException(String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
-        super(message, response, request);
+    public MissingPermissionsException(
+            Exception origin, String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
+        super(origin, message, response, request);
     }
 
 }

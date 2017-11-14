@@ -65,6 +65,11 @@ public class RestRequest<T> {
     private String customMajorParam = null;
 
     /**
+     * The origin of the rest request.
+     */
+    private final Exception origin;
+
+    /**
      * Creates a new instance of this class.
      *
      * @param api The api which will be used to execute the request.
@@ -75,6 +80,8 @@ public class RestRequest<T> {
         this.api = api;
         this.method = method;
         this.endpoint = endpoint;
+
+        this.origin = new Exception();
     }
 
     /**
@@ -140,6 +147,15 @@ public class RestRequest<T> {
             return Optional.empty();
         }
         return Optional.of(urlParameters[majorParameterPosition.get()]);
+    }
+
+    /**
+     * Gets the origin of the rest request.
+     *
+     * @return The origin of the rest request.
+     */
+    public Exception getOrigin() {
+        return origin;
     }
 
     /**
@@ -376,7 +392,7 @@ public class RestRequest<T> {
                         ? null : response.getBody().getObject().getString("message");
                 switch (code) {
                     case 50007:
-                        throw new CannotMessageUserException(
+                        throw new CannotMessageUserException(origin,
                                 message == null ? "Cannot send message to this user" : message, response, this);
                 }
             }
@@ -385,11 +401,11 @@ public class RestRequest<T> {
                     // A 429 will be handled in the RatelimitManager class
                     return response;
                 case 403:
-                    throw new MissingPermissionsException(
+                    throw new MissingPermissionsException(origin,
                             "Received a " + response.getStatus() + " response from Discord with body "
                                     + response.getBody().toString() + "!", response, this);
                 default:
-                    throw new DiscordException(
+                    throw new DiscordException(origin,
                             "Received a " + response.getStatus() + " response from Discord with body "
                                     + response.getBody().toString() + "!", response, this);
             }

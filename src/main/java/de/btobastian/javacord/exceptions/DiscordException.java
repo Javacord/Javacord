@@ -24,12 +24,13 @@ public class DiscordException extends Exception {
     /**
      * Creates a new instance of this class.
      *
+     * @param origin The origin of the exception.
      * @param message The message of the exception.
      * @param response The response which caused the exception.
      * @param request The request.
      */
-    public DiscordException(String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
-        super(message);
+    public DiscordException(Exception origin, String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
+        super(message, origin);
         this.response = response;
         this.request = request;
     }
