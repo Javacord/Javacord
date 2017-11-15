@@ -56,12 +56,17 @@ public class ImplServerTextChannel implements ServerTextChannel {
     /**
      * Whether the channel is "not safe for work" or not.
      */
-    private boolean nsfw = false;
+    private boolean nsfw;
 
     /**
      * The parent id of the channel.
      */
     private long parentId;
+
+    /**
+     * The topic of the channel.
+     */
+    private String topic;
 
     /**
      * A map with all overwritten user permissions.
@@ -91,6 +96,7 @@ public class ImplServerTextChannel implements ServerTextChannel {
         position = data.getInt("position");
         nsfw = data.has("nsfw") && data.getBoolean("nsfw");
         parentId = Long.valueOf(data.optString("parent_id", "-1"));
+        topic = data.has("topic") && !data.isNull("topic") ? data.getString("topic") : "";
 
         JSONArray permissionOverwritesJson = data.optJSONArray("permission_overwrites");
         permissionOverwritesJson = permissionOverwritesJson == null ? new JSONArray() : permissionOverwritesJson;
@@ -167,6 +173,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public Optional<ChannelCategory> getCategory() {
         return getServer().getChannelCategoryById(parentId);
+    }
+
+    @Override
+    public String getTopic() {
+        return topic;
     }
 
     @Override

@@ -36,6 +36,13 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     Optional<ChannelCategory> getCategory();
 
     /**
+     * Gets the topic of the channel.
+     *
+     * @return The topic of the channel.
+     */
+    String getTopic();
+
+    /**
      * Updates the topic of the channel.
      *
      * @param topic The new topic of the channel.
