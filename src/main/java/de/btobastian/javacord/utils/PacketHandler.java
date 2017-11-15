@@ -24,7 +24,6 @@ public abstract class PacketHandler {
     private final String type;
     private final boolean async;
     private ExecutorService executorService;
-    protected final ExecutorService listenerExecutorService;
 
     /**
      * Creates a new instance of this class.
@@ -40,7 +39,6 @@ public abstract class PacketHandler {
         if (async) {
             executorService = api.getThreadPool().getSingleThreadExecutorService("handlers");
         }
-        listenerExecutorService = api.getThreadPool().getSingleThreadExecutorService("listeners");
     }
 
     /**
@@ -81,15 +79,10 @@ public abstract class PacketHandler {
      * @param listeners The listeners for the event.
      * @param consumer The consumer which consumes the listeners and calls the event.
      * @param <T> The listener class.
+     * @see DiscordWebsocketAdapter#dispatchEvent(List, Consumer)
      */
     protected <T> void dispatchEvent(List<T> listeners, Consumer<T> consumer) {
-        listenerExecutorService.submit(() -> listeners.stream().forEach(listener -> {
-            try {
-                consumer.accept(listener);
-            } catch (Throwable t) {
-                logger.error("An error occurred while calling a listener method!", t);
-            }
-        }));
+        api.getWebSocketAdapter().dispatchEvent(listeners, consumer);
     }
 
     /**

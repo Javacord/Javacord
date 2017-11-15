@@ -1,44 +1,24 @@
 package de.btobastian.javacord;
 
 import com.mashape.unirest.http.HttpMethod;
-import de.btobastian.javacord.entities.ApplicationInfo;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.GameType;
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.Webhook;
-import de.btobastian.javacord.entities.channels.Channel;
-import de.btobastian.javacord.entities.channels.ChannelCategory;
-import de.btobastian.javacord.entities.channels.GroupChannel;
-import de.btobastian.javacord.entities.channels.PrivateChannel;
-import de.btobastian.javacord.entities.channels.ServerChannel;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
-import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.channels.VoiceChannel;
+import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.connection.LostConnectionListener;
+import de.btobastian.javacord.listeners.connection.ReconnectListener;
+import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerJoinListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.server.*;
+import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
@@ -54,13 +34,7 @@ import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -1736,5 +1710,47 @@ public interface DiscordApi {
      * @return A list with all registered user change nickname listeners.
      */
     List<UserChangeNicknameListener> getUserChangeNicknameListeners();
+
+    /**
+     * Adds a listener, which listens to connection losses.
+     *
+     * @param listener The listener to add.
+     */
+    void addLostConnectionListener(LostConnectionListener listener);
+
+    /**
+     * Gets a list with all registered lost connection listeners.
+     *
+     * @return A list with all registered lost connection listeners.
+     */
+    List<LostConnectionListener> getLostConnectionListeners();
+
+    /**
+     * Adds a listener, which listens to reconnects.
+     *
+     * @param listener The listener to add.
+     */
+    void addReconnectListener(ReconnectListener listener);
+
+    /**
+     * Gets a list with all registered reconnect listeners.
+     *
+     * @return A list with all registered reconnect listeners.
+     */
+    List<ReconnectListener> getReconnectListeners();
+
+    /**
+     * Adds a listener, which listens to resumes.
+     *
+     * @param listener The listener to add.
+     */
+    void addResumeListener(ResumeListener listener);
+
+    /**
+     * Gets a list with all registered resume listeners.
+     *
+     * @return A list with all registered resume listeners.
+     */
+    List<ResumeListener> getResumeListeners();
 
 }

@@ -4,6 +4,12 @@ import com.neovisionaries.ws.client.*;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.events.connection.LostConnectionEvent;
+import de.btobastian.javacord.events.connection.ReconnectEvent;
+import de.btobastian.javacord.events.connection.ResumeEvent;
+import de.btobastian.javacord.listeners.connection.LostConnectionListener;
+import de.btobastian.javacord.listeners.connection.ReconnectListener;
+import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.ResumedHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
@@ -32,7 +38,9 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -65,12 +73,16 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     private long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
+    private final ExecutorService listenerExecutorService;
+
     // A reconnect attempt counter
     private int reconnectAttempt = 0;
 
     public DiscordWebsocketAdapter(DiscordApi api, String gateway) {
         this.api = api;
         this.gateway = gateway;
+
+        this.listenerExecutorService = api.getThreadPool().getSingleThreadExecutorService("listeners");
 
         registerHandlers();
 
@@ -139,6 +151,11 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
             }
         }
 
+        LostConnectionEvent lostConnectionEvent = new LostConnectionEvent(api);
+        List<LostConnectionListener> listeners = new ArrayList<>();
+        listeners.addAll(api.getLostConnectionListeners());
+        dispatchEvent(listeners, listener -> listener.onLostConnection(lostConnectionEvent));
+
         if (!ready.isDone()) {
             ready.complete(false);
             return;
@@ -185,6 +202,11 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     logger.debug("Received RESUMED packet");
+
+                    ResumeEvent resumeEvent = new ResumeEvent(api);
+                    List<ResumeListener> listeners = new ArrayList<>();
+                    listeners.addAll(api.getResumeListeners());
+                    dispatchEvent(listeners, listener -> listener.onResume(resumeEvent));
                 }
                 if (type.equals("READY")) {
                     reconnectAttempt = 0;
@@ -223,6 +245,10 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                                 Thread.sleep(100);
                             } catch (InterruptedException ignored) { }
                         }
+                        ReconnectEvent reconnectEvent = new ReconnectEvent(api);
+                        List<ReconnectListener> listeners = new ArrayList<>();
+                        listeners.addAll(api.getReconnectListeners());
+                        dispatchEvent(listeners, listener -> listener.onReconnect(reconnectEvent));
                         ready.complete(true);
                     });
                     logger.debug("Received READY packet");
@@ -427,6 +453,23 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      */
     public CompletableFuture<Boolean> isReady() {
         return ready;
+    }
+
+    /**
+     * Dispatches an event in a the listener thread.
+     *
+     * @param listeners The listeners for the event.
+     * @param consumer The consumer which consumes the listeners and calls the event.
+     * @param <T> The listener class.
+     */
+    protected <T> void dispatchEvent(List<T> listeners, Consumer<T> consumer) {
+        listenerExecutorService.submit(() -> listeners.stream().forEach(listener -> {
+            try {
+                consumer.accept(listener);
+            } catch (Throwable t) {
+                logger.error("An error occurred while calling a listener method!", t);
+            }
+        }));
     }
 
     /**

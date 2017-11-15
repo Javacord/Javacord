@@ -13,6 +13,9 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.listeners.connection.LostConnectionListener;
+import de.btobastian.javacord.listeners.connection.ReconnectListener;
+import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -906,5 +909,35 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
         return getListeners(UserChangeNicknameListener.class);
+    }
+
+    @Override
+    public void addLostConnectionListener(LostConnectionListener listener) {
+        addListener(LostConnectionListener.class, listener);
+    }
+
+    @Override
+    public List<LostConnectionListener> getLostConnectionListeners() {
+        return getListeners(LostConnectionListener.class);
+    }
+
+    @Override
+    public void addReconnectListener(ReconnectListener listener) {
+        addListener(ReconnectListener.class, listener);
+    }
+
+    @Override
+    public List<ReconnectListener> getReconnectListeners() {
+        return getListeners(ReconnectListener.class);
+    }
+
+    @Override
+    public void addResumeListener(ResumeListener listener) {
+        addListener(ResumeListener.class, listener);
+    }
+
+    @Override
+    public List<ResumeListener> getResumeListeners() {
+        return getListeners(ResumeListener.class);
     }
 }
