@@ -1753,4 +1753,18 @@ public interface DiscordApi {
      */
     List<ResumeListener> getResumeListeners();
 
+    /**
+     * Adds a listener, which listens to server text channel topic changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener);
+
+    /**
+     * Gets a list with all registered server text channel change topic listeners.
+     *
+     * @return A list with all registered server text channel change topic listeners.
+     */
+    List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners();
+
 }

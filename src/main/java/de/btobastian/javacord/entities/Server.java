@@ -1113,4 +1113,24 @@ public interface Server extends DiscordEntity, IconHolder {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeNicknameListener.class);
     }
 
+    /**
+     * Adds a listener, which listens to server text channel topic changes in this server.
+     *
+     * @param listener The listener to add.
+     */
+    default void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), ServerTextChannelChangeTopicListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server text channel change topic listeners.
+     *
+     * @return A list with all registered server text channel change topic listeners.
+     */
+    default List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(Server.class, getId(), ServerTextChannelChangeTopicListener.class);
+    }
+
 }

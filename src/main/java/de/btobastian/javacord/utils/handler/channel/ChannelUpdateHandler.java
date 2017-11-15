@@ -13,20 +13,16 @@ import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeNameEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeOverwrittenPermissionsEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangePositionEvent;
+import de.btobastian.javacord.events.server.channel.ServerTextChannelChangeTopicEvent;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
+import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.utils.PacketHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -228,11 +224,28 @@ public class ChannelUpdateHandler extends PacketHandler {
     /**
      * Handles a server text channel update.
      *
-     * @param channel The channel data.
+     * @param jsonChannel The json channel data.
      */
-    private void handleServerTextChannel(JSONObject channel) {
-        long serverId = Long.parseLong(channel.getString("guild_id"));
+    private void handleServerTextChannel(JSONObject jsonChannel) {
+        long channelId = Long.parseLong(jsonChannel.getString("id"));
+        api.getTextChannelById(channelId).map(c -> ((ImplServerTextChannel) c)).ifPresent(channel -> {
+            String oldTopic = channel.getTopic();
+            String newTopic =
+                    jsonChannel.has("topic") && !jsonChannel.isNull("topic") ? jsonChannel.getString("topic") : "";
+            if (!oldTopic.equals(newTopic)) {
+                channel.setTopic(newTopic);
 
+                ServerTextChannelChangeTopicEvent event =
+                        new ServerTextChannelChangeTopicEvent(channel, newTopic, oldTopic);
+
+                List<ServerTextChannelChangeTopicListener> listeners = new ArrayList<>();
+                listeners.addAll(channel.getServerTextChannelChangeTopicListeners());
+                listeners.addAll(channel.getServer().getServerTextChannelChangeTopicListeners());
+                listeners.addAll(api.getServerTextChannelChangeTopicListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerTextChannelChangeTopic(event));
+            }
+        });
     }
 
     /**

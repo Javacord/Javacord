@@ -138,6 +138,15 @@ public class ImplServerTextChannel implements ServerTextChannel {
     }
 
     /**
+     * Sets the topic of the channel.
+     *
+     * @param topic The new topic of the channel.
+     */
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    /**
      * Gets the overwritten role permissions.
      *
      * @return The overwritten role permissions.

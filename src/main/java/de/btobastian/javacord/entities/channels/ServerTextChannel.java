@@ -1,13 +1,16 @@
 package de.btobastian.javacord.entities.channels;
 
 import com.mashape.unirest.http.HttpMethod;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionType;
+import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -100,6 +103,26 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     default boolean canWrite(User user) {
         return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
                 hasPermissions(user, PermissionType.READ_MESSAGES, PermissionType.SEND_MESSAGES);
+    }
+
+    /**
+     * Adds a listener, which listens to topic changes of this channel.
+     *
+     * @param listener The listener to add.
+     */
+    default void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerTextChannel.class, getId(), ServerTextChannelChangeTopicListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server text channel change topic listeners.
+     *
+     * @return A list with all registered server text channel change topic listeners.
+     */
+    default List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(ServerTextChannel.class, getId(), ServerTextChannelChangeTopicListener.class);
     }
 
 }

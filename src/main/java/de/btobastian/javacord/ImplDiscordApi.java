@@ -940,4 +940,14 @@ public class ImplDiscordApi implements DiscordApi {
     public List<ResumeListener> getResumeListeners() {
         return getListeners(ResumeListener.class);
     }
+
+    @Override
+    public void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener) {
+        addListener(ServerTextChannelChangeTopicListener.class, listener);
+    }
+
+    @Override
+    public List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners() {
+        return getListeners(ServerTextChannelChangeTopicListener.class);
+    }
 }
