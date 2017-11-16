@@ -12,6 +12,7 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.permissions.PermissionType;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
@@ -482,6 +483,20 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A list which contains all reactions of the message.
      */
     List<Reaction> getReactions();
+
+    /**
+     * Gets a list with all users mentioned in this message.
+     *
+     * @return A list with all users mentioned in this message.
+     */
+    List<User> getMentionedUsers();
+
+    /**
+     * Gets a list with all roles mentioned in this message.
+     *
+     * @return A list with all roles mentioned in this message.
+     */
+    List<Role> getMentionedRoles();
 
     /**
      * Gets a reaction by it's emoji.

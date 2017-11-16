@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.message.*;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -95,6 +96,16 @@ public class ImplMessage implements Message {
     private List<MessageAttachment> attachments = new ArrayList<>();
 
     /**
+     * The users mentioned in this message.
+     */
+    private List<User> mentions = new ArrayList<>();
+
+    /**
+     * The roles mentioned in this message.
+     */
+    private List<Role> roleMentions = new ArrayList<>();
+
+    /**
      * Creates a new message object.
      *
      * @param api The discord api instance.
@@ -136,6 +147,20 @@ public class ImplMessage implements Message {
             MessageAttachment attachment = new ImplMessageAttachment(this, attachmentsJson.getJSONObject(i));
             attachments.add(attachment);
         }
+
+        JSONArray mentionsJson = data.getJSONArray("mentions");
+        for (int i = 0; i < mentionsJson.length(); i++) {
+            User user = api.getOrCreateUser(mentionsJson.getJSONObject(i));
+            mentions.add(user);
+        }
+
+        getServer().ifPresent(server -> {
+            JSONArray roleMentionsJson = data.has("mention_roles") && !data.isNull("mention_roles") ?
+                    data.getJSONArray("mention_roles") : new JSONArray();
+            for (int i = 0; i < roleMentionsJson.length(); i++) {
+                server.getRoleById(roleMentionsJson.getString(i)).ifPresent(roleMentions::add);
+            }
+        });
     }
 
     /**
@@ -295,6 +320,16 @@ public class ImplMessage implements Message {
     @Override
     public List<Reaction> getReactions() {
         return new ArrayList<>(reactions);
+    }
+
+    @Override
+    public List<User> getMentionedUsers() {
+        return mentions;
+    }
+
+    @Override
+    public List<Role> getMentionedRoles() {
+        return roleMentions;
     }
 
     @Override
