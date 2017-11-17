@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.message;
 
+import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.*;
 
 import java.util.Optional;
@@ -88,6 +89,16 @@ public interface MessageAuthor extends DiscordEntity {
             return Optional.of(getApi().getWebhookById(getId()));
         }
         return Optional.empty();
+    }
+
+    /**
+     * Gets if this author is the user of the connected account.
+     *
+     * @return Whether this author is the user of the connected account or not.
+     * @see DiscordApi#getYourself()
+     */
+    default boolean isYourself() {
+        return getApi().getYourself().getId() == getId();
     }
 
 }
