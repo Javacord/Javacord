@@ -90,6 +90,13 @@ public interface Server extends DiscordEntity {
     User getOwner();
 
     /**
+     * Gets the verification level of the server.
+     *
+     * @return The verification level of the server.
+     */
+    VerificationLevel getVerificationLevel();
+
+    /**
      * Gets the icon of the server.
      *
      * @return The icon of the server.

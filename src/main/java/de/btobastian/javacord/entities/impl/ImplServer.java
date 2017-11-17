@@ -65,6 +65,11 @@ public class ImplServer implements Server {
     private long ownerId;
 
     /**
+     * The verification level of the server.
+     */
+    private VerificationLevel verificationLevel;
+
+    /**
      * The amount of members in this server.
      */
     private int memberCount = -1;
@@ -119,6 +124,7 @@ public class ImplServer implements Server {
         large = data.getBoolean("large");
         memberCount = data.getInt("member_count");
         ownerId = Long.parseLong(data.getString("owner_id"));
+        verificationLevel = VerificationLevel.fromId(data.getInt("verification_level"));
         if (data.has("icon") && !data.isNull("icon")) {
             iconId = data.getString("icon");
         }
@@ -434,6 +440,11 @@ public class ImplServer implements Server {
     public User getOwner() {
         return api.getUserById(ownerId)
                 .orElseThrow(() -> new IllegalStateException("Owner of server " + toString() + " is not cached!"));
+    }
+
+    @Override
+    public VerificationLevel getVerificationLevel() {
+        return verificationLevel;
     }
 
     @Override
