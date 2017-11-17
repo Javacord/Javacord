@@ -18,6 +18,7 @@ public enum RestEndpoint {
     MESSAGE_DELETE("/channels/%s/messages", 0),
     MESSAGES_BULK_DELETE("/channels/%s/messages/bulk-delete", 0),
     CHANNEL_TYPING("/channels/%s/typing", 0),
+    CHANNEL_INVITE("/channels/%s/invites", 0),
     USER_CHANNEL("/users/@me/channels"),
     CHANNEL("/channels/%s", 0),
     ROLE("/guilds/%s/roles/%s", 0),
@@ -31,7 +32,9 @@ public enum RestEndpoint {
     SELF_INFO("/oauth2/applications/@me"),
     CHANNEL_WEBHOOK("/channels/%s/webhooks", 0),
     SERVER_WEBHOOK("/guilds/%s/webhooks", 0),
-    WEBHOOK("/webhooks/%s");
+    SERVER_INVITE("/guilds/%s/invites", 0),
+    WEBHOOK("/webhooks/%s"),
+    INVITE("/invites/%s");
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".

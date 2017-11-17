@@ -4,6 +4,7 @@ import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
+import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -256,6 +257,18 @@ public interface DiscordApi {
      * @return A collection with the ids of all unavailable servers.
      */
     Collection<Long> getUnavailableServers();
+
+    /**
+     * Gets an invite by it's code.
+     *
+     * @param code The code of the invite.
+     * @return The invite with the given code.
+     */
+    default CompletableFuture<Invite> getInviteByCode(String code) {
+        return new RestRequest<Invite>(this, HttpMethod.GET, RestEndpoint.INVITE)
+                .setUrlParameters(code)
+                .execute(res -> new ImplInvite(this, res.getBody().getObject()));
+    }
 
     /**
      * Gets a collection with all users the bot knows of.

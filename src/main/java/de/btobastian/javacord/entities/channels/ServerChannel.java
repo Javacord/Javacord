@@ -2,8 +2,10 @@ package de.btobastian.javacord.entities.channels;
 
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.RichInvite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.permissions.*;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
@@ -12,12 +14,10 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -57,6 +57,24 @@ public interface ServerChannel extends Channel {
      */
     default int getPosition() {
         return getServer().getChannels().indexOf(this);
+    }
+
+    /**
+     * Gets the invites of the server.
+     *
+     * @return The invites of the server.
+     */
+    default CompletableFuture<Collection<RichInvite>> getInvites() {
+        return new RestRequest<Collection<RichInvite>>(getApi(), HttpMethod.GET, RestEndpoint.CHANNEL_INVITE)
+                .setUrlParameters(getIdAsString())
+                .execute(res -> {
+                    Collection<RichInvite> invites = new HashSet<>();
+                    JSONArray invitesJson = res.getBody().getArray();
+                    for (int i = 0; i < invitesJson.length(); i++) {
+                        invites.add(new ImplInvite(getApi(), invitesJson.getJSONObject(i)));
+                    }
+                    return invites;
+                });
     }
 
     /**

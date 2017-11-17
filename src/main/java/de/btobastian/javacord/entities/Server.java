@@ -2,7 +2,9 @@ package de.btobastian.javacord.entities;
 
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.RichInvite;
 import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -100,6 +102,24 @@ public interface Server extends DiscordEntity {
      * @return The splash of the server.
      */
     Optional<Icon> getSplash();
+
+    /**
+     * Gets the invites of the server.
+     *
+     * @return The invites of the server.
+     */
+    default CompletableFuture<Collection<RichInvite>> getInvites() {
+        return new RestRequest<Collection<RichInvite>>(getApi(), HttpMethod.GET, RestEndpoint.SERVER_INVITE)
+                .setUrlParameters(getIdAsString())
+                .execute(res -> {
+                    Collection<RichInvite> invites = new HashSet<>();
+                    JSONArray invitesJson = res.getBody().getArray();
+                    for (int i = 0; i < invitesJson.length(); i++) {
+                        invites.add(new ImplInvite(getApi(), invitesJson.getJSONObject(i)));
+                    }
+                    return invites;
+                });
+    }
 
     /**
      * Gets a sorted list (by position) with all roles of the server.
