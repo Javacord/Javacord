@@ -105,6 +105,13 @@ public interface Server extends DiscordEntity {
     ExplicitContentFilterLevel getExplicitContentFilterLevel();
 
     /**
+     * Gets the default message notification level of the server.
+     *
+     * @return The default message notification level of the server.
+     */
+    DefaultMessageNotificationLevel getDefaultMessageNotificationLevel();
+
+    /**
      * Gets the icon of the server.
      *
      * @return The icon of the server.

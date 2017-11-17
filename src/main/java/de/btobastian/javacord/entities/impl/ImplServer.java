@@ -76,6 +76,11 @@ public class ImplServer implements Server {
     private ExplicitContentFilterLevel explicitContentFilterLevel;
 
     /**
+     * The default message notification level of the server.
+     */
+    private DefaultMessageNotificationLevel defaultMessageNotificationLevel;
+
+    /**
      * The amount of members in this server.
      */
     private int memberCount = -1;
@@ -132,6 +137,8 @@ public class ImplServer implements Server {
         ownerId = Long.parseLong(data.getString("owner_id"));
         verificationLevel = VerificationLevel.fromId(data.getInt("verification_level"));
         explicitContentFilterLevel = ExplicitContentFilterLevel.fromId(data.getInt("explicit_content_filter"));
+        defaultMessageNotificationLevel =
+                DefaultMessageNotificationLevel.fromId(data.getInt("default_message_notifications"));
         if (data.has("icon") && !data.isNull("icon")) {
             iconId = data.getString("icon");
         }
@@ -457,6 +464,11 @@ public class ImplServer implements Server {
     @Override
     public ExplicitContentFilterLevel getExplicitContentFilterLevel() {
         return explicitContentFilterLevel;
+    }
+
+    @Override
+    public DefaultMessageNotificationLevel getDefaultMessageNotificationLevel() {
+        return defaultMessageNotificationLevel;
     }
 
     @Override
