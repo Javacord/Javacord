@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.impl;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
@@ -70,6 +71,11 @@ public class ImplServer implements Server {
     private VerificationLevel verificationLevel;
 
     /**
+     * The explicit content filter level of the server.
+     */
+    private ExplicitContentFilterLevel explicitContentFilterLevel;
+
+    /**
      * The amount of members in this server.
      */
     private int memberCount = -1;
@@ -125,6 +131,7 @@ public class ImplServer implements Server {
         memberCount = data.getInt("member_count");
         ownerId = Long.parseLong(data.getString("owner_id"));
         verificationLevel = VerificationLevel.fromId(data.getInt("verification_level"));
+        explicitContentFilterLevel = ExplicitContentFilterLevel.fromId(data.getInt("explicit_content_filter"));
         if (data.has("icon") && !data.isNull("icon")) {
             iconId = data.getString("icon");
         }
@@ -445,6 +452,11 @@ public class ImplServer implements Server {
     @Override
     public VerificationLevel getVerificationLevel() {
         return verificationLevel;
+    }
+
+    @Override
+    public ExplicitContentFilterLevel getExplicitContentFilterLevel() {
+        return explicitContentFilterLevel;
     }
 
     @Override

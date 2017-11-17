@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities;
 
 import com.mashape.unirest.http.HttpMethod;
+import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.RichInvite;
 import de.btobastian.javacord.entities.channels.*;
@@ -95,6 +96,13 @@ public interface Server extends DiscordEntity {
      * @return The verification level of the server.
      */
     VerificationLevel getVerificationLevel();
+
+    /**
+     * Gets the explicit content filter level of the server.
+     *
+     * @return The explicit content filter level of the server.
+     */
+    ExplicitContentFilterLevel getExplicitContentFilterLevel();
 
     /**
      * Gets the icon of the server.
