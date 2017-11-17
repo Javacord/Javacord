@@ -95,6 +95,13 @@ public interface Server extends DiscordEntity {
     Optional<Icon> getIcon();
 
     /**
+     * Gets the splash of the server.
+     *
+     * @return The splash of the server.
+     */
+    Optional<Icon> getSplash();
+
+    /**
      * Gets a sorted list (by position) with all roles of the server.
      *
      * @return A sorted list (by position) with all roles of the server.

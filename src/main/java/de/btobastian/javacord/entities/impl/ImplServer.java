@@ -75,6 +75,11 @@ public class ImplServer implements Server {
     private String iconId;
 
     /**
+     * The splash of the server. Might be <code>null</code>.
+     */
+    private String splash;
+
+    /**
      * A map with all roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
@@ -116,6 +121,9 @@ public class ImplServer implements Server {
         ownerId = Long.parseLong(data.getString("owner_id"));
         if (data.has("icon") && !data.isNull("icon")) {
             iconId = data.getString("icon");
+        }
+        if (data.has("splash") && !data.isNull("splash")) {
+            splash = data.getString("splash");
         }
 
         if (data.has("channels")) {
@@ -436,6 +444,20 @@ public class ImplServer implements Server {
         try {
             return Optional.of(new ImplIcon(
                     getApi(), new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconId + ".png")));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Icon> getSplash() {
+        if (splash == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new ImplIcon(
+                    getApi(), new URL("https://cdn.discordapp.com/splashes/" + getId() + "/" + splash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
