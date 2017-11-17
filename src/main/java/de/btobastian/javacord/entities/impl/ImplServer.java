@@ -429,6 +429,20 @@ public class ImplServer implements Server {
     }
 
     @Override
+    public Optional<Icon> getIcon() {
+        if (iconId == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new ImplIcon(
+                    getApi(), new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconId + ".png")));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public List<Role> getRoles() {
         return roles.values().stream()
                 .sorted(Comparator.comparingInt(Role::getPosition))
@@ -438,19 +452,6 @@ public class ImplServer implements Server {
     @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
-    }
-
-    @Override
-    public Optional<URL> getIconUrl() {
-        if (iconId == null) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconId + ".png"));
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
-            return Optional.empty();
-        }
     }
 
     @Override

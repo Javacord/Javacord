@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * The class represents a Discord server, sometimes also called guild.
  */
-public interface Server extends DiscordEntity, IconHolder {
+public interface Server extends DiscordEntity {
 
     /**
      * Gets the name of the server.
@@ -86,6 +86,13 @@ public interface Server extends DiscordEntity, IconHolder {
      * @return The owner of the server.
      */
     User getOwner();
+
+    /**
+     * Gets the icon of the server.
+     *
+     * @return The icon of the server.
+     */
+    Optional<Icon> getIcon();
 
     /**
      * Gets a sorted list (by position) with all roles of the server.

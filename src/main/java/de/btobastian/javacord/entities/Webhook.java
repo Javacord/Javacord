@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a webhook.
  * Webhook objects won't receive any updates!
  */
-public interface Webhook extends DiscordEntity, IconHolder {
+public interface Webhook extends DiscordEntity {
 
     /**
      * Gets the server id of the webhook.
@@ -58,6 +58,13 @@ public interface Webhook extends DiscordEntity, IconHolder {
      * @return The default name of the webhook.
      */
     Optional<String> getName();
+
+    /**
+     * Gets the default avatar of the webhook.
+     *
+     * @return The default avatar of the webhook.
+     */
+    Optional<Icon> getAvatar();
 
     /**
      * Gets the secure token of the webhook.

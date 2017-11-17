@@ -1,19 +1,26 @@
 package de.btobastian.javacord.entities.message.impl;
 
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.entities.IconHolder;
+import de.btobastian.javacord.entities.Icon;
+import de.btobastian.javacord.entities.impl.ImplIcon;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAuthor;
+import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 
 /**
  * The implementation of {@link MessageAuthor}.
  */
-public class ImplMessageAuthor implements MessageAuthor, IconHolder {
+public class ImplMessageAuthor implements MessageAuthor {
+
+    /**
+     * The logger of this class.
+     */
+    Logger logger = LoggerUtil.getLogger(ImplMessageAuthor.class);
 
     private final Message message;
 
@@ -68,6 +75,21 @@ public class ImplMessageAuthor implements MessageAuthor, IconHolder {
     }
 
     @Override
+    public Icon getAvatar() {
+        String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
+        if (avatarId != null) {
+            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
+                    (avatarId.startsWith("a_") ? ".gif" : ".png");
+        }
+        try {
+            return new ImplIcon(getApi(), new URL(url));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
+            return null;
+        }
+    }
+
+    @Override
     public boolean isUser() {
         return webhookId == null;
     }
@@ -77,18 +99,4 @@ public class ImplMessageAuthor implements MessageAuthor, IconHolder {
         return webhookId != null;
     }
 
-    @Override
-    public Optional<URL> getIconUrl() {
-        String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
-        if (avatarId != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
-                    (avatarId.startsWith("a_") ? ".gif" : ".png");
-        }
-        try {
-            return Optional.of(new URL(url));
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
-            return Optional.empty();
-        }
-    }
 }

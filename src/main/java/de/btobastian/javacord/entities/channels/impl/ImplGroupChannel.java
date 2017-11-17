@@ -2,8 +2,10 @@ package de.btobastian.javacord.entities.channels.impl;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
+import de.btobastian.javacord.entities.impl.ImplIcon;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -93,19 +95,6 @@ public class ImplGroupChannel implements GroupChannel {
     }
 
     @Override
-    public Optional<URL> getIconUrl() {
-        if (iconId == null) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(new URL("https://cdn.discordapp.com/channel-icons/" + getId() + "/" + iconId + ".png"));
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
-            return Optional.empty();
-        }
-    }
-
-    @Override
     public Collection<User> getMembers() {
         return Collections.unmodifiableCollection(recipients);
     }
@@ -113,6 +102,20 @@ public class ImplGroupChannel implements GroupChannel {
     @Override
     public Optional<String> getName() {
         return Optional.ofNullable(name);
+    }
+
+    @Override
+    public Optional<Icon> getIcon() {
+        if (iconId == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new ImplIcon(
+                    getApi(), new URL("https://cdn.discordapp.com/channel-icons/" + getId() + "/" + iconId + ".png")));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.impl;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
@@ -63,20 +64,6 @@ public class ImplWebhook implements Webhook {
     }
 
     @Override
-    public Optional<URL> getIconUrl() {
-        if (avatarId != null) {
-            String url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
-                    (avatarId.startsWith("a_") ? ".gif" : ".png");
-            try {
-                return Optional.of(new URL(url));
-            } catch (MalformedURLException e) {
-                logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
-            }
-        }
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<Long> getServerId() {
         return Optional.ofNullable(serverId);
     }
@@ -104,6 +91,20 @@ public class ImplWebhook implements Webhook {
     @Override
     public Optional<String> getName() {
         return Optional.ofNullable(name);
+    }
+
+    @Override
+    public Optional<Icon> getAvatar() {
+        if (avatarId != null) {
+            String url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
+                    (avatarId.startsWith("a_") ? ".gif" : ".png");
+            try {
+                return Optional.of(new ImplIcon(getApi(), new URL(url)));
+            } catch (MalformedURLException e) {
+                logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

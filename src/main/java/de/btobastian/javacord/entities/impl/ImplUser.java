@@ -4,7 +4,7 @@ import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.IconHolder;
+import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link User}.
  */
-public class ImplUser implements User, IconHolder {
+public class ImplUser implements User {
 
     /**
      * The logger of this class.
@@ -166,6 +166,21 @@ public class ImplUser implements User, IconHolder {
     }
 
     @Override
+    public Icon getAvatar() {
+        String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
+        if (avatarId != null) {
+            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
+                    (avatarId.startsWith("a_") ? ".gif" : ".png");
+        }
+        try {
+            return new ImplIcon(getApi(), new URL(url));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
+            return null;
+        }
+    }
+
+    @Override
     public Optional<PrivateChannel> getPrivateChannel() {
         return Optional.ofNullable(channel);
     }
@@ -190,22 +205,6 @@ public class ImplUser implements User, IconHolder {
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public Optional<URL> getIconUrl() {
-        String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
-        if (avatarId != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
-                    (avatarId.startsWith("a_") ? ".gif" : ".png");
-
-        }
-        try {
-            return Optional.of(new URL(url));
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
-            return Optional.empty();
-        }
     }
 
     @Override

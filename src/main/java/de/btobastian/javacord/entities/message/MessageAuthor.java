@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents either a user or a webhook.
  */
-public interface MessageAuthor extends DiscordEntity, AvatarHolder {
+public interface MessageAuthor extends DiscordEntity {
 
     /**
      * Gets the message.
@@ -44,6 +44,13 @@ public interface MessageAuthor extends DiscordEntity, AvatarHolder {
      * @return The discriminator of the author.
      */
     String getDiscriminator();
+
+    /**
+     * Gets the avatar of the author.
+     *
+     * @return The avatar of the author.
+     */
+    Icon getAvatar();
 
     /**
      * Checks if the author of the message is a user.

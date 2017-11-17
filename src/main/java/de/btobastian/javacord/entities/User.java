@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * This class represents a user.
  */
-public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHolder {
+public interface User extends DiscordEntity, Messageable, Mentionable {
 
     @Override
     default String getMentionTag() {
@@ -75,6 +75,13 @@ public interface User extends DiscordEntity, Messageable, Mentionable, AvatarHol
      * @return The status of the user.
      */
     UserStatus getStatus();
+
+    /**
+     * Gets the avatar of the user.
+     *
+     * @return The avatar of the user.
+     */
+    Icon getAvatar();
 
     /**
      * Gets all mutual servers with this user.

@@ -1,7 +1,7 @@
 package de.btobastian.javacord.entities.channels;
 
 import com.mashape.unirest.http.HttpMethod;
-import de.btobastian.javacord.entities.IconHolder;
+import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a group channel. Group channels are not supported by bot accounts!
  */
-public interface GroupChannel extends TextChannel, VoiceChannel, IconHolder {
+public interface GroupChannel extends TextChannel, VoiceChannel {
 
     @Override
     default ChannelType getType() {
@@ -34,6 +34,13 @@ public interface GroupChannel extends TextChannel, VoiceChannel, IconHolder {
      * @return The name of the channel.
      */
     Optional<String> getName();
+
+    /**
+     * Gets the icon of the group channel.
+     *
+     * @return The icon of the group channel.
+     */
+    Optional<Icon> getIcon();
 
     /**
      * Updates the name of the channel.
