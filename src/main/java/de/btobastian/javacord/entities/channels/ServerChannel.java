@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.channels;
 
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.entities.RichInvite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
@@ -57,6 +58,15 @@ public interface ServerChannel extends Channel {
      */
     default int getPosition() {
         return getServer().getChannels().indexOf(this);
+    }
+
+    /**
+     * Gets an invite builder for this channel.
+     *
+     * @return An invite builder for this channel.
+     */
+    default InviteBuilder getInviteBuilder() {
+        return new InviteBuilder(this);
     }
 
     /**
