@@ -178,6 +178,24 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Gets a list with all pinned messages.
+     *
+     * @return A list with all pinned messages.
+     */
+    default CompletableFuture<List<Message>> getPins() {
+        return new RestRequest<List<Message>>(getApi(), HttpMethod.GET, RestEndpoint.PINS)
+                .setUrlParameters(getIdAsString())
+                .execute(res -> {
+                    List<Message> pins = new ArrayList<>();
+                    JSONArray pinsJson = res.getBody().getArray();
+                    for (int i = 0; i < pinsJson.length(); i++) {
+                        pins.add(((ImplDiscordApi) getApi()).getOrCreateMessage(this, pinsJson.getJSONObject(i)));
+                    }
+                    return pins;
+                });
+    }
+
+    /**
      * Gets the history of messages in this channel.
      *
      * @param limit The limit of messages to get.
