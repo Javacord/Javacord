@@ -2,7 +2,7 @@ package de.btobastian.javacord.entities.channels;
 
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ImplDiscordApi;
-import de.btobastian.javacord.RichInvite;
+import de.btobastian.javacord.entities.RichInvite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplInvite;

@@ -1,7 +1,4 @@
-package de.btobastian.javacord;
-
-import de.btobastian.javacord.entities.Invite;
-import de.btobastian.javacord.entities.User;
+package de.btobastian.javacord.entities;
 
 import java.time.Instant;
 

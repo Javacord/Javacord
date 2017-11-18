@@ -3,7 +3,6 @@ package de.btobastian.javacord.entities;
 import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.ImplDiscordApi;
-import de.btobastian.javacord.RichInvite;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
