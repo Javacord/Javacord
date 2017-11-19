@@ -271,18 +271,6 @@ public interface DiscordApi {
     }
 
     /**
-     * Accepts an invite.
-     *
-     * @param code The code of the invite.
-     * @return The invite with the given code.
-     */
-    default CompletableFuture<Invite> acceptInvite(String code) {
-        return new RestRequest<Invite>(this, HttpMethod.POST, RestEndpoint.INVITE)
-                .setUrlParameters(code)
-                .execute(res -> new ImplInvite(this, res.getBody().getObject()));
-    }
-
-    /**
      * Gets a collection with all users the bot knows of.
      *
      * @return A collection with all users the bot knows of.

@@ -113,14 +113,4 @@ public interface Invite {
                 .execute(res -> null);
     }
 
-    /**
-     * Accepts the invite.
-     *
-     * @return The accepted invite.
-     * @see de.btobastian.javacord.DiscordApi#acceptInvite(String)
-     */
-    default CompletableFuture<Invite> accept() {
-        return ((ImplInvite) this).getApi().acceptInvite(getCode());
-    }
-
 }
