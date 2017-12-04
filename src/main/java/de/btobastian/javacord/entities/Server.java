@@ -392,6 +392,44 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Unbans the given user from the server.
+     *
+     * @param user The user to ban.
+     * @return A future to check if the unban was successful.
+     */
+    default CompletableFuture<Void> unbanUser(User user) {
+        return unbanUser(user.getId());
+    }
+
+    /**
+     * Unbans the given user from the server.
+     *
+     * @param userId The id of the user to unban.
+     * @return A future to check if the unban was successful.
+     */
+    default CompletableFuture<Void> unbanUser(long userId) {
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString(), String.valueOf(userId))
+                .execute(res -> null);
+    }
+
+    /**
+     * Unbans the given user from the server.
+     *
+     * @param userId The id of the user to unban.
+     * @return A future to check if the unban was successful.
+     */
+    default CompletableFuture<Void> unbanUser(String userId) {
+        try {
+            return unbanUser(Long.parseLong(userId));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
      * Gets a list of all webhooks in this server.
      *
      * @return A list of all webhooks in this server.
