@@ -365,6 +365,33 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Bans the given user from the server.
+     *
+     * @param user The user to ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString(), user.getIdAsString())
+                .setBody(new JSONObject().put("delete-message-days", 0))
+                .execute(res -> null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user The user to ban.
+     * @param deleteMessageDays The number of days to delete messages for (0-7).
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, int deleteMessageDays) {
+        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString(), user.getIdAsString())
+                .setBody(new JSONObject().put("delete-message-days", deleteMessageDays))
+                .execute(res -> null);
+    }
+
+    /**
      * Gets a list of all webhooks in this server.
      *
      * @return A list of all webhooks in this server.
