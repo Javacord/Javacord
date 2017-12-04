@@ -353,6 +353,18 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Kicks the given user from the server.
+     *
+     * @param user The user to kick.
+     * @return A future to check if the kick was successful.
+     */
+    default CompletableFuture<Void> kickUser(User user) {
+        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.SERVER_MEMBER)
+                .setUrlParameters(getIdAsString(), user.getIdAsString())
+                .execute(res -> null);
+    }
+
+    /**
      * Gets a list of all webhooks in this server.
      *
      * @return A list of all webhooks in this server.
