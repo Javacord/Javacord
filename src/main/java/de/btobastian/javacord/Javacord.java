@@ -4,6 +4,7 @@ import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
+import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 
 /**
@@ -53,9 +54,24 @@ public class Javacord {
      */
     public static <T> Function<Throwable, T> exceptionLogger() {
         return throwable -> {
-            logger.error("Caught unhandled exception!", throwable);
+            logger.error("Caught unhandled exception!", unwrapCompletionException(throwable));
             return null;
         };
+    }
+
+    /**
+     * Unwraps an completion exception.
+     *
+     * @param throwable The completion exception.
+     * @return The cause of the completion exception.
+     */
+    private static Throwable unwrapCompletionException(Throwable throwable) {
+        Throwable cause = throwable.getCause();
+        while ((throwable instanceof CompletionException) && (cause != null)) {
+            throwable = cause;
+            cause = throwable.getCause();
+        }
+        return throwable;
     }
 
 }
