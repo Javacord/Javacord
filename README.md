@@ -1,25 +1,39 @@
-# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg" alt="Latest version"></a> <a href="http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Latest JavaDocs"></a>
+# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg" alt="Latest version"></a> <a href="https://jitpack.io/com/github/btobastian/javacord/v_3-SNAPSHOT/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Javacord Wiki"></a>
 A multithreaded but simple to use library to create a Discord bot in Java.
 
-##  Maven
+## IMPORTANT
+This README is for the rewrite of Javacord (aka. Javacord 3) and is not compelete (e.g. the wiki is still for version 2.x). If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) and ask for help there. 
+
+## Download
+The recommended way to "download" Javacord is to use a build manager like Maven.
+If you are not familiar with Maven, you can take a look at the [Setup Guide](https://github.com/BtoBastian/Javacord/wiki#setup) or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/).
+
+**Repository**
 ```xml
 <repository>
-  <id>javacord-repo</id>
-  <url>http://repo.javacord.org</url>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
 </repository>
-...
+```
+**Javacord Dependency**
+```xml
 <dependency>
-  <groupId>de.btobastian.javacord</groupId>
-  <artifactId>javacord</artifactId>
-  <version>3.0.0</version>
-   <!-- This will use the shaded javacord which contains all required dependencies -->
-  <classifier>shaded</classifier>
+    <groupId>de.btobastian</groupId>
+    <artifactId>Javacord</artifactId>
+    <!-- See below what to insert here -->
+    <version>COMMIT_ID</version>
 </dependency>
-<!-- A SLF4J compatible logging framework. I would recommend to use logback -->
+```
+Replace `COMMIT_ID` with the latest commit id. Once the rewrite is finished, there will be proper version numbers. In this example the version would be `5255914`:
+![](https://i.imgur.com/FSAYqVq.png)
+
+**Optional Logger Dependency**
+```xml
+<!-- Any SLF4J comaptible logging framework. logback-classic is recommended -->
 <dependency>
   <groupId>ch.qos.logback</groupId>
   <artifactId>logback-classic</artifactId>
-  <version>1.1.3</version>
+  <version>1.2.3</version>
 </dependency>
 ```
 
@@ -36,17 +50,12 @@ If you never used maven before you should take a look at the setup tutorial:
 
 ## Wiki
 
-For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord/wiki)
+For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord3-Docs/wiki)
 
-## Download
-For those of you who don't use maven: [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/)
-
-Thanks to ketrwu (https://github.com/KennethWussmann).
+The wiki for Javacord 3 is a work in progress and not complete!
 
 ## Javadocs
-The javadocs can be found here: [JavaDocs](http://ci.ketrwu.de/job/Javacord/branch/master/javadoc/)
-
-Thanks to ketrwu, too.
+The latest javadocs can be found here: [JavaDocs](https://jitpack.io/com/github/btobastian/javacord/v_3-SNAPSHOT/javadoc/)
 
 ## Logging in
 
