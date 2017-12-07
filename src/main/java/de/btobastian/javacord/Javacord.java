@@ -4,6 +4,7 @@ import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 
@@ -46,32 +47,22 @@ public class Javacord {
     private Javacord() { }
 
     /**
-     * This function can be used in the {@link java.util.concurrent.CompletableFuture#exceptionally(Function)} method.
-     * It just prints the exception and is doing nothing else.
+     * This method can be used as method reference in the
+     * {@link CompletableFuture#exceptionally(Function)} method. It unwraps
+     * {@link CompletionException CompletionExceptions} first and logs it afterwards.
      *
+     * @param throwable The exception to print.
      * @param <T> The return type of the function.
-     * @return A function which prints the given throwable and returns null.
+     * @return <code>null</code>
      */
-    public static <T> Function<Throwable, T> exceptionLogger() {
-        return throwable -> {
-            logger.error("Caught unhandled exception!", unwrapCompletionException(throwable));
-            return null;
-        };
-    }
-
-    /**
-     * Unwraps an completion exception.
-     *
-     * @param throwable The completion exception.
-     * @return The cause of the completion exception.
-     */
-    private static Throwable unwrapCompletionException(Throwable throwable) {
+    public static <T> T exceptionLogger(Throwable throwable) {
         Throwable cause = throwable.getCause();
         while ((throwable instanceof CompletionException) && (cause != null)) {
             throwable = cause;
             cause = throwable.getCause();
         }
-        return throwable;
+        logger.error("Caught unhandled exception!", throwable);
+        return null;
     }
 
 }
