@@ -17,10 +17,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
-import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
-import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
-import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
-import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
+import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -1263,6 +1260,42 @@ public interface Server extends DiscordEntity {
     default List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners() {
         return ((ImplDiscordApi) getApi())
                 .getObjectListeners(Server.class, getId(), ServerTextChannelChangeTopicListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to users being added to roles in this server.
+     *
+     * @param listener The listener to add.
+     */
+    default void addUserRoleAddListener(UserRoleAddListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserRoleAddListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered user role add listeners.
+     *
+     * @return A list with all registered user role add listeners.
+     */
+    default List<UserRoleAddListener> getUserRoleAddListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserRoleAddListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to users being removed from roles in this server.
+     *
+     * @param listener The listener to add.
+     */
+    default void addUserRoleRemoveListener(UserRoleRemoveListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserRoleRemoveListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered user role remove listeners.
+     *
+     * @return A list with all registered user role remove listeners.
+     */
+    default List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserRoleRemoveListener.class);
     }
 
 }

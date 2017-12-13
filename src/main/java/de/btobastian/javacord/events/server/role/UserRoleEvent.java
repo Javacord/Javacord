@@ -31,7 +31,7 @@ public abstract class UserRoleEvent extends RoleEvent {
      *
      * @return The user of the event.
      */
-    public User getuser() {
+    public User getUser() {
         return user;
     }
 }

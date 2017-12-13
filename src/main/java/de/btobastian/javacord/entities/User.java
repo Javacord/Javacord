@@ -11,6 +11,8 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
+import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -357,6 +359,42 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeNicknameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this user being added to roles.
+     *
+     * @param listener The listener to add.
+     */
+    default void addUserRoleAddListener(UserRoleAddListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserRoleAddListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered user role add listeners.
+     *
+     * @return A list with all registered user role add listeners.
+     */
+    default List<UserRoleAddListener> getUserRoleAddListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserRoleAddListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this user being removed from roles in this server.
+     *
+     * @param listener The listener to add.
+     */
+    default void addUserRoleRemoveListener(UserRoleRemoveListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserRoleRemoveListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered user role remove listeners.
+     *
+     * @return A list with all registered user role remove listeners.
+     */
+    default List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserRoleRemoveListener.class);
     }
 
 }

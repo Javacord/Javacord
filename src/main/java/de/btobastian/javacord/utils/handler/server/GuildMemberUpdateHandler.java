@@ -21,14 +21,19 @@ package de.btobastian.javacord.utils.handler.server;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.entities.permissions.impl.ImplRole;
+import de.btobastian.javacord.events.server.role.UserRoleAddEvent;
+import de.btobastian.javacord.events.server.role.UserRoleRemoveEvent;
 import de.btobastian.javacord.events.user.UserChangeNicknameEvent;
+import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
+import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.utils.PacketHandler;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Handles the guild member update packet.
@@ -63,6 +68,60 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     listeners.addAll(api.getUserChangeNicknameListeners());
 
                     dispatchEvent(listeners, listener -> listener.onUserChangeNickname(event));
+                }
+            }
+
+            if (packet.has("roles")) {
+                JSONArray jsonRoles = packet.getJSONArray("roles");
+                Collection<Role> newRoles = new HashSet<>();
+                Collection<Role> oldRoles = server.getRolesOf(user);
+                Collection<Role> intersection = new HashSet<>();
+                for (int i = 0; i < jsonRoles.length(); i++) {
+                    api.getRoleById(jsonRoles.getString(i))
+                            .map(role -> {
+                                newRoles.add(role);
+                                return role;
+                            })
+                            .filter(oldRoles::contains)
+                            .ifPresent(intersection::add);
+                }
+
+                // Added roles
+                Collection<Role> addedRoles = new ArrayList<>(newRoles);
+                addedRoles.removeAll(intersection);
+                for (Role role : addedRoles) {
+                    if (role.isEveryoneRole()) {
+                        continue;
+                    }
+                    ((ImplRole) role).addUserToCache(user);
+                    UserRoleAddEvent event = new UserRoleAddEvent(api, role, user);
+
+                    List<UserRoleAddListener> listeners = new ArrayList<>();
+                    listeners.addAll(user.getUserRoleAddListeners());
+                    listeners.addAll(role.getUserRoleAddListeners());
+                    listeners.addAll(role.getServer().getUserRoleAddListeners());
+                    listeners.addAll(api.getUserRoleAddListeners());
+
+                    dispatchEvent(listeners, listener -> listener.onUserRoleAdd(event));
+                }
+
+                // Removed roles
+                Collection<Role> removedRoles = new ArrayList<>(oldRoles);
+                removedRoles.removeAll(intersection);
+                for (Role role : removedRoles) {
+                    if (role.isEveryoneRole()) {
+                        continue;
+                    }
+                    ((ImplRole) role).removeUserFromCache(user);
+                    UserRoleRemoveEvent event = new UserRoleRemoveEvent(api, role, user);
+
+                    List<UserRoleRemoveListener> listeners = new ArrayList<>();
+                    listeners.addAll(user.getUserRoleRemoveListeners());
+                    listeners.addAll(role.getUserRoleRemoveListeners());
+                    listeners.addAll(role.getServer().getUserRoleRemoveListeners());
+                    listeners.addAll(api.getUserRoleRemoveListeners());
+
+                    dispatchEvent(listeners, listener -> listener.onUserRoleRemove(event));
                 }
             }
         });

@@ -24,10 +24,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
-import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
-import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
-import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
-import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
+import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -949,5 +946,25 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners() {
         return getListeners(ServerTextChannelChangeTopicListener.class);
+    }
+
+    @Override
+    public void addUserRoleAddListener(UserRoleAddListener listener) {
+        addListener(UserRoleAddListener.class, listener);
+    }
+
+    @Override
+    public List<UserRoleAddListener> getUserRoleAddListeners() {
+        return getListeners(UserRoleAddListener.class);
+    }
+
+    @Override
+    public void addUserRoleRemoveListener(UserRoleRemoveListener listener) {
+        addListener(UserRoleRemoveListener.class, listener);
+    }
+
+    @Override
+    public List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
+        return getListeners(UserRoleRemoveListener.class);
     }
 }
