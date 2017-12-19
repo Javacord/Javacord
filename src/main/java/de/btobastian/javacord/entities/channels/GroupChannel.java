@@ -1,11 +1,11 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -49,10 +49,10 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("name", name == null ? JSONObject.NULL : name))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
+                .execute((res, json) -> null);
     }
 
 }

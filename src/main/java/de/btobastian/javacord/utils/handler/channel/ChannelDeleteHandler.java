@@ -1,12 +1,12 @@
 package de.btobastian.javacord.utils.handler.channel;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.channel.ServerChannelDeleteEvent;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,8 @@ public class ChannelDeleteHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        int type = packet.getInt("type");
+    public void handle(JsonNode packet) {
+        int type = packet.get("type").asInt();
         switch (type) {
             case 0:
                 handleServerTextChannel(packet);
@@ -49,9 +49,9 @@ public class ChannelDeleteHandler extends PacketHandler {
      *
      * @param channelJson The channel data.
      */
-    private void handleCategory(JSONObject channelJson) {
-        long serverId = Long.parseLong(channelJson.getString("guild_id"));
-        long channelId = Long.parseLong(channelJson.getString("id"));
+    private void handleCategory(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
         api.getServerById(serverId).ifPresent(server -> server.getChannelCategoryById(channelId).ifPresent(channel -> {
             dispatchServerChannelDeleteEvent(channel);
             ((ImplServer) server).removeChannelFromCache(channel.getId());
@@ -63,9 +63,9 @@ public class ChannelDeleteHandler extends PacketHandler {
      *
      * @param channelJson The channel data.
      */
-    private void handleServerTextChannel(JSONObject channelJson) {
-        long serverId = Long.parseLong(channelJson.getString("guild_id"));
-        long channelId = Long.parseLong(channelJson.getString("id"));
+    private void handleServerTextChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
         api.getServerById(serverId).ifPresent(server -> server.getTextChannelById(channelId).ifPresent(channel -> {
             dispatchServerChannelDeleteEvent(channel);
             ((ImplServer) server).removeChannelFromCache(channel.getId());
@@ -77,9 +77,9 @@ public class ChannelDeleteHandler extends PacketHandler {
      *
      * @param channelJson The channel data.
      */
-    private void handleServerVoiceChannel(JSONObject channelJson) {
-        long serverId = Long.parseLong(channelJson.getString("guild_id"));
-        long channelId = Long.parseLong(channelJson.getString("id"));
+    private void handleServerVoiceChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
         api.getServerById(serverId).ifPresent(server -> server.getVoiceChannelById(channelId).ifPresent(channel -> {
             dispatchServerChannelDeleteEvent(channel);
             ((ImplServer) server).removeChannelFromCache(channel.getId());
@@ -91,7 +91,7 @@ public class ChannelDeleteHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handlePrivateChannel(JSONObject channel) {
+    private void handlePrivateChannel(JsonNode channel) {
         // TODO handle private channel deletion -> only for client bots
     }
 

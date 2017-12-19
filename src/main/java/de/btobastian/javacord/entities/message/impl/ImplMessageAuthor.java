@@ -1,12 +1,12 @@
 package de.btobastian.javacord.entities.message.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.impl.ImplIcon;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAuthor;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -38,13 +38,13 @@ public class ImplMessageAuthor implements MessageAuthor {
      * @param webhookId The id of the webhook, if the author is a webhook.
      * @param data The json data of the author.
      */
-    public ImplMessageAuthor(Message message, Long webhookId, JSONObject data) {
+    public ImplMessageAuthor(Message message, Long webhookId, JsonNode data) {
         this.message = message;
 
-        this.id = Long.parseLong(data.getString("id"));
-        this.name = data.getString("username");
-        this.discriminator = data.getString("discriminator");
-        this.avatarId = data.has("avatar") && !data.isNull("avatar") ? data.getString("avatar") : null;
+        this.id = data.get("id").asLong();
+        this.name = data.get("username").asText();
+        this.discriminator = data.get("discriminator").asText();
+        this.avatarId = data.has("avatar") && !data.get("avatar").isNull() ? data.get("avatar").asText() : null;
 
         this.webhookId = webhookId;
     }

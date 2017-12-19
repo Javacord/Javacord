@@ -1,8 +1,8 @@
 package de.btobastian.javacord.utils.handler;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 /**
  * This class handles the resumed packet.
@@ -19,8 +19,8 @@ public class ResumedHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        // dummy implementation
+    public void handle(JsonNode packet) {
+        // NOP
     }
 
 }

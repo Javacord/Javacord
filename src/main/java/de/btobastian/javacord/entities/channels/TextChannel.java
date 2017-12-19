@@ -1,6 +1,9 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
@@ -20,15 +23,19 @@ import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import org.slf4j.Logger;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 /**
@@ -44,26 +51,47 @@ public interface TextChannel extends Channel, Messageable {
     @Override
     default CompletableFuture<Message> sendMessage(
             String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
-        JSONObject body = new JSONObject()
+        ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("content", content == null ? "" : content)
-                .put("tts", tts)
-                .put("mentions", new String[0]);
+                .put("tts", tts);
+        body.putArray("mentions");
         if (embed != null) {
-            body.put("embed", embed.toJSONObject());
+            embed.toJsonNode(body.putObject("embed"));
         }
         if (nonce != null) {
             body.put("nonce", nonce);
         }
-        RestRequest<Message> request = new RestRequest<Message>(getApi(), HttpMethod.POST, RestEndpoint.MESSAGE)
+
+        RestRequest<Message> request = new RestRequest<Message>(getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(getId()));
         if (stream != null && fileName != null) {
-            request.addField("file", stream, fileName);
-            request.addField("payload_json", body.toString());
+            byte[] bytes;
+            try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                int nRead;
+                byte[] data = new byte[16384];
+
+                while ((nRead = stream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                bytes = buffer.toByteArray();
+                stream.close();
+            } catch (IOException e) {
+                CompletableFuture<Message> future = new CompletableFuture<>();
+                future.completeExceptionally(e);
+                return future;
+            }
+            
+            request.setMultipartBody(new MultipartBody.Builder()
+                    .addFormDataPart("payload_json", body.toString())
+                    .addFormDataPart("file", fileName,
+                            RequestBody.create(MediaType.parse(URLConnection.guessContentTypeFromName(fileName)), bytes)
+                    ).build());
         } else {
             request.setBody(body);
         }
 
-        return request.execute(res -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, res.getBody().getObject()));
+        return request.execute((res, json) -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, json));
     }
 
     /**
@@ -73,10 +101,10 @@ public interface TextChannel extends Channel, Messageable {
      * @return A future to tell us if the action was successful.
      */
     default CompletableFuture<Void> type() {
-        return new RestRequest<Void>(getApi(), HttpMethod.POST, RestEndpoint.CHANNEL_TYPING)
+        return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.CHANNEL_TYPING)
                 .setRatelimitRetries(0)
                 .setUrlParameters(String.valueOf(getId()))
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -104,14 +132,17 @@ public interface TextChannel extends Channel, Messageable {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> bulkDelete(long... messageIds) {
-        Collection<String> messageStringIds = LongStream.of(messageIds).boxed()
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        ArrayNode messages = body.putArray("messages");
+        LongStream.of(messageIds).boxed()
                 .map(String::valueOf)
-                .collect(Collectors.toList());
-        return new RestRequest<Void>(getApi(), HttpMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
+                .forEach(messages::add);
+
+        return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
                 .setRatelimitRetries(0)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("messages", messageStringIds))
-                .execute(res -> null);
+                .setBody(body)
+                .execute((res, json) -> null);
     }
 
     /**
@@ -158,9 +189,9 @@ public interface TextChannel extends Channel, Messageable {
     default CompletableFuture<Message> getMessageById(long id) {
         return getApi().getCachedMessageById(id)
                 .map(CompletableFuture::completedFuture)
-                .orElseGet(() -> new RestRequest<Message>(getApi(), HttpMethod.GET, RestEndpoint.MESSAGE)
+                .orElseGet(() -> new RestRequest<Message>(getApi(), RestMethod.GET, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(getId()), String.valueOf(id))
-                .execute(res -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, res.getBody().getObject())));
+                .execute((res, json) -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, json)));
     }
 
     /**
@@ -183,13 +214,12 @@ public interface TextChannel extends Channel, Messageable {
      * @return A list with all pinned messages.
      */
     default CompletableFuture<List<Message>> getPins() {
-        return new RestRequest<List<Message>>(getApi(), HttpMethod.GET, RestEndpoint.PINS)
+        return new RestRequest<List<Message>>(getApi(), RestMethod.GET, RestEndpoint.PINS)
                 .setUrlParameters(getIdAsString())
-                .execute(res -> {
+                .execute((res, json) -> {
                     List<Message> pins = new ArrayList<>();
-                    JSONArray pinsJson = res.getBody().getArray();
-                    for (int i = 0; i < pinsJson.length(); i++) {
-                        pins.add(((ImplDiscordApi) getApi()).getOrCreateMessage(this, pinsJson.getJSONObject(i)));
+                    for (JsonNode pin : json) {
+                        pins.add(((ImplDiscordApi) getApi()).getOrCreateMessage(this, pin));
                     }
                     return pins;
                 });
@@ -313,13 +343,12 @@ public interface TextChannel extends Channel, Messageable {
      * @return A list of all webhooks in this channel.
      */
     default CompletableFuture<List<Webhook>> getWebhooks() {
-        return new RestRequest<List<Webhook>>(getApi(), HttpMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
+        return new RestRequest<List<Webhook>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute(res -> {
+                .execute((res, json) -> {
                     List<Webhook> webhooks = new ArrayList<>();
-                    JSONArray webhooksJson = res.getBody().getArray();
-                    for (int i = 0; i < webhooksJson.length(); i++) {
-                        webhooks.add(new ImplWebhook(getApi(), webhooksJson.getJSONObject(i)));
+                    for (JsonNode webhook : json) {
+                        webhooks.add(new ImplWebhook(getApi(), webhook));
                     }
                     return webhooks;
                 });

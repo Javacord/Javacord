@@ -1,5 +1,6 @@
 package de.btobastian.javacord.utils.handler.channel;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
@@ -19,8 +20,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwr
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,8 +39,8 @@ public class ChannelUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        int type = packet.getInt("type");
+    public void handle(JsonNode packet) {
+        int type = packet.get("type").asInt();
         switch (type) {
             case 0:
                 handleServerChannel(packet);
@@ -66,11 +65,11 @@ public class ChannelUpdateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handleServerChannel(JSONObject channel) {
-        long channelId = Long.parseLong(channel.getString("id"));
+    private void handleServerChannel(JsonNode channel) {
+        long channelId = channel.get("id").asLong();
         api.getServerChannelById(channelId).ifPresent(c -> {
             String oldName = c.getName();
-            String newName = channel.getString("name");
+            String newName = channel.get("name").asText();
             if (!Objects.deepEquals(oldName, newName)) {
                 c.asChannelCategory().ifPresent(cc -> ((ImplChannelCategory) cc).setName(newName));
                 c.asServerTextChannel().ifPresent(stc -> ((ImplServerTextChannel) stc).setName(newName));
@@ -87,7 +86,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             }
 
             int oldPosition = c.getRawPosition();
-            int newPosition = channel.getInt("position");
+            int newPosition = channel.get("position").asInt();
             if (oldPosition != newPosition) {
                 c.asChannelCategory().ifPresent(cc -> ((ImplChannelCategory) cc).setPosition(newPosition));
                 c.asServerTextChannel().ifPresent(stc -> ((ImplServerTextChannel) stc).setPosition(newPosition));
@@ -104,53 +103,52 @@ public class ChannelUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChannelChangePosition(event));
             }
 
-            JSONArray permissionOverwritesJson = channel.has("permission_overwrites") ?
-                    channel.getJSONArray("permission_overwrites") : new JSONArray();
             Collection<Long> rolesWithOverwrittenPermissions = new HashSet<>();
             Collection<Long> usersWithOverwrittenPermissions = new HashSet<>();
-            for (int i = 0; i < permissionOverwritesJson.length(); i++) {
-                JSONObject permissionOverwriteJson = permissionOverwritesJson.getJSONObject(i);
-                Permissions oldOverwrittenPermissions = null;
-                DiscordEntity entity = null;
-                ConcurrentHashMap<Long, Permissions> overwrittenPermissions = null;
-                switch (permissionOverwriteJson.getString("type")) {
-                    case "role":
-                        entity = api.getRoleById(permissionOverwriteJson.getString("id")).orElseThrow(() ->
-                                new IllegalStateException("Received channel update event with unknown role!"));
-                        oldOverwrittenPermissions = c.getOverwrittenPermissions((Role) entity);
-                        if (c instanceof ImplChannelCategory) {
-                            overwrittenPermissions = ((ImplChannelCategory) c).getOverwrittenRolePermissions();
-                        } else if (c instanceof ImplServerTextChannel) {
-                            overwrittenPermissions = ((ImplServerTextChannel) c).getOverwrittenRolePermissions();
-                        } else if (c instanceof ImplServerVoiceChannel) {
-                            overwrittenPermissions = ((ImplServerVoiceChannel) c).getOverwrittenRolePermissions();
-                        }
-                        rolesWithOverwrittenPermissions.add(entity.getId());
-                        break;
-                    case "member":
-                        entity = api.getUserById(permissionOverwriteJson.getString("id")).orElseThrow(() ->
-                                new IllegalStateException("Received channel update event with unknown user!"));
-                        oldOverwrittenPermissions = c.getOverwrittenPermissions((User) entity);
-                        if (c instanceof ImplChannelCategory) {
-                            overwrittenPermissions = ((ImplChannelCategory) c).getOverwrittenUserPermissions();
-                        } else if (c instanceof ImplServerTextChannel) {
-                            overwrittenPermissions = ((ImplServerTextChannel) c).getOverwrittenUserPermissions();
-                        } else if (c instanceof ImplServerVoiceChannel) {
-                            overwrittenPermissions = ((ImplServerVoiceChannel) c).getOverwrittenUserPermissions();
-                        }
-                        usersWithOverwrittenPermissions.add(entity.getId());
-                        break;
-                    default:
-                        throw new IllegalStateException(
-                                "Permission overwrite object with unknown type: " + permissionOverwriteJson.toString());
-                }
-                int allow = permissionOverwriteJson.optInt("allow", 0);
-                int deny = permissionOverwriteJson.optInt("deny", 0);
-                Permissions newOverwrittenPermissions = new ImplPermissions(allow, deny);
-                if (!newOverwrittenPermissions.equals(oldOverwrittenPermissions)) {
-                    overwrittenPermissions.put(entity.getId(), newOverwrittenPermissions);
-                    dispatchServerChannelChangeOverwrittenPermissionsEvent(
-                            c, newOverwrittenPermissions, oldOverwrittenPermissions, entity);
+            if (channel.has("permission_overwrites") && !channel.get("permission_overwrites").isNull()) {
+                for (JsonNode permissionOverwriteJson : channel.get("permission_overwrites")) {
+                    Permissions oldOverwrittenPermissions = null;
+                    DiscordEntity entity = null;
+                    ConcurrentHashMap<Long, Permissions> overwrittenPermissions = null;
+                    switch (permissionOverwriteJson.get("type").asText()) {
+                        case "role":
+                            entity = api.getRoleById(permissionOverwriteJson.get("id").asText()).orElseThrow(() ->
+                                    new IllegalStateException("Received channel update event with unknown role!"));
+                            oldOverwrittenPermissions = c.getOverwrittenPermissions((Role) entity);
+                            if (c instanceof ImplChannelCategory) {
+                                overwrittenPermissions = ((ImplChannelCategory) c).getOverwrittenRolePermissions();
+                            } else if (c instanceof ImplServerTextChannel) {
+                                overwrittenPermissions = ((ImplServerTextChannel) c).getOverwrittenRolePermissions();
+                            } else if (c instanceof ImplServerVoiceChannel) {
+                                overwrittenPermissions = ((ImplServerVoiceChannel) c).getOverwrittenRolePermissions();
+                            }
+                            rolesWithOverwrittenPermissions.add(entity.getId());
+                            break;
+                        case "member":
+                            entity = api.getUserById(permissionOverwriteJson.get("id").asText()).orElseThrow(() ->
+                                    new IllegalStateException("Received channel update event with unknown user!"));
+                            oldOverwrittenPermissions = c.getOverwrittenPermissions((User) entity);
+                            if (c instanceof ImplChannelCategory) {
+                                overwrittenPermissions = ((ImplChannelCategory) c).getOverwrittenUserPermissions();
+                            } else if (c instanceof ImplServerTextChannel) {
+                                overwrittenPermissions = ((ImplServerTextChannel) c).getOverwrittenUserPermissions();
+                            } else if (c instanceof ImplServerVoiceChannel) {
+                                overwrittenPermissions = ((ImplServerVoiceChannel) c).getOverwrittenUserPermissions();
+                            }
+                            usersWithOverwrittenPermissions.add(entity.getId());
+                            break;
+                        default:
+                            throw new IllegalStateException(
+                                    "Permission overwrite object with unknown type: " + permissionOverwriteJson.toString());
+                    }
+                    int allow = permissionOverwriteJson.get("allow").asInt(0);
+                    int deny = permissionOverwriteJson.get("deny").asInt(0);
+                    Permissions newOverwrittenPermissions = new ImplPermissions(allow, deny);
+                    if (!newOverwrittenPermissions.equals(oldOverwrittenPermissions)) {
+                        overwrittenPermissions.put(entity.getId(), newOverwrittenPermissions);
+                        dispatchServerChannelChangeOverwrittenPermissionsEvent(
+                                c, newOverwrittenPermissions, oldOverwrittenPermissions, entity);
+                    }
                 }
             }
             ConcurrentHashMap<Long, Permissions> overwrittenRolePermissions = null;
@@ -201,11 +199,11 @@ public class ChannelUpdateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handleChannelCategory(JSONObject channel) {
-        long channelId = Long.parseLong(channel.getString("id"));
+    private void handleChannelCategory(JsonNode channel) {
+        long channelId = channel.get("id").asLong();
         api.getChannelCategoryById(channelId).map(c -> ((ImplChannelCategory) c)).ifPresent(c -> {
             String oldName = c.getName();
-            String newName = channel.getString("name");
+            String newName = channel.get("name").asText();
             if (!Objects.deepEquals(oldName, newName)) {
                 c.setName(newName);
                 ServerChannelChangeNameEvent event =
@@ -226,12 +224,12 @@ public class ChannelUpdateHandler extends PacketHandler {
      *
      * @param jsonChannel The json channel data.
      */
-    private void handleServerTextChannel(JSONObject jsonChannel) {
-        long channelId = Long.parseLong(jsonChannel.getString("id"));
+    private void handleServerTextChannel(JsonNode jsonChannel) {
+        long channelId = jsonChannel.get("id").asLong();
         api.getTextChannelById(channelId).map(c -> ((ImplServerTextChannel) c)).ifPresent(channel -> {
             String oldTopic = channel.getTopic();
-            String newTopic =
-                    jsonChannel.has("topic") && !jsonChannel.isNull("topic") ? jsonChannel.getString("topic") : "";
+            String newTopic = jsonChannel.has("topic") && !jsonChannel.get("topic").isNull()
+                    ? jsonChannel.get("topic").asText() : "";
             if (!oldTopic.equals(newTopic)) {
                 channel.setTopic(newTopic);
 
@@ -253,8 +251,8 @@ public class ChannelUpdateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handleServerVoiceChannel(JSONObject channel) {
-        long serverId = Long.parseLong(channel.getString("guild_id"));
+    private void handleServerVoiceChannel(JsonNode channel) {
+        long serverId = Long.parseLong(channel.get("guild_id").asText());
 
     }
 
@@ -263,7 +261,7 @@ public class ChannelUpdateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handlePrivateChannel(JSONObject channel) {
+    private void handlePrivateChannel(JsonNode channel) {
 
     }
 

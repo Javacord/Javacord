@@ -1,5 +1,8 @@
 package de.btobastian.javacord.entities.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.ImplDiscordApi;
@@ -15,8 +18,6 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -126,31 +127,29 @@ public class ImplServer implements Server {
      * @param api The discord api instance.
      * @param data The json data of the server.
      */
-    public ImplServer(ImplDiscordApi api, JSONObject data) {
+    public ImplServer(ImplDiscordApi api, JsonNode data) {
         this.api = api;
 
-        id = Long.parseLong(data.getString("id"));
-        name = data.getString("name");
-        region = Region.getRegionByKey(data.getString("region"));
-        large = data.getBoolean("large");
-        memberCount = data.getInt("member_count");
-        ownerId = Long.parseLong(data.getString("owner_id"));
-        verificationLevel = VerificationLevel.fromId(data.getInt("verification_level"));
-        explicitContentFilterLevel = ExplicitContentFilterLevel.fromId(data.getInt("explicit_content_filter"));
+        id = Long.parseLong(data.get("id").asText());
+        name = data.get("name").asText();
+        region = Region.getRegionByKey(data.get("region").asText());
+        large = data.get("large").asBoolean();
+        memberCount = data.get("member_count").asInt();
+        ownerId = Long.parseLong(data.get("owner_id").asText());
+        verificationLevel = VerificationLevel.fromId(data.get("verification_level").asInt());
+        explicitContentFilterLevel = ExplicitContentFilterLevel.fromId(data.get("explicit_content_filter").asInt());
         defaultMessageNotificationLevel =
-                DefaultMessageNotificationLevel.fromId(data.getInt("default_message_notifications"));
-        if (data.has("icon") && !data.isNull("icon")) {
-            iconId = data.getString("icon");
+                DefaultMessageNotificationLevel.fromId(data.get("default_message_notifications").asInt());
+        if (data.has("icon") && !data.get("icon").isNull()) {
+            iconId = data.get("icon").asText();
         }
-        if (data.has("splash") && !data.isNull("splash")) {
-            splash = data.getString("splash");
+        if (data.has("splash") && !data.get("splash").isNull()) {
+            splash = data.get("splash").asText();
         }
 
         if (data.has("channels")) {
-            JSONArray channels = data.getJSONArray("channels");
-            for (int i = 0; i < channels.length(); i++) {
-                JSONObject channel = channels.getJSONObject(i);
-                switch (channel.getInt("type")) {
+            for (JsonNode channel : data.get("channels")) {
+                switch (channel.get("type").asInt()) {
                     case 0:
                         getOrCreateServerTextChannel(channel);
                         break;
@@ -164,58 +163,58 @@ public class ImplServer implements Server {
             }
         }
 
-        JSONArray roles = data.has("roles") ? data.getJSONArray("roles") : new JSONArray();
-        for (int i = 0; i < roles.length(); i++) {
-            Role role = new ImplRole(api, this, roles.getJSONObject(i));
-            this.roles.put(role.getId(), role);
+        if (data.has("roles")) {
+            for (JsonNode roleJson : data.get("roles")) {
+                Role role = new ImplRole(api, this, roleJson);
+                this.roles.put(role.getId(), role);
+            }
         }
 
-        JSONArray members = new JSONArray();
         if (data.has("members")) {
-            members = data.getJSONArray("members");
+            addMembers(data.get("members"));
         }
-        addMembers(members);
 
         if (isLarge() && getMembers().size() < getMemberCount()) {
-            JSONObject requestGuildMembersPacket = new JSONObject()
-                    .put("op", 8)
-                    .put("d", new JSONObject()
+            ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
+                    .put("op", 8);
+            requestGuildMembersPacket.putObject("d")
                             .put("guild_id", String.valueOf(getId()))
                             .put("query","")
-                            .put("limit", 0));
+                            .put("limit", 0);
             logger.debug("Sending request guild members packet for server {}", this);
             this.api.getWebSocketAdapter().getWebSocket().sendText(requestGuildMembersPacket.toString());
         }
 
-        JSONArray emojis = data.has("emojis") ? data.getJSONArray("emojis") : new JSONArray();
-        for (int i = 0; i < emojis.length(); i++) {
-            CustomEmoji emoji = api.getOrCreateCustomEmoji(this, emojis.getJSONObject(i));
-            addCustomEmoji(emoji);
+        if (data.has("emojis")) {
+            for (JsonNode emojiJson : data.get("emojis")) {
+                CustomEmoji emoji = api.getOrCreateCustomEmoji(this, emojiJson);
+                addCustomEmoji(emoji);
+            }
         }
 
-        JSONArray presences = data.has("presences") ? data.getJSONArray("presences") : new JSONArray();
-        for (int i = 0; i < presences.length(); i++) {
-            JSONObject presence = presences.getJSONObject(i);
-            long userId = Long.parseLong(presence.getJSONObject("user").getString("id"));
-            api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
-                if (presence.has("game")) {
-                    Game game = null;
-                    if (!presence.isNull("game")) {
-                        int gameType = presence.getJSONObject("game").getInt("type");
-                        String name = presence.getJSONObject("game").getString("name");
-                        String streamingUrl =
-                                presence.getJSONObject("game").has("url") &&
-                                !presence.getJSONObject("game").isNull("url") ?
-                                presence.getJSONObject("game").getString("url") : null;
-                        game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
+        if (data.has("presences")) {
+            for (JsonNode presenceJson : data.get("presences")) {
+                long userId = Long.parseLong(presenceJson.get("user").get("id").asText());
+                api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
+                    if (presenceJson.has("game")) {
+                        Game game = null;
+                        if (!presenceJson.get("game").isNull()) {
+                            int gameType = presenceJson.get("game").get("type").asInt();
+                            String name = presenceJson.get("game").get("name").asText();
+                            String streamingUrl =
+                                    presenceJson.get("game").has("url") &&
+                                            !presenceJson.get("game").get("url").isNull() ?
+                                            presenceJson.get("game").get("url").asText() : null;
+                            game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
+                        }
+                        user.setGame(game);
                     }
-                    user.setGame(game);
-                }
-                if (presence.has("status")) {
-                    UserStatus status = UserStatus.fromString(presence.optString("status"));
-                    user.setStatus(status);
-                }
-            });
+                    if (presenceJson.has("status")) {
+                        UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());
+                        user.setStatus(status);
+                    }
+                });
+            }
         }
 
         api.addServerToCache(this);
@@ -272,8 +271,8 @@ public class ImplServer implements Server {
      * @param data The json data of the role.
      * @return The role.
      */
-    public Role getOrCreateRole(JSONObject data) {
-        long id = Long.parseLong(data.getString("id"));
+    public Role getOrCreateRole(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
         synchronized (this) {
             return getRoleById(id).orElseGet(() -> {
                 Role role = new ImplRole(api, this, data);
@@ -289,9 +288,9 @@ public class ImplServer implements Server {
      * @param data The json data of the channel.
      * @return The server text channel.
      */
-    public ChannelCategory getOrCreateChannelCategory(JSONObject data) {
-        long id = Long.parseLong(data.getString("id"));
-        int type = data.getInt("type");
+    public ChannelCategory getOrCreateChannelCategory(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        int type = data.get("type").asInt();
         synchronized (this) {
             if (type == 4) {
                 return getChannelCategoryById(id).orElseGet(() -> new ImplChannelCategory(api, this, data));
@@ -307,9 +306,9 @@ public class ImplServer implements Server {
      * @param data The json data of the channel.
      * @return The server text channel.
      */
-    public ServerTextChannel getOrCreateServerTextChannel(JSONObject data) {
-        long id = Long.parseLong(data.getString("id"));
-        int type = data.getInt("type");
+    public ServerTextChannel getOrCreateServerTextChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        int type = data.get("type").asInt();
         synchronized (this) {
             if (type == 0) {
                 return getTextChannelById(id).orElseGet(() -> new ImplServerTextChannel(api, this, data));
@@ -325,9 +324,9 @@ public class ImplServer implements Server {
      * @param data The json data of the channel.
      * @return The server voice channel.
      */
-    public ServerVoiceChannel getOrCreateServerVoiceChannel(JSONObject data) {
-        long id = Long.parseLong(data.getString("id"));
-        int type = data.getInt("type");
+    public ServerVoiceChannel getOrCreateServerVoiceChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        int type = data.get("type").asInt();
         synchronized (this) {
             if (type == 2) {
                 return getVoiceChannelById(id).orElseGet(() -> new ImplServerVoiceChannel(api, this, data));
@@ -353,16 +352,15 @@ public class ImplServer implements Server {
      *
      * @param member The user to add.
      */
-    public void addMember(JSONObject member) {
-        User user = api.getOrCreateUser(member.getJSONObject("user"));
+    public void addMember(JsonNode member) {
+        User user = api.getOrCreateUser(member.get("user"));
         members.put(user.getId(), user);
-        if (member.has("nick") && !member.isNull("nick")) {
-            nicknames.put(user.getId(), member.getString("nick"));
+        if (member.has("nick") && !member.get("nick").isNull()) {
+            nicknames.put(user.getId(), member.get("nick").asText());
         }
 
-        JSONArray memberRoles = member.getJSONArray("roles");
-        for (int i = 0; i < memberRoles.length(); i++) {
-            long roleId = Long.parseLong(memberRoles.getString(i));
+        for (JsonNode roleIds : member.get("roles")) {
+            long roleId = Long.parseLong(roleIds.asText());
             getRoleById(roleId).map(role -> ((ImplRole) role)).ifPresent(role -> role.addUserToCache(user));
         }
     }
@@ -386,9 +384,9 @@ public class ImplServer implements Server {
      *
      * @param members An array of guild member objects.
      */
-    public void addMembers(JSONArray members) {
-        for (int i = 0; i < members.length(); i++) {
-            addMember(members.getJSONObject(i));
+    public void addMembers(JsonNode members) {
+        for (JsonNode member : members) {
+            addMember(member);
         }
     }
 

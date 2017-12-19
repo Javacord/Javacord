@@ -1,13 +1,12 @@
 package de.btobastian.javacord.utils.handler.server;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.events.server.emoji.CustomEmojiCreateEvent;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,14 +27,12 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        long id = Long.valueOf(packet.getString("guild_id"));
+    public void handle(JsonNode packet) {
+        long id = packet.get("guild_id").asLong();
         api.getServerById(id).map(server -> (ImplServer) server).ifPresent(server -> {
-            JSONArray emojisJson = packet.getJSONArray("emojis");
-            HashMap<Long, JSONObject> emojis = new HashMap<>();
-            for (int i = 0; i < emojisJson.length(); i++) {
-                JSONObject emojiJson = emojisJson.getJSONObject(i);
-                emojis.put(Long.parseLong(emojiJson.getString("id")), emojiJson);
+            HashMap<Long, JsonNode> emojis = new HashMap<>();
+            for (JsonNode emojiJson : packet.get("emojis")) {
+                emojis.put(emojiJson.get("id").asLong(), emojiJson);
             }
 
             emojis.entrySet().stream().forEach(entry -> {

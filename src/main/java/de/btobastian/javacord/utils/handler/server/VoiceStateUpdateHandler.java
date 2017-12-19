@@ -1,8 +1,8 @@
 package de.btobastian.javacord.utils.handler.server;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 /**
  * Handles the voice state update packet.
@@ -19,7 +19,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
+    public void handle(JsonNode packet) {
         // NOP
     }
 

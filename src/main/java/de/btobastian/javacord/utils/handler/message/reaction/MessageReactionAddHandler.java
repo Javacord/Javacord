@@ -1,5 +1,6 @@
 package de.btobastian.javacord.utils.handler.message.reaction;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
@@ -10,7 +11,6 @@ import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.events.message.reaction.ReactionAddEvent;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,16 +31,16 @@ public class MessageReactionAddHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        api.getTextChannelById(packet.getString("channel_id")).ifPresent(channel -> {
-            long messageId = Long.parseLong(packet.getString("message_id"));
-            User user = api.getUserById(packet.getString("user_id")).orElse(null);
+    public void handle(JsonNode packet) {
+        api.getTextChannelById(packet.get("channel_id").asText()).ifPresent(channel -> {
+            long messageId = packet.get("message_id").asLong();
+            User user = api.getUserById(packet.get("user_id").asText()).orElse(null);
             Optional<Message> message = api.getCachedMessageById(messageId);
 
             Emoji emoji;
-            JSONObject emojiJson = packet.getJSONObject("emoji");
-            if (!emojiJson.has("id") || emojiJson.isNull("id")) {
-                emoji = ImplUnicodeEmoji.fromString(emojiJson.getString("name"));
+            JsonNode emojiJson = packet.get("emoji");
+            if (!emojiJson.has("id") || emojiJson.get("id").isNull()) {
+                emoji = ImplUnicodeEmoji.fromString(emojiJson.get("name").asText());
             } else {
                 emoji = api.getOrCreateCustomEmoji(null, emojiJson);
             }

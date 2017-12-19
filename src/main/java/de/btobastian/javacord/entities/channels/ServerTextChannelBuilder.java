@@ -1,11 +1,12 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -66,7 +67,7 @@ public class ServerTextChannelBuilder {
      * @return The created text channel.
      */
     public CompletableFuture<ServerTextChannel> create() {
-        JSONObject body = new JSONObject();
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("type", 0);
         if (name == null) {
             throw new IllegalStateException("Name is no optional parameter!");
@@ -75,10 +76,10 @@ public class ServerTextChannelBuilder {
         if (category != null) {
             body.put("parent_id", String.valueOf(category.getId()));
         }
-        return new RestRequest<ServerTextChannel>(server.getApi(), HttpMethod.POST, RestEndpoint.SERVER_CHANNEL)
+        return new RestRequest<ServerTextChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)
-                .execute(res -> server.getOrCreateServerTextChannel(res.getBody().getObject()));
+                .execute((res, json) -> server.getOrCreateServerTextChannel(json));
     }
 
 }

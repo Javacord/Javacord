@@ -1,9 +1,8 @@
 package de.btobastian.javacord.entities.message.embed.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.entities.message.embed.*;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.awt.*;
@@ -44,23 +43,22 @@ public class ImplEmbed implements Embed {
      *
      * @param data The json data of the embed.
      */
-    public ImplEmbed(JSONObject data) {
-        title = data.has("title") ? data.getString("title") : null;
-        type = data.has("type") ? data.getString("type") : null;
-        description = data.has("description") ? data.getString("description") : null;
-        url = data.has("url") ? data.getString("url") : null;
-        timestamp = data.has("timestamp") ? OffsetDateTime.parse(data.getString("timestamp")).toInstant() : null;
-        color = data.has("color") ? new Color(data.getInt("color")) : null;
-        footer = data.has("footer") ? new ImplEmbedFooter(data.getJSONObject("footer")) : null;
-        image = data.has("image") ? new ImplEmbedImage(data.getJSONObject("image")) : null;
-        thumbnail = data.has("thumbnail") ? new ImplEmbedThumbnail(data.getJSONObject("thumbnail")) : null;
-        video = data.has("video") ? new ImplEmbedVideo(data.getJSONObject("video")) : null;
-        provider = data.has("provider") ? new ImplEmbedProvider(data.getJSONObject("provider")) : null;
-        author = data.has("author") ? new ImplEmbedAuthor(data.getJSONObject("author")) : null;
+    public ImplEmbed(JsonNode data) {
+        title = data.has("title") ? data.get("title").asText() : null;
+        type = data.has("type") ? data.get("type").asText() : null;
+        description = data.has("description") ? data.get("description").asText() : null;
+        url = data.has("url") ? data.get("url").asText() : null;
+        timestamp = data.has("timestamp") ? OffsetDateTime.parse(data.get("timestamp").asText()).toInstant() : null;
+        color = data.has("color") ? new Color(data.get("color").asInt()) : null;
+        footer = data.has("footer") ? new ImplEmbedFooter(data.get("footer")) : null;
+        image = data.has("image") ? new ImplEmbedImage(data.get("image")) : null;
+        thumbnail = data.has("thumbnail") ? new ImplEmbedThumbnail(data.get("thumbnail")) : null;
+        video = data.has("video") ? new ImplEmbedVideo(data.get("video")) : null;
+        provider = data.has("provider") ? new ImplEmbedProvider(data.get("provider")) : null;
+        author = data.has("author") ? new ImplEmbedAuthor(data.get("author")) : null;
         if (data.has("fields")) {
-            JSONArray fields = data.getJSONArray("fields");
-            for (int i = 0; i < fields.length(); i++) {
-                this.fields.add(new ImplEmbedField(fields.getJSONObject(i)));
+            for (JsonNode jsonField : data.get("fields")) {
+                this.fields.add(new ImplEmbedField(jsonField));
             }
         }
     }

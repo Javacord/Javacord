@@ -1,7 +1,8 @@
 package de.btobastian.javacord.entities.message.embed;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.awt.*;
 import java.time.Instant;
@@ -196,12 +197,21 @@ public class EmbedBuilder {
     }
 
     /**
-     * Gets the embed as a {@link JSONObject}. This is what is sent to Discord.
+     * Gets the embed as a {@link ObjectNode}. This is what is sent to Discord.
      *
-     * @return The embed as a JSONObject.
+     * @return The embed as a ObjectNode.
      */
-    public JSONObject toJSONObject() {
-        JSONObject object = new JSONObject();
+    public ObjectNode toJsonNode() {
+        ObjectNode object = JsonNodeFactory.instance.objectNode();
+        return toJsonNode(object);
+    }
+
+    /**
+     * Adds the json data to the given object node.
+     *
+     * @return The provided object with the data of the embed.
+     */
+    public ObjectNode toJsonNode(ObjectNode object) {
         object.put("type", "rich");
         if (title != null) {
             object.put("title", title);
@@ -219,20 +229,19 @@ public class EmbedBuilder {
             object.put("timestamp", DateTimeFormatter.ISO_INSTANT.format(timestamp));
         }
         if (footerText != null || footerIconUrl != null) {
-            JSONObject footer = new JSONObject();
+            ObjectNode footer = object.putObject("footer");
             if (footerText != null) {
                 footer.put("text", footerText);
             }
             if (footerIconUrl != null) {
                 footer.put("icon_url", footerIconUrl);
             }
-            object.put("footer", footer);
         }
         if (imageUrl != null) {
-            object.put("image", new JSONObject().put("url", imageUrl));
+            object.putObject("image").put("url", imageUrl);
         }
         if (authorName != null) {
-            JSONObject author = new JSONObject();
+            ObjectNode author = object.putObject("icon_url");
             author.put("name", authorName);
             if (authorUrl != null) {
                 author.put("url", authorUrl);
@@ -240,27 +249,24 @@ public class EmbedBuilder {
             if (authorIconUrl != null) {
                 author.put("icon_url", authorIconUrl);
             }
-            object.put("author", author);
         }
         if (thumbnailUrl != null) {
-            object.put("thumbnail", new JSONObject().put("url", thumbnailUrl));
+            object.putObject("thumbnail").put("url", thumbnailUrl);
         }
         if (fields.size() > 0) {
-            JSONArray jsonFields = new JSONArray();
+            ArrayNode jsonFields = object.putArray("fields");
             for (Object[] field : fields) {
-                JSONObject jsonField = new JSONObject();
+                ObjectNode jsonField = jsonFields.addObject();
                 if (field[0] != null) {
-                    jsonField.put("name", field[0]);
+                    jsonField.put("name", (String) field[0]);
                 }
                 if (field[1] != null) {
-                    jsonField.put("value", field[1]);
+                    jsonField.put("value", (String) field[1]);
                 }
                 if (field[2] != null) {
                     jsonField.put("inline", (boolean) field[2]);
                 }
-                jsonFields.put(jsonField);
             }
-            object.put("fields", jsonFields);
         }
         return object;
     }

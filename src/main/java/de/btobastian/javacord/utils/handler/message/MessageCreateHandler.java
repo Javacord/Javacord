@@ -1,12 +1,12 @@
 package de.btobastian.javacord.utils.handler.message;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.events.message.MessageCreateEvent;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,8 @@ public class MessageCreateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        api.getTextChannelById(packet.getString("channel_id")).ifPresent(channel -> {
+    public void handle(JsonNode packet) {
+        api.getTextChannelById(packet.get("channel_id").asText()).ifPresent(channel -> {
             Message message = api.getOrCreateMessage(channel, packet);
             MessageCreateEvent event = new MessageCreateEvent(api, message);
 

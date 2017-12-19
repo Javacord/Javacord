@@ -1,11 +1,11 @@
 package de.btobastian.javacord.entities;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -102,14 +102,14 @@ public class InviteBuilder {
      * @return The created invite.
      */
     public CompletableFuture<Invite> build() {
-        return new RestRequest<Invite>(channel.getApi(), HttpMethod.POST, RestEndpoint.CHANNEL_INVITE)
+        return new RestRequest<Invite>(channel.getApi(), RestMethod.POST, RestEndpoint.CHANNEL_INVITE)
                 .setUrlParameters(channel.getIdAsString())
-                .setBody(new JSONObject()
+                .setBody(JsonNodeFactory.instance.objectNode()
                         .put("max_age", maxAge)
                         .put("max_uses", maxUses)
                         .put("temporary", temporary)
                         .put("unique", unique))
-                .execute(res -> new ImplInvite(channel.getApi(), res.getBody().getObject()));
+                .execute((res, json) -> new ImplInvite(channel.getApi(), json));
     }
 
 }

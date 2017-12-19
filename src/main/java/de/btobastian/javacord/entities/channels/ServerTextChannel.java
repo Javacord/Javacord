@@ -1,14 +1,14 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,10 +52,10 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateTopic(String topic) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("topic", topic == null ? JSONObject.NULL : topic))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("topic", topic))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -65,10 +65,10 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNsfwFlag(boolean nsfw) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("nsfw", nsfw))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("nsfw", nsfw))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -78,11 +78,11 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject()
-                        .put("parent_id", category == null ? JSONObject.NULL : String.valueOf(category.getId())))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode()
+                        .put("parent_id", category == null ? null : category.getIdAsString()))
+                .execute((res, json) -> null);
     }
 
     /**

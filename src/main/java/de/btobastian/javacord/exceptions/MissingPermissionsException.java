@@ -1,8 +1,7 @@
 package de.btobastian.javacord.exceptions;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import okhttp3.Response;
 
 /**
  * When we are not allowed to perform an action.
@@ -18,7 +17,7 @@ public class MissingPermissionsException extends DiscordException {
      * @param request The request.
      */
     public MissingPermissionsException(
-            Exception origin, String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
+            Exception origin, String message, Response response, RestRequest<?> request) {
         super(origin, message, response, request);
     }
 

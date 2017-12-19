@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.*;
@@ -23,9 +24,8 @@ import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -127,13 +127,12 @@ public interface Server extends DiscordEntity {
      * @return The invites of the server.
      */
     default CompletableFuture<Collection<RichInvite>> getInvites() {
-        return new RestRequest<Collection<RichInvite>>(getApi(), HttpMethod.GET, RestEndpoint.SERVER_INVITE)
+        return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_INVITE)
                 .setUrlParameters(getIdAsString())
-                .execute(res -> {
+                .execute((res, json) -> {
                     Collection<RichInvite> invites = new HashSet<>();
-                    JSONArray invitesJson = res.getBody().getArray();
-                    for (int i = 0; i < invitesJson.length(); i++) {
-                        invites.add(new ImplInvite(getApi(), invitesJson.getJSONObject(i)));
+                    for (JsonNode inviteJson : json) {
+                        invites.add(new ImplInvite(getApi(), inviteJson));
                     }
                     return invites;
                 });
@@ -273,15 +272,15 @@ public interface Server extends DiscordEntity {
      */
     default CompletableFuture<Void> updateNickname(User user, String nickname) {
         if (user.isYourself()) {
-            return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.OWN_NICKNAME)
+            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
                     .setUrlParameters(String.valueOf(getId()))
-                    .setBody(new JSONObject().put("nick", nickname == null ? JSONObject.NULL : nickname))
-                    .execute(res -> null);
+                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
+                    .execute((res, json) -> null);
         } else {
-            return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER_MEMBER)
+            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
                     .setUrlParameters(String.valueOf(getId()), String.valueOf(user.getId()))
-                    .setBody(new JSONObject().put("nick", nickname == null ? JSONObject.NULL : nickname))
-                    .execute(res -> null);
+                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
+                    .execute((res, json) -> null);
         }
     }
 
@@ -302,10 +301,10 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("name", name == null ? JSONObject.NULL : name))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -315,10 +314,10 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRegion(Region region) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("region", region == null ? JSONObject.NULL : region.getKey()))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("region", region == null ? null : region.getKey()))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -328,10 +327,10 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAfkTimeout(int seconds) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("afk_timeout", seconds))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("afk_timeout", seconds))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -342,11 +341,11 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> transferOwnership(User newOwner) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.SERVER)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject()
-                        .put("owner_id", newOwner == null ? JSONObject.NULL : String.valueOf(newOwner.getId())))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode()
+                        .put("owner_id", newOwner == null ? null : newOwner.getIdAsString()))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -356,9 +355,9 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the kick was successful.
      */
     default CompletableFuture<Void> kickUser(User user) {
-        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.SERVER_MEMBER)
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -368,10 +367,10 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(User user) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.BAN)
+        return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setBody(new JSONObject().put("delete-message-days", 0))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("delete-message-days", 0))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -382,10 +381,10 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(User user, int deleteMessageDays) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PUT, RestEndpoint.BAN)
+        return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setBody(new JSONObject().put("delete-message-days", deleteMessageDays))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("delete-message-days", deleteMessageDays))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -405,9 +404,9 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the unban was successful.
      */
     default CompletableFuture<Void> unbanUser(long userId) {
-        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.BAN)
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), String.valueOf(userId))
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -432,13 +431,12 @@ public interface Server extends DiscordEntity {
      * @return A list of all webhooks in this server.
      */
     default CompletableFuture<List<Webhook>> getWebhooks() {
-        return new RestRequest<List<Webhook>>(getApi(), HttpMethod.GET, RestEndpoint.SERVER_WEBHOOK)
+        return new RestRequest<List<Webhook>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute(res -> {
+                .execute((res, json) -> {
                     List<Webhook> webhooks = new ArrayList<>();
-                    JSONArray webhooksJson = res.getBody().getArray();
-                    for (int i = 0; i < webhooksJson.length(); i++) {
-                        webhooks.add(new ImplWebhook(getApi(), webhooksJson.getJSONObject(i)));
+                    for (JsonNode webhookJson : json) {
+                        webhooks.add(new ImplWebhook(getApi(), webhookJson));
                     }
                     return webhooks;
                 });

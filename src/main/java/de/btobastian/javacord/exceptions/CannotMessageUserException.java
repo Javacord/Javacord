@@ -1,8 +1,7 @@
 package de.btobastian.javacord.exceptions;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import okhttp3.Response;
 
 /**
  * When the bot cannot message a user.
@@ -23,7 +22,7 @@ public class CannotMessageUserException extends MissingPermissionsException {
      * @param request The request.
      */
     public CannotMessageUserException(
-            Exception origin, String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
+            Exception origin, String message, Response response, RestRequest<?> request) {
         super(origin, message, response, request);
     }
 

@@ -1,13 +1,13 @@
 package de.btobastian.javacord.entities.message;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,15 +30,14 @@ public interface Reaction {
     static CompletableFuture<List<User>> getUsers(DiscordApi api, long channelId, long messageId, Emoji emoji) {
         String value = emoji.asUnicodeEmoji().orElse(
                 emoji.asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
-        return new RestRequest<List<User>>(api, HttpMethod.GET, RestEndpoint.REACTION)
+        return new RestRequest<List<User>>(api, RestMethod.GET, RestEndpoint.REACTION)
                 .setUrlParameters(
                         String.valueOf(channelId), String.valueOf(messageId), value)
                 .setRatelimitRetries(250)
-                .execute(res -> {
+                .execute((res, json) -> {
                     List<User> users = new ArrayList<>();
-                    JSONArray usersJson = res.getBody().getArray();
-                    for (int i = 0; i < usersJson.length(); i++) {
-                        users.add(((ImplDiscordApi) api).getOrCreateUser(usersJson.getJSONObject(i)));
+                    for (JsonNode userJson : json) {
+                        users.add(((ImplDiscordApi) api).getOrCreateUser(userJson));
                     }
                     return users;
                 });
@@ -76,14 +75,14 @@ public interface Reaction {
     static CompletableFuture<Void> removeUser(DiscordApi api, long channelId, long messageId, Emoji emoji, User user) {
         String value = emoji.asUnicodeEmoji().orElse(
                 emoji.asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
-        return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.REACTION)
+        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
                 .setUrlParameters(
                         String.valueOf(channelId),
                         String.valueOf(messageId),
                         value,
                         user.isYourself() ? "@me" : String.valueOf(user.getId()))
                 .setRatelimitRetries(250)
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**

@@ -1,5 +1,6 @@
 package de.btobastian.javacord.utils.handler.server;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.User;
@@ -7,7 +8,6 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerChangeNameEvent;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +28,13 @@ public class GuildUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        if (packet.has("unavailable") && packet.getBoolean("unavailable")) {
+    public void handle(JsonNode packet) {
+        if (packet.has("unavailable") && packet.get("unavailable").asBoolean()) {
             return;
         }
-        long id = Long.valueOf(packet.getString("id"));
+        long id = packet.get("id").asLong();
         api.getServerById(id).map(server -> (ImplServer) server).ifPresent(server -> {
-            String newName = packet.getString("name");
+            String newName = packet.get("name").asText();
             String oldName = server.getName();
             if (!Objects.deepEquals(oldName, newName)) {
                 server.setName(newName);
@@ -47,38 +47,40 @@ public class GuildUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChangeName(event));
             }
 
-            User newOwner = api.getUserById(packet.getString("owner_id")).orElse(null);
+            User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);
             User oldOwner = server.getOwner();
             if (oldOwner != newOwner) {
 
             }
 
-            Region newRegion = Region.getRegionByKey(packet.getString("region"));
+            Region newRegion = Region.getRegionByKey(packet.get("region").asText());
             Region oldRegion = server.getRegion();
             if (oldRegion != newRegion) {
 
             }
 
             String oldAfkChannelId = "...";
-            String newAfkChannelId = packet.isNull("afk_channel_id") ? null : packet.getString("afk_channel_id");
+            String newAfkChannelId =
+                    packet.get("afk_channel_id").isNull() ? null : packet.get("afk_channel_id").asText();
             if (!Objects.deepEquals(oldAfkChannelId, newAfkChannelId)) {
 
             }
 
             int oldAfkTimeout = -1;
-            int newAfkTimeout = packet.getInt("afk_timeout");
+            int newAfkTimeout = packet.get("afk_timeout").asInt();
             if (oldAfkTimeout != newAfkTimeout) {
 
             }
 
             boolean oldEmbedEnabled = false;
-            boolean newEmbedEnabled = packet.getBoolean("embed_enabled");
+            boolean newEmbedEnabled = packet.get("embed_enabled").asBoolean();
             if (oldEmbedEnabled != newEmbedEnabled) {
 
             }
 
             String oldEmbedChannelId = "...";
-            String newEmbedChannelId = packet.isNull("embed_channel_id") ? null : packet.getString("embed_channel_id");
+            String newEmbedChannelId =
+                    packet.get("embed_channel_id").isNull() ? null : packet.get("embed_channel_id").asText();
             if (!Objects.deepEquals(oldEmbedChannelId, newEmbedChannelId)) {
 
             }

@@ -1,8 +1,8 @@
 package de.btobastian.javacord.entities.message.embed.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.entities.message.embed.EmbedVideo;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -27,10 +27,10 @@ public class ImplEmbedVideo implements EmbedVideo {
      *
      * @param data The json data of the video.
      */
-    public ImplEmbedVideo(JSONObject data) {
-        url = data.has("url") ? data.getString("url") : null;
-        height = data.has("height") ? data.getInt("height") : -1;
-        width = data.has("width") ? data.getInt("width") : -1;
+    public ImplEmbedVideo(JsonNode data) {
+        url = data.has("url") ? data.get("url").asText() : null;
+        height = data.has("height") ? data.get("height").asInt() : -1;
+        width = data.has("width") ? data.get("width").asInt() : -1;
     }
 
     @Override

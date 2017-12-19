@@ -1,8 +1,8 @@
 package de.btobastian.javacord.entities.message.embed.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.entities.message.embed.EmbedProvider;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -26,9 +26,9 @@ public class ImplEmbedProvider implements EmbedProvider {
      *
      * @param data The json data of the provider.
      */
-    public ImplEmbedProvider(JSONObject data) {
-        name = data.has("name") ? data.getString("name") : null;
-        url = data.has("url") && !data.isNull("url") ? data.getString("url") : null;
+    public ImplEmbedProvider(JsonNode data) {
+        name = data.has("name") ? data.get("name").asText() : null;
+        url = data.has("url") && !data.get("url").isNull() ? data.get("url").asText() : null;
     }
 
     @Override

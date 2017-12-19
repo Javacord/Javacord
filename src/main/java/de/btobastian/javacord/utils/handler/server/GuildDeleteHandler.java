@@ -1,30 +1,12 @@
-/*
- * Copyright (C) 2017 Bastian Oppermann
- * 
- * This file is part of Javacord.
- * 
- * Javacord is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser general Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Javacord is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, see <http://www.gnu.org/licenses/>.
- */
 package de.btobastian.javacord.utils.handler.server;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.events.server.ServerBecomesUnavailableEvent;
 import de.btobastian.javacord.events.server.ServerLeaveEvent;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +26,9 @@ public class GuildDeleteHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        long serverId = Long.parseLong(packet.getString("id"));
-        if (packet.has("unavailable") && packet.getBoolean("unavailable")) {
+    public void handle(JsonNode packet) {
+        long serverId = packet.get("id").asLong();
+        if (packet.has("unavailable") && packet.get("unavailable").asBoolean()) {
             api.addUnavailableServerToCache(serverId);
             api.getServerById(serverId).ifPresent(server -> {
                 ServerBecomesUnavailableEvent event = new ServerBecomesUnavailableEvent(api, server);

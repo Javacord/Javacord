@@ -1,11 +1,12 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -98,7 +99,7 @@ public class ServerVoiceChannelBuilder {
      * @return The created voice channel.
      */
     public CompletableFuture<ServerVoiceChannel> create() {
-        JSONObject body = new JSONObject();
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("type", 2);
         if (name == null) {
             throw new IllegalStateException("Name is no optional parameter!");
@@ -113,10 +114,10 @@ public class ServerVoiceChannelBuilder {
         if (userlimit != null) {
             body.put("user_limit", (int) userlimit);
         }
-        return new RestRequest<ServerVoiceChannel>(server.getApi(), HttpMethod.POST, RestEndpoint.SERVER_CHANNEL)
+        return new RestRequest<ServerVoiceChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)
-                .execute(res -> server.getOrCreateServerVoiceChannel(res.getBody().getObject()));
+                .execute((res, json) -> server.getOrCreateServerVoiceChannel(json));
     }
 
 }

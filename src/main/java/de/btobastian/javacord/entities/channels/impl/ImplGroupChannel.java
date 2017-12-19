@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.channels.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Icon;
@@ -9,8 +10,6 @@ import de.btobastian.javacord.entities.impl.ImplIcon;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -63,18 +62,19 @@ public class ImplGroupChannel implements GroupChannel {
      * @param api The discord api instance.
      * @param data The json data of the channel.
      */
-    public ImplGroupChannel(ImplDiscordApi api, JSONObject data) {
+    public ImplGroupChannel(ImplDiscordApi api, JsonNode data) {
         this.api = api;
-        JSONArray jsonRecipients = data.getJSONArray("recipients");
-        for (int i = 0; i < jsonRecipients.length(); i++) {
-            recipients.add(api.getOrCreateUser(jsonRecipients.getJSONObject(i)));
+
+        for (JsonNode recipientJson : data.get("recipients")) {
+            recipients.add(api.getOrCreateUser(recipientJson));
         }
+
         this.messageCache = new ImplMessageCache(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds());
 
-        id = Long.parseLong(data.getString("id"));
-        name = data.has("name") && !data.isNull("name") ? data.getString("name") : null;
-        iconId = data.has("icon") && !data.isNull("icon") ? data.getString("icon") : null;
+        id = Long.parseLong(data.get("id").asText());
+        name = data.has("name") && !data.get("name").isNull() ? data.get("name").asText() : null;
+        iconId = data.has("icon") && !data.get("icon").isNull() ? data.get("icon").asText() : null;
 
         api.addGroupChannelToCache(this);
     }

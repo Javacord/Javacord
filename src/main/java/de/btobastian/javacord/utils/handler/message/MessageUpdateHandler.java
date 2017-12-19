@@ -1,5 +1,6 @@
 package de.btobastian.javacord.utils.handler.message;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.message.Message;
@@ -9,8 +10,6 @@ import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.events.message.MessageEditEvent;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -44,20 +43,20 @@ public class MessageUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        long messageId = Long.parseLong(packet.getString("id"));
-        long channelId = Long.parseLong(packet.getString("channel_id"));
+    public void handle(JsonNode packet) {
+        long messageId = packet.get("id").asLong();
+        long channelId = packet.get("channel_id").asLong();
 
         api.getTextChannelById(channelId).ifPresent(channel -> {
             Optional<ImplMessage> message = api.getCachedMessageById(messageId).map(msg -> (ImplMessage) msg);
 
             MessageEditEvent editEvent = null;
-            if (packet.has("edited_timestamp") && !packet.isNull("edited_timestamp")) {
+            if (packet.has("edited_timestamp") && !packet.get("edited_timestamp").isNull()) {
                 message.ifPresent(msg ->
-                        msg.setLastEditTime(OffsetDateTime.parse(packet.getString("edited_timestamp")).toInstant()));
+                        msg.setLastEditTime(OffsetDateTime.parse(packet.get("edited_timestamp").asText()).toInstant()));
 
                 long editTimestamp =
-                        OffsetDateTime.parse(packet.getString("edited_timestamp")).toInstant().toEpochMilli();
+                        OffsetDateTime.parse(packet.get("edited_timestamp").asText()).toInstant().toEpochMilli();
                 long lastKnownEditTimestamp = lastKnownEditTimestamps.getOrDefault(messageId, 0L);
                 lastKnownEditTimestamps.put(messageId, editTimestamp);
 
@@ -74,16 +73,15 @@ public class MessageUpdateHandler extends PacketHandler {
 
                 String newContent = null;
                 if (packet.has("content")) {
-                    newContent = packet.getString("content");
+                    newContent = packet.get("content").asText();
                     String finalNewContent = newContent;
                     message.ifPresent(msg -> msg.setContent(finalNewContent));
                 }
                 List<Embed> newEmbeds = null;
                 if (packet.has("embeds")) {
                     newEmbeds = new ArrayList<>();
-                    JSONArray embedsJson = packet.getJSONArray("embeds");
-                    for (int i = 0; i < embedsJson.length(); i++) {
-                        Embed embed = new ImplEmbed(embedsJson.getJSONObject(i));
+                    for (JsonNode embedJson : packet.get("embeds")) {
+                        Embed embed = new ImplEmbed(embedJson);
                         newEmbeds.add(embed);
                     }
                     List<Embed> finalNewEmbeds = newEmbeds;
@@ -100,8 +98,8 @@ public class MessageUpdateHandler extends PacketHandler {
                         isMostLikelyAnEdit = true;
                     } else {
                         for (int i = 0; i < newEmbeds.size(); i++) {
-                            if (!newEmbeds.get(i).toBuilder().toJSONObject().toString()
-                                    .equals(oldEmbeds.get(i).toBuilder().toJSONObject().toString())) {
+                            if (!newEmbeds.get(i).toBuilder().toJsonNode().toString()
+                                    .equals(oldEmbeds.get(i).toBuilder().toJsonNode().toString())) {
                                 isMostLikelyAnEdit = true;
                             }
                         }

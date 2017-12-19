@@ -1,5 +1,6 @@
 package de.btobastian.javacord.utils.handler.server.role;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
@@ -9,7 +10,6 @@ import de.btobastian.javacord.events.server.role.RoleChangePositionEvent;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +29,12 @@ public class GuildRoleUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        JSONObject roleJson = packet.getJSONObject("role");
-        long roleId = Long.parseLong(roleJson.getString("id"));
+    public void handle(JsonNode packet) {
+        JsonNode roleJson = packet.get("role");
+        long roleId = roleJson.get("id").asLong();
         api.getRoleById(roleId).map(role -> (ImplRole) role).ifPresent(role -> {
             Permissions oldPermissions = role.getPermissions();
-            ImplPermissions newPermissions = new ImplPermissions(roleJson.getInt("permissions"), 0);
+            ImplPermissions newPermissions = new ImplPermissions(roleJson.get("permissions").asInt(), 0);
             if (!oldPermissions.equals(newPermissions)) {
                 role.setPermissions(newPermissions);
 
@@ -50,7 +50,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             }
 
             int oldPosition = role.getPosition();
-            int newPosition = roleJson.getInt("position");
+            int newPosition = roleJson.get("position").asInt();
             if (oldPosition != newPosition) {
                 role.setPosition(newPosition);
 

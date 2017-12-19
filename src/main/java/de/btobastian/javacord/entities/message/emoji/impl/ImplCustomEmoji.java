@@ -1,10 +1,10 @@
 package de.btobastian.javacord.entities.message.emoji.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
-import org.json.JSONObject;
 
 import java.util.Optional;
 
@@ -39,7 +39,7 @@ public class ImplCustomEmoji implements CustomEmoji {
      * @param api The discord api instance.
      * @param data The json data of the emoji.
      */
-    public ImplCustomEmoji(ImplDiscordApi api, JSONObject data) {
+    public ImplCustomEmoji(ImplDiscordApi api, JsonNode data) {
         this(api, null, data);
     }
 
@@ -50,11 +50,11 @@ public class ImplCustomEmoji implements CustomEmoji {
      * @param server The server of the emoji.
      * @param data The json data of the emoji.
      */
-    public ImplCustomEmoji(ImplDiscordApi api, Server server, JSONObject data) {
+    public ImplCustomEmoji(ImplDiscordApi api, Server server, JsonNode data) {
         this.api = api;
         this.server = server;
-        id = Long.parseLong(data.getString("id"));
-        name = data.getString("name");
+        id = data.get("id").asLong();
+        name = data.get("name").asText();
     }
 
     @Override

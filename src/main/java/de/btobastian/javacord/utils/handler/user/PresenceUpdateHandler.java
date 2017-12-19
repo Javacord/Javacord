@@ -1,23 +1,6 @@
-/*
- * Copyright (C) 2017 Bastian Oppermann
- * 
- * This file is part of Javacord.
- * 
- * Javacord is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser general Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Javacord is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, see <http://www.gnu.org/licenses/>.
- */
 package de.btobastian.javacord.utils.handler.user;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
@@ -30,7 +13,6 @@ import de.btobastian.javacord.events.user.UserChangeStatusEvent;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,17 +33,17 @@ public class PresenceUpdateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        long userId = Long.parseLong(packet.getJSONObject("user").getString("id"));
+    public void handle(JsonNode packet) {
+        long userId = packet.get("user").get("id").asLong();
         api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
             if (packet.has("game")) {
                 Game newGame = null;
-                if (!packet.isNull("game")) {
-                    int gameType = packet.getJSONObject("game").getInt("type");
-                    String name = packet.getJSONObject("game").getString("name");
+                if (!packet.get("game").isNull()) {
+                    int gameType = packet.get("game").get("type").asInt();
+                    String name = packet.get("game").get("name").asText();
                     String streamingUrl =
-                            packet.getJSONObject("game").has("url") && !packet.getJSONObject("game").isNull("url") ?
-                            packet.getJSONObject("game").getString("url") : null;
+                            packet.get("game").has("url") && !packet.get("game").get("url").isNull() ?
+                            packet.get("game").get("url").asText() : null;
                     newGame = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
                 }
                 Game oldGame = user.getGame().orElse(null);
@@ -71,7 +53,8 @@ public class PresenceUpdateHandler extends PacketHandler {
                 }
             }
             if (packet.has("status")) {
-                UserStatus newStatus = UserStatus.fromString(packet.optString("status"));
+                UserStatus newStatus = UserStatus.fromString(
+                        packet.has("status") ? packet.get("status").asText(null) : null);
                 UserStatus oldStatus = user.getStatus();
                 user.setStatus(newStatus);
                 if (newStatus != oldStatus) {

@@ -1,30 +1,12 @@
-/*
- * Copyright (C) 2017 Bastian Oppermann
- * 
- * This file is part of Javacord.
- * 
- * Javacord is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser general Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Javacord is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, see <http://www.gnu.org/licenses/>.
- */
 package de.btobastian.javacord.utils.handler.server;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerMemberAddEvent;
 import de.btobastian.javacord.listeners.server.ServerMemberAddListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +26,12 @@ public class GuildMemberAddHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        api.getServerById(packet.getString("guild_id"))
+    public void handle(JsonNode packet) {
+        api.getServerById(packet.get("guild_id").asText())
                 .map(server -> (ImplServer) server)
                 .ifPresent(server -> {
                     server.addMember(packet);
-                    User user = api.getOrCreateUser(packet.getJSONObject("user"));
+                    User user = api.getOrCreateUser(packet.get("user"));
 
                     ServerMemberAddEvent event = new ServerMemberAddEvent(api, server, user);
 

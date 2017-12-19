@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.channels.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
@@ -9,8 +10,6 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -66,30 +65,29 @@ public class ImplChannelCategory implements ChannelCategory {
      * @param server The server of the channel.
      * @param data The json data of the channel.
      */
-    public ImplChannelCategory(ImplDiscordApi api, ImplServer server, JSONObject data) {
+    public ImplChannelCategory(ImplDiscordApi api, ImplServer server, JsonNode data) {
         this.api = api;
         this.server = server;
 
-        id = Long.parseLong(data.getString("id"));
-        name = data.getString("name");
-        position = data.getInt("position");
-        nsfw = data.has("nsfw") && data.getBoolean("nsfw");
+        id = Long.parseLong(data.get("id").asText());
+        name = data.get("name").asText();
+        position = data.get("position").asInt();
+        nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
 
-        JSONArray permissionOverwritesJson = data.optJSONArray("permission_overwrites");
-        permissionOverwritesJson = permissionOverwritesJson == null ? new JSONArray() : permissionOverwritesJson;
-        for (int i = 0; i < permissionOverwritesJson.length(); i++) {
-            JSONObject permissionOverwrite = permissionOverwritesJson.getJSONObject(i);
-            long id = Long.parseLong(permissionOverwrite.optString("id", "-1"));
-            int allow = permissionOverwrite.optInt("allow", 0);
-            int deny = permissionOverwrite.optInt("deny", 0);
-            Permissions permissions = new ImplPermissions(allow, deny);
-            switch (permissionOverwrite.getString("type")) {
-                case "role":
-                    overwrittenRolePermissions.put(id, permissions);
-                    break;
-                case "member":
-                    overwrittenUserPermissions.put(id, permissions);
-                    break;
+        if (data.has("permission_overwrites")) {
+            for (JsonNode permissionOverwrite : data.get("permission_overwrites")) {
+                long id = Long.parseLong(permissionOverwrite.has("id") ? permissionOverwrite.get("id").asText() : "-1");
+                int allow = permissionOverwrite.has("allow") ? permissionOverwrite.get("allow").asInt() : 0;
+                int deny = permissionOverwrite.has("deny") ? permissionOverwrite.get("deny").asInt() : 0;
+                Permissions permissions = new ImplPermissions(allow, deny);
+                switch (permissionOverwrite.get("type").asText()) {
+                    case "role":
+                        overwrittenRolePermissions.put(id, permissions);
+                        break;
+                    case "member":
+                        overwrittenUserPermissions.put(id, permissions);
+                        break;
+                }
             }
         }
 

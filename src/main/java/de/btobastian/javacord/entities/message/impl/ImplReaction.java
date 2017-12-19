@@ -1,11 +1,11 @@
 package de.btobastian.javacord.entities.message.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
-import org.json.JSONObject;
 
 /**
  * The implementation of {@link Reaction}.
@@ -38,14 +38,14 @@ public class ImplReaction implements Reaction {
      * @param message The message, the reaction belongs to.
      * @param data The json data of the reaction.
      */
-    public ImplReaction(Message message, JSONObject data) {
+    public ImplReaction(Message message, JsonNode data) {
         this.message = message;
-        this.count = data.getInt("count");
-        this.containsYou = data.getBoolean("me");
+        this.count = data.get("count").asInt();
+        this.containsYou = data.get("me").asBoolean();
 
-        JSONObject emojiJson = data.getJSONObject("emoji");
-        if (!emojiJson.has("id") || emojiJson.isNull("id")) {
-            emoji = ImplUnicodeEmoji.fromString(emojiJson.getString("name"));
+        JsonNode emojiJson = data.get("emoji");
+        if (!emojiJson.has("id") || emojiJson.get("id").isNull()) {
+            emoji = ImplUnicodeEmoji.fromString(emojiJson.get("name").asText());
         } else {
             emoji = ((ImplDiscordApi) message.getApi()).getOrCreateCustomEmoji(null, emojiJson);
         }

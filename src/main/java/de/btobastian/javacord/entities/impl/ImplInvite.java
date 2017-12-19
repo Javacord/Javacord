@@ -1,12 +1,12 @@
 package de.btobastian.javacord.entities.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.ChannelType;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -111,29 +111,29 @@ public class ImplInvite implements RichInvite {
      * @param api The discord api instance.
      * @param data The json data of the invite.
      */
-    public ImplInvite(DiscordApi api, JSONObject data) {
+    public ImplInvite(DiscordApi api, JsonNode data) {
         this.api = api;
-        this.code = data.getString("code");
-        this.serverId = Long.parseLong(data.getJSONObject("guild").getString("id"));
-        this.serverName = data.getJSONObject("guild").getString("name");
-        this.serverIcon = data.getJSONObject("guild").has("icon") && !data.getJSONObject("guild").isNull("icon") ?
-                data.getJSONObject("guild").getString("icon") : null;
-        this.serverSplash = data.getJSONObject("guild").has("splash") && !data.getJSONObject("guild").isNull("splash") ?
-                data.getJSONObject("guild").getString("splash") : null;
-        this.channelId = Long.parseLong(data.getJSONObject("channel").getString("id"));
-        this.channelName = data.getJSONObject("channel").getString("name");
-        this.channelType = ChannelType.fromId(data.getJSONObject("channel").getInt("type"));
+        this.code = data.get("code").asText();
+        this.serverId = Long.parseLong(data.get("guild").get("id").asText());
+        this.serverName = data.get("guild").get("name").asText();
+        this.serverIcon = data.get("guild").has("icon") && !data.get("guild").get("icon").isNull() ?
+                data.get("guild").get("icon").asText() : null;
+        this.serverSplash = data.get("guild").has("splash") && !data.get("guild").get("splash").isNull() ?
+                data.get("guild").get("splash").asText() : null;
+        this.channelId = Long.parseLong(data.get("channel").get("id").asText());
+        this.channelName = data.get("channel").get("name").asText();
+        this.channelType = ChannelType.fromId(data.get("channel").get("type").asInt());
 
         // Rich data (may not be present)
         this.inviter = data.has("inviter") ?
-                ((ImplDiscordApi) api).getOrCreateUser(data.getJSONObject("inviter")) : null;
-        this.uses = data.has("uses") ? data.getInt("uses") : -1;
-        this.maxUses = data.has("max_uses") ? data.getInt("max_uses") : -1;
-        this.maxAge = data.has("max_age") ? data.getInt("max_age") : -1;
-        this.temporary = data.has("temporary") && data.getBoolean("temporary");
+                ((ImplDiscordApi) api).getOrCreateUser(data.get("inviter")) : null;
+        this.uses = data.has("uses") ? data.get("uses").asInt() : -1;
+        this.maxUses = data.has("max_uses") ? data.get("max_uses").asInt() : -1;
+        this.maxAge = data.has("max_age") ? data.get("max_age").asInt() : -1;
+        this.temporary = data.has("temporary") && data.get("temporary").asBoolean();
         this.creationTimestamp = data.has("created_at") ?
-                OffsetDateTime.parse(data.getString("created_at")).toInstant() : null;
-        this.revoked = data.has("revoked") && data.getBoolean("revoked");
+                OffsetDateTime.parse(data.get("created_at").asText()).toInstant() : null;
+        this.revoked = data.has("revoked") && data.get("revoked").asBoolean();
     }
 
     /**

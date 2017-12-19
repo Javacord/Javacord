@@ -1,12 +1,12 @@
 package de.btobastian.javacord.utils.handler.message;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.events.message.MessageDeleteEvent;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,9 @@ public class MessageDeleteHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        long messageId = Long.parseLong(packet.getString("id"));
-        long channelId = Long.parseLong(packet.getString("channel_id"));
+    public void handle(JsonNode packet) {
+        long messageId = packet.get("id").asLong();
+        long channelId = packet.get("channel_id").asLong();
 
         api.getTextChannelById(channelId).ifPresent(channel -> {
             MessageDeleteEvent event = new MessageDeleteEvent(api, messageId, channel);

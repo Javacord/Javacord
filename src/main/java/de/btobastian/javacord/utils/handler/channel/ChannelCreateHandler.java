@@ -1,5 +1,6 @@
 package de.btobastian.javacord.utils.handler.channel;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
@@ -9,7 +10,6 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.events.server.channel.ServerChannelCreateEvent;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +29,8 @@ public class ChannelCreateHandler extends PacketHandler {
     }
 
     @Override
-    public void handle(JSONObject packet) {
-        int type = packet.getInt("type");
+    public void handle(JsonNode packet) {
+        int type = packet.get("type").asInt();
         switch (type) {
             case 0:
                 handleServerTextChannel(packet);
@@ -52,8 +52,8 @@ public class ChannelCreateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handleChannelCategory(JSONObject channel) {
-        long serverId = Long.parseLong(channel.getString("guild_id"));
+    private void handleChannelCategory(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
         api.getServerById(serverId).ifPresent(server -> {
             ChannelCategory textChannel = ((ImplServer) server).getOrCreateChannelCategory(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEvent(textChannel);
@@ -71,8 +71,8 @@ public class ChannelCreateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handleServerTextChannel(JSONObject channel) {
-        long serverId = Long.parseLong(channel.getString("guild_id"));
+    private void handleServerTextChannel(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
         api.getServerById(serverId).ifPresent(server -> {
             ServerTextChannel textChannel = ((ImplServer) server).getOrCreateServerTextChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEvent(textChannel);
@@ -90,8 +90,8 @@ public class ChannelCreateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handleServerVoiceChannel(JSONObject channel) {
-        long serverId = Long.parseLong(channel.getString("guild_id"));
+    private void handleServerVoiceChannel(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
         api.getServerById(serverId).ifPresent(server -> {
             ServerVoiceChannel voiceChannel = ((ImplServer) server).getOrCreateServerVoiceChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEvent(voiceChannel);
@@ -109,10 +109,10 @@ public class ChannelCreateHandler extends PacketHandler {
      *
      * @param channel The channel data.
      */
-    private void handlePrivateChannel(JSONObject channel) {
+    private void handlePrivateChannel(JsonNode channel) {
         // A CHANNEL_CREATE packet is sent every time a bot account receives a message, see
         // https://github.com/hammerandchisel/discord-api-docs/issues/184
-        ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.getJSONArray("recipients").getJSONObject(0));
+        ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.get("recipients").get(0));
         if (!recipient.getPrivateChannel().isPresent()) {
             recipient.getOrCreateChannel(channel);
         }

@@ -1,9 +1,9 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -32,10 +32,10 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateUserLimit(int limit) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("user_limit", limit))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("user_limit", limit))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -54,11 +54,11 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject()
-                        .put("parent_id", category == null ? JSONObject.NULL : String.valueOf(category.getId())))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode()
+                        .put("parent_id", category == null ? null : category.getIdAsString()))
+                .execute((res, json) -> null);
     }
 
     /**

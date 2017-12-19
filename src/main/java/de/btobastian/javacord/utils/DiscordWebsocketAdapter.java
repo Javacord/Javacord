@@ -1,5 +1,9 @@
 package de.btobastian.javacord.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neovisionaries.ws.client.*;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
@@ -28,7 +32,6 @@ import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.TypingStartHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import javax.net.ssl.SSLContext;
@@ -178,17 +181,18 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onTextMessage(WebSocket websocket, String text) throws Exception {
-        JSONObject packet = new JSONObject(text);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode packet = mapper.readTree(text);
 
-        int op = packet.getInt("op");
+        int op = packet.get("op").asInt();
 
         switch (op) {
             case 0:
-                lastSeq = packet.getInt("s");
-                String type = packet.getString("t");
+                lastSeq = packet.get("s").asInt();
+                String type = packet.get("t").asText();
                 PacketHandler handler = handlers.get(type);
                 if (handler != null) {
-                    handler.handlePacket(packet.getJSONObject("d"));
+                    handler.handlePacket(packet.get("d"));
                 } else {
                     logger.debug("Received unknown packet of type {} (packet: {})", type, packet.toString());
                 }
@@ -213,7 +217,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                     // We are the one who send the first heartbeat
                     heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
-                    sessionId = packet.getJSONObject("d").getString("session_id");
+                    sessionId = packet.get("d").get("session_id").asText();
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("startupWait").submit(() -> {
                         boolean allUsersLoaded = false;
@@ -269,8 +273,8 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
                 sendIdentify(websocket);
                 break;
             case 10:
-                JSONObject data = packet.getJSONObject("d");
-                heartbeatInterval = data.getInt("heartbeat_interval");
+                JsonNode data = packet.get("d");
+                heartbeatInterval = data.get("heartbeat_interval").asInt();
                 logger.debug("Received HELLO packet");
                 break;
             case 11:
@@ -335,7 +339,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param websocket The websocket the heartbeat should be sent to.
      */
     private void sendHeartbeat(WebSocket websocket) {
-        JSONObject heartbeatPacket = new JSONObject();
+        ObjectNode heartbeatPacket = JsonNodeFactory.instance.objectNode();
         heartbeatPacket.put("op", 1);
         heartbeatPacket.put("d", lastSeq);
         websocket.sendText(heartbeatPacket.toString());
@@ -347,12 +351,12 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param websocket The websocket the resume packet should be sent to.
      */
     private void sendResume(WebSocket websocket) {
-        JSONObject resumePacket = new JSONObject()
-                .put("op", 6)
-                .put("d", new JSONObject()
-                        .put("token", api.getToken())
-                        .put("session_id", sessionId)
-                        .put("seq", lastSeq));
+        ObjectNode resumePacket = JsonNodeFactory.instance.objectNode()
+                .put("op", 6);
+        resumePacket.putObject("d")
+                .put("token", api.getToken())
+                .put("session_id", sessionId)
+                .put("seq", lastSeq);
         logger.debug("Sending resume packet");
         websocket.sendText(resumePacket.toString());
     }
@@ -363,20 +367,20 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
      * @param websocket The websocket the identify packet should be sent to.
      */
     private void sendIdentify(WebSocket websocket) {
-        JSONObject identifyPacket = new JSONObject()
-                .put("op", 2)
-                .put("d", new JSONObject()
-                        .put("token", api.getToken())
-                        .put("properties", new JSONObject()
-                                .put("$os", System.getProperty("os.name"))
-                                .put("$browser", "Javacord")
-                                .put("$device", "Javacord")
-                                .put("$referrer", "")
-                                .put("$referring_domain", ""))
-                        .put("compress", true)
-                        .put("large_threshold", 250));
+        ObjectNode identifyPacket = JsonNodeFactory.instance.objectNode()
+                .put("op", 2);
+        ObjectNode data = identifyPacket.putObject("d");
+        data.put("token", api.getToken())
+                .put("compress", true)
+                .put("large_threshold", 250)
+                .putObject("properties")
+                .put("$os", System.getProperty("os.name"))
+                .put("$browser", "Javacord")
+                .put("$device", "Javacord")
+                .put("$referrer", "")
+                .put("$referring_domain", "");
         if (api.getTotalShards() > 1) {
-            identifyPacket.getJSONObject("d").put("shard", new int[]{api.getCurrentShard(), api.getTotalShards()});
+            data.putArray("shard").add(api.getCurrentShard()).add(api.getTotalShards());
         }
         logger.debug("Sending identify packet");
         websocket.sendText(identifyPacket.toString());
@@ -478,17 +482,16 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     public void updateStatus() {
         Optional<Game> game = api.getGame();
         logger.debug("Updating status (game: {})", game.isPresent() ? game.get().getName() : "none");
-        JSONObject gameJson = new JSONObject();
-        gameJson.put("name", game.isPresent() ? game.get().getName() : JSONObject.NULL);
+        ObjectNode updateStatus = JsonNodeFactory.instance.objectNode()
+                .put("op", 3);
+        updateStatus.putObject("d")
+                .put("status", "online")
+                .put("afk", false)
+                .putNull("since");
+        ObjectNode gameJson = updateStatus.putObject("game");
+        gameJson.put("name", game.isPresent() ? game.get().getName() : null);
         gameJson.put("type", game.map(g -> g.getType().getId()).orElse(0));
         game.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> gameJson.put("url", url)));
-        JSONObject updateStatus = new JSONObject()
-                .put("op", 3)
-                .put("d", new JSONObject()
-                        .put("status", "online")
-                        .put("afk", false)
-                        .put("game", gameJson)
-                        .put("since", JSONObject.NULL));
         websocket.sendText(updateStatus.toString());
     }
 

@@ -1,6 +1,5 @@
 package de.btobastian.javacord;
 
-import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
@@ -30,7 +29,9 @@ import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import okhttp3.OkHttpClient;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -57,6 +58,13 @@ public interface DiscordApi {
      * @return The internally used thread pool.
      */
     ThreadPool getThreadPool();
+
+    /**
+     * Gets the used {@link OkHttpClient http client} for this api instance.
+     *
+     * @return The used http client.
+     */
+    OkHttpClient getHttpClient();
 
     /**
      * Gets the ratelimit manager for this bot.
@@ -232,8 +240,8 @@ public interface DiscordApi {
      * @return The application info of the bot.
      */
     default CompletableFuture<ApplicationInfo> getApplicationInfo() {
-        return new RestRequest<ApplicationInfo>(this, HttpMethod.GET, RestEndpoint.SELF_INFO)
-                .execute(res -> new ImplApplicationInfo(this, res.getBody().getObject()));
+        return new RestRequest<ApplicationInfo>(this, RestMethod.GET, RestEndpoint.SELF_INFO)
+                .execute((res, json) -> new ImplApplicationInfo(this, json));
     }
 
     /**
@@ -243,9 +251,9 @@ public interface DiscordApi {
      * @return The webhook with the given id.
      */
     default CompletableFuture<Webhook> getWebhookById(long id) {
-        return new RestRequest<Webhook>(this, HttpMethod.GET, RestEndpoint.WEBHOOK)
+        return new RestRequest<Webhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
                 .setUrlParameters(String.valueOf(id))
-                .execute(res -> new ImplWebhook(this, res.getBody().getObject()));
+                .execute((res, json) -> new ImplWebhook(this, json));
     }
 
     /**
@@ -262,9 +270,9 @@ public interface DiscordApi {
      * @return The invite with the given code.
      */
     default CompletableFuture<Invite> getInviteByCode(String code) {
-        return new RestRequest<Invite>(this, HttpMethod.GET, RestEndpoint.INVITE)
+        return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
                 .setUrlParameters(code)
-                .execute(res -> new ImplInvite(this, res.getBody().getObject()));
+                .execute((res, json) -> new ImplInvite(this, json));
     }
 
     /**

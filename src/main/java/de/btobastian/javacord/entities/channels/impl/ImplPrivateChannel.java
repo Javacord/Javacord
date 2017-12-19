@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.channels.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
@@ -7,7 +8,6 @@ import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
-import org.json.JSONObject;
 
 /**
  * The implementation of {@link PrivateChannel}.
@@ -40,13 +40,13 @@ public class ImplPrivateChannel implements PrivateChannel {
      * @param api The discord api instance.
      * @param data The json data of the channel.
      */
-    public ImplPrivateChannel(ImplDiscordApi api, JSONObject data) {
+    public ImplPrivateChannel(ImplDiscordApi api, JsonNode data) {
         this.api = api;
-        this.recipient = (ImplUser) api.getOrCreateUser(data.getJSONArray("recipients").getJSONObject(0));
+        this.recipient = (ImplUser) api.getOrCreateUser(data.get("recipients").get(0));
         this.messageCache = new ImplMessageCache(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds());
 
-        id = Long.parseLong(data.getString("id"));
+        id = Long.parseLong(data.get("id").asText());
         recipient.setChannel(this);
     }
 

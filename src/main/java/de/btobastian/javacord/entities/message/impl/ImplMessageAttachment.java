@@ -1,10 +1,10 @@
 package de.btobastian.javacord.entities.message.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -67,15 +67,15 @@ public class ImplMessageAttachment implements MessageAttachment {
      * @param message The message of the attachment.
      * @param data The data of the attachment.
      */
-    public ImplMessageAttachment(Message message, JSONObject data) {
+    public ImplMessageAttachment(Message message, JsonNode data) {
         this.message = message;
-        id = Long.parseLong(data.getString("id"));
-        fileName = data.getString("filename");
-        size = data.getInt("size");
-        url = data.getString("url");
-        proxyUrl = data.getString("proxy_url");
-        height = data.has("height") && !data.isNull("height") ? data.getInt("height") : null;
-        width = data.has("width") && !data.isNull("width") ? data.getInt("width") : null;
+        id = data.get("id").asLong();
+        fileName = data.get("filename").asText();
+        size = data.get("size").asInt();
+        url = data.get("url").asText();
+        proxyUrl = data.get("proxy_url").asText();
+        height = data.has("height") && !data.get("height").isNull() ? data.get("height").asInt() : null;
+        width = data.has("width") && !data.get("width").isNull() ? data.get("width").asInt() : null;
     }
 
     @Override

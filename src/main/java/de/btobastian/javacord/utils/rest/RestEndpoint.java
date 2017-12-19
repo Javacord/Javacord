@@ -1,6 +1,7 @@
 package de.btobastian.javacord.utils.rest;
 
 import de.btobastian.javacord.Javacord;
+import okhttp3.HttpUrl;
 
 import java.util.Optional;
 
@@ -154,6 +155,17 @@ public enum RestEndpoint {
             }
         }
         return url;
+    }
+
+    /**
+     * Gets the full {@link HttpUrl http url} of the endpoint.
+     * Parameters which are "too much" are added to the end.
+     *
+     * @param parameters The parameters of the url. E.g. for channel ids.
+     * @return The full http url of the endpoint.
+     */
+    public HttpUrl getOkHttpUrl(String... parameters) {
+        return HttpUrl.parse(getFullUrl(parameters));
     }
 
 }

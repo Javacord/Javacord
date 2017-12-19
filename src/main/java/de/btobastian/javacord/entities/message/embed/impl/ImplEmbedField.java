@@ -1,7 +1,7 @@
 package de.btobastian.javacord.entities.message.embed.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.entities.message.embed.EmbedField;
-import org.json.JSONObject;
 
 /**
  * The implementation of {@link EmbedField}.
@@ -17,10 +17,10 @@ public class ImplEmbedField implements EmbedField {
      *
      * @param data The json data of the field.
      */
-    public ImplEmbedField(JSONObject data) {
-        name = data.has("name") ? data.getString("name") : null;
-        value = data.has("value") ? data.getString("value") : null;
-        inline = data.has("inline") && data.getBoolean("inline");
+    public ImplEmbedField(JsonNode data) {
+        name = data.has("name") ? data.get("name").asText() : null;
+        value = data.has("value") ? data.get("value").asText() : null;
+        inline = data.has("inline") && data.get("inline").asBoolean();
     }
 
     @Override

@@ -1,8 +1,8 @@
 package de.btobastian.javacord.entities.message.embed.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.entities.message.embed.EmbedFooter;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -28,11 +28,11 @@ public class ImplEmbedFooter implements EmbedFooter {
      *
      * @param data The json data of the footer.
      */
-    public ImplEmbedFooter(JSONObject data) {
-        text = data.has("text") ? data.getString("text") : null;
-        iconUrl = data.has("icon_url") && !data.isNull("icon_url") ? data.getString("icon_url") : null;
-        proxyIconUrl = data.has("proxy_icon_url") && !data.isNull("proxy_icon_url")
-                ? data.getString("proxy_icon_url") : null;
+    public ImplEmbedFooter(JsonNode data) {
+        text = data.has("text") ? data.get("text").asText() : null;
+        iconUrl = data.has("icon_url") && !data.get("icon_url").isNull() ? data.get("icon_url").asText() : null;
+        proxyIconUrl = data.has("proxy_icon_url") && !data.get("proxy_icon_url").isNull()
+                ? data.get("proxy_icon_url").asText() : null;
     }
 
     @Override

@@ -1,18 +1,15 @@
 package de.btobastian.javacord.entities.message.impl;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageHistory;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONArray;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -194,7 +191,7 @@ public class ImplMessageHistory implements MessageHistory {
      */
     private CompletableFuture<Message[]> request(int limit, long before, long after, long around) {
         RestRequest<Message[]> restRequest =
-                new RestRequest<Message[]>(channel.getApi(), HttpMethod.GET, RestEndpoint.MESSAGE)
+                new RestRequest<Message[]>(channel.getApi(), RestMethod.GET, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(channel.getId()));
 
         if (limit != -1) {
@@ -210,15 +207,13 @@ public class ImplMessageHistory implements MessageHistory {
             restRequest.addQueryParameter("around", String.valueOf(around));
         }
 
-        return restRequest.execute(res -> {
-                    JSONArray messagesJson = res.getBody().getArray();
-                    Message[] messages = new Message[messagesJson.length()];
-                    for (int i = 0; i < messagesJson.length(); i++) {
-                        messages[i] = ((ImplDiscordApi) channel.getApi())
-                                .getOrCreateMessage(channel, messagesJson.getJSONObject(i));
-                    }
-                    return messages;
-                });
+        return restRequest.execute((res, json) -> {
+            Collection<Message> messages = new ArrayList<>();
+            for (JsonNode messageJson : json) {
+                messages.add(((ImplDiscordApi) channel.getApi()).getOrCreateMessage(channel, messageJson));
+            }
+            return messages.toArray(new Message[messages.size()]);
+        });
     }
 
     @Override

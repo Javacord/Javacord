@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.message.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
@@ -10,8 +11,6 @@ import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -112,55 +111,60 @@ public class ImplMessage implements Message {
      * @param channel The channel of the message.
      * @param data The json data of the message.
      */
-    public ImplMessage(ImplDiscordApi api, TextChannel channel, JSONObject data) {
+    public ImplMessage(ImplDiscordApi api, TextChannel channel, JsonNode data) {
         this.api = api;
         this.channel = channel;
 
-        id = Long.parseLong(data.getString("id"));
-        content = data.getString("content");
+        id = data.get("id").asLong();
+        content = data.get("content").asText();
 
-        lastEditTime = data.has("edited_timestamp") && !data.isNull("edited_timestamp") ?
-                OffsetDateTime.parse(data.getString("edited_timestamp")).toInstant() : null;
+        lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull() ?
+                OffsetDateTime.parse(data.get("edited_timestamp").asText()).toInstant() : null;
 
-        type = MessageType.byType(data.getInt("type"), data.has("webhook_id"));
+        type = MessageType.byType(data.get("type").asInt(), data.has("webhook_id"));
 
-        Long webhookId = data.has("webhook_id") ? Long.parseLong(data.getString("webhook_id")) : null;
-        author = new ImplMessageAuthor(this, webhookId, data.getJSONObject("author"));
+        Long webhookId = data.has("webhook_id") ? data.get("webhook_id").asLong() : null;
+        author = new ImplMessageAuthor(this, webhookId, data.get("author"));
 
         ImplMessageCache cache = (ImplMessageCache) channel.getMessageCache();
         cache.addMessage(this);
 
-        JSONArray embedsJson = data.has("embeds") ? data.getJSONArray("embeds") : new JSONArray();
-        for (int i = 0; i < embedsJson.length(); i++) {
-            Embed embed = new ImplEmbed(embedsJson.getJSONObject(i));
-            embeds.add(embed);
-        }
-
-        JSONArray reactionsJson = data.has("reactions") ? data.getJSONArray("reactions") : new JSONArray();
-        for (int i = 0; i < reactionsJson.length(); i++) {
-            Reaction reaction = new ImplReaction(this, reactionsJson.getJSONObject(i));
-            reactions.add(reaction);
-        }
-
-        JSONArray attachmentsJson = data.has("attachments") ? data.getJSONArray("attachments") : new JSONArray();
-        for (int i = 0; i < attachmentsJson.length(); i++) {
-            MessageAttachment attachment = new ImplMessageAttachment(this, attachmentsJson.getJSONObject(i));
-            attachments.add(attachment);
-        }
-
-        JSONArray mentionsJson = data.getJSONArray("mentions");
-        for (int i = 0; i < mentionsJson.length(); i++) {
-            User user = api.getOrCreateUser(mentionsJson.getJSONObject(i));
-            mentions.add(user);
-        }
-
-        getServer().ifPresent(server -> {
-            JSONArray roleMentionsJson = data.has("mention_roles") && !data.isNull("mention_roles") ?
-                    data.getJSONArray("mention_roles") : new JSONArray();
-            for (int i = 0; i < roleMentionsJson.length(); i++) {
-                server.getRoleById(roleMentionsJson.getString(i)).ifPresent(roleMentions::add);
+        if (data.has("embeds")) {
+            for (JsonNode embedJson : data.get("embeds")) {
+                Embed embed = new ImplEmbed(embedJson);
+                embeds.add(embed);
             }
-        });
+        }
+
+        if (data.has("reactions")) {
+            for (JsonNode reactionJson : data.get("reactions")) {
+                Reaction reaction = new ImplReaction(this, reactionJson);
+                reactions.add(reaction);
+            }
+        }
+
+        if (data.has("attachments")) {
+            for (JsonNode attachmentJson : data.get("attachments")) {
+                MessageAttachment attachment = new ImplMessageAttachment(this, attachmentJson);
+                attachments.add(attachment);
+            }
+        }
+
+        if (data.has("mentions")) {
+            for (JsonNode mentionJson : data.get("mentions")) {
+                User user = api.getOrCreateUser(mentionJson);
+                mentions.add(user);
+            }
+        }
+
+        if (data.has("mention_roles") && !data.get("mention_roles").isNull()) {
+            getServer().ifPresent(server -> {
+                for (JsonNode roleMentionJson : data.get("mention_roles")) {
+                    server.getRoleById(roleMentionJson.asText()).ifPresent(roleMentions::add);
+                }
+            });
+        }
+
     }
 
     /**

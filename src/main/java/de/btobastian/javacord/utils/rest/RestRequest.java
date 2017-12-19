@@ -1,29 +1,20 @@
 package de.btobastian.javacord.utils.rest;
 
-import com.mashape.unirest.http.HttpMethod;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.BaseRequest;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import com.mashape.unirest.request.body.MultipartBody;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.MissingPermissionsException;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import okhttp3.*;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * This class is used to wrap a rest request.
@@ -36,7 +27,7 @@ public class RestRequest<T> {
     private static final Logger logger = LoggerUtil.getLogger(RestRequest.class);
 
     private final DiscordApi api;
-    private final HttpMethod method;
+    private final RestMethod method;
     private final RestEndpoint endpoint;
 
     private boolean includeAuthorizationHeader = true;
@@ -47,17 +38,12 @@ public class RestRequest<T> {
 
     private int retryCounter = 0;
 
-    private final CompletableFuture<HttpResponse<JsonNode>> result = new CompletableFuture<>();
+    private final CompletableFuture<Response> result = new CompletableFuture<>();
 
     /**
-     * This consumer is called to add a file to the request.
+     * The multipart body of the request.
      */
-    private Function<HttpRequestWithBody, MultipartBody> fileSupplier = request -> null;
-
-    /**
-     * This consumer is called to add fields to the request.
-     */
-    private List<Function<MultipartBody, MultipartBody>> fieldSupplier = new ArrayList<>();
+    private MultipartBody multipartBody;
 
     /**
      * The custom major parameter if it's not included in the url (e.g. for reactions)
@@ -76,7 +62,7 @@ public class RestRequest<T> {
      * @param method The http method of the request.
      * @param endpoint The endpoint to which the request should be sent.
      */
-    public RestRequest(DiscordApi api, HttpMethod method, RestEndpoint endpoint) {
+    public RestRequest(DiscordApi api, RestMethod method, RestEndpoint endpoint) {
         this.api = api;
         this.method = method;
         this.endpoint = endpoint;
@@ -98,7 +84,7 @@ public class RestRequest<T> {
      *
      * @return The method of this request.
      */
-    public HttpMethod getMethod() {
+    public RestMethod getMethod() {
         return method;
     }
 
@@ -182,40 +168,14 @@ public class RestRequest<T> {
     }
 
     /**
-     * Adds a field to the request.
+     * Sets the multipart body of the request.
+     * If a multipart body is set, the {@link #setBody(String)} method is ignored!
      *
-     * @param name The name of the field.
-     * @param file The file.
+     * @param multipartBody The multipart body of the request.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest<T> addField(String name, File file) {
-        fileSupplier = request -> request.field(name, file);
-        return this;
-    }
-
-    /**
-     * Adds a field to the request.
-     *
-     * @param name The name of the field.
-     * @param stream The stream of the data.
-     * @param fileName The name of the file.
-     * @return The current instance in order to chain call methods.
-     */
-    public RestRequest<T> addField(String name, InputStream stream, String fileName) {
-        fileSupplier = request -> request.field(name, stream, fileName);
-        return this;
-    }
-
-    /**
-     * Adds a field to the request.
-     * This will only work, if a file was added, too!
-     *
-     * @param name The name of the field.
-     * @param value The value of the field.
-     * @return The current instance in order to chain call methods.
-     */
-    public RestRequest<T> addField(String name, String value) {
-        fieldSupplier.add(request -> request.field(name, value));
+    public RestRequest<T> setMultipartBody(MultipartBody multipartBody) {
+        this.multipartBody = multipartBody;
         return this;
     }
 
@@ -250,17 +210,7 @@ public class RestRequest<T> {
      * @param body The body of the request.
      * @return The current instance in order to chain call methods.
      */
-    public RestRequest<T> setBody(JSONObject body) {
-        return setBody(body.toString());
-    }
-
-    /**
-     * Sets the body of the request.
-     *
-     * @param body The body of the request.
-     * @return The current instance in order to chain call methods.
-     */
-    public RestRequest<T> setBody(JSONArray body) {
+    public RestRequest<T> setBody(JsonNode body) {
         return setBody(body.toString());
     }
 
@@ -301,7 +251,7 @@ public class RestRequest<T> {
      * @param function A function which processes the rest response to the requested object.
      * @return A future which will contain the output of the function.
      */
-    public CompletableFuture<T> execute(Function<HttpResponse<JsonNode>, T> function) {
+    public CompletableFuture<T> execute(BiFunction<Response, JsonNode, T> function) {
         api.getRatelimitManager().queueRequest(this);
         CompletableFuture<T> future = new CompletableFuture<>();
         result.whenComplete((response, throwable) -> {
@@ -310,7 +260,10 @@ public class RestRequest<T> {
                 return;
             }
             try {
-                future.complete(function.apply(response));
+                ObjectMapper mapper = new ObjectMapper();
+                ResponseBody body = response.peekBody(Long.MAX_VALUE);
+                JsonNode responseJson = body == null ? null : mapper.readTree(body.string());
+                future.complete(function.apply(response, responseJson));
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
@@ -323,91 +276,88 @@ public class RestRequest<T> {
      *
      * @return Gets the result of this request.
      */
-    public CompletableFuture<HttpResponse<JsonNode>> getResult() {
+    public CompletableFuture<Response> getResult() {
         return result;
     }
 
     /**
      * Executes the request blocking.
      *
-     * @return The response of the request.
+     * @return The response of the request and the response body as json node.
      * @throws Exception If something went wrong while executing the request.
      */
-    public HttpResponse<JsonNode> executeBlocking() throws Exception {
-        BaseRequest request;
+    public Response executeBlocking() throws Exception {
+        Request.Builder requestBuilder = new Request.Builder();
+        HttpUrl.Builder httpUrlBuilder = endpoint.getOkHttpUrl(urlParameters).newBuilder();
+        for (String[] queryParameter : queryParameters) {
+            httpUrlBuilder.addQueryParameter(queryParameter[0], queryParameter[1]);
+        }
+        requestBuilder.url(httpUrlBuilder.build());
+
+        RequestBody requestBody;
+        if (multipartBody != null) {
+            requestBody = multipartBody;
+        } else if (body != null) {
+            requestBody = RequestBody.create(MediaType.parse("application/json"), body);
+        } else {
+            requestBody = RequestBody.create(null, new byte[0]);
+        }
+
         switch (method) {
             case GET:
-                request = Unirest.get(endpoint.getFullUrl(urlParameters));
+                requestBuilder.get();
                 break;
             case POST:
-                request = Unirest.post(endpoint.getFullUrl(urlParameters));
+                requestBuilder.post(requestBody);
                 break;
             case PUT:
-                request = Unirest.put(endpoint.getFullUrl(urlParameters));
+                requestBuilder.put(requestBody);
                 break;
             case DELETE:
-                request = Unirest.delete(endpoint.getFullUrl(urlParameters));
+                requestBuilder.delete(requestBody);
                 break;
             case PATCH:
-                request = Unirest.patch(endpoint.getFullUrl(urlParameters));
-                break;
-            case HEAD:
-                request = Unirest.head(endpoint.getFullUrl(urlParameters));
-                break;
-            case OPTIONS:
-                request = Unirest.options(endpoint.getFullUrl(urlParameters));
+                requestBuilder.patch(requestBody);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported http method!");
         }
-        for (String[] queryParameter : queryParameters) {
-            ((HttpRequest) request).queryString(queryParameter[0], queryParameter[1]);
-        }
         if (includeAuthorizationHeader) {
-            ((HttpRequest) request).header("authorization", api.getToken());
-        }
-        if (request instanceof HttpRequestWithBody) {
-            if (fileSupplier.apply(Unirest.post("")) != null) {
-                MultipartBody multipartBody = fileSupplier.apply((HttpRequestWithBody) request);
-                for (Function<MultipartBody, MultipartBody> func : fieldSupplier) {
-                    multipartBody = func.apply(multipartBody);
-                }
-                request = multipartBody;
-            } else if (body != null) {
-                ((HttpRequestWithBody) request).body(body);
-                ((HttpRequest) request).header("content-type", "application/json");
-            }
+            requestBuilder.addHeader("authorization", api.getToken());
         }
         logger.debug("Trying to send {} request to {}{}",
                 method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
-        HttpResponse<JsonNode> response = request.asJson();
+
+        Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute();
+        ResponseBody responseBody = response.peekBody(Long.MAX_VALUE);
         logger.debug("Sent {} request to {} and received status code {} with{} body{}",
-                method.name(), endpoint.getFullUrl(urlParameters), response.getStatus(),
-                response.getBody() == null ? " empty" : "",
-                response.getBody() == null ? "" : " " + response.getBody().toString());
-        if (response.getStatus() >= 300 || response.getStatus() < 200) {
-            if (!response.getBody().isArray() && response.getBody().getObject().has("code")) {
-                int code = response.getBody().getObject().getInt("code");
-                String message = response.getBody().getObject().has("message")
-                        ? null : response.getBody().getObject().getString("message");
+                method.name(), endpoint.getFullUrl(urlParameters), response.code(),
+                responseBody == null ? " empty" : "",
+                responseBody == null ? "" : " " + responseBody.string());
+        if (response.code() >= 300 || response.code() < 200) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode responseJson = responseBody == null ? null : mapper.readTree(responseBody.string());
+            if (responseJson != null && responseJson.has("code")) {
+                int code = responseJson.get("code").asInt();
+                String message = responseJson.has("message") ? responseJson.get("message").asText() : null;
                 switch (code) {
                     case 50007:
                         throw new CannotMessageUserException(origin,
                                 message == null ? "Cannot send message to this user" : message, response, this);
                 }
             }
-            switch (response.getStatus()) {
+            switch (response.code()) {
                 case 429:
                     // A 429 will be handled in the RatelimitManager class
                     return response;
                 case 403:
                     throw new MissingPermissionsException(origin,
-                            "Received a " + response.getStatus() + " response from Discord with body "
-                                    + response.getBody().toString() + "!", response, this);
+                            "Received a " + response.code() + " response from Discord with body "
+                                    + (responseBody == null ? "empty" : responseBody.string()) + "!", response, this);
                 default:
                     throw new DiscordException(origin,
-                            "Received a " + response.getStatus() + " response from Discord with body "
-                                    + response.getBody().toString() + "!", response, this);
+                            "Received a " + response.code() + " response from Discord with body "
+                                    + (responseBody == null ? "empty" : responseBody.string()) + "!", response, this);
             }
         }
         return response;

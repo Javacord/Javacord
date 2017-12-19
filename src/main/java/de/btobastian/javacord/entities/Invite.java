@@ -1,10 +1,10 @@
 package de.btobastian.javacord.entities;
 
-import com.mashape.unirest.http.HttpMethod;
 import de.btobastian.javacord.entities.channels.ChannelType;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.net.MalformedURLException;
@@ -108,9 +108,9 @@ public interface Invite {
      * @return A future to check if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
-        return new RestRequest<Void>(((ImplInvite) this).getApi(), HttpMethod.DELETE, RestEndpoint.INVITE)
+        return new RestRequest<Void>(((ImplInvite) this).getApi(), RestMethod.DELETE, RestEndpoint.INVITE)
                 .setUrlParameters(getCode())
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
 }

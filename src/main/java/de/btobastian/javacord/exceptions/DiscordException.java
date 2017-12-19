@@ -1,8 +1,7 @@
 package de.btobastian.javacord.exceptions;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import okhttp3.Response;
 
 import java.util.Optional;
 
@@ -14,7 +13,7 @@ public class DiscordException extends Exception {
     /**
      * The response. May be <code>null</code> if the exception was thrown before sending a request.
      */
-    private final HttpResponse<JsonNode> response;
+    private final Response response;
 
     /**
      * The request. May be <code>null</code> if the exception was thrown before creating a request.
@@ -29,7 +28,7 @@ public class DiscordException extends Exception {
      * @param response The response which caused the exception.
      * @param request The request.
      */
-    public DiscordException(Exception origin, String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
+    public DiscordException(Exception origin, String message, Response response, RestRequest<?> request) {
         super(message, origin);
         this.response = response;
         this.request = request;
@@ -41,7 +40,7 @@ public class DiscordException extends Exception {
      *
      * @return The response which caused the exception.
      */
-    public Optional<HttpResponse<JsonNode>> getResponse() {
+    public Optional<Response> getResponse() {
         return Optional.ofNullable(response);
     }
 

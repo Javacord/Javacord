@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.impl;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Game;
@@ -13,8 +14,8 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
@@ -84,16 +85,16 @@ public class ImplUser implements User {
      * @param api The discord api instance.
      * @param data The json data of the user.
      */
-    public ImplUser(ImplDiscordApi api, JSONObject data) {
+    public ImplUser(ImplDiscordApi api, JsonNode data) {
         this.api = api;
 
-        id = Long.parseLong(data.getString("id"));
-        name = data.getString("username");
-        discriminator = data.getString("discriminator");
-        if (data.has("avatar") && !data.isNull("avatar")) {
-            avatarId = data.getString("avatar");
+        id = Long.parseLong(data.get("id").asText());
+        name = data.get("username").asText();
+        discriminator = data.get("discriminator").asText();
+        if (data.has("avatar") && !data.get("avatar").isNull()) {
+            avatarId = data.get("avatar").asText();
         }
-        bot = data.has("bot") && data.getBoolean("bot");
+        bot = data.has("bot") && data.get("bot").asBoolean();
 
         api.addUserToCache(this);
     }
@@ -131,7 +132,7 @@ public class ImplUser implements User {
      * @param data The data of the private channel.
      * @return The private channel for the given data.
      */
-    public PrivateChannel getOrCreateChannel(JSONObject data) {
+    public PrivateChannel getOrCreateChannel(JsonNode data) {
         synchronized (this) {
             if (channel != null) {
                 return channel;
@@ -192,9 +193,9 @@ public class ImplUser implements User {
             future.complete(channel);
             return future;
         }
-        return new RestRequest<PrivateChannel>(api, HttpMethod.POST, RestEndpoint.USER_CHANNEL)
-                .setBody(new JSONObject().put("recipient_id", String.valueOf(getId())))
-                .execute(res -> getOrCreateChannel(res.getBody().getObject()));
+        return new RestRequest<PrivateChannel>(api, RestMethod.POST, RestEndpoint.USER_CHANNEL)
+                .setBody(JsonNodeFactory.instance.objectNode().put("recipient_id", getIdAsString()))
+                .execute((res, json) -> getOrCreateChannel(json));
     }
 
     @Override

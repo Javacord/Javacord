@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.permissions.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
@@ -7,7 +8,6 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
-import org.json.JSONObject;
 
 import java.awt.*;
 import java.util.Collection;
@@ -72,15 +72,15 @@ public class ImplRole implements Role {
      * @param server The server of the role.
      * @param data The json data of the role.
      */
-    public ImplRole(ImplDiscordApi api, ImplServer server, JSONObject data) {
+    public ImplRole(ImplDiscordApi api, ImplServer server, JsonNode data) {
         this.api = api;
         this.server = server;
-        this.id = Long.parseLong(data.getString("id"));
-        this.name = data.getString("name");
-        this.position = data.getInt("position");
-        this.color = data.optInt("color", 0);
-        this.hoist = data.optBoolean("hoist", false);
-        this.permissions = new ImplPermissions(data.getInt("permissions"), 0);
+        this.id = data.get("id").asLong();
+        this.name = data.get("name").asText();
+        this.position = data.get("position").asInt();
+        this.color = data.get("color").asInt(0);
+        this.hoist = data.get("hoist").asBoolean(false);
+        this.permissions = new ImplPermissions(data.get("permissions").asInt(), 0);
     }
 
     /**

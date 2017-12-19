@@ -1,8 +1,7 @@
 package de.btobastian.javacord.exceptions;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import okhttp3.Response;
 
 /**
  * When we encounter a rate limit and ran out of retires.
@@ -18,7 +17,7 @@ public class RatelimitException extends DiscordException {
      * @param request The request.
      */
     public RatelimitException(
-            Exception origin, String message, HttpResponse<JsonNode> response, RestRequest<?> request) {
+            Exception origin, String message, Response response, RestRequest<?> request) {
         super(origin, message, response, request);
     }
 

@@ -1,12 +1,12 @@
 package de.btobastian.javacord.entities;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -79,9 +79,9 @@ public interface Webhook extends DiscordEntity {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
-        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.WEBHOOK)
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -91,10 +91,10 @@ public interface Webhook extends DiscordEntity {
      * @return The updated webhook. The current object won't get updated!
      */
     default CompletableFuture<Webhook> updateName(String name) {
-        return new RestRequest<Webhook>(getApi(), HttpMethod.PATCH, RestEndpoint.WEBHOOK)
+        return new RestRequest<Webhook>(getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .setBody(new JSONObject().put("name", name))
-                .execute(res -> new ImplWebhook(getApi(), res.getBody().getObject()));
+                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
+                .execute((res, json) -> new ImplWebhook(getApi(), json));
     }
 
     /**
@@ -104,10 +104,10 @@ public interface Webhook extends DiscordEntity {
      * @return The updated webhook. The current object won't get updated!
      */
     default CompletableFuture<Webhook> updateChannel(ServerTextChannel channel) {
-        return new RestRequest<Webhook>(getApi(), HttpMethod.PATCH, RestEndpoint.WEBHOOK)
+        return new RestRequest<Webhook>(getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .setBody(new JSONObject().put("channel_id", channel.getId()))
-                .execute(res -> new ImplWebhook(getApi(), res.getBody().getObject()));
+                .setBody(JsonNodeFactory.instance.objectNode().put("channel_id", channel.getId()))
+                .execute((res, json) -> new ImplWebhook(getApi(), json));
     }
 
 }

@@ -1,6 +1,6 @@
 package de.btobastian.javacord;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Server;
@@ -34,8 +34,9 @@ import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -59,6 +60,11 @@ public class ImplDiscordApi implements DiscordApi {
      * The thread pool which is used internally.
      */
     private final ThreadPool threadPool = new ThreadPool();
+
+    /**
+     * The http client for this instance.
+     */
+    private final OkHttpClient httpClient;
 
     /**
      * The ratelimit manager for this bot.
@@ -189,14 +195,21 @@ public class ImplDiscordApi implements DiscordApi {
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5)-(1/(1/(0.1*x)+1))*Math.pow(x,1.5))*totalShards;
 
+        this.httpClient = new OkHttpClient.Builder()
+                .addInterceptor(chain -> chain.proceed(chain.request()
+                        .newBuilder()
+                        .addHeader("User-Agent", Javacord.USER_AGENT)
+                        .build()))
+                .build();
+
         RestEndpoint endpoint = RestEndpoint.GATEWAY_BOT;
         if (accountType == AccountType.CLIENT) {
             endpoint = RestEndpoint.GATEWAY;
         }
 
-        new RestRequest<String>(this, HttpMethod.GET, endpoint)
+        new RestRequest<String>(this, RestMethod.GET, endpoint)
                 .includeAuthorizationHeader(accountType == AccountType.BOT)
-                .execute(res -> res.getBody().getObject().getString("url"))
+                .execute((res, json) -> json.get("url").asText())
                 .whenComplete((gateway, t) -> {
                     if (t != null) {
                         ready.completeExceptionally(t);
@@ -321,8 +334,8 @@ public class ImplDiscordApi implements DiscordApi {
      * @param data The json data of the user.
      * @return The user.
      */
-    public User getOrCreateUser(JSONObject data) {
-        long id = Long.parseLong(data.getString("id"));
+    public User getOrCreateUser(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
         synchronized (this) {
             return getUserById(id).orElseGet(() -> {
                 if (!data.has("username")) {
@@ -340,8 +353,8 @@ public class ImplDiscordApi implements DiscordApi {
      * @param data The data of the emoji.
      * @return The emoji for the given json object.
      */
-    public CustomEmoji getOrCreateCustomEmoji(Server server, JSONObject data) {
-        long id = Long.parseLong(data.getString("id"));
+    public CustomEmoji getOrCreateCustomEmoji(Server server, JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
         return customEmojis.computeIfAbsent(id, key -> new ImplCustomEmoji(this, server, data));
     }
 
@@ -352,8 +365,8 @@ public class ImplDiscordApi implements DiscordApi {
      * @param data The data of the message.
      * @return The message for the given json object.
      */
-    public Message getOrCreateMessage(TextChannel channel, JSONObject data) {
-        long id = Long.parseLong(data.getString("id"));
+    public Message getOrCreateMessage(TextChannel channel, JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
         // The constructor already adds the message to the cache.
         // If we use #computeIfAbsent() here, it would cause a deadlock
         return messages.getOrDefault(id, new ImplMessage(this, channel, data));
@@ -458,6 +471,11 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public ThreadPool getThreadPool() {
         return threadPool;
+    }
+
+    @Override
+    public OkHttpClient getHttpClient() {
+        return httpClient;
     }
 
     @Override

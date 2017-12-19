@@ -1,24 +1,22 @@
 package de.btobastian.javacord.utils.ratelimits;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.exceptions.RatelimitException;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestRequest;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
+import java.util.concurrent.*;
+import java.util.function.BiFunction;
 
 /**
  * This class manages ratelimits and keeps track of them.
@@ -48,7 +46,7 @@ public class RatelimitManager {
 
     /**
      * Adds a request to the queue based on the ratelimit bucket.
-     * This method is automatically called when using {@link RestRequest#execute(Function)}!
+     * This method is automatically called when using {@link RestRequest#execute(BiFunction)}!
      *
      * @param request The request to queue.
      */
@@ -122,7 +120,10 @@ public class RatelimitManager {
                     RestRequest<?> restRequest = queue.peek();
                     boolean remove = true;
                     try {
-                        HttpResponse<JsonNode> response = restRequest.executeBlocking();
+                        Response response = restRequest.executeBlocking();
+                        ResponseBody responseBody = response.peekBody(Long.MAX_VALUE);
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode responseJson = responseBody == null ? null : mapper.readTree(responseBody.string());
 
                         long currentTime = System.currentTimeMillis();
 
@@ -130,24 +131,24 @@ public class RatelimitManager {
                             calculateOffset(currentTime, response);
                         }
 
-                        if (response.getStatus() == 429) {
+                        if (response.code() == 429) {
                             remove = false;
                             logger.debug("Received a 429 response from Discord! Recalculating time offset...");
                             api.setTimeOffset(null);
 
-                            int retryAfter = response.getBody().getObject().getInt("retry_after");
+                            int retryAfter = responseJson != null ? responseJson.get("retry_after").asInt() : 0;
                             bucket.setRateLimitRemaining(0);
                             bucket.setRateLimitResetTimestamp(currentTime + retryAfter);
                         } else {
                             restRequest.getResult().complete(response);
 
-                            String remaining = response.getHeaders().getFirst("X-RateLimit-Remaining");
+                            String remaining = response.header("X-RateLimit-Remaining", "0");
                             long reset = restRequest
                                     .getEndpoint()
                                     .getHardcodedRatelimit()
                                     .map(ratelimit -> currentTime + api.getTimeOffset() + ratelimit)
-                                    .orElseGet(() -> Long.parseLong(response.getHeaders().getFirst("X-RateLimit-Reset")) * 1000);
-                            String global = response.getHeaders().getFirst("X-RateLimit-Global");
+                                    .orElseGet(() -> Long.parseLong(response.header("X-RateLimit-Reset", "0")) * 1000);
+                            String global = response.header("X-RateLimit-Global");
 
                             if (global != null && global.equals("true")) {
                                 // Mark the endpoint as global
@@ -174,10 +175,10 @@ public class RatelimitManager {
         }), delay, TimeUnit.MILLISECONDS);
     }
 
-    private void calculateOffset(long currentTime, HttpResponse<?> response) {
+    private void calculateOffset(long currentTime, Response response) {
         // Discord sends the date in their header in the format RFC_1123_DATE_TIME
         // We use this header to calculate a possible offset between our local time and the discord time
-        String date = response.getHeaders().getFirst("Date");
+        String date = response.header("Date");
         if (date != null) {
             long discordTimestamp = OffsetDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
                     .toInstant().toEpochMilli();

@@ -1,9 +1,9 @@
 package de.btobastian.javacord.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public abstract class PacketHandler {
      *
      * @param packet The packet (the "d"-object).
      */
-    public void handlePacket(final JSONObject packet) {
+    public void handlePacket(final JsonNode packet) {
         if (async) {
             executorService.submit(() -> {
                 try {
@@ -71,7 +71,7 @@ public abstract class PacketHandler {
      *
      * @param packet The packet (the "d"-object).
      */
-    protected abstract void handle(JSONObject packet);
+    protected abstract void handle(JsonNode packet);
 
     /**
      * Dispatches an event in a the listener thread.

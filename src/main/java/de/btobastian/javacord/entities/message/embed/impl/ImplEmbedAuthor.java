@@ -1,8 +1,8 @@
 package de.btobastian.javacord.entities.message.embed.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.entities.message.embed.EmbedAuthor;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -29,12 +29,12 @@ public class ImplEmbedAuthor implements EmbedAuthor {
      *
      * @param data The json data of the author.
      */
-    public ImplEmbedAuthor(JSONObject data) {
-        name = data.has("name") ? data.getString("name") : null;
-        url = data.has("url") && !data.isNull("url") ? data.getString("url") : null;
-        iconUrl = data.has("icon_url") && !data.isNull("icon_url") ? data.getString("icon_url") : null;
-        proxyIconUrl = data.has("proxy_icon_url") && !data.isNull("proxy_icon_url")
-                ? data.getString("proxy_icon_url") : null;
+    public ImplEmbedAuthor(JsonNode data) {
+        name = data.has("name") ? data.get("name").asText() : null;
+        url = data.has("url") && !data.get("url").isNull() ? data.get("url").asText() : null;
+        iconUrl = data.has("icon_url") && !data.get("icon_url").isNull() ? data.get("icon_url").asText() : null;
+        proxyIconUrl = data.has("proxy_icon_url") && !data.get("proxy_icon_url").isNull()
+                ? data.get("proxy_icon_url").asText() : null;
     }
 
     @Override

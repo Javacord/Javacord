@@ -1,6 +1,5 @@
 package de.btobastian.javacord;
 
-import com.mashape.unirest.http.Unirest;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -39,10 +38,6 @@ public class Javacord {
      * <a href="https://discordapp.com/developers/docs/topics/gateway#gateway-protocol-versions">here</a>.
      */
     public static final String DISCORD_GATEWAY_PROTOCOL_VERSION = "6";
-
-    static {
-        Unirest.setDefaultHeader("User-Agent", USER_AGENT);
-    }
 
     private Javacord() { }
 

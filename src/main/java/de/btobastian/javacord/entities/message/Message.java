@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.message;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Server;
@@ -18,8 +19,8 @@ import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.List;
@@ -42,10 +43,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
+        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
                 .setRatelimitRetries(250)
-                .execute(res -> {
+                .execute((res, json) -> {
                     api.getCachedMessageById(messageId).ifPresent(msg -> ((ImplMessage) msg).setDeleted(true));
                     return null;
                 });
@@ -133,17 +134,17 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     static CompletableFuture<Void> edit(
             DiscordApi api, long channelId, long messageId, String content, EmbedBuilder embed) {
-        JSONObject body = new JSONObject();
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
         if (content != null) {
             body.put("content", content);
         }
         if (embed != null) {
-            body.put("embed", embed.toJSONObject());
+            embed.toJsonNode(body.putObject("embed"));
         }
-        return new RestRequest<Void>(api, HttpMethod.PATCH, RestEndpoint.MESSAGE)
+        return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
                 .setBody(body)
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -177,10 +178,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, String unicodeEmoji) {
-        return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.REACTION)
+        return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), unicodeEmoji, "@me")
                 .setRatelimitRetries(500)
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -218,10 +219,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
                         .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
                         .orElse("UNKNOWN")
         );
-        return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.REACTION)
+        return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), value, "@me")
                 .setRatelimitRetries(500)
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -252,9 +253,9 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> removeAllReactions(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.REACTION)
+        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -284,9 +285,9 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the pin was successful.
      */
     static CompletableFuture<Void> pin(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, HttpMethod.PUT, RestEndpoint.PINS)
+        return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.PINS)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
@@ -316,9 +317,9 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> unpin(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, HttpMethod.DELETE, RestEndpoint.PINS)
+        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.PINS)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**

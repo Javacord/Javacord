@@ -1,9 +1,9 @@
 package de.btobastian.javacord.entities.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.User;
-import org.json.JSONObject;
 
 import java.util.Optional;
 
@@ -29,17 +29,17 @@ public class ImplApplicationInfo implements ApplicationInfo {
      * @param api The discord api.
      * @param data The json data of the application.
      */
-    public ImplApplicationInfo(DiscordApi api, JSONObject data) {
+    public ImplApplicationInfo(DiscordApi api, JsonNode data) {
         this.api = api;
 
-        clientId = Long.parseLong(data.getString("id"));
-        name = data.getString("name");
-        description = data.getString("description");
-        publicBot = data.getBoolean("bot_public");
-        botRequiresCodeGrant = data.getBoolean("bot_require_code_grant");
-        ownerId = Long.parseLong(data.getJSONObject("owner").getString("id"));
-        ownerName = data.getJSONObject("owner").getString("username");
-        ownerDiscriminator = data.getJSONObject("owner").getString("discriminator");
+        clientId = data.get("id").asLong();
+        name = data.get("name").asText();
+        description = data.get("description").asText();
+        publicBot = data.get("bot_public").asBoolean();
+        botRequiresCodeGrant = data.get("bot_require_code_grant").asBoolean();
+        ownerId = data.get("owner").get("id").asLong();
+        ownerName = data.get("owner").get("username").asText();
+        ownerDiscriminator = data.get("owner").get("discriminator").asText();
     }
 
     @Override

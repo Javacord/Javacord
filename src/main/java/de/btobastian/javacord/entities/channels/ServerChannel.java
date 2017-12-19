@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.mashape.unirest.http.HttpMethod;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.entities.RichInvite;
@@ -14,9 +15,8 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwr
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -75,13 +75,12 @@ public interface ServerChannel extends Channel {
      * @return The invites of the server.
      */
     default CompletableFuture<Collection<RichInvite>> getInvites() {
-        return new RestRequest<Collection<RichInvite>>(getApi(), HttpMethod.GET, RestEndpoint.CHANNEL_INVITE)
+        return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_INVITE)
                 .setUrlParameters(getIdAsString())
-                .execute(res -> {
+                .execute((res, json) -> {
                     Collection<RichInvite> invites = new HashSet<>();
-                    JSONArray invitesJson = res.getBody().getArray();
-                    for (int i = 0; i < invitesJson.length(); i++) {
-                        invites.add(new ImplInvite(getApi(), invitesJson.getJSONObject(i)));
+                    for (JsonNode inviteJson : json) {
+                        invites.add(new ImplInvite(getApi(), inviteJson));
                     }
                     return invites;
                 });
@@ -94,10 +93,10 @@ public interface ServerChannel extends Channel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("name", name == null ? JSONObject.NULL : name))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -109,10 +108,10 @@ public interface ServerChannel extends Channel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updatePosition(int position) {
-        return new RestRequest<Void>(getApi(), HttpMethod.PATCH, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .setBody(new JSONObject().put("position", position))
-                .execute(res -> null);
+                .setBody(JsonNodeFactory.instance.objectNode().put("position", position))
+                .execute((res, json) -> null);
     }
 
     /**
@@ -233,9 +232,9 @@ public interface ServerChannel extends Channel {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
-        return new RestRequest<Void>(getApi(), HttpMethod.DELETE, RestEndpoint.CHANNEL)
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .execute(res -> null);
+                .execute((res, json) -> null);
     }
 
     /**
