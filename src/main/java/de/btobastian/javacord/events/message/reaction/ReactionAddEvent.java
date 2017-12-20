@@ -14,11 +14,6 @@ import java.util.concurrent.CompletableFuture;
 public class ReactionAddEvent extends SingleReactionEvent {
 
     /**
-     * The user of the event.
-     */
-    private final User user;
-
-    /**
      * Creates a new reaction add event.
      *
      * @param api The discord api instance.
@@ -28,17 +23,7 @@ public class ReactionAddEvent extends SingleReactionEvent {
      * @param user The user who added the reaction.
      */
     public ReactionAddEvent(DiscordApi api, long messageId, TextChannel channel, Emoji emoji, User user) {
-        super(api, messageId, channel, emoji);
-        this.user = user;
-    }
-
-    /**
-     * Gets the user who added the reaction.
-     *
-     * @return The user who added the reaction.
-     */
-    public User getUser() {
-        return user;
+        super(api, messageId, channel, emoji, user);
     }
 
     /**

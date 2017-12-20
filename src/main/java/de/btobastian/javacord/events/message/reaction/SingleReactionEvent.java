@@ -22,16 +22,23 @@ public class SingleReactionEvent extends ReactionEvent {
     private final Emoji emoji;
 
     /**
+     * The user of the event.
+     */
+    private final User user;
+
+    /**
      * Creates a new single reaction event.
      *
      * @param api The discord api instance.
      * @param messageId The id of the message.
      * @param channel The text channel in which the message was sent.
      * @param emoji The emoji.
+     * @param user The "owner" of the reaction.
      */
-    public SingleReactionEvent(DiscordApi api, long messageId, TextChannel channel, Emoji emoji) {
+    public SingleReactionEvent(DiscordApi api, long messageId, TextChannel channel, Emoji emoji, User user) {
         super(api, messageId, channel);
         this.emoji = emoji;
+        this.user = user;
     }
 
     /**
@@ -41,6 +48,15 @@ public class SingleReactionEvent extends ReactionEvent {
      */
     public Emoji getEmoji() {
         return emoji;
+    }
+
+    /**
+     * Gets the "owner" of the reaction.
+     *
+     * @return The "owner" of the reaction..
+     */
+    public User getUser() {
+        return user;
     }
 
     /**
