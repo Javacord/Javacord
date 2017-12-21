@@ -86,6 +86,13 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     Icon getAvatar();
 
     /**
+     * Gets if the user has a default Discord avatar.
+     *
+     * @return Whether this user has a default avatar or not.
+     */
+    boolean hasDefaultAvatar();
+
+    /**
      * Gets all mutual servers with this user.
      *
      * @return All mutual servers with this user.
