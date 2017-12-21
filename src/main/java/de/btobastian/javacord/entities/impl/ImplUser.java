@@ -182,6 +182,11 @@ public class ImplUser implements User {
     }
 
     @Override
+    public boolean hasDefaultAvatar() {
+        return avatarId == null;
+    }
+
+    @Override
     public Optional<PrivateChannel> getPrivateChannel() {
         return Optional.ofNullable(channel);
     }
