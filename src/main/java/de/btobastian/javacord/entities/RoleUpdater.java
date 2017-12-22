@@ -22,7 +22,7 @@ public class RoleUpdater {
 
     /**
      * A collection of the roles changed by this builder.
-     * The user's roles will be changed to this upon calling {@link #build()}
+     * The user's roles will be changed to this upon calling {@link #update()}
      */
     private Collection<Role> roles;
 
@@ -42,7 +42,7 @@ public class RoleUpdater {
      * Queues a role to be added to the user.
      *
      * @param role The role to be added.
-     * @return This builder, allowing for chaining.
+     * @return The current instance in order to chain call methods.
      */
     public RoleUpdater addRole(Role role){
         roles.add(role);
@@ -53,7 +53,7 @@ public class RoleUpdater {
      * Queues a collection of roles to be added to a user.
      *
      * @param roles The collection of roles to be added.
-     * @return This builder, allowing for chaining.
+     * @return The current instance in order to chain call methods.
      */
     public RoleUpdater addAllRoles(Collection<Role> roles){
         this.roles.addAll(roles);
@@ -64,7 +64,7 @@ public class RoleUpdater {
      * Queues a role to be removed from the user.
      *
      * @param role The role to be removed.
-     * @return This builder, allowing for chaining.
+     * @return The current instance in order to chain call methods.
      */
     public RoleUpdater removeRole(Role role){
         roles.remove(role);
@@ -75,7 +75,7 @@ public class RoleUpdater {
      * Queues a collection of roles to be removed a user.
      *
      * @param roles The collection of roles to be removed.
-     * @return This builder, allowing for chaining.
+     * @return The current instance in order to chain call methods.
      */
     public RoleUpdater removeAllRoles(Collection<Role> roles){
         this.roles.removeAll(roles);
@@ -87,7 +87,7 @@ public class RoleUpdater {
      *
      * @return A future to check if the update was successful.
      */
-    public CompletableFuture<Void> build(){
+    public CompletableFuture<Void> update(){
         return server.updateRoles(user, roles);
     }
 }

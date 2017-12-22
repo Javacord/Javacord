@@ -327,7 +327,7 @@ public interface Server extends DiscordEntity {
      * Creates a {@link RoleUpdater} object to add or remove multiple roles of a user simultaneously.
      *
      * @param user The user to update the roles of.
-     * @return The {@link RoleUpdater} object.
+     * @return The role updater object.
      */
     default RoleUpdater getRoleUpdater(User user){
         return new RoleUpdater(this, user);
