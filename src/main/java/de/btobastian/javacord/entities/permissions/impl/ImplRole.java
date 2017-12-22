@@ -162,7 +162,7 @@ public class ImplRole implements Role {
 
     @Override
     public Collection<User> getUsers() {
-        if (getName().equals("@everyone")) {
+        if (isEveryoneRole()) {
             return getServer().getMembers();
         }
         return Collections.unmodifiableCollection(users);
