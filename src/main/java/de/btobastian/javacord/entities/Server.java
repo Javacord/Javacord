@@ -1,12 +1,15 @@
 package de.btobastian.javacord.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.*;
@@ -317,6 +320,36 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("region", region == null ? null : region.getKey()))
+                .execute((res, json) -> null);
+    }
+
+    /**
+     * Creates a {@link RoleUpdater} object to add or remove multiple roles of a user simultaneously.
+     *
+     * @param user The user to update the roles of.
+     * @return The role updater object.
+     */
+    default RoleUpdater getRoleUpdater(User user){
+        return new RoleUpdater(this, user);
+    }
+
+    /**
+     * Updates the roles of a server member.
+     * This will replace the roles of the server member with a provided collection.
+     *
+     * @param user The user to update the roles of.
+     * @param roles The collection of roles to replace the user's roles.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles){
+        ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
+        ArrayNode rolesJson = updateNode.putArray("roles");
+        for (Role role : roles) {
+            rolesJson.add(role.getIdAsString());
+        }
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
+                .setUrlParameters(getIdAsString(), user.getIdAsString())
+                .setBody(updateNode)
                 .execute((res, json) -> null);
     }
 
