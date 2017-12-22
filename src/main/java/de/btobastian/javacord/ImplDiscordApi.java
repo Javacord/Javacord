@@ -193,7 +193,7 @@ public class ImplDiscordApi implements DiscordApi {
         this.currentShard = currentShard;
         this.totalShards = totalShards;
         this.reconnectDelayProvider = x ->
-                (int) Math.round(Math.pow(x, 1.5)-(1/(1/(0.1*x)+1))*Math.pow(x,1.5))*totalShards;
+                (int) Math.round(Math.pow(x, 1.5)-(1/(1/(0.1*x)+1))*Math.pow(x,1.5))+(currentShard*6);
 
         this.httpClient = new OkHttpClient.Builder()
                 .addInterceptor(chain -> chain.proceed(chain.request()

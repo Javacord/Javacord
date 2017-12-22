@@ -197,7 +197,7 @@ public interface DiscordApi {
      * @param reconnectDelayProvider A function which get's the amount of reconnects (starting with <code>1</code>) as
      *                               the parameter and should return the delay in seconds to wait for the next reconnect
      *                               attempt. By default the function reconnect delay is calculated using the following
-     *                               equation: <code>f(x): (x^1.5-(1/(1/(0.1*x)+1))*x^1.5)*shardCount</code>.
+     *                               equation: <code>f(x): (x^1.5-(1/(1/(0.1*x)+1))*x^1.5)+(currentShard*6)</code>.
      *                               This would result in a delay which looks like this for a bot with 1 shard:
      *                               <table summary="">
      *                                  <tr>
