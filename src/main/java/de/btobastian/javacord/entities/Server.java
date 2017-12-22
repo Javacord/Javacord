@@ -574,6 +574,15 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Gets a new role builder.
+     *
+     * @return The builder to create a new role.
+     */
+    default RoleBuilder getRoleBuilder() {
+        return new RoleBuilder(this);
+    }
+
+    /**
      * Gets a sorted list (by position) with all channels of the server.
      *
      * @return A sorted list (by position) with all channels of the server.
