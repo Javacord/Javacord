@@ -209,6 +209,7 @@ public class EmbedBuilder {
     /**
      * Adds the json data to the given object node.
      *
+     * @param object The object, the data should be added to.
      * @return The provided object with the data of the embed.
      */
     public ObjectNode toJsonNode(ObjectNode object) {
