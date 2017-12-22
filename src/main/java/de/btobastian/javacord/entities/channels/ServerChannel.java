@@ -77,9 +77,9 @@ public interface ServerChannel extends Channel {
     default CompletableFuture<Collection<RichInvite>> getInvites() {
         return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_INVITE)
                 .setUrlParameters(getIdAsString())
-                .execute((res, json) -> {
+                .execute(result -> {
                     Collection<RichInvite> invites = new HashSet<>();
-                    for (JsonNode inviteJson : json) {
+                    for (JsonNode inviteJson : result.getJsonBody()) {
                         invites.add(new ImplInvite(getApi(), inviteJson));
                     }
                     return invites;
@@ -96,7 +96,7 @@ public interface ServerChannel extends Channel {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -111,7 +111,7 @@ public interface ServerChannel extends Channel {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("position", position))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -234,7 +234,7 @@ public interface ServerChannel extends Channel {
     default CompletableFuture<Void> delete() {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**

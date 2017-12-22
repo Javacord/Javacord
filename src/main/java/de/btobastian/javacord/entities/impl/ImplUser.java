@@ -200,7 +200,7 @@ public class ImplUser implements User {
         }
         return new RestRequest<PrivateChannel>(api, RestMethod.POST, RestEndpoint.USER_CHANNEL)
                 .setBody(JsonNodeFactory.instance.objectNode().put("recipient_id", getIdAsString()))
-                .execute((res, json) -> getOrCreateChannel(json));
+                .execute(result -> getOrCreateChannel(result.getJsonBody()));
     }
 
     @Override

@@ -9,7 +9,6 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.*;
@@ -132,9 +131,9 @@ public interface Server extends DiscordEntity {
     default CompletableFuture<Collection<RichInvite>> getInvites() {
         return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_INVITE)
                 .setUrlParameters(getIdAsString())
-                .execute((res, json) -> {
+                .execute(result -> {
                     Collection<RichInvite> invites = new HashSet<>();
-                    for (JsonNode inviteJson : json) {
+                    for (JsonNode inviteJson : result.getJsonBody()) {
                         invites.add(new ImplInvite(getApi(), inviteJson));
                     }
                     return invites;
@@ -278,12 +277,12 @@ public interface Server extends DiscordEntity {
             return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
                     .setUrlParameters(String.valueOf(getId()))
                     .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .execute((res, json) -> null);
+                    .execute(result -> null);
         } else {
             return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
                     .setUrlParameters(String.valueOf(getId()), String.valueOf(user.getId()))
                     .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .execute((res, json) -> null);
+                    .execute(result -> null);
         }
     }
 
@@ -307,7 +306,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -320,7 +319,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("region", region == null ? null : region.getKey()))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -350,7 +349,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
                 .setBody(updateNode)
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -363,7 +362,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("afk_timeout", seconds))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -378,7 +377,7 @@ public interface Server extends DiscordEntity {
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode()
                         .put("owner_id", newOwner == null ? null : newOwner.getIdAsString()))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -390,7 +389,7 @@ public interface Server extends DiscordEntity {
     default CompletableFuture<Void> kickUser(User user) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -403,7 +402,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
                 .setBody(JsonNodeFactory.instance.objectNode().put("delete-message-days", 0))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -417,7 +416,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
                 .setBody(JsonNodeFactory.instance.objectNode().put("delete-message-days", deleteMessageDays))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -439,7 +438,7 @@ public interface Server extends DiscordEntity {
     default CompletableFuture<Void> unbanUser(long userId) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), String.valueOf(userId))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -466,9 +465,9 @@ public interface Server extends DiscordEntity {
     default CompletableFuture<List<Webhook>> getWebhooks() {
         return new RestRequest<List<Webhook>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute((res, json) -> {
+                .execute(result -> {
                     List<Webhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhookJson : json) {
+                    for (JsonNode webhookJson : result.getJsonBody()) {
                         webhooks.add(new ImplWebhook(getApi(), webhookJson));
                     }
                     return webhooks;

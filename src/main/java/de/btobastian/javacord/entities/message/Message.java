@@ -46,7 +46,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
                 .setRatelimitRetries(250)
-                .execute((res, json) -> {
+                .execute(result -> {
                     api.getCachedMessageById(messageId).ifPresent(msg -> ((ImplMessage) msg).setDeleted(true));
                     return null;
                 });
@@ -144,7 +144,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
                 .setBody(body)
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -181,7 +181,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), unicodeEmoji, "@me")
                 .setRatelimitRetries(500)
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -222,7 +222,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), value, "@me")
                 .setRatelimitRetries(500)
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -255,7 +255,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     static CompletableFuture<Void> removeAllReactions(DiscordApi api, long channelId, long messageId) {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -287,7 +287,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     static CompletableFuture<Void> pin(DiscordApi api, long channelId, long messageId) {
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.PINS)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -319,7 +319,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     static CompletableFuture<Void> unpin(DiscordApi api, long channelId, long messageId) {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.PINS)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**

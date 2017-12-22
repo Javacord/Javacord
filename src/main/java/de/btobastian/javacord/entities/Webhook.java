@@ -81,7 +81,7 @@ public interface Webhook extends DiscordEntity {
     default CompletableFuture<Void> delete() {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -94,7 +94,7 @@ public interface Webhook extends DiscordEntity {
         return new RestRequest<Webhook>(getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
                 .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute((res, json) -> new ImplWebhook(getApi(), json));
+                .execute(result -> new ImplWebhook(getApi(), result.getJsonBody()));
     }
 
     /**
@@ -107,7 +107,7 @@ public interface Webhook extends DiscordEntity {
         return new RestRequest<Webhook>(getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
                 .setBody(JsonNodeFactory.instance.objectNode().put("channel_id", channel.getId()))
-                .execute((res, json) -> new ImplWebhook(getApi(), json));
+                .execute(result -> new ImplWebhook(getApi(), result.getJsonBody()));
     }
 
 }

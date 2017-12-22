@@ -55,7 +55,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("topic", topic))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -68,7 +68,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("nsfw", nsfw))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -82,7 +82,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode()
                         .put("parent_id", category == null ? null : category.getIdAsString()))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**

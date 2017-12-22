@@ -89,7 +89,7 @@ public interface Role extends DiscordEntity, Mentionable {
     default CompletableFuture<Void> delete() {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.ROLE)
                 .setUrlParameters(String.valueOf(getServer().getId()), String.valueOf(getId()))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**

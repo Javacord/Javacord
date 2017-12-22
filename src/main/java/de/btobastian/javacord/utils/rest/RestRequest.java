@@ -1,7 +1,6 @@
 package de.btobastian.javacord.utils.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * This class is used to wrap a rest request.
@@ -38,7 +37,7 @@ public class RestRequest<T> {
 
     private int retryCounter = 0;
 
-    private final CompletableFuture<Response> result = new CompletableFuture<>();
+    private final CompletableFuture<RestRequestResult> result = new CompletableFuture<>();
 
     /**
      * The multipart body of the request.
@@ -251,19 +250,16 @@ public class RestRequest<T> {
      * @param function A function which processes the rest response to the requested object.
      * @return A future which will contain the output of the function.
      */
-    public CompletableFuture<T> execute(BiFunction<Response, JsonNode, T> function) {
+    public CompletableFuture<T> execute(Function<RestRequestResult, T> function) {
         api.getRatelimitManager().queueRequest(this);
         CompletableFuture<T> future = new CompletableFuture<>();
-        result.whenComplete((response, throwable) -> {
+        result.whenComplete((result, throwable) -> {
             if (throwable != null) {
                 future.completeExceptionally(throwable);
                 return;
             }
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                ResponseBody body = response.peekBody(Long.MAX_VALUE);
-                JsonNode responseJson = body == null ? null : mapper.readTree(body.string());
-                future.complete(function.apply(response, responseJson));
+                future.complete(function.apply(result));
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
@@ -276,17 +272,17 @@ public class RestRequest<T> {
      *
      * @return Gets the result of this request.
      */
-    public CompletableFuture<Response> getResult() {
+    public CompletableFuture<RestRequestResult> getResult() {
         return result;
     }
 
     /**
      * Executes the request blocking.
      *
-     * @return The response of the request and the response body as json node.
+     * @return The result of the request.
      * @throws Exception If something went wrong while executing the request.
      */
-    public Response executeBlocking() throws Exception {
+    public RestRequestResult executeBlocking() throws Exception {
         Request.Builder requestBuilder = new Request.Builder();
         HttpUrl.Builder httpUrlBuilder = endpoint.getOkHttpUrl(urlParameters).newBuilder();
         for (String[] queryParameter : queryParameters) {
@@ -329,17 +325,14 @@ public class RestRequest<T> {
                 method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
 
         Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute();
-        ResponseBody responseBody = response.peekBody(Long.MAX_VALUE);
+        RestRequestResult result = new RestRequestResult(this, response);
         logger.debug("Sent {} request to {} and received status code {} with{} body{}",
                 method.name(), endpoint.getFullUrl(urlParameters), response.code(),
-                responseBody == null ? " empty" : "",
-                responseBody == null ? "" : " " + responseBody.string());
+                result.getBody().map(b -> "").orElse(" empty"), result.getStringBody().map(s -> " " + s).orElse(""));
         if (response.code() >= 300 || response.code() < 200) {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode responseJson = responseBody == null ? null : mapper.readTree(responseBody.string());
-            if (responseJson != null && responseJson.has("code")) {
-                int code = responseJson.get("code").asInt();
-                String message = responseJson.has("message") ? responseJson.get("message").asText() : null;
+            if (!result.getJsonBody().isNull() && result.getJsonBody().has("code")) {
+                int code = result.getJsonBody().get("code").asInt();
+                String message = result.getJsonBody().has("message") ? result.getJsonBody().get("message").asText() : null;
                 switch (code) {
                     case 50007:
                         throw new CannotMessageUserException(origin,
@@ -349,18 +342,20 @@ public class RestRequest<T> {
             switch (response.code()) {
                 case 429:
                     // A 429 will be handled in the RatelimitManager class
-                    return response;
+                    return result;
                 case 403:
                     throw new MissingPermissionsException(origin,
-                            "Received a " + response.code() + " response from Discord with body "
-                                    + (responseBody == null ? "empty" : responseBody.string()) + "!", response, this);
+                            "Received a " + response.code() + " response from Discord with"
+                                    + (result.getBody().isPresent() ? "" : " empty") + " body"
+                                    + result.getStringBody().map(s -> " " + s).orElse("") + "!", response, this);
                 default:
                     throw new DiscordException(origin,
-                            "Received a " + response.code() + " response from Discord with body "
-                                    + (responseBody == null ? "empty" : responseBody.string()) + "!", response, this);
+                            "Received a " + response.code() + " response from Discord with"
+                                    + (result.getBody().isPresent() ? "" : " empty") + " body"
+                                    + result.getStringBody().map(s -> " " + s).orElse("") + "!", response, this);
             }
         }
-        return response;
+        return result;
     }
 
 }

@@ -52,7 +52,7 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
 }

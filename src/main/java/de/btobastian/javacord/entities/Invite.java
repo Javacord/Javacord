@@ -110,7 +110,7 @@ public interface Invite {
     default CompletableFuture<Void> delete() {
         return new RestRequest<Void>(((ImplInvite) this).getApi(), RestMethod.DELETE, RestEndpoint.INVITE)
                 .setUrlParameters(getCode())
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
 }

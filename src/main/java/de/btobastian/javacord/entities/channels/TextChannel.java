@@ -91,7 +91,7 @@ public interface TextChannel extends Channel, Messageable {
             request.setBody(body);
         }
 
-        return request.execute((res, json) -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, json));
+        return request.execute(result -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, result.getJsonBody()));
     }
 
     /**
@@ -104,7 +104,7 @@ public interface TextChannel extends Channel, Messageable {
         return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.CHANNEL_TYPING)
                 .setRatelimitRetries(0)
                 .setUrlParameters(String.valueOf(getId()))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -142,7 +142,7 @@ public interface TextChannel extends Channel, Messageable {
                 .setRatelimitRetries(0)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(body)
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -191,7 +191,7 @@ public interface TextChannel extends Channel, Messageable {
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> new RestRequest<Message>(getApi(), RestMethod.GET, RestEndpoint.MESSAGE)
                 .setUrlParameters(String.valueOf(getId()), String.valueOf(id))
-                .execute((res, json) -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, json)));
+                .execute(result -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, result.getJsonBody())));
     }
 
     /**
@@ -216,9 +216,9 @@ public interface TextChannel extends Channel, Messageable {
     default CompletableFuture<List<Message>> getPins() {
         return new RestRequest<List<Message>>(getApi(), RestMethod.GET, RestEndpoint.PINS)
                 .setUrlParameters(getIdAsString())
-                .execute((res, json) -> {
+                .execute(result -> {
                     List<Message> pins = new ArrayList<>();
-                    for (JsonNode pin : json) {
+                    for (JsonNode pin : result.getJsonBody()) {
                         pins.add(((ImplDiscordApi) getApi()).getOrCreateMessage(this, pin));
                     }
                     return pins;
@@ -345,9 +345,9 @@ public interface TextChannel extends Channel, Messageable {
     default CompletableFuture<List<Webhook>> getWebhooks() {
         return new RestRequest<List<Webhook>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute((res, json) -> {
+                .execute(result -> {
                     List<Webhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhook : json) {
+                    for (JsonNode webhook : result.getJsonBody()) {
                         webhooks.add(new ImplWebhook(getApi(), webhook));
                     }
                     return webhooks;

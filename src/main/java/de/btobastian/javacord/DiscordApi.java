@@ -241,7 +241,7 @@ public interface DiscordApi {
      */
     default CompletableFuture<ApplicationInfo> getApplicationInfo() {
         return new RestRequest<ApplicationInfo>(this, RestMethod.GET, RestEndpoint.SELF_INFO)
-                .execute((res, json) -> new ImplApplicationInfo(this, json));
+                .execute(result -> new ImplApplicationInfo(this, result.getJsonBody()));
     }
 
     /**
@@ -253,7 +253,7 @@ public interface DiscordApi {
     default CompletableFuture<Webhook> getWebhookById(long id) {
         return new RestRequest<Webhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
                 .setUrlParameters(String.valueOf(id))
-                .execute((res, json) -> new ImplWebhook(this, json));
+                .execute(result -> new ImplWebhook(this, result.getJsonBody()));
     }
 
     /**
@@ -272,7 +272,7 @@ public interface DiscordApi {
     default CompletableFuture<Invite> getInviteByCode(String code) {
         return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
                 .setUrlParameters(code)
-                .execute((res, json) -> new ImplInvite(this, json));
+                .execute(result -> new ImplInvite(this, result.getJsonBody()));
     }
 
     /**

@@ -56,7 +56,7 @@ public class ChannelCategoryBuilder {
         return new RestRequest<ChannelCategory>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("type", 4).put("name", name))
-                .execute((res, json) -> server.getOrCreateChannelCategory(json));
+                .execute(result -> server.getOrCreateChannelCategory(result.getJsonBody()));
     }
 
 }

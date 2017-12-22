@@ -109,7 +109,7 @@ public class InviteBuilder {
                         .put("max_uses", maxUses)
                         .put("temporary", temporary)
                         .put("unique", unique))
-                .execute((res, json) -> new ImplInvite(channel.getApi(), json));
+                .execute(result -> new ImplInvite(channel.getApi(), result.getJsonBody()));
     }
 
 }

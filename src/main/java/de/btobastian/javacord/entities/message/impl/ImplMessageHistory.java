@@ -207,9 +207,9 @@ public class ImplMessageHistory implements MessageHistory {
             restRequest.addQueryParameter("around", String.valueOf(around));
         }
 
-        return restRequest.execute((res, json) -> {
+        return restRequest.execute(result -> {
             Collection<Message> messages = new ArrayList<>();
-            for (JsonNode messageJson : json) {
+            for (JsonNode messageJson : result.getJsonBody()) {
                 messages.add(((ImplDiscordApi) channel.getApi()).getOrCreateMessage(channel, messageJson));
             }
             return messages.toArray(new Message[messages.size()]);

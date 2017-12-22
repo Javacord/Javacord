@@ -117,7 +117,7 @@ public class ServerVoiceChannelBuilder {
         return new RestRequest<ServerVoiceChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)
-                .execute((res, json) -> server.getOrCreateServerVoiceChannel(json));
+                .execute(result -> server.getOrCreateServerVoiceChannel(result.getJsonBody()));
     }
 
 }

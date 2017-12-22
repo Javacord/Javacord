@@ -34,9 +34,9 @@ public interface Reaction {
                 .setUrlParameters(
                         String.valueOf(channelId), String.valueOf(messageId), value)
                 .setRatelimitRetries(250)
-                .execute((res, json) -> {
+                .execute(result -> {
                     List<User> users = new ArrayList<>();
-                    for (JsonNode userJson : json) {
+                    for (JsonNode userJson : result.getJsonBody()) {
                         users.add(((ImplDiscordApi) api).getOrCreateUser(userJson));
                     }
                     return users;
@@ -82,7 +82,7 @@ public interface Reaction {
                         value,
                         user.isYourself() ? "@me" : String.valueOf(user.getId()))
                 .setRatelimitRetries(250)
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**

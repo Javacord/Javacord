@@ -79,7 +79,7 @@ public class ServerTextChannelBuilder {
         return new RestRequest<ServerTextChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)
-                .execute((res, json) -> server.getOrCreateServerTextChannel(json));
+                .execute(result -> server.getOrCreateServerTextChannel(result.getJsonBody()));
     }
 
 }

@@ -35,7 +35,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode().put("user_limit", limit))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
@@ -58,7 +58,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
                 .setUrlParameters(String.valueOf(getId()))
                 .setBody(JsonNodeFactory.instance.objectNode()
                         .put("parent_id", category == null ? null : category.getIdAsString()))
-                .execute((res, json) -> null);
+                .execute(result -> null);
     }
 
     /**
