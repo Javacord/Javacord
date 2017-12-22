@@ -73,6 +73,13 @@ public interface Role extends DiscordEntity, Mentionable {
     Permissions getPermissions();
 
     /**
+     * Checks if this role is managed by an integration.
+     *
+     * @return Whether this role is managed by an integration or not.
+     */
+    boolean isManaged ();
+
+    /**
      * Checks if the role is the @everyone role.
      *
      * @return Whether the role is the @everyone role or not.

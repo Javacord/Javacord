@@ -61,6 +61,11 @@ public class ImplRole implements Role {
     private ImplPermissions permissions;
 
     /**
+     * Whether this role is managed by an integration or not.
+     */
+    private boolean managed;
+
+    /**
      * A collection with all users with this role.
      */
     private final Collection<User> users = new HashSet<>();
@@ -81,6 +86,7 @@ public class ImplRole implements Role {
         this.color = data.get("color").asInt(0);
         this.hoist = data.get("hoist").asBoolean(false);
         this.permissions = new ImplPermissions(data.get("permissions").asInt(), 0);
+        this.managed = data.get("managed").asBoolean(false);
     }
 
     /**
@@ -165,6 +171,11 @@ public class ImplRole implements Role {
     @Override
     public Permissions getPermissions() {
         return permissions;
+    }
+
+    @Override
+    public boolean isManaged() {
+        return managed;
     }
 
     @Override
