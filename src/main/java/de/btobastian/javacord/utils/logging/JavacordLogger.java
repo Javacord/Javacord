@@ -10,7 +10,8 @@ import java.util.logging.Logger;
 
 /**
  * This logger is used if no SLF4J compatible logger was found.
- * It uses the logger classes provided by java itself.
+ * It uses the the default output stream from {@link System#out} and {@link System#err}.
+ * This is a really primitive implementation and not recommended in production. Use a slf4j compatible logger instead!
  */
 public class JavacordLogger extends MarkerIgnoringBase {
 
@@ -72,9 +73,7 @@ public class JavacordLogger extends MarkerIgnoringBase {
     @Override
     final public void debug(String msg) {
         if (isDebugEnabled()) {
-            LogRecord record = new LogRecord(Level.FINE, msg);
-            record.setLoggerName(name);
-            Logger.getLogger(name).log(record);
+            log("DEBUG", msg, null);
         }
     }
 
@@ -82,10 +81,7 @@ public class JavacordLogger extends MarkerIgnoringBase {
     final public void debug(String format, Object arg1) {
         if (isDebugEnabled()) {
             FormattingTuple ft = MessageFormatter.format(format, arg1);
-            LogRecord record = new LogRecord(Level.FINE, ft.getMessage());
-            record.setThrown(ft.getThrowable());
-            record.setLoggerName(name);
-            Logger.getLogger(name).log(record);
+            log("DEBUG", ft.getMessage(), ft.getThrowable());
         }
     }
 
@@ -93,10 +89,7 @@ public class JavacordLogger extends MarkerIgnoringBase {
     final public void debug(String format, Object arg1, Object arg2) {
         if (isDebugEnabled()) {
             FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
-            LogRecord record = new LogRecord(Level.FINE, ft.getMessage());
-            record.setThrown(ft.getThrowable());
-            record.setLoggerName(name);
-            Logger.getLogger(name).log(record);
+            log("DEBUG", ft.getMessage(), ft.getThrowable());
         }
     }
 
@@ -104,20 +97,14 @@ public class JavacordLogger extends MarkerIgnoringBase {
     public final void debug(String format, Object... arguments) {
         if (isDebugEnabled()) {
             FormattingTuple ft = MessageFormatter.arrayFormat(format, arguments);
-            LogRecord record = new LogRecord(Level.FINE, ft.getMessage());
-            record.setThrown(ft.getThrowable());
-            record.setLoggerName(name);
-            Logger.getLogger(name).log(record);
+            log("DEBUG", ft.getMessage(), ft.getThrowable());
         }
     }
 
     @Override
     final public void debug(String msg, Throwable t) {
         if (isDebugEnabled()) {
-            LogRecord record = new LogRecord(Level.FINE, msg);
-            record.setThrown(t);
-            record.setLoggerName(name);
-            Logger.getLogger(name).log(record);
+            log("DEBUG", msg, t);
         }
     }
 
@@ -129,44 +116,31 @@ public class JavacordLogger extends MarkerIgnoringBase {
 
     @Override
     final public void info(String msg) {
-        LogRecord record = new LogRecord(Level.INFO, msg);
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("INFO", msg, null);
     }
 
     @Override
     final public void info(String format, Object arg1) {
         FormattingTuple ft = MessageFormatter.format(format, arg1);
-        LogRecord record = new LogRecord(Level.INFO, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("INFO", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     final public void info(String format, Object arg1, Object arg2) {
         FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
-        LogRecord record = new LogRecord(Level.INFO, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("INFO", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     public final void info(String format, Object... arguments) {
         FormattingTuple ft = MessageFormatter.arrayFormat(format, arguments);
-        LogRecord record = new LogRecord(Level.INFO, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("INFO", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     final public void info(String msg, Throwable t) {
         LogRecord record = new LogRecord(Level.INFO, msg);
-        record.setThrown(t);
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("INFO", msg, t);
     }
 
     @Override
@@ -177,44 +151,30 @@ public class JavacordLogger extends MarkerIgnoringBase {
 
     @Override
     final public void warn(String msg) {
-        LogRecord record = new LogRecord(Level.WARNING, msg);
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("WARNING", msg, null);
     }
 
     @Override
     final public void warn(String format, Object arg1) {
         FormattingTuple ft = MessageFormatter.format(format, arg1);
-        LogRecord record = new LogRecord(Level.WARNING, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("WARNING", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     final public void warn(String format, Object arg1, Object arg2) {
         FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
-        LogRecord record = new LogRecord(Level.WARNING, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("WARNING", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     public final void warn(String format, Object... arguments) {
         FormattingTuple ft = MessageFormatter.arrayFormat(format, arguments);
-        LogRecord record = new LogRecord(Level.WARNING, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("WARNING", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     final public void warn(String msg, Throwable t) {
-        LogRecord record = new LogRecord(Level.WARNING, msg);
-        record.setThrown(t);
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("WARNING", msg, t);
     }
 
     @Override
@@ -225,44 +185,46 @@ public class JavacordLogger extends MarkerIgnoringBase {
 
     @Override
     final public void error(String msg) {
-        LogRecord record = new LogRecord(Level.SEVERE, msg);
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("ERROR", msg, null);
     }
 
     @Override
     final public void error(String format, Object arg1) {
         FormattingTuple ft = MessageFormatter.format(format, arg1);
-        LogRecord record = new LogRecord(Level.SEVERE, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("ERROR", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     final public void error(String format, Object arg1, Object arg2) {
         FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
-        LogRecord record = new LogRecord(Level.SEVERE, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("ERROR", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     public final void error(String format, Object... arguments) {
         FormattingTuple ft = MessageFormatter.arrayFormat(format, arguments);
-        LogRecord record = new LogRecord(Level.SEVERE, ft.getMessage());
-        record.setThrown(ft.getThrowable());
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("ERROR", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
     final public void error(String msg, Throwable t) {
-        LogRecord record = new LogRecord(Level.SEVERE, msg);
-        record.setThrown(t);
-        record.setLoggerName(name);
-        Logger.getLogger(name).log(record);
+        log("ERROR", msg, t);
+    }
+
+    /**
+     * Simply logs the to the default output stream {@link System#out} and errors to {@link System#err}.
+     *
+     * @param level The level of the log message.
+     * @param msg The text of the log message.
+     * @param t The exception.
+     */
+    private void log(String level, String msg, Throwable t) {
+        if (msg != null) {
+            System.out.println("[" + level + "][" + name + "] " + msg);
+        }
+        if (t != null) {
+            t.printStackTrace();
+        }
     }
 
 }
