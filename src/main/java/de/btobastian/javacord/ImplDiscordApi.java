@@ -187,7 +187,7 @@ public class ImplDiscordApi implements DiscordApi {
             int currentShard,
             int totalShards,
             CompletableFuture<DiscordApi> ready
-    ){
+    ) {
         this.accountType = accountType;
         this.token = accountType.getTokenPrefix() + token;
         this.currentShard = currentShard;
