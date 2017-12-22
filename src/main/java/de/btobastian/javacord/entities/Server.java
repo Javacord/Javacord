@@ -1,6 +1,7 @@
 package de.btobastian.javacord.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ExplicitContentFilterLevel;
@@ -342,14 +343,12 @@ public interface Server extends DiscordEntity {
      */
     default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles){
         ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
-        updateNode.putArray("roles")
-            .addAll(roles.stream()
-                .map(Role::getId)
-                .map(String::valueOf)
-                .map(JsonNodeFactory.instance::textNode)
-                .collect(Collectors.toList()));
+        ArrayNode rolesJson = updateNode.putArray("roles");
+        for (Role role : roles) {
+            rolesJson.add(role.getIdAsString());
+        }
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                .setUrlParameters(String.valueOf(getId()), String.valueOf(user.getId()))
+                .setUrlParameters(getIdAsString(), user.getIdAsString())
                 .setBody(updateNode)
                 .execute((res, json) -> null);
     }

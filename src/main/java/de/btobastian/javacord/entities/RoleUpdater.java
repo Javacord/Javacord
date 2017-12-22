@@ -56,7 +56,7 @@ public class RoleUpdater {
      * @return This builder, allowing for chaining.
      */
     public RoleUpdater addAllRoles(Collection<Role> roles){
-        roles.forEach(this::addRole);
+        this.roles.addAll(roles);
         return this;
     }
 
@@ -78,7 +78,7 @@ public class RoleUpdater {
      * @return This builder, allowing for chaining.
      */
     public RoleUpdater removeAllRoles(Collection<Role> roles){
-        roles.forEach(this::removeRole);
+        this.roles.removeAll(roles);
         return this;
     }
 
