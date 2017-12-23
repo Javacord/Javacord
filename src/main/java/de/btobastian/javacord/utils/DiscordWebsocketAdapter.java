@@ -31,6 +31,7 @@ import de.btobastian.javacord.utils.handler.server.role.GuildRoleDeleteHandler;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.TypingStartHandler;
+import de.btobastian.javacord.utils.handler.user.UserUpdateHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -420,6 +421,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         // user
         addHandler(new PresenceUpdateHandler(api));
         addHandler(new TypingStartHandler(api));
+        addHandler(new UserUpdateHandler(api));
 
         // message
         addHandler(new MessageCreateHandler(api));
