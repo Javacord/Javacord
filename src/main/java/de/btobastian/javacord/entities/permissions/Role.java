@@ -52,6 +52,13 @@ public interface Role extends DiscordEntity, Mentionable {
     Optional<Color> getColor();
 
     /**
+     * Check if this role is mentionable.
+     *
+     * @return Whether this role is mentionable or not.
+     */
+    boolean isMentionable();
+
+    /**
      * Check if this role is pinned in the user listing (sometimes called "hoist").
      *
      * @return Whether this role is pinned in the user listing or not.
@@ -77,7 +84,7 @@ public interface Role extends DiscordEntity, Mentionable {
      *
      * @return Whether this role is managed by an integration or not.
      */
-    boolean isManaged ();
+    boolean isManaged();
 
     /**
      * Checks if the role is the @everyone role.

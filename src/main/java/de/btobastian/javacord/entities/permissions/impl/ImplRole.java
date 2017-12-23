@@ -56,6 +56,11 @@ public class ImplRole implements Role {
     private boolean hoist;
 
     /**
+     * Whether this role can be mentioned or not.
+     */
+    private boolean mentionable;
+
+    /**
      * The permissions of the role.
      */
     private ImplPermissions permissions;
@@ -85,6 +90,7 @@ public class ImplRole implements Role {
         this.position = data.get("position").asInt();
         this.color = data.get("color").asInt(0);
         this.hoist = data.get("hoist").asBoolean(false);
+        this.mentionable = data.get("mentionable").asBoolean(false);
         this.permissions = new ImplPermissions(data.get("permissions").asInt(), 0);
         this.managed = data.get("managed").asBoolean(false);
     }
@@ -153,6 +159,11 @@ public class ImplRole implements Role {
     @Override
     public Optional<Color> getColor() {
         return Optional.ofNullable(color == 0 ? null : new Color(color));
+    }
+
+    @Override
+    public boolean isMentionable() {
+        return mentionable;
     }
 
     @Override
