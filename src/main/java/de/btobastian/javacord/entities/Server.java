@@ -22,6 +22,7 @@ import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -855,9 +856,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to message creates in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageCreateListener(MessageCreateListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), MessageCreateListener.class, listener);
+    default ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), MessageCreateListener.class, listener);
     }
 
     /**
@@ -873,9 +876,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to you leaving this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerLeaveListener(ServerLeaveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), ServerLeaveListener.class, listener);
+    default ListenerManager<ServerLeaveListener> addServerLeaveListener(ServerLeaveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerLeaveListener.class, listener);
     }
 
     /**
@@ -891,9 +896,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to this server becoming unavailable.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerBecomesUnavailableListener(ServerBecomesUnavailableListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerBecomesUnavailableListener> addServerBecomesUnavailableListener(
+            ServerBecomesUnavailableListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerBecomesUnavailableListener.class, listener);
     }
 
@@ -911,9 +918,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to users starting to type in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserStartTypingListener(UserStartTypingListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserStartTypingListener.class, listener);
+    default ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), UserStartTypingListener.class, listener);
     }
 
     /**
@@ -929,9 +938,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to server channel creations in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelCreateListener(ServerChannelCreateListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelCreateListener> addServerChannelCreateListener(
+            ServerChannelCreateListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerChannelCreateListener.class, listener);
     }
 
@@ -948,9 +959,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to server channel deletions in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(
+            ServerChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerChannelDeleteListener.class, listener);
     }
 
@@ -967,9 +980,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to message deletions in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageDeleteListener(MessageDeleteListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), MessageDeleteListener.class, listener);
+    default ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), MessageDeleteListener.class, listener);
     }
 
     /**
@@ -985,9 +1000,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to message edits in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageEditListener(MessageEditListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), MessageEditListener.class, listener);
+    default ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), MessageEditListener.class, listener);
     }
 
     /**
@@ -1003,9 +1020,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to reactions being added on this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionAddListener(ReactionAddListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), ReactionAddListener.class, listener);
+    default ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ReactionAddListener.class, listener);
     }
 
     /**
@@ -1021,9 +1040,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to reactions being removed on this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionRemoveListener(ReactionRemoveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), ReactionRemoveListener.class, listener);
+    default ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ReactionRemoveListener.class, listener);
     }
 
     /**
@@ -1039,9 +1060,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to users joining this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerMemberAddListener(ServerMemberAddListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), ServerMemberAddListener.class, listener);
+    default ListenerManager<ServerMemberAddListener> addServerMemberAddListener(ServerMemberAddListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerMemberAddListener.class, listener);
     }
 
     /**
@@ -1057,9 +1080,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to users leaving this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerMemberRemoveListener> addServerMemberRemoveListener(
+            ServerMemberRemoveListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerMemberRemoveListener.class, listener);
     }
 
@@ -1076,9 +1101,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to server name changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChangeNameListener(ServerChangeNameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), ServerChangeNameListener.class, listener);
+    default ListenerManager<ServerChangeNameListener> addServerChangeNameListener(ServerChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeNameListener.class, listener);
     }
 
     /**
@@ -1094,9 +1121,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to server channel name changes in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
+            ServerChannelChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerChannelChangeNameListener.class, listener);
     }
 
@@ -1114,9 +1143,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to server channel position changes in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
+            ServerChannelChangePositionListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerChannelChangePositionListener.class, listener);
     }
 
@@ -1134,9 +1165,12 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to custom emoji creations in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addCustomEmojiCreateListener(CustomEmojiCreateListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), CustomEmojiCreateListener.class, listener);
+    default ListenerManager<CustomEmojiCreateListener> addCustomEmojiCreateListener(
+            CustomEmojiCreateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), CustomEmojiCreateListener.class, listener);
     }
 
     /**
@@ -1152,9 +1186,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to game changes of users in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeGameListener(UserChangeGameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserChangeGameListener.class, listener);
+    default ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), UserChangeGameListener.class, listener);
     }
 
     /**
@@ -1170,9 +1206,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to status changes of users in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeStatusListener(UserChangeStatusListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserChangeStatusListener.class, listener);
+    default ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), UserChangeStatusListener.class, listener);
     }
 
     /**
@@ -1188,9 +1226,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to role permission changes in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addRoleChangePermissionsListener(RoleChangePermissionsListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
+            RoleChangePermissionsListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), RoleChangePermissionsListener.class, listener);
     }
 
@@ -1208,9 +1248,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to role position changes in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addRoleChangePositionListener(RoleChangePositionListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(
+            RoleChangePositionListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), RoleChangePositionListener.class, listener);
     }
 
@@ -1227,10 +1269,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to overwritten permission changes in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangeOverwrittenPermissionsListener(
-            ServerChannelChangeOverwrittenPermissionsListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
@@ -1249,9 +1292,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to role creations in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addRoleCreateListener(RoleCreateListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), RoleCreateListener.class, listener);
+    default ListenerManager<RoleCreateListener> addRoleCreateListener(RoleCreateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), RoleCreateListener.class, listener);
     }
 
     /**
@@ -1267,9 +1312,10 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to role deletions in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addRoleDeleteListener(RoleDeleteListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), RoleDeleteListener.class, listener);
+    default ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), RoleDeleteListener.class, listener);
     }
 
     /**
@@ -1285,9 +1331,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to user nickname changes in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeNicknameListener(UserChangeNicknameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(
+            UserChangeNicknameListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), UserChangeNicknameListener.class, listener);
     }
 
@@ -1304,9 +1352,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to server text channel topic changes in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerTextChannelChangeTopicListener> addServerTextChannelChangeTopicListener(
+            ServerTextChannelChangeTopicListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Server.class, getId(), ServerTextChannelChangeTopicListener.class, listener);
     }
 
@@ -1324,9 +1374,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to users being added to roles in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserRoleAddListener(UserRoleAddListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserRoleAddListener.class, listener);
+    default ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), UserRoleAddListener.class, listener);
     }
 
     /**
@@ -1342,9 +1394,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to users being removed from roles in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserRoleRemoveListener(UserRoleRemoveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserRoleRemoveListener.class, listener);
+    default ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), UserRoleRemoveListener.class, listener);
     }
 
     /**
@@ -1360,9 +1414,11 @@ public interface Server extends DiscordEntity {
      * Adds a listener, which listens to members of this server changing their name.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeNameListener(UserChangeNameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserChangeNameListener.class, listener);
+    default ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), UserChangeNameListener.class, listener);
     }
 
     /**
