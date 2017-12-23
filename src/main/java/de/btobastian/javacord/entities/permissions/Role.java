@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.*;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -130,9 +131,11 @@ public interface Role extends DiscordEntity, Mentionable {
      * Adds a listener, which listens to permission changes of this role.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addRoleChangePermissionsListener(RoleChangePermissionsListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
+            RoleChangePermissionsListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Role.class, getId(), RoleChangePermissionsListener.class, listener);
     }
 
@@ -149,9 +152,12 @@ public interface Role extends DiscordEntity, Mentionable {
      * Adds a listener, which listens to position changes of this role.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addRoleChangePositionListener(RoleChangePositionListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(), RoleChangePositionListener.class, listener);
+    default ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(
+            RoleChangePositionListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Role.class, getId(), RoleChangePositionListener.class, listener);
     }
 
     /**
@@ -167,10 +173,11 @@ public interface Role extends DiscordEntity, Mentionable {
      * Adds a listener, which listens to overwritten permission changes of this role.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangeOverwrittenPermissionsListener(
-            ServerChannelChangeOverwrittenPermissionsListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 Role.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
@@ -189,9 +196,11 @@ public interface Role extends DiscordEntity, Mentionable {
      * Adds a listener, which listens to this role being deleted.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addRoleDeleteListener(RoleDeleteListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(), RoleDeleteListener.class, listener);
+    default ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Role.class, getId(), RoleDeleteListener.class, listener);
     }
 
     /**
@@ -207,9 +216,10 @@ public interface Role extends DiscordEntity, Mentionable {
      * Adds a listener, which listens to this user being added to this role.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserRoleAddListener(UserRoleAddListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(), UserRoleAddListener.class, listener);
+    default ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(), UserRoleAddListener.class, listener);
     }
 
     /**
@@ -225,9 +235,11 @@ public interface Role extends DiscordEntity, Mentionable {
      * Adds a listener, which listens to this user being removed from this role.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserRoleRemoveListener(UserRoleRemoveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(), UserRoleRemoveListener.class, listener);
+    default ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Role.class, getId(), UserRoleRemoveListener.class, listener);
     }
 
     /**
