@@ -18,6 +18,7 @@ import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -702,9 +703,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * Adds a listener, which listens to this message being deleted.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageDeleteListener(MessageDeleteListener listener) {
-        getApi().addMessageDeleteListener(getId(), listener);
+    default ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener) {
+        return getApi().addMessageDeleteListener(getId(), listener);
     }
 
     /**
@@ -720,9 +722,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * Adds a listener, which listens to this message being edited.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageEditListener(MessageEditListener listener) {
-        getApi().addMessageEditListener(getId(), listener);
+    default ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener) {
+        return getApi().addMessageEditListener(getId(), listener);
     }
 
     /**
@@ -738,9 +741,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * Adds a listener, which listens to reactions being added to this message.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionAddListener(ReactionAddListener listener) {
-        getApi().addReactionAddListener(getId(), listener);
+    default ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener) {
+        return getApi().addReactionAddListener(getId(), listener);
     }
 
     /**
@@ -756,9 +760,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * Adds a listener, which listens to reactions being removed from this message.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionRemoveListener(ReactionRemoveListener listener) {
-        getApi().addReactionRemoveListener(getId(), listener);
+    default ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener) {
+        return getApi().addReactionRemoveListener(getId(), listener);
     }
 
     /**
