@@ -27,6 +27,7 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
@@ -403,8 +404,11 @@ public class ImplDiscordApi implements DiscordApi {
      * @param objectId The id of the object.
      * @param listenerClass The listener class.
      * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The manager for the added listener.
      */
-    public void addObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
+    public <T> ListenerManager<T> addObjectListener(
+            Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
         synchronized (objectListeners) {
             Map<Long, Map<Class<?>, List<Object>>> objectListener =
                     objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
@@ -413,6 +417,7 @@ public class ImplDiscordApi implements DiscordApi {
             List<Object> classListeners = listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
             classListeners.add(listener);
         }
+        return new ListenerManager<>(this, listener, listenerClass, objectClass, objectId);
     }
 
     /**
@@ -479,12 +484,15 @@ public class ImplDiscordApi implements DiscordApi {
      *
      * @param clazz The listener class.
      * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The manager for the added listener.
      */
-    public void addListener(Class<?> clazz, Object listener) {
+    public <T> ListenerManager<T> addListener(Class<T> clazz, T listener) {
         synchronized (listeners) {
             List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
             classListeners.add(listener);
         }
+        return new ListenerManager<>(this, listener, clazz);
     }
 
     /**
@@ -681,8 +689,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addMessageCreateListener(MessageCreateListener listener) {
-        addListener(MessageCreateListener.class, listener);
+    public ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener) {
+        return addListener(MessageCreateListener.class, listener);
     }
 
     @Override
@@ -691,8 +699,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerJoinListener(ServerJoinListener listener) {
-        addListener(ServerJoinListener.class, listener);
+    public ListenerManager<ServerJoinListener> addServerJoinListener(ServerJoinListener listener) {
+        return addListener(ServerJoinListener.class, listener);
     }
 
     @Override
@@ -701,8 +709,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerLeaveListener(ServerLeaveListener listener) {
-        addListener(ServerLeaveListener.class, listener);
+    public ListenerManager<ServerLeaveListener> addServerLeaveListener(ServerLeaveListener listener) {
+        return addListener(ServerLeaveListener.class, listener);
     }
 
     @Override
@@ -711,8 +719,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerBecomesAvailableListener(ServerBecomesAvailableListener listener) {
-        addListener(ServerBecomesAvailableListener.class, listener);
+    public ListenerManager<ServerBecomesAvailableListener> addServerBecomesAvailableListener(
+            ServerBecomesAvailableListener listener) {
+        return addListener(ServerBecomesAvailableListener.class, listener);
     }
 
     @Override
@@ -721,8 +730,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerBecomesUnavailableListener(ServerBecomesUnavailableListener listener) {
-        addListener(ServerBecomesUnavailableListener.class, listener);
+    public ListenerManager<ServerBecomesUnavailableListener> addServerBecomesUnavailableListener(
+            ServerBecomesUnavailableListener listener) {
+        return addListener(ServerBecomesUnavailableListener.class, listener);
     }
 
     @Override
@@ -731,8 +741,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addUserStartTypingListener(UserStartTypingListener listener) {
-        addListener(UserStartTypingListener.class, listener);
+    public ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener) {
+        return addListener(UserStartTypingListener.class, listener);
     }
 
     @Override
@@ -741,8 +751,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerChannelCreateListener(ServerChannelCreateListener listener) {
-        addListener(ServerChannelCreateListener.class, listener);
+    public ListenerManager<ServerChannelCreateListener> addServerChannelCreateListener(
+            ServerChannelCreateListener listener) {
+        return addListener(ServerChannelCreateListener.class, listener);
     }
 
     @Override
@@ -751,8 +762,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
-        addListener(ServerChannelDeleteListener.class, listener);
+    public ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(
+            ServerChannelDeleteListener listener) {
+        return addListener(ServerChannelDeleteListener.class, listener);
     }
 
     @Override
@@ -761,13 +773,14 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addMessageDeleteListener(MessageDeleteListener listener) {
-        addListener(MessageDeleteListener.class, listener);
+    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener) {
+        return addListener(MessageDeleteListener.class, listener);
     }
 
     @Override
-    public void addMessageDeleteListener(long messageId, MessageDeleteListener listener) {
-        addObjectListener(Message.class, messageId, MessageDeleteListener.class, listener);
+    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(
+            long messageId, MessageDeleteListener listener) {
+        return addObjectListener(Message.class, messageId, MessageDeleteListener.class, listener);
     }
 
     @Override
@@ -781,13 +794,13 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addMessageEditListener(MessageEditListener listener) {
-        addListener(MessageEditListener.class, listener);
+    public ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener) {
+        return addListener(MessageEditListener.class, listener);
     }
 
     @Override
-    public void addMessageEditListener(long messageId, MessageEditListener listener) {
-        addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
+    public ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener) {
+        return addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
     }
 
     @Override
@@ -801,13 +814,13 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addReactionAddListener(ReactionAddListener listener) {
-        addListener(ReactionAddListener.class, listener);
+    public ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener) {
+        return addListener(ReactionAddListener.class, listener);
     }
 
     @Override
-    public void addReactionAddListener(long messageId, ReactionAddListener listener) {
-        addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
+    public ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener) {
+        return addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
     }
 
     @Override
@@ -821,13 +834,14 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addReactionRemoveListener(ReactionRemoveListener listener) {
-        addListener(ReactionRemoveListener.class, listener);
+    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener) {
+        return addListener(ReactionRemoveListener.class, listener);
     }
 
     @Override
-    public void addReactionRemoveListener(long messageId, ReactionRemoveListener listener) {
-        addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
+    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(
+            long messageId, ReactionRemoveListener listener) {
+        return addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
     }
 
     @Override
@@ -841,8 +855,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerMemberAddListener(ServerMemberAddListener listener) {
-        addListener(ServerMemberAddListener.class, listener);
+    public ListenerManager<ServerMemberAddListener> addServerMemberAddListener(ServerMemberAddListener listener) {
+        return addListener(ServerMemberAddListener.class, listener);
     }
 
     @Override
@@ -851,8 +865,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
-        addListener(ServerMemberRemoveListener.class, listener);
+    public ListenerManager<ServerMemberRemoveListener> addServerMemberRemoveListener(
+            ServerMemberRemoveListener listener) {
+        return addListener(ServerMemberRemoveListener.class, listener);
     }
 
     @Override
@@ -861,8 +876,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerChangeNameListener(ServerChangeNameListener listener) {
-        addListener(ServerChangeNameListener.class, listener);
+    public ListenerManager<ServerChangeNameListener> addServerChangeNameListener(ServerChangeNameListener listener) {
+        return addListener(ServerChangeNameListener.class, listener);
     }
 
     @Override
@@ -871,8 +886,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
-        addListener(ServerChannelChangeNameListener.class, listener);
+    public ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
+            ServerChannelChangeNameListener listener) {
+        return addListener(ServerChannelChangeNameListener.class, listener);
     }
 
     @Override
@@ -881,8 +897,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
-        addListener(ServerChannelChangePositionListener.class, listener);
+    public ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
+            ServerChannelChangePositionListener listener) {
+        return addListener(ServerChannelChangePositionListener.class, listener);
     }
 
     @Override
@@ -891,8 +908,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addCustomEmojiCreateListener(CustomEmojiCreateListener listener) {
-        addListener(CustomEmojiCreateListener.class, listener);
+    public ListenerManager<CustomEmojiCreateListener> addCustomEmojiCreateListener(CustomEmojiCreateListener listener) {
+        return addListener(CustomEmojiCreateListener.class, listener);
     }
 
     @Override
@@ -901,8 +918,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addUserChangeGameListener(UserChangeGameListener listener) {
-        addListener(UserChangeGameListener.class, listener);
+    public ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener) {
+        return addListener(UserChangeGameListener.class, listener);
     }
 
     @Override
@@ -911,8 +928,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addUserChangeStatusListener(UserChangeStatusListener listener) {
-        addListener(UserChangeStatusListener.class, listener);
+    public ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener) {
+        return addListener(UserChangeStatusListener.class, listener);
     }
 
     @Override
@@ -921,8 +938,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addRoleChangePermissionsListener(RoleChangePermissionsListener listener) {
-        addListener(RoleChangePermissionsListener.class, listener);
+    public ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
+            RoleChangePermissionsListener listener) {
+        return addListener(RoleChangePermissionsListener.class, listener);
     }
 
     @Override
@@ -931,8 +949,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addRoleChangePositionListener(RoleChangePositionListener listener) {
-        addListener(RoleChangePositionListener.class, listener);
+    public ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(
+            RoleChangePositionListener listener) {
+        return addListener(RoleChangePositionListener.class, listener);
     }
 
     @Override
@@ -941,19 +960,20 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerChannelChangeOverwrittenPermissionsListener(
-            ServerChannelChangeOverwrittenPermissionsListener listener) {
-        addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
+    public ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+        return addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
     @Override
-    public List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+    public List<ServerChannelChangeOverwrittenPermissionsListener>
+    getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
 
     @Override
-    public void addRoleCreateListener(RoleCreateListener listener) {
-        addListener(RoleCreateListener.class, listener);
+    public ListenerManager<RoleCreateListener> addRoleCreateListener(RoleCreateListener listener) {
+        return addListener(RoleCreateListener.class, listener);
     }
 
     @Override
@@ -962,8 +982,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addRoleDeleteListener(RoleDeleteListener listener) {
-        addListener(RoleDeleteListener.class, listener);
+    public ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener) {
+        return addListener(RoleDeleteListener.class, listener);
     }
 
     @Override
@@ -972,8 +992,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addUserChangeNicknameListener(UserChangeNicknameListener listener) {
-        addListener(UserChangeNicknameListener.class, listener);
+    public ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(
+            UserChangeNicknameListener listener) {
+        return addListener(UserChangeNicknameListener.class, listener);
     }
 
     @Override
@@ -982,8 +1003,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addLostConnectionListener(LostConnectionListener listener) {
-        addListener(LostConnectionListener.class, listener);
+    public ListenerManager<LostConnectionListener> addLostConnectionListener(LostConnectionListener listener) {
+        return addListener(LostConnectionListener.class, listener);
     }
 
     @Override
@@ -992,8 +1013,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addReconnectListener(ReconnectListener listener) {
-        addListener(ReconnectListener.class, listener);
+    public ListenerManager<ReconnectListener> addReconnectListener(ReconnectListener listener) {
+        return addListener(ReconnectListener.class, listener);
     }
 
     @Override
@@ -1002,8 +1023,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addResumeListener(ResumeListener listener) {
-        addListener(ResumeListener.class, listener);
+    public ListenerManager<ResumeListener> addResumeListener(ResumeListener listener) {
+        return addListener(ResumeListener.class, listener);
     }
 
     @Override
@@ -1012,8 +1033,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener) {
-        addListener(ServerTextChannelChangeTopicListener.class, listener);
+    public ListenerManager<ServerTextChannelChangeTopicListener> addServerTextChannelChangeTopicListener(
+            ServerTextChannelChangeTopicListener listener) {
+        return addListener(ServerTextChannelChangeTopicListener.class, listener);
     }
 
     @Override
@@ -1022,8 +1044,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addUserRoleAddListener(UserRoleAddListener listener) {
-        addListener(UserRoleAddListener.class, listener);
+    public ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener) {
+        return addListener(UserRoleAddListener.class, listener);
     }
 
     @Override
@@ -1032,8 +1054,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addUserRoleRemoveListener(UserRoleRemoveListener listener) {
-        addListener(UserRoleRemoveListener.class, listener);
+    public ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener) {
+        return addListener(UserRoleRemoveListener.class, listener);
     }
 
     @Override
@@ -1042,8 +1064,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void addUserChangeNameListener(UserChangeNameListener listener) {
-        addListener(UserChangeNameListener.class, listener);
+    public ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener) {
+        return addListener(UserChangeNameListener.class, listener);
     }
 
     @Override

@@ -23,6 +23,7 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -1122,8 +1123,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to global message creates.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addMessageCreateListener(MessageCreateListener listener);
+    ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener);
 
     /**
      * Gets a list with all registered message create listeners.
@@ -1136,8 +1138,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to server joins.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerJoinListener(ServerJoinListener listener);
+    ListenerManager<ServerJoinListener> addServerJoinListener(ServerJoinListener listener);
 
     /**
      * Gets a list with all registered server join listeners.
@@ -1150,8 +1153,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to server leaves.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerLeaveListener(ServerLeaveListener listener);
+    ListenerManager<ServerLeaveListener> addServerLeaveListener(ServerLeaveListener listener);
 
     /**
      * Gets a list with all registered server leaves listeners.
@@ -1164,8 +1168,10 @@ public interface DiscordApi {
      * Adds a listener, which listens to servers becoming available.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerBecomesAvailableListener(ServerBecomesAvailableListener listener);
+    ListenerManager<ServerBecomesAvailableListener> addServerBecomesAvailableListener(
+            ServerBecomesAvailableListener listener);
 
     /**
      * Gets a list with all registered server becomes available listeners.
@@ -1178,8 +1184,10 @@ public interface DiscordApi {
      * Adds a listener, which listens to servers becoming unavailable.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerBecomesUnavailableListener(ServerBecomesUnavailableListener listener);
+    ListenerManager<ServerBecomesUnavailableListener> addServerBecomesUnavailableListener(
+            ServerBecomesUnavailableListener listener);
 
     /**
      * Gets a list with all registered server becomes unavailable listeners.
@@ -1192,8 +1200,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to users starting to type.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addUserStartTypingListener(UserStartTypingListener listener);
+    ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener);
 
     /**
      * Gets a list with all registered user starts typing listeners.
@@ -1206,8 +1215,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to server channel creations.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerChannelCreateListener(ServerChannelCreateListener listener);
+    ListenerManager<ServerChannelCreateListener> addServerChannelCreateListener(ServerChannelCreateListener listener);
 
     /**
      * Gets a list with all registered server channel create listeners.
@@ -1220,8 +1230,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to server channel deletions.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerChannelDeleteListener(ServerChannelDeleteListener listener);
+    ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(ServerChannelDeleteListener listener);
 
     /**
      * Gets a list with all registered server channel delete listeners.
@@ -1234,17 +1245,20 @@ public interface DiscordApi {
      * Adds a listener, which listens to message deletions.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addMessageDeleteListener(MessageDeleteListener listener);
+    ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener);
 
     /**
      * Adds a listener, which listens to message deletions of a specific message.
      *
      * @param message The message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageDeleteListener(Message message, MessageDeleteListener listener) {
-        addMessageDeleteListener(message.getId(), listener);
+    default ListenerManager<MessageDeleteListener> addMessageDeleteListener(
+            Message message, MessageDeleteListener listener) {
+        return addMessageDeleteListener(message.getId(), listener);
     }
 
     /**
@@ -1252,20 +1266,9 @@ public interface DiscordApi {
      *
      * @param messageId The id of the message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addMessageDeleteListener(long messageId, MessageDeleteListener listener);
-
-    /**
-     * Adds a listener, which listens to message deletions of a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     */
-    default void addMessageDeleteListener(String messageId, MessageDeleteListener listener) {
-        try {
-            addMessageDeleteListener(Long.parseLong(messageId), listener);
-        } catch (NumberFormatException ignored) { }
-    }
+    ListenerManager<MessageDeleteListener> addMessageDeleteListener(long messageId, MessageDeleteListener listener);
 
     /**
      * Gets a list with all registered message delete listeners.
@@ -1309,17 +1312,20 @@ public interface DiscordApi {
      * Adds a listener, which listens to message edits.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addMessageEditListener(MessageEditListener listener);
+    ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener);
 
     /**
      * Adds a listener, which listens to message edits of a specific message.
      *
      * @param message The message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageEditListener(Message message, MessageEditListener listener) {
-        addMessageEditListener(message.getId(), listener);
+    default ListenerManager<MessageEditListener> addMessageEditListener(
+            Message message, MessageEditListener listener) {
+        return addMessageEditListener(message.getId(), listener);
     }
 
     /**
@@ -1327,20 +1333,9 @@ public interface DiscordApi {
      *
      * @param messageId The id of the message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addMessageEditListener(long messageId, MessageEditListener listener);
-
-    /**
-     * Adds a listener, which listens to message edits of a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     */
-    default void addMessageEditListener(String messageId, MessageEditListener listener) {
-        try {
-            addMessageEditListener(Long.parseLong(messageId), listener);
-        } catch (NumberFormatException ignored) { }
-    }
+    ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener);
 
     /**
      * Gets a list with all registered message edit listeners.
@@ -1368,33 +1363,22 @@ public interface DiscordApi {
     List<MessageEditListener> getMessageEditListeners(long messageId);
 
     /**
-     * Gets a list with all registered message edit listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered message edit listeners.
-     */
-    default List<MessageEditListener> getMessageEditListeners(String messageId) {
-        try {
-            return getMessageEditListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) { }
-        return Collections.emptyList();
-    }
-
-    /**
      * Adds a listener, which listens to reactions being added.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addReactionAddListener(ReactionAddListener listener);
+    ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener);
 
     /**
      * Adds a listener, which listens to reactions being added to a specific message.
      *
      * @param message The message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionAddListener(Message message, ReactionAddListener listener) {
-        addReactionAddListener(listener);
+    default ListenerManager<ReactionAddListener> addReactionAddListener(Message message, ReactionAddListener listener) {
+        return addReactionAddListener(message.getId(), listener);
     }
 
     /**
@@ -1402,20 +1386,9 @@ public interface DiscordApi {
      *
      * @param messageId The id of the message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addReactionAddListener(long messageId, ReactionAddListener listener);
-
-    /**
-     * Adds a listener, which listens to reactions being added to a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     */
-    default void addReactionAddListener(String messageId, ReactionAddListener listener) {
-        try {
-            addReactionAddListener(Long.parseLong(messageId), listener);
-        } catch (NumberFormatException ignored) { }
-    }
+    ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener);
 
     /**
      * Gets a list with all registered reaction add listeners.
@@ -1459,17 +1432,20 @@ public interface DiscordApi {
      * Adds a listener, which listens to reactions being removed.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addReactionRemoveListener(ReactionRemoveListener listener);
+    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener);
 
     /**
      * Adds a listener, which listens to reactions being removed from a specific message.
      *
      * @param message The message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionRemoveListener(Message message, ReactionRemoveListener listener) {
-        addReactionRemoveListener(message.getId(), listener);
+    default ListenerManager<ReactionRemoveListener> addReactionRemoveListener(
+            Message message, ReactionRemoveListener listener) {
+        return addReactionRemoveListener(message.getId(), listener);
     }
 
     /**
@@ -1477,20 +1453,9 @@ public interface DiscordApi {
      *
      * @param messageId The id of the message which should be listened to.
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addReactionRemoveListener(long messageId, ReactionRemoveListener listener);
-
-    /**
-     * Adds a listener, which listens to reactions being removed from a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     */
-    default void addReactionRemoveListener(String messageId, ReactionRemoveListener listener) {
-        try {
-            addReactionRemoveListener(Long.parseLong(messageId), listener);
-        } catch (NumberFormatException ignored) { }
-    }
+    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(long messageId, ReactionRemoveListener listener);
 
     /**
      * Gets a list with all registered reaction remove listeners.
@@ -1534,8 +1499,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to users joining servers.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerMemberAddListener(ServerMemberAddListener listener);
+    ListenerManager<ServerMemberAddListener> addServerMemberAddListener(ServerMemberAddListener listener);
 
     /**
      * Gets a list with all registered server member add listeners.
@@ -1548,8 +1514,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to users leaving servers.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerMemberRemoveListener(ServerMemberRemoveListener listener);
+    ListenerManager<ServerMemberRemoveListener> addServerMemberRemoveListener(ServerMemberRemoveListener listener);
 
     /**
      * Gets a list with all registered server member remove listeners.
@@ -1562,8 +1529,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to server name changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerChangeNameListener(ServerChangeNameListener listener);
+    ListenerManager<ServerChangeNameListener> addServerChangeNameListener(ServerChangeNameListener listener);
 
     /**
      * Gets a list with all registered server change name listeners.
@@ -1576,8 +1544,10 @@ public interface DiscordApi {
      * Adds a listener, which listens to server channel name changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener);
+    ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
+            ServerChannelChangeNameListener listener);
 
     /**
      * Gets a list with all registered server channel change name listeners.
@@ -1590,8 +1560,10 @@ public interface DiscordApi {
      * Adds a listener, which listens to server channel position changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener);
+    ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
+            ServerChannelChangePositionListener listener);
 
     /**
      * Gets a list with all registered server channel change position listeners.
@@ -1604,8 +1576,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to custom emoji creations.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addCustomEmojiCreateListener(CustomEmojiCreateListener listener);
+    ListenerManager<CustomEmojiCreateListener> addCustomEmojiCreateListener(CustomEmojiCreateListener listener);
 
     /**
      * Gets a list with all registered custom emoji create listeners.
@@ -1618,8 +1591,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to user game changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addUserChangeGameListener(UserChangeGameListener listener);
+    ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener);
 
     /**
      * Gets a list with all registered user change game listeners.
@@ -1632,8 +1606,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to user status changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addUserChangeStatusListener(UserChangeStatusListener listener);
+    ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener);
 
     /**
      * Gets a list with all registered user change status listeners.
@@ -1646,8 +1621,10 @@ public interface DiscordApi {
      * Adds a listener, which listens to role permission changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addRoleChangePermissionsListener(RoleChangePermissionsListener listener);
+    ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
+            RoleChangePermissionsListener listener);
 
     /**
      * Gets a list with all registered role change permissions listeners.
@@ -1660,8 +1637,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to role position changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addRoleChangePositionListener(RoleChangePositionListener listener);
+    ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(RoleChangePositionListener listener);
 
     /**
      * Gets a list with all registered role change position listeners.
@@ -1674,8 +1652,10 @@ public interface DiscordApi {
      * Adds a listener, which listens to overwritten permission changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+    ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
@@ -1688,8 +1668,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to role creations.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addRoleCreateListener(RoleCreateListener listener);
+    ListenerManager<RoleCreateListener> addRoleCreateListener(RoleCreateListener listener);
 
     /**
      * Gets a list with all registered role create listeners.
@@ -1702,8 +1683,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to role deletions.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addRoleDeleteListener(RoleDeleteListener listener);
+    ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener);
 
     /**
      * Gets a list with all registered role delete listeners.
@@ -1716,8 +1698,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to user nickname changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addUserChangeNicknameListener(UserChangeNicknameListener listener);
+    ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(UserChangeNicknameListener listener);
 
     /**
      * Gets a list with all registered user change nickname listeners.
@@ -1730,8 +1713,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to connection losses.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addLostConnectionListener(LostConnectionListener listener);
+    ListenerManager<LostConnectionListener> addLostConnectionListener(LostConnectionListener listener);
 
     /**
      * Gets a list with all registered lost connection listeners.
@@ -1744,8 +1728,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to reconnects.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addReconnectListener(ReconnectListener listener);
+    ListenerManager<ReconnectListener> addReconnectListener(ReconnectListener listener);
 
     /**
      * Gets a list with all registered reconnect listeners.
@@ -1758,8 +1743,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to resumes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addResumeListener(ResumeListener listener);
+    ListenerManager<ResumeListener> addResumeListener(ResumeListener listener);
 
     /**
      * Gets a list with all registered resume listeners.
@@ -1772,8 +1758,10 @@ public interface DiscordApi {
      * Adds a listener, which listens to server text channel topic changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener);
+    ListenerManager<ServerTextChannelChangeTopicListener> addServerTextChannelChangeTopicListener(
+            ServerTextChannelChangeTopicListener listener);
 
     /**
      * Gets a list with all registered server text channel change topic listeners.
@@ -1786,8 +1774,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to users being added to roles.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addUserRoleAddListener(UserRoleAddListener listener);
+    ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener);
 
     /**
      * Gets a list with all registered user role add listeners.
@@ -1800,8 +1789,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to users being removed from roles.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addUserRoleRemoveListener(UserRoleRemoveListener listener);
+    ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener);
 
     /**
      * Gets a list with all registered user role remove listeners.
@@ -1814,8 +1804,9 @@ public interface DiscordApi {
      * Adds a listener, which listens to user name changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    void addUserChangeNameListener(UserChangeNameListener listener);
+    ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener);
 
     /**
      * Gets a list with all registered user change name listeners.
