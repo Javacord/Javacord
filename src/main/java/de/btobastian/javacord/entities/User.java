@@ -14,6 +14,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwr
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
 import de.btobastian.javacord.listeners.user.*;
+import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.Collection;
 import java.util.List;
@@ -185,9 +186,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to message creates from this user.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addMessageCreateListener(MessageCreateListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), MessageCreateListener.class, listener);
+    default ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), MessageCreateListener.class, listener);
     }
 
     /**
@@ -203,9 +206,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to this user starting to type.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserStartTypingListener(UserStartTypingListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserStartTypingListener.class, listener);
+    default ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), UserStartTypingListener.class, listener);
     }
 
     /**
@@ -221,9 +226,10 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to reactions being added by this user.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionAddListener(ReactionAddListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ReactionAddListener.class, listener);
+    default ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ReactionAddListener.class, listener);
     }
 
     /**
@@ -239,9 +245,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to reactions being removed by this user.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addReactionRemoveListener(ReactionRemoveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ReactionRemoveListener.class, listener);
+    default ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), ReactionRemoveListener.class, listener);
     }
 
     /**
@@ -257,9 +265,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to this user joining known servers.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerMemberAddListener(ServerMemberAddListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ServerMemberAddListener.class, listener);
+    default ListenerManager<ServerMemberAddListener> addServerMemberAddListener(ServerMemberAddListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), ServerMemberAddListener.class, listener);
     }
 
     /**
@@ -275,9 +285,12 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to this user leaving known servers.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerMemberRemoveListener(ServerMemberRemoveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ServerMemberRemoveListener.class, listener);
+    default ListenerManager<ServerMemberRemoveListener> addServerMemberRemoveListener(
+            ServerMemberRemoveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), ServerMemberRemoveListener.class, listener);
     }
 
     /**
@@ -293,9 +306,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to this user's game changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeGameListener(UserChangeGameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserChangeGameListener.class, listener);
+    default ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), UserChangeGameListener.class, listener);
     }
 
     /**
@@ -311,9 +326,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to this user's status changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeStatusListener(UserChangeStatusListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserChangeStatusListener.class, listener);
+    default ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), UserChangeStatusListener.class, listener);
     }
 
     /**
@@ -329,10 +346,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to overwritten permission changes of this user.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangeOverwrittenPermissionsListener(
-            ServerChannelChangeOverwrittenPermissionsListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 User.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
@@ -351,9 +369,12 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to nickname changes of this user.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeNicknameListener(UserChangeNicknameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserChangeNicknameListener.class, listener);
+    default ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(
+            UserChangeNicknameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), UserChangeNicknameListener.class, listener);
     }
 
     /**
@@ -369,9 +390,10 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to this user being added to roles.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserRoleAddListener(UserRoleAddListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserRoleAddListener.class, listener);
+    default ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserRoleAddListener.class, listener);
     }
 
     /**
@@ -387,9 +409,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to this user being removed from roles in this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserRoleRemoveListener(UserRoleRemoveListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserRoleRemoveListener.class, listener);
+    default ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), UserRoleRemoveListener.class, listener);
     }
 
     /**
@@ -405,9 +429,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * Adds a listener, which listens to name changes of this user.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addUserChangeNameListener(UserChangeNameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserChangeNameListener.class, listener);
+    default ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), UserChangeNameListener.class, listener);
     }
 
     /**
