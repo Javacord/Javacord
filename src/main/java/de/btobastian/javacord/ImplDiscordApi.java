@@ -25,10 +25,7 @@ import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.*;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
-import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
-import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
-import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -984,5 +981,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
         return getListeners(UserRoleRemoveListener.class);
+    }
+
+    @Override
+    public void addUserChangeNameListener(UserChangeNameListener listener) {
+        addListener(UserChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeNameListener> getUserChangeNameListeners() {
+        return getListeners(UserChangeNameListener.class);
     }
 }

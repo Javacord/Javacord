@@ -9,8 +9,10 @@ import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.events.user.UserChangeGameEvent;
+import de.btobastian.javacord.events.user.UserChangeNameEvent;
 import de.btobastian.javacord.events.user.UserChangeStatusEvent;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
+import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
@@ -61,6 +63,14 @@ public class PresenceUpdateHandler extends PacketHandler {
                     dispatchUserStatusChangeEvent(user, newStatus, oldStatus);
                 }
             }
+            if (packet.get("user").has("username")) {
+                String newName = packet.get("user").get("username").asText();
+                String oldName = user.getName();
+                if (!oldName.equals(newName)) {
+                    user.setName(newName);
+                    dispatchUserChangeNameEvent(user, newName, oldName);
+                }
+            }
         });
     }
 
@@ -84,6 +94,17 @@ public class PresenceUpdateHandler extends PacketHandler {
         listeners.addAll(api.getUserChangeStatusListeners());
 
         dispatchEvent(listeners, listener -> listener.onUserChangeStatus(event));
+    }
+
+    private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
+        UserChangeNameEvent event = new UserChangeNameEvent(api, user, newName, oldName);
+
+        List<UserChangeNameListener> listeners = new ArrayList<>();
+        listeners.addAll(user.getUserChangeNameListeners());
+        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeNameListeners()));
+        listeners.addAll(api.getUserChangeNameListeners());
+
+        dispatchEvent(listeners, listener -> listener.onUserChangeName(event));
     }
 
 }

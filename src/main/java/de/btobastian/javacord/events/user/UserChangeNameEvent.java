@@ -9,6 +9,11 @@ import de.btobastian.javacord.entities.User;
 public class UserChangeNameEvent extends UserEvent {
 
     /**
+     * The new name of the user.
+     */
+    private final String newName;
+
+    /**
      * The old name of the user.
      */
     private final String oldName;
@@ -18,11 +23,22 @@ public class UserChangeNameEvent extends UserEvent {
      *
      * @param api The api instance of the event.
      * @param user The user of the event.
+     * @param newName The new name of the user.
      * @param oldName The old name of the user.
      */
-    public UserChangeNameEvent(DiscordApi api, User user, String oldName) {
+    public UserChangeNameEvent(DiscordApi api, User user, String newName, String oldName) {
         super(api, user);
+        this.newName = newName;
         this.oldName = oldName;
+    }
+
+    /**
+     * Gets the new name of the user.
+     *
+     * @return The new name of the user.
+     */
+    public String getNewName() {
+        return newName;
     }
 
     /**
@@ -32,16 +48,6 @@ public class UserChangeNameEvent extends UserEvent {
      */
     public String getOldName() {
         return oldName;
-    }
-
-    /**
-     * Gets the new name of the user.
-     *
-     * @return The new name of the user.
-     */
-    public String getNewName() {
-        // TODO return getUser().getName();
-        return "";
     }
 
 }

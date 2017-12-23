@@ -21,10 +21,7 @@ import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.*;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
-import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
-import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
-import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -1335,6 +1332,24 @@ public interface Server extends DiscordEntity {
      */
     default List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserRoleRemoveListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to members of this server changing their name.
+     *
+     * @param listener The listener to add.
+     */
+    default void addUserChangeNameListener(UserChangeNameListener listener) {
+        ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), UserChangeNameListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered user change name listeners.
+     *
+     * @return A list with all registered user change name listeners.
+     */
+    default List<UserChangeNameListener> getUserChangeNameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeNameListener.class);
     }
 
 }

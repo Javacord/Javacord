@@ -21,10 +21,7 @@ import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.role.*;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
-import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
-import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
-import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
@@ -1812,5 +1809,19 @@ public interface DiscordApi {
      * @return A list with all registered user role remove listeners.
      */
     List<UserRoleRemoveListener> getUserRoleRemoveListeners();
+
+    /**
+     * Adds a listener, which listens to user name changes.
+     *
+     * @param listener The listener to add.
+     */
+    void addUserChangeNameListener(UserChangeNameListener listener);
+
+    /**
+     * Gets a list with all registered user change name listeners.
+     *
+     * @return A list with all registered user change name listeners.
+     */
+    List<UserChangeNameListener> getUserChangeNameListeners();
 
 }
