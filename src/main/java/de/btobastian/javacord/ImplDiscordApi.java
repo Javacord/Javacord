@@ -397,7 +397,7 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
-     * Adds a object listener.
+     * Adds an object listener.
      *
      * @param objectClass The class of the object.
      * @param objectId The id of the object.
@@ -405,16 +405,54 @@ public class ImplDiscordApi implements DiscordApi {
      * @param listener The listener to add.
      */
     public void addObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
-        Map<Long, Map<Class<?>, List<Object>>> objectListener =
-                objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
-        Map<Class<?>, List<Object>> listeners =
-                objectListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
-        List<Object> classListeners = listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
-        classListeners.add(listener);
+        synchronized (objectListeners) {
+            Map<Long, Map<Class<?>, List<Object>>> objectListener =
+                    objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
+            Map<Class<?>, List<Object>> listeners =
+                    objectListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
+            List<Object> classListeners = listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
+            classListeners.add(listener);
+        }
     }
 
     /**
-     * Gets all message listeners of the given class.
+     * Removes an object listener.
+     *
+     * @param objectClass The class of the object.
+     * @param objectId The id of the object.
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     */
+    public void removeObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
+        synchronized (objectListeners) {
+            Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
+            if (objectClass == null) {
+                return;
+            }
+            Map<Class<?>, List<Object>> listeners = objectListener.get(objectId);
+            if (listeners == null) {
+                return;
+            }
+            List<Object> classListeners = listeners.get(listenerClass);
+            if (classListeners == null) {
+                return;
+            }
+            classListeners.remove(listener);
+            // Clean it up
+            if (classListeners.isEmpty()) {
+                listeners.remove(listenerClass);
+                if (listeners.isEmpty()) {
+                    objectListener.remove(objectId);
+                    if (objectListener.isEmpty()) {
+                        objectListeners.remove(objectClass);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets all object listeners of the given class.
      *
      * @param objectClass The class of the object.
      * @param objectId The id of the object.
@@ -443,8 +481,28 @@ public class ImplDiscordApi implements DiscordApi {
      * @param listener The listener to add.
      */
     private void addListener(Class<?> clazz, Object listener) {
-        List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
-        classListeners.add(listener);
+        synchronized (listeners) {
+            List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
+            classListeners.add(listener);
+        }
+    }
+
+    /**
+     * Removes a global listener.
+     *
+     * @param clazz The listener class.
+     * @param listener The listener to remove.
+     */
+    private void removeListener(Class<?> clazz, Object listener) {
+        synchronized (listeners) {
+            List<Object> classListeners = listeners.get(clazz);
+            if (classListeners != null) {
+                classListeners.remove(listener);
+                if (classListeners.isEmpty()) {
+                    listeners.remove(clazz);
+                }
+            }
+        }
     }
 
     /**
