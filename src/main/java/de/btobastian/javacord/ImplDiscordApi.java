@@ -480,7 +480,7 @@ public class ImplDiscordApi implements DiscordApi {
      * @param clazz The listener class.
      * @param listener The listener to add.
      */
-    private void addListener(Class<?> clazz, Object listener) {
+    public void addListener(Class<?> clazz, Object listener) {
         synchronized (listeners) {
             List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
             classListeners.add(listener);
@@ -493,7 +493,7 @@ public class ImplDiscordApi implements DiscordApi {
      * @param clazz The listener class.
      * @param listener The listener to remove.
      */
-    private void removeListener(Class<?> clazz, Object listener) {
+    public void removeListener(Class<?> clazz, Object listener) {
         synchronized (listeners) {
             List<Object> classListeners = listeners.get(clazz);
             if (classListeners != null) {
@@ -513,7 +513,7 @@ public class ImplDiscordApi implements DiscordApi {
      * @return A list with all listeners of the given type.
      */
     @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    private <T> List<T> getListeners(Class<?> clazz) {
+    public <T> List<T> getListeners(Class<?> clazz) {
         List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
         return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
     }
