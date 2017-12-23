@@ -14,6 +14,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameLi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -251,9 +252,11 @@ public interface ServerChannel extends Channel {
      * Adds a listener, which listens to this channel being deleted.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelDeleteListener(ServerChannelDeleteListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(
+            ServerChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 ServerChannel.class, getId(), ServerChannelDeleteListener.class, listener);
     }
 
@@ -271,9 +274,11 @@ public interface ServerChannel extends Channel {
      * Adds a listener, which listens this server channel name changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangeNameListener(ServerChannelChangeNameListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
+            ServerChannelChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 ServerChannel.class, getId(), ServerChannelChangeNameListener.class, listener);
     }
 
@@ -291,9 +296,11 @@ public interface ServerChannel extends Channel {
      * Adds a listener, which listens this server channel position changes.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangePositionListener(ServerChannelChangePositionListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
+            ServerChannelChangePositionListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 ServerChannel.class, getId(), ServerChannelChangePositionListener.class, listener);
     }
 
@@ -311,9 +318,11 @@ public interface ServerChannel extends Channel {
      * Adds a listener, which listens to overwritten permission changes of this server.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
@@ -322,7 +331,8 @@ public interface ServerChannel extends Channel {
      *
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
-    default List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners() {
+    default List<ServerChannelChangeOverwrittenPermissionsListener>
+    getServerChannelChangeOverwrittenPermissionsListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
     }

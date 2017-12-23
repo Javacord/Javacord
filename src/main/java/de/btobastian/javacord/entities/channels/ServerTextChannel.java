@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -109,9 +110,11 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * Adds a listener, which listens to topic changes of this channel.
      *
      * @param listener The listener to add.
+     * @return The manager of the listener.
      */
-    default void addServerTextChannelChangeTopicListener(ServerTextChannelChangeTopicListener listener) {
-        ((ImplDiscordApi) getApi()).addObjectListener(
+    default ListenerManager<ServerTextChannelChangeTopicListener> addServerTextChannelChangeTopicListener(
+            ServerTextChannelChangeTopicListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
                 ServerTextChannel.class, getId(), ServerTextChannelChangeTopicListener.class, listener);
     }
 
