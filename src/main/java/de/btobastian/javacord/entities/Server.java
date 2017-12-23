@@ -320,6 +320,17 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Deletes the server.
+     *
+     * @return A future to check if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete() {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> null);
+    }
+
+    /**
      * Creates a {@link RoleUpdater} object to add or remove multiple roles of a user simultaneously.
      *
      * @param user The user to update the roles of.
