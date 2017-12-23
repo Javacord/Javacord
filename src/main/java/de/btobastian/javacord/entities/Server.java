@@ -331,6 +331,17 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Leaves the server.
+     *
+     * @return A future to check if the bot successfully left the server.
+     */
+    default CompletableFuture<Void> leave() {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_SELF)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> null);
+    }
+
+    /**
      * Creates a {@link RoleUpdater} object to add or remove multiple roles of a user simultaneously.
      *
      * @param user The user to update the roles of.
