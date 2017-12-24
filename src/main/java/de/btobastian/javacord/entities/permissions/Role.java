@@ -152,6 +152,19 @@ public interface Role extends DiscordEntity, Mentionable {
     }
 
     /**
+     * Updates whether the role is mentionable or not.
+     *
+     * @param mentionable Whether the role should be mentionable or not.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateMentionableFlag(boolean mentionable) {
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
+                .setBody(JsonNodeFactory.instance.objectNode().put("mentionable", mentionable))
+                .execute(result -> null);
+    }
+
+    /**
      * Deletes the role.
      *
      * @return A future to check if the deletion was successful.
