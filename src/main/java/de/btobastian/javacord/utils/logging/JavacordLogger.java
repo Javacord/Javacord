@@ -219,10 +219,13 @@ public class JavacordLogger extends MarkerIgnoringBase {
      * @param t The exception.
      */
     private void log(String level, String msg, Throwable t) {
-        if (msg != null) {
+        if (msg != null && t == null) {
             System.out.println("[" + level + "][" + name + "] " + msg);
         }
         if (t != null) {
+            if (msg != null) {
+                System.err.println("[" + level + "][" + name + "] " + msg);
+            }
             t.printStackTrace();
         }
     }
