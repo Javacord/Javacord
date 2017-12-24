@@ -326,16 +326,29 @@ public interface DiscordApi {
 
     /**
      * Updates the avatar of the current account.
+     * This assumes the provided image is of type <code>"png"</code>.
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
+     * @see #updateAvatar(BufferedImage, String)
      */
     default CompletableFuture<Void> updateAvatar(BufferedImage avatar) {
+        return updateAvatar(avatar, "png");
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     *
+     * @param avatar The new avatar.
+     * @param type The type of the image. Supports <code>"png"</code>, <code>"jpg"</code> and <code>"gif"</code>.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(BufferedImage avatar, String type) {
         String base64Avatar;
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ImageIO.write(avatar, "jpg", os);
-            base64Avatar = "data:image/jpg;base64," + Base64.getEncoder().encodeToString(os.toByteArray());
+            ImageIO.write(avatar, type, os);
+            base64Avatar = "data:image/" + type + ";base64," + Base64.getEncoder().encodeToString(os.toByteArray());
         } catch (IOException e) {
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);
