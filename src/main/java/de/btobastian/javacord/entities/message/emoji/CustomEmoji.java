@@ -27,7 +27,7 @@ public interface CustomEmoji extends DiscordEntity, Emoji {
 
     @Override
     default String getMentionTag() {
-        return "<:" + getName() + ":" + getId() + ">";
+        return "<" + (isAnimated() ? "a" : "") + ":" + getName() + ":" + getId() + ">";
     }
 
     @Override

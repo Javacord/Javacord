@@ -34,6 +34,11 @@ public class ImplCustomEmoji implements CustomEmoji {
     private Server server;
 
     /**
+     * Whether the emoji is animated or not.
+     */
+    private final boolean animated;
+
+    /**
      * Creates a new custom emoji.
      *
      * @param api The discord api instance.
@@ -55,6 +60,7 @@ public class ImplCustomEmoji implements CustomEmoji {
         this.server = server;
         id = data.get("id").asLong();
         name = data.get("name").asText();
+        animated = data.has("animated") && data.get("animated").asBoolean(false);
     }
 
     @Override
@@ -75,6 +81,11 @@ public class ImplCustomEmoji implements CustomEmoji {
     @Override
     public Optional<Server> getServer() {
         return Optional.ofNullable(server);
+    }
+
+    @Override
+    public boolean isAnimated() {
+        return animated;
     }
 
     @Override

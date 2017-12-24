@@ -399,7 +399,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             content = channelMention.replaceFirst("#" + channelName);
             channelMention.reset(content);
         }
-        Matcher customEmoji = Pattern.compile("<:([0-9a-zA-Z]+):([0-9]+)>").matcher(content);
+        Matcher customEmoji = Pattern.compile("<a?:([0-9a-zA-Z]+):([0-9]+)>").matcher(content);
         while (customEmoji.find()) {
             String emojiId = customEmoji.group(2);
             String name = getApi().getCustomEmojiById(emojiId).map(CustomEmoji::getName).orElse(customEmoji.group(1));

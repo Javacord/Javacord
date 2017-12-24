@@ -24,6 +24,14 @@ public interface Emoji extends Mentionable {
     Optional<CustomEmoji> asCustomEmoji();
 
     /**
+     * Checks if the emoji is animated.
+     * Always returns <code>false</code> for unicode emojis.
+     *
+     * @return Whether the emoji is animated or not.
+     */
+    boolean isAnimated();
+
+    /**
      * Checks if the emoji is a unicode.
      *
      * @return Whether the emoji is a unicode emoji or not.
