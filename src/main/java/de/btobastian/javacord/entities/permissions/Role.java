@@ -139,6 +139,19 @@ public interface Role extends DiscordEntity, Mentionable {
     }
 
     /**
+     * Updates if the role should be pinned in the user listing (sometimes called "hoist").
+     *
+     * @param displaySeparately Whether the role should be pinned in the user listing or not.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateDisplaySeparatelyFlag(boolean displaySeparately) {
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
+                .setBody(JsonNodeFactory.instance.objectNode().put("hoist", displaySeparately))
+                .execute(result -> null);
+    }
+
+    /**
      * Deletes the role.
      *
      * @return A future to check if the deletion was successful.
