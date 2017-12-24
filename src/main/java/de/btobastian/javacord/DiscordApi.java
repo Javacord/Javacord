@@ -32,6 +32,10 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import okhttp3.OkHttpClient;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -310,13 +314,36 @@ public interface DiscordApi {
     /**
      * Updates the name of the current account.
      *
-     * @param username The name of the current account.
+     * @param username The new username.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateUsername(String username) {
         return new RestRequest<Void>(this, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
                 .setRatelimitRetries(0)
                 .setBody(JsonNodeFactory.instance.objectNode().put("username", username))
+                .execute(result -> null);
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     *
+     * @param avatar The new avatar.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(BufferedImage avatar) {
+        String base64Avatar;
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(avatar, "jpg", os);
+            base64Avatar = "data:image/jpg;base64," + Base64.getEncoder().encodeToString(os.toByteArray());
+        } catch (IOException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+        return new RestRequest<Void>(this, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
+                .setRatelimitRetries(0)
+                .setBody(JsonNodeFactory.instance.objectNode().put("avatar", base64Avatar))
                 .execute(result -> null);
     }
 
