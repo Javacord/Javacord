@@ -486,11 +486,11 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
         logger.debug("Updating status (game: {})", game.isPresent() ? game.get().getName() : "none");
         ObjectNode updateStatus = JsonNodeFactory.instance.objectNode()
                 .put("op", 3);
-        updateStatus.putObject("d")
+        ObjectNode data = updateStatus.putObject("d")
                 .put("status", "online")
                 .put("afk", false)
                 .putNull("since");
-        ObjectNode gameJson = updateStatus.putObject("game");
+        ObjectNode gameJson = data.putObject("game");
         gameJson.put("name", game.isPresent() ? game.get().getName() : null);
         gameJson.put("type", game.map(g -> g.getType().getId()).orElse(0));
         game.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> gameJson.put("url", url)));
