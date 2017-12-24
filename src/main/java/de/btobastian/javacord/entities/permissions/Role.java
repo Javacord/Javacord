@@ -126,6 +126,19 @@ public interface Role extends DiscordEntity, Mentionable {
     }
 
     /**
+     * Updates the color of the role.
+     *
+     * @param color The new color of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateColor(Color color) {
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
+                .setBody(JsonNodeFactory.instance.objectNode().put("color", color.getRGB() & 0xFFFFFF))
+                .execute(result -> null);
+    }
+
+    /**
      * Deletes the role.
      *
      * @return A future to check if the deletion was successful.
