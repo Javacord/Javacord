@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.utils.ListenerManager;
@@ -107,6 +108,20 @@ public interface Role extends DiscordEntity, Mentionable {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
                 .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
+                .execute(result -> null);
+    }
+
+    /**
+     * Updates the permissions of the role.
+     *
+     * @param permissions The new permissions of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updatePermissions(Permissions permissions) {
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
+                .setBody(JsonNodeFactory.instance.objectNode()
+                        .put("permissions", ((ImplPermissions) permissions).getAllowed()))
                 .execute(result -> null);
     }
 
