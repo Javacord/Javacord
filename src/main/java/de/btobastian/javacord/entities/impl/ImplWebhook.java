@@ -50,7 +50,7 @@ public class ImplWebhook implements Webhook {
         this.user = data.has("user") ? this.api.getOrCreateUser(data.get("user")) : null;
         this.name = data.has("name") && !data.get("name").isNull() ? data.get("name").asText() : null;
         this.avatarId = data.has("avatar") && !data.get("avatar").isNull() ? data.get("avatar").asText() : null;
-        this.token = data.get("token").asText();
+        this.token = data.has("token") ? data.get("token").asText() : null;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class ImplWebhook implements Webhook {
     }
 
     @Override
-    public String getToken() {
-        return token;
+    public Optional<String> getToken() {
+        return Optional.ofNullable(token);
     }
 }

@@ -71,7 +71,7 @@ public interface Webhook extends DiscordEntity {
      *
      * @return The secure token of the webhook.
      */
-    String getToken();
+    Optional<String> getToken();
 
     /**
      * Deletes the webhook.
