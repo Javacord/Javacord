@@ -81,14 +81,17 @@ public class RatelimitManager {
         }
         int delay = bucket.getTimeTillSpaceGetsAvailable();
         if (delay > 0) {
-            synchronized (queue) {
-                if (request.incrementRetryCounter()) {
-                    request.getResult().completeExceptionally(
-                            new RatelimitException(request.getOrigin(),
-                                    "You have been ratelimited and ran out of retires!", null, request)
-                    );
-                    queue.remove(request);
-                    return;
+            synchronized (bucket) {
+                synchronized (queue) {
+                    if (request.incrementRetryCounter()) {
+                        request.getResult().completeExceptionally(
+                                new RatelimitException(request.getOrigin(),
+                                        "You have been ratelimited and ran out of retires!", null, request)
+                        );
+                        queue.remove(request);
+                        bucket.setHasActiveScheduler(false);
+                        return;
+                    }
                 }
             }
             logger.debug("Delaying requests to {} for {}ms to prevent hitting ratelimits", bucket, delay);
@@ -147,12 +150,12 @@ public class RatelimitManager {
                         } else {
                             restRequest.getResult().complete(result);
 
-                            String remaining = result.getResponse().header("X-RateLimit-Remaining", "0");
+                            String remaining = result.getResponse().header("X-RateLimit-Remaining", "1");
                             long reset = restRequest
                                     .getEndpoint()
                                     .getHardcodedRatelimit()
                                     .map(ratelimit -> currentTime + api.getTimeOffset() + ratelimit)
-                                    .orElseGet(() -> Long.parseLong(result.getResponse().header("X-RateLimit-Reset", "0")) * 1000);
+                                    .orElseGet(() -> Long.parseLong(result.getResponse().header("X-RateLimit-Reset")) * 1000);
                             String global = result.getResponse().header("X-RateLimit-Global");
 
                             if (global != null && global.equals("true")) {
