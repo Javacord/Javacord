@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.message;
 
+import de.btobastian.javacord.AccountType;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.*;
 
@@ -59,6 +60,16 @@ public interface MessageAuthor extends DiscordEntity {
      * @return Whether the author is a user or not.
      */
     boolean isUser();
+
+    /**
+     * Checks if the author is the owner of the current account.
+     * Always returns <code>false</code> if logged in to a user account.
+     *
+     * @return Whether thi author is the owner of the current account.
+     */
+    default boolean isBotOwner() {
+        return getApi().getAccountType() == AccountType.BOT && isUser() && getApi().getOwnerId() == getId();
+    }
 
     /**
      * Gets the author as user.

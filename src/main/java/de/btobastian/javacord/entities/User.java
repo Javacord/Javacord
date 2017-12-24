@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities;
 
+import de.btobastian.javacord.AccountType;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
@@ -61,6 +62,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return Whether the user is a bot account or not.
      */
     boolean isBot();
+
+    /**
+     * Checks if this user is the owner of the current account.
+     * Always returns <code>false</code> if logged in to a user account.
+     *
+     * @return Whether this user is the owner of the current account.
+     */
+    default boolean isBotOwner() {
+        return getApi().getAccountType() == AccountType.BOT && getApi().getOwnerId() == getId();
+    }
 
     /**
      * Gets the game of the user.
