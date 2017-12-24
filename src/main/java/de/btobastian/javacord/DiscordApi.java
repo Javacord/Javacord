@@ -1,5 +1,6 @@
 package de.btobastian.javacord;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
@@ -304,6 +305,19 @@ public interface DiscordApi {
         return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
                 .setUrlParameters(code)
                 .execute(result -> new ImplInvite(this, result.getJsonBody()));
+    }
+
+    /**
+     * Updates the name of the current account.
+     *
+     * @param username The name of the current account.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateUsername(String username) {
+        return new RestRequest<Void>(this, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
+                .setRatelimitRetries(0)
+                .setBody(JsonNodeFactory.instance.objectNode().put("username", username))
+                .execute(result -> null);
     }
 
     /**

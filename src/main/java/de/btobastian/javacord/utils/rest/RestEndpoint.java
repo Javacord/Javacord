@@ -37,7 +37,8 @@ public enum RestEndpoint {
     SERVER_INVITE("/guilds/%s/invites", 0),
     WEBHOOK("/webhooks/%s"),
     INVITE("/invites/%s"),
-    BAN("/guilds/%s/bans/%s");
+    BAN("/guilds/%s/bans/%s", 0),
+    CURRENT_USER("/users/@me");
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
