@@ -36,6 +36,11 @@ public interface CustomEmoji extends DiscordEntity, Emoji {
      */
     Optional<Server> getServer();
 
+    /**
+     * Gets the image of the emoji.
+     *
+     * @return The image of the emoji.
+     */
     default Icon getImage() {
         String urlString = "https://cdn.discordapp.com/emojis/" + getId() + (isAnimated() ? ".gif" : ".png");
         try {
