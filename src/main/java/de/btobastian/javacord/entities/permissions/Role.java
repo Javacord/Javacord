@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.permissions;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
@@ -94,6 +95,19 @@ public interface Role extends DiscordEntity, Mentionable {
      */
     default boolean isEveryoneRole() {
         return getId() == getServer().getId();
+    }
+
+    /**
+     * Updates the name of the role.
+     *
+     * @param name The new name of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateName(String name) {
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
+                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
+                .execute(result -> null);
     }
 
     /**
