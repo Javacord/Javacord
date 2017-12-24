@@ -104,7 +104,7 @@ public class RoleBuilder {
     }
 
     /**
-     * Check if the role should be pinned in the user listing (sometimes called "hoist").
+     * Sets if the role should be pinned in the user listing (sometimes called "hoist").
      *
      * @param displaySeparately Whether the role should be pinned in the user listing or not.
      * @return The current instance in order to chain call methods.
