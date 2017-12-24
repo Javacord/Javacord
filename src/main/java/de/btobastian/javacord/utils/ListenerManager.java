@@ -3,6 +3,8 @@ package de.btobastian.javacord.utils;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +41,11 @@ public class ListenerManager<T> {
      * <code>-1</code> if it's a global listener.
      */
     private final long objectId;
+
+    /**
+     * The remove handlers.
+     */
+    private final List<Runnable> removeHandlers = new ArrayList<>();
 
     /**
      * Creates a new listener manager for a global listener.
@@ -119,6 +126,7 @@ public class ListenerManager<T> {
      * @return The current instance in order to chain call methods.
      */
     public ListenerManager<T> remove() {
+        removeHandlers.forEach(Runnable::run);
         if (isGlobalListener()) {
             api.removeListener(listenerClass, listener);
         } else {
@@ -137,6 +145,15 @@ public class ListenerManager<T> {
     public ListenerManager<T> removeAfter(long delay, TimeUnit timeUnit) {
         api.getThreadPool().getScheduler().schedule((Runnable) this::remove, delay, timeUnit);
         return this;
+    }
+
+    /**
+     * Adds a runnable which gets called when the listener gets removed.
+     *
+     * @param removeHandler The handler which gets called when the listener gets remove.
+     */
+    public void addRemoveHandler(Runnable removeHandler) {
+        removeHandlers.add(removeHandler);
     }
 
 }
