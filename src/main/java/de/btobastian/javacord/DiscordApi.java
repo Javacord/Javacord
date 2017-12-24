@@ -79,6 +79,13 @@ public interface DiscordApi {
     DiscordWebsocketAdapter getWebSocketAdapter();
 
     /**
+     * Gets the type of the current account.
+     *
+     * @return The type of the current account.
+     */
+    AccountType getAccountType();
+
+    /**
      * Creates an invite link for the this bot.
      * The method only works for bot accounts!
      *
@@ -182,6 +189,32 @@ public interface DiscordApi {
      * @return The user of the connected account.
      */
     User getYourself();
+
+    /**
+     * Gets the id of the application's owner.
+     *
+     * @return The id of the application's owner.
+     * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
+     */
+    long getOwnerId();
+
+    /**
+     * Gets the owner of the application.
+     *
+     * @return The owner of the application.
+     * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
+     */
+    default Optional<User> getOwner() {
+        return getUserById(getOwnerId());
+    }
+
+    /**
+     * Gets the client id of the application.
+     *
+     * @return The client id of the application.
+     * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
+     */
+    long getClientId();
 
     /**
      * Disconnects the bot.

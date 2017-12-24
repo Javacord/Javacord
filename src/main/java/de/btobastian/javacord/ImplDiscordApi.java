@@ -120,6 +120,16 @@ public class ImplDiscordApi implements DiscordApi {
     private User you;
 
     /**
+     * The client id of the application.
+     */
+    private long clientId = -1;
+
+    /**
+     * The id of the application's owner.
+     */
+    private long ownerId = -1;
+
+    /**
      * The time offset between the Discord time and our local time.
      */
     private Long timeOffset = null;
@@ -217,7 +227,19 @@ public class ImplDiscordApi implements DiscordApi {
                     websocketAdapter = new DiscordWebsocketAdapter(this, gateway);
                     websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
                         if (readyReceived) {
-                            ready.complete(this);
+                            if (accountType == AccountType.BOT) {
+                                getApplicationInfo().whenComplete((applicationInfo, exception) -> {
+                                    if (exception != null) {
+                                       logger.error("Could not access self application info on startup!", exception);
+                                    } else {
+                                        clientId = applicationInfo.getClientId();
+                                        ownerId = applicationInfo.getOwnerId();
+                                    }
+                                    ready.complete(this);
+                                });
+                            } else {
+                                ready.complete(this);
+                            }
                         } else {
                             ready.completeExceptionally(
                                     new IllegalStateException("Websocket closed before READY packet was received!"));
@@ -557,6 +579,11 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    @Override
     public void setMessageCacheSize(int capacity, int storageTimeInSeconds) {
         this.defaultMessageCacheCapacity = capacity;
         this.defaultMessageCacheStorageTimeInSeconds = storageTimeInSeconds;
@@ -612,6 +639,22 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public User getYourself(){
         return you;
+    }
+
+    @Override
+    public long getOwnerId() {
+        if (accountType != AccountType.BOT) {
+            throw new IllegalStateException("Cannot get owner id of non bot accounts");
+        }
+        return ownerId;
+    }
+
+    @Override
+    public long getClientId() {
+        if (accountType != AccountType.BOT) {
+            throw new IllegalStateException("Cannot get client id of non bot accounts");
+        }
+        return clientId;
     }
 
     @Override
