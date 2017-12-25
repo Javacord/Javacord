@@ -109,6 +109,11 @@ public class RoleUpdater {
         return this;
     }
 
+    /**
+     * Performs the queued updates.
+     *
+     * @return A future to check if the update was successful.
+     */
     public CompletableFuture<Void> update() {
         boolean patchRole = false;
         ObjectNode body = JsonNodeFactory.instance.objectNode();

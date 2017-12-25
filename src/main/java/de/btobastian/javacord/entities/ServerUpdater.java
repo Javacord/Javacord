@@ -275,7 +275,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Performs the queued changes.
+     * Performs the queued updates.
      *
      * @return A future to check if the update was successful.
      */
