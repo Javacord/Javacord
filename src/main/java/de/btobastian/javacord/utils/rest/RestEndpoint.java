@@ -38,7 +38,8 @@ public enum RestEndpoint {
     WEBHOOK("/webhooks/%s"),
     INVITE("/invites/%s"),
     BAN("/guilds/%s/bans/%s", 0),
-    CURRENT_USER("/users/@me");
+    CURRENT_USER("/users/@me"),
+    AUDIT_LOG("/guilds/%s/audit-logs", 0);
 
     /**
      * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".

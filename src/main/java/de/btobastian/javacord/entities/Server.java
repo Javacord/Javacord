@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.auditlog.AuditLog;
+import de.btobastian.javacord.entities.auditlog.impl.ImplAuditLog;
 import de.btobastian.javacord.entities.channels.*;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
@@ -492,6 +494,19 @@ public interface Server extends DiscordEntity {
                     }
                     return webhooks;
                 });
+    }
+
+    /**
+     * Gets the audit log of this server.
+     *
+     * @param limit The maximum amount of audit log entries.
+     * @return The audit log.
+     */
+    default CompletableFuture<AuditLog> getAuditLog(int limit) {
+        return new RestRequest<AuditLog>(getApi(), RestMethod.GET, RestEndpoint.AUDIT_LOG)
+                .setUrlParameters(getIdAsString())
+                .addQueryParameter("limit", String.valueOf(limit))
+                .execute(result -> new ImplAuditLog(getApi(), result.getJsonBody()));
     }
 
     /**
