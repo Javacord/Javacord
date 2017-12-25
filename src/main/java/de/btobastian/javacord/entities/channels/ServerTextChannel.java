@@ -1,15 +1,11 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.utils.ListenerManager;
-import de.btobastian.javacord.utils.rest.RestEndpoint;
-import de.btobastian.javacord.utils.rest.RestMethod;
-import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,52 +43,63 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     String getTopic();
 
     /**
+     * Gets the updater for this channel.
+     *
+     * @return The updater for this channel.
+     */
+    default ServerTextChannelUpdater getUpdater() {
+        return new ServerTextChannelUpdater(this);
+    }
+
+    /**
      * Updates the topic of the channel.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param topic The new topic of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateTopic(String topic) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("topic", topic))
-                .execute(result -> null);
+        return getUpdater().setTopic(topic).update();
     }
 
     /**
-     * Updates the nsfw (not safe for work) flag of the channel.
+     * Updates the nsfw flag of the channel.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
-     * @param nsfw The new nsfw flag to set.
+     * @param nsfw The new nsfw flag of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNsfwFlag(boolean nsfw) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("nsfw", nsfw))
-                .execute(result -> null);
+        return getUpdater().setNsfwFlag(nsfw).update();
     }
 
     /**
      * Updates the category of the channel.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param category The new category of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode()
-                        .put("parent_id", category == null ? null : category.getIdAsString()))
-                .execute(result -> null);
+        return getUpdater().setCategory(category).update();
     }
 
     /**
-     * Removes the channel from its current category.
+     * Removes the category of the channel.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeCategory() {
-        return updateCategory(null);
+        return getUpdater().removeCategory().update();
     }
 
     /**

@@ -1,11 +1,7 @@
 package de.btobastian.javacord.entities.channels;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.utils.rest.RestEndpoint;
-import de.btobastian.javacord.utils.rest.RestMethod;
-import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -43,16 +39,25 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
     Optional<Icon> getIcon();
 
     /**
+     * Gets the updater for this channel.
+     *
+     * @return The updater for this channel.
+     */
+    default GroupChannelUpdater getUpdater() {
+        return new GroupChannelUpdater(this);
+    }
+
+    /**
      * Updates the name of the channel.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link GroupChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param name The new name of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute(result -> null);
+        return getUpdater().setName(name).update();
     }
 
 }

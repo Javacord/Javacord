@@ -1,7 +1,6 @@
 package de.btobastian.javacord.entities.channels;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.InviteBuilder;
 import de.btobastian.javacord.entities.RichInvite;
@@ -88,20 +87,32 @@ public interface ServerChannel extends Channel {
     }
 
     /**
+     * Gets the updater for this channel.
+     *
+     * @return The updater for this channel.
+     */
+    default ServerChannelUpdater getUpdater() {
+        return new ServerChannelUpdater(this);
+    }
+
+    /**
      * Updates the name of the channel.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param name The new name of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute(result -> null);
+        return getUpdater().setName(name).update();
     }
 
     /**
      * Updates the position of the channel.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param position The new position of the channel.
      *                 If you want to update the position based on other channels, make sure to use
@@ -109,10 +120,7 @@ public interface ServerChannel extends Channel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updatePosition(int position) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("position", position))
-                .execute(result -> null);
+        return getUpdater().setPosition(position).update();
     }
 
     /**
