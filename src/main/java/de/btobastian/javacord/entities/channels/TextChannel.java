@@ -338,14 +338,19 @@ public interface TextChannel extends Channel, Messageable {
      * @return Whether the given user can attach files or not.
      */
     default boolean canAttachFiles(User user) {
-        boolean allowed = asServerTextChannel()
-                .map(channel -> channel.hasPermissions(user, PermissionType.ADMINISTRATOR)
-                        || (channel.canWrite(user) && channel.hasPermissions(user, PermissionType.ATTACH_FILE)))
-                .orElse(false);
-        allowed = allowed ||
-                asGroupChannel().map(channel -> channel.getMembers().contains(user)).orElse(false) ||
-                asPrivateChannel().map(privateChannel -> privateChannel.getRecipient() == user || user.isYourself()).orElse(false);
-        return allowed;
+        Optional<PrivateChannel> privateChannel = asPrivateChannel();
+        if (privateChannel.isPresent()) {
+            return user.isYourself() || privateChannel.get().getRecipient() == user;
+        }
+        Optional<GroupChannel> groupChannel = asGroupChannel();
+        if (groupChannel.isPresent()) {
+            return user.isYourself() || groupChannel.get().getMembers().contains(user);
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || (severTextChannel.get().hasPermissions(user, PermissionType.ATTACH_FILE)
+                && severTextChannel.get().canWrite(user));
     }
 
     /**
