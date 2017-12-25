@@ -29,6 +29,7 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -266,6 +267,147 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Gets the updater for this server.
+     *
+     * @return The updater for this server.
+     */
+    default ServerUpdater getUpdater() {
+        return new ServerUpdater(this);
+    }
+
+    /**
+     * Updates the name of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param name The new name of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateName(String name) {
+        return getUpdater().setName(name).update();
+    }
+
+    /**
+     * Updates the region of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param region The new region of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateRegion(Region region) {
+        return getUpdater().setRegion(region).update();
+    }
+
+    /**
+     * Updates the verification level of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param verificationLevel The new verification level of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateVerificationLevel(VerificationLevel verificationLevel) {
+        return getUpdater().setVerificationLevel(verificationLevel).update();
+    }
+
+    /**
+     * Updates the default message notification level of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param defaultMessageNotificationLevel The new default message notification level of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateDefaultMessageNotificationLevel(
+            DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
+        return getUpdater().setDefaultMessageNotificationLevel(defaultMessageNotificationLevel).update();
+    }
+
+    /**
+     * Updates the afk channel of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param afkChannel The new afk channel of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAfkChannel(ServerVoiceChannel afkChannel) {
+        return getUpdater().setAfkChannel(afkChannel).update();
+    }
+
+    /**
+     * Updates the afk timeout of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param afkTimeout The new afk timeout of the server in seconds.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAfkTimeoutInSeconds(int afkTimeout) {
+        return getUpdater().setAfkTimeoutInSeconds(afkTimeout).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(BufferedImage icon) {
+        return getUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the owner of the server.
+     * You must be the owner of this server in order to transfer it!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param owner The new owner of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateOwner(User owner) {
+        return getUpdater().setOwner(owner).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(BufferedImage splash) {
+        return getUpdater().setSplash(splash).update();
+    }
+
+    /**
+     * Updates the system channel of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param systemChannel The new system channel of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> setSystemChannel(ServerTextChannel systemChannel) {
+        return getUpdater().setSystemChannel(systemChannel).update();
+    }
+
+    /**
      * Changes the nickname of the given user.
      *
      * @param user The user.
@@ -297,32 +439,6 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Updates the name of the server.
-     *
-     * @param name The new name of the server.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateName(String name) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute(result -> null);
-    }
-
-    /**
-     * Updates the region of the server.
-     *
-     * @param region The new region of the server.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateRegion(Region region) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("region", region == null ? null : region.getKey()))
-                .execute(result -> null);
-    }
-
-    /**
      * Deletes the server.
      *
      * @return A future to check if the deletion was successful.
@@ -345,16 +461,6 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Creates a {@link RoleUpdater} object to add or remove multiple roles of a user simultaneously.
-     *
-     * @param user The user to update the roles of.
-     * @return The role updater object.
-     */
-    default RoleUpdater getRoleUpdater(User user){
-        return new RoleUpdater(this, user);
-    }
-
-    /**
      * Updates the roles of a server member.
      * This will replace the roles of the server member with a provided collection.
      *
@@ -362,7 +468,7 @@ public interface Server extends DiscordEntity {
      * @param roles The collection of roles to replace the user's roles.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles){
+    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles) {
         ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
         ArrayNode rolesJson = updateNode.putArray("roles");
         for (Role role : roles) {
@@ -371,34 +477,6 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
                 .setBody(updateNode)
-                .execute(result -> null);
-    }
-
-    /**
-     * Sets the afk timeout (in seconds) of the server.
-     *
-     * @param seconds The timeout in seconds.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateAfkTimeout(int seconds) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode().put("afk_timeout", seconds))
-                .execute(result -> null);
-    }
-
-    /**
-     * Transfers the ownership of the server to an other user.
-     * You must be the owner of this server in order to transfer it!
-     *
-     * @param newOwner The new owner of the server.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> transferOwnership(User newOwner) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
-                .setUrlParameters(String.valueOf(getId()))
-                .setBody(JsonNodeFactory.instance.objectNode()
-                        .put("owner_id", newOwner == null ? null : newOwner.getIdAsString()))
                 .execute(result -> null);
     }
 
