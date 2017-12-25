@@ -1,12 +1,10 @@
 package de.btobastian.javacord.entities.permissions;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.utils.ListenerManager;
@@ -99,69 +97,77 @@ public interface Role extends DiscordEntity, Mentionable {
     }
 
     /**
+     * Gets the updater for this role.
+     *
+     * @return The updater for this role.
+     */
+    default RoleUpdater getUpdater() {
+        return new RoleUpdater(this);
+    }
+
+    /**
      * Updates the name of the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param name The new name of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
-                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute(result -> null);
+        return getUpdater().setName(name).update();
     }
 
     /**
      * Updates the permissions of the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param permissions The new permissions of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updatePermissions(Permissions permissions) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
-                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode()
-                        .put("permissions", ((ImplPermissions) permissions).getAllowed()))
-                .execute(result -> null);
+        return getUpdater().setPermissions(permissions).update();
     }
 
     /**
      * Updates the color of the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param color The new color of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateColor(Color color) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
-                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("color", color.getRGB() & 0xFFFFFF))
-                .execute(result -> null);
+        return getUpdater().setColor(color).update();
     }
 
     /**
-     * Updates if the role should be pinned in the user listing (sometimes called "hoist").
+     * Updates the display separately flag of the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
      *
-     * @param displaySeparately Whether the role should be pinned in the user listing or not.
+     * @param displaySeparately The new display separately flag of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateDisplaySeparatelyFlag(boolean displaySeparately) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
-                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("hoist", displaySeparately))
-                .execute(result -> null);
+        return getUpdater().setDisplaySeparatelyFlag(displaySeparately).update();
     }
 
     /**
-     * Updates whether the role is mentionable or not.
+     * Updates the mentionable flag of the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
      *
-     * @param mentionable Whether the role should be mentionable or not.
+     * @param mentionable The new mentionable flag of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateMentionableFlag(boolean mentionable) {
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
-                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("mentionable", mentionable))
-                .execute(result -> null);
+        return getUpdater().setMentionableFlag(mentionable).update();
     }
 
     /**
