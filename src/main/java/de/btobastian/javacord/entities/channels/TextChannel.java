@@ -315,30 +315,6 @@ public interface TextChannel extends Channel, Messageable {
     MessageCache getMessageCache();
 
     /**
-     * Checks if the given user is allowed to add <b>new</b> reactions to messages in this channel.
-     *
-     * @param user The user to check.
-     * @return Whether the user is allowed to add <b>new</b> reactions to message in this channel or not.
-     */
-    default boolean canAddNewReactions(User user) {
-        Optional<PrivateChannel> privateChannel = asPrivateChannel();
-        if (privateChannel.isPresent()) {
-            return user.isYourself() || privateChannel.get().getRecipient() == user;
-        }
-        Optional<GroupChannel> groupChannel = asGroupChannel();
-        if (groupChannel.isPresent()) {
-            return user.isYourself() || groupChannel.get().getMembers().contains(user);
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severTextChannel.get().hasPermissions(user,
-                PermissionType.READ_MESSAGES,
-                PermissionType.READ_MESSAGE_HISTORY,
-                PermissionType.ADD_REACTIONS);
-    }
-
-    /**
      * Gets a list of all webhooks in this channel.
      *
      * @return A list of all webhooks in this channel.
@@ -370,6 +346,30 @@ public interface TextChannel extends Channel, Messageable {
                 asGroupChannel().map(channel -> channel.getMembers().contains(user)).orElse(false) ||
                 asPrivateChannel().map(privateChannel -> privateChannel.getRecipient() == user || user.isYourself()).orElse(false);
         return allowed;
+    }
+
+    /**
+     * Checks if the given user is allowed to add <b>new</b> reactions to messages in this channel.
+     *
+     * @param user The user to check.
+     * @return Whether the user is allowed to add <b>new</b> reactions to message in this channel or not.
+     */
+    default boolean canAddNewReactions(User user) {
+        Optional<PrivateChannel> privateChannel = asPrivateChannel();
+        if (privateChannel.isPresent()) {
+            return user.isYourself() || privateChannel.get().getRecipient() == user;
+        }
+        Optional<GroupChannel> groupChannel = asGroupChannel();
+        if (groupChannel.isPresent()) {
+            return user.isYourself() || groupChannel.get().getMembers().contains(user);
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermissions(user,
+                PermissionType.READ_MESSAGES,
+                PermissionType.READ_MESSAGE_HISTORY,
+                PermissionType.ADD_REACTIONS);
     }
 
     /**
