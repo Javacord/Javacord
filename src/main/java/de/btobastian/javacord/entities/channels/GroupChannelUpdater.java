@@ -9,7 +9,7 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This class can be used to update server channels.
+ * This class can be used to update group channels.
  */
 public class GroupChannelUpdater {
 
