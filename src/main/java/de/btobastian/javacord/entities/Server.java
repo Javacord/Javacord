@@ -959,6 +959,21 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Gets the highest role of the given user in this server.
+     * The optional is empty, if the user is not a member of this server.
+     *
+     * @param user The user.
+     * @return The highest role of the given user.
+     */
+    default Optional<Role> getHighestRoleOf(User user) {
+        List<Role> roles = getRolesOf(user);
+        if (roles.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(roles.get(roles.size() - 1));
+    }
+
+    /**
      * Checks if the given user is the owner of the server.
      *
      * @param user The user to check.
