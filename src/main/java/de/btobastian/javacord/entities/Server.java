@@ -1028,6 +1028,7 @@ public interface Server extends DiscordEntity {
 
     /**
      * Checks if the given user can kick the other user.
+     * This methods also considers the position of the user roles.
      *
      * @param user The user which "want" to kick the other user.
      * @param userToKick The user which should be kicked.
@@ -1051,6 +1052,23 @@ public interface Server extends DiscordEntity {
     default boolean canBanUsers(User user) {
         return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
                 hasPermissions(user, PermissionType.BAN_MEMBERS);
+    }
+
+    /**
+     * Checks if the given user can ban the other user.
+     * This methods also considers the position of the user roles.
+     *
+     * @param user The user which "want" to ban the other user.
+     * @param userToBan The user which should be banned.
+     * @return Whether the given user can ban the other user or not.
+     */
+    default boolean canBanUser(User user, User userToBan) {
+        if (canBanUsers(user)) {
+            return false;
+        }
+        Optional<Role> ownRole = getHighestRoleOf(user);
+        Optional<Role> otherRole = getHighestRoleOf(userToBan);
+        return ownRole.isPresent() && (!otherRole.isPresent() || ownRole.get().isHigherThan(otherRole.get()));
     }
 
     /**
