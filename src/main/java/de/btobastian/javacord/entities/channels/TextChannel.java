@@ -357,6 +357,25 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the given user can use tts (text to speech) in this channel.
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     *
+     * @param user The user to check.
+     * @return Whether the given user can use tts or not.
+     */
+    default boolean canUseTts(User user) {
+        if (!canWrite(user)) {
+            return false;
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermissions(user, PermissionType.SEND_TTS_MESSAGES);
+    }
+
+    /**
      * Checks if the given user can attach files in this channel.
      *
      * @param user The user to check.
