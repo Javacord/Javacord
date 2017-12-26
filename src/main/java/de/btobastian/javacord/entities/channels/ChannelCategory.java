@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.channels;
 
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 
 import java.util.ArrayList;
@@ -36,6 +37,18 @@ public interface ChannelCategory extends ServerChannel {
                 .filter(channel -> channel.getCategory().orElse(null) == this)
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .forEach(channels::add);
+        return channels;
+    }
+
+    /**
+     * Gets a sorted (by position) list with all channels in this category the given user can see.
+     *
+     * @param user The user to check.
+     * @return The visible channels in the category.
+     */
+    default List<ServerChannel> getVisibleChannels(User user) {
+        List<ServerChannel> channels = getChannels();
+        channels.removeIf(channel -> !channel.canSee(user));
         return channels;
     }
 
