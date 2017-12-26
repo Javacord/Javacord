@@ -53,6 +53,21 @@ public interface ChannelCategory extends ServerChannel {
     }
 
     /**
+     * Checks if the given user can see all channels in this category.
+     *
+     * @param user The user to check.
+     * @return Whether the user can see all channels in this category or not.
+     */
+    default boolean canSeeAll(User user) {
+        for (ServerChannel channel : getChannels()) {
+            if (!channel.canSee(user)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Checks is the category is "not safe for work".
      *
      * @return Whether the category is "not safe for work" or not.
