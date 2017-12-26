@@ -959,6 +959,16 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the given user is the owner of the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user is the owner of the server or not.
+     */
+    default boolean isOwner(User user) {
+        return getOwner() == user;
+    }
+
+    /**
      * Adds a listener, which listens to message creates in this server.
      *
      * @param listener The listener to add.
