@@ -377,6 +377,25 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the given user can use embed links in this channel.
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     *
+     * @param user The user to check.
+     * @return Whether the given user can embed links or not.
+     */
+    default boolean canEmbedLinks(User user) {
+        if (!canWrite(user)) {
+            return false;
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermissions(user, PermissionType.EMBED_LINKS);
+    }
+
+    /**
      * Checks if the given user can read the message history of this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
