@@ -85,6 +85,16 @@ public class ImplDiscordApi implements DiscordApi {
     private String token;
 
     /**
+     * Whether the {@link #disconnect()} method has been called before or not.
+     */
+    private volatile boolean disconnectCalled = false;
+
+    /**
+     * A lock to synchronize on {@link ImplDiscordApi#disconnectCalled}.
+     */
+    private final Object disconnectCalledLock = new Object();
+
+    /**
      * The game which is currently displayed. May be <code>null</code>.
      */
     private Game game;
@@ -250,6 +260,9 @@ public class ImplDiscordApi implements DiscordApi {
                             () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
                             , 30, 30, TimeUnit.SECONDS);
                 });
+
+        // Add shutdown hook
+        ready.thenAccept(api -> Runtime.getRuntime().addShutdownHook(new Thread(api::disconnect)));
     }
 
     /**
@@ -659,8 +672,13 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void disconnect() {
-        websocketAdapter.disconnect();
-        threadPool.shutdown();
+        synchronized (disconnectCalledLock) {
+            if (!disconnectCalled) {
+                websocketAdapter.disconnect();
+                threadPool.shutdown();
+            }
+            disconnectCalled = true;
+        }
     }
 
     @Override
