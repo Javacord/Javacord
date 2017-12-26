@@ -1028,6 +1028,17 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the given user can manage nicknames on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can manage nicknames or not.
+     */
+    default boolean canManageNicknames(User user) {
+        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
+                hasPermission(user, PermissionType.MANAGE_NICKNAMES);
+    }
+
+    /**
      * Checks if the given user can kick users from the server.
      *
      * @param user The user to check.
