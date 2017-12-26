@@ -1,6 +1,8 @@
 package de.btobastian.javacord.entities.channels;
 
 import de.btobastian.javacord.entities.DiscordEntity;
+import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.permissions.PermissionType;
 
 import java.util.Optional;
 
@@ -110,6 +112,31 @@ public interface Channel extends DiscordEntity {
             return Optional.of((VoiceChannel) this);
         }
         return Optional.empty();
+    }
+
+
+
+    /**
+     * Checks if the given user can see this channel.
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
+     * part of the chat.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can see this channel or not.
+     */
+    default boolean canSee(User user) {
+        Optional<PrivateChannel> privateChannel = asPrivateChannel();
+        if (privateChannel.isPresent()) {
+            return user.isYourself() || privateChannel.get().getRecipient() == user;
+        }
+        Optional<GroupChannel> groupChannel = asGroupChannel();
+        if (groupChannel.isPresent()) {
+            return user.isYourself() || groupChannel.get().getMembers().contains(user);
+        }
+        Optional<ServerChannel> severChannel = asServerChannel();
+        return !severChannel.isPresent()
+                || severChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severChannel.get().hasPermissions(user, PermissionType.READ_MESSAGES);
     }
 
 }

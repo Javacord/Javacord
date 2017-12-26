@@ -247,16 +247,6 @@ public interface ServerChannel extends Channel {
     }
 
     /**
-     * Checks if the given user can see this channel.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can see this channel or not.
-     */
-    default boolean canSee(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) || hasPermissions(user, PermissionType.READ_MESSAGES);
-    }
-
-    /**
      * Adds a listener, which listens to this channel being deleted.
      *
      * @param listener The listener to add.
