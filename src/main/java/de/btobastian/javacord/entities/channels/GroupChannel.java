@@ -39,6 +39,16 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
     Optional<Icon> getIcon();
 
     /**
+     * Checks if the user is a member of this group channel.
+     *
+     * @param user The user to check.
+     * @return Whether the user is a member of this group channel or not.
+     */
+    default boolean isMember(User user) {
+        return user.isYourself() || getMembers().contains(user);
+    }
+
+    /**
      * Gets the updater for this channel.
      *
      * @return The updater for this channel.
