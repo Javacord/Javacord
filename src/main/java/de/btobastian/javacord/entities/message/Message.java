@@ -700,6 +700,24 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Checks if the given user can delete this message.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can delete the message or not.
+     */
+    default boolean canDelete(User user) {
+        // You cannot delete messages in channels you cannot see
+        if (!getChannel().canSee(user)) {
+            return false;
+        }
+        // The user can see the message and is the author
+        if (getAuthor().asUser().orElse(null) == user) {
+            return true;
+        }
+        return getServerTextChannel().map(channel -> channel.canManageMessages(user)).orElse(false);
+    }
+
+    /**
      * Adds a listener, which listens to this message being deleted.
      *
      * @param listener The listener to add.
