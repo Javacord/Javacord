@@ -378,6 +378,24 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the given user can manage messages (delete or pin them) in this channel.
+     * In private chats (private channel or group channel) this always return <code>true</code> if the user is
+     * part of the chat.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can manage messages or not.
+     */
+    default boolean canManageMessages(User user) {
+        if (!canSee(user)) {
+            return false;
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermissions(user, PermissionType.MANAGE_MESSAGES);
+    }
+
+    /**
      * Adds a listener, which listens to message creates in this channel.
      *
      * @param listener The listener to add.
