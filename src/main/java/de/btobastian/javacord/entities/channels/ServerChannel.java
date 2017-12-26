@@ -247,6 +247,26 @@ public interface ServerChannel extends Channel {
     }
 
     /**
+     * Checks if the given user can create an instant invite to this channel.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can create an instant invite or not.
+     */
+    default boolean canCreateInstantInvite(User user) {
+        // The user must be able to see the channel
+        if (!canSee(user)) {
+            return false;
+        }
+        // You cannot create invites for categories
+        if (getType() == ChannelType.CHANNEL_CATEGORY) {
+            return false;
+        }
+        // The user must be admin or have the CREATE_INSTANT_INVITE permission
+        return hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || hasPermissions(user, PermissionType.CREATE_INSTANT_INVITE);
+    }
+
+    /**
      * Adds a listener, which listens to this channel being deleted.
      *
      * @param listener The listener to add.
