@@ -1039,6 +1039,17 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the given user can manage emojis on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can manage emojis or not.
+     */
+    default boolean canManageEmojis(User user) {
+        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
+                hasPermission(user, PermissionType.MANAGE_EMOJIS);
+    }
+
+    /**
      * Checks if the given user can kick users from the server.
      *
      * @param user The user to check.
