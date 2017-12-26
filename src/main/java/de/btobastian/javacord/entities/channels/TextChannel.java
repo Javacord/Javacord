@@ -357,6 +357,26 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the given user can use external emojis in this channel.
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     * It also doesn't check if the user is even able to send any external emojis (twitch subscription or nitro).
+     *
+     * @param user The user to check.
+     * @return Whether the given user can use external emojis or not.
+     */
+    default boolean canUseExternalEmojis(User user) {
+        if (!canWrite(user)) {
+            return false;
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermissions(user, PermissionType.USE_EXTERNAL_EMOJIS);
+    }
+
+    /**
      * Checks if the given user can read the message history of this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
