@@ -357,6 +357,24 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the given user can read the message history of this channel.
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
+     * part of the chat.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can read the message history or not.
+     */
+    default boolean canReadMessageHistory(User user) {
+        if (!canSee(user)) {
+            return false;
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermissions(user, PermissionType.READ_MESSAGE_HISTORY);
+    }
+
+    /**
      * Checks if the given user can use tts (text to speech) in this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
