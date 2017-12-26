@@ -969,6 +969,16 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the given user is an administrator of the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user is an administrator of the server or not.
+     */
+    default boolean isAdmin(User user) {
+        return hasPermissions(user, PermissionType.ADMINISTRATOR);
+    }
+
+    /**
      * Adds a listener, which listens to message creates in this server.
      *
      * @param listener The listener to add.
