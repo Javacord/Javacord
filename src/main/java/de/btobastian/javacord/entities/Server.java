@@ -946,6 +946,19 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Gets a sorted (by position) list with all channels of this server the given user can see.
+     * Returns an empty list, if the user is not a member of this server.
+     *
+     * @param user The user to check.
+     * @return The visible channels of this server.
+     */
+    default List<ServerChannel> getVisibleChannels(User user) {
+        List<ServerChannel> channels = getChannels();
+        channels.removeIf(channel -> !channel.canSee(user));
+        return channels;
+    }
+
+    /**
      * Adds a listener, which listens to message creates in this server.
      *
      * @param listener The listener to add.
