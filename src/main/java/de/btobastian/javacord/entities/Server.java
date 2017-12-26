@@ -1027,6 +1027,22 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the given user can kick the other user.
+     *
+     * @param user The user which "want" to kick the other user.
+     * @param userToKick The user which should be kicked.
+     * @return Whether the given user can kick the other user or not.
+     */
+    default boolean canKickUser(User user, User userToKick) {
+        if (canKickUsers(user)) {
+            return false;
+        }
+        Optional<Role> ownRole = getHighestRoleOf(user);
+        Optional<Role> otherRole = getHighestRoleOf(userToKick);
+        return ownRole.isPresent() && (!otherRole.isPresent() || ownRole.get().isHigherThan(otherRole.get()));
+    }
+
+    /**
      * Checks if the given user can ban users from the server.
      *
      * @param user The user to check.
