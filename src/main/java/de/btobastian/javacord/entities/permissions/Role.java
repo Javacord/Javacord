@@ -209,6 +209,17 @@ public interface Role extends DiscordEntity, Mentionable {
     }
 
     /**
+     * Checks if the this role is higher than the given role.
+     * Always returns <code>true</code> if the roles are on different servers.
+     *
+     * @param role The role to check.
+     * @return Whether the this role is higher than the given role or not.
+     */
+    default boolean isHigherThan(Role role) {
+        return role.getServer() != getServer() || role.getPosition() <= getPosition();
+    }
+
+    /**
      * Adds a listener, which listens to permission changes of this role.
      *
      * @param listener The listener to add.
