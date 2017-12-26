@@ -379,7 +379,7 @@ public interface TextChannel extends Channel, Messageable {
 
     /**
      * Checks if the given user can manage messages (delete or pin them) in this channel.
-     * In private chats (private channel or group channel) this always return <code>true</code> if the user is
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
      *
      * @param user The user to check.
@@ -393,6 +393,25 @@ public interface TextChannel extends Channel, Messageable {
         return !severTextChannel.isPresent()
                 || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
                 || severTextChannel.get().hasPermissions(user, PermissionType.MANAGE_MESSAGES);
+    }
+
+    /**
+     * Checks if the given user can mention everyone (@everyone) in this channel.
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
+     * part of the chat.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can mention everyone (@everyone) or not.
+     */
+    default boolean canMentionEveryone(User user) {
+        if (!canSee(user)) {
+            return false;
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || (severTextChannel.get().hasPermissions(user, PermissionType.MENTION_EVERYONE)
+                && severTextChannel.get().canWrite(user));
     }
 
     /**
