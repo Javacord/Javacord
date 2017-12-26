@@ -2,8 +2,6 @@ package de.btobastian.javacord.entities.channels;
 
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Mentionable;
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.utils.ListenerManager;
 
@@ -100,17 +98,6 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      */
     default CompletableFuture<Void> removeCategory() {
         return getUpdater().removeCategory().update();
-    }
-
-    /**
-     * Checks if the given user can send messages in this channel.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can write messages or not.
-     */
-    default boolean canWrite(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermissions(user, PermissionType.READ_MESSAGES, PermissionType.SEND_MESSAGES);
     }
 
     /**

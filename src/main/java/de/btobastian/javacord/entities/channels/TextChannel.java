@@ -332,6 +332,31 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the given user can send messages in this channel.
+     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     *
+     * @param user The user to check.
+     * @return Whether the given user can write messages or not.
+     */
+    default boolean canWrite(User user) {
+        Optional<PrivateChannel> privateChannel = asPrivateChannel();
+        if (privateChannel.isPresent()) {
+            return user.isYourself() || privateChannel.get().getRecipient() == user;
+        }
+        Optional<GroupChannel> groupChannel = asGroupChannel();
+        if (groupChannel.isPresent()) {
+            return user.isYourself() || groupChannel.get().getMembers().contains(user);
+        }
+        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
+        return !severTextChannel.isPresent()
+                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get()
+                .hasPermissions(user, PermissionType.READ_MESSAGES, PermissionType.SEND_MESSAGES);
+    }
+
+    /**
      * Checks if the given user can attach files in this channel.
      *
      * @param user The user to check.
