@@ -979,6 +979,17 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the given user can create new channels.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can create channels or not.
+     */
+    default boolean canCreateChannels(User user) {
+        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
+                hasPermissions(user, PermissionType.MANAGE_CHANNELS);
+    }
+
+    /**
      * Adds a listener, which listens to message creates in this server.
      *
      * @param listener The listener to add.
