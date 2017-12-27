@@ -10,7 +10,7 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
-import de.btobastian.javacord.listeners.server.member.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
@@ -278,18 +278,18 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberAddListener> addServerMemberAddListener(ServerMemberAddListener listener) {
+    default ListenerManager<ServerMemberJoinListener> addServerMemberJoinListener(ServerMemberJoinListener listener) {
         return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerMemberAddListener.class, listener);
+                .addObjectListener(User.class, getId(), ServerMemberJoinListener.class, listener);
     }
 
     /**
-     * Gets a list with all registered server member add listeners.
+     * Gets a list with all registered server member join listeners.
      *
-     * @return A list with all registered server member add listeners.
+     * @return A list with all registered server member join listeners.
      */
-    default List<ServerMemberAddListener> getServerMemberAddListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberAddListener.class);
+    default List<ServerMemberJoinListener> getServerMemberJoinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberJoinListener.class);
     }
 
     /**

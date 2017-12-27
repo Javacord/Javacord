@@ -26,7 +26,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
-import de.btobastian.javacord.listeners.server.member.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
@@ -1359,18 +1359,18 @@ public interface Server extends DiscordEntity {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberAddListener> addServerMemberAddListener(ServerMemberAddListener listener) {
+    default ListenerManager<ServerMemberJoinListener> addServerMemberJoinListener(ServerMemberJoinListener listener) {
         return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerMemberAddListener.class, listener);
+                .addObjectListener(Server.class, getId(), ServerMemberJoinListener.class, listener);
     }
 
     /**
-     * Gets a list with all registered server member add listeners.
+     * Gets a list with all registered server member join listeners.
      *
-     * @return A list with all registered server member add listeners.
+     * @return A list with all registered server member join listeners.
      */
-    default List<ServerMemberAddListener> getServerMemberAddListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberAddListener.class);
+    default List<ServerMemberJoinListener> getServerMemberJoinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberJoinListener.class);
     }
 
     /**

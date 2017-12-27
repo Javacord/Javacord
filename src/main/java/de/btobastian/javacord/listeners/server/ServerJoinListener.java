@@ -1,11 +1,11 @@
 package de.btobastian.javacord.listeners.server;
 
 import de.btobastian.javacord.events.server.ServerJoinEvent;
-import de.btobastian.javacord.listeners.server.member.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 
 /**
  * This listener listens to server joins.
- * Do not confuse it with the {@link ServerMemberAddListener}:
+ * Do not confuse it with the {@link ServerMemberJoinListener}:
  * ServerMemberAddListener is for other users and ServerJoinListener is for yourself!
  */
 @FunctionalInterface

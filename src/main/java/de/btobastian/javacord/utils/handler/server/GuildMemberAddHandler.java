@@ -5,7 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.member.ServerMemberAddEvent;
-import de.btobastian.javacord.listeners.server.member.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -35,10 +35,10 @@ public class GuildMemberAddHandler extends PacketHandler {
 
                     ServerMemberAddEvent event = new ServerMemberAddEvent(api, server, user);
 
-                    List<ServerMemberAddListener> listeners = new ArrayList<>();
-                    listeners.addAll(server.getServerMemberAddListeners());
-                    listeners.addAll(user.getServerMemberAddListeners());
-                    listeners.addAll(api.getServerMemberAddListeners());
+                    List<ServerMemberJoinListener> listeners = new ArrayList<>();
+                    listeners.addAll(server.getServerMemberJoinListeners());
+                    listeners.addAll(user.getServerMemberJoinListeners());
+                    listeners.addAll(api.getServerMemberJoinListeners());
 
                     dispatchEvent(listeners, listener -> listener.onServerMemberAdd(event));
                 });
