@@ -30,6 +30,15 @@ public interface Icon {
     URL getUrl();
 
     /**
+     * Checks if the icon is animated.
+     *
+     * @return Whether the icon is animated or not.
+     */
+    default boolean isAnimated() {
+        return getUrl().getFile().endsWith(".gif");
+    }
+
+    /**
      * Gets the icon as byte array.
      *
      * @return The icon as byte array.
