@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.events.server.member.ServerMemberRemoveEvent;
-import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
+import de.btobastian.javacord.events.server.member.ServerMemberLeaveEvent;
+import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -33,12 +33,12 @@ public class GuildMemberRemoveHandler extends PacketHandler {
                     User user = api.getOrCreateUser(packet.get("user"));
                     server.removeMember(user);
 
-                    ServerMemberRemoveEvent event = new ServerMemberRemoveEvent(api, server, user);
+                    ServerMemberLeaveEvent event = new ServerMemberLeaveEvent(api, server, user);
 
-                    List<ServerMemberRemoveListener> listeners = new ArrayList<>();
-                    listeners.addAll(server.getServerMemberRemoveListeners());
-                    listeners.addAll(user.getServerMemberRemoveListeners());
-                    listeners.addAll(api.getServerMemberRemoveListeners());
+                    List<ServerMemberLeaveListener> listeners = new ArrayList<>();
+                    listeners.addAll(server.getServerMemberLeaveListeners());
+                    listeners.addAll(user.getServerMemberLeaveListeners());
+                    listeners.addAll(api.getServerMemberLeaveListeners());
 
                     dispatchEvent(listeners, listener -> listener.onServerMemberRemove(event));
                 });

@@ -27,7 +27,7 @@ import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
-import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.ListenerManager;
@@ -1379,19 +1379,19 @@ public interface Server extends DiscordEntity {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberRemoveListener> addServerMemberRemoveListener(
-            ServerMemberRemoveListener listener) {
+    default ListenerManager<ServerMemberLeaveListener> addServerMemberLeaveListener(
+            ServerMemberLeaveListener listener) {
         return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerMemberRemoveListener.class, listener);
+                Server.class, getId(), ServerMemberLeaveListener.class, listener);
     }
 
     /**
-     * Gets a list with all registered server member remove listeners.
+     * Gets a list with all registered server member leave listeners.
      *
-     * @return A list with all registered server member remove listeners.
+     * @return A list with all registered server member leave listeners.
      */
-    default List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberRemoveListener.class);
+    default List<ServerMemberLeaveListener> getServerMemberLeaveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberLeaveListener.class);
     }
 
     /**

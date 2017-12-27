@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.events.server.member.ServerMemberAddEvent;
+import de.btobastian.javacord.events.server.member.ServerMemberJoinEvent;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
@@ -33,7 +33,7 @@ public class GuildMemberAddHandler extends PacketHandler {
                     server.addMember(packet);
                     User user = api.getOrCreateUser(packet.get("user"));
 
-                    ServerMemberAddEvent event = new ServerMemberAddEvent(api, server, user);
+                    ServerMemberJoinEvent event = new ServerMemberJoinEvent(api, server, user);
 
                     List<ServerMemberJoinListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getServerMemberJoinListeners());

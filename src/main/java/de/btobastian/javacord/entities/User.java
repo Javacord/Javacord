@@ -11,7 +11,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
-import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
 import de.btobastian.javacord.listeners.user.*;
@@ -298,19 +298,19 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberRemoveListener> addServerMemberRemoveListener(
-            ServerMemberRemoveListener listener) {
+    default ListenerManager<ServerMemberLeaveListener> addServerMemberLeaveListener(
+            ServerMemberLeaveListener listener) {
         return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerMemberRemoveListener.class, listener);
+                .addObjectListener(User.class, getId(), ServerMemberLeaveListener.class, listener);
     }
 
     /**
-     * Gets a list with all registered server member remove listeners.
+     * Gets a list with all registered server member leave listeners.
      *
-     * @return A list with all registered server member remove listeners.
+     * @return A list with all registered server member leave listeners.
      */
-    default List<ServerMemberRemoveListener> getServerMemberRemoveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberRemoveListener.class);
+    default List<ServerMemberLeaveListener> getServerMemberLeaveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberLeaveListener.class);
     }
 
     /**

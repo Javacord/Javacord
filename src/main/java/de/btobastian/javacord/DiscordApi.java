@@ -23,7 +23,7 @@ import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
-import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
@@ -1673,14 +1673,14 @@ public interface DiscordApi {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<ServerMemberRemoveListener> addServerMemberRemoveListener(ServerMemberRemoveListener listener);
+    ListenerManager<ServerMemberLeaveListener> addServerMemberLeaveListener(ServerMemberLeaveListener listener);
 
     /**
-     * Gets a list with all registered server member remove listeners.
+     * Gets a list with all registered server member leave listeners.
      *
-     * @return A list with all registered server member remove listeners.
+     * @return A list with all registered server member leave listeners.
      */
-    List<ServerMemberRemoveListener> getServerMemberRemoveListeners();
+    List<ServerMemberLeaveListener> getServerMemberLeaveListeners();
 
     /**
      * Adds a listener, which listens to server name changes.
