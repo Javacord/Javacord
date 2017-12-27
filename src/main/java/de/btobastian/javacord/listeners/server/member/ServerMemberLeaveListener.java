@@ -16,5 +16,5 @@ public interface ServerMemberLeaveListener {
     *
     * @param event the event.
     */
-    void onServerMemberRemove(ServerMemberLeaveEvent event);
+    void onServerMemberLeave(ServerMemberLeaveEvent event);
 }

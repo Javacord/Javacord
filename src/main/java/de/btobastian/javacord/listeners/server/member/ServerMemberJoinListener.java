@@ -16,5 +16,5 @@ public interface ServerMemberJoinListener {
      *
      * @param event The event.
      */
-    void onServerMemberAdd(ServerMemberJoinEvent event);
+    void onServerMemberJoin(ServerMemberJoinEvent event);
 }
