@@ -1745,6 +1745,22 @@ public interface DiscordApi {
     List<ServerChangeIconListener> getServerChangeIconListeners();
 
     /**
+     * Adds a listener, which listens to server verification level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeVerificationLevelListener> addServerChangeVerificationLevelListener(
+            ServerChangeVerificationLevelListener listener);
+
+    /**
+     * Gets a list with all registered server change verification level listeners.
+     *
+     * @return A list with all registered server change verification level listeners.
+     */
+    List<ServerChangeVerificationLevelListener> getServerChangeVerificationLevelListeners();
+
+    /**
      * Adds a listener, which listens to server channel name changes.
      *
      * @param listener The listener to add.

@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.VerificationLevel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerChangeIconEvent;
 import de.btobastian.javacord.events.server.ServerChangeNameEvent;
+import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
+import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -60,6 +63,20 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getServerChangeIconListeners());
 
                 dispatchEvent(listeners, listener -> listener.onServerChangeIcon(event));
+            }
+
+            VerificationLevel newVerificationLevel = VerificationLevel.fromId(packet.get("verification_level").asInt());
+            VerificationLevel oldVerificationLevel = server.getVerificationLevel();
+            if (newVerificationLevel != oldVerificationLevel) {
+                server.setVerificationLevel(newVerificationLevel);
+                ServerChangeVerificationLevelEvent event = new ServerChangeVerificationLevelEvent(
+                        api, server, newVerificationLevel, oldVerificationLevel);
+
+                List<ServerChangeVerificationLevelListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeVerificationLevelListeners());
+                listeners.addAll(api.getServerChangeVerificationLevelListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeVerificationLevel(event));
             }
 
             User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);

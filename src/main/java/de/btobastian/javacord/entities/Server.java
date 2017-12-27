@@ -21,10 +21,7 @@ import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
-import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
-import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerLeaveListener;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
@@ -1475,6 +1472,28 @@ public interface Server extends DiscordEntity {
      */
     default List<ServerChangeIconListener> getServerChangeIconListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeIconListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to server verification level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeVerificationLevelListener> addServerChangeVerificationLevelListener(
+            ServerChangeVerificationLevelListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeVerificationLevelListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change verification level listeners.
+     *
+     * @return A list with all registered server change verification level listeners.
+     */
+    default List<ServerChangeVerificationLevelListener> getServerChangeVerificationLevelListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(Server.class, getId(), ServerChangeVerificationLevelListener.class);
     }
 
     /**

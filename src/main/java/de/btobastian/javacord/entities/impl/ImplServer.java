@@ -239,6 +239,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the verification level of the server.
+     *
+     * @param verificationLevel The verification level of the server.
+     */
+    public void setVerificationLevel(VerificationLevel verificationLevel) {
+        this.verificationLevel = verificationLevel;
+    }
+
+    /**
      * Adds a channel to the cache.
      *
      * @param channel The channel to add.
