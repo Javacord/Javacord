@@ -9,6 +9,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.auditlog.AuditLog;
 import de.btobastian.javacord.entities.auditlog.impl.ImplAuditLog;
 import de.btobastian.javacord.entities.channels.*;
+import de.btobastian.javacord.entities.impl.ImplBan;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
@@ -555,6 +556,23 @@ public interface Server extends DiscordEntity {
             future.completeExceptionally(e);
             return future;
         }
+    }
+
+    /**
+     * Gets a collection with all server bans.
+     *
+     * @return A collection with all server bans.
+     */
+    default CompletableFuture<Collection<Ban>> getBans() {
+        return new RestRequest<Collection<Ban>>(getApi(), RestMethod.GET, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> {
+                    Collection<Ban> bans = new ArrayList<>();
+                    for (JsonNode ban : result.getJsonBody()) {
+                        bans.add(new ImplBan(this, ban));
+                    }
+                    return bans;
+                });
     }
 
     /**

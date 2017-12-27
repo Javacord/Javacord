@@ -37,7 +37,7 @@ public enum RestEndpoint {
     SERVER_INVITE("/guilds/%s/invites", 0),
     WEBHOOK("/webhooks/%s"),
     INVITE("/invites/%s"),
-    BAN("/guilds/%s/bans/%s", 0),
+    BAN("/guilds/%s/bans", 0),
     CURRENT_USER("/users/@me"),
     AUDIT_LOG("/guilds/%s/audit-logs", 0);
 
