@@ -1,6 +1,7 @@
-package de.btobastian.javacord.listeners.server;
+package de.btobastian.javacord.listeners.server.member;
 
-import de.btobastian.javacord.events.server.ServerMemberRemoveEvent;
+import de.btobastian.javacord.events.server.member.ServerMemberRemoveEvent;
+import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 
 /**
  * This listener listens to server member leaves.

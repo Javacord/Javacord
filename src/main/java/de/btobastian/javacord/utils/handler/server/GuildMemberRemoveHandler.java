@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.events.server.ServerMemberRemoveEvent;
-import de.btobastian.javacord.listeners.server.ServerMemberRemoveListener;
+import de.btobastian.javacord.events.server.member.ServerMemberRemoveEvent;
+import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;

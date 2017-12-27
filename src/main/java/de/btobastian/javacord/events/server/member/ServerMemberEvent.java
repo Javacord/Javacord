@@ -1,8 +1,9 @@
-package de.btobastian.javacord.events.server;
+package de.btobastian.javacord.events.server.member;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.events.server.ServerEvent;
 
 /**
  * A server member event.

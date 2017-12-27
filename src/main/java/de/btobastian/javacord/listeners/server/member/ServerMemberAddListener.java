@@ -1,6 +1,7 @@
-package de.btobastian.javacord.listeners.server;
+package de.btobastian.javacord.listeners.server.member;
 
-import de.btobastian.javacord.events.server.ServerMemberAddEvent;
+import de.btobastian.javacord.events.server.member.ServerMemberAddEvent;
+import de.btobastian.javacord.listeners.server.ServerJoinListener;
 
 /**
  * This listener listens to server member joins.

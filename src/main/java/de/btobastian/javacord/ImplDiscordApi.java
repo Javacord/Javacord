@@ -25,6 +25,8 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberAddListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberRemoveListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
