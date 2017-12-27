@@ -17,6 +17,7 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
@@ -1578,6 +1579,73 @@ public interface DiscordApi {
     default List<ReactionRemoveListener> getReactionRemoveListeners(String messageId) {
         try {
             return getReactionRemoveListeners(Long.valueOf(messageId));
+        } catch (NumberFormatException ignored) { }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Adds a listener, which listens to all reactions being removed at once.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(ReactionRemoveAllListener listener);
+
+    /**
+     * Adds a listener, which listens to all reactions being removed from a specific message at once.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
+            Message message, ReactionRemoveAllListener listener) {
+        return addReactionRemoveAllListener(message.getId(), listener);
+    }
+
+    /**
+     * Adds a listener, which listens to all reactions being removed from a specific message at once.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(long messageId, ReactionRemoveAllListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove all listeners.
+     *
+     * @return A list with all registered reaction remove all listeners.
+     */
+    List<ReactionRemoveAllListener> getReactionRemoveAllListeners();
+
+    /**
+     * Gets a list with all registered reaction remove all listeners of a specific message.
+     *
+     * @param message The message.
+     * @return A list with all registered reaction remove all listeners.
+     */
+    default List<ReactionRemoveAllListener> getReactionRemoveAllListeners(Message message) {
+        return getReactionRemoveAllListeners(message.getId());
+    }
+
+    /**
+     * Gets a list with all registered reaction remove all listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction remove all listeners.
+     */
+    List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId);
+
+    /**
+     * Gets a list with all registered reaction remove all listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction remove all listeners.
+     */
+    default List<ReactionRemoveAllListener> getReactionRemoveAllListeners(String messageId) {
+        try {
+            return getReactionRemoveAllListeners(Long.valueOf(messageId));
         } catch (NumberFormatException ignored) { }
         return Collections.emptyList();
     }

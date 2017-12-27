@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.message;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
@@ -17,6 +18,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -791,6 +793,27 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getApi().getReactionRemoveListeners(getId());
+    }
+
+    /**
+     * Adds a listener, which listens to all reactions being removed at once from this message.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
+            ReactionRemoveAllListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Message.class, getId(), ReactionRemoveAllListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered reaction remove all listeners.
+     *
+     * @return A list with all registered reaction remove all listeners.
+     */
+    default List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), ReactionRemoveAllListener.class);
     }
 
 }

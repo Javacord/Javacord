@@ -252,6 +252,13 @@ public class ImplMessage implements Message {
         reactions.removeIf(r -> r.getCount() <= 0);
     }
 
+    /**
+     * Removes all reaction from this message.
+     */
+    public void removeAllReactionsFromCache() {
+        reactions.clear();
+    }
+
     @Override
     public DiscordApi getApi() {
         return api;

@@ -24,6 +24,7 @@ import de.btobastian.javacord.utils.handler.message.MessageDeleteBulkHandler;
 import de.btobastian.javacord.utils.handler.message.MessageDeleteHandler;
 import de.btobastian.javacord.utils.handler.message.MessageUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionAddHandler;
+import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionRemoveAllHandler;
 import de.btobastian.javacord.utils.handler.message.reaction.MessageReactionRemoveHandler;
 import de.btobastian.javacord.utils.handler.server.*;
 import de.btobastian.javacord.utils.handler.server.role.GuildRoleCreateHandler;
@@ -431,6 +432,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
 
         // reaction
         addHandler(new MessageReactionAddHandler(api));
+        addHandler(new MessageReactionRemoveAllHandler(api));
         addHandler(new MessageReactionRemoveHandler(api));
     }
 

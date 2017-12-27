@@ -19,6 +19,7 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
@@ -1325,6 +1326,27 @@ public interface Server extends DiscordEntity {
      */
     default List<ReactionRemoveListener> getReactionRemoveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ReactionRemoveListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to all reactions being removed at once from a message on this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
+            ReactionRemoveAllListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ReactionRemoveAllListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered reaction remove all listeners.
+     *
+     * @return A list with all registered reaction remove all listeners.
+     */
+    default List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ReactionRemoveAllListener.class);
     }
 
     /**

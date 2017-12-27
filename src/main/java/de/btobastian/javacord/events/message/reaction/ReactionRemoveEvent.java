@@ -6,7 +6,7 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 
 /**
- * A reaction add event.
+ * A reaction remove event.
  */
 public class ReactionRemoveEvent extends SingleReactionEvent {
 

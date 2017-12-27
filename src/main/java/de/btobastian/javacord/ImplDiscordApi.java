@@ -20,6 +20,7 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
+import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
@@ -913,6 +914,27 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners(long messageId) {
         return getObjectListeners(Message.class, messageId, ReactionRemoveListener.class);
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(ReactionRemoveAllListener listener) {
+        return addListener(ReactionRemoveAllListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
+            long messageId, ReactionRemoveAllListener listener) {
+        return addObjectListener(Message.class, messageId, ReactionRemoveAllListener.class, listener);
+    }
+
+    @Override
+    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
+        return getListeners(ReactionRemoveAllListener.class);
+    }
+
+    @Override
+    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId) {
+        return getObjectListeners(Message.class, messageId, ReactionRemoveAllListener.class);
     }
 
     @Override
