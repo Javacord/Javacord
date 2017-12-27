@@ -8,9 +8,11 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplGame;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.events.user.UserChangeAvatarEvent;
 import de.btobastian.javacord.events.user.UserChangeGameEvent;
 import de.btobastian.javacord.events.user.UserChangeNameEvent;
 import de.btobastian.javacord.events.user.UserChangeStatusEvent;
+import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
 import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -71,6 +73,22 @@ public class PresenceUpdateHandler extends PacketHandler {
                     dispatchUserChangeNameEvent(user, newName, oldName);
                 }
             }
+            if (packet.get("user").has("username")) {
+                String newName = packet.get("user").get("username").asText();
+                String oldName = user.getName();
+                if (!oldName.equals(newName)) {
+                    user.setName(newName);
+                    dispatchUserChangeNameEvent(user, newName, oldName);
+                }
+            }
+            if (packet.get("user").has("avatar")) {
+                String newAvatarHash = packet.get("user").get("avatar").asText(null);
+                String oldAvatarHash = user.getAvatarHash();
+                if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
+                    user.setAvatarHash(newAvatarHash);
+                    dispatchUserChangeAvatarEvent(user, newAvatarHash, oldAvatarHash);
+                }
+            }
         });
     }
 
@@ -105,6 +123,17 @@ public class PresenceUpdateHandler extends PacketHandler {
         listeners.addAll(api.getUserChangeNameListeners());
 
         dispatchEvent(listeners, listener -> listener.onUserChangeName(event));
+    }
+
+    private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
+        UserChangeAvatarEvent event = new UserChangeAvatarEvent(api, user, newAvatarHash, oldAvatarHash);
+
+        List<UserChangeAvatarListener> listeners = new ArrayList<>();
+        listeners.addAll(user.getUserChangeAvatarListeners());
+        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeAvatarListeners()));
+        listeners.addAll(api.getUserChangeAvatarListeners());
+
+        dispatchEvent(listeners, listener -> listener.onUserChangeAvatar(event));
     }
 
 }

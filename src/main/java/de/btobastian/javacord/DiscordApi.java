@@ -2004,4 +2004,19 @@ public interface DiscordApi {
      */
     List<UserChangeNameListener> getUserChangeNameListeners();
 
+    /**
+     * Adds a listener, which listens to user avatar changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener);
+
+    /**
+     * Gets a list with all registered user change avatar listeners.
+     *
+     * @return A list with all registered user change avatar listeners.
+     */
+    List<UserChangeAvatarListener> getUserChangeAvatarListeners();
+
 }

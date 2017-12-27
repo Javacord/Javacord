@@ -1179,4 +1179,14 @@ public class ImplDiscordApi implements DiscordApi {
     public List<UserChangeNameListener> getUserChangeNameListeners() {
         return getListeners(UserChangeNameListener.class);
     }
+
+    @Override
+    public ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener) {
+        return addListener(UserChangeAvatarListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
+        return getListeners(UserChangeAvatarListener.class);
+    }
 }

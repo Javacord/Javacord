@@ -498,4 +498,24 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
         return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeNameListener.class);
     }
 
+    /**
+     * Adds a listener, which listens to avatar changes of this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), UserChangeAvatarListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered user change avatar listeners.
+     *
+     * @return A list with all registered user change avatar listeners.
+     */
+    default List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeAvatarListener.class);
+    }
+
 }

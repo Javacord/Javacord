@@ -55,9 +55,9 @@ public class ImplUser implements User {
     private PrivateChannel channel = null;
 
     /**
-     * The avatar id of the user. Might be <code>null</code>!
+     * The avatar hash of the user. Might be <code>null</code>!
      */
-    private String avatarId = null;
+    private String avatarHash = null;
 
     /**
      * The discriminator of the user.
@@ -92,7 +92,7 @@ public class ImplUser implements User {
         name = data.get("username").asText();
         discriminator = data.get("discriminator").asText();
         if (data.has("avatar") && !data.get("avatar").isNull()) {
-            avatarId = data.get("avatar").asText();
+            avatarHash = data.get("avatar").asText();
         }
         bot = data.has("bot") && data.get("bot").asBoolean();
 
@@ -133,6 +133,25 @@ public class ImplUser implements User {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Gets the avatar hash of the user.
+     * Might be <code>null</code>.
+     *
+     * @return The avatar hash of the user.
+     */
+    public String getAvatarHash() {
+        return avatarHash;
+    }
+
+    /**
+     * Sets the avatar hash of the user.
+     *
+     * @param avatarHash The avatar hash to set.
+     */
+    public void setAvatarHash(String avatarHash) {
+        this.avatarHash = avatarHash;
     }
 
     /**
@@ -178,9 +197,9 @@ public class ImplUser implements User {
     @Override
     public Icon getAvatar() {
         String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
-        if (avatarId != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
-                    (avatarId.startsWith("a_") ? ".gif" : ".png");
+        if (avatarHash != null) {
+            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarHash +
+                    (avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
         try {
             return new ImplIcon(getApi(), new URL(url));
@@ -192,7 +211,7 @@ public class ImplUser implements User {
 
     @Override
     public boolean hasDefaultAvatar() {
-        return avatarId == null;
+        return avatarHash == null;
     }
 
     @Override

@@ -1769,4 +1769,24 @@ public interface Server extends DiscordEntity {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeNameListener.class);
     }
 
+    /**
+     * Adds a listener, which listens to members of this server changing their avatar.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), UserChangeAvatarListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered user change avatar listeners.
+     *
+     * @return A list with all registered user change avatar listeners.
+     */
+    default List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeAvatarListener.class);
+    }
+
 }
