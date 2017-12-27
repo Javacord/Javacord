@@ -1014,6 +1014,17 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public ListenerManager<ServerChangeRegionListener> addServerChangeRegionListener(
+            ServerChangeRegionListener listener) {
+        return addListener(ServerChangeRegionListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeRegionListener> getServerChangeRegionListeners() {
+        return getListeners(ServerChangeRegionListener.class);
+    }
+
+    @Override
     public ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
             ServerChannelChangeNameListener listener) {
         return addListener(ServerChannelChangeNameListener.class, listener);

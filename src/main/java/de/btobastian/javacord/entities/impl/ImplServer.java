@@ -248,6 +248,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the region of the server.
+     *
+     * @param region The region of the server.
+     */
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    /**
      * Adds a channel to the cache.
      *
      * @param channel The channel to add.

@@ -1761,6 +1761,21 @@ public interface DiscordApi {
     List<ServerChangeVerificationLevelListener> getServerChangeVerificationLevelListeners();
 
     /**
+     * Adds a listener, which listens to server region changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeRegionListener> addServerChangeRegionListener(ServerChangeRegionListener listener);
+
+    /**
+     * Gets a list with all registered server change region listeners.
+     *
+     * @return A list with all registered server change region listeners.
+     */
+    List<ServerChangeRegionListener> getServerChangeRegionListeners();
+
+    /**
      * Adds a listener, which listens to server channel name changes.
      *
      * @param listener The listener to add.

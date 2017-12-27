@@ -10,6 +10,11 @@ import de.btobastian.javacord.entities.Server;
 public class ServerChangeRegionEvent extends ServerEvent {
 
     /**
+     * The new region of the server.
+     */
+    private final Region newRegion;
+
+    /**
      * The old region of the server.
      */
     private final Region oldRegion;
@@ -19,10 +24,12 @@ public class ServerChangeRegionEvent extends ServerEvent {
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
+     * @param newRegion The new region of the server.
      * @param oldRegion The old region of the server.
      */
-    public ServerChangeRegionEvent(DiscordApi api, Server server, Region oldRegion) {
+    public ServerChangeRegionEvent(DiscordApi api, Server server, Region newRegion, Region oldRegion) {
         super(api, server);
+        this.newRegion = newRegion;
         this.oldRegion = oldRegion;
     }
 
@@ -41,8 +48,7 @@ public class ServerChangeRegionEvent extends ServerEvent {
      * @return The new region of the server.
      */
     public Region getNewRegion() {
-        // TODO return getServer().getRegion();
-        return Region.UNKNOWN;
+        return newRegion;
     }
 
 }

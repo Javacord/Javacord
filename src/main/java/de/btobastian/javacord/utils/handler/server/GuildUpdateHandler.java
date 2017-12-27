@@ -8,9 +8,11 @@ import de.btobastian.javacord.entities.VerificationLevel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerChangeIconEvent;
 import de.btobastian.javacord.events.server.ServerChangeNameEvent;
+import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
 import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
+import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
@@ -79,15 +81,22 @@ public class GuildUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChangeVerificationLevel(event));
             }
 
-            User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);
-            User oldOwner = server.getOwner();
-            if (oldOwner != newOwner) {
-
-            }
-
             Region newRegion = Region.getRegionByKey(packet.get("region").asText());
             Region oldRegion = server.getRegion();
             if (oldRegion != newRegion) {
+                server.setRegion(newRegion);
+                ServerChangeRegionEvent event = new ServerChangeRegionEvent(api, server, newRegion, oldRegion);
+
+                List<ServerChangeRegionListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeRegionListeners());
+                listeners.addAll(api.getServerChangeRegionListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeRegion(event));
+            }
+
+            User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);
+            User oldOwner = server.getOwner();
+            if (oldOwner != newOwner) {
 
             }
 

@@ -1497,6 +1497,27 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Adds a listener, which listens to server region changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeRegionListener> addServerChangeRegionListener(
+            ServerChangeRegionListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeRegionListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change region listeners.
+     *
+     * @return A list with all registered server change region listeners.
+     */
+    default List<ServerChangeRegionListener> getServerChangeRegionListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeRegionListener.class);
+    }
+
+    /**
      * Adds a listener, which listens to server channel name changes in this server.
      *
      * @param listener The listener to add.
