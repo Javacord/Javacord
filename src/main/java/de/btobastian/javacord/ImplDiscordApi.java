@@ -993,6 +993,16 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public ListenerManager<ServerChangeIconListener> addServerChangeIconListener(ServerChangeIconListener listener) {
+        return addListener(ServerChangeIconListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeIconListener> getServerChangeIconListeners() {
+        return getListeners(ServerChangeIconListener.class);
+    }
+
+    @Override
     public ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
             ServerChannelChangeNameListener listener) {
         return addListener(ServerChannelChangeNameListener.class, listener);

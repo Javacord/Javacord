@@ -87,9 +87,9 @@ public class ImplServer implements Server {
     private int memberCount = -1;
 
     /**
-     * The icon id of the server. Might be <code>null</code>.
+     * The icon hash of the server. Might be <code>null</code>.
      */
-    private String iconId;
+    private String iconHash;
 
     /**
      * The splash of the server. Might be <code>null</code>.
@@ -141,7 +141,7 @@ public class ImplServer implements Server {
         defaultMessageNotificationLevel =
                 DefaultMessageNotificationLevel.fromId(data.get("default_message_notifications").asInt());
         if (data.has("icon") && !data.get("icon").isNull()) {
-            iconId = data.get("icon").asText();
+            iconHash = data.get("icon").asText();
         }
         if (data.has("splash") && !data.get("splash").isNull()) {
             splash = data.get("splash").asText();
@@ -218,6 +218,24 @@ public class ImplServer implements Server {
         }
 
         api.addServerToCache(this);
+    }
+
+    /**
+     * Gets the icon hash of the server.
+     *
+     * @return The icon hash of the server.
+     */
+    public String getIconHash() {
+        return iconHash;
+    }
+
+    /**
+     * Sets the icon hash of the server.
+     *
+     * @param iconHash The icon hash of the server.
+     */
+    public void setIconHash(String iconHash) {
+        this.iconHash = iconHash;
     }
 
     /**
@@ -471,12 +489,12 @@ public class ImplServer implements Server {
 
     @Override
     public Optional<Icon> getIcon() {
-        if (iconId == null) {
+        if (iconHash == null) {
             return Optional.empty();
         }
         try {
             return Optional.of(new ImplIcon(
-                    getApi(), new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconId + ".png")));
+                    getApi(), new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconHash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();

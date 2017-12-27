@@ -5,7 +5,9 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.events.server.ServerChangeIconEvent;
 import de.btobastian.javacord.events.server.ServerChangeNameEvent;
+import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
@@ -45,6 +47,19 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getServerChangeNameListeners());
 
                 dispatchEvent(listeners, listener -> listener.onServerChangeName(event));
+            }
+
+            String newIconHash = packet.get("icon").asText(null);
+            String oldIconHash = server.getIconHash();
+            if (!Objects.deepEquals(oldIconHash, newIconHash)) {
+                server.setIconHash(newIconHash);
+                ServerChangeIconEvent event = new ServerChangeIconEvent(api, server, newIconHash, oldIconHash);
+
+                List<ServerChangeIconListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeIconListeners());
+                listeners.addAll(api.getServerChangeIconListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeIcon(event));
             }
 
             User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);

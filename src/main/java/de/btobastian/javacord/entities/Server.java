@@ -22,6 +22,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.*;
@@ -1454,6 +1455,26 @@ public interface Server extends DiscordEntity {
      */
     default List<ServerChangeNameListener> getServerChangeNameListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to server icon changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeIconListener> addServerChangeIconListener(ServerChangeIconListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeIconListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change icon listeners.
+     *
+     * @return A list with all registered server change icon listeners.
+     */
+    default List<ServerChangeIconListener> getServerChangeIconListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeIconListener.class);
     }
 
     /**

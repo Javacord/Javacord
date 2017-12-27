@@ -1730,6 +1730,21 @@ public interface DiscordApi {
     List<ServerChangeNameListener> getServerChangeNameListeners();
 
     /**
+     * Adds a listener, which listens to server icon changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeIconListener> addServerChangeIconListener(ServerChangeIconListener listener);
+
+    /**
+     * Gets a list with all registered server change icon listeners.
+     *
+     * @return A list with all registered server change icon listeners.
+     */
+    List<ServerChangeIconListener> getServerChangeIconListeners();
+
+    /**
      * Adds a listener, which listens to server channel name changes.
      *
      * @param listener The listener to add.
