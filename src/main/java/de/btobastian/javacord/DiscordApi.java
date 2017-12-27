@@ -25,6 +25,7 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
@@ -1697,6 +1698,21 @@ public interface DiscordApi {
      * @return A list with all registered server member ban listeners.
      */
     List<ServerMemberBanListener> getServerMemberBanListeners();
+
+    /**
+     * Adds a listener, which listens to users getting unbanned from servers.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerMemberUnbanListener> addServerMemberUnbanListener(ServerMemberUnbanListener listener);
+
+    /**
+     * Gets a list with all registered server member unban listeners.
+     *
+     * @return A list with all registered server member unban listeners.
+     */
+    List<ServerMemberUnbanListener> getServerMemberUnbanListeners();
 
     /**
      * Adds a listener, which listens to server name changes.

@@ -13,6 +13,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwr
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
 import de.btobastian.javacord.listeners.user.*;
@@ -332,6 +333,26 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default List<ServerMemberBanListener> getServerMemberBanListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberBanListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this user getting unbanned from known servers.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerMemberUnbanListener> addServerMemberUnbanListener(ServerMemberUnbanListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), ServerMemberUnbanListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server member unban listeners.
+     *
+     * @return A list with all registered server member unban listeners.
+     */
+    default List<ServerMemberUnbanListener> getServerMemberUnbanListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberUnbanListener.class);
     }
 
     /**

@@ -29,6 +29,7 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
 import de.btobastian.javacord.utils.ListenerManager;
@@ -1413,6 +1414,26 @@ public interface Server extends DiscordEntity {
      */
     default List<ServerMemberBanListener> getServerMemberBanListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberBanListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to users getting unbanned from this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerMemberUnbanListener> addServerMemberUnbanListener(ServerMemberUnbanListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), ServerMemberUnbanListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server member unban listeners.
+     *
+     * @return A list with all registered server member unban listeners.
+     */
+    default List<ServerMemberUnbanListener> getServerMemberUnbanListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberUnbanListener.class);
     }
 
     /**
