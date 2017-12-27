@@ -25,6 +25,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.role.*;
@@ -958,6 +959,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerMemberLeaveListener> getServerMemberLeaveListeners() {
         return getListeners(ServerMemberLeaveListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener) {
+        return addListener(ServerMemberBanListener.class, listener);
+    }
+
+    @Override
+    public List<ServerMemberBanListener> getServerMemberBanListeners() {
+        return getListeners(ServerMemberBanListener.class);
     }
 
     @Override

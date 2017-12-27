@@ -26,6 +26,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.role.*;
@@ -1392,6 +1393,26 @@ public interface Server extends DiscordEntity {
      */
     default List<ServerMemberLeaveListener> getServerMemberLeaveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberLeaveListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to users getting banned from this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), ServerMemberBanListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server member ban listeners.
+     *
+     * @return A list with all registered server member ban listeners.
+     */
+    default List<ServerMemberBanListener> getServerMemberBanListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberBanListener.class);
     }
 
     /**

@@ -10,6 +10,7 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
@@ -311,6 +312,26 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default List<ServerMemberLeaveListener> getServerMemberLeaveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberLeaveListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this user getting banned from known servers.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), ServerMemberBanListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server member ban listeners.
+     *
+     * @return A list with all registered server member ban listeners.
+     */
+    default List<ServerMemberBanListener> getServerMemberBanListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberBanListener.class);
     }
 
     /**

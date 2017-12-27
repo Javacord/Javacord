@@ -22,6 +22,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.listeners.server.channel.*;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.role.*;
@@ -1681,6 +1682,21 @@ public interface DiscordApi {
      * @return A list with all registered server member leave listeners.
      */
     List<ServerMemberLeaveListener> getServerMemberLeaveListeners();
+
+    /**
+     * Adds a listener, which listens to users getting banned from servers.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener);
+
+    /**
+     * Gets a list with all registered server member ban listeners.
+     *
+     * @return A list with all registered server member ban listeners.
+     */
+    List<ServerMemberBanListener> getServerMemberBanListeners();
 
     /**
      * Adds a listener, which listens to server name changes.
