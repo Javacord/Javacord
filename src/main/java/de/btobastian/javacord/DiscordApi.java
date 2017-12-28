@@ -101,8 +101,8 @@ public interface DiscordApi {
      *
      * @return An invite link for this bot.
      */
-    default CompletableFuture<String> createBotInvite() {
-        return getApplicationInfo().thenApply(info -> new BotInviteBuilder(info.getClientId()).build());
+    default String createBotInvite() {
+        return new BotInviteBuilder(getClientId()).build();
     }
 
     /**
@@ -112,9 +112,8 @@ public interface DiscordApi {
      * @param permissions The permissions which should be granted to the bot.
      * @return An invite link for this bot.
      */
-    default CompletableFuture<String> createBotInvite(Permissions permissions) {
-        return getApplicationInfo()
-                .thenApply(info -> new BotInviteBuilder(info.getClientId()).setPermissions(permissions).build());
+    default String createBotInvite(Permissions permissions) {
+        return new BotInviteBuilder(getClientId()).setPermissions(permissions).build();
     }
 
     /**
@@ -379,7 +378,7 @@ public interface DiscordApi {
      * @return The user with the given id.
      */
     Optional<User> getUserById(long id);
-    
+
     /**
      * Gets a user by it's id.
      *
