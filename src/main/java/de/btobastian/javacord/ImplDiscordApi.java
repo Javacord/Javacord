@@ -31,7 +31,7 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
-import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
+import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -77,7 +77,7 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * The websocket adapter used to connect to Discord.
      */
-    private DiscordWebsocketAdapter websocketAdapter = null;
+    private DiscordWebSocketAdapter websocketAdapter = null;
 
     /**
      * The account type of the bot.
@@ -239,7 +239,7 @@ public class ImplDiscordApi implements DiscordApi {
                         return;
                     }
 
-                    websocketAdapter = new DiscordWebsocketAdapter(this, gateway);
+                    websocketAdapter = new DiscordWebSocketAdapter(this, gateway);
                     websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
                         if (readyReceived) {
                             if (accountType == AccountType.BOT) {
@@ -592,7 +592,7 @@ public class ImplDiscordApi implements DiscordApi {
      *       so for the end user it is in fact never null.
      */
     @Override
-    public DiscordWebsocketAdapter getWebSocketAdapter() {
+    public DiscordWebSocketAdapter getWebSocketAdapter() {
         return websocketAdapter;
     }
 

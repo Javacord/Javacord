@@ -79,7 +79,7 @@ public abstract class PacketHandler {
      * @param listeners The listeners for the event.
      * @param consumer The consumer which consumes the listeners and calls the event.
      * @param <T> The listener class.
-     * @see DiscordWebsocketAdapter#dispatchEvent(List, Consumer)
+     * @see DiscordWebSocketAdapter#dispatchEvent(List, Consumer)
      */
     protected <T> void dispatchEvent(List<T> listeners, Consumer<T> consumer) {
         api.getWebSocketAdapter().dispatchEvent(listeners, consumer);

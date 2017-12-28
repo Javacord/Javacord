@@ -28,7 +28,7 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.*;
 import de.btobastian.javacord.listeners.user.*;
-import de.btobastian.javacord.utils.DiscordWebsocketAdapter;
+import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
@@ -86,7 +86,7 @@ public interface DiscordApi {
      *
      * @return The websocket adapter.
      */
-    DiscordWebsocketAdapter getWebSocketAdapter();
+    DiscordWebSocketAdapter getWebSocketAdapter();
 
     /**
      * Gets the type of the current account.
