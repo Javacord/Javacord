@@ -100,6 +100,7 @@ public interface DiscordApi {
      * The method only works for bot accounts!
      *
      * @return An invite link for this bot.
+     * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
      */
     default String createBotInvite() {
         return new BotInviteBuilder(getClientId()).build();
@@ -111,6 +112,7 @@ public interface DiscordApi {
      *
      * @param permissions The permissions which should be granted to the bot.
      * @return An invite link for this bot.
+     * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
      */
     default String createBotInvite(Permissions permissions) {
         return new BotInviteBuilder(getClientId()).setPermissions(permissions).build();
