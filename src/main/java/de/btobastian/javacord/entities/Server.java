@@ -1518,6 +1518,30 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Adds a listener, which listens to server default message notification level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
+    addServerChangeDefaultMessageNotificationLevelListener(
+            ServerChangeDefaultMessageNotificationLevelListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), ServerChangeDefaultMessageNotificationLevelListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change default message notification level listeners.
+     *
+     * @return A list with all registered server change default message notification level listeners.
+     */
+    default List<ServerChangeDefaultMessageNotificationLevelListener>
+    getServerChangeDefaultMessageNotificationLevelListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(Server.class, getId(), ServerChangeDefaultMessageNotificationLevelListener.class);
+    }
+
+    /**
      * Adds a listener, which listens to server channel name changes in this server.
      *
      * @param listener The listener to add.

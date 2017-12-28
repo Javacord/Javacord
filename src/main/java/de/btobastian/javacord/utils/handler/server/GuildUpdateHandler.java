@@ -2,18 +2,13 @@ package de.btobastian.javacord.utils.handler.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.DefaultMessageNotificationLevel;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.VerificationLevel;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.events.server.ServerChangeIconEvent;
-import de.btobastian.javacord.events.server.ServerChangeNameEvent;
-import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
-import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
-import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
-import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
-import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
-import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
+import de.btobastian.javacord.events.server.*;
+import de.btobastian.javacord.listeners.server.*;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -92,6 +87,23 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getServerChangeRegionListeners());
 
                 dispatchEvent(listeners, listener -> listener.onServerChangeRegion(event));
+            }
+
+            DefaultMessageNotificationLevel newDefaultMessageNotificationLevel =
+                    DefaultMessageNotificationLevel.fromId(packet.get("default_message_notifications").asInt());
+            DefaultMessageNotificationLevel oldDefaultMessageNotificationLevel =
+                    server.getDefaultMessageNotificationLevel();
+            if (newDefaultMessageNotificationLevel != oldDefaultMessageNotificationLevel) {
+                server.setDefaultMessageNotificationLevel(newDefaultMessageNotificationLevel);
+                ServerChangeDefaultMessageNotificationLevelEvent event =
+                        new ServerChangeDefaultMessageNotificationLevelEvent(
+                                api, server, newDefaultMessageNotificationLevel, oldDefaultMessageNotificationLevel);
+
+                List<ServerChangeDefaultMessageNotificationLevelListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeDefaultMessageNotificationLevelListeners());
+                listeners.addAll(api.getServerChangeDefaultMessageNotificationLevelListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeDefaultMessageNotificationLevel(event));
             }
 
             User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);

@@ -1025,6 +1025,19 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
+    addServerChangeDefaultMessageNotificationLevelListener(
+            ServerChangeDefaultMessageNotificationLevelListener listener) {
+        return addListener(ServerChangeDefaultMessageNotificationLevelListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeDefaultMessageNotificationLevelListener>
+    getServerChangeDefaultMessageNotificationLevelListeners() {
+        return getListeners(ServerChangeDefaultMessageNotificationLevelListener.class);
+    }
+
+    @Override
     public ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
             ServerChannelChangeNameListener listener) {
         return addListener(ServerChannelChangeNameListener.class, listener);

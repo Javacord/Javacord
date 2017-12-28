@@ -257,6 +257,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the default message notification level of the server.
+     *
+     * @param defaultMessageNotificationLevel The default message notification level to set.
+     */
+    public void setDefaultMessageNotificationLevel(DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
+        this.defaultMessageNotificationLevel = defaultMessageNotificationLevel;
+    }
+
+    /**
      * Adds a channel to the cache.
      *
      * @param channel The channel to add.

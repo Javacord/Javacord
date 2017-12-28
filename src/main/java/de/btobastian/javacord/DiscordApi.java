@@ -1776,6 +1776,23 @@ public interface DiscordApi {
     List<ServerChangeRegionListener> getServerChangeRegionListeners();
 
     /**
+     * Adds a listener, which listens to server default message notification level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
+    addServerChangeDefaultMessageNotificationLevelListener(
+            ServerChangeDefaultMessageNotificationLevelListener listener);
+
+    /**
+     * Gets a list with all registered server change default message notification level listeners.
+     *
+     * @return A list with all registered server change default message notification level listeners.
+     */
+    List<ServerChangeDefaultMessageNotificationLevelListener> getServerChangeDefaultMessageNotificationLevelListeners();
+
+    /**
      * Adds a listener, which listens to server channel name changes.
      *
      * @param listener The listener to add.
