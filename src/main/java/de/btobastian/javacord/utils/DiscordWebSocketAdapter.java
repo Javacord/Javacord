@@ -50,6 +50,7 @@ import de.btobastian.javacord.utils.handler.user.PresencesReplaceHandler;
 import de.btobastian.javacord.utils.handler.user.TypingStartHandler;
 import de.btobastian.javacord.utils.handler.user.UserUpdateHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
+import de.btobastian.javacord.utils.logging.WebSocketLogger;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -233,6 +234,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             this.websocket.set(websocket);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
+            websocket.addListener(new WebSocketLogger());
             waitForIdentifyRateLimit();
             websocket.connect();
         } catch (Throwable t) {
