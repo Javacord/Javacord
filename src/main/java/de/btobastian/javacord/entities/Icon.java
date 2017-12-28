@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * This class represents a discord icon, for example a server icon or a user avatar.
@@ -44,32 +45,21 @@ public interface Icon {
      * @return The icon as byte array.
      */
     default CompletableFuture<byte[]> asByteArray() {
-        CompletableFuture<byte[]> future = new CompletableFuture<>();
-        ((ImplIcon) this).getApi().getThreadPool().getExecutorService().submit(() -> {
-            try {
-                logger.debug("Trying to get icon for entity {}", this);
-                HttpsURLConnection conn = (HttpsURLConnection) getUrl().openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
-                try (
-                        InputStream in = new BufferedInputStream(conn.getInputStream());
-                        ByteArrayOutputStream out = new ByteArrayOutputStream()
-                ) {
-                    byte[] buf = new byte[1024];
-                    int n;
-                    while (-1 != (n = in.read(buf))) {
-                        out.write(buf, 0, n);
-                    }
-                    byte[] icon = out.toByteArray();
-                    logger.debug("Got icon for entity {} (size: {})", this, icon.length);
-                    future.complete(icon);
+        return asInputStream().thenApply(stream -> {
+            try (
+                    InputStream in = new BufferedInputStream(stream);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream()
+            ) {
+                byte[] buf = new byte[1024];
+                int n;
+                while (-1 != (n = in.read(buf))) {
+                    out.write(buf, 0, n);
                 }
-            } catch (Throwable t) {
-                future.completeExceptionally(t);
+                return out.toByteArray();
+            } catch (IOException e) {
+                throw new CompletionException(e);
             }
         });
-        return future;
     }
 
     /**
@@ -82,12 +72,13 @@ public interface Icon {
         CompletableFuture<InputStream> future = new CompletableFuture<>();
         ((ImplIcon) this).getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
-                logger.debug("Trying to get icon for entity {}", this);
+                logger.debug("Trying to download icon from {}", getUrl());
                 HttpsURLConnection conn = (HttpsURLConnection) getUrl().openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
                 conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
                 future.complete(conn.getInputStream());
+                logger.debug("Downloaded icon from {} (content length: {})", getUrl(), conn.getContentLength());
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
@@ -107,8 +98,7 @@ public interface Icon {
                     try {
                         return ImageIO.read(stream);
                     } catch (IOException e) {
-                        logger.error("Failed to convert byte array to buffered image", e);
-                        return null;
+                        throw new CompletionException(e);
                     }
                 });
     }
