@@ -52,12 +52,12 @@ import java.util.zip.Inflater;
 /**
  * The main websocket adapter.
  */
-public class DiscordWebsocketAdapter extends WebSocketAdapter {
+public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(DiscordWebsocketAdapter.class);
+    private static final Logger logger = LoggerUtil.getLogger(DiscordWebSocketAdapter.class);
 
     private final DiscordApi api;
     private final HashMap<String, PacketHandler> handlers = new HashMap<>();
@@ -83,7 +83,7 @@ public class DiscordWebsocketAdapter extends WebSocketAdapter {
     // A reconnect attempt counter
     private int reconnectAttempt = 0;
 
-    public DiscordWebsocketAdapter(DiscordApi api, String gateway) {
+    public DiscordWebSocketAdapter(DiscordApi api, String gateway) {
         this.api = api;
         this.gateway = gateway;
 
