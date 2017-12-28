@@ -2,10 +2,10 @@ package de.btobastian.javacord.entities.message;
 
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -115,6 +115,17 @@ public interface Messageable {
     /**
      * Sends a message.
      *
+     * @param image The image to send.
+     * @param fileName The name of the image.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(BufferedImage image, String fileName) {
+        return sendMessage(null, null, false, null, bufferedImageToInputStream(image), fileName);
+    }
+
+    /**
+     * Sends a message.
+     *
      * @param content The content of the message.
      * @param file The file to send.
      * @return The sent message.
@@ -133,6 +144,18 @@ public interface Messageable {
      */
     default CompletableFuture<Message> sendMessage(String content, InputStream stream, String fileName) {
         return sendMessage(content, null, false, null, stream, fileName);
+    }
+
+    /**
+     * Sends a message.
+     *
+     * @param content The content of the message.
+     * @param image The image to send.
+     * @param fileName The name of the image.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(String content, BufferedImage image, String fileName) {
+        return sendMessage(content, null, false, null, bufferedImageToInputStream(image), fileName);
     }
 
     /**
@@ -161,6 +184,18 @@ public interface Messageable {
     /**
      * Sends a message.
      *
+     * @param embed The embed which should be displayed.
+     * @param image The image to send.
+     * @param fileName The name of the image.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(EmbedBuilder embed, BufferedImage image, String fileName) {
+        return sendMessage(null, embed, false, null, bufferedImageToInputStream(image), fileName);
+    }
+
+    /**
+     * Sends a message.
+     *
      * @param content The content of the message.
      * @param embed The embed which should be displayed.
      * @param file The file to send.
@@ -183,4 +218,41 @@ public interface Messageable {
         return sendMessage(null, embed, false, null, stream, fileName);
     }
 
+    /**
+     * Sends a message.
+     *
+     * @param content The content of the message.
+     * @param embed The embed which should be displayed.
+     * @param image The image to send.
+     * @param fileName The name of the image.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, BufferedImage image, String fileName) {
+        return sendMessage(null, embed, false, null, bufferedImageToInputStream(image), fileName);
+    }
+
+    /**
+     * Converts a {@link BufferedImage} to an {@link InputStream}.
+     * @param image The BufferedImage to convert.
+     * @param format The format of the image in respects to {@link ImageIO#write(RenderedImage, String, File)}
+     * @return The converted image.
+     */
+    default InputStream bufferedImageToInputStream(BufferedImage image, String format) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(image, format, outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        } catch (IOException e) {
+            throw new IllegalStateException("The provided image could not be saved!");
+        }
+    }
+
+    /**
+     * Converts a {@link BufferedImage} to an {@link InputStream} in .png format.
+     * @param image The BufferedImage to convert.
+     * @return The converted image.
+     */
+    default InputStream bufferedImageToInputStream(BufferedImage image) {
+        return bufferedImageToInputStream(image, "png");
+    }
 }
