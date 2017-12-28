@@ -324,38 +324,41 @@ public class RestRequest<T> {
         logger.debug("Trying to send {} request to {}{}",
                 method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
 
-        Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute();
-        RestRequestResult result = new RestRequestResult(this, response);
-        logger.debug("Sent {} request to {} and received status code {} with{} body{}",
-                method.name(), endpoint.getFullUrl(urlParameters), response.code(),
-                result.getBody().map(b -> "").orElse(" empty"), result.getStringBody().map(s -> " " + s).orElse(""));
-        if (response.code() >= 300 || response.code() < 200) {
-            if (!result.getJsonBody().isNull() && result.getJsonBody().has("code")) {
-                int code = result.getJsonBody().get("code").asInt();
-                String message = result.getJsonBody().has("message") ? result.getJsonBody().get("message").asText() : null;
-                switch (code) {
-                    case 50007:
-                        throw new CannotMessageUserException(origin,
-                                message == null ? "Cannot send message to this user" : message, response, this);
+        try (Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute()) {
+            RestRequestResult result = new RestRequestResult(this, response);
+            logger.debug("Sent {} request to {} and received status code {} with{} body{}",
+                    method.name(), endpoint.getFullUrl(urlParameters), response.code(),
+                    result.getBody().map(b -> "").orElse(" empty"),
+                    result.getStringBody().map(s -> " " + s).orElse(""));
+            if (response.code() >= 300 || response.code() < 200) {
+                if (!result.getJsonBody().isNull() && result.getJsonBody().has("code")) {
+                    int code = result.getJsonBody().get("code").asInt();
+                    String message = result.getJsonBody().has("message") ?
+                            result.getJsonBody().get("message").asText() : null;
+                    switch (code) {
+                        case 50007:
+                            throw new CannotMessageUserException(origin,
+                                    message == null ? "Cannot send message to this user" : message, this, result);
+                    }
+                }
+                switch (response.code()) {
+                    case 429:
+                        // A 429 will be handled in the RatelimitManager class
+                        return result;
+                    case 403:
+                        throw new MissingPermissionsException(origin,
+                                "Received a " + response.code() + " response from Discord with"
+                                        + (result.getBody().isPresent() ? "" : " empty") + " body"
+                                        + result.getStringBody().map(s -> " " + s).orElse("") + "!", this, result);
+                    default:
+                        throw new DiscordException(origin,
+                                "Received a " + response.code() + " response from Discord with"
+                                        + (result.getBody().isPresent() ? "" : " empty") + " body"
+                                        + result.getStringBody().map(s -> " " + s).orElse("") + "!", this, result);
                 }
             }
-            switch (response.code()) {
-                case 429:
-                    // A 429 will be handled in the RatelimitManager class
-                    return result;
-                case 403:
-                    throw new MissingPermissionsException(origin,
-                            "Received a " + response.code() + " response from Discord with"
-                                    + (result.getBody().isPresent() ? "" : " empty") + " body"
-                                    + result.getStringBody().map(s -> " " + s).orElse("") + "!", response, this);
-                default:
-                    throw new DiscordException(origin,
-                            "Received a " + response.code() + " response from Discord with"
-                                    + (result.getBody().isPresent() ? "" : " empty") + " body"
-                                    + result.getStringBody().map(s -> " " + s).orElse("") + "!", response, this);
-            }
+            return result;
         }
-        return result;
     }
 
 }

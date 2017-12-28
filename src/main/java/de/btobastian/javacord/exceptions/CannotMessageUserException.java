@@ -1,6 +1,7 @@
 package de.btobastian.javacord.exceptions;
 
 import de.btobastian.javacord.utils.rest.RestRequest;
+import de.btobastian.javacord.utils.rest.RestRequestResult;
 import okhttp3.Response;
 
 /**
@@ -18,12 +19,12 @@ public class CannotMessageUserException extends MissingPermissionsException {
      *
      * @param origin The origin of the exception.
      * @param message The message of the exception.
-     * @param response The response which caused the exception.
      * @param request The request.
+     * @param restRequestResult The rest request result which caused the exception.
      */
     public CannotMessageUserException(
-            Exception origin, String message, Response response, RestRequest<?> request) {
-        super(origin, message, response, request);
+            Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
+        super(origin, message, request, restRequestResult);
     }
 
 }
