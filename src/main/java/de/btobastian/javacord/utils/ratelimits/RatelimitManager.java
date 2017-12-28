@@ -86,7 +86,7 @@ public class RatelimitManager {
                     if (request.incrementRetryCounter()) {
                         request.getResult().completeExceptionally(
                                 new RatelimitException(request.getOrigin(),
-                                        "You have been ratelimited and ran out of retires!", null, request)
+                                        "You have been ratelimited and ran out of retires!", request)
                         );
                         queue.remove(request);
                         bucket.setHasActiveScheduler(false);
@@ -107,7 +107,7 @@ public class RatelimitManager {
                                 if (req.incrementRetryCounter()) {
                                     req.getResult().completeExceptionally(
                                             new RatelimitException(req.getOrigin(),
-                                                    "You have been ratelimited and ran out of retires!", null, req)
+                                                    "You have been ratelimited and ran out of retires!", req)
                                     );
                                     return true;
                                 }

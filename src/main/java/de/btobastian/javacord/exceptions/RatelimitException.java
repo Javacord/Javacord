@@ -1,6 +1,7 @@
 package de.btobastian.javacord.exceptions;
 
 import de.btobastian.javacord.utils.rest.RestRequest;
+import de.btobastian.javacord.utils.rest.RestRequestResult;
 import okhttp3.Response;
 
 /**
@@ -13,12 +14,11 @@ public class RatelimitException extends DiscordException {
      *
      * @param origin The origin of the exception.
      * @param message The message of the exception.
-     * @param response The response which caused the exception.
      * @param request The request.
      */
     public RatelimitException(
-            Exception origin, String message, Response response, RestRequest<?> request) {
-        super(origin, message, response, request);
+            Exception origin, String message, RestRequest<?> request) {
+        super(origin, message, request, null);
     }
 
 }
