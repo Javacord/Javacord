@@ -266,6 +266,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the server owner id.
+     *
+     * @param ownerId The owner id to set.
+     */
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    /**
      * Adds a channel to the cache.
      *
      * @param channel The channel to add.

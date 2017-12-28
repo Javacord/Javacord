@@ -10,6 +10,11 @@ import de.btobastian.javacord.entities.User;
 public class ServerChangeOwnerEvent extends ServerEvent {
 
     /**
+     * The new owner of the server.
+     */
+    private final User newOwner;
+
+    /**
      * The old owner of the server.
      */
     private final User oldOwner;
@@ -19,10 +24,12 @@ public class ServerChangeOwnerEvent extends ServerEvent {
      *
      * @param api The api instance of the event.
      * @param server The server of the event.
+     * @param newOwner The new owner of the server.
      * @param oldOwner The old owner of the server.
      */
-    public ServerChangeOwnerEvent(DiscordApi api, Server server, User oldOwner) {
+    public ServerChangeOwnerEvent(DiscordApi api, Server server, User newOwner, User oldOwner) {
         super(api, server);
+        this.newOwner = newOwner;
         this.oldOwner = oldOwner;
     }
 
@@ -41,8 +48,7 @@ public class ServerChangeOwnerEvent extends ServerEvent {
      * @return The new owner of the server.
      */
     public User getNewOwner() {
-        // TODO return getServer().getOwner();
-        return null;
+        return newOwner;
     }
 
 }

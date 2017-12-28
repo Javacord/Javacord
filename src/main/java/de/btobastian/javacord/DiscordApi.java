@@ -1794,6 +1794,21 @@ public interface DiscordApi {
     List<ServerChangeDefaultMessageNotificationLevelListener> getServerChangeDefaultMessageNotificationLevelListeners();
 
     /**
+     * Adds a listener, which listens to server owner changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeOwnerListener> addServerChangeOwnerListener(ServerChangeOwnerListener listener);
+
+    /**
+     * Gets a list with all registered server change owner listeners.
+     *
+     * @return A list with all registered server change owner listeners.
+     */
+    List<ServerChangeOwnerListener> getServerChangeOwnerListeners();
+
+    /**
      * Adds a listener, which listens to server channel name changes.
      *
      * @param listener The listener to add.

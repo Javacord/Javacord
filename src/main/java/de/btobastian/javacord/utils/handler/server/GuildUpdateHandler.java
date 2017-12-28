@@ -109,7 +109,14 @@ public class GuildUpdateHandler extends PacketHandler {
             User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);
             User oldOwner = server.getOwner();
             if (oldOwner != newOwner) {
+                server.setOwnerId(newOwner.getId());
+                ServerChangeOwnerEvent event = new ServerChangeOwnerEvent(api, server, newOwner, oldOwner);
 
+                List<ServerChangeOwnerListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeOwnerListeners());
+                listeners.addAll(api.getServerChangeOwnerListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeOwner(event));
             }
 
             String oldAfkChannelId = "...";

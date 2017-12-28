@@ -1038,6 +1038,16 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public ListenerManager<ServerChangeOwnerListener> addServerChangeOwnerListener(ServerChangeOwnerListener listener) {
+        return addListener(ServerChangeOwnerListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeOwnerListener> getServerChangeOwnerListeners() {
+        return getListeners(ServerChangeOwnerListener.class);
+    }
+
+    @Override
     public ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
             ServerChannelChangeNameListener listener) {
         return addListener(ServerChannelChangeNameListener.class, listener);

@@ -1542,6 +1542,27 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Adds a listener, which listens to server owner changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeOwnerListener> addServerChangeOwnerListener(
+            ServerChangeOwnerListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeOwnerListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change owner listeners.
+     *
+     * @return A list with all registered server change owner listeners.
+     */
+    default List<ServerChangeOwnerListener> getServerChangeOwnerListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeOwnerListener.class);
+    }
+
+    /**
      * Adds a listener, which listens to server channel name changes in this server.
      *
      * @param listener The listener to add.
