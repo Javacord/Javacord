@@ -1,6 +1,7 @@
 package de.btobastian.javacord;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.btobastian.javacord.entities.Game;
 import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Server;
@@ -68,6 +69,11 @@ public class ImplDiscordApi implements DiscordApi {
      * The http client for this instance.
      */
     private final OkHttpClient httpClient;
+
+    /**
+     * The object mapper for this instance.
+     */
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * The ratelimit manager for this bot.
@@ -579,6 +585,11 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public OkHttpClient getHttpClient() {
         return httpClient;
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     @Override

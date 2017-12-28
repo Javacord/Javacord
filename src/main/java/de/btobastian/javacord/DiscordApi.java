@@ -1,5 +1,6 @@
 package de.btobastian.javacord;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.channels.*;
@@ -73,6 +74,13 @@ public interface DiscordApi {
      * @return The used http client.
      */
     OkHttpClient getHttpClient();
+
+    /**
+     * Gets the object mapper used by this api instance.
+     *
+     * @return The object mapper used by this api instance.
+     */
+    ObjectMapper getObjectMapper();
 
     /**
      * Gets the ratelimit manager for this bot.

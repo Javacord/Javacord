@@ -183,7 +183,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onTextMessage(WebSocket websocket, String text) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = api.getObjectMapper();
         JsonNode packet = mapper.readTree(text);
 
         int op = packet.get("op").asInt();
