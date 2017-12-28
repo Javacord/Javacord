@@ -274,6 +274,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the explicit content filter level of the server.
+     *
+     * @param explicitContentFilterLevel The explicit content filter level to set.
+     */
+    public void setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
+        this.explicitContentFilterLevel = explicitContentFilterLevel;
+    }
+
+    /**
      * Adds a channel to the cache.
      *
      * @param channel The channel to add.

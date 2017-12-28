@@ -1562,6 +1562,28 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Adds a listener, which listens to server explicit content filter level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeExplicitContentFilterLevelListener>
+    addServerChangeExplicitContentFilterLevelListener(ServerChangeExplicitContentFilterLevelListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), ServerChangeExplicitContentFilterLevelListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change explicit content filter level listeners.
+     *
+     * @return A list with all registered server change explicit content filter level listeners.
+     */
+    default List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(Server.class, getId(), ServerChangeExplicitContentFilterLevelListener.class);
+    }
+
+    /**
      * Adds a listener, which listens to server channel name changes in this server.
      *
      * @param listener The listener to add.

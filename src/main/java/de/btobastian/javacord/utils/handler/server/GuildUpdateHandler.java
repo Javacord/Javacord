@@ -2,10 +2,7 @@ package de.btobastian.javacord.utils.handler.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.entities.DefaultMessageNotificationLevel;
-import de.btobastian.javacord.entities.Region;
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.VerificationLevel;
+import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.*;
 import de.btobastian.javacord.listeners.server.*;
@@ -119,6 +116,21 @@ public class GuildUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChangeOwner(event));
             }
 
+            ExplicitContentFilterLevel newExplicitContentFilterLevel =
+                    ExplicitContentFilterLevel.fromId(packet.get("explicit_content_filter").asInt());
+            ExplicitContentFilterLevel oldExplicitContentFilterLevel = server.getExplicitContentFilterLevel();
+            if (oldExplicitContentFilterLevel != newExplicitContentFilterLevel) {
+                server.setExplicitContentFilterLevel(newExplicitContentFilterLevel);
+                ServerChangeExplicitContentFilterLevelEvent event = new ServerChangeExplicitContentFilterLevelEvent(
+                        api, server, newExplicitContentFilterLevel, oldExplicitContentFilterLevel);
+
+                List<ServerChangeExplicitContentFilterLevelListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeExplicitContentFilterLevelListeners());
+                listeners.addAll(api.getServerChangeExplicitContentFilterLevelListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeExplicitContentFilterLevel(event));
+            }
+
             String oldAfkChannelId = "...";
             String newAfkChannelId =
                     packet.get("afk_channel_id").isNull() ? null : packet.get("afk_channel_id").asText();
@@ -145,10 +157,6 @@ public class GuildUpdateHandler extends PacketHandler {
 
             }
 
-            // TODO verification_level
-            // TODO default_message_notifications
-            // TODO explicit_content_filter
-            // TODO roles
             // TODO emojis
             // TODO features
             // TODO mfa_level

@@ -1817,6 +1817,22 @@ public interface DiscordApi {
     List<ServerChangeOwnerListener> getServerChangeOwnerListeners();
 
     /**
+     * Adds a listener, which listens to server explicit content filter level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeExplicitContentFilterLevelListener> addServerChangeExplicitContentFilterLevelListener(
+            ServerChangeExplicitContentFilterLevelListener listener);
+
+    /**
+     * Gets a list with all registered server change explicit content filter level listeners.
+     *
+     * @return A list with all registered server change explicit content filter level listeners.
+     */
+    List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners();
+
+    /**
      * Adds a listener, which listens to server channel name changes.
      *
      * @param listener The listener to add.

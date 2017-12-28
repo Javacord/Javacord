@@ -1059,6 +1059,17 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public ListenerManager<ServerChangeExplicitContentFilterLevelListener>
+    addServerChangeExplicitContentFilterLevelListener(ServerChangeExplicitContentFilterLevelListener listener) {
+        return addListener(ServerChangeExplicitContentFilterLevelListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners() {
+        return getListeners(ServerChangeExplicitContentFilterLevelListener.class);
+    }
+
+    @Override
     public ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
             ServerChannelChangeNameListener listener) {
         return addListener(ServerChannelChangeNameListener.class, listener);
