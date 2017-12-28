@@ -73,6 +73,29 @@ public interface Icon {
     }
 
     /**
+     * Gets the input stream for the icon.
+     * This can be used for {@link de.btobastian.javacord.entities.message.Messageable#sendMessage(InputStream, String)}
+     *
+     * @return The input stream for the icon.
+     */
+    default CompletableFuture<InputStream> asInputStream() {
+        CompletableFuture<InputStream> future = new CompletableFuture<>();
+        ((ImplIcon) this).getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                logger.debug("Trying to get icon for entity {}", this);
+                HttpsURLConnection conn = (HttpsURLConnection) getUrl().openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
+                future.complete(conn.getInputStream());
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
      * Gets the icon as {@link BufferedImage}.
      *
      * @return The icon as BufferedImage.
