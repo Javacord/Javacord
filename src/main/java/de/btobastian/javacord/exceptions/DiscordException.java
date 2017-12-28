@@ -29,7 +29,8 @@ public class DiscordException extends Exception {
      * @param request The request.
      * @param restRequestResult The rest request result which caused the exception.
      */
-    public DiscordException(Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
+    public DiscordException(
+            Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
         super(message, origin);
         this.request = request;
         this.restRequestResult = restRequestResult;

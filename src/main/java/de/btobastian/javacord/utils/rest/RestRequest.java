@@ -324,15 +324,17 @@ public class RestRequest<T> {
         logger.debug("Trying to send {} request to {}{}",
                 method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
 
-        try(Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute()) {
+        try (Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute()) {
             RestRequestResult result = new RestRequestResult(this, response);
             logger.debug("Sent {} request to {} and received status code {} with{} body{}",
                     method.name(), endpoint.getFullUrl(urlParameters), response.code(),
-                    result.getBody().map(b -> "").orElse(" empty"), result.getStringBody().map(s -> " " + s).orElse(""));
+                    result.getBody().map(b -> "").orElse(" empty"),
+                    result.getStringBody().map(s -> " " + s).orElse(""));
             if (response.code() >= 300 || response.code() < 200) {
                 if (!result.getJsonBody().isNull() && result.getJsonBody().has("code")) {
                     int code = result.getJsonBody().get("code").asInt();
-                    String message = result.getJsonBody().has("message") ? result.getJsonBody().get("message").asText() : null;
+                    String message = result.getJsonBody().has("message") ?
+                            result.getJsonBody().get("message").asText() : null;
                     switch (code) {
                         case 50007:
                             throw new CannotMessageUserException(origin,
