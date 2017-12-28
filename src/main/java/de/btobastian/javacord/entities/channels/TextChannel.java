@@ -85,6 +85,7 @@ public interface TextChannel extends Channel, Messageable {
             }
             
             request.setMultipartBody(new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
                     .addFormDataPart("payload_json", body.toString())
                     .addFormDataPart("file", fileName,
                             RequestBody.create(MediaType.parse(URLConnection.guessContentTypeFromName(fileName)), bytes)
