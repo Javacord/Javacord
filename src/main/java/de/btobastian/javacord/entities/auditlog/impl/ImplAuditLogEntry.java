@@ -2,7 +2,6 @@ package de.btobastian.javacord.entities.auditlog.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.ExplicitContentFilterLevel;
 import de.btobastian.javacord.entities.*;
 import de.btobastian.javacord.entities.auditlog.*;
 import de.btobastian.javacord.entities.impl.ImplIcon;

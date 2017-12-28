@@ -1,4 +1,4 @@
-package de.btobastian.javacord;
+package de.btobastian.javacord.entities;
 
 /**
  * This enum contains all explicit content filter levels.
