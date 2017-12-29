@@ -96,7 +96,7 @@ public class ListenerManager<T> {
 
     /**
      * Gets the class of the object, the listener was added to.
-     * For global listeners, it returns {@link DiscordApi#getClass()}.
+     * For global listeners, it returns the class of {@link DiscordApi}.
      *
      * @return The class of the object, the listener was added to.
      */
