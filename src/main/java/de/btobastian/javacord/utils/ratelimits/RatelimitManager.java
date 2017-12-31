@@ -155,7 +155,7 @@ public class RatelimitManager {
                                     .getEndpoint()
                                     .getHardcodedRatelimit()
                                     .map(ratelimit -> currentTime + api.getTimeOffset() + ratelimit)
-                                    .orElseGet(() -> Long.parseLong(result.getResponse().header("X-RateLimit-Reset")) * 1000);
+                                    .orElseGet(() -> Long.parseLong(result.getResponse().header("X-RateLimit-Reset", "0")) * 1000);
                             String global = result.getResponse().header("X-RateLimit-Global");
 
                             if (global != null && global.equals("true")) {
