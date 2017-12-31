@@ -148,8 +148,6 @@ public class RatelimitManager {
                             bucket.setRateLimitRemaining(0);
                             bucket.setRateLimitResetTimestamp(currentTime + retryAfter);
                         } else {
-                            restRequest.getResult().complete(result);
-
                             String remaining = result.getResponse().header("X-RateLimit-Remaining", "1");
                             long reset = restRequest
                                     .getEndpoint()
@@ -165,6 +163,8 @@ public class RatelimitManager {
 
                             bucket.setRateLimitRemaining(Integer.parseInt(remaining));
                             bucket.setRateLimitResetTimestamp(reset);
+
+                            restRequest.getResult().complete(result);
                         }
                     } catch (Exception e) {
                         restRequest.getResult().completeExceptionally(e);
