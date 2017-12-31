@@ -34,6 +34,9 @@ import de.btobastian.javacord.utils.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.utils.handler.user.TypingStartHandler;
 import de.btobastian.javacord.utils.handler.user.UserUpdateHandler;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
+import de.btobastian.javacord.utils.rest.RestRequest;
 import org.slf4j.Logger;
 
 import javax.net.ssl.SSLContext;
@@ -45,6 +48,9 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -59,10 +65,14 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     private static final Logger logger = LoggerUtil.getLogger(DiscordWebSocketAdapter.class);
 
+    private static String gateway;
+    private static final ReadWriteLock gatewayLock = new ReentrantReadWriteLock();
+    private static final Lock gatewayReadLock = gatewayLock.readLock();
+    private static final Lock gatewayWriteLock = gatewayLock.writeLock();
+
     private final DiscordApi api;
     private final HashMap<String, PacketHandler> handlers = new HashMap<>();
     private final CompletableFuture<Boolean> ready = new CompletableFuture<>();
-    private final String gateway;
 
     private WebSocket websocket = null;
 
@@ -83,15 +93,39 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     // A reconnect attempt counter
     private int reconnectAttempt = 0;
 
-    public DiscordWebSocketAdapter(DiscordApi api, String gateway) {
+    public DiscordWebSocketAdapter(DiscordApi api) {
         this.api = api;
-        this.gateway = gateway;
 
         this.listenerExecutorService = api.getThreadPool().getSingleThreadExecutorService("listeners");
 
         registerHandlers();
 
         connect();
+    }
+
+    private static String getGateway(DiscordApi api) {
+        gatewayReadLock.lock();
+        if (gateway == null) {
+            gatewayReadLock.unlock();
+            gatewayWriteLock.lock();
+            try {
+                if (gateway == null) {
+                    gateway = new RestRequest<String>(api, RestMethod.GET, RestEndpoint.GATEWAY)
+                            .includeAuthorizationHeader(false)
+                            .execute(result -> result.getJsonBody().get("url").asText())
+                            .join();
+                }
+                gatewayReadLock.lock();
+            } finally {
+                gatewayWriteLock.unlock();
+            }
+        }
+
+        try {
+            return gateway;
+        } finally {
+            gatewayReadLock.unlock();
+        }
     }
 
     /**
@@ -110,7 +144,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             logger.warn("An error occurred while setting ssl context", e);
         }
         try {
-            websocket = factory.createSocket(gateway + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION);
+            websocket = factory.createSocket(getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
             websocket.connect();
@@ -121,7 +155,15 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
                 // Reconnect after a (short?) delay depending on the amount of reconnect attempts
                 api.getThreadPool().getScheduler()
-                        .schedule(this::connect, api.getReconnectDelay(reconnectAttempt), TimeUnit.SECONDS);
+                        .schedule(() -> {
+                            gatewayWriteLock.lock();
+                            try {
+                                gateway = null;
+                            } finally {
+                                gatewayWriteLock.unlock();
+                            }
+                            this.connect();
+                        }, api.getReconnectDelay(reconnectAttempt), TimeUnit.SECONDS);
             }
         }
     }
