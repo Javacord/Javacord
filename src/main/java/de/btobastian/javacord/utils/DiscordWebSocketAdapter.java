@@ -48,12 +48,16 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
+
+import static com.neovisionaries.ws.client.WebSocketFrame.createTextFrame;
+import static java.util.Collections.synchronizedList;
 
 /**
  * The main websocket adapter.
@@ -85,6 +89,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private boolean heartbeatAckReceived = false;
 
     private boolean reconnect = true;
+
+    private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify = new AtomicMarkableReference<>(null, false);
+    private final List<WebSocketListener> identifyFrameListeners = synchronizedList(new ArrayList<>());
 
     private long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
@@ -311,10 +318,15 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 connect();
                 break;
             case 9:
-                // Invalid session :(
-                logger.info("Could not resume session. Reconnecting in 5 seconds...");
-                Thread.sleep(5000);
-                sendIdentify(websocket);
+                if (lastSentFrameWasIdentify.isMarked()) {
+                    logger.info("Hit identifying rate limit. Retrying in 5 seconds...");
+                    Thread.sleep(5000);
+                    sendIdentify(websocket);
+                } else {
+                    // Invalid session :(
+                    logger.info("Could not resume session. Reconnecting now...");
+                    sendIdentify(websocket);
+                }
                 break;
             case 10:
                 JsonNode data = packet.get("d");
@@ -426,8 +438,30 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         if (api.getTotalShards() > 1) {
             data.putArray("shard").add(api.getCurrentShard()).add(api.getTotalShards());
         }
+        // remove eventually still registered listeners
+        while (!identifyFrameListeners.isEmpty()) {
+            websocket.removeListener(identifyFrameListeners.remove(0));
+        }
+        WebSocketFrame identifyFrame = createTextFrame(identifyPacket.toString());
+        lastSentFrameWasIdentify.set(identifyFrame, false);
+        WebSocketAdapter identifyFrameListener = new WebSocketAdapter() {
+            @Override
+            public void onFrameSent(WebSocket websocket, WebSocketFrame frame) {
+                if (lastSentFrameWasIdentify.isMarked()) {
+                    // sending frame after identify was sent => unset mark
+                    lastSentFrameWasIdentify.set(null, false);
+                    websocket.removeListener(this);
+                    identifyFrameListeners.remove(this);
+                } else {
+                    // identify frame is actually sent => set the mark
+                    lastSentFrameWasIdentify.compareAndSet(frame, null, false, true);
+                }
+            }
+        };
+        identifyFrameListeners.add(identifyFrameListener);
+        websocket.addListener(identifyFrameListener);
         logger.debug("Sending identify packet");
-        websocket.sendText(identifyPacket.toString());
+        websocket.sendFrame(identifyFrame);
     }
 
     /**
