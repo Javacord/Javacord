@@ -82,8 +82,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private int lastSeq = -1;
     private String sessionId = null;
 
-    private boolean heartbeatAckReceived = false;
-
     private boolean reconnect = true;
 
     private long lastGuildMembersChunkReceived = System.currentTimeMillis();
@@ -246,8 +244,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 if (type.equals("RESUMED")) {
                     reconnectAttempt = 0;
-                    // We are the one who send the first heartbeat
-                    heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     logger.debug("Received RESUMED packet");
 
@@ -258,8 +254,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 if (type.equals("READY")) {
                     reconnectAttempt = 0;
-                    // We are the one who send the first heartbeat
-                    heartbeatAckReceived = true;
                     heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     sessionId = packet.get("d").get("session_id").asText();
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
@@ -322,7 +316,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 logger.debug("Received HELLO packet");
                 break;
             case 11:
-                heartbeatAckReceived = true;
+                // heartbeat ack received
                 break;
             default:
                 logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
@@ -369,7 +363,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                heartbeatAckReceived = false;
                 sendHeartbeat(websocket);
                 logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
             }
