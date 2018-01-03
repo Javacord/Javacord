@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -69,7 +70,19 @@ public class DiscordApiBuilder {
      * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
     public Collection<CompletableFuture<DiscordApi>> loginAllShards() {
-        return loginShards(IntStream.range(0, totalShards).toArray());
+        return loginShards(shard -> true);
+    }
+
+    /**
+     * Login shards adhering to the given predicate to the account with the given token.
+     * It is invalid to call {@link #setCurrentShard(int)} with
+     * anything but {@code 0} before calling this method.
+     *
+     * @param shardsCondition The predicate for identifying shards to connect, starting with {@code 0}!
+     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     */
+    public Collection<CompletableFuture<DiscordApi>> loginShards(IntPredicate shardsCondition) {
+        return loginShards(IntStream.range(0, totalShards).filter(shardsCondition).toArray());
     }
 
     /**
