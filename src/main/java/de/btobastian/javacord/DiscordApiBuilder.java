@@ -9,7 +9,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
+import de.btobastian.javacord.utils.rest.RestRequest;
+import de.btobastian.javacord.utils.rest.RestRequestResult;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
@@ -193,5 +199,37 @@ public class DiscordApiBuilder {
         }
         this.currentShard = currentShard;
         return this;
+    }
+
+    /**
+     * Retrieves the recommended shards count from the Discord API and sets it in this builder.
+     * Sharding allows you to split your bot into several independent instances.
+     * A shard only handles a subset of a bot's servers.
+     *
+     * @return The current instance in order to chain call methods.
+     * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
+     */
+    public CompletableFuture<DiscordApiBuilder> setRecommendedTotalShards() {
+        CompletableFuture<DiscordApiBuilder> future = new CompletableFuture<>();
+        if (token == null) {
+            future.completeExceptionally(new IllegalArgumentException("You cannot request the recommended total shards without a token!"));
+            return future;
+        }
+
+        RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(new ImplDiscordApi(token), RestMethod.GET, RestEndpoint.GATEWAY_BOT);
+        botGatewayRequest
+                .execute(RestRequestResult::getJsonBody)
+                .thenAccept(resultJson -> {
+                    DiscordWebSocketAdapter.setGateway(resultJson.get("url").asText());
+                    setTotalShards(resultJson.get("shards").asInt());
+                    future.complete(DiscordApiBuilder.this);
+                })
+                .exceptionally(t -> {
+                    future.completeExceptionally(t);
+                    return null;
+                })
+                .whenComplete((nothing, throwable) -> botGatewayRequest.getApi().disconnect());
+
+        return future;
     }
 }

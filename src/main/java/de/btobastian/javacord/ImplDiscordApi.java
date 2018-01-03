@@ -199,6 +199,16 @@ public class ImplDiscordApi implements DiscordApi {
             new ConcurrentHashMap<>();
 
     /**
+     * Creates a new discord api instance that can be used for auto-ratelimited REST calls,
+     * but does not connect to the Discord WebSocket.
+     *
+     * @param token The token used to connect without any account type specific prefix.
+     */
+    public ImplDiscordApi(String token) {
+        this(AccountType.BOT, token, 0, 1, null);
+    }
+
+    /**
      * Creates a new discord api instance.
      *
      * @param accountType The account type of the instance.
@@ -228,43 +238,47 @@ public class ImplDiscordApi implements DiscordApi {
                         .build()))
                 .build();
 
-        getThreadPool().getExecutorService().submit(() -> {
-            try {
-                this.websocketAdapter = new DiscordWebSocketAdapter(this);
-                this.websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
-                    if (readyReceived) {
-                        if (accountType == AccountType.BOT) {
-                            getApplicationInfo().whenComplete((applicationInfo, exception) -> {
-                                if (exception != null) {
-                                   logger.error("Could not access self application info on startup!", exception);
-                                } else {
-                                    clientId = applicationInfo.getClientId();
-                                    ownerId = applicationInfo.getOwnerId();
-                                }
+        if (ready != null) {
+            getThreadPool().getExecutorService().submit(() -> {
+                try {
+                    this.websocketAdapter = new DiscordWebSocketAdapter(this);
+                    this.websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
+                        if (readyReceived) {
+                            if (accountType == AccountType.BOT) {
+                                getApplicationInfo().whenComplete((applicationInfo, exception) -> {
+                                    if (exception != null) {
+                                       logger.error("Could not access self application info on startup!", exception);
+                                    } else {
+                                        clientId = applicationInfo.getClientId();
+                                        ownerId = applicationInfo.getOwnerId();
+                                    }
+                                    ready.complete(this);
+                                });
+                            } else {
                                 ready.complete(this);
-                            });
+                            }
                         } else {
-                            ready.complete(this);
+                            ready.completeExceptionally(
+                                    new IllegalStateException("Websocket closed before READY packet was received!"));
                         }
-                    } else {
-                        ready.completeExceptionally(
-                                new IllegalStateException("Websocket closed before READY packet was received!"));
+                    });
+                } catch (Throwable t) {
+                    if (websocketAdapter != null) {
+                        websocketAdapter.disconnect();
                     }
-                });
-            } catch (Throwable t) {
-                if (websocketAdapter != null) {
-                    websocketAdapter.disconnect();
+                    ready.completeExceptionally(t);
                 }
-                ready.completeExceptionally(t);
-            }
-        });
+            });
 
-        getThreadPool().getScheduler().scheduleAtFixedRate(
-                () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
-                , 30, 30, TimeUnit.SECONDS);
+            getThreadPool().getScheduler().scheduleAtFixedRate(
+                    () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
+                    , 30, 30, TimeUnit.SECONDS);
 
-        // Add shutdown hook
-        ready.thenAccept(api -> Runtime.getRuntime().addShutdownHook(new Thread(api::disconnect)));
+            // Add shutdown hook
+            ready.thenAccept(api -> Runtime.getRuntime().addShutdownHook(new Thread(api::disconnect)));
+        } else {
+            Runtime.getRuntime().addShutdownHook(new Thread(this::disconnect));
+        }
     }
 
     /**
@@ -681,7 +695,9 @@ public class ImplDiscordApi implements DiscordApi {
     public void disconnect() {
         synchronized (disconnectCalledLock) {
             if (!disconnectCalled) {
-                websocketAdapter.disconnect();
+                if (websocketAdapter != null) {
+                    websocketAdapter.disconnect();
+                }
                 threadPool.shutdown();
             }
             disconnectCalled = true;

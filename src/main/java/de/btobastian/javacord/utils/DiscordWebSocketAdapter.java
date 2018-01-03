@@ -144,6 +144,15 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         }
     }
 
+    public static void setGateway(String gateway) {
+        gatewayWriteLock.lock();
+        try {
+            DiscordWebSocketAdapter.gateway = gateway;
+        } finally {
+            gatewayWriteLock.unlock();
+        }
+    }
+
     /**
      * Disconnects from the websocket.
      */
