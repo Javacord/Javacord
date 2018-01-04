@@ -65,10 +65,23 @@ public interface MessageAuthor extends DiscordEntity {
      * Checks if the author is the owner of the current account.
      * Always returns <code>false</code> if logged in to a user account.
      *
-     * @return Whether thi author is the owner of the current account.
+     * @return Whether the author is the owner of the current account.
      */
     default boolean isBotOwner() {
         return getApi().getAccountType() == AccountType.BOT && isUser() && getApi().getOwnerId() == getId();
+    }
+
+    /**
+     * Checks if the author is an administrator of the server where the message was sent.
+     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
+     *
+     * @return Whether the author is an administrator of the server or not.
+     */
+    default boolean isServerAdmin() {
+        return getMessage()
+                .getServer()
+                .flatMap(server -> asUser().map(server::isAdmin))
+                .orElse(false);
     }
 
     /**
