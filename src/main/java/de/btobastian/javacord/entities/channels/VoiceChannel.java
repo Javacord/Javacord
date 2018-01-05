@@ -24,8 +24,9 @@ public interface VoiceChannel extends Channel {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severTextChannel.get().hasPermissions(user, PermissionType.VOICE_CONNECT);
+                || severTextChannel.get().hasAnyPermission(user,
+                                                           PermissionType.ADMINISTRATOR,
+                                                           PermissionType.VOICE_CONNECT);
     }
 
     /**
@@ -41,8 +42,9 @@ public interface VoiceChannel extends Channel {
         }
         Optional<ServerVoiceChannel> serverVoiceChannel = asServerVoiceChannel();
         return !serverVoiceChannel.isPresent()
-                || serverVoiceChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || serverVoiceChannel.get().hasPermissions(user, PermissionType.VOICE_MUTE_MEMBERS);
+                || serverVoiceChannel.get().hasAnyPermission(user,
+                                                             PermissionType.ADMINISTRATOR,
+                                                             PermissionType.VOICE_MUTE_MEMBERS);
     }
 
 }

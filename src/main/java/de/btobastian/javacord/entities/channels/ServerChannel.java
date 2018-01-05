@@ -228,11 +228,37 @@ public interface ServerChannel extends Channel {
      *
      * @param user The user to check.
      * @param type The permission type(s) to check.
-     * @return Whether the user has all given permissions of not.
+     * @return Whether the user has all given permissions or not.
      * @see #getEffectiveAllowedPermissions(User)
      */
     default boolean hasPermissions(User user, PermissionType... type) {
         return getEffectiveAllowedPermissions(user).containsAll(Arrays.asList(type));
+    }
+
+    /**
+     * Checks if the user has any of a given set of permissions.
+     *
+     * @param user The user to check.
+     * @param type The permission type(s) to check.
+     * @return Whether the user has any of the given permissions or not.
+     * @see #getEffectiveAllowedPermissions(User)
+     */
+    default boolean hasAnyPermission(User user, PermissionType... type) {
+        return getEffectiveAllowedPermissions(user).stream().anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
+    }
+
+    /**
+     * Checks if a user has a given permission.
+     * Remember, that some permissions affect others!
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
+     *
+     * @param user The user.
+     * @param permission The permission to check.
+     * @return Whether the user has the permission or not.
+     */
+    default boolean hasPermission(User user, PermissionType permission) {
+        return getEffectiveAllowedPermissions(user).contains(permission);
     }
 
     /**
@@ -262,8 +288,9 @@ public interface ServerChannel extends Channel {
             return false;
         }
         // The user must be admin or have the CREATE_INSTANT_INVITE permission
-        return hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || hasPermissions(user, PermissionType.CREATE_INSTANT_INVITE);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.CREATE_INSTANT_INVITE);
     }
 
     /**

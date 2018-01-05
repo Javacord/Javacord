@@ -135,8 +135,9 @@ public interface Channel extends DiscordEntity {
         }
         Optional<ServerChannel> severChannel = asServerChannel();
         return !severChannel.isPresent()
-                || severChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severChannel.get().hasPermissions(user, PermissionType.READ_MESSAGES);
+                || severChannel.get().hasAnyPermission(user,
+                                                       PermissionType.ADMINISTRATOR,
+                                                       PermissionType.READ_MESSAGES);
     }
 
 }
