@@ -264,11 +264,23 @@ public interface Server extends DiscordEntity {
      *
      * @param user The user to check.
      * @param type The permission type(s) to check.
-     * @return Whether the user has all given permissions of not.
+     * @return Whether the user has all given permissions or not.
      * @see #getAllowedPermissionsOf(User)
      */
     default boolean hasPermissions(User user, PermissionType... type) {
         return getAllowedPermissionsOf(user).containsAll(Arrays.asList(type));
+    }
+
+    /**
+     * Checks if the user has any of a given set of permissions.
+     *
+     * @param user The user to check.
+     * @param type The permission type(s) to check.
+     * @return Whether the user has any of the given permissions or not.
+     * @see #getAllowedPermissionsOf(User)
+     */
+    default boolean hasAnyPermission(User user, PermissionType... type) {
+        return getAllowedPermissionsOf(user).stream().anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
     }
 
     /**
@@ -1012,7 +1024,7 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user is an administrator of the server or not.
      */
     default boolean isAdmin(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR);
+        return hasPermission(user, PermissionType.ADMINISTRATOR);
     }
 
     /**
@@ -1022,8 +1034,9 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user can create channels or not.
      */
     default boolean canCreateChannels(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermissions(user, PermissionType.MANAGE_CHANNELS);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.MANAGE_CHANNELS);
     }
 
     /**
@@ -1033,8 +1046,9 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user view the audit log or not.
      */
     default boolean canViewAuditLog(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermissions(user, PermissionType.VIEW_AUDIT_LOG);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.VIEW_AUDIT_LOG);
     }
 
     /**
@@ -1044,9 +1058,10 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user can change its own nickname or not.
      */
     default boolean canChangeOwnNickname(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermissions(user, PermissionType.CHANGE_NICKNAME) ||
-                hasPermission(user, PermissionType.MANAGE_NICKNAMES);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.CHANGE_NICKNAME,
+                                PermissionType.MANAGE_NICKNAMES);
     }
 
     /**
@@ -1056,8 +1071,9 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user can manage nicknames or not.
      */
     default boolean canManageNicknames(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermission(user, PermissionType.MANAGE_NICKNAMES);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.MANAGE_NICKNAMES);
     }
 
     /**
@@ -1067,8 +1083,9 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user can manage emojis or not.
      */
     default boolean canManageEmojis(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermission(user, PermissionType.MANAGE_EMOJIS);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.MANAGE_EMOJIS);
     }
 
     /**
@@ -1078,8 +1095,9 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user can kick users or not.
      */
     default boolean canKickUsers(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermissions(user, PermissionType.KICK_MEMBERS);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.KICK_MEMBERS);
     }
 
     /**
@@ -1106,8 +1124,9 @@ public interface Server extends DiscordEntity {
      * @return Whether the given user can ban users or not.
      */
     default boolean canBanUsers(User user) {
-        return hasPermissions(user, PermissionType.ADMINISTRATOR) ||
-                hasPermissions(user, PermissionType.BAN_MEMBERS);
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.BAN_MEMBERS);
     }
 
     /**
