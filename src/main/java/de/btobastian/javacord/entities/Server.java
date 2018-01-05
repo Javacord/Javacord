@@ -1089,6 +1089,18 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the given user can manage the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can manage the server or not.
+     */
+    default boolean canManageServer(User user) {
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.MANAGE_SERVER);
+    }
+
+    /**
      * Checks if the given user can kick users from the server.
      *
      * @param user The user to check.
