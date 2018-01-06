@@ -37,9 +37,6 @@ import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
-import de.btobastian.javacord.utils.rest.RestEndpoint;
-import de.btobastian.javacord.utils.rest.RestMethod;
-import de.btobastian.javacord.utils.rest.RestRequest;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 
@@ -231,46 +228,40 @@ public class ImplDiscordApi implements DiscordApi {
                         .build()))
                 .build();
 
-        RestEndpoint endpoint = RestEndpoint.GATEWAY_BOT;
-        if (accountType == AccountType.CLIENT) {
-            endpoint = RestEndpoint.GATEWAY;
-        }
-
-        new RestRequest<String>(this, RestMethod.GET, endpoint)
-                .includeAuthorizationHeader(accountType == AccountType.BOT)
-                .execute(result -> result.getJsonBody().get("url").asText())
-                .whenComplete((gateway, t) -> {
-                    if (t != null) {
-                        ready.completeExceptionally(t);
-                        return;
-                    }
-
-                    websocketAdapter = new DiscordWebSocketAdapter(this, gateway);
-                    websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
-                        if (readyReceived) {
-                            if (accountType == AccountType.BOT) {
-                                getApplicationInfo().whenComplete((applicationInfo, exception) -> {
-                                    if (exception != null) {
-                                       logger.error("Could not access self application info on startup!", exception);
-                                    } else {
-                                        clientId = applicationInfo.getClientId();
-                                        ownerId = applicationInfo.getOwnerId();
-                                    }
-                                    ready.complete(this);
-                                });
-                            } else {
+        getThreadPool().getExecutorService().submit(() -> {
+            try {
+                this.websocketAdapter = new DiscordWebSocketAdapter(this);
+                this.websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
+                    if (readyReceived) {
+                        if (accountType == AccountType.BOT) {
+                            getApplicationInfo().whenComplete((applicationInfo, exception) -> {
+                                if (exception != null) {
+                                   logger.error("Could not access self application info on startup!", exception);
+                                } else {
+                                    clientId = applicationInfo.getClientId();
+                                    ownerId = applicationInfo.getOwnerId();
+                                }
                                 ready.complete(this);
-                            }
+                            });
                         } else {
-                            ready.completeExceptionally(
-                                    new IllegalStateException("Websocket closed before READY packet was received!"));
+                            ready.complete(this);
                         }
-                    });
-
-                    getThreadPool().getScheduler().scheduleAtFixedRate(
-                            () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
-                            , 30, 30, TimeUnit.SECONDS);
+                    } else {
+                        ready.completeExceptionally(
+                                new IllegalStateException("Websocket closed before READY packet was received!"));
+                    }
                 });
+            } catch (Throwable t) {
+                if (websocketAdapter != null) {
+                    websocketAdapter.disconnect();
+                }
+                ready.completeExceptionally(t);
+            }
+        });
+
+        getThreadPool().getScheduler().scheduleAtFixedRate(
+                () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
+                , 30, 30, TimeUnit.SECONDS);
 
         // Add shutdown hook
         ready.thenAccept(api -> Runtime.getRuntime().addShutdownHook(new Thread(api::disconnect)));
