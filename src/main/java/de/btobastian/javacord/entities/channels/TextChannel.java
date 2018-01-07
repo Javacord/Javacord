@@ -83,7 +83,7 @@ public interface TextChannel extends Channel, Messageable {
                 future.completeExceptionally(e);
                 return future;
             }
-            
+
             request.setMultipartBody(new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("payload_json", body.toString())
@@ -353,7 +353,7 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || severTextChannel.get()
                 .hasPermissions(user, PermissionType.READ_MESSAGES, PermissionType.SEND_MESSAGES);
     }
@@ -374,8 +374,9 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severTextChannel.get().hasPermissions(user, PermissionType.USE_EXTERNAL_EMOJIS);
+                || severTextChannel.get().hasAnyPermission(user,
+                                                           PermissionType.ADMINISTRATOR,
+                                                           PermissionType.USE_EXTERNAL_EMOJIS);
     }
 
     /**
@@ -393,8 +394,9 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severTextChannel.get().hasPermissions(user, PermissionType.EMBED_LINKS);
+                || severTextChannel.get().hasAnyPermission(user,
+                                                           PermissionType.ADMINISTRATOR,
+                                                           PermissionType.EMBED_LINKS);
     }
 
     /**
@@ -411,8 +413,9 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severTextChannel.get().hasPermissions(user, PermissionType.READ_MESSAGE_HISTORY);
+                || severTextChannel.get().hasAnyPermission(user,
+                                                           PermissionType.ADMINISTRATOR,
+                                                           PermissionType.READ_MESSAGE_HISTORY);
     }
 
     /**
@@ -430,8 +433,9 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severTextChannel.get().hasPermissions(user, PermissionType.SEND_TTS_MESSAGES);
+                || severTextChannel.get().hasAnyPermission(user,
+                                                           PermissionType.ADMINISTRATOR,
+                                                           PermissionType.SEND_TTS_MESSAGES);
     }
 
     /**
@@ -451,8 +455,8 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || (severTextChannel.get().hasPermissions(user, PermissionType.ATTACH_FILE)
+                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
+                || (severTextChannel.get().hasPermission(user, PermissionType.ATTACH_FILE)
                 && severTextChannel.get().canWrite(user));
     }
 
@@ -473,7 +477,7 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || severTextChannel.get().hasPermissions(user,
                 PermissionType.READ_MESSAGES,
                 PermissionType.READ_MESSAGE_HISTORY,
@@ -494,8 +498,9 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || severTextChannel.get().hasPermissions(user, PermissionType.MANAGE_MESSAGES);
+                || severTextChannel.get().hasAnyPermission(user,
+                                                           PermissionType.ADMINISTRATOR,
+                                                           PermissionType.MANAGE_MESSAGES);
     }
 
     /**
@@ -512,8 +517,8 @@ public interface TextChannel extends Channel, Messageable {
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
-                || severTextChannel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
-                || (severTextChannel.get().hasPermissions(user, PermissionType.MENTION_EVERYONE)
+                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
+                || (severTextChannel.get().hasPermission(user, PermissionType.MENTION_EVERYONE)
                 && severTextChannel.get().canWrite(user));
     }
 

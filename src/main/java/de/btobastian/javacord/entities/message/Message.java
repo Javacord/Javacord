@@ -694,7 +694,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     default boolean canAddNewReactions(User user) {
         Optional<ServerTextChannel> channel = getServerTextChannel();
         return !channel.isPresent()
-                || channel.get().hasPermissions(user, PermissionType.ADMINISTRATOR)
+                || channel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || channel.get().hasPermissions(user,
                     PermissionType.READ_MESSAGES,
                     PermissionType.READ_MESSAGE_HISTORY,
