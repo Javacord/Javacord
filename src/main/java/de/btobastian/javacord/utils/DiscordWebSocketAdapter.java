@@ -59,10 +59,6 @@ import java.util.function.Consumer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-import static com.neovisionaries.ws.client.WebSocketFrame.createTextFrame;
-import static java.util.Collections.synchronizedList;
-import static java.util.Collections.synchronizedMap;
-
 /**
  * The main websocket adapter.
  */
@@ -94,8 +90,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private boolean reconnect = true;
 
-    private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify = new AtomicMarkableReference<>(null, false);
-    private final List<WebSocketListener> identifyFrameListeners = synchronizedList(new ArrayList<>());
+    private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify =
+            new AtomicMarkableReference<>(null, false);
+    private final List<WebSocketListener> identifyFrameListeners = Collections.synchronizedList(new ArrayList<>());
 
     private long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
@@ -104,7 +101,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     // A reconnect attempt counter
     private int reconnectAttempt = 0;
 
-    private static final Map<String, Long> lastIdentificationPerAccount = synchronizedMap(new HashMap<>());
+    private static final Map<String, Long> lastIdentificationPerAccount = Collections.synchronizedMap(new HashMap<>());
     private static final ConcurrentMap<String, Semaphore> connectionDelaySemaphorePerAccount = new ConcurrentHashMap<>();
 
     static {
@@ -474,7 +471,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         while (!identifyFrameListeners.isEmpty()) {
             websocket.removeListener(identifyFrameListeners.remove(0));
         }
-        WebSocketFrame identifyFrame = createTextFrame(identifyPacket.toString());
+        WebSocketFrame identifyFrame = WebSocketFrame.createTextFrame(identifyPacket.toString());
         lastSentFrameWasIdentify.set(identifyFrame, false);
         WebSocketAdapter identifyFrameListener = new WebSocketAdapter() {
             @Override
