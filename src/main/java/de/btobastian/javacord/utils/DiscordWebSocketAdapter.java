@@ -100,10 +100,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private static final ConcurrentMap<String, Semaphore> connectionDelaySemaphorePerAccount = new ConcurrentHashMap<>();
 
     static {
+        // This scheduler makes sure that the semaphores get released after a while if it failed in the listener
+        // for whatever reason. It's just a fail-safe.
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() ->
             connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
                 if ((semaphore.availablePermits() == 0) &&
-                        ((System.currentTimeMillis() - lastIdentificationPerAccount.get(token)) >= 15_000)) {
+                        ((System.currentTimeMillis() - lastIdentificationPerAccount.get(token)) >= 15000)) {
                     semaphore.release();
                 }
             }), 10, 10, TimeUnit.SECONDS);
