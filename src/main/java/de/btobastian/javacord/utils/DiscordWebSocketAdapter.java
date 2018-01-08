@@ -352,7 +352,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     sendIdentify(websocket);
                 } else {
                     // Invalid session :(
-                    int zeroToFourSeconds = new Random().nextInt(4000);
+                    int zeroToFourSeconds = (int) (Math.random() * 4000);
                     logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
                                 1 + zeroToFourSeconds / 1000,
                                 1 + zeroToFourSeconds / 100 % 10);
