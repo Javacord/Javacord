@@ -557,6 +557,17 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Removes a user from the list of reactors of a given emoji reaction.
+     *
+     * @param emoji The emoji of the reaction.
+     * @param user The user to remove.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> removeReactionByEmoji(Emoji emoji, User user) {
+        return Reaction.removeUser(getApi(), getChannel().getId(), getId(), emoji, user);
+    }
+
+    /**
      * Gets the server text channel of the message.
      * Only present if the message was sent in a server.
      *
