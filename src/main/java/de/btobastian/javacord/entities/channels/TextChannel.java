@@ -184,7 +184,7 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
-     * Gets a message by it's id.
+     * Gets a message by its id.
      *
      * @param id The id of the message.
      * @return The message with the given id.
@@ -198,7 +198,7 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
-     * Gets a message by it's id.
+     * Gets a message by its id.
      *
      * @param id The id of the message.
      * @return The message with the given id.

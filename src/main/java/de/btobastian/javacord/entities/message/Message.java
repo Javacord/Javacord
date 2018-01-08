@@ -503,7 +503,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     List<Role> getMentionedRoles();
 
     /**
-     * Gets a reaction by it's emoji.
+     * Gets a reaction by its emoji.
      *
      * @param emoji The emoji of the reaction.
      * @return The reaction for the given emoji.
@@ -513,7 +513,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
-     * Gets a reaction by it's unicode emoji.
+     * Gets a reaction by its unicode emoji.
      *
      * @param unicodeEmoji The unicode emoji of the reaction.
      * @return The reaction for the given emoji.

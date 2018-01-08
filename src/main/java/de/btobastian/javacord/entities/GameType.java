@@ -48,7 +48,7 @@ public enum GameType {
     }
 
     /**
-     * Gets the game type by it's id.
+     * Gets the game type by its id.
      *
      * @param id The id of the game type
      * @return The game type with the given id or {@link GameType#GAME} if unknown id.

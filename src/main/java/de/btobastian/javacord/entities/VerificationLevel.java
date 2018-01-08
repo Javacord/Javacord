@@ -36,7 +36,7 @@ public enum VerificationLevel {
     }
 
     /**
-     * Gets the verification level by it's id.
+     * Gets the verification level by its id.
      *
      * @param id The id of the verification level.
      * @return The verification level with the given id.

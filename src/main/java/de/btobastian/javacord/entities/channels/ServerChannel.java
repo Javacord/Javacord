@@ -44,7 +44,7 @@ public interface ServerChannel extends Channel {
     /**
      * Gets the raw position of the channel.
      * This is the positions sent from Discord and might not be unique and have gaps.
-     * Also every channel type (text, voice and category) has it's own position counter.
+     * Also every channel type (text, voice and category) has its own position counter.
      *
      * @return The raw position of the channel.
      */

@@ -33,7 +33,7 @@ public enum DefaultMessageNotificationLevel {
     }
 
     /**
-     * Gets the default message notification level by it's id.
+     * Gets the default message notification level by its id.
      *
      * @param id The id of the default message notification level.
      * @return The default message notification level with the given id.

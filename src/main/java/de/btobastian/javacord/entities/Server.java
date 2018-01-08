@@ -154,7 +154,7 @@ public interface Server extends DiscordEntity {
     List<Role> getRoles();
 
     /**
-     * Gets a role by it's id.
+     * Gets a role by its id.
      *
      * @param id The id of the role.
      * @return The role with the given id.
@@ -162,7 +162,7 @@ public interface Server extends DiscordEntity {
     Optional<Role> getRoleById(long id);
 
     /**
-     * Gets a role by it's id.
+     * Gets a role by its id.
      *
      * @param id The id of the role.
      * @return The role with the given id.
@@ -644,7 +644,7 @@ public interface Server extends DiscordEntity {
     Collection<CustomEmoji> getCustomEmojis();
 
     /**
-     * Gets a custom emoji in this server by it's id.
+     * Gets a custom emoji in this server by its id.
      *
      * @param id The id of the emoji.
      * @return The emoji with the given id.
@@ -654,7 +654,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a custom emoji in this server by it's id.
+     * Gets a custom emoji in this server by its id.
      *
      * @param id The id of the emoji.
      * @return The emoji with the given id.
@@ -776,7 +776,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a channel by it's id.
+     * Gets a channel by its id.
      *
      * @param id The id of the channel.
      * @return The channel with the given id.
@@ -784,7 +784,7 @@ public interface Server extends DiscordEntity {
     Optional<ServerChannel> getChannelById(long id);
 
     /**
-     * Gets a channel by it's id.
+     * Gets a channel by its id.
      *
      * @param id The id of the channel.
      * @return The channel with the given id.
@@ -824,7 +824,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a channel category by it's id.
+     * Gets a channel category by its id.
      *
      * @param id The id of the channel category.
      * @return The channel category with the given id.
@@ -836,7 +836,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a channel category by it's id.
+     * Gets a channel category by its id.
      *
      * @param id The id of the channel category.
      * @return The channel category with the given id.
@@ -876,7 +876,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a text channel by it's id.
+     * Gets a text channel by its id.
      *
      * @param id The id of the text channel.
      * @return The text channel with the given id.
@@ -888,7 +888,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a text channel by it's id.
+     * Gets a text channel by its id.
      *
      * @param id The id of the text channel.
      * @return The text channel with the given id.
@@ -928,7 +928,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a voice channel by it's id.
+     * Gets a voice channel by its id.
      *
      * @param id The id of the voice channel.
      * @return The voice channel with the given id.
@@ -940,7 +940,7 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Gets a voice channel by it's id.
+     * Gets a voice channel by its id.
      *
      * @param id The id of the voice channel.
      * @return The voice channel with the given id.

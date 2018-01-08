@@ -81,7 +81,7 @@ public class UserChangeAvatarEvent extends UserEvent {
     }
 
     /**
-     * Gets the avatar by it's hash.
+     * Gets the avatar by its hash.
      *
      * @param avatarHash The hash of the avatar.
      * @return The icon with the given hash.

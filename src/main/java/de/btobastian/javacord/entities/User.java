@@ -36,9 +36,9 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     }
 
     /**
-     * Gets the mention tag, to mention the user with it's nickname, instead of it's normal name.
+     * Gets the mention tag, to mention the user with its nickname, instead of its normal name.
      *
-     * @return The mention tag, to mention the user with it's nickname.
+     * @return The mention tag, to mention the user with its nickname.
      */
     default String getNicknameMentionTag() {
         return "<@!" + getId() + ">";

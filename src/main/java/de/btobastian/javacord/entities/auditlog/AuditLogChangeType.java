@@ -76,7 +76,7 @@ public enum AuditLogChangeType {
     }
 
     /**
-     * Gets the type by it's name.
+     * Gets the type by its name.
      *
      * @param name The name of the type.
      * @return The type with the given name.

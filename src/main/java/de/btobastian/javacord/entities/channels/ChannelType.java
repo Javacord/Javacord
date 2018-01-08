@@ -36,7 +36,7 @@ public enum ChannelType {
     }
 
     /**
-     * Gets a channel type by it's id.
+     * Gets a channel type by its id.
      *
      * @param id The id of the channel type.
      * @return The channel type with the given id.

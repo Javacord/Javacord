@@ -34,7 +34,7 @@ public enum ExplicitContentFilterLevel {
     }
 
     /**
-     * Gets the explicit content filter level by it's id.
+     * Gets the explicit content filter level by its id.
      *
      * @param id The id of the explicit content filter level.
      * @return The explicit content filter level with the given id.
