@@ -616,6 +616,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     @Override
+    public void handleCallbackError(WebSocket websocket, Throwable cause) throws Exception {
+        logger.error("Websocket callback error!", cause);
+    }
+
+    @Override
     public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
         logger.warn("Websocket onUnexpected error!", cause);
     }
