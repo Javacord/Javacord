@@ -31,6 +31,7 @@ public class GuildMemberAddHandler extends PacketHandler {
                 .map(server -> (ImplServer) server)
                 .ifPresent(server -> {
                     server.addMember(packet);
+                    server.incrementMemberCount();
                     User user = api.getOrCreateUser(packet.get("user"));
 
                     ServerMemberJoinEvent event = new ServerMemberJoinEvent(api, server, user);

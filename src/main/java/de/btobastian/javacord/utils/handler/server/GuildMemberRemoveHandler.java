@@ -32,6 +32,7 @@ public class GuildMemberRemoveHandler extends PacketHandler {
                 .ifPresent(server -> {
                     User user = api.getOrCreateUser(packet.get("user"));
                     server.removeMember(user);
+                    server.decrementMemberCount();
 
                     ServerMemberLeaveEvent event = new ServerMemberLeaveEvent(api, server, user);
 

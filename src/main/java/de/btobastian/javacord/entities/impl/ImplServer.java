@@ -410,6 +410,13 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Decrements the member count.
+     */
+    public void decrementMemberCount() {
+        memberCount--;
+    }
+
+    /**
      * Adds a member to the server.
      *
      * @param member The user to add.
@@ -425,6 +432,13 @@ public class ImplServer implements Server {
             long roleId = Long.parseLong(roleIds.asText());
             getRoleById(roleId).map(role -> ((ImplRole) role)).ifPresent(role -> role.addUserToCache(user));
         }
+    }
+
+    /**
+     * Increments the member count.
+     */
+    public void incrementMemberCount() {
+        memberCount++;
     }
 
     /**
