@@ -45,12 +45,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -105,16 +100,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private static final ConcurrentMap<String, Semaphore> connectionDelaySemaphorePerAccount = new ConcurrentHashMap<>();
 
     static {
-        new Timer("Connection Delay Semaphores Starvation Protector", true).schedule(new TimerTask() {
-            @Override
-            public void run() {
-                connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
-                    if ((semaphore.availablePermits() == 0) && ((System.currentTimeMillis() - lastIdentificationPerAccount.get(token)) >= 15_000)) {
-                        semaphore.release();
-                    }
-                });
-            }
-        }, 10_000, 10_000);
+        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() ->
+            connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
+                if ((semaphore.availablePermits() == 0) &&
+                        ((System.currentTimeMillis() - lastIdentificationPerAccount.get(token)) >= 15_000)) {
+                    semaphore.release();
+                }
+            }), 10, 10, TimeUnit.SECONDS);
     }
 
     public DiscordWebSocketAdapter(DiscordApi api) {
