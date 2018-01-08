@@ -162,4 +162,17 @@ public interface Reaction {
     default CompletableFuture<Void> removeYourself() {
         return removeUser(getMessage().getApi().getYourself());
     }
+
+    /**
+     * Removes all reactors.
+     *
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> remove() {
+        return getUsers()
+                .thenCompose(users -> CompletableFuture.allOf(
+                        users.stream()
+                                .map(this::removeUser)
+                                .toArray(CompletableFuture[]::new)));
+    }
 }
