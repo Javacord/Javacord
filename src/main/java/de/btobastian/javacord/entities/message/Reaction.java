@@ -154,4 +154,12 @@ public interface Reaction {
                 getMessage().getApi(), getMessage().getChannel().getId(), getMessage().getId(), getEmoji(), user);
     }
 
+    /**
+     * Removes yourself from the list of reactors.
+     *
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> removeYourself() {
+        return removeUser(getMessage().getApi().getYourself());
+    }
 }
