@@ -16,6 +16,7 @@ import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
+import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -565,6 +566,17 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default CompletableFuture<Void> removeReactionByEmoji(Emoji emoji, User user) {
         return Reaction.removeUser(getApi(), getChannel().getId(), getId(), emoji, user);
+    }
+
+    /**
+     * Removes a user from the list of reactors of a given unicode emoji reaction.
+     *
+     * @param unicodeEmoji The unicode emoji of the reaction.
+     * @param user The user to remove.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> removeReactionByEmoji(String unicodeEmoji, User user) {
+        return removeReactionByEmoji(ImplUnicodeEmoji.fromString(unicodeEmoji), user);
     }
 
     /**
