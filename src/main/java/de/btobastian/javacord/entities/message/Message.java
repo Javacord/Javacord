@@ -590,6 +590,16 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Removes you from the list of reactors of a given unicode emoji reaction.
+     *
+     * @param unicodeEmoji The unicode emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> removeOwnReactionByEmoji(String unicodeEmoji) {
+        return removeOwnReactionByEmoji(ImplUnicodeEmoji.fromString(unicodeEmoji));
+    }
+
+    /**
      * Gets the server text channel of the message.
      * Only present if the message was sent in a server.
      *
