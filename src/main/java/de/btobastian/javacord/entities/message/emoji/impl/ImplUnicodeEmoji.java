@@ -32,7 +32,7 @@ public class ImplUnicodeEmoji implements Emoji {
     }
 
     /**
-     * Gets a unicode emoji by it's string representation.
+     * Gets a unicode emoji by its string representation.
      *
      * @param emoji The emoji string.
      * @return The object, representing the emoji from the given string.

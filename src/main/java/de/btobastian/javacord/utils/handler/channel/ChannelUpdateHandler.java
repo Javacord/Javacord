@@ -277,7 +277,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             ServerChannel channel, Permissions newPermissions, Permissions oldPermissions, DiscordEntity entity) {
         if (newPermissions.equals(oldPermissions)) {
             // This can be caused by adding a user/role in a channels overwritten permissions without modifying
-            // any of it's values. We don't need to dispatch an event for this.
+            // any of its values. We don't need to dispatch an event for this.
             return;
         }
         ServerChannelChangeOverwrittenPermissionsEvent event =

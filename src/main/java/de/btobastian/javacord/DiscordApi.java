@@ -295,7 +295,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a webhook by it's id.
+     * Gets a webhook by its id.
      *
      * @param id The id of the webhook.
      * @return The webhook with the given id.
@@ -314,7 +314,7 @@ public interface DiscordApi {
     Collection<Long> getUnavailableServers();
 
     /**
-     * Gets an invite by it's code.
+     * Gets an invite by its code.
      *
      * @param code The code of the invite.
      * @return The invite with the given code.
@@ -382,7 +382,7 @@ public interface DiscordApi {
     Collection<User> getUsers();
 
     /**
-     * Gets a user by it's id.
+     * Gets a user by its id.
      *
      * @param id The id of the user.
      * @return The user with the given id.
@@ -390,7 +390,7 @@ public interface DiscordApi {
     Optional<User> getUserById(long id);
 
     /**
-     * Gets a user by it's id.
+     * Gets a user by its id.
      *
      * @param id The id of the user.
      * @return The user with the given id.
@@ -437,7 +437,7 @@ public interface DiscordApi {
     Collection<Message> getCachedMessages();
 
     /**
-     * Gets a cached message by it's id.
+     * Gets a cached message by its id.
      *
      * @param id The id of the message.
      * @return The cached message.
@@ -445,7 +445,7 @@ public interface DiscordApi {
     Optional<Message> getCachedMessageById(long id);
 
     /**
-     * Gets a cached message by it's id.
+     * Gets a cached message by its id.
      *
      * @param id The id of the message.
      * @return The cached message.
@@ -459,7 +459,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a message by it's id.
+     * Gets a message by its id.
      *
      * @param id The id of the message.
      * @param channel The channel of the message.
@@ -471,7 +471,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a message by it's id.
+     * Gets a message by its id.
      *
      * @param id The id of the message.
      * @param channel The channel of the message.
@@ -490,7 +490,7 @@ public interface DiscordApi {
     Collection<Server> getServers();
 
     /**
-     * Gets a server by it's id.
+     * Gets a server by its id.
      *
      * @param id The id of the server.
      * @return The server with the given id.
@@ -502,7 +502,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server by it's id.
+     * Gets a server by its id.
      *
      * @param id The id of the server.
      * @return The server with the given id.
@@ -549,7 +549,7 @@ public interface DiscordApi {
     Collection<CustomEmoji> getCustomEmojis();
 
     /**
-     * Gets a custom emoji in this server by it's id.
+     * Gets a custom emoji in this server by its id.
      *
      * @param id The id of the emoji.
      * @return The emoji with the given id.
@@ -559,7 +559,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a custom emoji in this server by it's id.
+     * Gets a custom emoji in this server by its id.
      *
      * @param id The id of the emoji.
      * @return The emoji with the given id.
@@ -610,7 +610,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a role by it's id.
+     * Gets a role by its id.
      *
      * @param id The id of the role.
      * @return The role with the given id.
@@ -624,7 +624,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a role by it's id.
+     * Gets a role by its id.
      *
      * @param id The id of the role.
      * @return The role with the given id.
@@ -767,7 +767,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a channel by it's id.
+     * Gets a channel by its id.
      *
      * @param id The id of the channel.
      * @return The channel with the given id.
@@ -779,7 +779,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a channel by it's id.
+     * Gets a channel by its id.
      *
      * @param id The id of the channel.
      * @return The channel with the given id.
@@ -821,7 +821,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a text channel by it's id.
+     * Gets a text channel by its id.
      *
      * @param id The id of the text channel.
      * @return The text channel with the given id.
@@ -833,7 +833,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a text channel by it's id.
+     * Gets a text channel by its id.
      *
      * @param id The id of the text channel.
      * @return The text channel with the given id.
@@ -875,7 +875,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a voice channel by it's id.
+     * Gets a voice channel by its id.
      *
      * @param id The id of the voice channel.
      * @return The voice channel with the given id.
@@ -887,7 +887,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a voice channel by it's id.
+     * Gets a voice channel by its id.
      *
      * @param id The id of the voice channel.
      * @return The voice channel with the given id.
@@ -929,7 +929,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server channel by it's id.
+     * Gets a server channel by its id.
      *
      * @param id The id of the server channel.
      * @return The server channel with the given id.
@@ -941,7 +941,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server channel by it's id.
+     * Gets a server channel by its id.
      *
      * @param id The id of the server channel.
      * @return The server channel with the given id.
@@ -981,7 +981,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a channel category by it's id.
+     * Gets a channel category by its id.
      *
      * @param id The id of the channel category.
      * @return The channel category with the given id.
@@ -993,7 +993,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a channel category by it's id.
+     * Gets a channel category by its id.
      *
      * @param id The id of the channel category.
      * @return The channel category with the given id.
@@ -1033,7 +1033,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server text channel by it's id.
+     * Gets a server text channel by its id.
      *
      * @param id The id of the server text channel.
      * @return The server text channel with the given id.
@@ -1045,7 +1045,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server text channel by it's id.
+     * Gets a server text channel by its id.
      *
      * @param id The id of the server text channel.
      * @return The server text channel with the given id.
@@ -1085,7 +1085,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server voice channel by it's id.
+     * Gets a server voice channel by its id.
      *
      * @param id The id of the server voice channel.
      * @return The server voice channel with the given id.
@@ -1097,7 +1097,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server voice channel by it's id.
+     * Gets a server voice channel by its id.
      *
      * @param id The id of the server voice channel.
      * @return The server voice channel with the given id.
@@ -1137,7 +1137,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a private channel by it's id.
+     * Gets a private channel by its id.
      *
      * @param id The id of the private channel.
      * @return The private channel with the given id.
@@ -1149,7 +1149,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a private channel by it's id.
+     * Gets a private channel by its id.
      *
      * @param id The id of the private channel.
      * @return The private channel with the given id.
@@ -1163,7 +1163,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a group channel by it's id.
+     * Gets a group channel by its id.
      *
      * @param id The id of the group channel.
      * @return The group channel with the given id.
@@ -1175,7 +1175,7 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a group channel by it's id.
+     * Gets a group channel by its id.
      *
      * @param id The id of the group channel.
      * @return The group channel with the given id.

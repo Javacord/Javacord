@@ -57,7 +57,7 @@ public enum AuditLogActionType {
     }
 
     /**
-     * Gets an {@link AuditLogActionType} by it's value.
+     * Gets an {@link AuditLogActionType} by its value.
      *
      * @param value The value of the action type.
      * @return The action type for the given value,

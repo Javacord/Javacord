@@ -42,7 +42,7 @@ public enum MessageType {
     }
 
     /**
-     * Gets the type by it's int representation.
+     * Gets the type by its int representation.
      *
      * @param type The int representation.
      * @param webhook Whether the message was sent by a webhook or not.
