@@ -104,7 +104,7 @@ public interface TextChannel extends Channel, Messageable {
 
     /**
      * Displays the "xyz is typing..." message.
-     * The message automatically disappears after 5 seconds or after sending a message.
+     * The message automatically disappears after 10 seconds or after sending a message.
      *
      * @return A future to tell us if the action was successful.
      */
