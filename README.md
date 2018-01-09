@@ -2,7 +2,7 @@
 A multithreaded but simple to use library to create a Discord bot in Java.
 
 ## IMPORTANT
-This README is for the rewrite of Javacord (aka. Javacord 3) and is not compelete (e.g. the wiki is still for version 2.x). If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) and ask for help there. 
+This README is for the rewrite of Javacord (aka. Javacord 3) and is not compelete (e.g. the wiki is still for version 2.x). If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) and ask for help there.
 
 ## Download
 The recommended way to "download" Javacord is to use a build manager like Maven.
@@ -44,7 +44,7 @@ If you never used maven before you should take a look at the setup tutorial:
 * [IntelliJ Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
 
 ## Support
- 
+
 * [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3) (recommended)
 * [DiscordAPI #java_javacord channel](https://discord.gg/0SBTUU1wZTVXVKEo)
 
@@ -69,7 +69,7 @@ public class MyFirstBot {
         new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
             // Login successful
             api.getTextChannelById(123L).ifPresent(channel -> channel.sendMessage("I'm online now!"));
-        }).exceptionally(Javacord.exceptionLogger());
+        }).exceptionally(ExceptionLogger.get());
     }
 
 }
@@ -108,7 +108,7 @@ More examples can be found in the wiki: [Examples](https://github.com/BtoBastian
 
 In order to add a bot to your server you need it's client id.
 
-You can get your client id from the [same page](https://discordapp.com/developers/applications/me) where you created it. 
+You can get your client id from the [same page](https://discordapp.com/developers/applications/me) where you created it.
 
 >![](http://i.imgur.com/qzPDsp2.png)
 

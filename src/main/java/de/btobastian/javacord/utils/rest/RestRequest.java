@@ -70,7 +70,7 @@ public class RestRequest<T> {
         this.method = method;
         this.endpoint = endpoint;
 
-        this.origin = new Exception();
+        this.origin = new Exception("origin of RestRequest call");
     }
 
     /**

@@ -145,7 +145,7 @@ public interface TextChannel extends Channel, Messageable {
      * Sending a message will make the message go away shortly, but it will return immediately if not cancelled using
      * the {@code AutoCloseable}. This can be used in a try-with-resources block like
      * <code>try (NonThrowingAutoCloseable typingIndicator =
-     * textChannel.typeContinuously(((Function&lt;Throwable, ?&gt;) Javacord::exceptionLogger)::apply))
+     * textChannel.typeContinuously(ExceptionLogger.getConsumer(RatelimitException.class)))
      * { /* do lengthy stuff &#42;/ } sendReply();</code>.
      * <p>
      * The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
@@ -173,7 +173,7 @@ public interface TextChannel extends Channel, Messageable {
      * Sending a message will make the message go away shortly, but it will return immediately if not cancelled using
      * the {@code AutoCloseable}. This can be used in a try-with-resources block like
      * <code>try (NonThrowingAutoCloseable typingIndicator = textChannel.typeContinuouslyAfter(500,
-     * TimeUnit.MILLISECONDS, ((Function&lt;Throwable, ?&gt;) Javacord::exceptionLogger)::apply))
+     * TimeUnit.MILLISECONDS, ExceptionLogger.getConsumer(RatelimitException.class)))
      * { /* do lengthy stuff &#42;/ } sendReply();</code>.
      * <p>
      * The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very short
