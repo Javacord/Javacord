@@ -144,6 +144,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         }
     }
 
+    /**
+     * Sets the gateway used to connect.
+     *
+     * @param gateway The gateway to set.
+     */
     public static void setGateway(String gateway) {
         gatewayWriteLock.lock();
         try {
