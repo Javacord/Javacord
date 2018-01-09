@@ -77,7 +77,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return getUpdater().removeCategory().update();
+        return getUpdater().setCategory(category).update();
     }
 
     /**
@@ -89,7 +89,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeCategory() {
-        return updateCategory(null);
+        return getUpdater().removeCategory().update();
     }
 
 }
