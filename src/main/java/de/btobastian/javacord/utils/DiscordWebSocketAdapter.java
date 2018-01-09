@@ -95,7 +95,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private int reconnectAttempt = 0;
 
     private static final Map<String, Long> lastIdentificationPerAccount = Collections.synchronizedMap(new HashMap<>());
-    private static final ConcurrentMap<String, Semaphore> connectionDelaySemaphorePerAccount = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Semaphore> connectionDelaySemaphorePerAccount =
+            new ConcurrentHashMap<>();
 
     static {
         // This scheduler makes sure that the semaphores get released after a while if it failed in the listener
@@ -109,16 +110,26 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             }), 10, 10, TimeUnit.SECONDS);
     }
 
+    /**
+     * Creates a new discord websocket adapter.
+     *
+     * @param api The discord api instance.
+     */
     public DiscordWebSocketAdapter(DiscordApi api) {
         this.api = api;
-
         this.listenerExecutorService = api.getThreadPool().getSingleThreadExecutorService("listeners");
 
         registerHandlers();
-
         connect();
     }
 
+    /**
+     * Gets the gateway used to connect.
+     * If no gateway was requested or set so far, it will request one from Discord.
+     *
+     * @param api The api used to make the rest call.
+     * @return The gateway url as string.
+     */
     private static String getGateway(DiscordApi api) {
         gatewayReadLock.lock();
         if (gateway == null) {
@@ -166,6 +177,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         websocket.sendClose(1000);
     }
 
+    /**
+     * Connects the websocket.
+     */
     private void connect() {
         WebSocketFactory factory = new WebSocketFactory();
         try {
@@ -174,11 +188,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             logger.warn("An error occurred while setting ssl context", e);
         }
         try {
-            websocket = factory.createSocket(getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION);
+            websocket = factory.createSocket(
+                    getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
             String token = api.getToken();
-            // identification is rate limited to once every 5 seconds, so don't try to more often per account, even in different instances
+            // identification is rate limited to once every 5 seconds,
+            // so don't try to more often per account, even in different instances
             connectionDelaySemaphorePerAccount.computeIfAbsent(token, key -> new Semaphore(1)).acquireUninterruptibly();
             for (long delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L));
                  delay > 0;
@@ -358,7 +374,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
                                 1 + zeroToFourSeconds / 1000,
                                 1 + zeroToFourSeconds / 100 % 10);
-                    lastIdentificationPerAccount.put(api.getToken(), System.currentTimeMillis() - 4000 + zeroToFourSeconds);
+                    lastIdentificationPerAccount
+                            .put(api.getToken(), System.currentTimeMillis() - 4000 + zeroToFourSeconds);
                     sendIdentify(websocket);
                 }
                 break;
@@ -617,6 +634,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     @Override
     public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
         switch (cause.getMessage()) {
+            // TODO This is copied from v2. I'm unsure if that's something we should do. Probably not ^^
             case "Flushing frames to the server failed: Connection closed by remote host":
             case "Flushing frames to the server failed: Socket is closed":
             case "Flushing frames to the server failed: Connection has been shutdown: javax.net.ssl.SSLException:" +
