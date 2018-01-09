@@ -67,6 +67,18 @@ public interface Channel extends DiscordEntity {
     }
 
     /**
+     * Gets the channel as categorizable.
+     *
+     * @return The channel as categorizable.
+     */
+    default Optional<Categorizable> asCategorizable() {
+        if (this instanceof Categorizable) {
+            return Optional.of((Categorizable) this);
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Gets the channel as server text channel.
      *
      * @return The channel as server text channel.
