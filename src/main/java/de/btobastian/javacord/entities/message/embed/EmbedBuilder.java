@@ -242,7 +242,7 @@ public class EmbedBuilder {
             object.putObject("image").put("url", imageUrl);
         }
         if (authorName != null) {
-            ObjectNode author = object.putObject("icon_url");
+            ObjectNode author = object.putObject("author");
             author.put("name", authorName);
             if (authorUrl != null) {
                 author.put("url", authorUrl);
