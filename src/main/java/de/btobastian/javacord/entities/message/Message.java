@@ -580,6 +580,16 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Removes all reactors of a given emoji reaction.
+     *
+     * @param emoji The emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> removeReactionByEmoji(Emoji emoji) {
+        return getReactionByEmoji(emoji).map(Reaction::remove).orElse(CompletableFuture.completedFuture(null));
+    }
+
+    /**
      * Removes you from the list of reactors of a given emoji reaction.
      *
      * @param emoji The emoji of the reaction.
