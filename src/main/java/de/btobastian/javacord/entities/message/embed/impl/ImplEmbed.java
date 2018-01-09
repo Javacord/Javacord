@@ -1,7 +1,14 @@
 package de.btobastian.javacord.entities.message.embed.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.btobastian.javacord.entities.message.embed.*;
+import de.btobastian.javacord.entities.message.embed.Embed;
+import de.btobastian.javacord.entities.message.embed.EmbedAuthor;
+import de.btobastian.javacord.entities.message.embed.EmbedField;
+import de.btobastian.javacord.entities.message.embed.EmbedFooter;
+import de.btobastian.javacord.entities.message.embed.EmbedImage;
+import de.btobastian.javacord.entities.message.embed.EmbedProvider;
+import de.btobastian.javacord.entities.message.embed.EmbedThumbnail;
+import de.btobastian.javacord.entities.message.embed.EmbedVideo;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 

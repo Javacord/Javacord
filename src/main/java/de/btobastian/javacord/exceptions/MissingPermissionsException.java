@@ -2,7 +2,6 @@ package de.btobastian.javacord.exceptions;
 
 import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
-import okhttp3.Response;
 
 /**
  * When we are not allowed to perform an action.

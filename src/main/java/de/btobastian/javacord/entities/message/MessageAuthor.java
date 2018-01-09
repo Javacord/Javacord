@@ -2,7 +2,11 @@ package de.btobastian.javacord.entities.message;
 
 import de.btobastian.javacord.AccountType;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.entities.*;
+import de.btobastian.javacord.entities.DiscordEntity;
+import de.btobastian.javacord.entities.Icon;
+import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.Webhook;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

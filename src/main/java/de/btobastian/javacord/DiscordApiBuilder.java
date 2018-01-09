@@ -1,14 +1,5 @@
 package de.btobastian.javacord;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.IntPredicate;
-import java.util.stream.IntStream;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -18,6 +9,15 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
 
 /**
  * This class is used to login to a Discord account.

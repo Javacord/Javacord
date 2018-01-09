@@ -16,7 +16,12 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
-import de.btobastian.javacord.listeners.user.*;
+import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
+import de.btobastian.javacord.listeners.user.UserChangeGameListener;
+import de.btobastian.javacord.listeners.user.UserChangeNameListener;
+import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
+import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
+import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.Collection;
