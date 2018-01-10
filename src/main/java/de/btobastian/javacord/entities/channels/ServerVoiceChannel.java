@@ -6,19 +6,12 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server voice channel.
  */
-public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
+public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categorizable {
 
     @Override
     default ChannelType getType() {
         return ChannelType.SERVER_VOICE_CHANNEL;
     }
-
-    /**
-     * Gets the category of the channel.
-     *
-     * @return The category of the channel.
-     */
-    Optional<ChannelCategory> getCategory();
 
     /**
      * Gets the updater for this channel.
@@ -68,7 +61,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
     }
 
     /**
-     * Updates the category of the channel.
+     * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
@@ -77,11 +70,11 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return getUpdater().removeCategory().update();
+        return getUpdater().setCategory(category).update();
     }
 
     /**
-     * Removes the category of the channel.
+     * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
@@ -89,7 +82,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeCategory() {
-        return updateCategory(null);
+        return getUpdater().removeCategory().update();
     }
 
 }

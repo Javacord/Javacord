@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server text channel.
  */
-public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionable {
+public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionable, Categorizable {
 
     @Override
     default ChannelType getType() {
@@ -25,13 +25,6 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @return Whether the channel is "not safe for work" or not.
      */
     boolean isNsfw();
-
-    /**
-     * Gets the category of the channel.
-     *
-     * @return The category of the channel.
-     */
-    Optional<ChannelCategory> getCategory();
 
     /**
      * Gets the topic of the channel.
@@ -76,7 +69,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     }
 
     /**
-     * Updates the category of the channel.
+     * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
@@ -89,7 +82,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     }
 
     /**
-     * Removes the category of the channel.
+     * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
