@@ -490,7 +490,7 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
-     * Checks if the given user can manage messages (delete or pin them) in this channel.
+     * Checks if the given user can manage messages (delete or pin them or remove reactions of others) in this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
      *
@@ -506,6 +506,19 @@ public interface TextChannel extends Channel, Messageable {
                 || severTextChannel.get().hasAnyPermission(user,
                                                            PermissionType.ADMINISTRATOR,
                                                            PermissionType.MANAGE_MESSAGES);
+    }
+
+    /**
+     * Checks if the given user can remove reactions of other users in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     * This method just forwards to {@link #canManageMessages(User)} as it is the same permission that is needed.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can remove reactions of others or not.
+     */
+    default boolean canRemoveReactionsOfOthers(User user) {
+        return canManageMessages(user);
     }
 
     /**
