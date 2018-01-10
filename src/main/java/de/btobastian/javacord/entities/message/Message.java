@@ -693,7 +693,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * Checks if the given user is allowed to add <b>new</b> reactions to the message.
      *
      * @param user The user to check.
-     * @return Whether the user is allowed to add <b>new</b> reactions to the message or not.
+     * @return Whether the given user is allowed to add <b>new</b> reactions to the message or not.
      */
     default boolean canAddNewReactions(User user) {
         Optional<ServerTextChannel> channel = getServerTextChannel();

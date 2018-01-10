@@ -1083,7 +1083,7 @@ public interface Server extends DiscordEntity {
      * Checks if the given user can view the audit log of the server.
      *
      * @param user The user to check.
-     * @return Whether the given user view the audit log or not.
+     * @return Whether the given user can view the audit log or not.
      */
     default boolean canViewAuditLog(User user) {
         return hasAnyPermission(user,
