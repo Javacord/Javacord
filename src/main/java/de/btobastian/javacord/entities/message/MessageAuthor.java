@@ -211,6 +211,20 @@ public interface MessageAuthor extends DiscordEntity {
     }
 
     /**
+     * Checks if the author can see the channel where the message was sent.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
+     *
+     * @return Whether the author can see the channel or not.
+     */
+    default boolean canSeeChannel() {
+        return asUser()
+                .map(getMessage().getChannel()::canSee)
+                .orElse(false);
+    }
+
+    /**
      * Checks if the author can see all channels in the category of the channel where the message was sent.
      * Always returns {@code false} if the author is not a user.
      * Always returns {@code true} if the channel is not categorizable or has no category.
