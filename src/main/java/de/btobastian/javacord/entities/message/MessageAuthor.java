@@ -343,7 +343,7 @@ public interface MessageAuthor extends DiscordEntity {
      * Checks if the author is allowed to add <b>new</b> reactions to messages in the channel where the message was sent.
      * Always returns {@code false} if the author is not a user.
      *
-     * @return Whether the author is allowed to add <b>new</b> reactions to message in the or not.
+     * @return Whether the author is allowed to add <b>new</b> reactions to messages in the channel or not.
      */
     default boolean canAddNewReactionsInTextChannel() {
         return getMessage()
