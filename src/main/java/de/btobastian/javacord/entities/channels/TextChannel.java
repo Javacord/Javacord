@@ -469,7 +469,7 @@ public interface TextChannel extends Channel, Messageable {
      * Checks if the given user is allowed to add <b>new</b> reactions to messages in this channel.
      *
      * @param user The user to check.
-     * @return Whether the user is allowed to add <b>new</b> reactions to message in this channel or not.
+     * @return Whether the given user is allowed to add <b>new</b> reactions to message in this channel or not.
      */
     default boolean canAddNewReactions(User user) {
         Optional<PrivateChannel> privateChannel = asPrivateChannel();
