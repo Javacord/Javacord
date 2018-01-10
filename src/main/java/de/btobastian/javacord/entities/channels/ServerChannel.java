@@ -22,7 +22,6 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -149,7 +148,7 @@ public interface ServerChannel extends Channel {
 
     /**
      * Gets the effective overwritten permissions of a user.
-     * This method also takes into account the roles of the user and their hierarchy.
+     * This method also takes into account the roles of the user.
      * It doesn't take into account the "global" permissions!
      *
      * @param user The user.
@@ -157,15 +156,28 @@ public interface ServerChannel extends Channel {
      */
     default Permissions getEffectiveOverwrittenPermissions(User user) {
         PermissionsBuilder builder = new PermissionsBuilder(ImplPermissions.EMPTY_PERMISSIONS);
-        List<Permissions> permissionOverwrites = new ArrayList<>();
-        for (Role role : getServer().getRolesOf(user)) {
-            permissionOverwrites.add(getOverwrittenPermissions(role));
-        }
-        permissionOverwrites.add(getOverwrittenPermissions(user));
+        List<Permissions> permissionOverwrites = getServer().getRolesOf(user).stream()
+                .map(this::getOverwrittenPermissions)
+                .collect(Collectors.toList());
         for (Permissions permissions : permissionOverwrites) {
-            Arrays.stream(PermissionType.values())
-                    .filter(type -> permissions.getState(type) != PermissionState.NONE)
-                    .forEachOrdered(type -> builder.setState(type, permissions.getState(type)));
+            for (PermissionType type : PermissionType.values()) {
+                if (permissions.getState(type) == PermissionState.DENIED) {
+                    builder.setState(type, PermissionState.DENIED);
+                }
+            }
+        }
+        for (Permissions permissions : permissionOverwrites) {
+            for (PermissionType type : PermissionType.values()) {
+                if (permissions.getState(type) == PermissionState.ALLOWED) {
+                    builder.setState(type, PermissionState.ALLOWED);
+                }
+            }
+        }
+        for (PermissionType type : PermissionType.values()) {
+            Permissions permissions = getOverwrittenPermissions(user);
+            if (permissions.getState(type) == PermissionState.ALLOWED) {
+                builder.setState(type, PermissionState.ALLOWED);
+            }
         }
         return builder.build();
     }
