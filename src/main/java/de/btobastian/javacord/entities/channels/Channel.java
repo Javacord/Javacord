@@ -152,4 +152,15 @@ public interface Channel extends DiscordEntity {
                                                        PermissionType.READ_MESSAGES);
     }
 
+    /**
+     * Checks if the user of the connected account can see this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     *
+     * @return Whether the user of the connected account can see this channel or not.
+     */
+    default boolean canYouSee() {
+        return canSee(getApi().getYourself());
+    }
+
 }

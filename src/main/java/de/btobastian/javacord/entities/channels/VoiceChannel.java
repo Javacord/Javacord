@@ -30,6 +30,17 @@ public interface VoiceChannel extends Channel {
     }
 
     /**
+     * Checks if the user of the connected account can connect to the voice channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     *
+     * @return Whether the user of the connected account can connect or not.
+     */
+    default boolean canYouConnect() {
+        return canConnect(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can mute other users in this voice channel.
      * In private chats (private channel or group channel) this always returns <code>false</code>.
      *
@@ -45,6 +56,16 @@ public interface VoiceChannel extends Channel {
                 || serverVoiceChannel.get().hasAnyPermission(user,
                                                              PermissionType.ADMINISTRATOR,
                                                              PermissionType.VOICE_MUTE_MEMBERS);
+    }
+
+    /**
+     * Checks if the user of the connected account can mute other users in this voice channel.
+     * In private chats (private channel or group channel) this always returns {@code false}.
+     *
+     * @return Whether the user of the connected account can mute other users or not.
+     */
+    default boolean canYouMuteUsers() {
+        return canMuteUsers(getApi().getYourself());
     }
 
 }

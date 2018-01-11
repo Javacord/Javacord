@@ -56,7 +56,7 @@ public interface ChannelCategory extends ServerChannel {
      * Checks if the given user can see all channels in this category.
      *
      * @param user The user to check.
-     * @return Whether the user can see all channels in this category or not.
+     * @return Whether the given user can see all channels in this category or not.
      */
     default boolean canSeeAll(User user) {
         for (ServerChannel channel : getChannels()) {
@@ -65,6 +65,15 @@ public interface ChannelCategory extends ServerChannel {
             }
         }
         return true;
+    }
+
+    /**
+     * Checks if the user of the connected account can see all channels in this category.
+     *
+     * @return Whether the user of the connected account can see all channels in this category or not.
+     */
+    default boolean canYouSeeAll() {
+        return canSeeAll(getApi().getYourself());
     }
 
     /**

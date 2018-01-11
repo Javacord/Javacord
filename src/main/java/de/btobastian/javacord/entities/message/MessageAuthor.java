@@ -150,7 +150,7 @@ public interface MessageAuthor extends DiscordEntity {
     default boolean canManageServer() {
         return getMessage()
                 .getServer()
-                .flatMap(server -> asUser().map(server::canManageServer))
+                .flatMap(server -> asUser().map(server::canManage))
                 .orElse(false);
     }
 
