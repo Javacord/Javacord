@@ -233,8 +233,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 } catch (InterruptedException ignored) { }
             }
             websocket.connect();
-        } catch (IOException | WebSocketException e) {
-            logger.warn("An error occurred while connecting to websocket", e);
+        } catch (Throwable t) {
+            logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
                 reconnectAttempt++;
                 logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
