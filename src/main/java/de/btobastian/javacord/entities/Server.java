@@ -1080,6 +1080,15 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the user of the connected account can create new channels.
+     *
+     * @return Whether the user of the connected account can create channels or not.
+     */
+    default boolean canYouCreateChannels() {
+        return canCreateChannels(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can view the audit log of the server.
      *
      * @param user The user to check.
@@ -1089,6 +1098,15 @@ public interface Server extends DiscordEntity {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
                                 PermissionType.VIEW_AUDIT_LOG);
+    }
+
+    /**
+     * Checks if the user of the connected account can view the audit log of the server.
+     *
+     * @return Whether the user of the connected account can view the audit log or not.
+     */
+    default boolean canYouViewAuditLog() {
+        return canViewAuditLog(getApi().getYourself());
     }
 
     /**
@@ -1105,6 +1123,15 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the user of the connected account can change its own nickname in the server.
+     *
+     * @return Whether the user of the connected account can change its own nickname or not.
+     */
+    default boolean canYouChangeOwnNickname() {
+        return canChangeOwnNickname(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can manage nicknames on the server.
      *
      * @param user The user to check.
@@ -1114,6 +1141,15 @@ public interface Server extends DiscordEntity {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
                                 PermissionType.MANAGE_NICKNAMES);
+    }
+
+    /**
+     * Checks if the user of the connected account can manage nicknames on the server.
+     *
+     * @return Whether the user of the connected account can manage nicknames or not.
+     */
+    default boolean canYouManageNicknames() {
+        return canManageNicknames(getApi().getYourself());
     }
 
     /**
@@ -1129,15 +1165,33 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the user of the connected account can manage emojis on the server.
+     *
+     * @return Whether the user of the connected account can manage emojis or not.
+     */
+    default boolean canYouManageEmojis() {
+        return canManageEmojis(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can manage the server.
      *
      * @param user The user to check.
      * @return Whether the given user can manage the server or not.
      */
-    default boolean canManageServer(User user) {
+    default boolean canManage(User user) {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
                                 PermissionType.MANAGE_SERVER);
+    }
+
+    /**
+     * Checks if the user of the connected account can manage the server.
+     *
+     * @return Whether the user of the connected account can manage the server or not.
+     */
+    default boolean canYouManage() {
+        return canManage(getApi().getYourself());
     }
 
     /**
@@ -1150,6 +1204,15 @@ public interface Server extends DiscordEntity {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
                                 PermissionType.KICK_MEMBERS);
+    }
+
+    /**
+     * Checks if the user of the connected account can kick users from the server.
+     *
+     * @return Whether the user of the connected account can kick users or not.
+     */
+    default boolean canYouKickUsers() {
+        return canKickUsers(getApi().getYourself());
     }
 
     /**
@@ -1170,6 +1233,17 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Checks if the user of the connected account can kick the user.
+     * This methods also considers the position of the user roles.
+     *
+     * @param userToKick The user which should be kicked.
+     * @return Whether the user of the connected account can kick the user or not.
+     */
+    default boolean canYouKickUser(User userToKick) {
+        return canKickUser(getApi().getYourself(), userToKick);
+    }
+
+    /**
      * Checks if the given user can ban users from the server.
      *
      * @param user The user to check.
@@ -1179,6 +1253,15 @@ public interface Server extends DiscordEntity {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
                                 PermissionType.BAN_MEMBERS);
+    }
+
+    /**
+     * Checks if the user of the connected account can ban users from the server.
+     *
+     * @return Whether the user of the connected account can ban users or not.
+     */
+    default boolean canYouBanUsers() {
+        return canBanUsers(getApi().getYourself());
     }
 
     /**
@@ -1196,6 +1279,17 @@ public interface Server extends DiscordEntity {
         Optional<Role> ownRole = getHighestRoleOf(user);
         Optional<Role> otherRole = getHighestRoleOf(userToBan);
         return ownRole.isPresent() && (!otherRole.isPresent() || ownRole.get().isHigherThan(otherRole.get()));
+    }
+
+    /**
+     * Checks if the user of the connected account can ban the user.
+     * This methods also considers the position of the user roles.
+     *
+     * @param userToBan The user which should be banned.
+     * @return Whether the user of the connected account can ban the user or not.
+     */
+    default boolean canYouBanUser(User userToBan) {
+        return canBanUser(getApi().getYourself(), userToBan);
     }
 
     /**

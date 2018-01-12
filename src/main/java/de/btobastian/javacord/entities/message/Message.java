@@ -769,6 +769,15 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Checks if the user of the connected account is allowed to add <b>new</b> reactions to the message.
+     *
+     * @return Whether the user of the connected account is allowed to add <b>new</b> reactions to the message or not.
+     */
+    default boolean canYouAddNewReactions() {
+        return canAddNewReactions(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can delete this message.
      *
      * @param user The user to check.
@@ -784,6 +793,15 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             return true;
         }
         return getServerTextChannel().map(channel -> channel.canManageMessages(user)).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can delete this message.
+     *
+     * @return Whether the user of the connected account can delete the message or not.
+     */
+    default boolean canYouDelete() {
+        return canDelete(getApi().getYourself());
     }
 
     /**

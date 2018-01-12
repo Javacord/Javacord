@@ -364,6 +364,18 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the user of the connected account can send messages in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     *
+     * @return Whether the user of the connected account can write messages or not.
+     */
+    default boolean canYouWrite() {
+        return canWrite(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can use external emojis in this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
@@ -382,6 +394,19 @@ public interface TextChannel extends Channel, Messageable {
                 || severTextChannel.get().hasAnyPermission(user,
                                                            PermissionType.ADMINISTRATOR,
                                                            PermissionType.USE_EXTERNAL_EMOJIS);
+    }
+
+    /**
+     * Checks if the user of the connected account can use external emojis in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     * It also doesn't check if the user is even able to send any external emojis (twitch subscription or nitro).
+     *
+     * @return Whether the user of the connected account can use external emojis or not.
+     */
+    default boolean canYouUseExternalEmojis() {
+        return canUseExternalEmojis(getApi().getYourself());
     }
 
     /**
@@ -405,6 +430,18 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the user of the connected account can use embed links in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     *
+     * @return Whether the user of the connected account can embed links or not.
+     */
+    default boolean canYouEmbedLinks() {
+        return canEmbedLinks(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can read the message history of this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
@@ -421,6 +458,17 @@ public interface TextChannel extends Channel, Messageable {
                 || severTextChannel.get().hasAnyPermission(user,
                                                            PermissionType.ADMINISTRATOR,
                                                            PermissionType.READ_MESSAGE_HISTORY);
+    }
+
+    /**
+     * Checks if the user of the connected account can read the message history of this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     *
+     * @return Whether the user of the connected account can read the message history or not.
+     */
+    default boolean canYouReadMessageHistory() {
+        return canReadMessageHistory(getApi().getYourself());
     }
 
     /**
@@ -444,6 +492,18 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the user of the connected account can use tts (text to speech) in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     * Please notice, this does not check if a user has blocked private messages!
+     *
+     * @return Whether the user of the connected account can use tts or not.
+     */
+    default boolean canYouUseTts() {
+        return canUseTts(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can attach files in this channel.
      *
      * @param user The user to check.
@@ -463,6 +523,15 @@ public interface TextChannel extends Channel, Messageable {
                 || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || (severTextChannel.get().hasPermission(user, PermissionType.ATTACH_FILE)
                 && severTextChannel.get().canWrite(user));
+    }
+
+    /**
+     * Checks if the user of the connected account can attach files in this channel.
+     *
+     * @return Whether the user of the connected account can attach files or not.
+     */
+    default boolean canYouAttachFiles() {
+        return canAttachFiles(getApi().getYourself());
     }
 
     /**
@@ -490,6 +559,15 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the user of the connected account is allowed to add <b>new</b> reactions to messages in this channel.
+     *
+     * @return Whether the user of the connected account is allowed to add <b>new</b> reactions to messages in this channel or not.
+     */
+    default boolean canYouAddNewReactions() {
+        return canAddNewReactions(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can manage messages (delete or pin them or remove reactions of others) in this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
      * part of the chat.
@@ -509,6 +587,17 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Checks if the user of the connected account can manage messages (delete or pin them or remove reactions of others) in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     *
+     * @return Whether the user of the connected account can manage messages or not.
+     */
+    default boolean canYouManageMessages() {
+        return canManageMessages(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can remove reactions of other users in this channel.
      * In private chats (private channel or group channel) this always returns {@code true} if the user is
      * part of the chat.
@@ -519,6 +608,17 @@ public interface TextChannel extends Channel, Messageable {
      */
     default boolean canRemoveReactionsOfOthers(User user) {
         return canManageMessages(user);
+    }
+
+    /**
+     * Checks if the user of the connected account can remove reactions of other users in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     *
+     * @return Whether the user of the connected account can remove reactions of others or not.
+     */
+    default boolean canYouRemoveReactionsOfOthers() {
+        return canRemoveReactionsOfOthers(getApi().getYourself());
     }
 
     /**
@@ -538,6 +638,17 @@ public interface TextChannel extends Channel, Messageable {
                 || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || (severTextChannel.get().hasPermission(user, PermissionType.MENTION_EVERYONE)
                 && severTextChannel.get().canWrite(user));
+    }
+
+    /**
+     * Checks if the user of the connected account can mention everyone (@everyone) in this channel.
+     * In private chats (private channel or group channel) this always returns {@code true} if the user is
+     * part of the chat.
+     *
+     * @return Whether the user of the connected account can mention everyone (@everyone) or not.
+     */
+    default boolean canYouMentionEveryone() {
+        return canMentionEveryone(getApi().getYourself());
     }
 
     /**

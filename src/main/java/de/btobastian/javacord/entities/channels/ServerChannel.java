@@ -314,6 +314,15 @@ public interface ServerChannel extends Channel {
     }
 
     /**
+     * Checks if the user of the connected account can create an instant invite to this channel.
+     *
+     * @return Whether the user of the connected account can create an instant invite or not.
+     */
+    default boolean canYouCreateInstantInvite() {
+        return canCreateInstantInvite(getApi().getYourself());
+    }
+
+    /**
      * Adds a listener, which listens to this channel being deleted.
      *
      * @param listener The listener to add.

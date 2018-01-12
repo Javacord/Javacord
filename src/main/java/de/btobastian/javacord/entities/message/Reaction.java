@@ -155,7 +155,7 @@ public interface Reaction {
     }
 
     /**
-     * Removes yourself from the list of reactors.
+     * Removes the user of the connected account from the list of reactors.
      *
      * @return A future to tell us if the action was successful.
      */
