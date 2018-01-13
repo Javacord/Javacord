@@ -2,16 +2,19 @@ package de.btobastian.javacord.utils.ratelimits;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.RatelimitException;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
+import okhttp3.Response;
 import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -133,8 +136,11 @@ public class RatelimitManager {
                     }
                     RestRequest<?> restRequest = queue.peek();
                     boolean remove = true;
+                    RestRequestResult rateLimitHeadersSource = null;
+                    CompletableFuture<RestRequestResult> restRequestResult = restRequest.getResult();
                     try {
                         RestRequestResult result = restRequest.executeBlocking();
+                        rateLimitHeadersSource = result;
 
                         long currentTime = System.currentTimeMillis();
 
@@ -144,6 +150,7 @@ public class RatelimitManager {
 
                         if (result.getResponse().code() == 429) {
                             remove = false;
+                            rateLimitHeadersSource = null;
                             logger.debug("Received a 429 response from Discord! Recalculating time offset...");
                             api.setTimeOffset(null);
 
@@ -152,26 +159,38 @@ public class RatelimitManager {
                             bucket.setRateLimitRemaining(0);
                             bucket.setRateLimitResetTimestamp(currentTime + retryAfter);
                         } else {
-                            String remaining = result.getResponse().header("X-RateLimit-Remaining", "1");
-                            long reset = restRequest
-                                    .getEndpoint()
-                                    .getHardcodedRatelimit()
-                                    .map(ratelimit -> currentTime + api.getTimeOffset() + ratelimit)
-                                    .orElseGet(() -> Long.parseLong(result.getResponse().header("X-RateLimit-Reset", "0")) * 1000);
-                            String global = result.getResponse().header("X-RateLimit-Global");
-
-                            if (global != null && global.equals("true")) {
-                                // Mark the endpoint as global
-                                bucket.getEndpoint().ifPresent(endpoint -> endpoint.setGlobal(true));
-                            }
-
-                            bucket.setRateLimitRemaining(Integer.parseInt(remaining));
-                            bucket.setRateLimitResetTimestamp(reset);
-
-                            restRequest.getResult().complete(result);
+                            restRequestResult.complete(result);
                         }
                     } catch (Exception e) {
-                        restRequest.getResult().completeExceptionally(e);
+                        if (e instanceof DiscordException) {
+                            rateLimitHeadersSource = ((DiscordException) e).getRestRequestResult().orElse(null);
+                        }
+                        restRequestResult.completeExceptionally(e);
+                    } finally {
+                        try {
+                            if (rateLimitHeadersSource != null) {
+                                Response response = rateLimitHeadersSource.getResponse();
+                                String remaining = response.header("X-RateLimit-Remaining", "1");
+                                long reset = restRequest
+                                        .getEndpoint()
+                                        .getHardcodedRatelimit()
+                                        .map(ratelimit -> System.currentTimeMillis() + api.getTimeOffset() + ratelimit)
+                                        .orElseGet(() -> Long.parseLong(response.header("X-RateLimit-Reset", "0")) * 1000);
+                                String global = response.header("X-RateLimit-Global");
+
+                                if (global != null && global.equals("true")) {
+                                    // Mark the endpoint as global
+                                    bucket.getEndpoint().ifPresent(endpoint -> endpoint.setGlobal(true));
+                                }
+                                bucket.setRateLimitRemaining(Integer.parseInt(remaining));
+                                bucket.setRateLimitResetTimestamp(reset);
+                            }
+                        } catch (Exception e) {
+                            if (restRequestResult.isDone()) {
+                                throw e;
+                            }
+                            restRequestResult.completeExceptionally(e);
+                        }
                     }
                     if (remove) {
                         queue.remove(restRequest);
