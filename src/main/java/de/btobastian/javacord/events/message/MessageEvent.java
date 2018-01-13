@@ -2,13 +2,17 @@ package de.btobastian.javacord.events.message;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
+import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
 import de.btobastian.javacord.events.Event;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -134,6 +138,140 @@ public abstract class MessageEvent extends Event {
      */
     public CompletableFuture<Void> removeAllReactionsFromMessage() {
         return Message.removeAllReactions(getApi(), getChannel().getId(), getMessageId());
+    }
+
+    /**
+     * Removes a user from the list of reactors of a given emoji reaction from the message.
+     *
+     * @param user The user to remove.
+     * @param emoji The emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionByEmojiFromMessage(User user, Emoji emoji) {
+        return Reaction.removeUser(getApi(), getChannel().getId(), getMessageId(), emoji, user);
+    }
+
+    /**
+     * Removes a user from the list of reactors of the given emoji reactions from the message.
+     *
+     * @param user The user to remove.
+     * @param emojis The emojis of the reactions.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, Emoji... emojis) {
+        return CompletableFuture.allOf(
+                Arrays.stream(emojis)
+                        .map(emoji -> removeReactionByEmojiFromMessage(user, emoji))
+                        .toArray(CompletableFuture[]::new));
+    }
+
+    /**
+     * Removes a user from the list of reactors of a given unicode emoji reaction from the message.
+     *
+     * @param user The user to remove.
+     * @param unicodeEmoji The unicode emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionByEmojiFromMessage(User user, String unicodeEmoji) {
+        return removeReactionByEmojiFromMessage(user, ImplUnicodeEmoji.fromString(unicodeEmoji));
+    }
+
+    /**
+     * Removes a user from the list of reactors of the given unicode emoji reactions from the message.
+     *
+     * @param unicodeEmojis The unicode emojis of the reactions.
+     * @param user The user to remove.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, String... unicodeEmojis) {
+        return removeReactionsByEmojiFromMessage(user, Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    /**
+     * Removes all reactors of a given emoji reaction from the message.
+     *
+     * @param emoji The emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionByEmojiFromMessage(Emoji emoji) {
+        return Reaction.getUsers(getApi(), getChannel().getId(), getMessageId(), emoji)
+                .thenCompose(users -> CompletableFuture.allOf(
+                        users.stream()
+                                .map(user -> Reaction.removeUser(getApi(), getChannel().getId(), getMessageId(), emoji, user))
+                                .toArray(CompletableFuture[]::new)));
+    }
+
+    /**
+     * Removes all reactors of the given emoji reactions from the message.
+     *
+     * @param emojis The emojis of the reactions.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionsByEmojiFromMessage(Emoji... emojis) {
+        return CompletableFuture.allOf(
+                Arrays.stream(emojis)
+                        .map(this::removeReactionByEmojiFromMessage)
+                        .toArray(CompletableFuture[]::new));
+    }
+
+    /**
+     * Removes all reactors of a given unicode emoji reaction from the message.
+     *
+     * @param unicodeEmoji The unicode emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionByEmojiFromMessage(String unicodeEmoji) {
+        return removeReactionByEmojiFromMessage(ImplUnicodeEmoji.fromString(unicodeEmoji));
+    }
+
+    /**
+     * Removes all reactors of the given unicode emoji reactions from the message.
+     *
+     * @param unicodeEmojis The unicode emojis of the reactions.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeReactionsByEmojiFromMessage(String... unicodeEmojis) {
+        return removeReactionsByEmojiFromMessage(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    /**
+     * Removes you from the list of reactors of a given emoji reaction from the message.
+     *
+     * @param emoji The emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeOwnReactionByEmojiFromMessage(Emoji emoji) {
+        return removeReactionByEmojiFromMessage(getApi().getYourself(), emoji);
+    }
+
+    /**
+     * Removes you from the list of reactors of the given emoji reactions from the message.
+     *
+     * @param emojis The emojis of the reactions.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeOwnReactionsByEmojiFromMessage(Emoji... emojis) {
+        return removeReactionsByEmojiFromMessage(getApi().getYourself(), emojis);
+    }
+
+    /**
+     * Removes you from the list of reactors of a given unicode emoji reaction from the message.
+     *
+     * @param unicodeEmoji The unicode emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeOwnReactionByEmojiFromMessage(String unicodeEmoji) {
+        return removeOwnReactionByEmojiFromMessage(ImplUnicodeEmoji.fromString(unicodeEmoji));
+    }
+
+    /**
+     * Removes you from the list of reactors of the given unicode emoji reactions from the message.
+     *
+     * @param unicodeEmojis The unicode emojis of the reactions.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> removeOwnReactionsByEmojiFromMessage(String... unicodeEmojis) {
+        return removeOwnReactionsByEmojiFromMessage(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
     }
 
     /**
