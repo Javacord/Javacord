@@ -550,6 +550,29 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Adds reactions to the message.
+     *
+     * @param emojis The emojis.
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> addReactions(Emoji... emojis) {
+        return CompletableFuture.allOf(
+                Arrays.stream(emojis)
+                        .map(this::addReaction)
+                        .toArray(CompletableFuture[]::new));
+    }
+
+    /**
+     * Adds unicode reactions to the message.
+     *
+     * @param unicodeEmojis The unicode emoji strings.
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> addReactions(String... unicodeEmojis) {
+        return addReactions(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    /**
      * Deletes all reactions on this message.
      *
      * @return A future to tell us if the deletion was successful.
