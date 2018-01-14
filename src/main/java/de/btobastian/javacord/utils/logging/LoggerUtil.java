@@ -62,7 +62,7 @@ public class LoggerUtil {
      * <p>
      * Useful with Java 7 for example :
      * {@code
-     *     try(MDCCloseable closeable = LoggerUtil.putCloseableToMdc(key, value)) {
+     *     try (MDCCloseable closeable = LoggerUtil.putCloseableToMdc(key, value)) {
      *         ....
      *     }
      * }
