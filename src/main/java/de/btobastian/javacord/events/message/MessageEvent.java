@@ -132,6 +132,29 @@ public abstract class MessageEvent extends Event {
     }
 
     /**
+     * Adds reactions to the message involved in the event.
+     *
+     * @param emojis The emojis.
+     * @return A future to tell us if the action was successful.
+     */
+    public CompletableFuture<Void> addReactionsToMessage(Emoji... emojis) {
+        return CompletableFuture.allOf(
+                Arrays.stream(emojis)
+                        .map(this::addReactionToMessage)
+                        .toArray(CompletableFuture[]::new));
+    }
+
+    /**
+     * Adds unicode reactions to the message involved in the event.
+     *
+     * @param unicodeEmojis The unicode emoji strings.
+     * @return A future to tell us if the action was successful.
+     */
+    public CompletableFuture<Void> addReactionsToMessage(String... unicodeEmojis) {
+        return addReactionsToMessage(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    /**
      * Deletes all reactions on the message involved in the event.
      *
      * @return A future to tell us if the deletion was successful.
