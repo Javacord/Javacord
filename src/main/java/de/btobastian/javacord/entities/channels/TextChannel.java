@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
@@ -43,6 +44,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
 /**
@@ -113,6 +116,22 @@ public interface TextChannel extends Channel, Messageable {
                 .setRatelimitRetries(0)
                 .setUrlParameters(String.valueOf(getId()))
                 .execute(result -> null);
+    }
+
+    /**
+     * Displays the "xyz is typing..." message continuously.
+     * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
+     * Sending a message will make the message go away, but it will return after a short delay if not canceled using
+     * the {@code AutoCloseable}.
+     * This can be used in a try-with-resources block like
+     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously()) { /* do lenghty stuff &#42;/ }</code>
+     *
+     * @return An auto-closable to stop sending the typing indicator.
+     */
+    default AutoCloseable typeContinuously() {
+        Future typingIndicator = getApi().getThreadPool().getScheduler()
+                .scheduleWithFixedDelay(() -> type().exceptionally(Javacord::exceptionLogger), 0, 8, TimeUnit.SECONDS);
+        return () -> typingIndicator.cancel(true);
     }
 
     /**
