@@ -3,7 +3,6 @@ package de.btobastian.javacord.utils.handler.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.Activity;
-import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.impl.ImplActivity;
@@ -43,12 +42,7 @@ public class PresenceUpdateHandler extends PacketHandler {
             if (packet.has("game")) {
                 Activity newActivity = null;
                 if (!packet.get("game").isNull()) {
-                    int activityType = packet.get("game").get("type").asInt();
-                    String name = packet.get("game").get("name").asText();
-                    String streamingUrl =
-                            packet.get("game").has("url") && !packet.get("game").get("url").isNull() ?
-                            packet.get("game").get("url").asText() : null;
-                    newActivity = new ImplActivity(ActivityType.getActivityTypeById(activityType), name, streamingUrl);
+                    newActivity = new ImplActivity(packet.get("game"));
                 }
                 Activity oldActivity = user.getActivity().orElse(null);
                 user.setActivity(newActivity);

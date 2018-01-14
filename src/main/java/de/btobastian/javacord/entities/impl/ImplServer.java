@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Activity;
-import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.DefaultMessageNotificationLevel;
 import de.btobastian.javacord.entities.ExplicitContentFilterLevel;
 import de.btobastian.javacord.entities.Icon;
@@ -212,13 +211,7 @@ public class ImplServer implements Server {
                     if (presenceJson.has("game")) {
                         Activity activity = null;
                         if (!presenceJson.get("game").isNull()) {
-                            int activityType = presenceJson.get("game").get("type").asInt();
-                            String name = presenceJson.get("game").get("name").asText();
-                            String streamingUrl =
-                                    presenceJson.get("game").has("url") &&
-                                            !presenceJson.get("game").get("url").isNull() ?
-                                            presenceJson.get("game").get("url").asText() : null;
-                            activity = new ImplActivity(ActivityType.getActivityTypeById(activityType), name, streamingUrl);
+                            activity = new ImplActivity(presenceJson.get("game"));
                         }
                         user.setActivity(activity);
                     }
