@@ -65,6 +65,7 @@ import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -306,10 +307,21 @@ public class ImplDiscordApi implements DiscordApi {
                     , 30, 30, TimeUnit.SECONDS);
 
             // Add shutdown hook
-            ready.thenAccept(api -> Runtime.getRuntime().addShutdownHook(new Thread(api::disconnect)));
+            ready.thenAccept(api -> {
+                WeakReference<DiscordApi> discordApiReference = new WeakReference<>(api);
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get()).ifPresent(DiscordApi::disconnect),
+                                                                String.format("%s Shutdown Disconnector (%s)", api.getClass().getSimpleName(), api)));
+            });
         } else {
-            Runtime.getRuntime().addShutdownHook(new Thread(this::disconnect));
+            WeakReference<DiscordApi> discordApiReference = new WeakReference<>(this);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get()).ifPresent(DiscordApi::disconnect),
+                                                            String.format("%s Shutdown Disconnector (%s)", getClass().getSimpleName(), this)));
         }
+    }
+
+    @Override
+    protected void finalize() {
+        disconnect();
     }
 
     /**
