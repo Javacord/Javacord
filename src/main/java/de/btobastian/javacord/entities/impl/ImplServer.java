@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.Activity;
+import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.DefaultMessageNotificationLevel;
 import de.btobastian.javacord.entities.ExplicitContentFilterLevel;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
@@ -210,17 +210,17 @@ public class ImplServer implements Server {
                 long userId = Long.parseLong(presenceJson.get("user").get("id").asText());
                 api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
                     if (presenceJson.has("game")) {
-                        Game game = null;
+                        Activity activity = null;
                         if (!presenceJson.get("game").isNull()) {
-                            int gameType = presenceJson.get("game").get("type").asInt();
+                            int activityType = presenceJson.get("game").get("type").asInt();
                             String name = presenceJson.get("game").get("name").asText();
                             String streamingUrl =
                                     presenceJson.get("game").has("url") &&
                                             !presenceJson.get("game").get("url").isNull() ?
                                             presenceJson.get("game").get("url").asText() : null;
-                            game = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
+                            activity = new ImplActivity(ActivityType.getActivityTypeById(activityType), name, streamingUrl);
                         }
-                        user.setGame(game);
+                        user.setActivity(activity);
                     }
                     if (presenceJson.has("status")) {
                         UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());

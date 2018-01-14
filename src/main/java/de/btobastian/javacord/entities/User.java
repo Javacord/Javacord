@@ -16,8 +16,8 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
+import de.btobastian.javacord.listeners.user.UserChangeActivityListener;
 import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -81,11 +81,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     }
 
     /**
-     * Gets the game of the user.
+     * Gets the activity of the user.
      *
-     * @return The game of the user.
+     * @return The activity of the user.
      */
-    Optional<Game> getGame();
+    Optional<Activity> getActivity();
 
     /**
      * Gets the status of the user.
@@ -370,23 +370,23 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     }
 
     /**
-     * Adds a listener, which listens to this user's game changes.
+     * Adds a listener, which listens to this user's activity changes.
      *
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener) {
+    default ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
         return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserChangeGameListener.class, listener);
+                .addObjectListener(User.class, getId(), UserChangeActivityListener.class, listener);
     }
 
     /**
-     * Gets a list with all registered user change game listeners.
+     * Gets a list with all registered user change activity listeners.
      *
-     * @return A list with all registered user change game listeners.
+     * @return A list with all registered user change activity listeners.
      */
-    default List<UserChangeGameListener> getUserChangeGameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeGameListener.class);
+    default List<UserChangeActivityListener> getUserChangeActivityListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeActivityListener.class);
     }
 
     /**

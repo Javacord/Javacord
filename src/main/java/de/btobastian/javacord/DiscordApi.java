@@ -2,9 +2,9 @@ package de.btobastian.javacord;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import de.btobastian.javacord.entities.Activity;
+import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.ApplicationInfo;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.GameType;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
@@ -62,8 +62,8 @@ import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
+import de.btobastian.javacord.listeners.user.UserChangeActivityListener;
 import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -213,39 +213,39 @@ public interface DiscordApi {
     int getTotalShards();
 
     /**
-     * Updates the game of this bot, represented as "Playing Half-Life 3" for example.
+     * Updates the activity of this bot, represented as "Playing Half-Life 3" for example.
      *
-     * @param name The name of the game.
+     * @param name The name of the activity.
      */
-    void updateGame(String name);
+    void updateActivity(String name);
 
     /**
-     * Updates the game of this bot with any type.
+     * Updates the activity of this bot with any type.
      *
-     * @param name The name of the game.
-     * @param type The type of the game.
+     * @param name The name of the activity.
+     * @param type The type of the activity.
      */
-    void updateGame(String name, GameType type);
+    void updateActivity(String name, ActivityType type);
 
     /**
-     * Updates the game of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
+     * Updates the activity of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
      * The update might not be visible immediately as it's through the websocket and only a limited amount of
-     * game status changes is allowed per minute.
+     * activity status changes is allowed per minute.
      *
-     * @param name The name of the game.
-     * @param streamingUrl The streaming url of the game.
+     * @param name The name of the activity.
+     * @param streamingUrl The streaming url of the activity.
      */
-    void updateGame(String name, String streamingUrl);
+    void updateActivity(String name, String streamingUrl);
 
     /**
-     * Gets the game which should be displayed.
-     * This might not be the game which is really displayed in the client, but it's the game which Javacord is trying
-     * to set for your bot, so it might change in the client a few seconds afterwards. If you want the game which
-     * is currently displayed, get the user object for your bot and get the game from this object.
+     * Gets the activity which should be displayed.
+     * This might not be the activity which is really displayed in the client, but it's the activity which Javacord is trying
+     * to set for your bot, so it might change in the client a few seconds afterwards. If you want the activity which
+     * is currently displayed, get the user object for your bot and get the activity from this object.
      *
-     * @return The game which should be displayed.
+     * @return The activity which should be displayed.
      */
-    Optional<Game> getGame();
+    Optional<Activity> getActivity();
 
     /**
      * Gets a user of the connected account.
@@ -1948,19 +1948,19 @@ public interface DiscordApi {
     List<CustomEmojiCreateListener> getCustomEmojiCreateListeners();
 
     /**
-     * Adds a listener, which listens to user game changes.
+     * Adds a listener, which listens to user activity changes.
      *
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener);
+    ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener);
 
     /**
-     * Gets a list with all registered user change game listeners.
+     * Gets a list with all registered user change activity listeners.
      *
-     * @return A list with all registered user change game listeners.
+     * @return A list with all registered user change activity listeners.
      */
-    List<UserChangeGameListener> getUserChangeGameListeners();
+    List<UserChangeActivityListener> getUserChangeActivityListeners();
 
     /**
      * Adds a listener, which listens to user status changes.

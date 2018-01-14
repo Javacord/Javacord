@@ -2,18 +2,18 @@ package de.btobastian.javacord.utils.handler.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.Activity;
+import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
-import de.btobastian.javacord.entities.impl.ImplGame;
+import de.btobastian.javacord.entities.impl.ImplActivity;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.events.user.UserChangeActivityEvent;
 import de.btobastian.javacord.events.user.UserChangeAvatarEvent;
-import de.btobastian.javacord.events.user.UserChangeGameEvent;
 import de.btobastian.javacord.events.user.UserChangeNameEvent;
 import de.btobastian.javacord.events.user.UserChangeStatusEvent;
+import de.btobastian.javacord.listeners.user.UserChangeActivityListener;
 import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -41,19 +41,19 @@ public class PresenceUpdateHandler extends PacketHandler {
         long userId = packet.get("user").get("id").asLong();
         api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
             if (packet.has("game")) {
-                Game newGame = null;
+                Activity newActivity = null;
                 if (!packet.get("game").isNull()) {
-                    int gameType = packet.get("game").get("type").asInt();
+                    int activityType = packet.get("game").get("type").asInt();
                     String name = packet.get("game").get("name").asText();
                     String streamingUrl =
                             packet.get("game").has("url") && !packet.get("game").get("url").isNull() ?
                             packet.get("game").get("url").asText() : null;
-                    newGame = new ImplGame(GameType.getGameTypeById(gameType), name, streamingUrl);
+                    newActivity = new ImplActivity(ActivityType.getActivityTypeById(activityType), name, streamingUrl);
                 }
-                Game oldGame = user.getGame().orElse(null);
-                user.setGame(newGame);
-                if (!Objects.deepEquals(newGame, oldGame)) {
-                    dispatchUserGameChangeEvent(user, newGame, oldGame);
+                Activity oldActivity = user.getActivity().orElse(null);
+                user.setActivity(newActivity);
+                if (!Objects.deepEquals(newActivity, oldActivity)) {
+                    dispatchUserActivityChangeEvent(user, newActivity, oldActivity);
                 }
             }
             if (packet.has("status")) {
@@ -92,15 +92,15 @@ public class PresenceUpdateHandler extends PacketHandler {
         });
     }
 
-    private void dispatchUserGameChangeEvent(User user, Game newGame, Game oldGame) {
-        UserChangeGameEvent event = new UserChangeGameEvent(api, user, newGame, oldGame);
+    private void dispatchUserActivityChangeEvent(User user, Activity newActivity, Activity oldActivity) {
+        UserChangeActivityEvent event = new UserChangeActivityEvent(api, user, newActivity, oldActivity);
 
-        List<UserChangeGameListener> listeners = new ArrayList<>();
-        listeners.addAll(user.getUserChangeGameListeners());
-        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeGameListeners()));
-        listeners.addAll(api.getUserChangeGameListeners());
+        List<UserChangeActivityListener> listeners = new ArrayList<>();
+        listeners.addAll(user.getUserChangeActivityListeners());
+        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeActivityListeners()));
+        listeners.addAll(api.getUserChangeActivityListeners());
 
-        dispatchEvent(listeners, listener -> listener.onUserChangeGame(event));
+        dispatchEvent(listeners, listener -> listener.onUserChangeActivity(event));
     }
 
     private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {

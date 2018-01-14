@@ -12,7 +12,7 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
-import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.entities.Activity;
 import de.btobastian.javacord.events.connection.LostConnectionEvent;
 import de.btobastian.javacord.events.connection.ReconnectEvent;
 import de.btobastian.javacord.events.connection.ResumeEvent;
@@ -644,18 +644,18 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * Sends the update status packet
      */
     public void updateStatus() {
-        Optional<Game> game = api.getGame();
-        logger.debug("Updating status (game: {})", game.isPresent() ? game.get().getName() : "none");
+        Optional<Activity> activity = api.getActivity();
+        logger.debug("Updating status (activity: {})", activity.isPresent() ? activity.get().getName() : "none");
         ObjectNode updateStatus = JsonNodeFactory.instance.objectNode()
                 .put("op", 3);
         ObjectNode data = updateStatus.putObject("d")
                 .put("status", "online")
                 .put("afk", false)
                 .putNull("since");
-        ObjectNode gameJson = data.putObject("game");
-        gameJson.put("name", game.isPresent() ? game.get().getName() : null);
-        gameJson.put("type", game.map(g -> g.getType().getId()).orElse(0));
-        game.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> gameJson.put("url", url)));
+        ObjectNode activityJson = data.putObject("game");
+        activityJson.put("name", activity.isPresent() ? activity.get().getName() : null);
+        activityJson.put("type", activity.map(g -> g.getType().getId()).orElse(0));
+        activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
         websocket.sendText(updateStatus.toString());
     }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
-import de.btobastian.javacord.entities.Game;
+import de.btobastian.javacord.entities.Activity;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
@@ -70,9 +70,9 @@ public class ImplUser implements User {
     private final boolean bot;
 
     /**
-     * The game of the user.
+     * The activity of the user.
      */
-    private Game game = null;
+    private Activity activity = null;
 
     /**
      * The status of the user.
@@ -109,12 +109,12 @@ public class ImplUser implements User {
     }
 
     /**
-     * Sets the game of the user.
+     * Sets the activity of the user.
      *
-     * @param game The game to set.
+     * @param activity The activity to set.
      */
-    public void setGame(Game game) {
-        this.game = game;
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 
     /**
@@ -185,8 +185,8 @@ public class ImplUser implements User {
     }
 
     @Override
-    public Optional<Game> getGame() {
-        return Optional.ofNullable(game);
+    public Optional<Activity> getActivity() {
+        return Optional.ofNullable(activity);
     }
 
     @Override

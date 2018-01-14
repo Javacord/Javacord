@@ -2,13 +2,13 @@ package de.btobastian.javacord;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.Activity;
+import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.impl.ImplGame;
+import de.btobastian.javacord.entities.impl.ImplActivity;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
@@ -51,8 +51,8 @@ import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
+import de.btobastian.javacord.listeners.user.UserChangeActivityListener;
 import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -134,9 +134,9 @@ public class ImplDiscordApi implements DiscordApi {
     private final Object disconnectCalledLock = new Object();
 
     /**
-     * The game which is currently displayed. May be <code>null</code>.
+     * The activity which is currently displayed. May be <code>null</code>.
      */
-    private Game game;
+    private Activity activity;
 
     /**
      * The default message cache capacity which is applied for every newly created channel.
@@ -462,19 +462,19 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
-     * Sets the current game, along with type and streaming Url.
+     * Sets the current activity, along with type and streaming Url.
      *
-     * @param name The name of the game.
-     * @param type The game's type.
+     * @param name The name of the activity.
+     * @param type The activity's type.
      * @param streamingUrl The Url used for streaming.
      */
-    private void updateGame(String name, GameType type, String streamingUrl){
+    private void updateActivity(String name, ActivityType type, String streamingUrl){
         if (name == null) {
-            game = null;
+            activity = null;
         } else if (streamingUrl == null) {
-            game = new ImplGame(type, name, null);
+            activity = new ImplActivity(type, name, null);
         } else {
-            game = new ImplGame(type, name, streamingUrl);
+            activity = new ImplActivity(type, name, streamingUrl);
         }
         websocketAdapter.updateStatus();
     }
@@ -682,23 +682,23 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public void updateGame(String name) {
-        updateGame(name, GameType.GAME, null);
+    public void updateActivity(String name) {
+        updateActivity(name, ActivityType.GAME, null);
     }
 
     @Override
-    public void updateGame(String name, GameType type) {
-        updateGame(name, type, null);
+    public void updateActivity(String name, ActivityType type) {
+        updateActivity(name, type, null);
     }
 
     @Override
-    public void updateGame(String name, String streamingUrl) {
-        updateGame(name, GameType.STREAMING, streamingUrl);
+    public void updateActivity(String name, String streamingUrl) {
+        updateActivity(name, ActivityType.STREAMING, streamingUrl);
     }
 
     @Override
-    public Optional<Game> getGame() {
-        return Optional.ofNullable(game);
+    public Optional<Activity> getActivity() {
+        return Optional.ofNullable(activity);
     }
 
     @Override
@@ -1140,13 +1140,13 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener) {
-        return addListener(UserChangeGameListener.class, listener);
+    public ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
+        return addListener(UserChangeActivityListener.class, listener);
     }
 
     @Override
-    public List<UserChangeGameListener> getUserChangeGameListeners() {
-        return getListeners(UserChangeGameListener.class);
+    public List<UserChangeActivityListener> getUserChangeActivityListeners() {
+        return getListeners(UserChangeActivityListener.class);
     }
 
     @Override

@@ -1,28 +1,28 @@
 package de.btobastian.javacord.entities.impl;
 
-import de.btobastian.javacord.entities.Game;
-import de.btobastian.javacord.entities.GameType;
+import de.btobastian.javacord.entities.Activity;
+import de.btobastian.javacord.entities.ActivityType;
 
 import java.util.Objects;
 import java.util.Optional;
 
 /**
- * The implementation of {@link Game}.
+ * The implementation of {@link Activity}.
  */
-public class ImplGame implements Game {
+public class ImplActivity implements Activity {
 
-    private final GameType type;
+    private final ActivityType type;
     private final String name;
     private final String streamingUrl;
 
     /**
-     * Creates a new game object.
+     * Creates a new activity object.
      *
-     * @param type The type of the game.
-     * @param name The name of the game.
-     * @param streamingUrl The streaming url of the game. May be <code>null</code>.
+     * @param type The type of the activity.
+     * @param name The name of the activity.
+     * @param streamingUrl The streaming url of the activity. May be <code>null</code>.
      */
-    public ImplGame(GameType type, String name, String streamingUrl) {
+    public ImplActivity(ActivityType type, String name, String streamingUrl) {
         this.type = type;
         this.name = name;
         this.streamingUrl = streamingUrl;
@@ -39,17 +39,17 @@ public class ImplGame implements Game {
     }
 
     @Override
-    public GameType getType() {
+    public ActivityType getType() {
         return type;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ImplGame)) {
+        if (!(obj instanceof ImplActivity)) {
             return false;
         }
-        ImplGame otherGame = (ImplGame) obj;
-        return Objects.deepEquals(name, otherGame.name) && Objects.deepEquals(streamingUrl, otherGame.streamingUrl);
+        ImplActivity otherActivity = (ImplActivity) obj;
+        return Objects.deepEquals(name, otherActivity.name) && Objects.deepEquals(streamingUrl, otherActivity.streamingUrl);
     }
 
     @Override

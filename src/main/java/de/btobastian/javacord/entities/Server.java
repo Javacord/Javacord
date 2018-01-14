@@ -57,8 +57,8 @@ import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
+import de.btobastian.javacord.listeners.user.UserChangeActivityListener;
 import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
-import de.btobastian.javacord.listeners.user.UserChangeGameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
@@ -1814,23 +1814,23 @@ public interface Server extends DiscordEntity {
     }
 
     /**
-     * Adds a listener, which listens to game changes of users in this server.
+     * Adds a listener, which listens to activity changes of users in this server.
      *
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeGameListener> addUserChangeGameListener(UserChangeGameListener listener) {
+    default ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
         return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserChangeGameListener.class, listener);
+                .addObjectListener(Server.class, getId(), UserChangeActivityListener.class, listener);
     }
 
     /**
-     * Gets a list with all registered user change game listeners.
+     * Gets a list with all registered user change activity listeners.
      *
      * @return A list with all registered custom emoji create listeners.
      */
-    default List<UserChangeGameListener> getUserChangeGameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeGameListener.class);
+    default List<UserChangeActivityListener> getUserChangeActivityListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeActivityListener.class);
     }
 
     /**

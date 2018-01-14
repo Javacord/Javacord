@@ -1,19 +1,19 @@
 package de.btobastian.javacord.entities;
 
 /**
- * Represents a game type.
+ * Represents a activity type.
  *
- * @see <a href="https://discordapp.com/developers/docs/topics/gateway#game-object-game-types">Discord docs</a>
+ * @see <a href="https://discordapp.com/developers/docs/topics/gateway#activity-object-activity-types">Discord docs</a>
  */
-public enum GameType {
+public enum ActivityType {
 
     /**
-     * Represents a normal game, represented as "Playing Half-Life 3" for example.
+     * Represents a normal activity, represented as "Playing Half-Life 3" for example.
      */
     GAME(0),
 
     /**
-     * Represents streaming a game, represented as "Streaming Half-Life 3" for example.
+     * Represents streaming a activity, represented as "Streaming Half-Life 3" for example.
      */
     STREAMING(1),
 
@@ -32,28 +32,28 @@ public enum GameType {
     /**
      * Class constructor.
      *
-     * @param id The id of the game type
+     * @param id The id of the activity type
      */
-    GameType(int id) {
+    ActivityType(int id) {
         this.id = id;
     }
 
     /**
-     * Gets the id of the game type.
+     * Gets the id of the activity type.
      *
-     * @return The id of the game type.
+     * @return The id of the activity type.
      */
     public int getId() {
         return id;
     }
 
     /**
-     * Gets the game type by its id.
+     * Gets the activity type by its id.
      *
-     * @param id The id of the game type
-     * @return The game type with the given id or {@link GameType#GAME} if unknown id.
+     * @param id The id of the activity type
+     * @return The activity type with the given id or {@link ActivityType#GAME} if unknown id.
      */
-    public static GameType getGameTypeById(int id) {
+    public static ActivityType getActivityTypeById(int id) {
         switch (id) {
             case 0:
                 return GAME;
