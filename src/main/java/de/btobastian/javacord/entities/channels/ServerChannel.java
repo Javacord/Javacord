@@ -175,6 +175,9 @@ public interface ServerChannel extends Channel {
         }
         for (PermissionType type : PermissionType.values()) {
             Permissions permissions = getOverwrittenPermissions(user);
+            if (permissions.getState(type) == PermissionState.DENIED) {
+                builder.setState(type, PermissionState.DENIED);
+            }
             if (permissions.getState(type) == PermissionState.ALLOWED) {
                 builder.setState(type, PermissionState.ALLOWED);
             }
