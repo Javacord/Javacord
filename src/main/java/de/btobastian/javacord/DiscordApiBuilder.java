@@ -8,7 +8,7 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
 import org.slf4j.Logger;
-import org.slf4j.MDC;
+import org.slf4j.MDC.MDCCloseable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,9 +62,9 @@ public class DiscordApiBuilder {
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
-        MDC.put("shard", Integer.toString(currentShard));
-        new ImplDiscordApi(accountType, token, currentShard, totalShards, future);
-        MDC.remove("shard");
+        try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard))){
+            new ImplDiscordApi(accountType, token, currentShard, totalShards, future);
+        }
         return future;
     }
 
