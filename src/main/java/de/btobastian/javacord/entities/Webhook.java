@@ -1,13 +1,12 @@
 package de.btobastian.javacord.entities;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
+import java.awt.image.BufferedImage;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -85,29 +84,63 @@ public interface Webhook extends DiscordEntity {
     }
 
     /**
+     * Gets the updater for this webhook.
+     *
+     * @return The updater for this webhook.
+     */
+    default WebhookUpdater getUpdater() {
+        return new WebhookUpdater(this);
+    }
+
+    /**
      * Updates the name of the webhook.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link WebhookUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param name The new name of the webhook.
-     * @return The updated webhook. The current object won't get updated!
+     * @return The updated webhook or the current instance if no updates were queued.
      */
     default CompletableFuture<Webhook> updateName(String name) {
-        return new RestRequest<Webhook>(getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
-                .setUrlParameters(getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("name", name))
-                .execute(result -> new ImplWebhook(getApi(), result.getJsonBody()));
+        return getUpdater().setName(name).update();
     }
 
     /**
      * Updates the channel of the webhook.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link WebhookUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param channel The new channel of the webhook.
-     * @return The updated webhook. The current object won't get updated!
+     * @return The updated webhook or the current instance if no updates were queued.
      */
     default CompletableFuture<Webhook> updateChannel(ServerTextChannel channel) {
-        return new RestRequest<Webhook>(getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
-                .setUrlParameters(getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("channel_id", channel.getId()))
-                .execute(result -> new ImplWebhook(getApi(), result.getJsonBody()));
+        return getUpdater().setChannel(channel).update();
+    }
+
+    /**
+     * Updates the avatar of the webhook.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link WebhookUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param avatar The new avatar of the webhook.
+     * @return The updated webhook or the current instance if no updates were queued.
+     */
+    default CompletableFuture<Webhook> updateAvatar(BufferedImage avatar) {
+        return getUpdater().setAvatar(avatar).update();
+    }
+
+    /**
+     * Removes the avatar of the webhook.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link WebhookUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @return The updated webhook or the current instance if no updates were queued.
+     */
+    default CompletableFuture<Webhook> removeAvatar() {
+        return getUpdater().removeAvatar().update();
     }
 
 }
