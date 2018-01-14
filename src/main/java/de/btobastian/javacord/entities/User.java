@@ -132,6 +132,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     }
 
     /**
+     * Gets the discriminated name of the user, e. g. {@code Bastian#8222}.
+     *
+     * @return The discriminated name of the user.
+     */
+    default String getDiscriminatedName() {
+        return getName() + "#" + getDiscriminator();
+    }
+
+    /**
      * Changes the nickname of the user in the given server.
      *
      * @param server The server.

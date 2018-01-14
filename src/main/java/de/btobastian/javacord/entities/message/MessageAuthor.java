@@ -46,11 +46,21 @@ public interface MessageAuthor extends DiscordEntity {
     }
 
     /**
-     * Gets the discriminator of the author.
+     * If the author is a user, gets the discriminated name of the user, e. g. {@code Bastian#8222},
+     * otherwise just gets the name of the author.
      *
-     * @return The discriminator of the author.
+     * @return The discriminated name of the user or the name of the author.
      */
-    String getDiscriminator();
+    default String getDiscriminatedName() {
+        return getDiscriminator().map(discriminator -> getName() + "#" + discriminator).orElseGet(this::getName);
+    }
+
+    /**
+     * Gets the discriminator of the author if the author is a user.
+     *
+     * @return The discriminator of the author if the author is a user.
+     */
+    Optional<String> getDiscriminator();
 
     /**
      * Gets the avatar of the author.
