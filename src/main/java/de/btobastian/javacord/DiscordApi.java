@@ -450,6 +450,28 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a user by its discriminated name like e. g. {@code Bastian#8222}.
+     *
+     * @param discriminatedName The discriminated name of the user.
+     * @return The user with the given discriminated name.
+     */
+    default Optional<User> getUserByDiscriminatedName(String discriminatedName) {
+        String[] nameAndDiscriminator = discriminatedName.split("#", 2);
+        return getUserByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]);
+    }
+
+    /**
+     * Gets a user by its name and discriminator.
+     *
+     * @param name The name of the user.
+     * @param discriminator The discriminator of the user.
+     * @return The user with the given name and discriminator.
+     */
+    default Optional<User> getUserByNameAndDiscriminator(String name, String discriminator) {
+        return getUsersByName(name).stream().filter(user -> user.getDiscriminator().equals(discriminator)).findAny();
+    }
+
+    /**
      * Gets a collection with all users with the given name.
      * This method is case sensitive!
      *

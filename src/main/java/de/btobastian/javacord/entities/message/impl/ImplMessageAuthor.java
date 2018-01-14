@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * The implementation of {@link MessageAuthor}.
@@ -70,8 +71,8 @@ public class ImplMessageAuthor implements MessageAuthor {
     }
 
     @Override
-    public String getDiscriminator() {
-        return discriminator;
+    public Optional<String> getDiscriminator() {
+        return isUser() ? Optional.of(discriminator) : Optional.empty();
     }
 
     @Override
