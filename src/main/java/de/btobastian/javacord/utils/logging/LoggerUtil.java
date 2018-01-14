@@ -2,6 +2,8 @@ package de.btobastian.javacord.utils.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.MDC.MDCCloseable;
 
 import java.util.HashMap;
 
@@ -19,7 +21,7 @@ public class LoggerUtil {
     private static volatile boolean debug = false;
 
     /**
-     * Gets or created a logger with the given name.
+     * Get or create a logger with the given name.
      *
      * @param name The name of the logger.
      * @return The logger with the given name.
@@ -42,6 +44,36 @@ public class LoggerUtil {
         } else {
             return LoggerFactory.getLogger(name);
         }
+    }
+
+    /**
+     * Put a diagnostic context value (the {@code val} parameter) as identified with the
+     * {@code key} parameter into the current thread's diagnostic context map. The
+     * {@code key} parameter cannot be {@code null}. The {@code val} parameter
+     * can be {@code null} only if the underlying implementation supports it.
+     *
+     * <p>
+     * This method delegates all work to the MDC of the underlying logging system
+     * and is a no-op if there is no proper logging binding present, also regarding {@code null} key.
+     * <p>
+     * This method returns a {@code Closeable} object which can remove {@code key} when
+     * {@code close} is called.
+     *
+     * <p>
+     * Useful with Java 7 for example :
+     * {@code
+     *     try(MDCCloseable closeable = LoggerUtil.putCloseableToMdc(key, value)) {
+     *         ....
+     *     }
+     * }
+     *
+     * @param key non-{@code null} key
+     * @param val value to put in the map
+     * @return a {@code Closeable} which can remove {@code key} when {@code close} is called.
+     * @throws IllegalArgumentException in case the {@code key} parameter is {@code null} and the method is not a no-op
+     */
+    public static MDCCloseable putCloseableToMdc(String key, String val) throws IllegalArgumentException {
+        return noLogger ? null : MDC.putCloseable(key, val);
     }
 
     /**
