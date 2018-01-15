@@ -254,15 +254,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     @Override
-    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
-        if (sessionId == null) {
-            sendIdentify(websocket);
-        } else {
-            sendResume(websocket);
-        }
-    }
-
-    @Override
     public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
                                WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
         if (closedByServer) {
@@ -411,6 +402,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 JsonNode data = packet.get("d");
                 heartbeatInterval = data.get("heartbeat_interval").asInt();
                 logger.debug("Received HELLO packet");
+                if (sessionId == null) {
+                    sendIdentify(websocket);
+                } else {
+                    sendResume(websocket);
+                }
                 break;
             case 11:
                 // heartbeat ack received
