@@ -35,6 +35,7 @@ import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
+import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthenticationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
@@ -1767,6 +1768,29 @@ public interface Server extends DiscordEntity {
     default List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners() {
         return ((ImplDiscordApi) getApi())
                 .getObjectListeners(Server.class, getId(), ServerChangeExplicitContentFilterLevelListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to server multi factor authentication level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
+    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change multi factor authentication level listeners.
+     *
+     * @return A list with all registered server change multi factor authentication level listeners.
+     */
+    default List<ServerChangeMultiFactorAuthenticationLevelListener>
+    getServerChangeMultiFactorAuthenticationLevelListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class);
     }
 
     /**

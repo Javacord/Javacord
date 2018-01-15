@@ -297,6 +297,15 @@ public class ImplServer implements Server {
     }
 
     /**
+     * Sets the multi factor authentication level of the server.
+     *
+     * @param multiFactorAuthenticationLevel The multi factor authentication level to set.
+     */
+    public void setMultiFactorAuthenticationLevel(MultiFactorAuthenticationLevel multiFactorAuthenticationLevel) {
+        this.multiFactorAuthenticationLevel = multiFactorAuthenticationLevel;
+    }
+
+    /**
      * Adds a channel to the cache.
      *
      * @param channel The channel to add.

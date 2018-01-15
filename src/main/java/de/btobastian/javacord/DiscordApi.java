@@ -39,6 +39,7 @@ import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
+import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthenticationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
@@ -1868,6 +1869,22 @@ public interface DiscordApi {
      * @return A list with all registered server change default message notification level listeners.
      */
     List<ServerChangeDefaultMessageNotificationLevelListener> getServerChangeDefaultMessageNotificationLevelListeners();
+
+    /**
+     * Adds a listener, which listens to server multi factor authentication level changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
+    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener);
+
+    /**
+     * Gets a list with all registered server change multi factor authentication level listeners.
+     *
+     * @return A list with all registered server change multi factor authentication level listeners.
+     */
+    List<ServerChangeMultiFactorAuthenticationLevelListener> getServerChangeMultiFactorAuthenticationLevelListeners();
 
     /**
      * Adds a listener, which listens to server owner changes.

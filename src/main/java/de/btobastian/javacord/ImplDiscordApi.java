@@ -28,6 +28,7 @@ import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
+import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthenticationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
@@ -1096,6 +1097,18 @@ public class ImplDiscordApi implements DiscordApi {
     public List<ServerChangeDefaultMessageNotificationLevelListener>
     getServerChangeDefaultMessageNotificationLevelListeners() {
         return getListeners(ServerChangeDefaultMessageNotificationLevelListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
+    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener) {
+        return addListener(ServerChangeMultiFactorAuthenticationLevelListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeMultiFactorAuthenticationLevelListener>
+    getServerChangeMultiFactorAuthenticationLevelListeners() {
+        return getListeners(ServerChangeMultiFactorAuthenticationLevelListener.class);
     }
 
     @Override

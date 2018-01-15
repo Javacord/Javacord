@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DefaultMessageNotificationLevel;
 import de.btobastian.javacord.entities.ExplicitContentFilterLevel;
+import de.btobastian.javacord.entities.MultiFactorAuthenticationLevel;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.VerificationLevel;
@@ -11,6 +12,7 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerChangeDefaultMessageNotificationLevelEvent;
 import de.btobastian.javacord.events.server.ServerChangeExplicitContentFilterLevelEvent;
 import de.btobastian.javacord.events.server.ServerChangeIconEvent;
+import de.btobastian.javacord.events.server.ServerChangeMultiFactorAuthenticationLevelEvent;
 import de.btobastian.javacord.events.server.ServerChangeNameEvent;
 import de.btobastian.javacord.events.server.ServerChangeOwnerEvent;
 import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
@@ -18,6 +20,7 @@ import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
+import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthenticationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
@@ -147,6 +150,23 @@ public class GuildUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChangeExplicitContentFilterLevel(event));
             }
 
+            MultiFactorAuthenticationLevel newMultiFactorAuthenticationLevel =
+                    MultiFactorAuthenticationLevel.fromId(packet.get("mfa_level").asInt());
+            MultiFactorAuthenticationLevel oldMultiFactorAuthenticationLevel =
+                    server.getMultiFactorAuthenticationLevel();
+            if (oldMultiFactorAuthenticationLevel != newMultiFactorAuthenticationLevel) {
+                server.setMultiFactorAuthenticationLevel(newMultiFactorAuthenticationLevel);
+                ServerChangeMultiFactorAuthenticationLevelEvent event =
+                        new ServerChangeMultiFactorAuthenticationLevelEvent(api,
+                                server, newMultiFactorAuthenticationLevel, oldMultiFactorAuthenticationLevel);
+
+                List<ServerChangeMultiFactorAuthenticationLevelListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeMultiFactorAuthenticationLevelListeners());
+                listeners.addAll(api.getServerChangeMultiFactorAuthenticationLevelListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeMultiFactorAuthenticationLevel(event));
+            }
+
             String oldAfkChannelId = "...";
             String newAfkChannelId =
                     packet.get("afk_channel_id").isNull() ? null : packet.get("afk_channel_id").asText();
@@ -175,7 +195,6 @@ public class GuildUpdateHandler extends PacketHandler {
 
             // TODO emojis
             // TODO features
-            // TODO mfa_level
             // TODO application_id
             // TODO widget_enabled
             // TODO widget_channel_id
