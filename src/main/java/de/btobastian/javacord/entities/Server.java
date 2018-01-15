@@ -393,6 +393,20 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Updates the multi factor authentication level of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param multiFactorAuthenticationLevel The new multi factor authentication level of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateMultiFactorAuthenticationLevel(
+            MultiFactorAuthenticationLevel multiFactorAuthenticationLevel) {
+        return getUpdater().setMultiFactorAuthenticationLevel(multiFactorAuthenticationLevel).update();
+    }
+
+    /**
      * Updates the afk channel of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
