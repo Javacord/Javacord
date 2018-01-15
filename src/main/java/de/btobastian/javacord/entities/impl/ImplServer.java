@@ -9,6 +9,7 @@ import de.btobastian.javacord.entities.Activity;
 import de.btobastian.javacord.entities.DefaultMessageNotificationLevel;
 import de.btobastian.javacord.entities.ExplicitContentFilterLevel;
 import de.btobastian.javacord.entities.Icon;
+import de.btobastian.javacord.entities.MultiFactorAuthenticationLevel;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
@@ -94,6 +95,11 @@ public class ImplServer implements Server {
     private DefaultMessageNotificationLevel defaultMessageNotificationLevel;
 
     /**
+     * The multi factor authentication level of the server.
+     */
+    private MultiFactorAuthenticationLevel multiFactorAuthenticationLevel;
+
+    /**
      * The amount of members in this server.
      */
     private int memberCount = -1;
@@ -152,6 +158,7 @@ public class ImplServer implements Server {
         explicitContentFilterLevel = ExplicitContentFilterLevel.fromId(data.get("explicit_content_filter").asInt());
         defaultMessageNotificationLevel =
                 DefaultMessageNotificationLevel.fromId(data.get("default_message_notifications").asInt());
+        multiFactorAuthenticationLevel = MultiFactorAuthenticationLevel.fromId(data.get("mfa_level").asInt());
         if (data.has("icon") && !data.get("icon").isNull()) {
             iconHash = data.get("icon").asText();
         }
@@ -550,6 +557,11 @@ public class ImplServer implements Server {
     @Override
     public DefaultMessageNotificationLevel getDefaultMessageNotificationLevel() {
         return defaultMessageNotificationLevel;
+    }
+
+    @Override
+    public MultiFactorAuthenticationLevel getMultiFactorAuthenticationLevel() {
+        return multiFactorAuthenticationLevel;
     }
 
     @Override

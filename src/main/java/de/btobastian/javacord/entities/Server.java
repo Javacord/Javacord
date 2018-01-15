@@ -156,6 +156,13 @@ public interface Server extends DiscordEntity {
     DefaultMessageNotificationLevel getDefaultMessageNotificationLevel();
 
     /**
+     * Gets the multi factor authentication level of the server.
+     *
+     * @return The multi factor authentication level of the server.
+     */
+    MultiFactorAuthenticationLevel getMultiFactorAuthenticationLevel();
+
+    /**
      * Gets the icon of the server.
      *
      * @return The icon of the server.
