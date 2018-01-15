@@ -105,7 +105,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private Timer heartbeatTimer = null;
 
-    private int heartbeatInterval = -1;
     private int lastSeq = -1;
     private String sessionId = null;
 
@@ -322,7 +321,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 if (type.equals("RESUMED")) {
                     reconnectAttempt = 0;
-                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     logger.debug("Received RESUMED packet");
 
                     ResumeEvent resumeEvent = new ResumeEvent(api);
@@ -332,7 +330,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 if (type.equals("READY")) {
                     reconnectAttempt = 0;
-                    heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
                     sessionId = packet.get("d").get("session_id").asText();
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("startupWait").submit(() -> {
@@ -399,9 +396,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 break;
             case 10:
-                JsonNode data = packet.get("d");
-                heartbeatInterval = data.get("heartbeat_interval").asInt();
                 logger.debug("Received HELLO packet");
+            
+                JsonNode data = packet.get("d");
+                int heartbeatInterval = data.get("heartbeat_interval").asInt();
+                heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
+
                 if (sessionId == null) {
                     sendIdentify(websocket);
                 } else {
