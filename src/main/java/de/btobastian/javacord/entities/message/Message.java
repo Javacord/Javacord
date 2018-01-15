@@ -522,7 +522,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         while (channelMention.find()) {
             String channelId = channelMention.group("id");
             getApi().getServerTextChannelById(channelId)
-                    .filter(mentionedChannels::contains)
+                    .filter(channel -> !mentionedChannels.contains(channel))
                     .ifPresent(mentionedChannels::add);
         }
         return mentionedChannels;
