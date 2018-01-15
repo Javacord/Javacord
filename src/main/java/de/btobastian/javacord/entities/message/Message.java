@@ -25,6 +25,7 @@ import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
+import de.btobastian.javacord.utils.DiscordRegexPattern;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class represents a Discord message.
@@ -387,7 +387,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default String getReadableContent() {
         String content = getContent();
-        Matcher userMention = Pattern.compile("<@!?([0-9]+)>").matcher(content);
+        Matcher userMention = DiscordRegexPattern.USER_MENTION.matcher(content);
         while (userMention.find()) {
             String userId = userMention.group(1);
             String userName = getChannel().asServerChannel().map(c -> {
@@ -398,7 +398,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             content = userMention.replaceFirst("@" + userName);
             userMention.reset(content);
         }
-        Matcher channelMention = Pattern.compile("<#([0-9]+)>").matcher(content);
+        Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(content);
         while (channelMention.find()) {
             String channelId = channelMention.group(1);
             String channelName = getChannel().asServerChannel().map(c ->
@@ -407,7 +407,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             content = channelMention.replaceFirst("#" + channelName);
             channelMention.reset(content);
         }
-        Matcher customEmoji = Pattern.compile("<a?:([0-9a-zA-Z]+):([0-9]+)>").matcher(content);
+        Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
         while (customEmoji.find()) {
             String emojiId = customEmoji.group(2);
             String name = getApi().getCustomEmojiById(emojiId).map(CustomEmoji::getName).orElse(customEmoji.group(1));
