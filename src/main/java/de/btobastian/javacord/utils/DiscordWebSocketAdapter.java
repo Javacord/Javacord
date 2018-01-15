@@ -377,7 +377,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             case 7:
                 logger.debug("Received op 7 packet. Reconnecting...");
                 websocket.sendClose(1000);
-                connect();
                 break;
             case 9:
                 if (lastSentFrameWasIdentify.isMarked()) {
