@@ -521,7 +521,9 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(getContent());
         while (channelMention.find()) {
             String channelId = channelMention.group("id");
-            getApi().getServerTextChannelById(channelId).ifPresent(mentionedChannels::add);
+            getApi().getServerTextChannelById(channelId)
+                    .filter(mentionedChannels::contains)
+                    .ifPresent(mentionedChannels::add);
         }
         return mentionedChannels;
     }
