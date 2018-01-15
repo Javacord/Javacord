@@ -389,7 +389,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         String content = getContent();
         Matcher userMention = DiscordRegexPattern.USER_MENTION.matcher(content);
         while (userMention.find()) {
-            String userId = userMention.group(1);
+            String userId = userMention.group("id");
             String userName = getChannel().asServerChannel().map(c -> {
                 Optional<User> user = c.getServer().getMembers().stream()
                         .filter(u -> userId.equals(String.valueOf(u.getId()))).findAny();
@@ -400,7 +400,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         }
         Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(content);
         while (channelMention.find()) {
-            String channelId = channelMention.group(1);
+            String channelId = channelMention.group("id");
             String channelName = getChannel().asServerChannel().map(c ->
                 c.getServer().getTextChannelById(channelId).map(ServerChannel::getName).orElse("deleted-channel")
             ).orElse("deleted-channel");
@@ -409,8 +409,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         }
         Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
         while (customEmoji.find()) {
-            String emojiId = customEmoji.group(2);
-            String name = getApi().getCustomEmojiById(emojiId).map(CustomEmoji::getName).orElse(customEmoji.group(1));
+            String emojiId = customEmoji.group("id");
+            String name = getApi().getCustomEmojiById(emojiId)
+                    .map(CustomEmoji::getName)
+                    .orElse(customEmoji.group("name"));
             content = customEmoji.replaceFirst(":" + name + ":");
             customEmoji.reset(content);
         }
