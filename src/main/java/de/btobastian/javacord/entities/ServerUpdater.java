@@ -64,11 +64,6 @@ public class ServerUpdater {
     private DefaultMessageNotificationLevel defaultMessageNotificationLevel = null;
 
     /**
-     * The multi factor authentication level to update.
-     */
-    private MultiFactorAuthenticationLevel multiFactorAuthenticationLevel = null;
-
-    /**
      * The afk channel to update.
      */
     private ServerChannel afkChannel = null;
@@ -149,18 +144,6 @@ public class ServerUpdater {
     public ServerUpdater setDefaultMessageNotificationLevel(
             DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
         this.defaultMessageNotificationLevel = defaultMessageNotificationLevel;
-        return this;
-    }
-
-    /**
-     * Queues the multi factor authentication level to be updated.
-     *
-     * @param multiFactorAuthenticationLevel The new multi factor authentication level of the server.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater setMultiFactorAuthenticationLevel(
-            MultiFactorAuthenticationLevel multiFactorAuthenticationLevel) {
-        this.multiFactorAuthenticationLevel = multiFactorAuthenticationLevel;
         return this;
     }
 
@@ -329,10 +312,6 @@ public class ServerUpdater {
         }
         if (defaultMessageNotificationLevel != null) {
             body.put("default_message_notifications", defaultMessageNotificationLevel.getId());
-            patchServer = true;
-        }
-        if (multiFactorAuthenticationLevel != null) {
-            body.put("mfa_level", multiFactorAuthenticationLevel.getId());
             patchServer = true;
         }
         if (afkChannel != null) {
