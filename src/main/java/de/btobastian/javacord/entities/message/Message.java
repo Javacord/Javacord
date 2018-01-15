@@ -32,6 +32,7 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -509,6 +510,21 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A list with all roles mentioned in this message.
      */
     List<Role> getMentionedRoles();
+
+    /**
+     * Gets a list with all channels mentioned in this message.
+     *
+     * @return A list with all channels mentioned in this message.
+     */
+    default List<ServerTextChannel> getMentionedChannels() {
+        List<ServerTextChannel> mentionedChannels = new ArrayList<>();
+        Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(getContent());
+        while (channelMention.find()) {
+            String channelId = channelMention.group("id");
+            getApi().getServerTextChannelById(channelId).ifPresent(mentionedChannels::add);
+        }
+        return mentionedChannels;
+    }
 
     /**
      * Gets a reaction by its emoji.
