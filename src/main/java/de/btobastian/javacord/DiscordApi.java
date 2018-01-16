@@ -53,6 +53,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
@@ -1981,6 +1982,22 @@ public interface DiscordApi {
      * @return A list with all registered custom emoji create listeners.
      */
     List<CustomEmojiCreateListener> getCustomEmojiCreateListeners();
+
+    /**
+     * Adds a listener, which listens to custom emoji name changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
+            CustomEmojiChangeNameListener listener);
+
+    /**
+     * Gets a list with all registered custom emoji change name listeners.
+     *
+     * @return A list with all registered custom emoji change name listeners.
+     */
+    List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners();
 
     /**
      * Adds a listener, which listens to user activity changes.

@@ -1,14 +1,18 @@
 package de.btobastian.javacord.entities.message.emoji;
 
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplIcon;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
+import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -64,6 +68,28 @@ public interface CustomEmoji extends DiscordEntity, Emoji {
     @Override
     default Optional<CustomEmoji> asCustomEmoji() {
         return Optional.of(this);
+    }
+
+    /**
+     * Adds a listener, which listens to this custom emoji being updated.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
+            CustomEmojiChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(CustomEmoji.class, getId(), CustomEmojiChangeNameListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered custom emoji update listeners.
+     *
+     * @return A list with all registered custom emoji update listeners.
+     */
+    default List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(CustomEmoji.class, getId(), CustomEmojiChangeNameListener.class);
     }
 
 }

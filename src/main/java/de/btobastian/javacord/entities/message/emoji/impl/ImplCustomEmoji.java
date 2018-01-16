@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -36,7 +37,7 @@ public class ImplCustomEmoji implements CustomEmoji {
     /**
      * Whether the emoji is animated or not.
      */
-    private final boolean animated;
+    private boolean animated;
 
     /**
      * Creates a new custom emoji.
@@ -59,8 +60,36 @@ public class ImplCustomEmoji implements CustomEmoji {
         this.api = api;
         this.server = server;
         id = data.get("id").asLong();
-        name = data.get("name").asText();
-        animated = data.has("animated") && data.get("animated").asBoolean(false);
+        updateFromJson(data);
+    }
+
+    /**
+     * Update the custom emoji with updated information.
+     *
+     * @param data The json data of the emoji
+     * @return whether anything was obsolete and got updated
+     * @throws IllegalArgumentException if the id does not match
+     */
+    public boolean updateFromJson(JsonNode data) {
+        if (id != data.get("id").asLong()) {
+            throw new IllegalArgumentException("id does not match");
+        }
+
+        boolean result = false;
+
+        String name = data.get("name").asText();
+        if (!Objects.equals(this.name, name)) {
+            this.name = name;
+            result = true;
+        }
+
+        boolean animated = data.has("animated") && data.get("animated").asBoolean(false);
+        if (!this.animated == animated) {
+            this.animated = animated;
+            result = true;
+        }
+
+        return result;
     }
 
     @Override
