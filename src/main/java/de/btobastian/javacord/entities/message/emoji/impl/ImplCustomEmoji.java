@@ -90,6 +90,6 @@ public class ImplCustomEmoji implements CustomEmoji {
 
     @Override
     public String toString() {
-        return String.format("CustomEmoji (id: %s, name: %s)", getId(), getName());
+        return String.format("CustomEmoji (id: %s, name: %s, animated: %b)", getId(), getName(), isAnimated());
     }
 }
