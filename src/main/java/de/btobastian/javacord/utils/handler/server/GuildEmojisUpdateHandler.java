@@ -7,14 +7,18 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.events.server.emoji.CustomEmojiChangeNameEvent;
 import de.btobastian.javacord.events.server.emoji.CustomEmojiCreateEvent;
+import de.btobastian.javacord.events.server.emoji.CustomEmojiDeleteEvent;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Handles the guild update packet.
@@ -70,6 +74,25 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     dispatchEvent(listeners, listener -> listener.onCustomEmojiCreate(event));
                 }
             });
+
+            Set<Long> emojiIds = emojis.keySet();
+            server.getCustomEmojis().stream()
+                    .filter(emoji -> !emojiIds.contains(emoji.getId()))
+                    // decouple from original collection
+                    .collect(Collectors.toList())
+                    .stream()
+                    .forEach(emoji -> {
+                        server.removeCustomEmoji(emoji);
+
+                        CustomEmojiDeleteEvent event = new CustomEmojiDeleteEvent(emoji);
+
+                        List<CustomEmojiDeleteListener> listeners = new ArrayList<>();
+                        listeners.addAll(emoji.getCustomEmojiDeleteListeners());
+                        listeners.addAll(server.getCustomEmojiDeleteListeners());
+                        listeners.addAll(api.getCustomEmojiDeleteListeners());
+
+                        dispatchEvent(listeners, listener -> listener.onCustomEmojiDelete(event));
+                    });
         });
     }
 

@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplIcon;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
@@ -90,6 +91,28 @@ public interface CustomEmoji extends DiscordEntity, Emoji {
     default List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
         return ((ImplDiscordApi) getApi())
                 .getObjectListeners(CustomEmoji.class, getId(), CustomEmojiChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this custom emoji being deleted.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(
+            CustomEmojiDeleteListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(CustomEmoji.class, getId(), CustomEmojiDeleteListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered custom emoji delete listeners.
+     *
+     * @return A list with all registered custom emoji delete listeners.
+     */
+    default List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(CustomEmoji.class, getId(), CustomEmojiDeleteListener.class);
     }
 
 }

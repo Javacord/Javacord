@@ -55,6 +55,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListen
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
@@ -1998,6 +1999,21 @@ public interface DiscordApi {
      * @return A list with all registered custom emoji change name listeners.
      */
     List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners();
+
+    /**
+     * Adds a listener, which listens to custom emoji deletions.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(CustomEmojiDeleteListener listener);
+
+    /**
+     * Gets a list with all registered custom emoji delete listeners.
+     *
+     * @return A list with all registered custom emoji delete listeners.
+     */
+    List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners();
 
     /**
      * Adds a listener, which listens to user activity changes.
