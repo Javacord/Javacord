@@ -75,6 +75,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicMarkableReference;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -112,6 +113,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify =
             new AtomicMarkableReference<>(null, false);
+    private final AtomicReference<WebSocketFrame> nextHeartbeatFrame = new AtomicReference<>(null);
     private final List<WebSocketListener> identifyFrameListeners = Collections.synchronizedList(new ArrayList<>());
 
     private long lastGuildMembersChunkReceived = System.currentTimeMillis();
@@ -471,7 +473,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         ObjectNode heartbeatPacket = JsonNodeFactory.instance.objectNode();
         heartbeatPacket.put("op", 1);
         heartbeatPacket.put("d", lastSeq);
-        websocket.sendText(heartbeatPacket.toString());
+        WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
+        nextHeartbeatFrame.set(heartbeatFrame);
+        websocket.sendFrame(heartbeatFrame);
     }
 
     /**
@@ -522,10 +526,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             @Override
             public void onFrameSent(WebSocket websocket, WebSocketFrame frame) {
                 if (lastSentFrameWasIdentify.isMarked()) {
-                    // sending frame after identify was sent => unset mark
-                    lastSentFrameWasIdentify.set(null, false);
-                    websocket.removeListener(this);
-                    identifyFrameListeners.remove(this);
+                    // sending non-heartbeat frame after identify was sent => unset mark
+                    if (!nextHeartbeatFrame.compareAndSet(frame, null)) {
+                        lastSentFrameWasIdentify.set(null, false);
+                        websocket.removeListener(this);
+                        identifyFrameListeners.remove(this);
+                    }
                 } else {
                     // identify frame is actually sent => set the mark
                     if (lastSentFrameWasIdentify.compareAndSet(frame, null, false, true)) {
