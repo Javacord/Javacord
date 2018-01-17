@@ -74,6 +74,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
@@ -105,6 +106,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private WebSocket websocket = null;
 
     private Timer heartbeatTimer = null;
+    private final AtomicBoolean heartbeatAckReceived = new AtomicBoolean();
 
     private int lastSeq = -1;
     private String sessionId = null;
@@ -203,7 +205,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     public void disconnect() {
         reconnect = false;
-        websocket.sendClose(1000);
+        websocket.sendClose(WebSocketCloseReason.DISCONNECT.getCloseCode());
     }
 
     /**
@@ -385,7 +387,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 break;
             case 7:
                 logger.debug("Received op 7 packet. Reconnecting...");
-                websocket.sendClose(1000);
+                websocket.sendClose(WebSocketCloseReason.DISCONNECT.getCloseCode());
                 break;
             case 9:
                 long fakeLastIdentificationTime = System.currentTimeMillis();
@@ -417,7 +419,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 break;
             case 11:
-                // heartbeat ack received
+                logger.debug("Heartbeat ACK received");
+                heartbeatAckReceived.set(true);
                 break;
             default:
                 logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
@@ -460,12 +463,19 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * @return The timer used for the heartbeat.
      */
     private Timer startHeartbeat(final WebSocket websocket, final int heartbeatInterval) {
+        // first heartbeat should assume last heartbeat was answered properly
+        heartbeatAckReceived.set(true);
         final Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                sendHeartbeat(websocket);
-                logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
+                if (heartbeatAckReceived.getAndSet(false)) {
+                    sendHeartbeat(websocket);
+                    logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
+                } else {
+                    websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseCode(),
+                                        WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
+                }
             }
         }, 0, heartbeatInterval);
         return timer;
