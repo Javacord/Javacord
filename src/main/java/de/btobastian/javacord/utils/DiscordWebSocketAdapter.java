@@ -386,8 +386,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 sendHeartbeat(websocket);
                 break;
             case 7:
-                logger.debug("Received op 7 packet. Reconnecting...");
-                websocket.sendClose(WebSocketCloseReason.DISCONNECT.getCloseCode());
+                websocket.sendClose(WebSocketCloseReason.OPCODE_7_RECEIVED.getCloseCode(),
+                                    WebSocketCloseReason.OPCODE_7_RECEIVED.getCloseReason());
                 break;
             case 9:
                 long fakeLastIdentificationTime = System.currentTimeMillis();

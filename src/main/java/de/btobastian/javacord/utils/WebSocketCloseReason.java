@@ -6,7 +6,8 @@ package de.btobastian.javacord.utils;
 public enum WebSocketCloseReason {
 
     DISCONNECT(1000),
-    HEARTBEAT_NOT_PROPERLY_ANSWERED(1001, "Heartbeat was not answered properly");
+    HEARTBEAT_NOT_PROPERLY_ANSWERED(1001, "Heartbeat was not answered properly"),
+    OPCODE_7_RECEIVED(4000, "Received opcode 7");
 
     /**
      * The close code.
