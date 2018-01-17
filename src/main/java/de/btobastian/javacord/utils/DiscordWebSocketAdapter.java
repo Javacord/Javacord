@@ -221,18 +221,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
-            String token = api.getToken();
-            // identification is rate limited to once every 5 seconds,
-            // so don't try to more often per account, even in different instances
-            connectionDelaySemaphorePerAccount.computeIfAbsent(token, key -> new Semaphore(1)).acquireUninterruptibly();
-            for (long delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L));
-                 delay > 0;
-                 delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L))) {
-                logger.debug("Delaying connecting by {}ms", delay);
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException ignored) { }
-            }
+            waitForIdentifyRateLimit();
             websocket.connect();
         } catch (Throwable t) {
             logger.warn("An error occurred while connecting to websocket", t);
@@ -251,6 +240,24 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             this.connect();
                         }, api.getReconnectDelay(reconnectAttempt), TimeUnit.SECONDS);
             }
+        }
+    }
+
+    /**
+     * Identification is rate limited to once every 5 seconds,
+     * so don't try to more often per account, even in different instances.
+     * This method waits for the identification rate limit to be over, then returns.
+     */
+    private void waitForIdentifyRateLimit() {
+        String token = api.getToken();
+        connectionDelaySemaphorePerAccount.computeIfAbsent(token, key -> new Semaphore(1)).acquireUninterruptibly();
+        for (long delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L));
+             delay > 0;
+             delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L))) {
+            logger.debug("Delaying connecting by {}ms", delay);
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException ignored) { }
         }
     }
 
@@ -381,24 +388,24 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 websocket.sendClose(1000);
                 break;
             case 9:
+                long fakeLastIdentificationTime = System.currentTimeMillis();
                 if (lastSentFrameWasIdentify.isMarked()) {
                     logger.info("Hit identifying rate limit. Retrying in 5 seconds...");
-                    lastIdentificationPerAccount.put(api.getToken(), System.currentTimeMillis());
-                    sendIdentify(websocket);
                 } else {
                     // Invalid session :(
                     int zeroToFourSeconds = (int) (Math.random() * 4000);
                     logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
                                 1 + zeroToFourSeconds / 1000,
                                 1 + zeroToFourSeconds / 100 % 10);
-                    lastIdentificationPerAccount
-                            .put(api.getToken(), System.currentTimeMillis() - 4000 + zeroToFourSeconds);
-                    sendIdentify(websocket);
+                    fakeLastIdentificationTime -= 4000 - zeroToFourSeconds;
                 }
+                lastIdentificationPerAccount.put(api.getToken(), fakeLastIdentificationTime);
+                waitForIdentifyRateLimit();
+                sendIdentify(websocket);
                 break;
             case 10:
                 logger.debug("Received HELLO packet");
-            
+
                 JsonNode data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
                 heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
