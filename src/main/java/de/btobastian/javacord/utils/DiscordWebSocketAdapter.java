@@ -210,7 +210,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     public void disconnect() {
         reconnect = false;
-        websocket.sendClose(WebSocketCloseReason.DISCONNECT.getCloseCode());
+        websocket.sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
     }
 
     /**
@@ -272,19 +272,35 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
                                WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
         if (closedByServer) {
-            logger.info("Websocket closed with reason {} and code {} by server!",
-                    serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown",
-                    serverCloseFrame != null ? serverCloseFrame.getCloseCode() : "unknown");
+            String closeReason = serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown";
+            String closeCodeString;
+            if (serverCloseFrame != null) {
+                int code = serverCloseFrame.getCloseCode();
+                closeCodeString = WebSocketCloseCode.fromCode(code)
+                        .map(closeCode -> closeCode + " (" + code + ")")
+                        .orElseGet(() -> String.valueOf(code));
+            } else {
+                closeCodeString = "'unknown'";
+            }
+            logger.info("Websocket closed with reason '{}' and code {} by server!", closeReason, closeCodeString);
         } else {
             switch (clientCloseFrame == null ? -1 : clientCloseFrame.getCloseCode()) {
-                case 1002:
-                case 1008:
+                case com.neovisionaries.ws.client.WebSocketCloseCode.UNCONFORMED:
+                case com.neovisionaries.ws.client.WebSocketCloseCode.VIOLATED:
                     logger.debug("Websocket closed!");
                     break;
                 default:
-                    logger.info("Websocket closed with reason {} and code {} by client!",
-                            clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown",
-                            clientCloseFrame != null ? clientCloseFrame.getCloseCode() : "unknown");
+                    String closeReason = clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown";
+                    String closeCodeString;
+                    if (clientCloseFrame != null) {
+                        int code = clientCloseFrame.getCloseCode();
+                        closeCodeString = WebSocketCloseCode.fromCode(code)
+                                .map(closeCode -> closeCode + " (" + code + ")")
+                                .orElseGet(() -> String.valueOf(code));
+                    } else {
+                        closeCodeString = "'unknown'";
+                    }
+                    logger.info("Websocket closed with reason '{}' and code {} by client!", closeReason, closeCodeString);
                     break;
             }
         }
@@ -391,8 +407,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 sendHeartbeat(websocket);
                 break;
             case 7:
-                websocket.sendClose(WebSocketCloseReason.OPCODE_7_RECEIVED.getCloseCode(),
-                                    WebSocketCloseReason.OPCODE_7_RECEIVED.getCloseReason());
+                websocket.sendClose(WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
+                                    WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
                 break;
             case 9:
                 long fakeLastIdentificationTime = System.currentTimeMillis();
@@ -479,7 +495,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     sendHeartbeat(websocket);
                     logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
                 } else {
-                    websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseCode(),
+                    websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
                                         WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
                 }
             }

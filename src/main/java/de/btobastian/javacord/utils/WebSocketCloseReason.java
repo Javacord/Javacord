@@ -1,18 +1,18 @@
 package de.btobastian.javacord.utils;
 
 /**
- * A enum with all different channel types.
+ * An enum with all different web socket close reasons.
  */
 public enum WebSocketCloseReason {
 
-    DISCONNECT(1000),
-    HEARTBEAT_NOT_PROPERLY_ANSWERED(1001, "Heartbeat was not answered properly"),
-    OPCODE_7_RECEIVED(4000, "Received opcode 7");
+    DISCONNECT(WebSocketCloseCode.NORMAL),
+    HEARTBEAT_NOT_PROPERLY_ANSWERED(WebSocketCloseCode.UNKNOWN_ERROR, "Heartbeat was not answered properly"),
+    COMMANDED_RECONNECT(WebSocketCloseCode.COMMANDED_RECONNECT, "Discord commanded a reconnect (Received opcode 7)");
 
     /**
-     * The close code.
+     * The web socket close code.
      */
-    private final int closeCode;
+    private final WebSocketCloseCode closeCode;
 
     /**
      * The close reason.
@@ -22,30 +22,30 @@ public enum WebSocketCloseReason {
     /**
      * Creates a new web socket close reason.
      *
-     * @param closeCode The close code.
+     * @param closeCode The web socket close code.
      */
-    WebSocketCloseReason(int closeCode) {
+    WebSocketCloseReason(WebSocketCloseCode closeCode) {
         this(closeCode, null);
     }
 
     /**
      * Creates a new web socket close reason.
      *
-     * @param closeCode The close code.
+     * @param closeCode The web socket close code.
      * @param closeReason The close reason.
      */
-    WebSocketCloseReason(int closeCode, String closeReason) {
+    WebSocketCloseReason(WebSocketCloseCode closeCode, String closeReason) {
         this.closeCode = closeCode;
         this.closeReason = closeReason;
     }
 
     /**
-     * Gets the close code.
+     * Gets the actual numeric close code.
      *
-     * @return The close code.
+     * @return The actual numeric close code.
      */
-    public int getCloseCode() {
-        return closeCode;
+    public int getNumericCloseCode() {
+        return closeCode.getCode();
     }
 
     /**
