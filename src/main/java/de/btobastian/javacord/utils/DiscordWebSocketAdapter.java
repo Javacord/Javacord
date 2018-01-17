@@ -67,6 +67,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -104,7 +105,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private WebSocket websocket = null;
 
-    private Timer heartbeatTimer = null;
+    private final Map<WebSocket, Timer> heartbeatTimerByWebSocket = Collections.synchronizedMap(new WeakHashMap<>());
 
     private int lastSeq = -1;
     private String sessionId = null;
@@ -293,10 +294,10 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         }
 
         // Reconnect
-        if (heartbeatTimer != null) {
-            heartbeatTimer.cancel();
-            heartbeatTimer = null;
-        }
+        heartbeatTimerByWebSocket.computeIfPresent(websocket, (key, timer) -> {
+            timer.cancel();
+            return null;
+        });
 
         if (reconnect) {
             reconnectAttempt++;
@@ -408,7 +409,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
                 JsonNode data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
-                heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
+                heartbeatTimerByWebSocket.compute(websocket, (key, timer) -> startHeartbeat(key, heartbeatInterval));
 
                 if (sessionId == null) {
                     sendIdentify(websocket);
