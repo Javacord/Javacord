@@ -92,6 +92,23 @@ public class ImplCustomEmoji implements CustomEmoji {
         return result;
     }
 
+    /**
+     * Creates a new custom emoji.
+     *
+     * @param api The discord api instance.
+     * @param server The server of the emoji.
+     * @param id The id of the emoji.
+     * @param name The name of the emoji.
+     * @param animated Whether the emoji is animated or not.
+     */
+    public ImplCustomEmoji(ImplDiscordApi api, Server server, long id, String name, boolean animated) {
+        this.api = api;
+        this.server = server;
+        this.id = id;
+        this.name = name;
+        this.animated = animated;
+    }
+
     @Override
     public DiscordApi getApi() {
         return api;

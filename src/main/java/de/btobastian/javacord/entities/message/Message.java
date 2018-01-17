@@ -16,6 +16,7 @@ import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
+import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -432,6 +433,31 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             customEmoji.reset(content);
         }
         return ESCAPED_CHARACTER.matcher(content).replaceAll("${char}");
+    }
+
+    /**
+     * Gets a list of all custom emojis in the message.
+     *
+     * @return The list of custom emojis in the message.
+     */
+    default List<CustomEmoji> getCustomEmojis() {
+        String content = getContent();
+        List<CustomEmoji> emojis = new ArrayList<>();
+        Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
+        while (customEmoji.find()) {
+            getServer().ifPresent(server -> {
+                String id = customEmoji.group("id");
+                Optional<CustomEmoji> maybeEmoji = server.getCustomEmojiById(id);
+                if (maybeEmoji.isPresent()) {
+                    emojis.add(maybeEmoji.get());
+                } else {
+                    emojis.add(new ImplCustomEmoji((ImplDiscordApi) getApi(), null, Long.parseLong(id),
+                            customEmoji.group("name"),
+                            customEmoji.group(0).charAt(1) == 'a'));
+                }
+            });
+        }
+        return emojis;
     }
 
     /**
