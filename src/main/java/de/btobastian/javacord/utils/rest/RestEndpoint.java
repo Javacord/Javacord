@@ -35,7 +35,7 @@ public enum RestEndpoint {
     CHANNEL_WEBHOOK("/channels/%s/webhooks", 0),
     SERVER_WEBHOOK("/guilds/%s/webhooks", 0),
     SERVER_INVITE("/guilds/%s/invites", 0),
-    WEBHOOK("/webhooks/%s"),
+    WEBHOOK("/webhooks/%s", 0),
     INVITE("/invites/%s"),
     BAN("/guilds/%s/bans", 0),
     CURRENT_USER("/users/@me"),
