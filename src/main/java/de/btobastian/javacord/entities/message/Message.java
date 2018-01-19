@@ -17,7 +17,6 @@ import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
-import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -56,10 +55,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
                 .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
                 .setRatelimitRetries(250)
-                .execute(result -> {
-                    api.getCachedMessageById(messageId).ifPresent(msg -> ((ImplMessage) msg).setDeleted(true));
-                    return null;
-                });
+                .execute(result -> null);
     }
 
     /**
@@ -484,24 +480,6 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @param cachedForever  Whether the message should be kept in cache forever or not.
      */
     void setCachedForever(boolean cachedForever);
-
-    /**
-     * Checks if the information of this message is still valid.
-     * If the message got removed from cache but you stored this objects somewhere it might have outdated content.
-     *
-     * @return Whether the information of this message is still valid or not.
-     */
-    default boolean isValid() {
-        return getApi().getCachedMessageById(getId()).orElse(null) == this;
-    }
-
-    /**
-     * Whether this message is deleted or not.
-     * Deleted messages might still be in the cache for not more than 60 seconds.
-     *
-     * @return Whether the message is deleted or not.
-     */
-    boolean isDeleted();
 
     /**
      * Gets a list with all reactions of the message.

@@ -75,6 +75,8 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,7 +84,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -227,7 +231,19 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * A map with all cached messages.
      */
-    private final ConcurrentHashMap<Long, Message> messages = new ConcurrentHashMap<>();
+    private final Map<Long, WeakReference<Message>> messages = Collections.synchronizedMap(new ConcurrentHashMap<>());
+
+    /**
+     * A map to retrieve message IDs by the weak ref that point to the respective
+     * message or used to point to it for usage in the messages cleanup,
+     * as at cleanup time the weak ref is already emptied.
+     */
+    private final Map<Reference<? extends Message>, Long> messageIdByRef = Collections.synchronizedMap(new WeakHashMap<>());
+
+    /**
+     * The queue that is notified if a message became weakly-reachable.
+     */
+    private final ReferenceQueue<Message> messagesCleanupQueue = new ReferenceQueue<>();
 
     /**
      * A map which contains all listeners.
@@ -317,9 +333,17 @@ public class ImplDiscordApi implements DiscordApi {
                 }
             });
 
-            getThreadPool().getScheduler().scheduleAtFixedRate(
-                    () -> messages.entrySet().removeIf(entry -> !((ImplMessage) entry.getValue()).keepCached())
-                    , 30, 30, TimeUnit.SECONDS);
+            // After minimum JDK 9 is required this can be switched to use a Cleaner
+            getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+                for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
+                     messageRef != null;
+                     messageRef = messagesCleanupQueue.poll()) {
+                    Long messageId = messageIdByRef.remove(messageRef);
+                    if (messageId != null) {
+                        messages.remove(messageId, messageRef);
+                    }
+                }
+            }, 30, 30, TimeUnit.SECONDS);
 
             // Add shutdown hook
             ready.thenAccept(api -> {
@@ -350,6 +374,7 @@ public class ImplDiscordApi implements DiscordApi {
         unavailableServers.clear();
         customEmojis.clear();
         messages.clear();
+        messageIdByRef.clear();
         timeOffset = null;
     }
 
@@ -475,8 +500,14 @@ public class ImplDiscordApi implements DiscordApi {
     public Message getOrCreateMessage(TextChannel channel, JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
         // The constructor already adds the message to the cache.
-        // If we use #computeIfAbsent() here, it would cause a deadlock
-        return messages.getOrDefault(id, new ImplMessage(this, channel, data));
+        // If we use #compute() here, it would cause a deadlock
+        synchronized (messages) {
+            WeakReference<Message> resultRef = messages.get(id);
+            // If the map has no entry or the weak ref was still in the map but cleared, create a new message
+            return (resultRef == null) || (resultRef.get() == null)
+                   ? new ImplMessage(this, channel, data)
+                   : resultRef.get();
+        }
     }
 
     /**
@@ -485,7 +516,26 @@ public class ImplDiscordApi implements DiscordApi {
      * @param message The message to add.
      */
     public void addMessageToCache(Message message) {
-        messages.computeIfAbsent(message.getId(), key -> message);
+        messages.compute(message.getId(), (key, value) -> {
+            if ((value == null) || (value.get() == null)) {
+                WeakReference<Message> result = new WeakReference<>(message, messagesCleanupQueue);
+                messageIdByRef.put(result, message.getId());
+                return result;
+            }
+            return value;
+        });
+    }
+
+    /**
+     * Removes a message from the cache.
+     *
+     * @param messageId The id of the message to remove.
+     */
+    public void removeMessageFromCache(long messageId) {
+        WeakReference<Message> messageRef = messages.remove(messageId);
+        if (messageRef != null) {
+            messageIdByRef.remove(messageRef, messageId);
+        }
     }
 
     /**
@@ -832,12 +882,17 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public Collection<Message> getCachedMessages() {
-        return messages.values();
+        synchronized (messages) {
+            return messages.values().stream()
+                    .map(Reference::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
     public Optional<Message> getCachedMessageById(long id) {
-        return Optional.ofNullable(messages.get(id));
+        return Optional.ofNullable(messages.get(id)).map(Reference::get);
     }
 
     @Override

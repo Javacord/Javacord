@@ -2,12 +2,12 @@ package de.btobastian.javacord.events.message.reaction;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
-import de.btobastian.javacord.events.message.OptionalMessageEvent;
+import de.btobastian.javacord.events.message.RequestableMessageEvent;
 
 /**
  * A reaction event.
  */
-public abstract class ReactionEvent extends OptionalMessageEvent {
+public abstract class ReactionEvent extends RequestableMessageEvent {
 
     /**
      * Creates a new reaction event.

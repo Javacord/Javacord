@@ -5,7 +5,6 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * A message event where the message is NOT guaranteed to be in the cache.
@@ -36,20 +35,6 @@ public abstract class OptionalMessageEvent extends MessageEvent {
      */
     public Optional<Message> getMessage() {
         return Optional.ofNullable(message);
-    }
-
-    /**
-     * Requests a message from Discord, if it's not cached.
-     *
-     * @return The message either from the cache or directly from Discord.
-     * @see TextChannel#getMessageById(long)
-     */
-    public CompletableFuture<Message> requestMessage() {
-        Optional<Message> message = getMessage();
-        if (!message.isPresent()) {
-            return getChannel().getMessageById(getMessageId());
-        }
-        return CompletableFuture.completedFuture(this.message);
     }
 
 }

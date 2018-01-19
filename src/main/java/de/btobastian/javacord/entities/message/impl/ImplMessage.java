@@ -69,21 +69,6 @@ public class ImplMessage implements Message {
     private boolean cacheForever = false;
 
     /**
-     * As soon as we receive a message delete event, we mark the message as deleted.
-     */
-    private boolean deleted = false;
-
-    /**
-     * Whether the message should be kept in cache or not.
-     */
-    private boolean keepCached = true;
-
-    /**
-     * We use the counter to make sure a message is cached for at least 2 minutes!
-     */
-    private byte keepCachedCounter = 0;
-
-    /**
      * A list with all embeds.
      */
     private List<Embed> embeds = new ArrayList<>();
@@ -172,29 +157,6 @@ public class ImplMessage implements Message {
     }
 
     /**
-     * Checks if the message should be kept in cache.
-     *
-     * @return Whether the message should be kept in cache or not.
-     */
-    public boolean keepCached() {
-        if (keepCachedCounter <= 5) {
-            // keepCached() is checked every 30 seconds.
-            // This makes sure, that messages are cached for at least 2 minutes!
-            keepCachedCounter++;
-        }
-        return keepCached || keepCachedCounter <= 5;
-    }
-
-    /**
-     * Sets if the message should be kept in cache.
-     *
-     * @param keepCached Whether the message should be kept in cache or not.
-     */
-    public void setKeepCached(boolean keepCached) {
-        this.keepCached = keepCached;
-    }
-
-    /**
      * Sets the content of the message.
      *
      * @param content The content to set.
@@ -219,15 +181,6 @@ public class ImplMessage implements Message {
      */
     public void setEmbeds(List<Embed> embeds) {
         this.embeds = embeds;
-    }
-
-    /**
-     * Sets the deleted flag of the message.
-     *
-     * @param deleted The deleted flag.
-     */
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 
     /**
@@ -325,11 +278,6 @@ public class ImplMessage implements Message {
             // Just make sure it's in the cache
             ((ImplMessageCache) channel.getMessageCache()).addMessage(this);
         }
-    }
-
-    @Override
-    public boolean isDeleted() {
-        return deleted;
     }
 
     @Override
