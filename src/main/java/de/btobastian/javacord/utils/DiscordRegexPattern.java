@@ -23,6 +23,11 @@ public class DiscordRegexPattern {
     public static final Pattern CUSTOM_EMOJI = Pattern.compile("<a?:(?<name>[0-9a-zA-Z_]+):(?<id>[0-9]+)>");
 
     /**
+     * A pattern which checks for unicode emojis (e.g. {@code 🤔}
+     */
+    public static final Pattern UNICODE_EMOJI = Pattern.compile("\\p{So}|[\\uD83C-\\uDBFF\\uDC00-\\uDFFF]+");
+
+    /**
      * You are not meant to create instances of this class.
      *
      * @throws UnsupportedOperationException

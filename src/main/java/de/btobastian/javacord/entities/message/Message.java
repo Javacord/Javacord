@@ -422,6 +422,21 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Gets a list of all unicode emojis in the message.
+     *
+     * @return The list of unicode emojis in the message.
+     */
+    default List<String> getUnicodeEmojis() {
+        String content = getContent();
+        List<String> emojis = new ArrayList<>();
+        Matcher unicodeEmoji = DiscordRegexPattern.UNICODE_EMOJI.matcher(content);
+        while (unicodeEmoji.find()) {
+            emojis.add(unicodeEmoji.group(0));
+        }
+        return emojis;
+    }
+
+    /**
      * Gets the type of the message.
      *
      * @return The type of the message.
