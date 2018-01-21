@@ -13,6 +13,11 @@ public class DiscordRegexPattern {
     public static final Pattern USER_MENTION = Pattern.compile("<@!?(?<id>[0-9]+)>");
 
     /**
+     * A pattern which checks for mentioned roles (e.g. {@code <@&1234567890>}).
+     */
+    public static final Pattern ROLE_MENTION = Pattern.compile("<@&(?<id>[0-9]+)>");
+
+    /**
      * A pattern which checks for mentioned channels (e.g. {@code <#1234567890>}).
      */
     public static final Pattern CHANNEL_MENTION = Pattern.compile("<#(?<id>[0-9]+)>");
