@@ -224,6 +224,15 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Gets the @everyone role.
+     *
+     * @return The @everyone role.
+     */
+    default Role getEveryoneRole() {
+        return getRoleById(getId()).orElseThrow(AssertionError::new);
+    }
+
+    /**
      * Gets a sorted list (by position) with all roles with the given name.
      * This method is case sensitive!
      *
