@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ImplDiscordApi;
-import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
@@ -46,6 +45,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
 /**
@@ -108,8 +108,13 @@ public interface TextChannel extends Channel, Messageable {
     /**
      * Displays the "xyz is typing..." message.
      * The message automatically disappears after 10 seconds or after sending a message.
+     * No ratelimit retries are done at all.
+     * If the ratelimit is reached already, then the returned future will complete exceptionally right on the first try
+     * with a {@code RatelimitException}.
      *
      * @return A future to tell us if the action was successful.
+     * @see #typeContinuously()
+     * @see #typeContinuously(Consumer)
      */
     default CompletableFuture<Void> type() {
         return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.CHANNEL_TYPING)
@@ -124,13 +129,41 @@ public interface TextChannel extends Channel, Messageable {
      * Sending a message will make the message go away, but it will return after a short delay if not canceled using
      * the {@code AutoCloseable}.
      * This can be used in a try-with-resources block like
-     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously()) { /* do lenghty stuff &#42;/ }</code>
+     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously()) { /* do lengthy stuff &#42;/ }</code>.
+     * Any occurring exceptions including ratelimit exceptions are suppressed.
+     * If you want to handle exceptions, use {@link #typeContinuously(Consumer)}.
      *
      * @return An auto-closable to stop sending the typing indicator.
+     * @see #type()
+     * @see #typeContinuously(Consumer)
      */
     default AutoCloseable typeContinuously() {
         Future typingIndicator = getApi().getThreadPool().getScheduler()
-                .scheduleWithFixedDelay(() -> type().exceptionally(Javacord::exceptionLogger), 0, 8, TimeUnit.SECONDS);
+                .scheduleWithFixedDelay(this::type, 0, 8, TimeUnit.SECONDS);
+        return () -> typingIndicator.cancel(true);
+    }
+
+    /**
+     * Displays the "xyz is typing..." message continuously.
+     * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
+     * Sending a message will make the message go away, but it will return after a short delay if not canceled using
+     * the {@code AutoCloseable}.
+     * Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler}.
+     * This can be used in a try-with-resources block like
+     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously(((Function&lt;Throwable, ?>)
+     * Javacord::exceptionLogger)::apply)) { /* do lengthy stuff &#42;/ }</code>.
+     *
+     * @param exceptionHandler The handler that exceptions are given to.
+     * @return An auto-closable to stop sending the typing indicator.
+     * @see #type()
+     * @see #typeContinuously()
+     */
+    default AutoCloseable typeContinuously(Consumer<Throwable> exceptionHandler) {
+        Future typingIndicator = getApi().getThreadPool().getScheduler()
+                .scheduleWithFixedDelay(() -> type().exceptionally(throwable -> {
+                    exceptionHandler.accept(throwable);
+                    return null;
+                }), 0, 8, TimeUnit.SECONDS);
         return () -> typingIndicator.cancel(true);
     }
 
