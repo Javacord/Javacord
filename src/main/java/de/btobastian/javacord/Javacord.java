@@ -33,11 +33,18 @@ public class Javacord {
     public static final String USER_AGENT = "DiscordBot (" + GITHUB_URL + ", v" + VERSION + ")";
 
     /**
-     * The gateway protocol version from Discord which we are using.
-     * A list with all protocol versions can be found
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#gateway-protocol-versions">here</a>.
+     * The gateway version from Discord which we are using.
+     * A list with all gateway versions can be found
+     * <a href="https://discordapp.com/developers/docs/topics/gateway#gateways-gateway-versions">here</a>.
      */
-    public static final String DISCORD_GATEWAY_PROTOCOL_VERSION = "6";
+    public static final String DISCORD_GATEWAY_VERSION = "6";
+
+    /**
+     * The API version from Discord which we are using.
+     * A list with all API versions can be found
+     * <a href="https://discordapp.com/developers/docs/reference#api-versioning-api-versions">here</a>.
+     */
+    public static final String DISCORD_API_VERSION = "6";
 
     private Javacord() { }
 

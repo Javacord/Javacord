@@ -221,7 +221,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         }
         try {
             websocket = factory.createSocket(
-                    getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_PROTOCOL_VERSION);
+                    getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
             waitForIdentifyRateLimit();
