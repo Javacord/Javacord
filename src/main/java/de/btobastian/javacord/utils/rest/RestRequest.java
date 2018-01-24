@@ -2,9 +2,7 @@ package de.btobastian.javacord.utils.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
-import de.btobastian.javacord.exceptions.MissingPermissionsException;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -340,26 +338,43 @@ public class RestRequest<T> {
                     int code = result.getJsonBody().get("code").asInt();
                     String message = result.getJsonBody().has("message") ?
                             result.getJsonBody().get("message").asText() : null;
-                    switch (code) {
-                        case 50007:
-                            throw new CannotMessageUserException(origin,
-                                    message == null ? "Cannot send message to this user" : message, this, result);
+                    Optional<? extends DiscordException> discordException = RestRequestResultErrorCode.fromCode(code)
+                            .flatMap(restRequestResultCode -> restRequestResultCode.getDiscordException(
+                                    origin, (message == null) ? restRequestResultCode.getMeaning() : message,
+                                    this, result));
+                    if (discordException.isPresent()) {
+                        throw discordException.get();
                     }
                 }
+
                 switch (response.code()) {
                     case 429:
                         // A 429 will be handled in the RatelimitManager class
                         return result;
-                    case 403:
-                        throw new MissingPermissionsException(origin,
-                                "Received a " + response.code() + " response from Discord with"
-                                        + (result.getBody().isPresent() ? "" : " empty") + " body"
-                                        + result.getStringBody().map(s -> " " + s).orElse("") + "!", this, result);
+
                     default:
-                        throw new DiscordException(origin,
-                                "Received a " + response.code() + " response from Discord with"
-                                        + (result.getBody().isPresent() ? "" : " empty") + " body"
-                                        + result.getStringBody().map(s -> " " + s).orElse("") + "!", this, result);
+                        Optional<? extends DiscordException> discordException =
+                                RestRequestHttpResponseCode.fromCode(response.code())
+                                        .flatMap(restRequestHttpResponseCode ->
+                                                         restRequestHttpResponseCode.getDiscordException(
+                                                                 origin, "Received a " + response.code()
+                                                                         + " response from Discord with"
+                                                                         + (result.getBody().isPresent()
+                                                                            ? ""
+                                                                            : " empty")
+                                                                         + " body"
+                                                                         + result.getStringBody()
+                                                                                 .map(s -> " " + s)
+                                                                                 .orElse("")
+                                                                         + "!", this, result));
+                        if (discordException.isPresent()) {
+                            throw discordException.get();
+                        } else {
+                            throw new DiscordException(
+                                    origin, "Received a " + response.code() + " response from Discord with"
+                                            + (result.getBody().isPresent() ? "" : " empty") + " body"
+                                            + result.getStringBody().map(s -> " " + s).orElse("") + "!", this, result);
+                        }
                 }
             }
             return result;

@@ -4,9 +4,9 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
 
 /**
- * When we are not allowed to perform an action (HTTP response code 403).
+ * When we sent a bad request (HTTP response code 400).
  */
-public class MissingPermissionsException extends DiscordException {
+public class BadRequestException extends DiscordException {
 
     /**
      * Creates a new instance of this class.
@@ -16,7 +16,7 @@ public class MissingPermissionsException extends DiscordException {
      * @param request The request.
      * @param restRequestResult The rest request result which caused the exception.
      */
-    public MissingPermissionsException(
+    public BadRequestException(
             Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
         super(origin, message, request, restRequestResult);
     }

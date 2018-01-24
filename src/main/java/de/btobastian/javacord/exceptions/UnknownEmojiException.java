@@ -4,9 +4,9 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
 
 /**
- * When we are not allowed to perform an action (HTTP response code 403).
+ * When the emoji that was sent, for example as reaction, is not an emoji Discord knows about.
  */
-public class MissingPermissionsException extends DiscordException {
+public class UnknownEmojiException extends BadRequestException {
 
     /**
      * Creates a new instance of this class.
@@ -16,7 +16,7 @@ public class MissingPermissionsException extends DiscordException {
      * @param request The request.
      * @param restRequestResult The rest request result which caused the exception.
      */
-    public MissingPermissionsException(
+    public UnknownEmojiException(
             Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
         super(origin, message, request, restRequestResult);
     }
