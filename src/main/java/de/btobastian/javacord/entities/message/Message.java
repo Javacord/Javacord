@@ -391,33 +391,50 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         Matcher userMention = DiscordRegexPattern.USER_MENTION.matcher(content);
         while (userMention.find()) {
             String userId = userMention.group("id");
-            String userName = getChannel().asServerChannel().map(c -> {
-                Optional<User> user = c.getServer().getMembers().stream()
-                        .filter(u -> userId.equals(String.valueOf(u.getId()))).findAny();
-                return user.map(u -> u.getNickname(c.getServer()).orElse(u.getName())).orElse("invalid-user");
-            }).orElse("invalid-user");
+            String userName = getServer()
+                    .map(server -> getApi()
+                            .getUserById(userId)
+                            .filter(server.getMembers()::contains)
+                            .map(user -> user.getDisplayName(server))
+                            .orElse("invalid-user"))
+                    .orElse("invalid-user");
             content = userMention.replaceFirst("@" + userName);
             userMention.reset(content);
+        }
+        Matcher roleMention = DiscordRegexPattern.ROLE_MENTION.matcher(content);
+        while (roleMention.find()) {
+            String roleId = roleMention.group("id");
+            String roleName = getServer()
+                    .map(server -> server
+                            .getRoleById(roleId)
+                            .map(Role::getName)
+                            .orElse("deleted-role"))
+                    .orElse("deleted-role");
+            content = roleMention.replaceFirst("@" + roleName);
+            roleMention.reset(content);
         }
         Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(content);
         while (channelMention.find()) {
             String channelId = channelMention.group("id");
-            String channelName = getChannel().asServerChannel().map(c ->
-                c.getServer().getTextChannelById(channelId).map(ServerChannel::getName).orElse("deleted-channel")
-            ).orElse("deleted-channel");
+            String channelName = getServer()
+                    .map(server -> server
+                            .getTextChannelById(channelId)
+                            .map(ServerChannel::getName)
+                            .orElse("deleted-channel"))
+                    .orElse("deleted-channel");
             content = channelMention.replaceFirst("#" + channelName);
             channelMention.reset(content);
         }
         Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
         while (customEmoji.find()) {
             String emojiId = customEmoji.group("id");
-            String name = getApi().getCustomEmojiById(emojiId)
+            String name = getApi()
+                    .getCustomEmojiById(emojiId)
                     .map(CustomEmoji::getName)
                     .orElse(customEmoji.group("name"));
             content = customEmoji.replaceFirst(":" + name + ":");
             customEmoji.reset(content);
         }
-        // TODO mention roles
         return content;
     }
 
