@@ -400,7 +400,7 @@ public class ImplDiscordApi implements DiscordApi {
      *
      * @param serverId The id of the server.
      */
-    public void removeUnavailableServerToCache(long serverId) {
+    public void removeUnavailableServerFromCache(long serverId) {
         unavailableServers.remove(serverId);
     }
 
