@@ -156,7 +156,20 @@ public interface ServerChannel extends Channel {
      */
     default Permissions getEffectiveOverwrittenPermissions(User user) {
         PermissionsBuilder builder = new PermissionsBuilder(ImplPermissions.EMPTY_PERMISSIONS);
-        List<Permissions> permissionOverwrites = getServer().getRolesOf(user).stream()
+        Server server = getServer();
+        Role everyoneRole = server.getEveryoneRole();
+        Permissions everyoneRolePermissionOverwrites = getOverwrittenPermissions(everyoneRole);
+        for (PermissionType type : PermissionType.values()) {
+            if (everyoneRolePermissionOverwrites.getState(type) == PermissionState.DENIED) {
+                builder.setState(type, PermissionState.DENIED);
+            }
+            if (everyoneRolePermissionOverwrites.getState(type) == PermissionState.ALLOWED) {
+                builder.setState(type, PermissionState.ALLOWED);
+            }
+        }
+        List<Role> rolesOfUser = server.getRolesOf(user);
+        rolesOfUser.remove(everyoneRole);
+        List<Permissions> permissionOverwrites = rolesOfUser.stream()
                 .map(this::getOverwrittenPermissions)
                 .collect(Collectors.toList());
         for (Permissions permissions : permissionOverwrites) {
