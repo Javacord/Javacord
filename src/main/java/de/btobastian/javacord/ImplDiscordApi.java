@@ -536,8 +536,11 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public void removeObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
         synchronized (objectListeners) {
-            Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
             if (objectClass == null) {
+                return;
+            }
+            Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
+            if (objectListener == null) {
                 return;
             }
             Map<Class<?>, List<Object>> listeners = objectListener.get(objectId);
