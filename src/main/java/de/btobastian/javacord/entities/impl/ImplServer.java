@@ -25,6 +25,7 @@ import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
+import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link de.btobastian.javacord.entities.Server}.
  */
-public class ImplServer implements Server {
+public class ImplServer implements Server, Cleanupable {
 
     /**
      * The logger of this class.
@@ -311,7 +312,10 @@ public class ImplServer implements Server {
      * @param channel The channel to add.
      */
     public void addChannelToCache(ServerChannel channel) {
-        channels.put(channel.getId(), channel);
+        ServerChannel oldChannel = channels.put(channel.getId(), channel);
+        if ((oldChannel instanceof Cleanupable) && (oldChannel != channel)) {
+            ((Cleanupable) oldChannel).cleanup();
+        }
     }
 
     /**
@@ -320,7 +324,12 @@ public class ImplServer implements Server {
      * @param channelId The id of the channel to remove.
      */
     public void removeChannelFromCache(long channelId) {
-        channels.remove(channelId);
+        channels.computeIfPresent(channelId, (key, channel) -> {
+            if (channel instanceof Cleanupable) {
+                ((Cleanupable) channel).cleanup();
+            }
+            return null;
+        });
     }
 
     /**
@@ -649,6 +658,14 @@ public class ImplServer implements Server {
     @Override
     public Optional<ServerChannel> getChannelById(long id) {
         return Optional.ofNullable(channels.get(id));
+    }
+
+    @Override
+    public void cleanup() {
+        channels.values().stream()
+                .filter(Cleanupable.class::isInstance)
+                .map(Cleanupable.class::cast)
+                .forEach(Cleanupable::cleanup);
     }
 
     @Override

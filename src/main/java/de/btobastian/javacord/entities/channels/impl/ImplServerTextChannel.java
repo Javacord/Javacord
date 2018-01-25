@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
+import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The implementation of {@link ServerTextChannel}.
  */
-public class ImplServerTextChannel implements ServerTextChannel {
+public class ImplServerTextChannel implements ServerTextChannel, Cleanupable {
 
     /**
      * The discord api instance.
@@ -220,6 +221,11 @@ public class ImplServerTextChannel implements ServerTextChannel {
     @Override
     public String getMentionTag() {
         return "<#" + getId() + ">";
+    }
+
+    @Override
+    public void cleanup() {
+        messageCache.cleanup();
     }
 
     @Override

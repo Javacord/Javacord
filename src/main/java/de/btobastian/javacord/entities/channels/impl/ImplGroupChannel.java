@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.impl.ImplIcon;
+import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -23,7 +24,7 @@ import java.util.Optional;
 /**
  * The implementation of {@link GroupChannel}.
  */
-public class ImplGroupChannel implements GroupChannel {
+public class ImplGroupChannel implements GroupChannel, Cleanupable {
 
     /**
      * The logger of this class.
@@ -120,6 +121,11 @@ public class ImplGroupChannel implements GroupChannel {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void cleanup() {
+        messageCache.cleanup();
     }
 
     @Override

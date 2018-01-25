@@ -3,23 +3,30 @@ package de.btobastian.javacord.utils.cache;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.utils.Cleanupable;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link MessageCache}.
  */
-public class ImplMessageCache implements MessageCache {
+public class ImplMessageCache implements MessageCache, Cleanupable {
 
     /**
      * A list with all messages.
      */
     private final List<Message> messages = new ArrayList<>();
+
+    /**
+     * The cache clean future to be cancelled in {@link #cleanup()}.
+     */
+    private final Future<?> cleanFuture;
 
     /**
      * The discord api instance.
@@ -48,7 +55,7 @@ public class ImplMessageCache implements MessageCache {
         this.capacity = capacity;
         this.storageTimeInSeconds = storageTimeInSeconds;
 
-        api.getThreadPool().getScheduler().scheduleWithFixedDelay(this::clean, 1, 1, TimeUnit.MINUTES);
+        cleanFuture = api.getThreadPool().getScheduler().scheduleWithFixedDelay(this::clean, 1, 1, TimeUnit.MINUTES);
     }
 
     /**
@@ -117,4 +124,8 @@ public class ImplMessageCache implements MessageCache {
         this.storageTimeInSeconds = storageTimeInSeconds >= 0 ? storageTimeInSeconds : 0;
     }
 
+    @Override
+    public void cleanup() {
+        cleanFuture.cancel(false);
+    }
 }
