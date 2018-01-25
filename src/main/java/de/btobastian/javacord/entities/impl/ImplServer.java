@@ -533,11 +533,6 @@ public class ImplServer implements Server {
     }
 
     @Override
-    public Collection<User> getMembers() {
-        return members.values();
-    }
-
-    @Override
     public boolean isLarge() {
         return large;
     }
@@ -599,6 +594,16 @@ public class ImplServer implements Server {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Collection<User> getMembers() {
+        return members.values();
+    }
+
+    @Override
+    public Optional<User> getMemberById(long id) {
+        return Optional.ofNullable(members.get(id));
     }
 
     @Override

@@ -108,13 +108,6 @@ public interface Server extends DiscordEntity {
     Optional<String> getNickname(User user);
 
     /**
-     * Gets a collection with all members of the server.
-     *
-     * @return A collection with all members of the server.
-     */
-    Collection<User> getMembers();
-
-    /**
      * Checks if the server if considered large.
      *
      * @return Whether the server is large or not.
@@ -192,6 +185,83 @@ public interface Server extends DiscordEntity {
                     }
                     return invites;
                 });
+    }
+
+    /**
+     * Gets a collection with all members of the server.
+     *
+     * @return A collection with all members of the server.
+     */
+    Collection<User> getMembers();
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param id The id of the member.
+     * @return The member with the given id.
+     */
+    Optional<User> getMemberById(long id);
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param id The id of the member.
+     * @return The member with the given id.
+     */
+    default Optional<User> getMemberById(String id) {
+        try {
+            return getMemberById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a member by its discriminated name like e. g. {@code Bastian#8222}.
+     *
+     * @param discriminatedName The discriminated name of the member.
+     * @return The member with the given discriminated name.
+     */
+    default Optional<User> getMemberByDiscriminatedName(String discriminatedName) {
+        String[] nameAndDiscriminator = discriminatedName.split("#", 2);
+        return getMemberByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]);
+    }
+
+    /**
+     * Gets a member by its name and discriminator.
+     *
+     * @param name The name of the member.
+     * @param discriminator The discriminator of the member.
+     * @return The member with the given name and discriminator.
+     */
+    default Optional<User> getMemberByNameAndDiscriminator(String name, String discriminator) {
+        return getMembersByName(name).stream().filter(user -> user.getDiscriminator().equals(discriminator)).findAny();
+    }
+
+    /**
+     * Gets a collection with all members with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the members.
+     * @return A collection with all members with the given name.
+     */
+    default Collection<User> getMembersByName(String name) {
+        return getMembers().stream()
+                .filter(user -> user.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a collection with all members with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the members.
+     * @return A collection with all members with the given name.
+     */
+    default Collection<User> getMembersByNameIgnoreCase(String name) {
+        return getMembers().stream()
+                .filter(user -> user.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
     }
 
     /**
