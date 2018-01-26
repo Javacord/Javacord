@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities;
 import de.btobastian.javacord.AccountType;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -213,6 +214,17 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return The new (or old) private channel with the user.
      */
     CompletableFuture<PrivateChannel> openPrivateChannel();
+
+    /**
+     * Gets the currently existing group channels with the user.
+     *
+     * @return The group channels with the user.
+     */
+    default Collection<GroupChannel> getGroupChannels() {
+        return getApi().getGroupChannels().stream()
+                .filter(groupChannel -> groupChannel.getMembers().contains(this))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Adds a listener, which listens to private channel creations for this user.
