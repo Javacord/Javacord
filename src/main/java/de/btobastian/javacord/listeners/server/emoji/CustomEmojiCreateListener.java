@@ -9,7 +9,7 @@ import de.btobastian.javacord.events.server.emoji.CustomEmojiCreateEvent;
 public interface CustomEmojiCreateListener {
 
     /**
-     * This method is called every a custom emoji is created.
+     * This method is called every time a custom emoji is created.
      *
      * @param event The event.
      */

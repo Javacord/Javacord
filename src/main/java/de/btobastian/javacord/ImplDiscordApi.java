@@ -42,7 +42,9 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
@@ -1182,6 +1184,27 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<CustomEmojiCreateListener> getCustomEmojiCreateListeners() {
         return getListeners(CustomEmojiCreateListener.class);
+    }
+
+    @Override
+    public ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
+            CustomEmojiChangeNameListener listener) {
+        return addListener(CustomEmojiChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
+        return getListeners(CustomEmojiChangeNameListener.class);
+    }
+
+    @Override
+    public ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(CustomEmojiDeleteListener listener) {
+        return addListener(CustomEmojiDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners() {
+        return getListeners(CustomEmojiDeleteListener.class);
     }
 
     @Override
