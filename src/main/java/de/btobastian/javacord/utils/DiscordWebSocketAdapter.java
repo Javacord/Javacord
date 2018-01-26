@@ -665,17 +665,17 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     public void updateStatus() {
         Optional<Activity> activity = api.getActivity();
-        logger.debug("Updating status (activity: {})", activity.isPresent() ? activity.get().getName() : "none");
         ObjectNode updateStatus = JsonNodeFactory.instance.objectNode()
                 .put("op", 3);
         ObjectNode data = updateStatus.putObject("d")
-                .put("status", "online")
+                .put("status", api.getStatus().getStatusString())
                 .put("afk", false)
                 .putNull("since");
         ObjectNode activityJson = data.putObject("game");
         activityJson.put("name", activity.isPresent() ? activity.get().getName() : null);
         activityJson.put("type", activity.map(g -> g.getType().getId()).orElse(0));
         activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
+        logger.debug("Updating status (content: {})", updateStatus.toString());
         websocket.sendText(updateStatus.toString());
     }
 

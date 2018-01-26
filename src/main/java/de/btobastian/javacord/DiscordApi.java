@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.channels.Channel;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
@@ -212,6 +213,24 @@ public interface DiscordApi {
      * @return The total amount of shards.
      */
     int getTotalShards();
+
+    /**
+     * Updates the status of this bot.
+     * The update might not be visible immediately as it's through the websocket and only a limited amount of
+     * status changes is allowed per minute.
+     *
+     * @param status The status of this bot.
+     */
+    void updateStatus(UserStatus status);
+
+    /**
+     * Gets the status which should be displayed for this bot.
+     * This might not be the status which is really displayed in the client, but it's the status which Javacord
+     * is trying to set for your bot, so it might change in the client a few seconds afterwards.
+     *
+     * @return The status which should be displayed for this bot.
+     */
+    UserStatus getStatus();
 
     /**
      * Updates the activity of this bot, represented as "Playing Half-Life 3" for example.

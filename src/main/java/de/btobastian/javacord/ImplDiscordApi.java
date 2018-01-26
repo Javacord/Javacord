@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.Activity;
 import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.impl.ImplActivity;
@@ -136,7 +137,12 @@ public class ImplDiscordApi implements DiscordApi {
     private final Object disconnectCalledLock = new Object();
 
     /**
-     * The activity which is currently displayed. May be <code>null</code>.
+     * The status which should be displayed for the bot.
+     */
+    private UserStatus status = UserStatus.ONLINE;
+
+    /**
+     * The activity which should be displayed. May be <code>null</code>.
      */
     private Activity activity;
 
@@ -692,6 +698,20 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public int getTotalShards() {
         return totalShards;
+    }
+
+    @Override
+    public void updateStatus(UserStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("The status cannot be null");
+        }
+        this.status = status;
+        websocketAdapter.updateStatus();
+    }
+
+    @Override
+    public UserStatus getStatus() {
+        return status;
     }
 
     @Override
