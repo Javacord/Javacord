@@ -361,7 +361,7 @@ public interface ServerChannel extends Channel {
     }
 
     /**
-     * Adds a listener, which listens this server channel name changes.
+     * Adds a listener, which listens to this server channel name changes.
      *
      * @param listener The listener to add.
      * @return The manager of the listener.
