@@ -133,7 +133,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     static {
         // This scheduler makes sure that the semaphores get released after a while if it failed in the listener
         // for whatever reason. It's just a fail-safe.
-        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() ->
+        Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "Connection Delay Semaphores Starvation Protector");
+            thread.setDaemon(true);
+            return thread;
+        }).scheduleWithFixedDelay(() ->
             connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
                 if ((semaphore.availablePermits() == 0) &&
                         ((System.currentTimeMillis() - lastIdentificationPerAccount.get(token)) >= 15000)) {
