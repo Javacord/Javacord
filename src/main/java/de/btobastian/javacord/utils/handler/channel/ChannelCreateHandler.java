@@ -55,8 +55,8 @@ public class ChannelCreateHandler extends PacketHandler {
     private void handleChannelCategory(JsonNode channel) {
         long serverId = channel.get("guild_id").asLong();
         api.getServerById(serverId).ifPresent(server -> {
-            ChannelCategory textChannel = ((ImplServer) server).getOrCreateChannelCategory(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEvent(textChannel);
+            ChannelCategory channelCategory = ((ImplServer) server).getOrCreateChannelCategory(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEvent(channelCategory);
 
             List<ServerChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerChannelCreateListeners());
