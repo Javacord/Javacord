@@ -21,6 +21,7 @@ import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -1065,6 +1066,18 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<GroupChannelCreateListener> getGroupChannelCreateListeners() {
         return getListeners(GroupChannelCreateListener.class);
+    }
+
+    @Override
+    public ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
+            GroupChannelChangeNameListener listener) {
+        return addListener(GroupChannelChangeNameListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
+            GroupChannelDeleteListener listener) {
+        return addListener(GroupChannelDeleteListener.class, listener);
     }
 
     @Override

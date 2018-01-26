@@ -109,6 +109,15 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
         return Optional.ofNullable(name);
     }
 
+    /**
+     * Sets the name of the channel.
+     *
+     * @param name The new name of the channel.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public Optional<Icon> getIcon() {
         if (iconId == null) {

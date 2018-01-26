@@ -1,9 +1,13 @@
 package de.btobastian.javacord.entities.channels;
 
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
+import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -68,6 +72,28 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      */
     default CompletableFuture<Void> updateName(String name) {
         return getUpdater().setName(name).update();
+    }
+
+    /**
+     * Adds a listener, which listens to this group channel name changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
+            GroupChannelChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                GroupChannel.class, getId(), GroupChannelChangeNameListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered group channel change name listeners.
+     *
+     * @return A list with all registered group channel change name listeners.
+     */
+    default List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                GroupChannel.class, getId(), GroupChannelChangeNameListener.class);
     }
 
 }
