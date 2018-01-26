@@ -322,12 +322,12 @@ public class ImplDiscordApi implements DiscordApi {
             ready.thenAccept(api -> {
                 WeakReference<DiscordApi> discordApiReference = new WeakReference<>(api);
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get()).ifPresent(DiscordApi::disconnect),
-                                                                String.format("%s Shutdown Disconnector (%s)", api.getClass().getSimpleName(), api)));
+                                                                String.format("Javacord - Shutdown Disconnector (%s)", api)));
             });
         } else {
             WeakReference<DiscordApi> discordApiReference = new WeakReference<>(this);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get()).ifPresent(DiscordApi::disconnect),
-                                                            String.format("%s Shutdown Disconnector (%s)", getClass().getSimpleName(), this)));
+                                                            String.format("Javacord - Shutdown Disconnector (%s)", this)));
         }
     }
 

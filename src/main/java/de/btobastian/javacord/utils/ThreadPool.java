@@ -19,8 +19,17 @@ public class ThreadPool {
     private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
     private final ExecutorService executorService = new ThreadPoolExecutor(
-            CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME, TIME_UNIT, new SynchronousQueue<>());
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(CORE_POOL_SIZE);
+            CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME, TIME_UNIT, new SynchronousQueue<>(),
+            runnable -> {
+                Thread thread = new Thread(runnable, "Javacord - Central ExecutorService");
+                thread.setDaemon(false);
+                return thread;
+            });
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(CORE_POOL_SIZE, runnable -> {
+        Thread thread = new Thread(runnable, "Javacord - Central Scheduler");
+        thread.setDaemon(false);
+        return thread;
+    });
     private final ConcurrentHashMap<String, ExecutorService> executorServiceSingeThreads = new ConcurrentHashMap<>();
 
     /**
@@ -61,7 +70,11 @@ public class ThreadPool {
         synchronized (executorServiceSingeThreads) {
             ExecutorService service = executorServiceSingeThreads.get(id);
             if (service == null) {
-                service = Executors.newSingleThreadExecutor();
+                service = Executors.newSingleThreadExecutor(runnable -> {
+                    Thread thread = new Thread(runnable, "Javacord - '" + id + "' Processor");
+                    thread.setDaemon(false);
+                    return thread;
+                });
                 executorServiceSingeThreads.put(id, service);
             }
             return service;
