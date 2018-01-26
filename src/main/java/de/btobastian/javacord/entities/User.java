@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
@@ -296,6 +297,27 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     default List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 User.class, getId(), GroupChannelChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to group channel deletions for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
+            GroupChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), GroupChannelDeleteListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered group channel delete listeners.
+     *
+     * @return A list with all registered group channel delete listeners.
+     */
+    default List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), GroupChannelDeleteListener.class);
     }
 
     /**

@@ -4,6 +4,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
 import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.Collection;
@@ -94,6 +95,28 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
     default List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 GroupChannel.class, getId(), GroupChannelChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this channel being deleted.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
+            GroupChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                GroupChannel.class, getId(), GroupChannelDeleteListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered group channel delete listeners.
+     *
+     * @return A list with all registered group channel delete listeners.
+     */
+    default List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                GroupChannel.class, getId(), GroupChannelDeleteListener.class);
     }
 
 }

@@ -23,6 +23,7 @@ import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -438,6 +439,18 @@ public class ImplDiscordApi implements DiscordApi {
         if ((oldChannel != null) && (oldChannel != channel)) {
             ((Cleanupable) oldChannel).cleanup();
         }
+    }
+
+    /**
+     * Removes a group channel from the cache.
+     *
+     * @param channelId The id of the channel to remove.
+     */
+    public void removeGroupChannelFromCache(long channelId) {
+        groupChannels.computeIfPresent(channelId, (key, groupChannel) -> {
+            ((Cleanupable) groupChannel).cleanup();
+            return null;
+        });
     }
 
     /**
@@ -1078,6 +1091,16 @@ public class ImplDiscordApi implements DiscordApi {
     public ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
             GroupChannelDeleteListener listener) {
         return addListener(GroupChannelDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
+        return getListeners(GroupChannelDeleteListener.class);
+    }
+
+    @Override
+    public List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
+        return getListeners(GroupChannelChangeNameListener.class);
     }
 
     @Override
