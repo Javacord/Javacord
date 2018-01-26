@@ -2,6 +2,9 @@ package de.btobastian.javacord;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketFrame;
 import de.btobastian.javacord.entities.Activity;
 import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.Server;
@@ -761,10 +764,24 @@ public class ImplDiscordApi implements DiscordApi {
     public void disconnect() {
         synchronized (disconnectCalledLock) {
             if (!disconnectCalled) {
-                if (websocketAdapter != null) {
+                if (websocketAdapter == null) {
+                    // if no web socket is connected, immediately shutdown thread pool
+                    threadPool.shutdown();
+                } else {
+                    // shutdown thread pool after web socket disconnected event was dispatched
+                    websocketAdapter.getWebSocket().addListener(new WebSocketAdapter() {
+                        @Override
+                        public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
+                                                   WebSocketFrame clientCloseFrame,
+                                                   boolean closedByServer) throws Exception {
+                            threadPool.shutdown();
+                        }
+                    });
+                    // disconnect web socket
                     websocketAdapter.disconnect();
+                    // shutdown thread pool if within one minute no disconnect event was dispatched
+                    threadPool.getScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
                 }
-                threadPool.shutdown();
             }
             disconnectCalled = true;
         }
