@@ -25,6 +25,7 @@ public class ImplActivityAssets implements ActivityAssets {
     /**
      * Creates a new activity assets object.
      *
+     * @param activity The associated {@link ImplActivity}.
      * @param data The json data of the assets party.
      */
     public ImplActivityAssets(ImplActivity activity, JsonNode data) {
