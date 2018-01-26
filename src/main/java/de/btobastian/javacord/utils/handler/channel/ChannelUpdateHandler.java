@@ -206,8 +206,8 @@ public class ChannelUpdateHandler extends PacketHandler {
      * @param channel The channel data.
      */
     private void handleChannelCategory(JsonNode channel) {
-        long channelId = channel.get("id").asLong();
-        api.getChannelCategoryById(channelId).map(c -> ((ImplChannelCategory) c)).ifPresent(c -> {
+        long channelCategoryId = channel.get("id").asLong();
+        api.getChannelCategoryById(channelCategoryId).map(ImplChannelCategory.class::cast).ifPresent(c -> {
             String oldName = c.getName();
             String newName = channel.get("name").asText();
             if (!Objects.deepEquals(oldName, newName)) {
