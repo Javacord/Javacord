@@ -9,7 +9,7 @@ import de.btobastian.javacord.entities.channels.TextChannel;
  * If the user starts typing the "xyz is typing..." message is displayed for 5 seconds.
  * It also stops if the user sent a message.
  */
-public class UserStartTypingEvent extends TextChannelEvent {
+public class UserStartTypingEvent extends TextChannelUserEvent {
 
     /**
      * Creates a new user start typing event.

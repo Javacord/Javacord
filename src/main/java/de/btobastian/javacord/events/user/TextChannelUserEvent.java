@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * A text channel event which effects a user.
  */
-public abstract class TextChannelEvent extends UserEvent {
+public abstract class TextChannelUserEvent extends UserEvent {
 
     /**
      * The text channel of the event.
@@ -20,13 +20,13 @@ public abstract class TextChannelEvent extends UserEvent {
     private final TextChannel channel;
 
     /**
-     * Creates a new text channel event.
+     * Creates a new text channel user event.
      *
      * @param api The api instance of the event.
      * @param user The user of the event.
      * @param channel The text channel of the event.
      */
-    public TextChannelEvent(DiscordApi api, User user, TextChannel channel) {
+    public TextChannelUserEvent(DiscordApi api, User user, TextChannel channel) {
         super(api, user);
         this.channel = channel;
     }
