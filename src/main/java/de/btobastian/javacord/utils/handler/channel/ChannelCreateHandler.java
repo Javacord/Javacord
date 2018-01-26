@@ -3,12 +3,15 @@ package de.btobastian.javacord.utils.handler.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
+import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.events.server.channel.ServerChannelCreateEvent;
+import de.btobastian.javacord.events.user.channel.PrivateChannelCreateEvent;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -114,7 +117,14 @@ public class ChannelCreateHandler extends PacketHandler {
         // https://github.com/hammerandchisel/discord-api-docs/issues/184
         ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.get("recipients").get(0));
         if (!recipient.getPrivateChannel().isPresent()) {
-            recipient.getOrCreateChannel(channel);
+            PrivateChannel privateChannel = recipient.getOrCreateChannel(channel);
+            PrivateChannelCreateEvent event = new PrivateChannelCreateEvent(privateChannel);
+
+            List<PrivateChannelCreateListener> listeners = new ArrayList<>();
+            listeners.addAll(recipient.getPrivateChannelCreateListeners());
+            listeners.addAll(api.getPrivateChannelCreateListeners());
+
+            dispatchEvent(listeners, listener -> listener.onPrivateChannelCreate(event));
         }
     }
 

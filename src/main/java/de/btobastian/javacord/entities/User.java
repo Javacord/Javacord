@@ -22,6 +22,7 @@ import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.Collection;
@@ -208,6 +209,27 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return The new (or old) private channel with the user.
      */
     CompletableFuture<PrivateChannel> openPrivateChannel();
+
+    /**
+     * Adds a listener, which listens to private channel creations for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(
+            PrivateChannelCreateListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), PrivateChannelCreateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered private channel create listeners.
+     *
+     * @return A list with all registered private channel create listeners.
+     */
+    default List<PrivateChannelCreateListener> getPrivateChannelCreateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelCreateListener.class);
+    }
 
     /**
      * Adds a listener, which listens to message creates from this user.

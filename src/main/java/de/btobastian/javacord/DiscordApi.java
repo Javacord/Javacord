@@ -72,6 +72,7 @@ import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -1454,6 +1455,21 @@ public interface DiscordApi {
      * @return A list with all registered server channel delete listeners.
      */
     List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to private channel creations.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(PrivateChannelCreateListener listener);
+
+    /**
+     * Gets a list with all registered private channel create listeners.
+     *
+     * @return A list with all registered private channel create listeners.
+     */
+    List<PrivateChannelCreateListener> getPrivateChannelCreateListeners();
 
     /**
      * Adds a listener, which listens to message deletions.

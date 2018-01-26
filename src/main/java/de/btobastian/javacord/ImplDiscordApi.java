@@ -64,6 +64,7 @@ import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
@@ -1029,6 +1030,17 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
         return getListeners(ServerChannelDeleteListener.class);
+    }
+
+    @Override
+    public ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(
+            PrivateChannelCreateListener listener) {
+        return addListener(PrivateChannelCreateListener.class, listener);
+    }
+
+    @Override
+    public List<PrivateChannelCreateListener> getPrivateChannelCreateListeners() {
+        return getListeners(PrivateChannelCreateListener.class);
     }
 
     @Override
