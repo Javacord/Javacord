@@ -10,7 +10,7 @@ public enum ActivityType {
     /**
      * Represents a normal activity, represented as "Playing Half-Life 3" for example.
      */
-    GAME(0),
+    PLAYING(0),
 
     /**
      * Represents streaming a activity, represented as "Streaming Half-Life 3" for example.
@@ -51,12 +51,12 @@ public enum ActivityType {
      * Gets the activity type by its id.
      *
      * @param id The id of the activity type
-     * @return The activity type with the given id or {@link ActivityType#GAME} if unknown id.
+     * @return The activity type with the given id or {@link ActivityType#PLAYING} if unknown id.
      */
     public static ActivityType getActivityTypeById(int id) {
         switch (id) {
             case 0:
-                return GAME;
+                return PLAYING;
             case 1:
                 return STREAMING;
             case 2:
@@ -64,7 +64,7 @@ public enum ActivityType {
             case 3:
                 return WATCHING;
             default:
-                return GAME;
+                return PLAYING;
         }
     }
 

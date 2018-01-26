@@ -696,7 +696,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public void updateActivity(String name) {
-        updateActivity(name, ActivityType.GAME, null);
+        updateActivity(name, ActivityType.PLAYING, null);
     }
 
     @Override
