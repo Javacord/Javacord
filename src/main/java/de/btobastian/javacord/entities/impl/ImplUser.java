@@ -222,9 +222,7 @@ public class ImplUser implements User {
     @Override
     public CompletableFuture<PrivateChannel> openPrivateChannel() {
         if (channel != null) {
-            CompletableFuture<PrivateChannel> future = new CompletableFuture<>();
-            future.complete(channel);
-            return future;
+            return CompletableFuture.completedFuture(channel);
         }
         return new RestRequest<PrivateChannel>(api, RestMethod.POST, RestEndpoint.USER_CHANNEL)
                 .setBody(JsonNodeFactory.instance.objectNode().put("recipient_id", getIdAsString()))
