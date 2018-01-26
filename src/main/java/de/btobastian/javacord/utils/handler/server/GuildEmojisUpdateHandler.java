@@ -40,7 +40,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     CustomEmoji emoji = api.getOrCreateCustomEmoji(server, entry.getValue());
                     server.addCustomEmoji(emoji);
 
-                    CustomEmojiCreateEvent event = new CustomEmojiCreateEvent(api, server, emoji);
+                    CustomEmojiCreateEvent event = new CustomEmojiCreateEvent(emoji);
 
                     List<CustomEmojiCreateListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getCustomEmojiCreateListeners());
