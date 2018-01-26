@@ -23,6 +23,7 @@ import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.Collection;
@@ -229,6 +230,27 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default List<PrivateChannelCreateListener> getPrivateChannelCreateListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelCreateListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to private channel deletions for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(
+            PrivateChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), PrivateChannelDeleteListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered private channel delete listeners.
+     *
+     * @return A list with all registered private channel delete listeners.
+     */
+    default List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelDeleteListener.class);
     }
 
     /**

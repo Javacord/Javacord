@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.events.server.channel.ServerChannelDeleteEvent;
+import de.btobastian.javacord.events.user.channel.PrivateChannelDeleteEvent;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -92,7 +95,19 @@ public class ChannelDeleteHandler extends PacketHandler {
      * @param channel The channel data.
      */
     private void handlePrivateChannel(JsonNode channel) {
-        // TODO handle private channel deletion -> only for client bots
+        ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.get("recipients").get(0));
+        recipient.getPrivateChannel().ifPresent(privateChannel -> {
+            PrivateChannelDeleteEvent event = new PrivateChannelDeleteEvent(privateChannel);
+
+            List<PrivateChannelDeleteListener> listeners = new ArrayList<>();
+            listeners.addAll(privateChannel.getPrivateChannelDeleteListeners());
+            listeners.addAll(recipient.getPrivateChannelDeleteListeners());
+            listeners.addAll(api.getPrivateChannelDeleteListeners());
+
+            dispatchEvent(listeners, listener -> listener.onPrivateChannelDelete(event));
+
+            recipient.setChannel(null);
+        });
     }
 
     /**
