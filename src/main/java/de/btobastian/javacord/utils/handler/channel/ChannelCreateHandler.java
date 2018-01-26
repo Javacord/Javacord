@@ -2,14 +2,19 @@ package de.btobastian.javacord.utils.handler.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
+import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
+import de.btobastian.javacord.entities.channels.impl.ImplGroupChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.events.group.channel.GroupChannelCreateEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelCreateEvent;
 import de.btobastian.javacord.events.user.channel.PrivateChannelCreateEvent;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -43,6 +48,9 @@ public class ChannelCreateHandler extends PacketHandler {
                 break;
             case 2:
                 handleServerVoiceChannel(packet);
+                break;
+            case 3:
+                handleGroupChannel(packet);
                 break;
             case 4:
                 handleChannelCategory(packet);
@@ -125,6 +133,27 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(api.getPrivateChannelCreateListeners());
 
             dispatchEvent(listeners, listener -> listener.onPrivateChannelCreate(event));
+        }
+    }
+
+    /**
+     * Handles a group channel creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleGroupChannel(JsonNode channel) {
+        long channelId = channel.get("id").asLong();
+        if (!api.getGroupChannelById(channelId).isPresent()) {
+            GroupChannel groupChannel = new ImplGroupChannel(api, channel);
+            GroupChannelCreateEvent event = new GroupChannelCreateEvent(groupChannel);
+
+            List<GroupChannelCreateListener> listeners = new ArrayList<>();
+            groupChannel.getMembers().stream()
+                    .map(User::getGroupChannelCreateListeners)
+                    .forEach(listeners::addAll);
+            listeners.addAll(api.getGroupChannelCreateListeners());
+
+            dispatchEvent(listeners, listener -> listener.onGroupChannelCreate(event));
         }
     }
 

@@ -29,6 +29,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -1486,6 +1487,21 @@ public interface DiscordApi {
      * @return A list with all registered private channel delete listeners.
      */
     List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to group channel creations.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<GroupChannelCreateListener> addGroupChannelCreateListener(GroupChannelCreateListener listener);
+
+    /**
+     * Gets a list with all registered group channel create listeners.
+     *
+     * @return A list with all registered group channel create listeners.
+     */
+    List<GroupChannelCreateListener> getGroupChannelCreateListeners();
 
     /**
      * Adds a listener, which listens to message deletions.

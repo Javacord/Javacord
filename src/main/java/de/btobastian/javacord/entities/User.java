@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
@@ -251,6 +252,27 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelDeleteListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to group channel creations for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<GroupChannelCreateListener> addGroupChannelCreateListener(
+            GroupChannelCreateListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), GroupChannelCreateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered group channel create listeners.
+     *
+     * @return A list with all registered group channel create listeners.
+     */
+    default List<GroupChannelCreateListener> getGroupChannelCreateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), GroupChannelCreateListener.class);
     }
 
     /**
