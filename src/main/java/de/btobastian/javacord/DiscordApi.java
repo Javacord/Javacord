@@ -240,9 +240,8 @@ public interface DiscordApi {
 
     /**
      * Gets the activity which should be displayed.
-     * This might not be the activity which is really displayed in the client, but it's the activity which Javacord is trying
-     * to set for your bot, so it might change in the client a few seconds afterwards. If you want the activity which
-     * is currently displayed, get the user object for your bot and get the activity from this object.
+     * This might not be the activity which is really displayed in the client, but it's the activity which Javacord
+     * is trying to set for your bot, so it might change in the client a few seconds afterwards.
      *
      * @return The activity which should be displayed.
      */
