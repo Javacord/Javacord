@@ -92,11 +92,16 @@ public interface TextChannel extends Channel, Messageable {
                 return future;
             }
 
+            String mediaType = URLConnection.guessContentTypeFromName(fileName);
+            if (mediaType == null) {
+                mediaType = "application/octet-stream";
+            }
+
             request.setMultipartBody(new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("payload_json", body.toString())
                     .addFormDataPart("file", fileName,
-                            RequestBody.create(MediaType.parse(URLConnection.guessContentTypeFromName(fileName)), bytes)
+                            RequestBody.create(MediaType.parse(mediaType), bytes)
                     ).build());
         } else {
             request.setBody(body);
