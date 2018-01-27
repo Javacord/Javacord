@@ -33,7 +33,7 @@ public class RatelimitManager {
     private static final Logger logger = LoggerUtil.getLogger(RatelimitManager.class);
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, runnable -> {
-        Thread thread = new Thread(runnable, "RatelimitBucket Delay Scheduler");
+        Thread thread = new Thread(runnable, "Javacord - RatelimitBucket Delay Scheduler");
         thread.setDaemon(true);
         return thread;
     });
