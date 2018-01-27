@@ -155,7 +155,7 @@ public interface TextChannel extends Channel, Messageable {
      * the {@code AutoCloseable}.
      * Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler}.
      * This can be used in a try-with-resources block like
-     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously(((Function&lt;Throwable, ?>)
+     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously(((Function&lt;Throwable, ?&gt;)
      * Javacord::exceptionLogger)::apply)) { /* do lengthy stuff &#42;/ }</code>.
      *
      * @param exceptionHandler The handler that exceptions are given to.
