@@ -234,7 +234,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater addRoleToUser(User user, Role role) {
-        Collection<Role> userRoles = this.userRoles.putIfAbsent(user, new ArrayList<>(server.getRolesOf(user)));
+        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.add(role);
         return this;
     }
@@ -247,7 +247,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater addAllRolesToUser(User user, Collection<Role> roles) {
-        Collection<Role> userRoles = this.userRoles.putIfAbsent(user, new ArrayList<>(server.getRolesOf(user)));
+        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.addAll(roles);
         return this;
     }
@@ -260,7 +260,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater removeRoleFromUser(User user, Role role) {
-        Collection<Role> userRoles = this.userRoles.putIfAbsent(user, new ArrayList<>(server.getRolesOf(user)));
+        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.remove(role);
         return this;
     }
@@ -273,7 +273,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater removeAllRolesFromUser(User user, Collection<Role> roles) {
-        Collection<Role> userRoles = this.userRoles.putIfAbsent(user, new ArrayList<>(server.getRolesOf(user)));
+        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.removeAll(roles);
         return this;
     }
