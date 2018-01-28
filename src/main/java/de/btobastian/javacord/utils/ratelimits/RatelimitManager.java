@@ -64,7 +64,8 @@ public class RatelimitManager {
                 .parallelStream()
                 .filter(b -> b.equals(request.getEndpoint(), request.getMajorUrlParameter().orElse(null)))
                 .findAny()
-                .orElse(new RatelimitBucket(api, request.getEndpoint(), request.getMajorUrlParameter().orElse(null)));
+                .orElseGet(() ->
+                        new RatelimitBucket(api, request.getEndpoint(), request.getMajorUrlParameter().orElse(null)));
 
         // Add bucket to list with buckets
         buckets.add(bucket);

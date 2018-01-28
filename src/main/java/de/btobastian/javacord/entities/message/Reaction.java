@@ -28,7 +28,7 @@ public interface Reaction {
      * @return A list with all users who used this reaction.
      */
     static CompletableFuture<List<User>> getUsers(DiscordApi api, long channelId, long messageId, Emoji emoji) {
-        String value = emoji.asUnicodeEmoji().orElse(
+        String value = emoji.asUnicodeEmoji().orElseGet(() ->
                 emoji.asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
         return new RestRequest<List<User>>(api, RestMethod.GET, RestEndpoint.REACTION)
                 .setUrlParameters(
@@ -73,7 +73,7 @@ public interface Reaction {
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> removeUser(DiscordApi api, long channelId, long messageId, Emoji emoji, User user) {
-        String value = emoji.asUnicodeEmoji().orElse(
+        String value = emoji.asUnicodeEmoji().orElseGet(() ->
                 emoji.asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
                 .setUrlParameters(
