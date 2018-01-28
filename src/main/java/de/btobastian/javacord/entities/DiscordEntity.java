@@ -42,7 +42,7 @@ public interface DiscordEntity {
     default Instant getCreationTimestamp() {
         // The first 42 bits (of the total 64) are the timestamp
         // Discord starts its counter at the first second of 2015
-        return Instant.ofEpochMilli((getId() >> 22) + 1420070400000L);
+        return Instant.ofEpochMilli((getId() >>> 22) + 1420070400000L);
     }
 
 }
