@@ -540,8 +540,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             data.putArray("shard").add(api.getCurrentShard()).add(api.getTotalShards());
         }
         // remove eventually still registered listeners
-        while (!identifyFrameListeners.isEmpty()) {
-            websocket.removeListener(identifyFrameListeners.remove(0));
+        synchronized (identifyFrameListeners) {
+            websocket.removeListeners(identifyFrameListeners);
+            identifyFrameListeners.clear();
         }
         WebSocketFrame identifyFrame = WebSocketFrame.createTextFrame(identifyPacket.toString());
         lastSentFrameWasIdentify.set(identifyFrame, false);
