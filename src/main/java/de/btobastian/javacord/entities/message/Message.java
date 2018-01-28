@@ -224,7 +224,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, Emoji emoji) {
-        String value = emoji.asUnicodeEmoji().orElse(
+        String value = emoji.asUnicodeEmoji().orElseGet(() ->
                 emoji.asCustomEmoji()
                         .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
                         .orElse("UNKNOWN")
@@ -431,7 +431,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             String name = getApi()
                     .getCustomEmojiById(emojiId)
                     .map(CustomEmoji::getName)
-                    .orElse(customEmoji.group("name"));
+                    .orElseGet(() -> customEmoji.group("name"));
             content = customEmoji.replaceFirst(":" + name + ":");
             customEmoji.reset(content);
         }
@@ -672,7 +672,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> removeReactionByEmoji(Emoji emoji) {
-        return getReactionByEmoji(emoji).map(Reaction::remove).orElse(CompletableFuture.completedFuture(null));
+        return getReactionByEmoji(emoji).map(Reaction::remove).orElseGet(() -> CompletableFuture.completedFuture(null));
     }
 
     /**
