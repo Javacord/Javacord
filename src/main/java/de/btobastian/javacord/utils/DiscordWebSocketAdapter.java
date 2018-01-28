@@ -420,6 +420,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 if (sessionId == null) {
                     sendIdentify(websocket);
                 } else {
+                    connectionDelaySemaphorePerAccount.get(api.getToken()).release();
                     sendResume(websocket);
                 }
                 break;
