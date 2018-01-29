@@ -16,6 +16,7 @@ import de.btobastian.javacord.utils.ListenerManager;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -241,6 +242,23 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
     default <T extends GroupChannelAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(GroupChannel.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<GroupChannel> getCurrentCachedInstance() {
+        return getApi().getGroupChannelById(getId());
+    }
+
+    @Override
+    default CompletableFuture<GroupChannel> getLatestInstance() {
+        Optional<GroupChannel> currentCachedInstance = getCurrentCachedInstance();
+        if (currentCachedInstance.isPresent()) {
+            return CompletableFuture.completedFuture(currentCachedInstance.get());
+        } else {
+            CompletableFuture<GroupChannel> result = new CompletableFuture<>();
+            result.completeExceptionally(new NoSuchElementException());
+            return result;
+        }
     }
 
 }

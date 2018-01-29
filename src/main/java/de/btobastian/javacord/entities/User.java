@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 /**
  * This class represents a user.
  */
-public interface User extends DiscordEntity, Messageable, Mentionable {
+public interface User extends DiscordEntity, Messageable, Mentionable, UpdatableFromCache<User> {
 
     @Override
     default String getMentionTag() {
@@ -796,6 +796,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     default <T extends UserAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(User.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<User> getCurrentCachedInstance() {
+        return getApi().getCachedUserById(getId());
+    }
+
+    @Override
+    default CompletableFuture<User> getLatestInstance() {
+        return getApi().getUserById(getId());
     }
 
 }

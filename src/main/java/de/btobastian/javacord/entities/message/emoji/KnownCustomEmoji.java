@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.emoji;
 
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.UpdatableFromCache;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiAttachableListener;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 /**
  * This class represents a known custom emoji.
  */
-public interface KnownCustomEmoji extends CustomEmoji {
+public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownCustomEmoji> {
 
     /**
      * The logger of this class.
@@ -273,6 +274,11 @@ public interface KnownCustomEmoji extends CustomEmoji {
     default <T extends CustomEmojiAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(KnownCustomEmoji.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<KnownCustomEmoji> getCurrentCachedInstance() {
+        return getApi().getCustomEmojiById(getId());
     }
 
 }
