@@ -662,26 +662,26 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a list of all custom emojis with the given name in the server.
+     * Gets a collection with all custom emojis with the given name in the server.
      * This method is case sensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A list of all custom emojis with the given name in this server.
+     * @return A collection with all custom emojis with the given name in this server.
      */
-    default List<CustomEmoji> getCustomEmojisByName(String name) {
+    default Collection<CustomEmoji> getCustomEmojisByName(String name) {
         return getCustomEmojis().stream()
                 .filter(emoji -> emoji.getName().equals(name))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Gets a list of all custom emojis with the given name in the server.
+     * Gets a collection with all custom emojis with the given name in the server.
      * This method is case insensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A list of all custom emojis with the given name in this server.
+     * @return A collection with all custom emojis with the given name in this server.
      */
-    default List<CustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
+    default Collection<CustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
         return getCustomEmojis().stream()
                 .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
                 .collect(Collectors.toList());
