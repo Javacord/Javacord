@@ -531,7 +531,7 @@ public interface MessageAuthor extends DiscordEntity {
      * @see DiscordApi#getYourself()
      */
     default boolean isYourself() {
-        return getApi().getYourself().getId() == getId();
+        return asUser().map(User::isYourself).orElse(false);
     }
 
 }
