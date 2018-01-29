@@ -189,7 +189,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @see DiscordApi#getYourself()
      */
     default boolean isYourself() {
-        return this == getApi().getYourself();
+        return getId() == getApi().getYourself().getId();
     }
 
     /**
