@@ -90,47 +90,23 @@ public class ImplMessageHistory implements MessageHistory {
         CompletableFuture<MessageHistory> future = new CompletableFuture<>();
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
-                ImplMessageHistory history = new ImplMessageHistory(channel);
+                // calculate the half limit.
+                int halfLimit = limit / 2;
 
-                // First step: Get the messages around directly from discord.
-                Message[] msgArray = history.request(limit == 100 ? 100 : limit % 100, -1, -1, around).join();
-                history.messages.addAll(Arrays.asList(msgArray));
-                history.messages.sort(Comparable::compareTo);
+                // get the newer half
+                ImplMessageHistory history = (ImplMessageHistory) getHistoryAfter(channel, halfLimit, around).join();
 
-                if (limit / 100 == 0 || msgArray.length == 0) {
-                    future.complete(history);
-                    return;
-                }
+                // calculate the message id for getting the older half + around message
+                long referenceMessageId = (history.getMessages().size() == 0) ? -1 : history.getOldestMessage().getId();
 
-                // Second step: Calculate the amount of message to get before and after the oldest/newest message
-                int messagesToFetchAfter = (int) (((limit - (limit == 100 ? 100 : limit % 100)) / 2D) + 0.5);
-                int messagesToFetchBefore = (int) ((limit - (limit == 100 ? 100 : limit % 100)) / 2D);
+                // get the older half + around message
+                MessageHistory historyBefore = getHistoryBefore(channel, halfLimit + 1, referenceMessageId).join();
 
-                // Third step: Get message history for before and after
-                MessageHistory historyBefore = null;
-                if (messagesToFetchBefore > 0) {
-                    historyBefore =
-                            getHistoryBefore(channel, messagesToFetchBefore, history.getOldestMessage().getId()).join();
-                }
+                // combine the messages of these "histories"
+                history.messages.addAll(((ImplMessageHistory) historyBefore).messages);
+                history.messages.sort(null);
 
-                MessageHistory historyAfter = null;
-                if (messagesToFetchAfter > 0) {
-                    historyAfter =
-                            getHistoryAfter(channel, messagesToFetchAfter, history.getNewestMessage().getId()).join();
-                }
-
-                // Forth step: Combine the messages of these "histories"
-                if (historyBefore != null) {
-                    history.messages.addAll(historyBefore.getMessages());
-                }
-
-                if (historyAfter != null) {
-                    history.messages.addAll(historyAfter.getMessages());
-                }
-
-                history.messages.sort(Comparable::compareTo);
-
-                // Fifth step: We are done! The answer is 42!
+                // we are done
                 future.complete(history);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
@@ -149,33 +125,51 @@ public class ImplMessageHistory implements MessageHistory {
      *
      * @return The history.
      */
-    private static CompletableFuture<MessageHistory> getHistory(TextChannel channel, int limit, long before, long after)
-    {
+    private static CompletableFuture<MessageHistory> getHistory(
+            TextChannel channel, int limit, long before, long after) {
         CompletableFuture<MessageHistory> future = new CompletableFuture<>();
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
                 ImplMessageHistory history = new ImplMessageHistory(channel);
 
-                int step = 0;
-                while (step < (double) limit / 100D) {
-                    Message[] msgArray;
-                    if (step == 0) {
-                        msgArray = history.request((limit % 100) == 0 ? 100 : limit % 100, before, after, -1).join();
-                    } else {
-                        msgArray = history.request(
-                                100,
-                                before != -1 ? history.getOldestMessage().getId() : -1,
-                                after != -1 ? history.getNewestMessage().getId() : -1,
-                                -1
-                        ).join();
-                    }
-                    history.messages.addAll(Arrays.asList(msgArray));
-                    history.messages.sort(Comparable::compareTo);
-                    step++;
+                // get the initial batch with the first <= 100 messages
+                int initialBatchSize = ((limit % 100) == 0) ? 100 : limit % 100;
+                Message[] msgArray = history.request(initialBatchSize, before, after, -1).join();
+                history.messages.addAll(Arrays.asList(msgArray));
+                history.messages.sort(null);
+
+                // limit <= 100 => initial request got all messages
+                // msgArray is empty => READ_MESSAGE_HISTORY permission is denied or no more messages available
+                if ((limit <= 100) || (msgArray.length == 0)) {
+                    future.complete(history);
+                    return;
+                }
+
+                // calculate the amount of remaining message to get
+                // this will be a multiple of 100 and at least 100
+                int remainingMessages = limit - initialBatchSize;
+
+                // get remaining messages
+                for (int step = 0; step < remainingMessages / 100; ++step) {
+                    msgArray = history.request(
+                            100,
+                            // before was set or both were not set
+                            (before != -1) || (after == -1) ? history.getOldestMessage().getId() : -1,
+                            (after != -1) ? history.getNewestMessage().getId() : -1,
+                            -1
+                    ).join();
+
+                    // no more messages available
                     if (msgArray.length == 0) {
                         break;
                     }
+
+                    // combine the messages of these "histories"
+                    history.messages.addAll(Arrays.asList(msgArray));
+                    history.messages.sort(null);
                 }
+
+                // we are done
                 future.complete(history);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
