@@ -22,6 +22,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListen
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.utils.ListenerManager;
+import de.btobastian.javacord.utils.NonThrowingAutoCloseable;
 import de.btobastian.javacord.utils.cache.MessageCache;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -133,7 +134,7 @@ public interface TextChannel extends Channel, Messageable {
      * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
      * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
      * the {@code AutoCloseable}. This can be used in a try-with-resources block like
-     * <code>try (AutoCloseable typingIndicator = textChannel.typeContinuously())
+     * <code>try (NonThrowingAutoCloseable typingIndicator = textChannel.typeContinuously())
      * { /* do lengthy stuff &#42;/ }</code>.
      * <p>
      * The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
@@ -150,7 +151,7 @@ public interface TextChannel extends Channel, Messageable {
      * @see #typeContinuouslyAfter(long, TimeUnit)
      * @see #typeContinuouslyAfter(long, TimeUnit, Consumer)
      */
-    default AutoCloseable typeContinuously() {
+    default NonThrowingAutoCloseable typeContinuously() {
         return typeContinuouslyAfter(0, TimeUnit.NANOSECONDS, null);
     }
 
@@ -159,7 +160,7 @@ public interface TextChannel extends Channel, Messageable {
      * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
      * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
      * the {@code AutoCloseable}. This can be used in a try-with-resources block like
-     * <code>try (AutoCloseable typingIndicator =
+     * <code>try (NonThrowingAutoCloseable typingIndicator =
      * textChannel.typeContinuouslyAfter(500, TimeUnit.MILLISECONDS)) { /* do lengthy stuff &#42;/ }</code>.
      * <p>
      * The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very short
@@ -179,7 +180,7 @@ public interface TextChannel extends Channel, Messageable {
      * @see #typeContinuously(Consumer)
      * @see #typeContinuouslyAfter(long, TimeUnit, Consumer)
      */
-    default AutoCloseable typeContinuouslyAfter(long delay, TimeUnit timeUnit) {
+    default NonThrowingAutoCloseable typeContinuouslyAfter(long delay, TimeUnit timeUnit) {
         return typeContinuouslyAfter(delay, timeUnit, null);
     }
 
@@ -188,7 +189,7 @@ public interface TextChannel extends Channel, Messageable {
      * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
      * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
      * the {@code AutoCloseable}. This can be used in a try-with-resources block like
-     * <code>try (AutoCloseable typingIndicator =
+     * <code>try (NonThrowingAutoCloseable typingIndicator =
      * textChannel.typeContinuously(((Function&lt;Throwable, ?&gt;) Javacord::exceptionLogger)::apply))
      * { /* do lengthy stuff &#42;/ }</code>.
      * <p>
@@ -207,7 +208,7 @@ public interface TextChannel extends Channel, Messageable {
      * @see #typeContinuouslyAfter(long, TimeUnit)
      * @see #typeContinuouslyAfter(long, TimeUnit, Consumer)
      */
-    default AutoCloseable typeContinuously(Consumer<Throwable> exceptionHandler) {
+    default NonThrowingAutoCloseable typeContinuously(Consumer<Throwable> exceptionHandler) {
         return typeContinuouslyAfter(0, TimeUnit.NANOSECONDS, exceptionHandler);
     }
 
@@ -216,7 +217,7 @@ public interface TextChannel extends Channel, Messageable {
      * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
      * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
      * the {@code AutoCloseable}. This can be used in a try-with-resources block like
-     * <code>try (AutoCloseable typingIndicator = textChannel.typeContinuouslyAfter(500,
+     * <code>try (NonThrowingAutoCloseable typingIndicator = textChannel.typeContinuouslyAfter(500,
      * TimeUnit.MILLISECONDS, ((Function&lt;Throwable, ?&gt;) Javacord::exceptionLogger)::apply))
      * { /* do lengthy stuff &#42;/ }</code>.
      * <p>
@@ -238,7 +239,7 @@ public interface TextChannel extends Channel, Messageable {
      * @see #typeContinuously(Consumer)
      * @see #typeContinuouslyAfter(long, TimeUnit)
      */
-    default AutoCloseable typeContinuouslyAfter(
+    default NonThrowingAutoCloseable typeContinuouslyAfter(
             long delay, TimeUnit timeUnit, Consumer<Throwable> exceptionHandler) {
         Future<?> typingIndicator = getApi().getThreadPool().getScheduler()
                 .scheduleWithFixedDelay(() -> {
