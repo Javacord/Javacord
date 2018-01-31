@@ -129,46 +129,127 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
-     * Displays the "xyz is typing..." message continuously.
+     * Displays the "xyz is typing..." message continuously, starting immediately.
      * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
-     * Sending a message will make the message go away, but it will return after a short delay if not canceled using
-     * the {@code AutoCloseable}.
-     * This can be used in a try-with-resources block like
-     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously()) { /* do lengthy stuff &#42;/ }</code>.
-     * Any occurring exceptions including ratelimit exceptions are suppressed.
-     * If you want to handle exceptions, use {@link #typeContinuously(Consumer)}.
+     * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
+     * the {@code AutoCloseable}. This can be used in a try-with-resources block like
+     * <code>try (AutoCloseable typingIndicator = textChannel.typeContinuously())
+     * { /* do lengthy stuff &#42;/ }</code>.
+     * <p>
+     * The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
+     * {@link #typeContinuouslyAfter(long, TimeUnit)}. This can be useful if the task you do can be finished in very
+     * short time which could cause the typing indicator and the response message being sent at the same time and the
+     * typing indicator could be shown for 10 seconds even if the message was sent already.
+     * <p>
+     * Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
+     * {@link #typeContinuously(Consumer)} or {@link #typeContinuouslyAfter(long, TimeUnit, Consumer)}.
      *
      * @return An auto-closable to stop sending the typing indicator.
      * @see #type()
      * @see #typeContinuously(Consumer)
+     * @see #typeContinuouslyAfter(long, TimeUnit)
+     * @see #typeContinuouslyAfter(long, TimeUnit, Consumer)
      */
     default AutoCloseable typeContinuously() {
-        Future typingIndicator = getApi().getThreadPool().getScheduler()
-                .scheduleWithFixedDelay(this::type, 0, 8, TimeUnit.SECONDS);
-        return () -> typingIndicator.cancel(true);
+        return typeContinuouslyAfter(0, TimeUnit.NANOSECONDS, null);
     }
 
     /**
-     * Displays the "xyz is typing..." message continuously.
+     * Displays the "xyz is typing..." message continuously, starting delayed.
      * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
-     * Sending a message will make the message go away, but it will return after a short delay if not canceled using
-     * the {@code AutoCloseable}.
-     * Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler}.
-     * This can be used in a try-with-resources block like
-     * <code>try(AutoCloseable typingIndicator = textChannel.typeContinuously(((Function&lt;Throwable, ?&gt;)
-     * Javacord::exceptionLogger)::apply)) { /* do lengthy stuff &#42;/ }</code>.
+     * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
+     * the {@code AutoCloseable}. This can be used in a try-with-resources block like
+     * <code>try (AutoCloseable typingIndicator =
+     * textChannel.typeContinuouslyAfter(500, TimeUnit.MILLISECONDS)) { /* do lengthy stuff &#42;/ }</code>.
+     * <p>
+     * The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very short
+     * time which could cause the typing indicator and the response message being sent at the same time and the typing
+     * indicator could be shown for 10 seconds even if the message was sent already. With the delay this is
+     * compensated, because if the returned {@code AutoCloseable} is closed before the delay is over, no typing
+     * indicator will be sent at all.
+     * <p>
+     * Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
+     * {@link #typeContinuously(Consumer)} or {@link #typeContinuouslyAfter(long, TimeUnit, Consumer)}.
+     *
+     * @param delay The delay to wait until the first typing indicator is sent.
+     * @param timeUnit The time unit of the delay value.
+     * @return An auto-closable to stop sending the typing indicator.
+     * @see #type()
+     * @see #typeContinuously()
+     * @see #typeContinuously(Consumer)
+     * @see #typeContinuouslyAfter(long, TimeUnit, Consumer)
+     */
+    default AutoCloseable typeContinuouslyAfter(long delay, TimeUnit timeUnit) {
+        return typeContinuouslyAfter(delay, timeUnit, null);
+    }
+
+    /**
+     * Displays the "xyz is typing..." message continuously, starting immediately.
+     * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
+     * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
+     * the {@code AutoCloseable}. This can be used in a try-with-resources block like
+     * <code>try (AutoCloseable typingIndicator =
+     * textChannel.typeContinuously(((Function&lt;Throwable, ?&gt;) Javacord::exceptionLogger)::apply))
+     * { /* do lengthy stuff &#42;/ }</code>.
+     * <p>
+     * The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
+     * {@link #typeContinuouslyAfter(long, TimeUnit)}. This can be useful if the task you do can be finished in very
+     * short time which could cause the typing indicator and the response message being sent at the same time and the
+     * typing indicator could be shown for 10 seconds even if the message was sent already.
+     * <p>
+     * Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler} or
+     * ignored if it is {@code null}.
      *
      * @param exceptionHandler The handler that exceptions are given to.
      * @return An auto-closable to stop sending the typing indicator.
      * @see #type()
      * @see #typeContinuously()
+     * @see #typeContinuouslyAfter(long, TimeUnit)
+     * @see #typeContinuouslyAfter(long, TimeUnit, Consumer)
      */
     default AutoCloseable typeContinuously(Consumer<Throwable> exceptionHandler) {
-        Future typingIndicator = getApi().getThreadPool().getScheduler()
-                .scheduleWithFixedDelay(() -> type().exceptionally(throwable -> {
-                    exceptionHandler.accept(throwable);
-                    return null;
-                }), 0, 8, TimeUnit.SECONDS);
+        return typeContinuouslyAfter(0, TimeUnit.NANOSECONDS, exceptionHandler);
+    }
+
+    /**
+     * Displays the "xyz is typing..." message continuously, starting delayed.
+     * The message is continuously displayed if not quit using the returned {@code AutoCloseable}.
+     * Sending a message will make the message go away, but it will return after a short delay if not cancelled using
+     * the {@code AutoCloseable}. This can be used in a try-with-resources block like
+     * <code>try (AutoCloseable typingIndicator = textChannel.typeContinuouslyAfter(500,
+     * TimeUnit.MILLISECONDS, ((Function&lt;Throwable, ?&gt;) Javacord::exceptionLogger)::apply))
+     * { /* do lengthy stuff &#42;/ }</code>.
+     * <p>
+     * The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very short
+     * time which could cause the typing indicator and the response message being sent at the same time and the typing
+     * indicator could be shown for 10 seconds even if the message was sent already. With the delay this is
+     * compensated, because if the returned {@code AutoCloseable} is closed before the delay is over, no typing
+     * indicator will be sent at all.
+     * <p>
+     * Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler} or
+     * ignored if it is {@code null}.
+     *
+     * @param exceptionHandler The handler that exceptions are given to.
+     * @param delay The delay to wait until the first typing indicator is sent.
+     * @param timeUnit The time unit of the delay value.
+     * @return An auto-closable to stop sending the typing indicator.
+     * @see #type()
+     * @see #typeContinuously()
+     * @see #typeContinuously(Consumer)
+     * @see #typeContinuouslyAfter(long, TimeUnit)
+     */
+    default AutoCloseable typeContinuouslyAfter(
+            long delay, TimeUnit timeUnit, Consumer<Throwable> exceptionHandler) {
+        Future<?> typingIndicator = getApi().getThreadPool().getScheduler()
+                .scheduleWithFixedDelay(() -> {
+                    CompletableFuture<?> typeFuture = type();
+                    if (exceptionHandler != null) {
+                        typeFuture.exceptionally(throwable -> {
+                            exceptionHandler.accept(throwable);
+                            return null;
+                        });
+                    }
+                }, TimeUnit.NANOSECONDS.convert(delay, timeUnit), 8_000_000_000L, TimeUnit.NANOSECONDS);
         return () -> typingIndicator.cancel(true);
     }
 
