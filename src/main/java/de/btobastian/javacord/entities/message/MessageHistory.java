@@ -36,7 +36,7 @@ public interface MessageHistory {
         if (getMessages().isEmpty()) {
             throw new IllegalStateException("Cannot get oldest message because the history does not contain messages!");
         }
-        return getMessages().get(getMessages().size() - 1);
+        return getMessages().get(0);
     }
 
     /**
@@ -49,7 +49,7 @@ public interface MessageHistory {
         if (getMessages().isEmpty()) {
             throw new IllegalStateException("Cannot get newest message because the history does not contain messages!");
         }
-        return getMessages().get(0);
+        return getMessages().get(getMessages().size() - 1);
     }
 
 }

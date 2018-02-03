@@ -297,7 +297,7 @@ public class ImplMessage implements Message {
 
     @Override
     public int compareTo(Message otherMessage) {
-        return otherMessage.getCreationTimestamp().compareTo(getCreationTimestamp());
+        return Long.compareUnsigned(getId(), otherMessage.getId());
     }
 
     @Override
