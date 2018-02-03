@@ -830,7 +830,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The history.
      * @see TextChannel#getHistoryBefore(int, long)
      */
-    default CompletableFuture<MessageHistory> getHistoryBefore(int limit) {
+    default CompletableFuture<MessageSet> getHistoryBefore(int limit) {
         return getChannel().getHistoryBefore(limit, this);
     }
 
@@ -841,7 +841,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The history.
      * @see TextChannel#getHistoryAfter(int, long)
      */
-    default CompletableFuture<MessageHistory> getHistoryAfter(int limit) {
+    default CompletableFuture<MessageSet> getHistoryAfter(int limit) {
         return getChannel().getHistoryAfter(limit, this);
     }
 
@@ -855,7 +855,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The history.
      * @see TextChannel#getHistoryAround(int, long)
      */
-    default CompletableFuture<MessageHistory> getHistoryAround(int limit) {
+    default CompletableFuture<MessageSet> getHistoryAround(int limit) {
         return getChannel().getHistoryAround(limit, this);
     }
 

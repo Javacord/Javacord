@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 /**
  * This class represents a history of messages in a specific channel.
  */
-public interface MessageHistory {
+public interface MessageSet {
 
     /**
      * Gets an ordered list with all messages.

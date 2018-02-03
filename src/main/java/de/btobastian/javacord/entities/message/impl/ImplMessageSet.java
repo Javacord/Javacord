@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.MessageHistory;
+import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link MessageHistory}.
+ * The implementation of {@link MessageSet}.
  */
-public class ImplMessageHistory implements MessageHistory {
+public class ImplMessageSet implements MessageSet {
 
     /**
      * A list with all messages.
@@ -36,7 +36,7 @@ public class ImplMessageHistory implements MessageHistory {
      *
      * @param channel The channel of the messages.
      */
-    private ImplMessageHistory(TextChannel channel) {
+    private ImplMessageSet(TextChannel channel) {
         this.channel = channel;
     }
 
@@ -47,7 +47,7 @@ public class ImplMessageHistory implements MessageHistory {
      * @param limit The limit of messages to get.
      * @return The history.
      */
-    public static CompletableFuture<MessageHistory> getHistory(TextChannel channel, int limit) {
+    public static CompletableFuture<MessageSet> getHistory(TextChannel channel, int limit) {
         return getHistory(channel, limit, -1, -1);
     }
 
@@ -59,7 +59,7 @@ public class ImplMessageHistory implements MessageHistory {
      * @param before Get messages before the message with this id.
      * @return The history.
      */
-    public static CompletableFuture<MessageHistory> getHistoryBefore(TextChannel channel, int limit, long before) {
+    public static CompletableFuture<MessageSet> getHistoryBefore(TextChannel channel, int limit, long before) {
         return getHistory(channel, limit, before, -1);
     }
 
@@ -71,7 +71,7 @@ public class ImplMessageHistory implements MessageHistory {
      * @param after Get messages after the message with this id.
      * @return The history.
      */
-    public static CompletableFuture<MessageHistory> getHistoryAfter(TextChannel channel, int limit, long after) {
+    public static CompletableFuture<MessageSet> getHistoryAfter(TextChannel channel, int limit, long after) {
         return getHistory(channel, limit, -1, after);
     }
 
@@ -86,24 +86,24 @@ public class ImplMessageHistory implements MessageHistory {
      * @param around Get messages around the message with this id.
      * @return The history.
      */
-    public static CompletableFuture<MessageHistory> getHistoryAround(TextChannel channel, int limit, long around) {
-        CompletableFuture<MessageHistory> future = new CompletableFuture<>();
+    public static CompletableFuture<MessageSet> getHistoryAround(TextChannel channel, int limit, long around) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
                 // calculate the half limit.
                 int halfLimit = limit / 2;
 
                 // get the newer half
-                ImplMessageHistory history = (ImplMessageHistory) getHistoryAfter(channel, halfLimit, around).join();
+                ImplMessageSet history = (ImplMessageSet) getHistoryAfter(channel, halfLimit, around).join();
 
                 // calculate the message id for getting the older half + around message
                 long referenceMessageId = (history.getMessages().size() == 0) ? -1 : history.getOldestMessage().getId();
 
                 // get the older half + around message
-                MessageHistory historyBefore = getHistoryBefore(channel, halfLimit + 1, referenceMessageId).join();
+                MessageSet historyBefore = getHistoryBefore(channel, halfLimit + 1, referenceMessageId).join();
 
                 // combine the messages of these "histories"
-                history.messages.addAll(((ImplMessageHistory) historyBefore).messages);
+                history.messages.addAll(((ImplMessageSet) historyBefore).messages);
                 history.messages.sort(null);
 
                 // we are done
@@ -125,12 +125,12 @@ public class ImplMessageHistory implements MessageHistory {
      *
      * @return The history.
      */
-    private static CompletableFuture<MessageHistory> getHistory(
+    private static CompletableFuture<MessageSet> getHistory(
             TextChannel channel, int limit, long before, long after) {
-        CompletableFuture<MessageHistory> future = new CompletableFuture<>();
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
-                ImplMessageHistory history = new ImplMessageHistory(channel);
+                ImplMessageSet history = new ImplMessageSet(channel);
 
                 // get the initial batch with the first <= 100 messages
                 int initialBatchSize = ((limit % 100) == 0) ? 100 : limit % 100;

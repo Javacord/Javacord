@@ -10,10 +10,10 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.MessageHistory;
+import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
-import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -399,8 +399,8 @@ public interface TextChannel extends Channel, Messageable {
      * @param limit The limit of messages to get.
      * @return The history.
      */
-    default CompletableFuture<MessageHistory> getHistory(int limit) {
-        return ImplMessageHistory.getHistory(this, limit);
+    default CompletableFuture<MessageSet> getHistory(int limit) {
+        return ImplMessageSet.getHistory(this, limit);
     }
 
     /**
@@ -410,8 +410,8 @@ public interface TextChannel extends Channel, Messageable {
      * @param before Get messages before the message with this id.
      * @return The history.
      */
-    default CompletableFuture<MessageHistory> getHistoryBefore(int limit, long before) {
-        return ImplMessageHistory.getHistoryBefore(this, limit, before);
+    default CompletableFuture<MessageSet> getHistoryBefore(int limit, long before) {
+        return ImplMessageSet.getHistoryBefore(this, limit, before);
     }
 
     /**
@@ -421,7 +421,7 @@ public interface TextChannel extends Channel, Messageable {
      * @param before Get messages before this message.
      * @return The history.
      */
-    default CompletableFuture<MessageHistory> getHistoryBefore(int limit, Message before) {
+    default CompletableFuture<MessageSet> getHistoryBefore(int limit, Message before) {
         return getHistoryBefore(limit, before.getId());
     }
 
@@ -432,8 +432,8 @@ public interface TextChannel extends Channel, Messageable {
      * @param after Get messages after the message with this id.
      * @return The history.
      */
-    default CompletableFuture<MessageHistory> getHistoryAfter(int limit, long after) {
-        return ImplMessageHistory.getHistoryAfter(this, limit, after);
+    default CompletableFuture<MessageSet> getHistoryAfter(int limit, long after) {
+        return ImplMessageSet.getHistoryAfter(this, limit, after);
     }
 
     /**
@@ -443,7 +443,7 @@ public interface TextChannel extends Channel, Messageable {
      * @param after Get messages after this message.
      * @return The history.
      */
-    default CompletableFuture<MessageHistory> getHistoryAfter(int limit, Message after) {
+    default CompletableFuture<MessageSet> getHistoryAfter(int limit, Message after) {
         return getHistoryAfter(limit, after.getId());
     }
     /**
@@ -456,8 +456,8 @@ public interface TextChannel extends Channel, Messageable {
      * @param around Get messages around the message with this id.
      * @return The history.
      */
-    default CompletableFuture<MessageHistory> getHistoryAround(int limit, long around) {
-        return ImplMessageHistory.getHistoryAround(this, limit, around);
+    default CompletableFuture<MessageSet> getHistoryAround(int limit, long around) {
+        return ImplMessageSet.getHistoryAround(this, limit, around);
     }
 
     /**
@@ -470,7 +470,7 @@ public interface TextChannel extends Channel, Messageable {
      * @param around Get messages around this message.
      * @return The history.
      */
-    default CompletableFuture<MessageHistory> getHistoryAround(int limit, Message around) {
+    default CompletableFuture<MessageSet> getHistoryAround(int limit, Message around) {
         return getHistoryAround(limit, around.getId());
     }
 
