@@ -394,84 +394,89 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
-     * Gets the history of messages in this channel.
+     * Gets up to a given amount of messages in this channel from the newer end.
      *
      * @param limit The limit of messages to get.
-     * @return The history.
+     * @return The messages.
      */
-    default CompletableFuture<MessageSet> getHistory(int limit) {
-        return ImplMessageSet.getHistory(this, limit);
+    default CompletableFuture<MessageSet> getMessages(int limit) {
+        return ImplMessageSet.getMessages(this, limit);
     }
 
     /**
-     * Gets the history of messages before a given message in this channel.
+     * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param before Get messages before the message with this id.
-     * @return The history.
+     * @return The messages.
      */
-    default CompletableFuture<MessageSet> getHistoryBefore(int limit, long before) {
-        return ImplMessageSet.getHistoryBefore(this, limit, before);
+    default CompletableFuture<MessageSet> getMessagesBefore(int limit, long before) {
+        return ImplMessageSet.getMessagesBefore(this, limit, before);
     }
 
     /**
-     * Gets the history of messages before a given message in this channel.
+     * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param before Get messages before this message.
-     * @return The history.
+     * @return The messages.
      */
-    default CompletableFuture<MessageSet> getHistoryBefore(int limit, Message before) {
-        return getHistoryBefore(limit, before.getId());
+    default CompletableFuture<MessageSet> getMessagesBefore(int limit, Message before) {
+        return getMessagesBefore(limit, before.getId());
     }
 
     /**
-     * Gets the history of messages after a given message in this channel.
+     * Gets up to a given amount of messages in this channel after a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param after Get messages after the message with this id.
-     * @return The history.
+     * @return The messages.
      */
-    default CompletableFuture<MessageSet> getHistoryAfter(int limit, long after) {
-        return ImplMessageSet.getHistoryAfter(this, limit, after);
+    default CompletableFuture<MessageSet> getMessagesAfter(int limit, long after) {
+        return ImplMessageSet.getMessagesAfter(this, limit, after);
     }
 
     /**
-     * Gets the history of messages after a given message in this channel.
+     * Gets up to a given amount of messages in this channel after a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param after Get messages after this message.
-     * @return The history.
+     * @return The messages.
      */
-    default CompletableFuture<MessageSet> getHistoryAfter(int limit, Message after) {
-        return getHistoryAfter(limit, after.getId());
+    default CompletableFuture<MessageSet> getMessagesAfter(int limit, Message after) {
+        return getMessagesAfter(limit, after.getId());
     }
+
     /**
-     * Gets the history of messages around a given message in this channel.
-     * Half of the message will be older than the given message and half of the message will be newer.
+     * Gets up to a given amount of messages in this channel around a given message in any channel.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and does not count towards the limit.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param limit The limit of messages to get.
      * @param around Get messages around the message with this id.
-     * @return The history.
+     * @return The messages.
      */
-    default CompletableFuture<MessageSet> getHistoryAround(int limit, long around) {
-        return ImplMessageSet.getHistoryAround(this, limit, around);
+    default CompletableFuture<MessageSet> getMessagesAround(int limit, long around) {
+        return ImplMessageSet.getMessagesAround(this, limit, around);
     }
 
     /**
-     * Gets the history of messages around a given message in this channel.
-     * Half of the message will be older than the given message and half of the message will be newer.
+     * Gets up to a given amount of messages in this channel around a given message in any channel.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and does not count towards the limit.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param limit The limit of messages to get.
      * @param around Get messages around this message.
-     * @return The history.
+     * @return The messages.
      */
-    default CompletableFuture<MessageSet> getHistoryAround(int limit, Message around) {
-        return getHistoryAround(limit, around.getId());
+    default CompletableFuture<MessageSet> getMessagesAround(int limit, Message around) {
+        return getMessagesAround(limit, around.getId());
     }
 
     /**

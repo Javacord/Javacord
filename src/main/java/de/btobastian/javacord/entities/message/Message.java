@@ -824,39 +824,40 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
-     * Gets the history of messages before this message.
+     * Gets up to a given amount of messages before this message.
      *
      * @param limit The limit of messages to get.
-     * @return The history.
-     * @see TextChannel#getHistoryBefore(int, long)
+     * @return The messages.
+     * @see TextChannel#getMessagesBefore(int, long)
      */
-    default CompletableFuture<MessageSet> getHistoryBefore(int limit) {
-        return getChannel().getHistoryBefore(limit, this);
+    default CompletableFuture<MessageSet> getMessagesBefore(int limit) {
+        return getChannel().getMessagesBefore(limit, this);
     }
 
     /**
-     * Gets the history of messages after this message.
+     * Gets up to a given amount of messages after this message.
      *
      * @param limit The limit of messages to get.
-     * @return The history.
-     * @see TextChannel#getHistoryAfter(int, long)
+     * @return The messages.
+     * @see TextChannel#getMessagesAfter(int, long)
      */
-    default CompletableFuture<MessageSet> getHistoryAfter(int limit) {
-        return getChannel().getHistoryAfter(limit, this);
+    default CompletableFuture<MessageSet> getMessagesAfter(int limit) {
+        return getChannel().getMessagesAfter(limit, this);
     }
 
     /**
-     * Gets the history of messages around this message.
-     * Half of the message will be older than the given message and half of the message will be newer.
+     * Gets up to a given amount of messages around this message.
+     * This message will be part of the result in addition to the messages around and does not count towards the limit.
+     * Half of the messages will be older than this message and half of the message will be newer.
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param limit The limit of messages to get.
-     * @return The history.
-     * @see TextChannel#getHistoryAround(int, long)
+     * @return The messages.
+     * @see TextChannel#getMessagesAround(int, long)
      */
-    default CompletableFuture<MessageSet> getHistoryAround(int limit) {
-        return getChannel().getHistoryAround(limit, this);
+    default CompletableFuture<MessageSet> getMessagesAround(int limit) {
+        return getChannel().getMessagesAround(limit, this);
     }
 
     /**

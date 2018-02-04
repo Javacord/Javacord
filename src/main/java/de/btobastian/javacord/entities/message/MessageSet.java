@@ -1,55 +1,48 @@
 package de.btobastian.javacord.entities.message;
 
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.NavigableSet;
+import java.util.Optional;
 
 /**
- * This class represents a history of messages in a specific channel.
+ * This class represents an unmodifiable set of messages that is always sorted from oldest
+ * to newest according to the natural ordering of {@link Message}s.
  */
-public interface MessageSet {
-
-    /**
-     * Gets an ordered list with all messages.
-     * The message with the lowest index is the newest message.
-     * The message with the largest index is the oldest message.
-     *
-     * @return An ordered list with all messages.
-     */
-    List<Message> getMessages();
-
-    /**
-     * Gets a stream with all messages in the history.
-     *
-     * @return A stream with all messages in the history.
-     */
-    default Stream<Message> stream() {
-        return getMessages().stream();
-    }
+public interface MessageSet extends NavigableSet<Message> {
 
     /**
      * Gets the oldest message in the history.
      *
      * @return The oldest message in the history.
-     * @throws IllegalStateException If the messages list is empty.
      */
-    default Message getOldestMessage() throws IllegalStateException {
-        if (getMessages().isEmpty()) {
-            throw new IllegalStateException("Cannot get oldest message because the history does not contain messages!");
-        }
-        return getMessages().get(0);
+    default Optional<Message> getOldestMessage() {
+        return isEmpty() ? Optional.empty() : Optional.of(first());
     }
 
     /**
      * Gets the newest message in the history.
      *
      * @return The newest message in the history.
-     * @throws IllegalStateException If the messages list is empty.
      */
-    default Message getNewestMessage() throws IllegalStateException {
-        if (getMessages().isEmpty()) {
-            throw new IllegalStateException("Cannot get newest message because the history does not contain messages!");
-        }
-        return getMessages().get(getMessages().size() - 1);
+    default Optional<Message> getNewestMessage() {
+        return isEmpty() ? Optional.empty() : Optional.of(last());
     }
+
+    @Override
+    MessageSet subSet(Message fromElement, boolean fromInclusive, Message toElement, boolean toInclusive);
+
+    @Override
+    MessageSet headSet(Message toElement, boolean inclusive);
+
+    @Override
+    MessageSet tailSet(Message fromElement, boolean inclusive);
+
+    @Override
+    MessageSet subSet(Message fromElement, Message toElement);
+
+    @Override
+    MessageSet headSet(Message toElement);
+
+    @Override
+    MessageSet tailSet(Message fromElement);
 
 }
