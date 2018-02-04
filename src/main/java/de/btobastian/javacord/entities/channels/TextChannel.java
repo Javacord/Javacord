@@ -48,7 +48,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.StreamSupport;
 
 /**
  * This class represents a text channel.
@@ -287,7 +289,7 @@ public interface TextChannel extends Channel, Messageable {
     default CompletableFuture<Void> bulkDelete(Iterable<Message> messages) {
         Collection<Long> messageIds = new HashSet<>();
         messages.forEach(message -> messageIds.add(message.getId()));
-        return bulkDelete(messageIds.stream().mapToLong(value -> value).toArray());
+        return bulkDelete(messageIds.stream().mapToLong(Long::longValue).toArray());
     }
 
     /**
@@ -381,15 +383,14 @@ public interface TextChannel extends Channel, Messageable {
      *
      * @return A list with all pinned messages.
      */
-    default CompletableFuture<List<Message>> getPins() {
-        return new RestRequest<List<Message>>(getApi(), RestMethod.GET, RestEndpoint.PINS)
+    default CompletableFuture<MessageSet> getPins() {
+        return new RestRequest<MessageSet>(getApi(), RestMethod.GET, RestEndpoint.PINS)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
-                    List<Message> pins = new ArrayList<>();
-                    for (JsonNode pin : result.getJsonBody()) {
-                        pins.add(((ImplDiscordApi) getApi()).getOrCreateMessage(this, pin));
-                    }
-                    return pins;
+                    Collection<Message> pins = StreamSupport.stream(result.getJsonBody().spliterator(), false)
+                            .map(pinJson -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, pinJson))
+                            .collect(Collectors.toList());
+                    return new ImplMessageSet(pins);
                 });
     }
 
