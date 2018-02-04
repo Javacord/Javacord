@@ -23,6 +23,7 @@ import de.btobastian.javacord.entities.impl.ImplApplicationInfo;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -543,11 +544,11 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a collection with all cached messages.
+     * Gets a message set with all currently cached messages.
      *
-     * @return A collection with all cached messages.
+     * @return A message set with all currently cached messages.
      */
-    Collection<Message> getCachedMessages();
+    MessageSet getCachedMessages();
 
     /**
      * Gets a cached message by its id.
