@@ -48,6 +48,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -407,6 +408,18 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Gets messages in this channel from the newer end until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see #getMessagesAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesUntil(Predicate<Message> condition) {
+        return ImplMessageSet.getMessagesUntil(this, condition);
+    }
+
+    /**
      * Gets a stream of messages in this channel sorted from newest to oldest.
      * <p>
      * The messages are retrieved in batches synchronously from Discord,
@@ -429,6 +442,20 @@ public interface TextChannel extends Channel, Messageable {
      */
     default CompletableFuture<MessageSet> getMessagesBefore(int limit, long before) {
         return ImplMessageSet.getMessagesBefore(this, limit, before);
+    }
+
+    /**
+     * Gets messages in this channel before a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param before Get messages before the message with this id.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeUntil(Predicate<Message> condition, long before) {
+        return ImplMessageSet.getMessagesBeforeUntil(this, condition, before);
     }
 
     /**
@@ -458,6 +485,20 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Gets messages in this channel before a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param before Get messages before this message.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeUntil(Predicate<Message> condition, Message before) {
+        return getMessagesBeforeUntil(condition, before.getId());
+    }
+
+    /**
      * Gets a stream of messages in this channel before a given message in any channel sorted from newest to oldest.
      * <p>
      * The messages are retrieved in batches synchronously from Discord,
@@ -484,6 +525,20 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Gets messages in this channel after a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param after Get messages after the message with this id.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterUntil(Predicate<Message> condition, long after) {
+        return ImplMessageSet.getMessagesAfterUntil(this, condition, after);
+    }
+
+    /**
      * Gets a stream of messages in this channel after a given message in any channel sorted from oldest to newest.
      * <p>
      * The messages are retrieved in batches synchronously from Discord,
@@ -507,6 +562,20 @@ public interface TextChannel extends Channel, Messageable {
      */
     default CompletableFuture<MessageSet> getMessagesAfter(int limit, Message after) {
         return getMessagesAfter(limit, after.getId());
+    }
+
+    /**
+     * Gets messages in this channel after a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param after Get messages after this message.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterUntil(Predicate<Message> condition, Message after) {
+        return getMessagesAfterUntil(condition, after.getId());
     }
 
     /**
@@ -538,6 +607,24 @@ public interface TextChannel extends Channel, Messageable {
      */
     default CompletableFuture<MessageSet> getMessagesAround(int limit, long around) {
         return ImplMessageSet.getMessagesAround(this, limit, around);
+    }
+
+    /**
+     * Gets messages in this channel around a given message in any channel until one that meets the given condition is
+     * found. If no message matches the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param around Get messages around the message with this id.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundUntil(Predicate<Message> condition, long around) {
+        return ImplMessageSet.getMessagesAroundUntil(this, condition, around);
     }
 
     /**
@@ -573,6 +660,24 @@ public interface TextChannel extends Channel, Messageable {
      */
     default CompletableFuture<MessageSet> getMessagesAround(int limit, Message around) {
         return getMessagesAround(limit, around.getId());
+    }
+
+    /**
+     * Gets messages in this channel around a given message in any channel until one that meets the given condition is
+     * found. If no message matches the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param around Get messages around this message.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundUntil(Predicate<Message> condition, Message around) {
+        return getMessagesAroundUntil(condition, around.getId());
     }
 
     /**

@@ -18,11 +18,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -77,6 +79,19 @@ public class ImplMessageSet implements MessageSet {
     }
 
     /**
+     * Gets messages in the given channel from the newer end until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see #getMessagesAsStream(TextChannel)
+     */
+    public static CompletableFuture<MessageSet> getMessagesUntil(TextChannel channel, Predicate<Message> condition) {
+        return getMessagesUntil(channel, condition, -1, -1);
+    }
+
+    /**
      * Gets a stream of messages in the given channel sorted from newest to oldest.
      * <p>
      * The messages are retrieved in batches synchronously from Discord,
@@ -101,6 +116,22 @@ public class ImplMessageSet implements MessageSet {
      */
     public static CompletableFuture<MessageSet> getMessagesBefore(TextChannel channel, int limit, long before) {
         return getMessages(channel, limit, before, -1);
+    }
+
+    /**
+     * Gets messages in the given channel before a given message in any channel until one that meets the given
+     * condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param before Get messages before the message with this id.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(TextChannel, long)
+     */
+    public static CompletableFuture<MessageSet> getMessagesBeforeUntil(
+            TextChannel channel, Predicate<Message> condition, long before) {
+        return getMessagesUntil(channel, condition, before, -1);
     }
 
     /**
@@ -130,6 +161,22 @@ public class ImplMessageSet implements MessageSet {
      */
     public static CompletableFuture<MessageSet> getMessagesAfter(TextChannel channel, int limit, long after) {
         return getMessages(channel, limit, -1, after);
+    }
+
+    /**
+     * Gets messages in the given channel after a given message in any channel until one that meets the given condition
+     * is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param after Get messages after the message with this id.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(TextChannel, long)
+     */
+    public static CompletableFuture<MessageSet> getMessagesAfterUntil(
+            TextChannel channel, Predicate<Message> condition, long after) {
+        return getMessagesUntil(channel, condition, -1, after);
     }
 
     /**
@@ -193,6 +240,40 @@ public class ImplMessageSet implements MessageSet {
 
                 // we are done
                 future.complete(new ImplMessageSet(messages));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets messages in the given channel around a given message in any channel until one that meets the given
+     * condition is found. If no message matches the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in the given
+     * channel and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the halves will not be same-sized.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param around Get messages around the message with this id.
+     *
+     * @return The messages.
+     */
+    public static CompletableFuture<MessageSet> getMessagesAroundUntil(
+            TextChannel channel, Predicate<Message> condition, long around) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesAroundAsStream(channel, around).peek(messages::add).filter(condition).findFirst();
+
+                future.complete(new ImplMessageSet(untilMessage
+                                                           .map(message -> messages)
+                                                           .orElse(Collections.emptyList())));
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
@@ -289,6 +370,36 @@ public class ImplMessageSet implements MessageSet {
                 return api.getOrCreateMessage(channel, messageJson);
             }
         }, Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.NONNULL | Spliterator.CONCURRENT), false);
+    }
+
+    /**
+     * Gets messages in the given channel until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param before Get messages before the message with this id.
+     * @param after Get messages after the message with this id.
+     *
+     * @return The messages.
+     */
+    private static CompletableFuture<MessageSet> getMessagesUntil(
+            TextChannel channel, Predicate<Message> condition, long before, long after) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesAsStream(channel, before, after).peek(messages::add).filter(condition).findFirst();
+
+                future.complete(new ImplMessageSet(untilMessage
+                                                           .map(message -> messages)
+                                                           .orElse(Collections.emptyList())));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
     }
 
     /**

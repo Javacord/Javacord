@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -837,6 +838,19 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Gets messages before this message until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBefore(int, long)
+     * @see #getMessagesBeforeAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeUntil(Predicate<Message> condition) {
+        return getChannel().getMessagesBeforeUntil(condition, this);
+    }
+
+    /**
      * Gets a stream of messages before this message sorted from newest to oldest.
      * <p>
      * The messages are retrieved in batches synchronously from Discord,
@@ -860,6 +874,19 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default CompletableFuture<MessageSet> getMessagesAfter(int limit) {
         return getChannel().getMessagesAfter(limit, this);
+    }
+
+    /**
+     * Gets messages after this message until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesAfter(int, long)
+     * @see #getMessagesAfterAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterUntil(Predicate<Message> condition) {
+        return getChannel().getMessagesAfterUntil(condition, this);
     }
 
     /**
@@ -890,6 +917,24 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default CompletableFuture<MessageSet> getMessagesAround(int limit) {
         return getChannel().getMessagesAround(limit, this);
+    }
+
+    /**
+     * Gets messages around this message until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     * This message will be part of the result in addition to the messages around and is matched against the condition
+     * and will abort retrieval.
+     * Half of the messages will be older than this message and half of the message will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesAround(int, long)
+     * @see #getMessagesAroundAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundUntil(Predicate<Message> condition) {
+        return getChannel().getMessagesAroundUntil(condition, this);
     }
 
     /**
