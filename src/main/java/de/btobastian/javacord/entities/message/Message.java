@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * This class represents a Discord message.
@@ -829,9 +830,24 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @param limit The limit of messages to get.
      * @return The messages.
      * @see TextChannel#getMessagesBefore(int, long)
+     * @see #getMessagesBeforeAsStream()
      */
     default CompletableFuture<MessageSet> getMessagesBefore(int limit) {
         return getChannel().getMessagesBefore(limit, this);
+    }
+
+    /**
+     * Gets a stream of messages before this message sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see TextChannel#getMessagesBeforeAsStream(long)
+     * @see #getMessagesBefore(int)
+     */
+    default Stream<Message> getMessagesBeforeAsStream() {
+        return getChannel().getMessagesBeforeAsStream(this);
     }
 
     /**
@@ -840,9 +856,24 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @param limit The limit of messages to get.
      * @return The messages.
      * @see TextChannel#getMessagesAfter(int, long)
+     * @see #getMessagesAfterAsStream()
      */
     default CompletableFuture<MessageSet> getMessagesAfter(int limit) {
         return getChannel().getMessagesAfter(limit, this);
+    }
+
+    /**
+     * Gets a stream of messages after this message sorted from oldest to newest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see TextChannel#getMessagesAfterAsStream(long)
+     * @see #getMessagesAfter(int)
+     */
+    default Stream<Message> getMessagesAfterAsStream() {
+        return getChannel().getMessagesAfterAsStream(this);
     }
 
     /**
@@ -855,9 +886,27 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @param limit The limit of messages to get.
      * @return The messages.
      * @see TextChannel#getMessagesAround(int, long)
+     * @see #getMessagesAroundAsStream()
      */
     default CompletableFuture<MessageSet> getMessagesAround(int limit) {
         return getChannel().getMessagesAround(limit, this);
+    }
+
+    /**
+     * Gets a stream of messages around this message. The first message in the stream will be this message.
+     * After that you will always get an older message and a newer message alternating as long as on both sides
+     * messages are available. If only on one side further messages are available, only those are delivered further on.
+     * It's not guaranteed to be perfectly balanced.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see TextChannel#getMessagesAroundAsStream(long)
+     * @see #getMessagesAround(int)
+     */
+    default Stream<Message> getMessagesAroundAsStream() {
+        return getChannel().getMessagesAroundAsStream(this);
     }
 
     /**

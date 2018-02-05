@@ -50,6 +50,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -399,9 +400,23 @@ public interface TextChannel extends Channel, Messageable {
      *
      * @param limit The limit of messages to get.
      * @return The messages.
+     * @see #getMessagesAsStream()
      */
     default CompletableFuture<MessageSet> getMessages(int limit) {
         return ImplMessageSet.getMessages(this, limit);
+    }
+
+    /**
+     * Gets a stream of messages in this channel sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see #getMessages(int)
+     */
+    default Stream<Message> getMessagesAsStream() {
+        return ImplMessageSet.getMessagesAsStream(this);
     }
 
     /**
@@ -410,9 +425,24 @@ public interface TextChannel extends Channel, Messageable {
      * @param limit The limit of messages to get.
      * @param before Get messages before the message with this id.
      * @return The messages.
+     * @see #getMessagesBeforeAsStream(long)
      */
     default CompletableFuture<MessageSet> getMessagesBefore(int limit, long before) {
         return ImplMessageSet.getMessagesBefore(this, limit, before);
+    }
+
+    /**
+     * Gets a stream of messages in this channel before a given message in any channel sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param before Get messages before the message with this id.
+     * @return The stream.
+     * @see #getMessagesBefore(int, long)
+     */
+    default Stream<Message> getMessagesBeforeAsStream(long before) {
+        return ImplMessageSet.getMessagesBeforeAsStream(this, before);
     }
 
     /**
@@ -421,9 +451,24 @@ public interface TextChannel extends Channel, Messageable {
      * @param limit The limit of messages to get.
      * @param before Get messages before this message.
      * @return The messages.
+     * @see #getMessagesBeforeAsStream(Message)
      */
     default CompletableFuture<MessageSet> getMessagesBefore(int limit, Message before) {
         return getMessagesBefore(limit, before.getId());
+    }
+
+    /**
+     * Gets a stream of messages in this channel before a given message in any channel sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param before Get messages before this message.
+     * @return The stream.
+     * @see #getMessagesBefore(int, Message)
+     */
+    default Stream<Message> getMessagesBeforeAsStream(Message before) {
+        return getMessagesBeforeAsStream(before.getId());
     }
 
     /**
@@ -432,9 +477,24 @@ public interface TextChannel extends Channel, Messageable {
      * @param limit The limit of messages to get.
      * @param after Get messages after the message with this id.
      * @return The messages.
+     * @see #getMessagesAfterAsStream(long)
      */
     default CompletableFuture<MessageSet> getMessagesAfter(int limit, long after) {
         return ImplMessageSet.getMessagesAfter(this, limit, after);
+    }
+
+    /**
+     * Gets a stream of messages in this channel after a given message in any channel sorted from oldest to newest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param after Get messages after the message with this id.
+     * @return The messages.
+     * @see #getMessagesAfter(int, long)
+     */
+    default Stream<Message> getMessagesAfterAsStream(long after) {
+        return ImplMessageSet.getMessagesAfterAsStream(this, after);
     }
 
     /**
@@ -443,9 +503,24 @@ public interface TextChannel extends Channel, Messageable {
      * @param limit The limit of messages to get.
      * @param after Get messages after this message.
      * @return The messages.
+     * @see #getMessagesAfterAsStream(Message)
      */
     default CompletableFuture<MessageSet> getMessagesAfter(int limit, Message after) {
         return getMessagesAfter(limit, after.getId());
+    }
+
+    /**
+     * Gets a stream of messages in this channel after a given message in any channel sorted from oldest to newest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param after Get messages after this message.
+     * @return The stream.
+     * @see #getMessagesAfter(int, Message)
+     */
+    default Stream<Message> getMessagesAfterAsStream(Message after) {
+        return getMessagesAfterAsStream(after.getId());
     }
 
     /**
@@ -459,9 +534,28 @@ public interface TextChannel extends Channel, Messageable {
      * @param limit The limit of messages to get.
      * @param around Get messages around the message with this id.
      * @return The messages.
+     * @see #getMessagesAroundAsStream(long)
      */
     default CompletableFuture<MessageSet> getMessagesAround(int limit, long around) {
         return ImplMessageSet.getMessagesAround(this, limit, around);
+    }
+
+    /**
+     * Gets a stream of messages in this channel around a given message in any channel.
+     * The first message in the stream will be the given message if it was sent in this channel.
+     * After that you will always get an older message and a newer message alternating as long as on both sides
+     * messages are available. If only on one side further messages are available, only those are delivered further on.
+     * It's not guaranteed to be perfectly balanced.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param around Get messages around the message with this id.
+     * @return The stream.
+     * @see #getMessagesAround(int, long)
+     */
+    default Stream<Message> getMessagesAroundAsStream(long around) {
+        return ImplMessageSet.getMessagesAroundAsStream(this, around);
     }
 
     /**
@@ -475,9 +569,28 @@ public interface TextChannel extends Channel, Messageable {
      * @param limit The limit of messages to get.
      * @param around Get messages around this message.
      * @return The messages.
+     * @see #getMessagesAroundAsStream(Message)
      */
     default CompletableFuture<MessageSet> getMessagesAround(int limit, Message around) {
         return getMessagesAround(limit, around.getId());
+    }
+
+    /**
+     * Gets a stream of messages in this channel around a given message in any channel.
+     * The first message in the stream will be the given message if it was sent in this channel.
+     * After that you will always get an older message and a newer message alternating as long as on both sides
+     * messages are available. If only on one side further messages are available, only those are delivered further on.
+     * It's not guaranteed to be perfectly balanced.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param around Get messages around this message.
+     * @return The stream.
+     * @see #getMessagesAround(int, Message)
+     */
+    default Stream<Message> getMessagesAroundAsStream(Message around) {
+        return getMessagesAroundAsStream(around.getId());
     }
 
     /**
