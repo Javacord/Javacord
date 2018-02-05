@@ -92,6 +92,19 @@ public class ImplMessageSet implements MessageSet {
     }
 
     /**
+     * Gets messages in the given channel from the newer end while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see #getMessagesAsStream(TextChannel)
+     */
+    public static CompletableFuture<MessageSet> getMessagesWhile(TextChannel channel, Predicate<Message> condition) {
+        return getMessagesWhile(channel, condition, -1, -1);
+    }
+
+    /**
      * Gets a stream of messages in the given channel sorted from newest to oldest.
      * <p>
      * The messages are retrieved in batches synchronously from Discord,
@@ -132,6 +145,21 @@ public class ImplMessageSet implements MessageSet {
     public static CompletableFuture<MessageSet> getMessagesBeforeUntil(
             TextChannel channel, Predicate<Message> condition, long before) {
         return getMessagesUntil(channel, condition, before, -1);
+    }
+
+    /**
+     * Gets messages in the given channel before a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The condition that has to be met.
+     * @param before Get messages before the message with this id.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(TextChannel, long)
+     */
+    public static CompletableFuture<MessageSet> getMessagesBeforeWhile(
+            TextChannel channel, Predicate<Message> condition, long before) {
+        return getMessagesWhile(channel, condition, before, -1);
     }
 
     /**
@@ -177,6 +205,21 @@ public class ImplMessageSet implements MessageSet {
     public static CompletableFuture<MessageSet> getMessagesAfterUntil(
             TextChannel channel, Predicate<Message> condition, long after) {
         return getMessagesUntil(channel, condition, -1, after);
+    }
+
+    /**
+     * Gets messages in the given channel after a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The condition that has to be met.
+     * @param after Get messages after the message with this id.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(TextChannel, long)
+     */
+    public static CompletableFuture<MessageSet> getMessagesAfterWhile(
+            TextChannel channel, Predicate<Message> condition, long after) {
+        return getMessagesWhile(channel, condition, -1, after);
     }
 
     /**
@@ -274,6 +317,42 @@ public class ImplMessageSet implements MessageSet {
                 future.complete(new ImplMessageSet(untilMessage
                                                            .map(message -> messages)
                                                            .orElse(Collections.emptyList())));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets messages in the given channel around a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in the given
+     * channel and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the halves will not be same-sized.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The condition that has to be met.
+     * @param around Get messages around the message with this id.
+     *
+     * @return The messages.
+     */
+    public static CompletableFuture<MessageSet> getMessagesAroundWhile(
+            TextChannel channel, Predicate<Message> condition, long around) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesAroundAsStream(channel, around)
+                                .peek(messages::add)
+                                .filter(condition.negate())
+                                .findFirst();
+                untilMessage.ifPresent(messages::remove);
+
+                future.complete(new ImplMessageSet(messages));
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
@@ -395,6 +474,38 @@ public class ImplMessageSet implements MessageSet {
                 future.complete(new ImplMessageSet(untilMessage
                                                            .map(message -> messages)
                                                            .orElse(Collections.emptyList())));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets messages in the given channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The condition that has to be met.
+     * @param before Get messages before the message with this id.
+     * @param after Get messages after the message with this id.
+     *
+     * @return The messages.
+     */
+    private static CompletableFuture<MessageSet> getMessagesWhile(
+            TextChannel channel, Predicate<Message> condition, long before, long after) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesAsStream(channel, before, after)
+                                .peek(messages::add)
+                                .filter(condition.negate())
+                                .findFirst();
+                untilMessage.ifPresent(messages::remove);
+
+                future.complete(new ImplMessageSet(messages));
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
