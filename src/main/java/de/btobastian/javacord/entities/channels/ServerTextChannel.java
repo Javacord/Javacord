@@ -114,4 +114,15 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
                 .getObjectListeners(ServerTextChannel.class, getId(), ServerTextChannelChangeTopicListener.class);
     }
 
+    /**
+     * Removes a listener from this server text channel.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T> void removeListener(Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(ServerTextChannel.class, getId(), listenerClass, listener);
+    }
+
 }

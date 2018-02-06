@@ -48,4 +48,15 @@ public interface PrivateChannel extends TextChannel, VoiceChannel {
                 PrivateChannel.class, getId(), PrivateChannelDeleteListener.class);
     }
 
+    /**
+     * Removes a listener from this private channel.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T> void removeListener(Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(PrivateChannel.class, getId(), listenerClass, listener);
+    }
+
 }

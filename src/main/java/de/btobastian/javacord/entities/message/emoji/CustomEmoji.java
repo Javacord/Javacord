@@ -115,4 +115,15 @@ public interface CustomEmoji extends DiscordEntity, Emoji {
                 .getObjectListeners(CustomEmoji.class, getId(), CustomEmojiDeleteListener.class);
     }
 
+    /**
+     * Removes a listener from this custom emoji.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T> void removeListener(Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(CustomEmoji.class, getId(), listenerClass, listener);
+    }
+
 }

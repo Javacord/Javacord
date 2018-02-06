@@ -730,4 +730,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
                 User.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
     }
 
+    /**
+     * Removes a listener from this user.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T> void removeListener(Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(User.class, getId(), listenerClass, listener);
+    }
+
 }

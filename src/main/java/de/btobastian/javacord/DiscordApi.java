@@ -2405,4 +2405,35 @@ public interface DiscordApi {
      */
     List<UserChangeAvatarListener> getUserChangeAvatarListeners();
 
+    /**
+     * Removes a global listener.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T> void removeListener(Class<T> listenerClass, T listener);
+
+    /**
+     * Removes a listener from the message with the given id.
+     *
+     * @param messageId The id of the message.
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T> void removeListenerFromMessage(long messageId, Class<T> listenerClass, T listener);
+
+    /**
+     * Removes a listener from the given message.
+     *
+     * @param message The message.
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T> void removeListenerFromMessage(Message message, Class<T> listenerClass, T listener) {
+        removeListenerFromMessage(message.getId(), listenerClass, listener);
+    }
+
 }

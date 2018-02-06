@@ -1285,4 +1285,15 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), ReactionRemoveAllListener.class);
     }
 
+    /**
+     * Removes a listener from this message.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T> void removeListener(Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(Message.class, getId(), listenerClass, listener);
+    }
+
 }

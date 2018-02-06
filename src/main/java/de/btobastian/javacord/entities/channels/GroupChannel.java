@@ -119,4 +119,15 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
                 GroupChannel.class, getId(), GroupChannelDeleteListener.class);
     }
 
+    /**
+     * Removes a listener from this group channel.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T> void removeListener(Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(GroupChannel.class, getId(), listenerClass, listener);
+    }
+
 }

@@ -711,6 +711,11 @@ public class ImplDiscordApi implements DiscordApi {
         }
     }
 
+    @Override
+    public <T> void removeListenerFromMessage(long messageId, Class<T> listenerClass, T listener) {
+        removeObjectListener(Message.class, messageId, listenerClass, listener);
+    }
+
     /**
      * Gets all object listeners of the given class.
      *
@@ -750,13 +755,7 @@ public class ImplDiscordApi implements DiscordApi {
                 .computeIfAbsent(listener, key -> new ListenerManager<>(this, listener, listenerClass));
     }
 
-    /**
-     * Removes a global listener.
-     *
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> void removeListener(Class<T> listenerClass, T listener) {
         synchronized (listeners) {
