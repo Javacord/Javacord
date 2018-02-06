@@ -89,6 +89,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -273,17 +274,19 @@ public class ImplDiscordApi implements DiscordApi {
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
-    private final ConcurrentHashMap<Class<?>, List<?>> listeners = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Map<?, ListenerManager<?>>> listeners =
+            Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     /**
      * A map which contains all listeners which are assigned to a specific object instead of being global.
      * The key of the outer map is the class which the listener was registered to (e.g. Message.class).
      * The key of the first inner map is the id of the object.
      * The key of the second inner map is the class of the listener.
-     * The final value is the listener itself.
+     * The key of the third inner map is the listener itself.
+     * The final value is the listener manager.
      */
-    private final ConcurrentHashMap<Class<?>, Map<Long, Map<Class<?>, List<?>>>> objectListeners =
-            new ConcurrentHashMap<>();
+    private final Map<Class<?>, Map<Long, Map<Class<?>, Map<?, ListenerManager<?>>>>> objectListeners =
+            Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     /**
      * Creates a new discord api instance that can be used for auto-ratelimited REST calls,
@@ -639,6 +642,9 @@ public class ImplDiscordApi implements DiscordApi {
 
     /**
      * Adds an object listener.
+     * Adding a listener multiple times to the same object will only add it once
+     * and return the same listener manager on each invocation.
+     * The order of invocation is according to first addition.
      *
      * @param objectClass The class of the object.
      * @param objectId The id of the object.
@@ -650,15 +656,13 @@ public class ImplDiscordApi implements DiscordApi {
     @SuppressWarnings("unchecked")
     public <T> ListenerManager<T> addObjectListener(
             Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
-        synchronized (objectListeners) {
-            Map<Long, Map<Class<?>, List<?>>> objectListener =
-                    objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
-            Map<Class<?>, List<?>> listeners =
-                    objectListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
-            List<T> classListeners = (List<T>) listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
-            classListeners.add(listener);
-        }
-        return new ListenerManager<>(this, listener, listenerClass, objectClass, objectId);
+        Map<T, ListenerManager<?>> listeners = (Map<T, ListenerManager<?>>) objectListeners
+                .computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>())
+                .computeIfAbsent(objectId, key -> new ConcurrentHashMap<>())
+                .computeIfAbsent(listenerClass, c -> Collections.synchronizedMap(new LinkedHashMap<>()));
+        return (ListenerManager<T>) listeners
+                .computeIfAbsent(listener, key -> new ListenerManager<>(this, listener, listenerClass,
+                                                                        objectClass, objectId));
     }
 
     /**
@@ -676,19 +680,24 @@ public class ImplDiscordApi implements DiscordApi {
             if (objectClass == null) {
                 return;
             }
-            Map<Long, Map<Class<?>, List<?>>> objectListener = objectListeners.get(objectClass);
+            Map<Long, Map<Class<?>, Map<?, ListenerManager<?>>>> objectListener = objectListeners.get(objectClass);
             if (objectListener == null) {
                 return;
             }
-            Map<Class<?>, List<?>> listeners = objectListener.get(objectId);
+            Map<Class<?>, Map<?, ListenerManager<?>>> listeners = objectListener.get(objectId);
             if (listeners == null) {
                 return;
             }
-            List<T> classListeners = (List<T>) listeners.get(listenerClass);
+            Map<T, ListenerManager<?>> classListeners = (Map<T, ListenerManager<?>>) listeners.get(listenerClass);
             if (classListeners == null) {
                 return;
             }
+            ListenerManager<T> listenerManager = (ListenerManager<T>) classListeners.get(listener);
+            if (listenerManager == null) {
+                return;
+            }
             classListeners.remove(listener);
+            listenerManager.removed();
             // Clean it up
             if (classListeners.isEmpty()) {
                 listeners.remove(listenerClass);
@@ -711,22 +720,22 @@ public class ImplDiscordApi implements DiscordApi {
      * @param <T> The type of the listener.
      * @return A list with all object listeners of the given type.
      */
-    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
+    @SuppressWarnings("unchecked")
     public <T> List<T> getObjectListeners(Class<?> objectClass, long objectId, Class<T> listenerClass) {
-        Map<Long, Map<Class<?>, List<?>>> objectListener = objectListeners.get(objectClass);
-        if (objectListener == null) {
-            return Collections.emptyList();
-        }
-        Map<Class<?>, List<?>> listeners = objectListener.get(objectId);
-        if (listeners == null) {
-            return Collections.emptyList();
-        }
-        List<T> classListeners = (List<T>) listeners.getOrDefault(listenerClass, Collections.emptyList());
-        return classListeners.stream().collect(Collectors.toCollection(ArrayList::new));
+        return (List<T>) Optional.ofNullable(objectClass)
+                .map(objectListeners::get)
+                .map(objectListener -> objectListener.get(objectId))
+                .map(listeners -> listeners.get(listenerClass))
+                .map(Map::keySet)
+                .map(ArrayList::new)
+                .orElseGet(ArrayList::new);
     }
 
     /**
      * Adds a listener.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener manager on each invocation.
+     * The order of invocation is according to first addition.
      *
      * @param listenerClass The listener class.
      * @param listener The listener to add.
@@ -735,11 +744,10 @@ public class ImplDiscordApi implements DiscordApi {
      */
     @SuppressWarnings("unchecked")
     public <T> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
-        synchronized (listeners) {
-            List<T> classListeners = (List<T>) listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
-            classListeners.add(listener);
-        }
-        return new ListenerManager<>(this, listener, listenerClass);
+        Map<T, ListenerManager<?>> classListeners = (Map<T, ListenerManager<?>>) listeners
+                .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()));
+        return (ListenerManager<T>) classListeners
+                .computeIfAbsent(listener, key -> new ListenerManager<>(this, listener, listenerClass));
     }
 
     /**
@@ -752,12 +760,19 @@ public class ImplDiscordApi implements DiscordApi {
     @SuppressWarnings("unchecked")
     public <T> void removeListener(Class<T> listenerClass, T listener) {
         synchronized (listeners) {
-            List<T> classListeners = (List<T>) listeners.get(listenerClass);
-            if (classListeners != null) {
-                classListeners.remove(listener);
-                if (classListeners.isEmpty()) {
-                    listeners.remove(listenerClass);
-                }
+            Map<T, ListenerManager<?>> classListeners = (Map<T, ListenerManager<?>>) listeners.get(listenerClass);
+            if (classListeners == null) {
+                return;
+            }
+            ListenerManager<T> listenerManager = (ListenerManager<T>) classListeners.get(listener);
+            if (listenerManager == null) {
+                return;
+            }
+            classListeners.remove(listener);
+            listenerManager.removed();
+            // Clean it up
+            if (classListeners.isEmpty()) {
+                listeners.remove(listenerClass);
             }
         }
     }
@@ -765,14 +780,17 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * Gets all listeners of the given class.
      *
-     * @param clazz The class of the listener.
+     * @param listenerClass The class of the listener.
      * @param <T> The class of the listener.
      * @return A list with all listeners of the given type.
      */
-    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    public <T> List<T> getListeners(Class<T> clazz) {
-        List<T> classListeners = (List<T>) listeners.getOrDefault(clazz, new ArrayList<>());
-        return classListeners.stream().collect(Collectors.toCollection(ArrayList::new));
+    @SuppressWarnings("unchecked")
+    public <T> List<T> getListeners(Class<T> listenerClass) {
+        return ((List<T>) Optional.ofNullable(listenerClass)
+                .map(listeners::get)
+                .map(Map::keySet)
+                .map(ArrayList::new)
+                .orElseGet(ArrayList::new));
     }
 
     @Override

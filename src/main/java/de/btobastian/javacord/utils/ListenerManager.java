@@ -118,12 +118,18 @@ public class ListenerManager<T> {
     }
 
     /**
+     * Called when the listener is removed.
+     */
+    public void removed() {
+        removeHandlers.forEach(Runnable::run);
+    }
+
+    /**
      * Removes the listener.
      *
      * @return The current instance in order to chain call methods.
      */
     public ListenerManager<T> remove() {
-        removeHandlers.forEach(Runnable::run);
         if (isGlobalListener()) {
             api.removeListener(listenerClass, listener);
         } else {
