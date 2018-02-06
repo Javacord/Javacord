@@ -452,6 +452,114 @@ public class ImplMessageSet implements MessageSet {
     }
 
     /**
+     * Gets all messages in the given channel between the first given message in any channel and the second given
+     * message in any channel, excluding the boundaries.
+     * Gets up to a given amount of messages in the given channel before a given message in any channel.
+     *
+     * @param channel The channel of the messages.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(TextChannel, long, long)
+     */
+    public static CompletableFuture<MessageSet> getMessagesBetween(TextChannel channel, long from, long to) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                future.complete(new ImplMessageSet(getMessagesBetweenAsStream(channel, from, to)
+                                                           .collect(Collectors.toList())));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets all messages in the given channel between the first given message in any channel and the second given
+     * message in any channel, excluding the boundaries, until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(TextChannel, long, long)
+     */
+    public static CompletableFuture<MessageSet> getMessagesBetweenUntil(
+            TextChannel channel, Predicate<Message> condition, long from, long to) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesBetweenAsStream(channel, from, to).peek(messages::add).filter(condition).findFirst();
+
+                future.complete(new ImplMessageSet(untilMessage
+                                                           .map(message -> messages)
+                                                           .orElse(Collections.emptyList())));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets all messages in the given channel between the first given message in any channel and the second given
+     * message in any channel, excluding the boundaries, while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The condition that has to be met.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(TextChannel, long, long)
+     */
+    public static CompletableFuture<MessageSet> getMessagesBetweenWhile(
+            TextChannel channel, Predicate<Message> condition, long from, long to) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesBetweenAsStream(channel, from, to)
+                                .peek(messages::add)
+                                .filter(condition.negate())
+                                .findFirst();
+                untilMessage.ifPresent(messages::remove);
+
+                future.complete(new ImplMessageSet(messages));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets all messages in the given channel between the first given message in any channel and the second given
+     * message in any channel, excluding the boundaries, sorted from first given message to the second given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param channel The channel of the messages.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The stream.
+     * @see #getMessagesBetween(TextChannel, long, long)
+     */
+    public static Stream<Message> getMessagesBetweenAsStream(TextChannel channel, long from, long to) {
+        long before = Math.max(from, to);
+        long after = Math.min(from, to);
+        Stream<Message> messages = getMessagesAsStream(channel, -1, after).filter(message -> message.getId() < before);
+        return (from == after) ? messages : messages.sorted(Comparator.reverseOrder());
+    }
+
+    /**
      * Gets messages in the given channel until one that meets the given condition is found.
      * If no message matches the condition, an empty set is returned.
      *

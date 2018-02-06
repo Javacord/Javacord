@@ -999,6 +999,122 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
+     * Gets all messages between this messages and the given message, excluding the boundaries.
+     *
+     * @param other The id of the other boundary messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetween(long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(long other) {
+        return getChannel().getMessagesBetween(getId(), other);
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, until one that meets the
+     * given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param other The id of the other boundary messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenUntil(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(long other, Predicate<Message> condition) {
+        return getChannel().getMessagesBetweenUntil(condition, getId(), other);
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, while they meet the
+     * given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param other The id of the other boundary messages.
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenWhile(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(long other, Predicate<Message> condition) {
+        return getChannel().getMessagesBetweenWhile(condition, getId(), other);
+    }
+
+    /**
+     * Gets a stream of all messages between this message and the given message, excluding the boundaries, sorted from
+     * this message to the given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param other The id of the other boundary messages.
+     * @return The stream.
+     * @see TextChannel#getMessagesBetweenAsStream(long, long)
+     * @see #getMessagesBetween(long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(long other) {
+        return getChannel().getMessagesBetweenAsStream(getId(), other);
+    }
+
+    /**
+     * Gets all messages between this messages and the given message, excluding the boundaries.
+     *
+     * @param other The other boundary messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetween(long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(Message other) {
+        return getMessagesBetween(other.getId());
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, until one that meets the
+     * given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param other The other boundary messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenUntil(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(Message other, Predicate<Message> condition) {
+        return getMessagesBetweenUntil(other.getId(), condition);
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, while they meet the
+     * given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param other The other boundary messages.
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenWhile(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(Message other, Predicate<Message> condition) {
+        return getMessagesBetweenWhile(other.getId(), condition);
+    }
+
+    /**
+     * Gets a stream of all messages between this message and the given message, excluding the boundaries, sorted from
+     * this message to the given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param other The other boundary messages.
+     * @return The stream.
+     * @see TextChannel#getMessagesBetweenAsStream(long, long)
+     * @see #getMessagesBetween(long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(Message other) {
+        return getMessagesBetweenAsStream(other.getId());
+    }
+
+    /**
      * Checks if the given user is allowed to add <b>new</b> reactions to the message.
      *
      * @param user The user to check.

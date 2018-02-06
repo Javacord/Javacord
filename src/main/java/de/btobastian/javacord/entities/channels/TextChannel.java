@@ -799,6 +799,126 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries.
+     *
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(long from, long to) {
+        return ImplMessageSet.getMessagesBetween(this, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(Predicate<Message> condition, long from, long to) {
+        return ImplMessageSet.getMessagesBetweenUntil(this, condition, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(Predicate<Message> condition, long from, long to) {
+        return ImplMessageSet.getMessagesBetweenWhile(this, condition, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, sorted from first given message to the second given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The stream.
+     * @see #getMessagesBetween(long, long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(long from, long to) {
+        return ImplMessageSet.getMessagesBetweenAsStream(this, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries.
+     *
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(Message from, Message to) {
+        return getMessagesBetween(from.getId(), to.getId());
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(
+            Predicate<Message> condition, Message from, Message to) {
+        return getMessagesBetweenUntil(condition, from.getId(), to.getId());
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(
+            Predicate<Message> condition, Message from, Message to) {
+        return getMessagesBetweenWhile(condition, from.getId(), to.getId());
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, sorted from first given message to the second given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The stream.
+     * @see #getMessagesBetween(long, long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(Message from, Message to) {
+        return getMessagesBetweenAsStream(from.getId(), to.getId());
+    }
+
+    /**
      * Gets the message cache for the channel.
      *
      * @return The message cache for the channel.
