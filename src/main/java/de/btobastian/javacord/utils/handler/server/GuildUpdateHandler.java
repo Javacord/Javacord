@@ -122,7 +122,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChangeDefaultMessageNotificationLevel(event));
             }
 
-            User newOwner = api.getUserById(packet.get("owner_id").asText()).orElse(null);
+            User newOwner = api.getCachedUserById(packet.get("owner_id").asText()).orElse(null);
             User oldOwner = server.getOwner();
             if (oldOwner != newOwner) {
                 server.setOwnerId(newOwner.getId());

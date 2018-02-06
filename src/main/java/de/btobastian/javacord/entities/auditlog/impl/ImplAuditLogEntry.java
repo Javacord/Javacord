@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link AuditLogEntry}.
@@ -49,9 +50,9 @@ public class ImplAuditLogEntry implements AuditLogEntry {
     private final AuditLog auditLog;
 
     /**
-     * The user who made the changes.
+     * The id of the user who made the changes.
      */
-    private final User user;
+    private final long userId;
 
     /**
      * The reason of the entry.
@@ -82,7 +83,7 @@ public class ImplAuditLogEntry implements AuditLogEntry {
     public ImplAuditLogEntry(AuditLog auditLog, JsonNode data) {
         this.auditLog = auditLog;
         this.id = data.get("id").asLong();
-        this.user = getApi().getUserById(data.get("user_id").asText()).orElse(null);
+        this.userId = data.get("user_id").asLong();
         this.reason = data.has("reason") ? data.get("reason").asText() : null;
         this.actionType = AuditLogActionType.fromValue(data.get("action_type").asInt());
         this.target = data.has("target_id") && !data.get("target_id").isNull() ?
@@ -254,8 +255,8 @@ public class ImplAuditLogEntry implements AuditLogEntry {
     }
 
     @Override
-    public User getUser() {
-        return user;
+    public CompletableFuture<User> getUser() {
+        return getApi().getUserById(userId);
     }
 
     @Override

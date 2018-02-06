@@ -290,7 +290,7 @@ public interface DiscordApi {
      * @return The owner of the application.
      * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
      */
-    default Optional<User> getOwner() {
+    default CompletableFuture<User> getOwner() {
         return getUserById(getOwnerId());
     }
 
@@ -442,11 +442,33 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a collection with all users the bot knows of.
+     * Gets a collection with all currently cached users.
      *
-     * @return A collection with all users the bot knows of.
+     * @return A collection with all currently cached users.
      */
-    Collection<User> getUsers();
+    Collection<User> getCachedUsers();
+
+    /**
+     * Gets a cached user by its id.
+     *
+     * @param id The id of the user.
+     * @return The user with the given id.
+     */
+    Optional<User> getCachedUserById(long id);
+
+    /**
+     * Gets a cached user by its id.
+     *
+     * @param id The id of the user.
+     * @return The user with the given id.
+     */
+    default Optional<User> getCachedUserById(String id) {
+        try {
+            return getCachedUserById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
 
     /**
      * Gets a user by its id.
@@ -454,7 +476,7 @@ public interface DiscordApi {
      * @param id The id of the user.
      * @return The user with the given id.
      */
-    Optional<User> getUserById(long id);
+    CompletableFuture<User> getUserById(long id);
 
     /**
      * Gets a user by its id.
@@ -462,11 +484,11 @@ public interface DiscordApi {
      * @param id The id of the user.
      * @return The user with the given id.
      */
-    default Optional<User> getUserById(String id) {
+    default CompletableFuture<User> getUserById(String id) {
         try {
             return getUserById(Long.valueOf(id));
         } catch (NumberFormatException e) {
-            return Optional.empty();
+            return getUserById(-1);
         }
     }
 
@@ -476,9 +498,9 @@ public interface DiscordApi {
      * @param discriminatedName The discriminated name of the user.
      * @return The user with the given discriminated name.
      */
-    default Optional<User> getUserByDiscriminatedName(String discriminatedName) {
+    default Optional<User> getCachedUserByDiscriminatedName(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
-        return getUserByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]);
+        return getCachedUserByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]);
     }
 
     /**
@@ -488,8 +510,10 @@ public interface DiscordApi {
      * @param discriminator The discriminator of the user.
      * @return The user with the given name and discriminator.
      */
-    default Optional<User> getUserByNameAndDiscriminator(String name, String discriminator) {
-        return getUsersByName(name).stream().filter(user -> user.getDiscriminator().equals(discriminator)).findAny();
+    default Optional<User> getCachedUserByNameAndDiscriminator(String name, String discriminator) {
+        return getCachedUsersByName(name).stream()
+                .filter(user -> user.getDiscriminator().equals(discriminator))
+                .findAny();
     }
 
     /**
@@ -499,8 +523,8 @@ public interface DiscordApi {
      * @param name The name of the users.
      * @return A collection with all users with the given name.
      */
-    default Collection<User> getUsersByName(String name) {
-        return getUsers().stream()
+    default Collection<User> getCachedUsersByName(String name) {
+        return getCachedUsers().stream()
                 .filter(user -> user.getName().equals(name))
                 .collect(Collectors.toList());
     }
@@ -512,8 +536,8 @@ public interface DiscordApi {
      * @param name The name of the users.
      * @return A collection with all users with the given name.
      */
-    default Collection<User> getUsersByNameIgnoreCase(String name) {
-        return getUsers().stream()
+    default Collection<User> getCachedUsersByNameIgnoreCase(String name) {
+        return getCachedUsers().stream()
                 .filter(user -> user.getName().equalsIgnoreCase(name))
                 .collect(Collectors.toList());
     }
@@ -778,7 +802,7 @@ public interface DiscordApi {
      * @return A collection with all private channels of the bot.
      */
     default Collection<PrivateChannel> getPrivateChannels() {
-        return getUsers().stream()
+        return getCachedUsers().stream()
                 .map(User::getPrivateChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)

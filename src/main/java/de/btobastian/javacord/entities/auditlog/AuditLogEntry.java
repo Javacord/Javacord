@@ -5,6 +5,7 @@ import de.btobastian.javacord.entities.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The interface represents an audit log entry.
@@ -23,7 +24,7 @@ public interface AuditLogEntry extends DiscordEntity {
      *
      * @return The user who made the changes.
      */
-    User getUser();
+    CompletableFuture<User> getUser();
 
     /**
      * Gets the reason for the change.

@@ -38,7 +38,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         long userId = packet.get("user").get("id").asLong();
-        api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
+        api.getCachedUserById(userId).map(ImplUser.class::cast).ifPresent(user -> {
             if (packet.has("game")) {
                 Activity newActivity = null;
                 if (!packet.get("game").isNull()) {

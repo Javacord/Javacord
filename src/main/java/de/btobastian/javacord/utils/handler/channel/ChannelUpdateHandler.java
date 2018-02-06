@@ -131,7 +131,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                             rolesWithOverwrittenPermissions.add(entity.getId());
                             break;
                         case "member":
-                            entity = api.getUserById(permissionOverwriteJson.get("id").asText()).orElseThrow(() ->
+                            entity = api.getCachedUserById(permissionOverwriteJson.get("id").asText()).orElseThrow(() ->
                                     new IllegalStateException("Received channel update event with unknown user!"));
                             oldOverwrittenPermissions = c.getOverwrittenPermissions((User) entity);
                             if (c instanceof ImplChannelCategory) {
@@ -176,7 +176,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 if (usersWithOverwrittenPermissions.contains(entry.getKey())) {
                     continue;
                 }
-                api.getUserById(entry.getKey()).ifPresent(user -> {
+                api.getCachedUserById(entry.getKey()).ifPresent(user -> {
                     Permissions oldPermissions = entry.getValue();
                     userIt.remove();
                     dispatchServerChannelChangeOverwrittenPermissionsEvent(

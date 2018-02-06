@@ -1,6 +1,6 @@
 package de.btobastian.javacord.entities;
 
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents the information of an application (aka. bot).
@@ -66,10 +66,9 @@ public interface ApplicationInfo {
 
     /**
      * Gets the owner of the application.
-     * If you don't share a server with the owner of this application the Optional will be empty.
      *
      * @return The owner of the application.
      */
-    Optional<User> getOwner();
+    CompletableFuture<User> getOwner();
 
 }

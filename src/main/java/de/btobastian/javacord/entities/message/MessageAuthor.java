@@ -500,7 +500,7 @@ public interface MessageAuthor extends DiscordEntity {
      */
     default Optional<User> asUser() {
         if (isUser()) {
-            return getApi().getUserById(getId());
+            return getApi().getCachedUserById(getId());
         }
         return Optional.empty();
     }

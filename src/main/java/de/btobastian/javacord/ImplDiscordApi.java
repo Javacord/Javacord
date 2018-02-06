@@ -69,6 +69,9 @@ import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
+import de.btobastian.javacord.utils.rest.RestRequest;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 
@@ -441,7 +444,7 @@ public class ImplDiscordApi implements DiscordApi {
     public User getOrCreateUser(JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
         synchronized (this) {
-            return getUserById(id).orElseGet(() -> {
+            return getCachedUserById(id).orElseGet(() -> {
                 if (!data.has("username")) {
                     throw new IllegalStateException("Couldn't get or created user. Please inform the developer!");
                 }
@@ -809,13 +812,22 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public Collection<User> getUsers() {
+    public Collection<User> getCachedUsers() {
         return users.values();
     }
 
     @Override
-    public Optional<User> getUserById(long id) {
+    public Optional<User> getCachedUserById(long id) {
         return Optional.ofNullable(users.get(id));
+    }
+
+    @Override
+    public CompletableFuture<User> getUserById(long id) {
+        return getCachedUserById(id)
+                .map(CompletableFuture::completedFuture)
+                .orElseGet(() -> new RestRequest<User>(this, RestMethod.GET, RestEndpoint.USER)
+                .setUrlParameters(String.valueOf(id))
+                .execute(result -> this.getOrCreateUser(result.getJsonBody())));
     }
 
     @Override
