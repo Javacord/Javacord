@@ -96,15 +96,12 @@ public class ListenerManager<T> {
 
     /**
      * Gets the class of the object, the listener was added to.
-     * For global listeners, it returns the class of {@link DiscordApi}.
+     * For global listeners, it returns an empty {@code Optional}.
      *
      * @return The class of the object, the listener was added to.
      */
-    public Class<?> getAssignedObjectClass() {
-        if (isGlobalListener()) {
-            return DiscordApi.class;
-        }
-        return assignedObjectClass;
+    public Optional<Class<?>> getAssignedObjectClass() {
+        return Optional.ofNullable(assignedObjectClass);
     }
 
     /**
