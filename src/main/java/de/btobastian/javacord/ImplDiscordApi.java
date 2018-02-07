@@ -273,7 +273,7 @@ public class ImplDiscordApi implements DiscordApi {
      * A map which contains all listeners.
      * The key is the class of the listener.
      */
-    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<?>, List<?>> listeners = new ConcurrentHashMap<>();
 
     /**
      * A map which contains all listeners which are assigned to a specific object instead of being global.
@@ -282,7 +282,7 @@ public class ImplDiscordApi implements DiscordApi {
      * The key of the second inner map is the class of the listener.
      * The final value is the listener itself.
      */
-    private final ConcurrentHashMap<Class<?>, Map<Long, Map<Class<?>, List<Object>>>> objectListeners =
+    private final ConcurrentHashMap<Class<?>, Map<Long, Map<Class<?>, List<?>>>> objectListeners =
             new ConcurrentHashMap<>();
 
     /**
@@ -647,14 +647,15 @@ public class ImplDiscordApi implements DiscordApi {
      * @param <T> The type of the listener.
      * @return The manager for the added listener.
      */
+    @SuppressWarnings("unchecked")
     public <T> ListenerManager<T> addObjectListener(
             Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
         synchronized (objectListeners) {
-            Map<Long, Map<Class<?>, List<Object>>> objectListener =
+            Map<Long, Map<Class<?>, List<?>>> objectListener =
                     objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
-            Map<Class<?>, List<Object>> listeners =
+            Map<Class<?>, List<?>> listeners =
                     objectListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
-            List<Object> classListeners = listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
+            List<T> classListeners = (List<T>) listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
             classListeners.add(listener);
         }
         return new ListenerManager<>(this, listener, listenerClass, objectClass, objectId);
@@ -667,21 +668,23 @@ public class ImplDiscordApi implements DiscordApi {
      * @param objectId The id of the object.
      * @param listenerClass The listener class.
      * @param listener The listener to remove.
+     * @param <T> The type of the listener.
      */
-    public void removeObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
+    @SuppressWarnings("unchecked")
+    public <T> void removeObjectListener(Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
         synchronized (objectListeners) {
             if (objectClass == null) {
                 return;
             }
-            Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
+            Map<Long, Map<Class<?>, List<?>>> objectListener = objectListeners.get(objectClass);
             if (objectListener == null) {
                 return;
             }
-            Map<Class<?>, List<Object>> listeners = objectListener.get(objectId);
+            Map<Class<?>, List<?>> listeners = objectListener.get(objectId);
             if (listeners == null) {
                 return;
             }
-            List<Object> classListeners = listeners.get(listenerClass);
+            List<T> classListeners = (List<T>) listeners.get(listenerClass);
             if (classListeners == null) {
                 return;
             }
@@ -705,52 +708,55 @@ public class ImplDiscordApi implements DiscordApi {
      * @param objectClass The class of the object.
      * @param objectId The id of the object.
      * @param listenerClass The listener class.
-     * @param <T> The listener class.
+     * @param <T> The type of the listener.
      * @return A list with all object listeners of the given type.
      */
     @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    public <T> List<T> getObjectListeners(Class<?> objectClass, long objectId, Class<?> listenerClass) {
-        Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
+    public <T> List<T> getObjectListeners(Class<?> objectClass, long objectId, Class<T> listenerClass) {
+        Map<Long, Map<Class<?>, List<?>>> objectListener = objectListeners.get(objectClass);
         if (objectListener == null) {
             return Collections.emptyList();
         }
-        Map<Class<?>, List<Object>> listeners = objectListener.get(objectId);
+        Map<Class<?>, List<?>> listeners = objectListener.get(objectId);
         if (listeners == null) {
             return Collections.emptyList();
         }
-        List<Object> classListeners = listeners.getOrDefault(listenerClass, Collections.emptyList());
-        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
+        List<T> classListeners = (List<T>) listeners.getOrDefault(listenerClass, Collections.emptyList());
+        return classListeners.stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
      * Adds a listener.
      *
-     * @param clazz The listener class.
+     * @param listenerClass The listener class.
      * @param listener The listener to add.
      * @param <T> The type of the listener.
      * @return The manager for the added listener.
      */
-    public <T> ListenerManager<T> addListener(Class<T> clazz, T listener) {
+    @SuppressWarnings("unchecked")
+    public <T> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
         synchronized (listeners) {
-            List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
+            List<T> classListeners = (List<T>) listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
             classListeners.add(listener);
         }
-        return new ListenerManager<>(this, listener, clazz);
+        return new ListenerManager<>(this, listener, listenerClass);
     }
 
     /**
      * Removes a global listener.
      *
-     * @param clazz The listener class.
+     * @param listenerClass The listener class.
      * @param listener The listener to remove.
+     * @param <T> The type of the listener.
      */
-    public void removeListener(Class<?> clazz, Object listener) {
+    @SuppressWarnings("unchecked")
+    public <T> void removeListener(Class<T> listenerClass, T listener) {
         synchronized (listeners) {
-            List<Object> classListeners = listeners.get(clazz);
+            List<T> classListeners = (List<T>) listeners.get(listenerClass);
             if (classListeners != null) {
                 classListeners.remove(listener);
                 if (classListeners.isEmpty()) {
-                    listeners.remove(clazz);
+                    listeners.remove(listenerClass);
                 }
             }
         }
@@ -764,9 +770,9 @@ public class ImplDiscordApi implements DiscordApi {
      * @return A list with all listeners of the given type.
      */
     @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    public <T> List<T> getListeners(Class<?> clazz) {
-        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
-        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
+    public <T> List<T> getListeners(Class<T> clazz) {
+        List<T> classListeners = (List<T>) listeners.getOrDefault(clazz, new ArrayList<>());
+        return classListeners.stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -1621,4 +1627,5 @@ public class ImplDiscordApi implements DiscordApi {
     public List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
         return getListeners(UserChangeAvatarListener.class);
     }
+
 }
