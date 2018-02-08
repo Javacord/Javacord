@@ -376,8 +376,8 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * The replacement happens as following:
      * <ul>
      * <li><b>User mentions</b>:
-     * <code>@nickname</code> if the user has a nickname, <code>@name</code> if the user has no nickname,
-     * <code>@invalid-user</code> if the user is not in the server.
+     * <code>@nickname</code> if the user has a nickname, <code>@name</code> if the user has no nickname, unchanged if
+     * the user is not in the cache.
      * <li><b>Channel mentions</b>:
      * <code>#name</code> if the text channel exists in the server, otherwise <code>#deleted-channel</code>
      * <li><b>Custom emoji</b>:
@@ -391,24 +391,21 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         Matcher userMention = DiscordRegexPattern.USER_MENTION.matcher(content);
         while (userMention.find()) {
             String userId = userMention.group("id");
-            String userName = getServer()
-                    .map(server -> getApi()
-                            .getUserById(userId)
-                            .filter(server.getMembers()::contains)
-                            .map(user -> user.getDisplayName(server))
-                            .orElse("invalid-user"))
-                    .orElse("invalid-user");
-            content = userMention.replaceFirst("@" + userName);
-            userMention.reset(content);
+            Optional<User> userOptional = getApi().getCachedUserById(userId);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                String userName = getServer().map(user::getDisplayName).orElseGet(user::getName);
+                content = userMention.replaceFirst("@" + userName);
+                userMention.reset(content);
+            }
         }
         Matcher roleMention = DiscordRegexPattern.ROLE_MENTION.matcher(content);
         while (roleMention.find()) {
             String roleId = roleMention.group("id");
             String roleName = getServer()
-                    .map(server -> server
+                    .flatMap(server -> server
                             .getRoleById(roleId)
-                            .map(Role::getName)
-                            .orElse("deleted-role"))
+                            .map(Role::getName))
                     .orElse("deleted-role");
             content = roleMention.replaceFirst("@" + roleName);
             roleMention.reset(content);
@@ -417,10 +414,9 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         while (channelMention.find()) {
             String channelId = channelMention.group("id");
             String channelName = getServer()
-                    .map(server -> server
+                    .flatMap(server -> server
                             .getTextChannelById(channelId)
-                            .map(ServerChannel::getName)
-                            .orElse("deleted-channel"))
+                            .map(ServerChannel::getName))
                     .orElse("deleted-channel");
             content = channelMention.replaceFirst("#" + channelName);
             channelMention.reset(content);

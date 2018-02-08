@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * An audit log entry target.
@@ -25,7 +26,7 @@ public interface AuditLogEntryTarget extends DiscordEntity {
      *
      * @return The target as user.
      */
-    default Optional<User> asUser() {
+    default CompletableFuture<User> asUser() {
         return getApi().getUserById(getId());
     }
 

@@ -214,7 +214,7 @@ public class ImplServer implements Server {
         if (data.has("presences")) {
             for (JsonNode presenceJson : data.get("presences")) {
                 long userId = Long.parseLong(presenceJson.get("user").get("id").asText());
-                api.getUserById(userId).map(user -> ((ImplUser) user)).ifPresent(user -> {
+                api.getCachedUserById(userId).map(ImplUser.class::cast).ifPresent(user -> {
                     if (presenceJson.has("game")) {
                         Activity activity = null;
                         if (!presenceJson.get("game").isNull()) {
@@ -544,7 +544,7 @@ public class ImplServer implements Server {
 
     @Override
     public User getOwner() {
-        return api.getUserById(ownerId)
+        return api.getCachedUserById(ownerId)
                 .orElseThrow(() -> new IllegalStateException("Owner of server " + toString() + " is not cached!"));
     }
 

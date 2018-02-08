@@ -5,7 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.User;
 
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link ApplicationInfo}.
@@ -83,7 +83,7 @@ public class ImplApplicationInfo implements ApplicationInfo {
     }
 
     @Override
-    public Optional<User> getOwner() {
+    public CompletableFuture<User> getOwner() {
         return api.getUserById(getOwnerId());
     }
 }

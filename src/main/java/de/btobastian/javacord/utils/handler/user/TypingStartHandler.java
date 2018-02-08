@@ -28,7 +28,7 @@ public class TypingStartHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         long userId = packet.get("user_id").asLong();
         long channelId = packet.get("channel_id").asLong();
-        api.getTextChannelById(channelId).ifPresent(channel -> api.getUserById(userId).ifPresent(user -> {
+        api.getTextChannelById(channelId).ifPresent(channel -> api.getCachedUserById(userId).ifPresent(user -> {
             UserStartTypingEvent event = new UserStartTypingEvent(api, user, channel);
 
             List<UserStartTypingListener> listeners = new ArrayList<>();
