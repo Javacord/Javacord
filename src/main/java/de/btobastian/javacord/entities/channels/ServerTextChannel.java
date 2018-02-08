@@ -6,7 +6,6 @@ import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTo
 import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**

@@ -1,5 +1,8 @@
 package de.btobastian.javacord.entities.channels.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
@@ -33,6 +36,11 @@ public class ImplPrivateChannel implements PrivateChannel {
      * The message cache of the private channel.
      */
     private final ImplMessageCache messageCache;
+
+	/**
+	 * List of users connected to this voice-channel.
+	 */
+	private final List<User> connectedUsers = new ArrayList<>();
 
     /**
      * Creates a new private channel.
@@ -70,6 +78,10 @@ public class ImplPrivateChannel implements PrivateChannel {
         return messageCache;
     }
 
+	@Override
+	public List<User> getConnectedUsers() {
+		return this.connectedUsers;
+	}
 
     @Override
     public String toString() {

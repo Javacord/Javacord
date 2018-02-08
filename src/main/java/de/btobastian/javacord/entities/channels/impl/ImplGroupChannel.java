@@ -25,106 +25,118 @@ import java.util.Optional;
  */
 public class ImplGroupChannel implements GroupChannel {
 
-    /**
-     * The logger of this class.
-     */
-    Logger logger = LoggerUtil.getLogger(ImplGroupChannel.class);
+	/**
+	 * The logger of this class.
+	 */
+	Logger logger = LoggerUtil.getLogger(ImplGroupChannel.class);
 
-    /**
-     * The discord api instance.
-     */
-    private final ImplDiscordApi api;
+	/**
+	 * The discord api instance.
+	 */
+	private final ImplDiscordApi api;
 
-    /**
-     * The id of the channel.
-     */
-    private final long id;
+	/**
+	 * The id of the channel.
+	 */
+	private final long id;
 
-    /**
-     * The name of the channel.
-     */
-    private String name;
+	/**
+	 * The name of the channel.
+	 */
+	private String name;
 
-    /**
-     * The icon id of the channel.
-     */
-    private String iconId;
+	/**
+	 * The icon id of the channel.
+	 */
+	private String iconId;
 
-    /**
-     * The recipients of the group channel.
-     */
-    private final List<User> recipients = new ArrayList<>();
+	/**
+	 * The recipients of the group channel.
+	 */
+	private final List<User> recipients = new ArrayList<>();
 
-    /**
-     * The message cache of the private channel.
-     */
-    private final ImplMessageCache messageCache;
+	/**
+	 * The message cache of the private channel.
+	 */
+	private final ImplMessageCache messageCache;
 
-    /**
-     * Creates a new private channel.
-     *
-     * @param api The discord api instance.
-     * @param data The json data of the channel.
-     */
-    public ImplGroupChannel(ImplDiscordApi api, JsonNode data) {
-        this.api = api;
+	/**
+	 * List of users connected to this voice-channel.
+	 */
+	private final List<User> connectedUsers = new ArrayList<>();
 
-        for (JsonNode recipientJson : data.get("recipients")) {
-            recipients.add(api.getOrCreateUser(recipientJson));
-        }
+	/**
+	 * Creates a new private channel.
+	 *
+	 * @param api
+	 *            The discord api instance.
+	 * @param data
+	 *            The json data of the channel.
+	 */
+	public ImplGroupChannel(ImplDiscordApi api, JsonNode data) {
+		this.api = api;
 
-        this.messageCache = new ImplMessageCache(
-                api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds());
+		for (JsonNode recipientJson : data.get("recipients")) {
+			recipients.add(api.getOrCreateUser(recipientJson));
+		}
 
-        id = Long.parseLong(data.get("id").asText());
-        name = data.has("name") && !data.get("name").isNull() ? data.get("name").asText() : null;
-        iconId = data.has("icon") && !data.get("icon").isNull() ? data.get("icon").asText() : null;
+		this.messageCache = new ImplMessageCache(api, api.getDefaultMessageCacheCapacity(),
+				api.getDefaultMessageCacheStorageTimeInSeconds());
 
-        api.addGroupChannelToCache(this);
-    }
+		id = Long.parseLong(data.get("id").asText());
+		name = data.has("name") && !data.get("name").isNull() ? data.get("name").asText() : null;
+		iconId = data.has("icon") && !data.get("icon").isNull() ? data.get("icon").asText() : null;
 
-    @Override
-    public DiscordApi getApi() {
-        return api;
-    }
+		api.addGroupChannelToCache(this);
+	}
 
-    @Override
-    public long getId() {
-        return id;
-    }
+	@Override
+	public DiscordApi getApi() {
+		return api;
+	}
 
-    @Override
-    public MessageCache getMessageCache() {
-        return messageCache;
-    }
+	@Override
+	public long getId() {
+		return id;
+	}
 
-    @Override
-    public Collection<User> getMembers() {
-        return Collections.unmodifiableCollection(recipients);
-    }
+	@Override
+	public MessageCache getMessageCache() {
+		return messageCache;
+	}
 
-    @Override
-    public Optional<String> getName() {
-        return Optional.ofNullable(name);
-    }
+	@Override
+	public Collection<User> getMembers() {
+		return Collections.unmodifiableCollection(recipients);
+	}
 
-    @Override
-    public Optional<Icon> getIcon() {
-        if (iconId == null) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(new ImplIcon(
-                    getApi(), new URL("https://cdn.discordapp.com/channel-icons/" + getId() + "/" + iconId + ".png")));
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
-            return Optional.empty();
-        }
-    }
+	@Override
+	public Optional<String> getName() {
+		return Optional.ofNullable(name);
+	}
 
-    @Override
-    public String toString() {
-        return String.format("GroupChannel (id: %s, name: %s)", getId(), getName());
-    }
+	@Override
+	public Optional<Icon> getIcon() {
+		if (iconId == null) {
+			return Optional.empty();
+		}
+		try {
+			return Optional.of(new ImplIcon(getApi(),
+					new URL("https://cdn.discordapp.com/channel-icons/" + getId() + "/" + iconId + ".png")));
+		} catch (MalformedURLException e) {
+			logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public List<User> getConnectedUsers() {
+		return this.connectedUsers;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("GroupChannel (id: %s, name: %s)", getId(), getName());
+	}
 
 }

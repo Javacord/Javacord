@@ -1,6 +1,5 @@
 package de.btobastian.javacord.entities.channels;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
