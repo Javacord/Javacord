@@ -37,11 +37,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class represents a Discord message.
  */
 public interface Message extends DiscordEntity, Comparable<Message> {
+
+    Pattern ESCAPED_CHARACTER =
+            Pattern.compile("\\\\(?<char>[^a-zA-Z0-9\\p{javaWhitespace}\\xa0\\u2007\\u202E\\u202F])");
 
     /**
      * Deletes the message.
@@ -427,7 +431,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             content = customEmoji.replaceFirst(":" + name + ":");
             customEmoji.reset(content);
         }
-        return content;
+        return ESCAPED_CHARACTER.matcher(content).replaceAll("${char}");
     }
 
     /**
