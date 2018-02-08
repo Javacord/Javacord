@@ -94,7 +94,7 @@ public class ImplAuditLogEntry implements AuditLogEntry {
                 JsonNode oldValue = changeJson.get("old_value");
                 JsonNode newValue = changeJson.get("new_value");
                 AuditLogChange<?> change;
-                String baseUrl;
+                String baseUrl = null;
                 switch (type) {
                     // Strings
                     case NAME:
@@ -141,7 +141,7 @@ public class ImplAuditLogEntry implements AuditLogEntry {
                     case ICON:
                         baseUrl = "https://cdn.discordapp.com/icons/";
                     case SPLASH:
-                        baseUrl = "https://cdn.discordapp.com/splashes/";
+                        baseUrl = (baseUrl == null) ? "https://cdn.discordapp.com/splashes/" : baseUrl;
                         try {
                             Icon oldIcon = oldValue != null ? new ImplIcon(getApi(), new URL(baseUrl + getTarget()
                                     .map(DiscordEntity::getId).orElse(0L) + "/" + oldValue.asText() + ".png")) : null;
