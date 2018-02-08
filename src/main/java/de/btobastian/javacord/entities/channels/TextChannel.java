@@ -143,7 +143,7 @@ public interface TextChannel extends Channel, Messageable {
      * @see #typeContinuously(Consumer)
      */
     default AutoCloseable typeContinuously() {
-        Future typingIndicator = getApi().getThreadPool().getScheduler()
+        Future<?> typingIndicator = getApi().getThreadPool().getScheduler()
                 .scheduleWithFixedDelay(this::type, 0, 8, TimeUnit.SECONDS);
         return () -> typingIndicator.cancel(true);
     }
@@ -164,7 +164,7 @@ public interface TextChannel extends Channel, Messageable {
      * @see #typeContinuously()
      */
     default AutoCloseable typeContinuously(Consumer<Throwable> exceptionHandler) {
-        Future typingIndicator = getApi().getThreadPool().getScheduler()
+        Future<?> typingIndicator = getApi().getThreadPool().getScheduler()
                 .scheduleWithFixedDelay(() -> type().exceptionally(throwable -> {
                     exceptionHandler.accept(throwable);
                     return null;

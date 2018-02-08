@@ -82,7 +82,7 @@ public class LoggerUtil {
      * @param clazz The class of the logger.
      * @return A logger for the given class.
      */
-    public static Logger getLogger(Class clazz) {
+    public static Logger getLogger(Class<?> clazz) {
         return getLogger(clazz.getName());
     }
 
