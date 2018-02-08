@@ -20,17 +20,10 @@ public class ThreadPool {
 
     private final ExecutorService executorService = new ThreadPoolExecutor(
             CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME, TIME_UNIT, new SynchronousQueue<>(),
-            runnable -> {
-                Thread thread = new Thread(runnable, "Javacord - Central ExecutorService");
-                thread.setDaemon(false);
-                return thread;
-            });
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(CORE_POOL_SIZE, runnable -> {
-        Thread thread = new Thread(runnable, "Javacord - Central Scheduler");
-        thread.setDaemon(false);
-        return thread;
-    });
-    private final ConcurrentHashMap<String, ExecutorService> executorServiceSingeThreads = new ConcurrentHashMap<>();
+            new ThreadFactory("Javacord - Central ExecutorService - %d", false));
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
+            CORE_POOL_SIZE, new ThreadFactory("Javacord - Central Scheduler - %d", false));
+    private final ConcurrentHashMap<String, ExecutorService> executorServiceSingleThreads = new ConcurrentHashMap<>();
 
     /**
      * Gets the used executor service.
@@ -57,7 +50,7 @@ public class ThreadPool {
     public void shutdown() {
         executorService.shutdown();
         scheduler.shutdown();
-        executorServiceSingeThreads.values().forEach(ExecutorService::shutdown);
+        executorServiceSingleThreads.values().forEach(ExecutorService::shutdown);
     }
 
     /**
@@ -67,18 +60,8 @@ public class ThreadPool {
      * @return The executor service with the given id. Never <code>null</code>!
      */
     public ExecutorService getSingleThreadExecutorService(String id) {
-        synchronized (executorServiceSingeThreads) {
-            ExecutorService service = executorServiceSingeThreads.get(id);
-            if (service == null) {
-                service = Executors.newSingleThreadExecutor(runnable -> {
-                    Thread thread = new Thread(runnable, "Javacord - '" + id + "' Processor");
-                    thread.setDaemon(false);
-                    return thread;
-                });
-                executorServiceSingeThreads.put(id, service);
-            }
-            return service;
-        }
+        return executorServiceSingleThreads.computeIfAbsent(id, key ->
+                Executors.newSingleThreadExecutor(new ThreadFactory("Javacord - '" + id + "' Processor", false)));
     }
 
 }

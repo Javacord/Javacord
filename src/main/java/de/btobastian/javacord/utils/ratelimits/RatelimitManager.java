@@ -4,6 +4,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.RatelimitException;
+import de.btobastian.javacord.utils.ThreadFactory;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
@@ -32,11 +33,8 @@ public class RatelimitManager {
      */
     private static final Logger logger = LoggerUtil.getLogger(RatelimitManager.class);
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, runnable -> {
-        Thread thread = new Thread(runnable, "Javacord - RatelimitBucket Delay Scheduler");
-        thread.setDaemon(true);
-        return thread;
-    });
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
+            1, new ThreadFactory("Javacord - RatelimitBucket Delay Scheduler - %d", true));
 
     private final Set<RatelimitBucket> buckets = ConcurrentHashMap.newKeySet();
     private final HashMap<RatelimitBucket, ConcurrentLinkedQueue<RestRequest<?>>> queues = new HashMap<>();
