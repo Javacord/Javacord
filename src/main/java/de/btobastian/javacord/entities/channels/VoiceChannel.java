@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.channels;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -66,6 +67,31 @@ public interface VoiceChannel extends Channel {
      */
     default boolean canYouMuteUsers() {
         return canMuteUsers(getApi().getYourself());
+    }
+
+    /**
+     * Gets the list of users connected to this voice-channel.
+     *
+     * @return The list of users connected to this voice-channel.
+     */
+    List<User> getConnectedUsers();
+
+    /**
+     * Adds a user to this voice-channel's connected-users list.
+     *
+     * @param user The user to add to this voice-channel's connected-users list.
+     */
+    default void addConnectedUser(User user) {
+        getConnectedUsers().add(user);
+    }
+
+    /**
+     * Removes a user from this voice-channel's connected-users list.
+     *
+     * @param user The user to remove from this voice-channel's connected-users list.
+     */
+    default void removeConnectedUser(User user) {
+        getConnectedUsers().remove(user);
     }
 
 }

@@ -9,6 +9,7 @@ import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.VoiceChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -73,6 +74,11 @@ public class ImplUser implements User, Cleanupable {
     private Activity activity = null;
 
     /**
+     * The voice-channel the user is connected to.
+     */
+    private VoiceChannel connectedVoiceChannel = null;
+
+    /**
      * The status of the user.
      */
     private UserStatus status = UserStatus.OFFLINE;
@@ -82,8 +88,9 @@ public class ImplUser implements User, Cleanupable {
      *
      * @param api The discord api instance.
      * @param data The json data of the user.
+     * @param addToCache Determines whether this should be cached.
      */
-    public ImplUser(ImplDiscordApi api, JsonNode data) {
+    public ImplUser(ImplDiscordApi api, JsonNode data, boolean addToCache) {
         this.api = api;
 
         id = Long.parseLong(data.get("id").asText());
@@ -93,8 +100,13 @@ public class ImplUser implements User, Cleanupable {
             avatarHash = data.get("avatar").asText();
         }
         bot = data.has("bot") && data.get("bot").asBoolean();
+        if (addToCache) {
+            api.addUserToCache(this);
+        }
+    }
 
-        api.addUserToCache(this);
+    public ImplUser(ImplDiscordApi api, JsonNode data) {
+        this(api, data, true);
     }
 
     /**
@@ -193,6 +205,20 @@ public class ImplUser implements User, Cleanupable {
     }
 
     @Override
+    public Optional<VoiceChannel> getConnectedVoiceChannel() {
+        return Optional.ofNullable(connectedVoiceChannel);
+    }
+
+    /**
+     * Sets the voice-channel this user is connected to. Might be <code>null</code>.
+     *
+     * @param channel The voice-channel this user is connected to.
+     */
+    public void setConnectedVoiceChannel(VoiceChannel channel) {
+        connectedVoiceChannel = channel;
+    }
+
+    @Override
     public UserStatus getStatus() {
         return status;
     }
@@ -228,7 +254,7 @@ public class ImplUser implements User, Cleanupable {
             return CompletableFuture.completedFuture(channel);
         }
         return new RestRequest<PrivateChannel>(api, RestMethod.POST, RestEndpoint.USER_CHANNEL)
-                .setBody(JsonNodeFactory.instance.objectNode().put("recipient_id", getIdAsString()))
+                .setBody(JsonNodeFactory.instance.objectNode().put("recipient_id", getId()))
                 .execute(result -> getOrCreateChannel(result.getJsonBody()));
     }
 

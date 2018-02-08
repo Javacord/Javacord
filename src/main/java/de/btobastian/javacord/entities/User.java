@@ -5,6 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.VoiceChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
@@ -93,6 +94,13 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return The activity of the user.
      */
     Optional<Activity> getActivity();
+
+    /**
+     * Gets the voice-channel the user is connected to.
+     *
+     * @return The voice-channel the user is connected to.
+     */
+    Optional<VoiceChannel> getConnectedVoiceChannel();
 
     /**
      * Gets the status of the user.

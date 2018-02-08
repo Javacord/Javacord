@@ -75,6 +75,8 @@ import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
+import de.btobastian.javacord.listeners.user.UserJoinVoiceChannelListener;
+import de.btobastian.javacord.listeners.user.UserLeaveVoiceChannelListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
@@ -2142,6 +2144,38 @@ public interface DiscordApi {
      * @return A list with all registered user change activity listeners.
      */
     List<UserChangeActivityListener> getUserChangeActivityListeners();
+
+    /**
+     * Adds a listener, which listens to user joining a voice-channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserJoinVoiceChannelListener> addUserJoinVoiceChannelListener(
+            UserJoinVoiceChannelListener listener);
+
+    /**
+     * Gets a list with all registered user join voice-channel listeners.
+     *
+     * @return A list with all registered user join voice-channel listeners.
+     */
+    List<UserJoinVoiceChannelListener> getUserJoinVoiceChannelListeners();
+
+    /**
+     * Adds a listener, which listens to user leaving a voice-channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserLeaveVoiceChannelListener> addUserLeaveVoiceChannelListener(
+            UserLeaveVoiceChannelListener listener);
+
+    /**
+     * Gets a list with all registered user leave voice-channel listeners.
+     *
+     * @return A list with all registered user leave voice-channel listeners.
+     */
+    List<UserLeaveVoiceChannelListener> getUserLeaveVoiceChannelListeners();
 
     /**
      * Adds a listener, which listens to user status changes.
