@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * A message delete event.
  */
-public class MessageEditEvent extends OptionalMessageEvent {
+public class MessageEditEvent extends RequestableMessageEvent {
 
     /**
      * The new content of the message.

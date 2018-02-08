@@ -3,14 +3,13 @@ package de.btobastian.javacord.utils.cache;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.impl.ImplMessage;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link MessageCache}.
@@ -73,34 +72,28 @@ public class ImplMessageCache implements MessageCache {
     }
 
     /**
+     * Adds a message to the cache.
+     *
+     * @param message The message to add.
+     */
+    public void removeMessage(Message message) {
+        synchronized (messages) {
+            messages.remove(message);
+        }
+    }
+
+    /**
      * Cleans the cache.
      */
     public void clean() {
         Instant minAge = Instant.ofEpochMilli(System.currentTimeMillis() - storageTimeInSeconds * 1000);
         synchronized (messages) {
-            Iterator<Message> iterator = messages.iterator();
-            // Remove all deleted messages from the cache
-            while (iterator.hasNext()) {
-                if (iterator.next().isDeleted()) {
-                    iterator.remove();
-                }
-            }
+            messages.removeIf(message -> !message.isCachedForever() && message.getCreationTimestamp().isBefore(minAge));
             long foreverCachedAmount = messages.stream().filter(Message::isCachedForever).count();
-            iterator = messages.iterator();
-            while (iterator.hasNext()) {
-                ImplMessage message = (ImplMessage) iterator.next();
-                if (message.isCachedForever()) {
-                    continue;
-                }
-                if (messages.size() > capacity + foreverCachedAmount || message.getCreationTimestamp().isBefore(minAge)) {
-                    iterator.remove();
-                    message.setKeepCached(false);
-                } else {
-                    // No need to keep iterating as the list is ordered.
-                    // If we don't remove an element now, we will also not remove the next element.
-                    return;
-                }
-            }
+            messages.removeAll(messages.stream()
+                                       .filter(message -> !message.isCachedForever())
+                                       .limit(Math.min(0, messages.size() - capacity - foreverCachedAmount))
+                                       .collect(Collectors.toList()));
         }
     }
 
