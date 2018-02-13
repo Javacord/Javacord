@@ -29,6 +29,9 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -72,6 +75,8 @@ import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -1454,6 +1459,82 @@ public interface DiscordApi {
      * @return A list with all registered server channel delete listeners.
      */
     List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to private channel creations.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(PrivateChannelCreateListener listener);
+
+    /**
+     * Gets a list with all registered private channel create listeners.
+     *
+     * @return A list with all registered private channel create listeners.
+     */
+    List<PrivateChannelCreateListener> getPrivateChannelCreateListeners();
+
+    /**
+     * Adds a listener, which listens to private channel deletions.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(PrivateChannelDeleteListener listener);
+
+    /**
+     * Gets a list with all registered private channel delete listeners.
+     *
+     * @return A list with all registered private channel delete listeners.
+     */
+    List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners();
+
+    /**
+     * Adds a listener, which listens to group channel creations.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<GroupChannelCreateListener> addGroupChannelCreateListener(GroupChannelCreateListener listener);
+
+    /**
+     * Gets a list with all registered group channel create listeners.
+     *
+     * @return A list with all registered group channel create listeners.
+     */
+    List<GroupChannelCreateListener> getGroupChannelCreateListeners();
+
+    /**
+     * Adds a listener, which listens to group channel name changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
+            GroupChannelChangeNameListener listener);
+
+    /**
+     * Gets a list with all registered group channel change name listeners.
+     *
+     * @return A list with all registered group channel change name listeners.
+     */
+    List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners();
+
+    /**
+     * Adds a listener, which listens to group channel deletions.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(GroupChannelDeleteListener listener);
+
+    /**
+     * Gets a list with all registered group channel delete listeners.
+     *
+     * @return A list with all registered group channel delete listeners.
+     */
+    List<GroupChannelDeleteListener> getGroupChannelDeleteListeners();
 
     /**
      * Adds a listener, which listens to message deletions.

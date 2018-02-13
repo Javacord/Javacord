@@ -6,15 +6,18 @@ import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplChannelCategory;
+import de.btobastian.javacord.entities.channels.impl.ImplGroupChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
+import de.btobastian.javacord.events.group.channel.GroupChannelChangeNameEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeNameEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeOverwrittenPermissionsEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangePositionEvent;
 import de.btobastian.javacord.events.server.channel.ServerTextChannelChangeTopicEvent;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
@@ -58,6 +61,9 @@ public class ChannelUpdateHandler extends PacketHandler {
             case 2:
                 handleServerChannel(packet);
                 handleServerVoiceChannel(packet);
+                break;
+            case 3:
+                handleGroupChannel(packet);
                 break;
             case 4:
                 handleServerChannel(packet);
@@ -268,7 +274,34 @@ public class ChannelUpdateHandler extends PacketHandler {
      * @param channel The channel data.
      */
     private void handlePrivateChannel(JsonNode channel) {
+    }
 
+    /**
+     * Handles a group channel update.
+     *
+     * @param channel The channel data.
+     */
+    private void handleGroupChannel(JsonNode channel) {
+        long channelId = channel.get("id").asLong();
+        api.getGroupChannelById(channelId).map(ImplGroupChannel.class::cast).ifPresent(groupChannel -> {
+            String oldName = groupChannel.getName().orElseThrow(AssertionError::new);
+            String newName = channel.get("name").asText();
+            if (!Objects.equals(oldName, newName)) {
+                groupChannel.setName(newName);
+
+                GroupChannelChangeNameEvent event =
+                        new GroupChannelChangeNameEvent(groupChannel, newName, oldName);
+
+                List<GroupChannelChangeNameListener> listeners = new ArrayList<>();
+                listeners.addAll(groupChannel.getGroupChannelChangeNameListeners());
+                groupChannel.getMembers().stream()
+                        .map(User::getGroupChannelChangeNameListeners)
+                        .forEach(listeners::addAll);
+                listeners.addAll(api.getGroupChannelChangeNameListeners());
+
+                dispatchEvent(listeners, listener -> listener.onGroupChannelChangeName(event));
+            }
+        });
     }
 
     /**

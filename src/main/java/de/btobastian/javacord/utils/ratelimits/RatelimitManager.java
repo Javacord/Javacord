@@ -4,6 +4,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.RatelimitException;
+import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.ThreadFactory;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -26,7 +27,7 @@ import java.util.function.Function;
 /**
  * This class manages ratelimits and keeps track of them.
  */
-public class RatelimitManager {
+public class RatelimitManager implements Cleanupable {
 
     /**
      * The logger of this class.
@@ -227,4 +228,8 @@ public class RatelimitManager {
         }
     }
 
+    @Override
+    public void cleanup() {
+        scheduler.shutdown();
+    }
 }

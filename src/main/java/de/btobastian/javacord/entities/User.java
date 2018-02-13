@@ -3,9 +3,13 @@ package de.btobastian.javacord.entities;
 import de.btobastian.javacord.AccountType;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
@@ -22,6 +26,8 @@ import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.Collection;
@@ -208,6 +214,123 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return The new (or old) private channel with the user.
      */
     CompletableFuture<PrivateChannel> openPrivateChannel();
+
+    /**
+     * Gets the currently existing group channels with the user.
+     *
+     * @return The group channels with the user.
+     */
+    default Collection<GroupChannel> getGroupChannels() {
+        return getApi().getGroupChannels().stream()
+                .filter(groupChannel -> groupChannel.getMembers().contains(this))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Adds a listener, which listens to private channel creations for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(
+            PrivateChannelCreateListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), PrivateChannelCreateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered private channel create listeners.
+     *
+     * @return A list with all registered private channel create listeners.
+     */
+    default List<PrivateChannelCreateListener> getPrivateChannelCreateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelCreateListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to private channel deletions for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(
+            PrivateChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), PrivateChannelDeleteListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered private channel delete listeners.
+     *
+     * @return A list with all registered private channel delete listeners.
+     */
+    default List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelDeleteListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to group channel creations for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<GroupChannelCreateListener> addGroupChannelCreateListener(
+            GroupChannelCreateListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), GroupChannelCreateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered group channel create listeners.
+     *
+     * @return A list with all registered group channel create listeners.
+     */
+    default List<GroupChannelCreateListener> getGroupChannelCreateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), GroupChannelCreateListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to group channel name changes for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
+            GroupChannelChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), GroupChannelChangeNameListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered group channel change name listeners.
+     *
+     * @return A list with all registered group channel change name listeners.
+     */
+    default List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                User.class, getId(), GroupChannelChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to group channel deletions for this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
+            GroupChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                User.class, getId(), GroupChannelDeleteListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered group channel delete listeners.
+     *
+     * @return A list with all registered group channel delete listeners.
+     */
+    default List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), GroupChannelDeleteListener.class);
+    }
 
     /**
      * Adds a listener, which listens to message creates from this user.

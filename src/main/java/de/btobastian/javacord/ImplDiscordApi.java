@@ -21,6 +21,9 @@ import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -64,6 +67,9 @@ import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
+import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -368,8 +374,17 @@ public class ImplDiscordApi implements DiscordApi {
      * This method is only meant to be called after receiving a READY packet.
      */
     public void purgeCache() {
+        users.values().stream()
+                .map(Cleanupable.class::cast)
+                .forEach(Cleanupable::cleanup);
         users.clear();
+        servers.values().stream()
+                .map(Cleanupable.class::cast)
+                .forEach(Cleanupable::cleanup);
         servers.clear();
+        groupChannels.values().stream()
+                .map(Cleanupable.class::cast)
+                .forEach(Cleanupable::cleanup);
         groupChannels.clear();
         unavailableServers.clear();
         customEmojis.clear();
@@ -384,7 +399,10 @@ public class ImplDiscordApi implements DiscordApi {
      * @param server The server to add.
      */
     public void addServerToCache(Server server) {
-        servers.put(server.getId(), server);
+        Server oldServer = servers.put(server.getId(), server);
+        if ((oldServer != null) && (oldServer != server)) {
+            ((Cleanupable) oldServer).cleanup();
+        }
     }
 
     /**
@@ -393,7 +411,10 @@ public class ImplDiscordApi implements DiscordApi {
      * @param serverId The id of the server to remove.
      */
     public void removeServerFromCache(long serverId) {
-        servers.remove(serverId);
+        servers.computeIfPresent(serverId, (key, server) -> {
+            ((Cleanupable) server).cleanup();
+            return null;
+        });
     }
 
     /**
@@ -402,7 +423,10 @@ public class ImplDiscordApi implements DiscordApi {
      * @param user The user to add.
      */
     public void addUserToCache(User user) {
-        users.put(user.getId(), user);
+        User oldUser = users.put(user.getId(), user);
+        if ((oldUser != null) && (oldUser != user)) {
+            ((Cleanupable) oldUser).cleanup();
+        }
     }
 
     /**
@@ -411,7 +435,22 @@ public class ImplDiscordApi implements DiscordApi {
      * @param channel The channel to add.
      */
     public void addGroupChannelToCache(GroupChannel channel) {
-        groupChannels.put(channel.getId(), channel);
+        GroupChannel oldChannel = groupChannels.put(channel.getId(), channel);
+        if ((oldChannel != null) && (oldChannel != channel)) {
+            ((Cleanupable) oldChannel).cleanup();
+        }
+    }
+
+    /**
+     * Removes a group channel from the cache.
+     *
+     * @param channelId The id of the channel to remove.
+     */
+    public void removeGroupChannelFromCache(long channelId) {
+        groupChannels.computeIfPresent(channelId, (key, groupChannel) -> {
+            ((Cleanupable) groupChannel).cleanup();
+            return null;
+        });
     }
 
     /**
@@ -838,6 +877,7 @@ public class ImplDiscordApi implements DiscordApi {
                     // shutdown thread pool if within one minute no disconnect event was dispatched
                     threadPool.getScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
                 }
+                ratelimitManager.cleanup();
             }
             disconnectCalled = true;
         }
@@ -1007,6 +1047,61 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
         return getListeners(ServerChannelDeleteListener.class);
+    }
+
+    @Override
+    public ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(
+            PrivateChannelCreateListener listener) {
+        return addListener(PrivateChannelCreateListener.class, listener);
+    }
+
+    @Override
+    public List<PrivateChannelCreateListener> getPrivateChannelCreateListeners() {
+        return getListeners(PrivateChannelCreateListener.class);
+    }
+
+    @Override
+    public ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(
+            PrivateChannelDeleteListener listener) {
+        return addListener(PrivateChannelDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners() {
+        return getListeners(PrivateChannelDeleteListener.class);
+    }
+
+    @Override
+    public ListenerManager<GroupChannelCreateListener> addGroupChannelCreateListener(
+            GroupChannelCreateListener listener) {
+        return addListener(GroupChannelCreateListener.class, listener);
+    }
+
+    @Override
+    public List<GroupChannelCreateListener> getGroupChannelCreateListeners() {
+        return getListeners(GroupChannelCreateListener.class);
+    }
+
+    @Override
+    public ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
+            GroupChannelChangeNameListener listener) {
+        return addListener(GroupChannelChangeNameListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
+            GroupChannelDeleteListener listener) {
+        return addListener(GroupChannelDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
+        return getListeners(GroupChannelDeleteListener.class);
+    }
+
+    @Override
+    public List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
+        return getListeners(GroupChannelChangeNameListener.class);
     }
 
     @Override

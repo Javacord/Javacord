@@ -2,10 +2,16 @@ package de.btobastian.javacord.utils.handler.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.events.group.channel.GroupChannelDeleteEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelDeleteEvent;
+import de.btobastian.javacord.events.user.channel.PrivateChannelDeleteEvent;
+import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -37,6 +43,9 @@ public class ChannelDeleteHandler extends PacketHandler {
                 break;
             case 2:
                 handleServerVoiceChannel(packet);
+                break;
+            case 3:
+                handleGroupChannel(packet);
                 break;
             case 4:
                 handleCategory(packet);
@@ -92,7 +101,42 @@ public class ChannelDeleteHandler extends PacketHandler {
      * @param channel The channel data.
      */
     private void handlePrivateChannel(JsonNode channel) {
-        // TODO handle private channel deletion -> only for client bots
+        ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.get("recipients").get(0));
+        recipient.getPrivateChannel().ifPresent(privateChannel -> {
+            PrivateChannelDeleteEvent event = new PrivateChannelDeleteEvent(privateChannel);
+
+            List<PrivateChannelDeleteListener> listeners = new ArrayList<>();
+            listeners.addAll(privateChannel.getPrivateChannelDeleteListeners());
+            listeners.addAll(recipient.getPrivateChannelDeleteListeners());
+            listeners.addAll(api.getPrivateChannelDeleteListeners());
+
+            dispatchEvent(listeners, listener -> listener.onPrivateChannelDelete(event));
+
+            recipient.setChannel(null);
+        });
+    }
+
+    /**
+     * Handles a group channel deletion.
+     *
+     * @param channel The channel data.
+     */
+    private void handleGroupChannel(JsonNode channel) {
+        long channelId = channel.get("id").asLong();
+
+        api.getGroupChannelById(channelId).ifPresent(groupChannel -> {
+            GroupChannelDeleteEvent event = new GroupChannelDeleteEvent(groupChannel);
+
+            List<GroupChannelDeleteListener> listeners = new ArrayList<>();
+            listeners.addAll(groupChannel.getGroupChannelDeleteListeners());
+            groupChannel.getMembers().stream()
+                    .map(User::getGroupChannelDeleteListeners)
+                    .forEach(listeners::addAll);
+            listeners.addAll(api.getGroupChannelDeleteListeners());
+
+            dispatchEvent(listeners, listener -> listener.onGroupChannelDelete(event));
+            api.removeGroupChannelFromCache(channelId);
+        });
     }
 
     /**

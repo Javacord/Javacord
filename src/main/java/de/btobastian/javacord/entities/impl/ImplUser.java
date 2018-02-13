@@ -12,6 +12,7 @@ import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
@@ -27,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link User}.
  */
-public class ImplUser implements User {
+public class ImplUser implements User, Cleanupable {
 
     /**
      * The logger of this class.
@@ -105,7 +106,12 @@ public class ImplUser implements User {
      * @param channel The channel to set.
      */
     public void setChannel(PrivateChannel channel) {
-        this.channel = channel;
+        if (this.channel != channel) {
+            if (this.channel != null) {
+                ((Cleanupable) this.channel).cleanup();
+            }
+            this.channel = channel;
+        }
     }
 
     /**
@@ -246,6 +252,13 @@ public class ImplUser implements User {
                 channel -> channel.sendMessage(content, embed, tts, nonce, stream, fileName).join(),
                 api.getThreadPool().getExecutorService()
         );
+    }
+
+    @Override
+    public void cleanup() {
+        if (channel != null) {
+            ((Cleanupable) channel).cleanup();
+        }
     }
 
     @Override

@@ -1,6 +1,11 @@
 package de.btobastian.javacord.entities.channels;
 
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
+import de.btobastian.javacord.utils.ListenerManager;
+
+import java.util.List;
 
 /**
  * This class represents a private channel.
@@ -20,5 +25,27 @@ public interface PrivateChannel extends TextChannel, VoiceChannel {
      * @return The recipient of the private channel.
      */
     User getRecipient();
+
+    /**
+     * Adds a listener, which listens to this channel being deleted.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(
+            PrivateChannelDeleteListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                PrivateChannel.class, getId(), PrivateChannelDeleteListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered private channel delete listeners.
+     *
+     * @return A list with all registered private channel delete listeners.
+     */
+    default List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                PrivateChannel.class, getId(), PrivateChannelDeleteListener.class);
+    }
 
 }

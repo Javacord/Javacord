@@ -6,13 +6,14 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplUser;
+import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
 
 /**
  * The implementation of {@link PrivateChannel}.
  */
-public class ImplPrivateChannel implements PrivateChannel {
+public class ImplPrivateChannel implements PrivateChannel, Cleanupable {
 
     /**
      * The discord api instance.
@@ -72,7 +73,13 @@ public class ImplPrivateChannel implements PrivateChannel {
 
 
     @Override
+    public void cleanup() {
+        messageCache.cleanup();
+    }
+
+    @Override
     public String toString() {
         return String.format("PrivateChannel (id: %s, recipient: %s)", getId(), getRecipient());
     }
+
 }
