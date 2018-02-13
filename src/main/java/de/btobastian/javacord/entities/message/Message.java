@@ -37,8 +37,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * This class represents a Discord message.
@@ -846,39 +848,292 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     }
 
     /**
-     * Gets the history of messages before this message.
+     * Gets up to a given amount of messages before this message.
      *
      * @param limit The limit of messages to get.
-     * @return The history.
-     * @see TextChannel#getHistoryBefore(int, long)
+     * @return The messages.
+     * @see TextChannel#getMessagesBefore(int, long)
+     * @see #getMessagesBeforeAsStream()
      */
-    default CompletableFuture<MessageHistory> getHistoryBefore(int limit) {
-        return getChannel().getHistoryBefore(limit, this);
+    default CompletableFuture<MessageSet> getMessagesBefore(int limit) {
+        return getChannel().getMessagesBefore(limit, this);
     }
 
     /**
-     * Gets the history of messages after this message.
+     * Gets messages before this message until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
      *
-     * @param limit The limit of messages to get.
-     * @return The history.
-     * @see TextChannel#getHistoryAfter(int, long)
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBefore(int, long)
+     * @see #getMessagesBeforeAsStream()
      */
-    default CompletableFuture<MessageHistory> getHistoryAfter(int limit) {
-        return getChannel().getHistoryAfter(limit, this);
+    default CompletableFuture<MessageSet> getMessagesBeforeUntil(Predicate<Message> condition) {
+        return getChannel().getMessagesBeforeUntil(condition, this);
     }
 
     /**
-     * Gets the history of messages around this message.
-     * Half of the message will be older than the given message and half of the message will be newer.
+     * Gets messages before this message while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see TextChannel#getMessagesBeforeWhile(Predicate, long)
+     * @see #getMessagesBeforeAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeWhile(Predicate<Message> condition) {
+        return getChannel().getMessagesBeforeWhile(condition, this);
+    }
+
+    /**
+     * Gets a stream of messages before this message sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see TextChannel#getMessagesBeforeAsStream(long)
+     * @see #getMessagesBefore(int)
+     */
+    default Stream<Message> getMessagesBeforeAsStream() {
+        return getChannel().getMessagesBeforeAsStream(this);
+    }
+
+    /**
+     * Gets up to a given amount of messages after this message.
+     *
+     * @param limit The limit of messages to get.
+     * @return The messages.
+     * @see TextChannel#getMessagesAfter(int, long)
+     * @see #getMessagesAfterAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesAfter(int limit) {
+        return getChannel().getMessagesAfter(limit, this);
+    }
+
+    /**
+     * Gets messages after this message until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesAfter(int, long)
+     * @see #getMessagesAfterAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterUntil(Predicate<Message> condition) {
+        return getChannel().getMessagesAfterUntil(condition, this);
+    }
+
+    /**
+     * Gets messages after this message while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see TextChannel#getMessagesAfterWhile(Predicate, long)
+     * @see #getMessagesAfterAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterWhile(Predicate<Message> condition) {
+        return getChannel().getMessagesAfterWhile(condition, this);
+    }
+
+    /**
+     * Gets a stream of messages after this message sorted from oldest to newest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see TextChannel#getMessagesAfterAsStream(long)
+     * @see #getMessagesAfter(int)
+     */
+    default Stream<Message> getMessagesAfterAsStream() {
+        return getChannel().getMessagesAfterAsStream(this);
+    }
+
+    /**
+     * Gets up to a given amount of messages around this message.
+     * This message will be part of the result in addition to the messages around and does not count towards the limit.
+     * Half of the messages will be older than this message and half of the message will be newer.
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param limit The limit of messages to get.
-     * @return The history.
-     * @see TextChannel#getHistoryAround(int, long)
+     * @return The messages.
+     * @see TextChannel#getMessagesAround(int, long)
+     * @see #getMessagesAroundAsStream()
      */
-    default CompletableFuture<MessageHistory> getHistoryAround(int limit) {
-        return getChannel().getHistoryAround(limit, this);
+    default CompletableFuture<MessageSet> getMessagesAround(int limit) {
+        return getChannel().getMessagesAround(limit, this);
+    }
+
+    /**
+     * Gets messages around this message until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     * This message will be part of the result in addition to the messages around and is matched against the condition
+     * and will abort retrieval.
+     * Half of the messages will be older than this message and half of the message will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesAround(int, long)
+     * @see #getMessagesAroundAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundUntil(Predicate<Message> condition) {
+        return getChannel().getMessagesAroundUntil(condition, this);
+    }
+
+    /**
+     * Gets messages around this message while they meet the given condition.
+     * If this message does not match the condition, an empty set is returned.
+     * This message will be part of the result in addition to the messages around and is matched against the condition
+     * and will abort retrieval.
+     * Half of the messages will be older than this message and half of the message will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see TextChannel#getMessagesAroundWhile(Predicate, long)
+     * @see #getMessagesAroundAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundWhile(Predicate<Message> condition) {
+        return getChannel().getMessagesAroundWhile(condition, this);
+    }
+
+    /**
+     * Gets a stream of messages around this message. The first message in the stream will be this message.
+     * After that you will always get an older message and a newer message alternating as long as on both sides
+     * messages are available. If only on one side further messages are available, only those are delivered further on.
+     * It's not guaranteed to be perfectly balanced.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see TextChannel#getMessagesAroundAsStream(long)
+     * @see #getMessagesAround(int)
+     */
+    default Stream<Message> getMessagesAroundAsStream() {
+        return getChannel().getMessagesAroundAsStream(this);
+    }
+
+    /**
+     * Gets all messages between this messages and the given message, excluding the boundaries.
+     *
+     * @param other The id of the other boundary messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetween(long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(long other) {
+        return getChannel().getMessagesBetween(getId(), other);
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, until one that meets the
+     * given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param other The id of the other boundary messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenUntil(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(long other, Predicate<Message> condition) {
+        return getChannel().getMessagesBetweenUntil(condition, getId(), other);
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, while they meet the
+     * given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param other The id of the other boundary messages.
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenWhile(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(long other, Predicate<Message> condition) {
+        return getChannel().getMessagesBetweenWhile(condition, getId(), other);
+    }
+
+    /**
+     * Gets a stream of all messages between this message and the given message, excluding the boundaries, sorted from
+     * this message to the given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param other The id of the other boundary messages.
+     * @return The stream.
+     * @see TextChannel#getMessagesBetweenAsStream(long, long)
+     * @see #getMessagesBetween(long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(long other) {
+        return getChannel().getMessagesBetweenAsStream(getId(), other);
+    }
+
+    /**
+     * Gets all messages between this messages and the given message, excluding the boundaries.
+     *
+     * @param other The other boundary messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetween(long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(Message other) {
+        return getMessagesBetween(other.getId());
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, until one that meets the
+     * given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param other The other boundary messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenUntil(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(Message other, Predicate<Message> condition) {
+        return getMessagesBetweenUntil(other.getId(), condition);
+    }
+
+    /**
+     * Gets all messages between this message and the given message, excluding the boundaries, while they meet the
+     * given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param other The other boundary messages.
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see TextChannel#getMessagesBetweenWhile(Predicate, long, long)
+     * @see #getMessagesBetweenAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(Message other, Predicate<Message> condition) {
+        return getMessagesBetweenWhile(other.getId(), condition);
+    }
+
+    /**
+     * Gets a stream of all messages between this message and the given message, excluding the boundaries, sorted from
+     * this message to the given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param other The other boundary messages.
+     * @return The stream.
+     * @see TextChannel#getMessagesBetweenAsStream(long, long)
+     * @see #getMessagesBetween(long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(Message other) {
+        return getMessagesBetweenAsStream(other.getId());
     }
 
     /**

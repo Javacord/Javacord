@@ -10,10 +10,10 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.MessageHistory;
+import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
-import de.btobastian.javacord.entities.message.impl.ImplMessageHistory;
+import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -48,7 +48,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * This class represents a text channel.
@@ -287,7 +291,7 @@ public interface TextChannel extends Channel, Messageable {
     default CompletableFuture<Void> bulkDelete(Iterable<Message> messages) {
         Collection<Long> messageIds = new HashSet<>();
         messages.forEach(message -> messageIds.add(message.getId()));
-        return bulkDelete(messageIds.stream().mapToLong(value -> value).toArray());
+        return bulkDelete(messageIds.stream().mapToLong(Long::longValue).toArray());
     }
 
     /**
@@ -381,97 +385,537 @@ public interface TextChannel extends Channel, Messageable {
      *
      * @return A list with all pinned messages.
      */
-    default CompletableFuture<List<Message>> getPins() {
-        return new RestRequest<List<Message>>(getApi(), RestMethod.GET, RestEndpoint.PINS)
+    default CompletableFuture<MessageSet> getPins() {
+        return new RestRequest<MessageSet>(getApi(), RestMethod.GET, RestEndpoint.PINS)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
-                    List<Message> pins = new ArrayList<>();
-                    for (JsonNode pin : result.getJsonBody()) {
-                        pins.add(((ImplDiscordApi) getApi()).getOrCreateMessage(this, pin));
-                    }
-                    return pins;
+                    Collection<Message> pins = StreamSupport.stream(result.getJsonBody().spliterator(), false)
+                            .map(pinJson -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, pinJson))
+                            .collect(Collectors.toList());
+                    return new ImplMessageSet(pins);
                 });
     }
 
     /**
-     * Gets the history of messages in this channel.
+     * Gets up to a given amount of messages in this channel from the newer end.
      *
      * @param limit The limit of messages to get.
-     * @return The history.
+     * @return The messages.
+     * @see #getMessagesAsStream()
      */
-    default CompletableFuture<MessageHistory> getHistory(int limit) {
-        return ImplMessageHistory.getHistory(this, limit);
+    default CompletableFuture<MessageSet> getMessages(int limit) {
+        return ImplMessageSet.getMessages(this, limit);
     }
 
     /**
-     * Gets the history of messages before a given message in this channel.
+     * Gets messages in this channel from the newer end until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @return The messages.
+     * @see #getMessagesAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesUntil(Predicate<Message> condition) {
+        return ImplMessageSet.getMessagesUntil(this, condition);
+    }
+
+    /**
+     * Gets messages in this channel from the newer end while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @return The messages.
+     * @see #getMessagesAsStream()
+     */
+    default CompletableFuture<MessageSet> getMessagesWhile(Predicate<Message> condition) {
+        return ImplMessageSet.getMessagesWhile(this, condition);
+    }
+
+    /**
+     * Gets a stream of messages in this channel sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @return The stream.
+     * @see #getMessages(int)
+     */
+    default Stream<Message> getMessagesAsStream() {
+        return ImplMessageSet.getMessagesAsStream(this);
+    }
+
+    /**
+     * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param before Get messages before the message with this id.
-     * @return The history.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(long)
      */
-    default CompletableFuture<MessageHistory> getHistoryBefore(int limit, long before) {
-        return ImplMessageHistory.getHistoryBefore(this, limit, before);
+    default CompletableFuture<MessageSet> getMessagesBefore(int limit, long before) {
+        return ImplMessageSet.getMessagesBefore(this, limit, before);
     }
 
     /**
-     * Gets the history of messages before a given message in this channel.
+     * Gets messages in this channel before a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param before Get messages before the message with this id.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeUntil(Predicate<Message> condition, long before) {
+        return ImplMessageSet.getMessagesBeforeUntil(this, condition, before);
+    }
+
+    /**
+     * Gets messages in this channel before a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param before Get messages before the message with this id.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeWhile(Predicate<Message> condition, long before) {
+        return ImplMessageSet.getMessagesBeforeWhile(this, condition, before);
+    }
+
+    /**
+     * Gets a stream of messages in this channel before a given message in any channel sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param before Get messages before the message with this id.
+     * @return The stream.
+     * @see #getMessagesBefore(int, long)
+     */
+    default Stream<Message> getMessagesBeforeAsStream(long before) {
+        return ImplMessageSet.getMessagesBeforeAsStream(this, before);
+    }
+
+    /**
+     * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param before Get messages before this message.
-     * @return The history.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(Message)
      */
-    default CompletableFuture<MessageHistory> getHistoryBefore(int limit, Message before) {
-        return getHistoryBefore(limit, before.getId());
+    default CompletableFuture<MessageSet> getMessagesBefore(int limit, Message before) {
+        return getMessagesBefore(limit, before.getId());
     }
 
     /**
-     * Gets the history of messages after a given message in this channel.
+     * Gets messages in this channel before a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param before Get messages before this message.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeUntil(Predicate<Message> condition, Message before) {
+        return getMessagesBeforeUntil(condition, before.getId());
+    }
+
+    /**
+     * Gets messages in this channel before a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param before Get messages before this message.
+     * @return The messages.
+     * @see #getMessagesBeforeAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesBeforeWhile(Predicate<Message> condition, Message before) {
+        return getMessagesBeforeWhile(condition, before.getId());
+    }
+
+    /**
+     * Gets a stream of messages in this channel before a given message in any channel sorted from newest to oldest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param before Get messages before this message.
+     * @return The stream.
+     * @see #getMessagesBefore(int, Message)
+     */
+    default Stream<Message> getMessagesBeforeAsStream(Message before) {
+        return getMessagesBeforeAsStream(before.getId());
+    }
+
+    /**
+     * Gets up to a given amount of messages in this channel after a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param after Get messages after the message with this id.
-     * @return The history.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(long)
      */
-    default CompletableFuture<MessageHistory> getHistoryAfter(int limit, long after) {
-        return ImplMessageHistory.getHistoryAfter(this, limit, after);
+    default CompletableFuture<MessageSet> getMessagesAfter(int limit, long after) {
+        return ImplMessageSet.getMessagesAfter(this, limit, after);
     }
 
     /**
-     * Gets the history of messages after a given message in this channel.
+     * Gets messages in this channel after a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param after Get messages after the message with this id.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterUntil(Predicate<Message> condition, long after) {
+        return ImplMessageSet.getMessagesAfterUntil(this, condition, after);
+    }
+
+    /**
+     * Gets messages in this channel after a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param after Get messages after the message with this id.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterWhile(Predicate<Message> condition, long after) {
+        return ImplMessageSet.getMessagesAfterWhile(this, condition, after);
+    }
+
+    /**
+     * Gets a stream of messages in this channel after a given message in any channel sorted from oldest to newest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param after Get messages after the message with this id.
+     * @return The messages.
+     * @see #getMessagesAfter(int, long)
+     */
+    default Stream<Message> getMessagesAfterAsStream(long after) {
+        return ImplMessageSet.getMessagesAfterAsStream(this, after);
+    }
+
+    /**
+     * Gets up to a given amount of messages in this channel after a given message in any channel.
      *
      * @param limit The limit of messages to get.
      * @param after Get messages after this message.
-     * @return The history.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(Message)
      */
-    default CompletableFuture<MessageHistory> getHistoryAfter(int limit, Message after) {
-        return getHistoryAfter(limit, after.getId());
+    default CompletableFuture<MessageSet> getMessagesAfter(int limit, Message after) {
+        return getMessagesAfter(limit, after.getId());
     }
+
     /**
-     * Gets the history of messages around a given message in this channel.
-     * Half of the message will be older than the given message and half of the message will be newer.
+     * Gets messages in this channel after a given message in any channel until one that meets the given condition is
+     * found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param after Get messages after this message.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterUntil(Predicate<Message> condition, Message after) {
+        return getMessagesAfterUntil(condition, after.getId());
+    }
+
+    /**
+     * Gets messages in this channel after a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param after Get messages after this message.
+     * @return The messages.
+     * @see #getMessagesAfterAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesAfterWhile(Predicate<Message> condition, Message after) {
+        return getMessagesAfterWhile(condition, after.getId());
+    }
+
+    /**
+     * Gets a stream of messages in this channel after a given message in any channel sorted from oldest to newest.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param after Get messages after this message.
+     * @return The stream.
+     * @see #getMessagesAfter(int, Message)
+     */
+    default Stream<Message> getMessagesAfterAsStream(Message after) {
+        return getMessagesAfterAsStream(after.getId());
+    }
+
+    /**
+     * Gets up to a given amount of messages in this channel around a given message in any channel.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and does not count towards the limit.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param limit The limit of messages to get.
      * @param around Get messages around the message with this id.
-     * @return The history.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(long)
      */
-    default CompletableFuture<MessageHistory> getHistoryAround(int limit, long around) {
-        return ImplMessageHistory.getHistoryAround(this, limit, around);
+    default CompletableFuture<MessageSet> getMessagesAround(int limit, long around) {
+        return ImplMessageSet.getMessagesAround(this, limit, around);
     }
 
     /**
-     * Gets the history of messages around a given message in this channel.
-     * Half of the message will be older than the given message and half of the message will be newer.
+     * Gets messages in this channel around a given message in any channel until one that meets the given condition is
+     * found. If no message matches the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param around Get messages around the message with this id.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundUntil(Predicate<Message> condition, long around) {
+        return ImplMessageSet.getMessagesAroundUntil(this, condition, around);
+    }
+
+    /**
+     * Gets messages in this channel around a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The condition that has to be met.
+     * @param around Get messages around the message with this id.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(long)
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundWhile(Predicate<Message> condition, long around) {
+        return ImplMessageSet.getMessagesAroundWhile(this, condition, around);
+    }
+
+    /**
+     * Gets a stream of messages in this channel around a given message in any channel.
+     * The first message in the stream will be the given message if it was sent in this channel.
+     * After that you will always get an older message and a newer message alternating as long as on both sides
+     * messages are available. If only on one side further messages are available, only those are delivered further on.
+     * It's not guaranteed to be perfectly balanced.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param around Get messages around the message with this id.
+     * @return The stream.
+     * @see #getMessagesAround(int, long)
+     */
+    default Stream<Message> getMessagesAroundAsStream(long around) {
+        return ImplMessageSet.getMessagesAroundAsStream(this, around);
+    }
+
+    /**
+     * Gets up to a given amount of messages in this channel around a given message in any channel.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and does not count towards the limit.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param limit The limit of messages to get.
      * @param around Get messages around this message.
-     * @return The history.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(Message)
      */
-    default CompletableFuture<MessageHistory> getHistoryAround(int limit, Message around) {
-        return getHistoryAround(limit, around.getId());
+    default CompletableFuture<MessageSet> getMessagesAround(int limit, Message around) {
+        return getMessagesAround(limit, around.getId());
+    }
+
+    /**
+     * Gets messages in this channel around a given message in any channel until one that meets the given condition is
+     * found. If no message matches the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param around Get messages around this message.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundUntil(Predicate<Message> condition, Message around) {
+        return getMessagesAroundUntil(condition, around.getId());
+    }
+
+    /**
+     * Gets messages in this channel around a given message in any channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     * The given message will be part of the result in addition to the messages around if it was sent in this channel
+     * and is matched against the condition and will abort retrieval.
+     * Half of the messages will be older than the given message and half of the messages will be newer.
+     * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
+     * It's also not guaranteed to be perfectly balanced.
+     *
+     * @param condition The condition that has to be met.
+     * @param around Get messages around this message.
+     * @return The messages.
+     * @see #getMessagesAroundAsStream(Message)
+     */
+    default CompletableFuture<MessageSet> getMessagesAroundWhile(Predicate<Message> condition, Message around) {
+        return getMessagesAroundWhile(condition, around.getId());
+    }
+
+    /**
+     * Gets a stream of messages in this channel around a given message in any channel.
+     * The first message in the stream will be the given message if it was sent in this channel.
+     * After that you will always get an older message and a newer message alternating as long as on both sides
+     * messages are available. If only on one side further messages are available, only those are delivered further on.
+     * It's not guaranteed to be perfectly balanced.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param around Get messages around this message.
+     * @return The stream.
+     * @see #getMessagesAround(int, Message)
+     */
+    default Stream<Message> getMessagesAroundAsStream(Message around) {
+        return getMessagesAroundAsStream(around.getId());
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries.
+     *
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(long from, long to) {
+        return ImplMessageSet.getMessagesBetween(this, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(Predicate<Message> condition, long from, long to) {
+        return ImplMessageSet.getMessagesBetweenUntil(this, condition, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(Predicate<Message> condition, long from, long to) {
+        return ImplMessageSet.getMessagesBetweenWhile(this, condition, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, sorted from first given message to the second given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param from The id of the start boundary messages.
+     * @param to The id of the other boundary messages.
+     * @return The stream.
+     * @see #getMessagesBetween(long, long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(long from, long to) {
+        return ImplMessageSet.getMessagesBetweenAsStream(this, from, to);
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries.
+     *
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetween(Message from, Message to) {
+        return getMessagesBetween(from.getId(), to.getId());
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenUntil(
+            Predicate<Message> condition, Message from, Message to) {
+        return getMessagesBetweenUntil(condition, from.getId(), to.getId());
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param condition The condition that has to be met.
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The messages.
+     * @see #getMessagesBetweenAsStream(long, long)
+     */
+    default CompletableFuture<MessageSet> getMessagesBetweenWhile(
+            Predicate<Message> condition, Message from, Message to) {
+        return getMessagesBetweenWhile(condition, from.getId(), to.getId());
+    }
+
+    /**
+     * Gets all messages in this channel between the first given message in any channel and the second given message in
+     * any channel, excluding the boundaries, sorted from first given message to the second given message.
+     * <p>
+     * The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param from The start boundary messages.
+     * @param to The other boundary messages.
+     * @return The stream.
+     * @see #getMessagesBetween(long, long)
+     */
+    default Stream<Message> getMessagesBetweenAsStream(Message from, Message to) {
+        return getMessagesBetweenAsStream(from.getId(), to.getId());
     }
 
     /**

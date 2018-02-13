@@ -15,9 +15,11 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.impl.ImplActivity;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
@@ -921,12 +923,12 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public Collection<Message> getCachedMessages() {
+    public MessageSet getCachedMessages() {
         synchronized (messages) {
-            return messages.values().stream()
-                    .map(Reference::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+            return new ImplMessageSet(messages.values().stream()
+                                              .map(Reference::get)
+                                              .filter(Objects::nonNull)
+                                              .collect(Collectors.toList()));
         }
     }
 
