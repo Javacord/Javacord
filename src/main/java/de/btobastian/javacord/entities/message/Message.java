@@ -447,14 +447,10 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         while (customEmoji.find()) {
             getServer().ifPresent(server -> {
                 String id = customEmoji.group("id");
-                Optional<CustomEmoji> maybeEmoji = server.getCustomEmojiById(id);
-                if (maybeEmoji.isPresent()) {
-                    emojis.add(maybeEmoji.get());
-                } else {
-                    emojis.add(new ImplCustomEmoji((ImplDiscordApi) getApi(), null, Long.parseLong(id),
-                            customEmoji.group("name"),
-                            customEmoji.group(0).charAt(1) == 'a'));
-                }
+                CustomEmoji emoji = server.getCustomEmojiById(id)
+                        .orElseGet(() -> new ImplCustomEmoji((ImplDiscordApi) getApi(), null, Long.parseLong(id),
+                                customEmoji.group("name"), customEmoji.group(0).charAt(1) == 'a'));
+                emojis.add(emoji);
             });
         }
         return emojis;
