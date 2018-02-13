@@ -66,13 +66,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -104,9 +103,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private final HashMap<String, PacketHandler> handlers = new HashMap<>();
     private final CompletableFuture<Boolean> ready = new CompletableFuture<>();
 
-    private WebSocket websocket = null;
+    private final AtomicReference<WebSocket> websocket = new AtomicReference<>();
 
-    private Timer heartbeatTimer = null;
+    private final AtomicReference<Future<?>> heartbeatTimer = new AtomicReference<>();
     private final AtomicBoolean heartbeatAckReceived = new AtomicBoolean();
 
     private int lastSeq = -1;
@@ -208,7 +207,14 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     public void disconnect() {
         reconnect = false;
-        websocket.sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
+        websocket.get().sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
+        // cancel heartbeat timer if within one minute no disconnect event was dispatched
+        api.getThreadPool().getScheduler().schedule(() -> heartbeatTimer.updateAndGet(future -> {
+            if (future != null) {
+                future.cancel(false);
+            }
+            return null;
+        }), 1, TimeUnit.MINUTES);
     }
 
     /**
@@ -222,8 +228,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             logger.warn("An error occurred while setting ssl context", e);
         }
         try {
-            websocket = factory.createSocket(
+            WebSocket websocket = factory.createSocket(
                     getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION);
+            this.websocket.set(websocket);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
             waitForIdentifyRateLimit();
@@ -313,12 +320,14 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             return;
         }
 
-        // Reconnect
-        if (heartbeatTimer != null) {
-            heartbeatTimer.cancel();
-            heartbeatTimer = null;
-        }
+        heartbeatTimer.updateAndGet(future -> {
+            if (future != null) {
+                future.cancel(false);
+            }
+            return null;
+        });
 
+        // Reconnect
         if (reconnect) {
             reconnectAttempt++;
             logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
@@ -429,7 +438,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
                 JsonNode data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
-                heartbeatTimer = startHeartbeat(websocket, heartbeatInterval);
+                heartbeatTimer.updateAndGet(future -> {
+                    if (future != null) {
+                        future.cancel(false);
+                    }
+                    return startHeartbeat(websocket, heartbeatInterval);
+                });
 
                 if (sessionId == null) {
                     sendIdentify(websocket);
@@ -482,23 +496,18 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * @param heartbeatInterval The heartbeat interval.
      * @return The timer used for the heartbeat.
      */
-    private Timer startHeartbeat(final WebSocket websocket, final int heartbeatInterval) {
+    private Future<?> startHeartbeat(final WebSocket websocket, final int heartbeatInterval) {
         // first heartbeat should assume last heartbeat was answered properly
         heartbeatAckReceived.set(true);
-        final Timer timer = new Timer(true);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (heartbeatAckReceived.getAndSet(false)) {
-                    sendHeartbeat(websocket);
-                    logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
-                } else {
-                    websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
-                                        WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
-                }
+        return api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+            if (heartbeatAckReceived.getAndSet(false)) {
+                sendHeartbeat(websocket);
+                logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
+            } else {
+                websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
+                                    WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
             }
-        }, 0, heartbeatInterval);
-        return timer;
+        }, 0, heartbeatInterval, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -651,7 +660,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * @return The websocket of the adapter.
      */
     public WebSocket getWebSocket() {
-        return websocket;
+        return websocket.get();
     }
 
     /**
@@ -696,7 +705,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         activityJson.put("type", activity.map(g -> g.getType().getId()).orElse(0));
         activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
         logger.debug("Updating status (content: {})", updateStatus.toString());
-        websocket.sendText(updateStatus.toString());
+        websocket.get().sendText(updateStatus.toString());
     }
 
     @Override
