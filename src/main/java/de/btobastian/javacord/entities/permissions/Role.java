@@ -11,6 +11,7 @@ import de.btobastian.javacord.listeners.server.role.RoleAttachableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
@@ -290,6 +291,27 @@ public interface Role extends DiscordEntity, Mentionable {
      */
     default List<RoleChangeManagedListener> getRoleChangeManagedListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangeManagedListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to mentionable changes of this role.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeMentionableListener> addRoleChangeMentionableListener(
+            RoleChangeMentionableListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Role.class, getId(), RoleChangeMentionableListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change mentionable listeners.
+     *
+     * @return A list with all registered role change mentionable listeners.
+     */
+    default List<RoleChangeMentionableListener> getRoleChangeMentionableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangeMentionableListener.class);
     }
 
     /**

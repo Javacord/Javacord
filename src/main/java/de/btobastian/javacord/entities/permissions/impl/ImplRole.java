@@ -150,6 +150,15 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Sets the mentionable flag of the role.
+     *
+     * @param mentionable The mentionable flag to set.
+     */
+    public void setMentionable(boolean mentionable) {
+        this.mentionable = mentionable;
+    }
+
+    /**
      * Sets the permissions of the role.
      *
      * @param permissions The permissions to set.

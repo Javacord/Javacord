@@ -8,11 +8,13 @@ import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.events.server.role.RoleChangeColorEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeHoistEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeManagedEvent;
+import de.btobastian.javacord.events.server.role.RoleChangeMentionableEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePermissionsEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePositionEvent;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -85,6 +87,21 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getRoleChangeManagedListeners());
 
                 dispatchEvent(listeners, listener -> listener.onRoleChangeManaged(event));
+            }
+
+            boolean oldMentionable = role.isMentionable();
+            boolean newMentionable = roleJson.get("mentionable").asBoolean(false);
+            if (oldMentionable != newMentionable) {
+                role.setMentionable(newMentionable);
+
+                RoleChangeMentionableEvent event = new RoleChangeMentionableEvent(api, role, oldMentionable);
+
+                List<RoleChangeMentionableListener> listeners = new ArrayList<>();
+                listeners.addAll(role.getRoleChangeMentionableListeners());
+                listeners.addAll(role.getServer().getRoleChangeMentionableListeners());
+                listeners.addAll(api.getRoleChangeMentionableListeners());
+
+                dispatchEvent(listeners, listener -> listener.onRoleChangeMentionable(event));
             }
 
             Permissions oldPermissions = role.getPermissions();
