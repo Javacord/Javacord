@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleAttachableListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
@@ -229,6 +230,26 @@ public interface Role extends DiscordEntity, Mentionable {
     }
 
     /**
+     * Adds a listener, which listens to color changes of this role.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Role.class, getId(), RoleChangeColorListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change color listeners.
+     *
+     * @return A list with all registered role change color listeners.
+     */
+    default List<RoleChangeColorListener> getRoleChangeColorListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangeColorListener.class);
+    }
+
+    /**
      * Adds a listener, which listens to permission changes of this role.
      *
      * @param listener The listener to add.
@@ -245,7 +266,7 @@ public interface Role extends DiscordEntity, Mentionable {
      *
      * @return A list with all registered role change permissions listeners.
      */
-    default java.util.List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
+    default List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangePermissionsListener.class);
     }
 

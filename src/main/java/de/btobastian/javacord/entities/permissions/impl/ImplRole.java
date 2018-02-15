@@ -114,6 +114,24 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Gets the color of the role as {@code int}.
+     *
+     * @return The color of the role as {@code int}.
+     */
+    public int getColorAsInt() {
+        return color;
+    }
+
+    /**
+     * Sets the color of the role.
+     *
+     * @param color The color to set.
+     */
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    /**
      * Sets the permissions of the role.
      *
      * @param permissions The permissions to set.

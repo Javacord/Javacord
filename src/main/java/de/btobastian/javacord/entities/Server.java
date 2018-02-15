@@ -58,6 +58,7 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
@@ -2033,6 +2034,26 @@ public interface Server extends DiscordEntity {
      */
     default List<UserChangeStatusListener> getUserChangeStatusListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeStatusListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to role color changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), RoleChangeColorListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change color listeners.
+     *
+     * @return A list with all registered role change color listeners.
+     */
+    default List<RoleChangeColorListener> getRoleChangeColorListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeColorListener.class);
     }
 
     /**

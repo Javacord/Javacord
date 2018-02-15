@@ -67,6 +67,7 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
@@ -1947,6 +1948,21 @@ public interface DiscordApi {
      * @return A list with all registered user change status listeners.
      */
     List<UserChangeStatusListener> getUserChangeStatusListeners();
+
+    /**
+     * Adds a listener, which listens to role color changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener);
+
+    /**
+     * Gets a list with all registered role change color listeners.
+     *
+     * @return A list with all registered role change color listeners.
+     */
+    List<RoleChangeColorListener> getRoleChangeColorListeners();
 
     /**
      * Adds a listener, which listens to role permission changes.
