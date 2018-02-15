@@ -132,6 +132,15 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Sets the hoist flag of the role.
+     *
+     * @param hoist The hoist flag to set.
+     */
+    public void setHoist(boolean hoist) {
+        this.hoist = hoist;
+    }
+
+    /**
      * Sets the permissions of the role.
      *
      * @param permissions The permissions to set.

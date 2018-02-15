@@ -6,9 +6,11 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.events.server.role.RoleChangeColorEvent;
+import de.btobastian.javacord.events.server.role.RoleChangeHoistEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePermissionsEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePositionEvent;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -51,6 +53,21 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getRoleChangeColorListeners());
 
                 dispatchEvent(listeners, listener -> listener.onRoleChangeColor(event));
+            }
+
+            boolean oldHoist = role.isDisplayedSeparately();
+            boolean newHoist = roleJson.get("hoist").asBoolean(false);
+            if (oldHoist != newHoist) {
+                role.setHoist(newHoist);
+
+                RoleChangeHoistEvent event = new RoleChangeHoistEvent(api, role, oldHoist);
+
+                List<RoleChangeHoistListener> listeners = new ArrayList<>();
+                listeners.addAll(role.getRoleChangeHoistListeners());
+                listeners.addAll(role.getServer().getRoleChangeHoistListeners());
+                listeners.addAll(api.getRoleChangeHoistListeners());
+
+                dispatchEvent(listeners, listener -> listener.onRoleChangeHoist(event));
             }
 
             Permissions oldPermissions = role.getPermissions();

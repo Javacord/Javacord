@@ -9,6 +9,7 @@ import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleAttachableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
@@ -247,6 +248,26 @@ public interface Role extends DiscordEntity, Mentionable {
      */
     default List<RoleChangeColorListener> getRoleChangeColorListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangeColorListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to hoist changes of this role.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeHoistListener> addRoleChangeHoistListener(RoleChangeHoistListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Role.class, getId(), RoleChangeHoistListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change hoist listeners.
+     *
+     * @return A list with all registered role change hoist listeners.
+     */
+    default List<RoleChangeHoistListener> getRoleChangeHoistListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangeHoistListener.class);
     }
 
     /**
