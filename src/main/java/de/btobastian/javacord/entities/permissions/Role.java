@@ -10,6 +10,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwr
 import de.btobastian.javacord.listeners.server.role.RoleAttachableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
@@ -268,6 +269,27 @@ public interface Role extends DiscordEntity, Mentionable {
      */
     default List<RoleChangeHoistListener> getRoleChangeHoistListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangeHoistListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to managed flag changes of this role.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeManagedListener> addRoleChangeManagedListener(
+            RoleChangeManagedListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Role.class, getId(), RoleChangeManagedListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change managed flag listeners.
+     *
+     * @return A list with all registered role change managed flag listeners.
+     */
+    default List<RoleChangeManagedListener> getRoleChangeManagedListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId(), RoleChangeManagedListener.class);
     }
 
     /**

@@ -141,6 +141,15 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Sets the managed flag of the role.
+     *
+     * @param managed The managed flag to set.
+     */
+    public void setManaged(boolean managed) {
+        this.managed = managed;
+    }
+
+    /**
      * Sets the permissions of the role.
      *
      * @param permissions The permissions to set.
