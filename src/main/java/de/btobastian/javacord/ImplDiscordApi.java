@@ -25,7 +25,6 @@ import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
-import de.btobastian.javacord.listeners.message.MessageAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -73,7 +72,6 @@ import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
-import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
@@ -725,30 +723,6 @@ public class ImplDiscordApi implements DiscordApi {
         }
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(long messageId, T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(MessageAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> addObjectListener(Message.class, messageId, listenerClass, listener))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener>  void removeMessageAttachableListener(
-            long messageId, Class<T> listenerClass, T listener) {
-        removeObjectListener(Message.class, messageId, listenerClass, listener);
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>> getMessageAttachableListeners(
-            long messageId) {
-        return getObjectListeners(Message.class, messageId);
-    }
-
     /**
      * Gets a map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and their
      * assigned listener classes they listen to.
@@ -1244,19 +1218,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(
-            long messageId, MessageDeleteListener listener) {
-        return addObjectListener(Message.class, messageId, MessageDeleteListener.class, listener);
-    }
-
-    @Override
     public List<MessageDeleteListener> getMessageDeleteListeners() {
         return getListeners(MessageDeleteListener.class);
-    }
-
-    @Override
-    public List<MessageDeleteListener> getMessageDeleteListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, MessageDeleteListener.class);
     }
 
     @Override
@@ -1265,18 +1228,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener) {
-        return addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
-    }
-
-    @Override
     public List<MessageEditListener> getMessageEditListeners() {
         return getListeners(MessageEditListener.class);
-    }
-
-    @Override
-    public List<MessageEditListener> getMessageEditListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, MessageEditListener.class);
     }
 
     @Override
@@ -1285,18 +1238,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener) {
-        return addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
-    }
-
-    @Override
     public List<ReactionAddListener> getReactionAddListeners() {
         return getListeners(ReactionAddListener.class);
-    }
-
-    @Override
-    public List<ReactionAddListener> getReactionAddListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, ReactionAddListener.class);
     }
 
     @Override
@@ -1305,19 +1248,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(
-            long messageId, ReactionRemoveListener listener) {
-        return addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
-    }
-
-    @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getListeners(ReactionRemoveListener.class);
-    }
-
-    @Override
-    public List<ReactionRemoveListener> getReactionRemoveListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, ReactionRemoveListener.class);
     }
 
     @Override
@@ -1326,19 +1258,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
-            long messageId, ReactionRemoveAllListener listener) {
-        return addObjectListener(Message.class, messageId, ReactionRemoveAllListener.class, listener);
-    }
-
-    @Override
     public List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
         return getListeners(ReactionRemoveAllListener.class);
-    }
-
-    @Override
-    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, ReactionRemoveAllListener.class);
     }
 
     @Override

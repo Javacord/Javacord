@@ -28,14 +28,12 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.GloballyAttachableListener;
-import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
-import de.btobastian.javacord.listeners.message.MessageAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -100,7 +98,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1560,63 +1557,11 @@ public interface DiscordApi {
     ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener);
 
     /**
-     * Adds a listener, which listens to message deletions of a specific message.
-     *
-     * @param message The message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    default ListenerManager<MessageDeleteListener> addMessageDeleteListener(
-            Message message, MessageDeleteListener listener) {
-        return addMessageDeleteListener(message.getId(), listener);
-    }
-
-    /**
-     * Adds a listener, which listens to message deletions of a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<MessageDeleteListener> addMessageDeleteListener(long messageId, MessageDeleteListener listener);
-
-    /**
      * Gets a list with all registered message delete listeners.
      *
      * @return A list with all registered message delete listeners.
      */
     List<MessageDeleteListener> getMessageDeleteListeners();
-
-    /**
-     * Gets a list with all registered message delete listeners of a specific message.
-     *
-     * @param message The message.
-     * @return A list with all registered message delete listeners.
-     */
-    default List<MessageDeleteListener> getMessageDeleteListeners(Message message) {
-        return getMessageDeleteListeners(message.getId());
-    }
-
-    /**
-     * Gets a list with all registered message delete listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered message delete listeners.
-     */
-    List<MessageDeleteListener> getMessageDeleteListeners(long messageId);
-
-    /**
-     * Gets a list with all registered message delete listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered message delete listeners.
-     */
-    default List<MessageDeleteListener> getMessageDeleteListeners(String messageId) {
-        try {
-            return getMessageDeleteListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) { }
-        return Collections.emptyList();
-    }
 
     /**
      * Adds a listener, which listens to message edits.
@@ -1627,50 +1572,11 @@ public interface DiscordApi {
     ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener);
 
     /**
-     * Adds a listener, which listens to message edits of a specific message.
-     *
-     * @param message The message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    default ListenerManager<MessageEditListener> addMessageEditListener(
-            Message message, MessageEditListener listener) {
-        return addMessageEditListener(message.getId(), listener);
-    }
-
-    /**
-     * Adds a listener, which listens to message edits of a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener);
-
-    /**
      * Gets a list with all registered message edit listeners.
      *
      * @return A list with all registered message edit listeners.
      */
     List<MessageEditListener> getMessageEditListeners();
-
-    /**
-     * Gets a list with all registered message edit listeners of a specific message.
-     *
-     * @param message The message.
-     * @return A list with all registered message edit listeners.
-     */
-    default List<MessageEditListener> getMessageEditListeners(Message message) {
-        return getMessageEditListeners(message.getId());
-    }
-
-    /**
-     * Gets a list with all registered message edit listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered message edit listeners.
-     */
-    List<MessageEditListener> getMessageEditListeners(long messageId);
 
     /**
      * Adds a listener, which listens to reactions being added.
@@ -1681,62 +1587,11 @@ public interface DiscordApi {
     ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener);
 
     /**
-     * Adds a listener, which listens to reactions being added to a specific message.
-     *
-     * @param message The message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    default ListenerManager<ReactionAddListener> addReactionAddListener(Message message, ReactionAddListener listener) {
-        return addReactionAddListener(message.getId(), listener);
-    }
-
-    /**
-     * Adds a listener, which listens to reactions being added to a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener);
-
-    /**
      * Gets a list with all registered reaction add listeners.
      *
      * @return A list with all registered reaction add listeners.
      */
     List<ReactionAddListener> getReactionAddListeners();
-
-    /**
-     * Gets a list with all registered reaction add listeners of a specific message.
-     *
-     * @param message The message.
-     * @return A list with all registered reaction add listeners.
-     */
-    default List<ReactionAddListener> getReactionAddListeners(Message message) {
-        return getReactionAddListeners(message.getId());
-    }
-
-    /**
-     * Gets a list with all registered reaction add listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered reaction add listeners.
-     */
-    List<ReactionAddListener> getReactionAddListeners(long messageId);
-
-    /**
-     * Gets a list with all registered reaction add listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered reaction add listeners.
-     */
-    default List<ReactionAddListener> getReactionAddListeners(String messageId) {
-        try {
-            return getReactionAddListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) { }
-        return Collections.emptyList();
-    }
 
     /**
      * Adds a listener, which listens to reactions being removed.
@@ -1747,63 +1602,11 @@ public interface DiscordApi {
     ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener);
 
     /**
-     * Adds a listener, which listens to reactions being removed from a specific message.
-     *
-     * @param message The message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    default ListenerManager<ReactionRemoveListener> addReactionRemoveListener(
-            Message message, ReactionRemoveListener listener) {
-        return addReactionRemoveListener(message.getId(), listener);
-    }
-
-    /**
-     * Adds a listener, which listens to reactions being removed from a specific message.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(long messageId, ReactionRemoveListener listener);
-
-    /**
      * Gets a list with all registered reaction remove listeners.
      *
      * @return A list with all registered reaction remove listeners.
      */
     List<ReactionRemoveListener> getReactionRemoveListeners();
-
-    /**
-     * Gets a list with all registered reaction remove listeners of a specific message.
-     *
-     * @param message The message.
-     * @return A list with all registered reaction remove listeners.
-     */
-    default List<ReactionRemoveListener> getReactionRemoveListeners(Message message) {
-        return getReactionRemoveListeners(message.getId());
-    }
-
-    /**
-     * Gets a list with all registered reaction remove listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered reaction remove listeners.
-     */
-    List<ReactionRemoveListener> getReactionRemoveListeners(long messageId);
-
-    /**
-     * Gets a list with all registered reaction remove listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered reaction remove listeners.
-     */
-    default List<ReactionRemoveListener> getReactionRemoveListeners(String messageId) {
-        try {
-            return getReactionRemoveListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) { }
-        return Collections.emptyList();
-    }
 
     /**
      * Adds a listener, which listens to all reactions being removed at once.
@@ -1814,63 +1617,11 @@ public interface DiscordApi {
     ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(ReactionRemoveAllListener listener);
 
     /**
-     * Adds a listener, which listens to all reactions being removed from a specific message at once.
-     *
-     * @param message The message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    default ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
-            Message message, ReactionRemoveAllListener listener) {
-        return addReactionRemoveAllListener(message.getId(), listener);
-    }
-
-    /**
-     * Adds a listener, which listens to all reactions being removed from a specific message at once.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(long messageId, ReactionRemoveAllListener listener);
-
-    /**
      * Gets a list with all registered reaction remove all listeners.
      *
      * @return A list with all registered reaction remove all listeners.
      */
     List<ReactionRemoveAllListener> getReactionRemoveAllListeners();
-
-    /**
-     * Gets a list with all registered reaction remove all listeners of a specific message.
-     *
-     * @param message The message.
-     * @return A list with all registered reaction remove all listeners.
-     */
-    default List<ReactionRemoveAllListener> getReactionRemoveAllListeners(Message message) {
-        return getReactionRemoveAllListeners(message.getId());
-    }
-
-    /**
-     * Gets a list with all registered reaction remove all listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered reaction remove all listeners.
-     */
-    List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId);
-
-    /**
-     * Gets a list with all registered reaction remove all listeners of a specific message.
-     *
-     * @param messageId The id of the message.
-     * @return A list with all registered reaction remove all listeners.
-     */
-    default List<ReactionRemoveAllListener> getReactionRemoveAllListeners(String messageId) {
-        try {
-            return getReactionRemoveAllListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) { }
-        return Collections.emptyList();
-    }
 
     /**
      * Adds a listener, which listens to users joining servers.
@@ -2475,114 +2226,5 @@ public interface DiscordApi {
      * their assigned listener classes they listen to.
      */
     <T extends GloballyAttachableListener> Map<T, List<Class<T>>> getListeners();
-
-    /**
-     * Adds a listener that implements one or more {@code MessageAttachableListener}s to the message with the given id.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param messageId The id of the message which should be listened to.
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(long messageId, T listener);
-
-    /**
-     * Adds a listener that implements one or more {@code MessageAttachableListener}s to the given message.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param message The message which should be listened to.
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    default <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(Message message, T listener) {
-        return addMessageAttachableListener(message.getId(), listener);
-    }
-
-    /**
-     * Removes a {@code MessageAttachableListener} from the message with the given id.
-     *
-     * @param messageId The id of the message.
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
-            long messageId, Class<T> listenerClass, T listener);
-
-    /**
-     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the given message.
-     *
-     * @param message The message.
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
-            Message message, Class<T> listenerClass, T listener) {
-        removeMessageAttachableListener(message.getId(), listenerClass, listener);
-    }
-
-    /**
-     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the message with the given id.
-     *
-     * @param messageId The id of the message.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    @SuppressWarnings("unchecked")
-    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
-            long messageId, T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(MessageAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> removeMessageAttachableListener(messageId, listenerClass, listener));
-    }
-
-    /**
-     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the given message.
-     *
-     * @param message The message.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
-            Message message, T listener) {
-        removeMessageAttachableListener(message.getId(), listener);
-    }
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
-     * assigned listener classes they listen to for the message with the given id.
-     *
-     * @param messageId The id of the message.
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
-     * their assigned listener classes they listen to.
-     */
-    <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(long messageId);
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
-     * assigned listener classes they listen to for the given message.
-     *
-     * @param message The message.
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
-     * their assigned listener classes they listen to.
-     */
-    default <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(Message message) {
-        return getMessageAttachableListeners(message.getId());
-    }
 
 }

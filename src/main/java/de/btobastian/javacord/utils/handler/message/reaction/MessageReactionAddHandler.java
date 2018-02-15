@@ -50,7 +50,7 @@ public class MessageReactionAddHandler extends PacketHandler {
             ReactionAddEvent event = new ReactionAddEvent(api, messageId, channel, emoji, user);
 
             List<ReactionAddListener> listeners = new ArrayList<>();
-            listeners.addAll(api.getReactionAddListeners(messageId));
+            listeners.addAll(Message.getReactionAddListeners(api, messageId));
             listeners.addAll(channel.getReactionAddListeners());
             if (channel instanceof ServerTextChannel) {
                 listeners.addAll(((ServerTextChannel) channel).getServer().getReactionAddListeners());

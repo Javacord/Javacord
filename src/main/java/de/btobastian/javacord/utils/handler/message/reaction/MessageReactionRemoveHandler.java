@@ -50,7 +50,7 @@ public class MessageReactionRemoveHandler extends PacketHandler {
             ReactionRemoveEvent event = new ReactionRemoveEvent(api, messageId, channel, emoji, user);
 
             List<ReactionRemoveListener> listeners = new ArrayList<>();
-            listeners.addAll(api.getReactionRemoveListeners(messageId));
+            listeners.addAll(Message.getReactionRemoveListeners(api, messageId));
             listeners.addAll(channel.getReactionRemoveListeners());
             if (channel instanceof ServerTextChannel) {
                 listeners.addAll(((ServerTextChannel) channel).getServer().getReactionRemoveListeners());
