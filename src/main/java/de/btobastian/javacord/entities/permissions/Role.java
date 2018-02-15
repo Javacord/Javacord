@@ -5,12 +5,15 @@ import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listeners.server.role.RoleAttachableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleDeleteListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
+import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
@@ -19,6 +22,8 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -348,13 +353,66 @@ public interface Role extends DiscordEntity, Mentionable {
     }
 
     /**
+     * Adds a listener that implements one or more {@code RoleAttachableListener}s.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends RoleAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addRoleAttachableListener(T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(RoleAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(Role.class, getId(),
+                                                                                    listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code RoleAttachableListener}s.
+     *
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends RoleAttachableListener & ObjectAttachableListener> void removeRoleAttachableListener(
+            T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(RoleAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(Role.class, getId(),
+                                                                                           listenerClass, listener));
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code RoleAttachableListener}s and their
+     * assigned listener classes they listen to.
+     *
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code RoleAttachableListener}s and their
+     * assigned listener classes they listen to.
+     */
+    default <T extends RoleAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getRoleAttachableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Role.class, getId());
+    }
+
+    /**
      * Removes a listener from this role.
      *
      * @param listenerClass The listener class.
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T> void removeListener(Class<T> listenerClass, T listener) {
+    default <T extends RoleAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(Role.class, getId(), listenerClass, listener);
     }
 

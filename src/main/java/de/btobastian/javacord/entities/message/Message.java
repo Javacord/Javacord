@@ -20,6 +20,8 @@ import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
+import de.btobastian.javacord.listeners.message.MessageAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
@@ -34,7 +36,9 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
@@ -1272,8 +1276,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
             ReactionRemoveAllListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Message.class, getId(), ReactionRemoveAllListener.class, listener);
+        return getApi().addReactionRemoveAllListener(getId(), listener);
     }
 
     /**
@@ -1282,7 +1285,48 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A list with all registered reaction remove all listeners.
      */
     default List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), ReactionRemoveAllListener.class);
+        return getApi().getReactionRemoveAllListeners(getId());
+    }
+
+    /**
+     * Adds a listener that implements one or more {@code MessageAttachableListener}s.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(T listener) {
+        return getApi().addMessageAttachableListener(getId(), listener);
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s.
+     *
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            T listener) {
+        getApi().removeMessageAttachableListener(getId(), listener);
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
+     * assigned listener classes they listen to.
+     *
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    default <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners() {
+        return getApi().getMessageAttachableListeners(getId());
     }
 
     /**
@@ -1292,8 +1336,9 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T> void removeListener(Class<T> listenerClass, T listener) {
-        ((ImplDiscordApi) getApi()).removeObjectListener(Message.class, getId(), listenerClass, listener);
+    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        getApi().removeMessageAttachableListener(getId(), listenerClass, listener);
     }
 
 }

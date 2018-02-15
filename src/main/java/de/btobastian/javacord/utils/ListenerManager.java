@@ -2,6 +2,8 @@ package de.btobastian.javacord.utils;
 
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.listeners.GloballyAttachableListener;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +88,15 @@ public class ListenerManager<T> {
     }
 
     /**
+     * Gets the listener class context for the managed listener.
+     *
+     * @return The listener class context for the managed listener.
+     */
+    public Class<T> getListenerClass() {
+        return listenerClass;
+    }
+
+    /**
      * Gets the managed listener.
      *
      * @return The managed listener.
@@ -129,11 +140,15 @@ public class ListenerManager<T> {
      *
      * @return The current instance in order to chain call methods.
      */
+    @SuppressWarnings("unchecked")
     public ListenerManager<T> remove() {
         if (isGlobalListener()) {
-            api.removeListener(listenerClass, listener);
+            api.removeListener(
+                    (Class<GloballyAttachableListener>) listenerClass, (GloballyAttachableListener) listener);
         } else {
-            api.removeObjectListener(assignedObjectClass, objectId, listenerClass, listener);
+            api.removeObjectListener(
+                    assignedObjectClass, objectId, (Class<ObjectAttachableListener>) listenerClass,
+                    (ObjectAttachableListener) listener);
         }
         return this;
     }

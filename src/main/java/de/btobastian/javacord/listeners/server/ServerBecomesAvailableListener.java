@@ -1,6 +1,7 @@
 package de.btobastian.javacord.listeners.server;
 
 import de.btobastian.javacord.events.server.ServerBecomesAvailableEvent;
+import de.btobastian.javacord.listeners.GloballyAttachableListener;
 
 /**
  * This listener listens to servers becoming unavailable.
@@ -9,7 +10,7 @@ import de.btobastian.javacord.events.server.ServerBecomesAvailableEvent;
  * @see <a href="https://discordapp.com/developers/docs/topics/gateway#guild-unavailability">Discord docs</a>
  */
 @FunctionalInterface
-public interface ServerBecomesAvailableListener {
+public interface ServerBecomesAvailableListener extends GloballyAttachableListener {
 
     /**
      * This method is called every time a server became unavailable.

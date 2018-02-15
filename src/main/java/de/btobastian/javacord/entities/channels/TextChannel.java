@@ -14,6 +14,8 @@ import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
 import de.btobastian.javacord.entities.permissions.PermissionType;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
+import de.btobastian.javacord.listeners.TextChannelAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -21,6 +23,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.NonThrowingAutoCloseable;
 import de.btobastian.javacord.utils.cache.MessageCache;
@@ -35,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -1339,13 +1343,66 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Adds a listener that implements one or more {@code TextChannelAttachableListener}s.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends TextChannelAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addTextChannelAttachableListener(T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(TextChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(TextChannel.class, getId(),
+                                                                                    listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code TextChannelAttachableListener}s.
+     *
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends TextChannelAttachableListener & ObjectAttachableListener> void
+    removeTextChannelAttachableListener(T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(TextChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(TextChannel.class, getId(),
+                                                                                           listenerClass, listener));
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code TextChannelAttachableListener}s and
+     * their assigned listener classes they listen to.
+     *
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code TextChannelAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    default <T extends TextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getTextChannelAttachableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId());
+    }
+
+    /**
      * Removes a listener from this text channel.
      *
      * @param listenerClass The listener class.
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T> void removeListener(Class<T> listenerClass, T listener) {
+    default <T extends TextChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(TextChannel.class, getId(), listenerClass, listener);
     }
 

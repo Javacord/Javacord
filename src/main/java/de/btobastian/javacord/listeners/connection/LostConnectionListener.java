@@ -1,6 +1,7 @@
 package de.btobastian.javacord.listeners.connection;
 
 import de.btobastian.javacord.events.connection.LostConnectionEvent;
+import de.btobastian.javacord.listeners.GloballyAttachableListener;
 
 /**
  * This listener listens to lost connections.
@@ -9,7 +10,7 @@ import de.btobastian.javacord.events.connection.LostConnectionEvent;
  * to resume the session without missing any events!
  */
 @FunctionalInterface
-public interface LostConnectionListener {
+public interface LostConnectionListener extends GloballyAttachableListener {
 
     /**
      * This method is called every time a connection is lost.

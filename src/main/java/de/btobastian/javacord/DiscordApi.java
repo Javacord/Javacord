@@ -27,12 +27,15 @@ import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.GloballyAttachableListener;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
+import de.btobastian.javacord.listeners.message.MessageAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -80,6 +83,7 @@ import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
+import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
@@ -99,6 +103,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -2406,34 +2411,178 @@ public interface DiscordApi {
     List<UserChangeAvatarListener> getUserChangeAvatarListeners();
 
     /**
-     * Removes a global listener.
+     * Adds a {@code GloballyAttachableListener}.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener manager on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The manager for the added listener.
+     */
+    <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener);
+
+    /**
+     * Adds a listener that implements one or more {@code GloballyAttachableListener}s.
+     * Adding a listener multiple times will only add it once
+     * and return the same set of listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     * @return The managers for the added listener.
+     */
+    @SuppressWarnings("unchecked")
+    default Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(
+            GloballyAttachableListener listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(GloballyAttachableListener.class::isAssignableFrom)
+                .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
+                .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
+                .map(listenerClass -> addListener(listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes a {@code GloballyAttachableListener}.
      *
      * @param listenerClass The listener class.
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    <T> void removeListener(Class<T> listenerClass, T listener);
+    <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener);
 
     /**
-     * Removes a listener from the message with the given id.
+     * Removes a listener that implements one or more {@code GloballyAttachableListener}s.
+     *
+     * @param listener The listener to remove.
+     */
+    @SuppressWarnings("unchecked")
+    default void removeListener(GloballyAttachableListener listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(GloballyAttachableListener.class::isAssignableFrom)
+                .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
+                .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
+                .forEach(listenerClass -> removeListener(listenerClass, listener));
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code GloballyAttachableListener}s and their
+     * assigned listener classes they listen to.
+     *
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code GloballyAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    <T extends GloballyAttachableListener> Map<T, List<Class<T>>> getListeners();
+
+    /**
+     * Adds a listener that implements one or more {@code MessageAttachableListener}s to the message with the given id.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(long messageId, T listener);
+
+    /**
+     * Adds a listener that implements one or more {@code MessageAttachableListener}s to the given message.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    default <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(Message message, T listener) {
+        return addMessageAttachableListener(message.getId(), listener);
+    }
+
+    /**
+     * Removes a {@code MessageAttachableListener} from the message with the given id.
      *
      * @param messageId The id of the message.
      * @param listenerClass The listener class.
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    <T> void removeListenerFromMessage(long messageId, Class<T> listenerClass, T listener);
+    <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            long messageId, Class<T> listenerClass, T listener);
 
     /**
-     * Removes a listener from the given message.
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the given message.
      *
      * @param message The message.
      * @param listenerClass The listener class.
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T> void removeListenerFromMessage(Message message, Class<T> listenerClass, T listener) {
-        removeListenerFromMessage(message.getId(), listenerClass, listener);
+    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            Message message, Class<T> listenerClass, T listener) {
+        removeMessageAttachableListener(message.getId(), listenerClass, listener);
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the message with the given id.
+     *
+     * @param messageId The id of the message.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            long messageId, T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(MessageAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> removeMessageAttachableListener(messageId, listenerClass, listener));
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the given message.
+     *
+     * @param message The message.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            Message message, T listener) {
+        removeMessageAttachableListener(message.getId(), listener);
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
+     * assigned listener classes they listen to for the message with the given id.
+     *
+     * @param messageId The id of the message.
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(long messageId);
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
+     * assigned listener classes they listen to for the given message.
+     *
+     * @param message The message.
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    default <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(Message message) {
+        return getMessageAttachableListeners(message.getId());
     }
 
 }

@@ -1,6 +1,7 @@
 package de.btobastian.javacord.listeners.server;
 
 import de.btobastian.javacord.events.server.ServerJoinEvent;
+import de.btobastian.javacord.listeners.GloballyAttachableListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 
 /**
@@ -9,7 +10,7 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
  * ServerMemberAddListener is for other users and ServerJoinListener is for yourself!
  */
 @FunctionalInterface
-public interface ServerJoinListener {
+public interface ServerJoinListener extends GloballyAttachableListener {
 
     /**
      * This method is called every time you join a server.
