@@ -159,6 +159,15 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Sets the name of the role.
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Sets the permissions of the role.
      *
      * @param permissions The permissions to set.

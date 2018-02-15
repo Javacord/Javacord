@@ -71,6 +71,7 @@ import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeNameListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
@@ -2012,6 +2013,21 @@ public interface DiscordApi {
      * @return A list with all registered role change mentionable listeners.
      */
     List<RoleChangeMentionableListener> getRoleChangeMentionableListeners();
+
+    /**
+     * Adds a listener, which listens to role name changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener);
+
+    /**
+     * Gets a list with all registered role change name listeners.
+     *
+     * @return A list with all registered role change name listeners.
+     */
+    List<RoleChangeNameListener> getRoleChangeNameListeners();
 
     /**
      * Adds a listener, which listens to role permission changes.

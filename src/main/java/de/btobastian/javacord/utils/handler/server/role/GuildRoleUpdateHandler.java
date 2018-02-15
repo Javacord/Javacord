@@ -9,12 +9,14 @@ import de.btobastian.javacord.events.server.role.RoleChangeColorEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeHoistEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeManagedEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeMentionableEvent;
+import de.btobastian.javacord.events.server.role.RoleChangeNameEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePermissionsEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePositionEvent;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeNameListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -102,6 +104,21 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getRoleChangeMentionableListeners());
 
                 dispatchEvent(listeners, listener -> listener.onRoleChangeMentionable(event));
+            }
+
+            String oldName = role.getName();
+            String newName = roleJson.get("name").asText();
+            if (!oldName.equals(newName)) {
+                role.setName(newName);
+
+                RoleChangeNameEvent event = new RoleChangeNameEvent(api, role, newName, oldName);
+
+                List<RoleChangeNameListener> listeners = new ArrayList<>();
+                listeners.addAll(role.getRoleChangeNameListeners());
+                listeners.addAll(role.getServer().getRoleChangeNameListeners());
+                listeners.addAll(api.getRoleChangeNameListeners());
+
+                dispatchEvent(listeners, listener -> listener.onRoleChangeName(event));
             }
 
             Permissions oldPermissions = role.getPermissions();

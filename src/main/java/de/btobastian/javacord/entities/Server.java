@@ -62,6 +62,7 @@ import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeNameListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
@@ -2120,6 +2121,26 @@ public interface Server extends DiscordEntity {
     default List<RoleChangeMentionableListener> getRoleChangeMentionableListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 Server.class, getId(), RoleChangeMentionableListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to role name changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), RoleChangeNameListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change name listeners.
+     *
+     * @return A list with all registered role change name listeners.
+     */
+    default List<RoleChangeNameListener> getRoleChangeNameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeNameListener.class);
     }
 
     /**
