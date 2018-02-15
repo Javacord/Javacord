@@ -30,6 +30,7 @@ import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListene
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.ListenerManager;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -175,6 +176,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default Optional<String> getNickname(Server server) {
         return server.getNickname(this);
+    }
+
+    /**
+     * Gets the timestamp of when the user joined the given server.
+     *
+     * @param server The server to check.
+     * @return The timestamp of when the user joined the server.
+     */
+    default Optional<Instant> getJoinedAtTimestamp(Server server) {
+        return server.getJoinedAtTimestamp(this);
     }
 
     /**

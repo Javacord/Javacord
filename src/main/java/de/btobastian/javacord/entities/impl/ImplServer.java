@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -135,6 +137,11 @@ public class ImplServer implements Server, Cleanupable {
      * A map with all nicknames. The key is the user id.
      */
     private final ConcurrentHashMap<Long, String> nicknames = new ConcurrentHashMap<>();
+
+    /**
+     * A map with all joinedAt instants. The key is the user id.
+     */
+    private final ConcurrentHashMap<Long, Instant> joinedAtTimestamps = new ConcurrentHashMap<>();
 
     /**
      * A list with all custom emojis from this server.
@@ -440,6 +447,7 @@ public class ImplServer implements Server, Cleanupable {
         members.remove(user.getId());
         nicknames.remove(user.getId());
         getRoles().forEach(role -> ((ImplRole) role).removeUserFromCache(user));
+        joinedAtTimestamps.remove(user.getId());
     }
 
     /**
@@ -465,6 +473,8 @@ public class ImplServer implements Server, Cleanupable {
             long roleId = Long.parseLong(roleIds.asText());
             getRoleById(roleId).map(role -> ((ImplRole) role)).ifPresent(role -> role.addUserToCache(user));
         }
+
+        joinedAtTimestamps.put(user.getId(), OffsetDateTime.parse(member.get("joined_at").asText()).toInstant());
     }
 
     /**
@@ -540,6 +550,11 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Optional<String> getNickname(User user) {
         return Optional.ofNullable(nicknames.get(user.getId()));
+    }
+
+    @Override
+    public Optional<Instant> getJoinedAtTimestamp(User user) {
+        return Optional.ofNullable(joinedAtTimestamps.get(user.getId()));
     }
 
     @Override
