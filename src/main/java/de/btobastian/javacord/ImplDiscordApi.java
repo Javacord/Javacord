@@ -211,7 +211,19 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * A map which contains all users.
      */
-    private final ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
+    private final Map<Long, WeakReference<User>> users = Collections.synchronizedMap(new ConcurrentHashMap<>());
+
+    /**
+     * A map to retrieve user IDs by the weak ref that point to the respective
+     * user or used to point to it for usage in the users cleanup,
+     * as at cleanup time the weak ref is already emptied.
+     */
+    private final Map<Reference<? extends User>, Long> userIdByRef = Collections.synchronizedMap(new WeakHashMap<>());
+
+    /**
+     * The queue that is notified if a user became weakly-reachable.
+     */
+    private final ReferenceQueue<User> usersCleanupQueue = new ReferenceQueue<>();
 
     /**
      * A map which contains all servers.
@@ -341,6 +353,18 @@ public class ImplDiscordApi implements DiscordApi {
 
             // After minimum JDK 9 is required this can be switched to use a Cleaner
             getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+                for (Reference<? extends User> userRef = usersCleanupQueue.poll();
+                     userRef != null;
+                     userRef = usersCleanupQueue.poll()) {
+                    Long userId = userIdByRef.remove(userRef);
+                    if (userId != null) {
+                        users.remove(userId, userRef);
+                    }
+                }
+            }, 30, 30, TimeUnit.SECONDS);
+
+            // After minimum JDK 9 is required this can be switched to use a Cleaner
+            getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
                 for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
                      messageRef != null;
                      messageRef = messagesCleanupQueue.poll()) {
@@ -374,10 +398,15 @@ public class ImplDiscordApi implements DiscordApi {
      * This method is only meant to be called after receiving a READY packet.
      */
     public void purgeCache() {
-        users.values().stream()
-                .map(Cleanupable.class::cast)
-                .forEach(Cleanupable::cleanup);
-        users.clear();
+        synchronized (users) {
+            users.values().stream()
+                    .map(Reference::get)
+                    .filter(Objects::nonNull)
+                    .map(Cleanupable.class::cast)
+                    .forEach(Cleanupable::cleanup);
+            users.clear();
+        }
+        userIdByRef.clear();
         servers.values().stream()
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);
@@ -423,10 +452,17 @@ public class ImplDiscordApi implements DiscordApi {
      * @param user The user to add.
      */
     public void addUserToCache(User user) {
-        User oldUser = users.put(user.getId(), user);
-        if ((oldUser != null) && (oldUser != user)) {
-            ((Cleanupable) oldUser).cleanup();
-        }
+        users.compute(user.getId(), (key, value) -> {
+            Optional.ofNullable(value)
+                    .map(Reference::get)
+                    .filter(oldUser -> oldUser != user)
+                    .map(Cleanupable.class::cast)
+                    .ifPresent(Cleanupable::cleanup);
+
+            WeakReference<User> result = new WeakReference<>(user, usersCleanupQueue);
+            userIdByRef.put(result, key);
+            return result;
+        });
     }
 
     /**
@@ -507,7 +543,7 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public User getOrCreateUser(JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
-        synchronized (this) {
+        synchronized (users) {
             return getCachedUserById(id).orElseGet(() -> {
                 if (!data.has("username")) {
                     throw new IllegalStateException("Couldn't get or created user. Please inform the developer!");
@@ -538,14 +574,8 @@ public class ImplDiscordApi implements DiscordApi {
      */
     public Message getOrCreateMessage(TextChannel channel, JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
-        // The constructor already adds the message to the cache.
-        // If we use #compute() here, it would cause a deadlock
         synchronized (messages) {
-            WeakReference<Message> resultRef = messages.get(id);
-            // If the map has no entry or the weak ref was still in the map but cleared, create a new message
-            return (resultRef == null) || (resultRef.get() == null)
-                   ? new ImplMessage(this, channel, data)
-                   : resultRef.get();
+            return getCachedMessageById(id).orElseGet(() -> new ImplMessage(this, channel, data));
         }
     }
 
@@ -558,7 +588,7 @@ public class ImplDiscordApi implements DiscordApi {
         messages.compute(message.getId(), (key, value) -> {
             if ((value == null) || (value.get() == null)) {
                 WeakReference<Message> result = new WeakReference<>(message, messagesCleanupQueue);
-                messageIdByRef.put(result, message.getId());
+                messageIdByRef.put(result, key);
                 return result;
             }
             return value;
@@ -896,12 +926,17 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public Collection<User> getCachedUsers() {
-        return users.values();
+        synchronized (users) {
+            return users.values().stream()
+                    .map(Reference::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
     public Optional<User> getCachedUserById(long id) {
-        return Optional.ofNullable(users.get(id));
+        return Optional.ofNullable(users.get(id)).map(Reference::get);
     }
 
     @Override
