@@ -343,9 +343,14 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         JsonNode packet = mapper.readTree(text);
 
         int op = packet.get("op").asInt();
+        Optional<GatewayOpcode> opcode = GatewayOpcode.fromCode(op);
+        if (!opcode.isPresent()) {
+            logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
+            return;
+        }
 
-        switch (op) {
-            case 0:
+        switch (opcode.get()) {
+            case DISPATCH:
                 lastSeq = packet.get("s").asInt();
                 String type = packet.get("t").asText();
                 PacketHandler handler = handlers.get(type);
@@ -410,14 +415,14 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     logger.debug("Received READY packet");
                 }
                 break;
-            case 1:
+            case HEARTBEAT:
                 sendHeartbeat(websocket);
                 break;
-            case 7:
+            case RECONNECT:
                 websocket.sendClose(WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
                                     WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
                 break;
-            case 9:
+            case INVALID_SESSION:
                 long fakeLastIdentificationTime = System.currentTimeMillis();
                 if (lastSentFrameWasIdentify.isMarked()) {
                     logger.info("Hit identifying rate limit. Retrying in 5 seconds...");
@@ -433,7 +438,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 waitForIdentifyRateLimit();
                 sendIdentify(websocket);
                 break;
-            case 10:
+            case HELLO:
                 logger.debug("Received HELLO packet");
 
                 JsonNode data = packet.get("d");
@@ -452,7 +457,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     sendResume(websocket);
                 }
                 break;
-            case 11:
+            case HEARTBEAT_ACK:
                 logger.debug("Heartbeat ACK received");
                 heartbeatAckReceived.set(true);
                 break;
@@ -517,7 +522,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     private void sendHeartbeat(WebSocket websocket) {
         ObjectNode heartbeatPacket = JsonNodeFactory.instance.objectNode();
-        heartbeatPacket.put("op", 1);
+        heartbeatPacket.put("op", GatewayOpcode.HEARTBEAT.getCode());
         heartbeatPacket.put("d", lastSeq);
         WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
         nextHeartbeatFrame.set(heartbeatFrame);
@@ -531,7 +536,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     private void sendResume(WebSocket websocket) {
         ObjectNode resumePacket = JsonNodeFactory.instance.objectNode()
-                .put("op", 6);
+                .put("op", GatewayOpcode.RESUME.getCode());
         resumePacket.putObject("d")
                 .put("token", api.getToken())
                 .put("session_id", sessionId)
@@ -547,7 +552,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     private void sendIdentify(WebSocket websocket) {
         ObjectNode identifyPacket = JsonNodeFactory.instance.objectNode()
-                .put("op", 2);
+                .put("op", GatewayOpcode.IDENTIFY.getCode());
         ObjectNode data = identifyPacket.putObject("d");
         String token = api.getToken();
         data.put("token", token)
@@ -695,7 +700,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     public void updateStatus() {
         Optional<Activity> activity = api.getActivity();
         ObjectNode updateStatus = JsonNodeFactory.instance.objectNode()
-                .put("op", 3);
+                .put("op", GatewayOpcode.STATUS_UPDATE.getCode());
         ObjectNode data = updateStatus.putObject("d")
                 .put("status", api.getStatus().getStatusString())
                 .put("afk", false)
