@@ -315,17 +315,17 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         listeners.addAll(api.getLostConnectionListeners());
         dispatchEvent(listeners, listener -> listener.onLostConnection(lostConnectionEvent));
 
-        if (!ready.isDone()) {
-            ready.complete(false);
-            return;
-        }
-
         heartbeatTimer.updateAndGet(future -> {
             if (future != null) {
                 future.cancel(false);
             }
             return null;
         });
+
+        if (!ready.isDone()) {
+            ready.complete(false);
+            return;
+        }
 
         // Reconnect
         if (reconnect) {
