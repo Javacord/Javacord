@@ -26,6 +26,7 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.utils.Cleanupable;
+import de.btobastian.javacord.utils.GatewayOpcode;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -196,7 +197,7 @@ public class ImplServer implements Server, Cleanupable {
 
         if (isLarge() && getMembers().size() < getMemberCount()) {
             ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
-                    .put("op", 8);
+                    .put("op", GatewayOpcode.REQUEST_GUILD_MEMBERS.getCode());
             requestGuildMembersPacket.putObject("d")
                             .put("guild_id", String.valueOf(getId()))
                             .put("query","")

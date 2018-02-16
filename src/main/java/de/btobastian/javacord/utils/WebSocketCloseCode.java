@@ -23,7 +23,7 @@ public enum WebSocketCloseCode {
      * which the connection was established has been fulfilled.
      * </i>
      */
-    NORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.NORMAL),
+    NORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.NORMAL, Usage.BOTH),
 
     /**
      * 1001;
@@ -32,7 +32,7 @@ public enum WebSocketCloseCode {
      * going down or a browser having navigated away from a page.
      * </i>
      */
-    AWAY(com.neovisionaries.ws.client.WebSocketCloseCode.AWAY),
+    AWAY(com.neovisionaries.ws.client.WebSocketCloseCode.AWAY, Usage.BOTH),
 
     /**
      * 1002;
@@ -41,7 +41,7 @@ public enum WebSocketCloseCode {
      * to a protocol error.
      * </i>
      */
-    UNCONFORMED(com.neovisionaries.ws.client.WebSocketCloseCode.UNCONFORMED),
+    UNCONFORMED(com.neovisionaries.ws.client.WebSocketCloseCode.UNCONFORMED, Usage.BOTH),
 
     /**
      * 1003;
@@ -52,7 +52,7 @@ public enum WebSocketCloseCode {
      * send this if it receives a binary message).
      * </i>
      */
-    UNACCEPTABLE(com.neovisionaries.ws.client.WebSocketCloseCode.UNACCEPTABLE),
+    UNACCEPTABLE(com.neovisionaries.ws.client.WebSocketCloseCode.UNACCEPTABLE, Usage.BOTH),
 
     /**
      * 1005;
@@ -63,7 +63,7 @@ public enum WebSocketCloseCode {
      * code was actually present.
      * </i>
      */
-    NONE(com.neovisionaries.ws.client.WebSocketCloseCode.NONE),
+    NONE(com.neovisionaries.ws.client.WebSocketCloseCode.NONE, Usage.BOTH),
 
     /**
      * 1006;
@@ -75,7 +75,7 @@ public enum WebSocketCloseCode {
      * receiving a Close control frame.
      * </i>
      */
-    ABNORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.ABNORMAL),
+    ABNORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.ABNORMAL, Usage.BOTH),
 
     /**
      * 1007;
@@ -87,7 +87,7 @@ public enum WebSocketCloseCode {
      * within a text message).
      * </i>
      */
-    INCONSISTENT(com.neovisionaries.ws.client.WebSocketCloseCode.INCONSISTENT),
+    INCONSISTENT(com.neovisionaries.ws.client.WebSocketCloseCode.INCONSISTENT, Usage.BOTH),
 
     /**
      * 1008;
@@ -99,7 +99,7 @@ public enum WebSocketCloseCode {
      * or if there is a need to hide specific details about the policy.
      * </i>
      */
-    VIOLATED(com.neovisionaries.ws.client.WebSocketCloseCode.VIOLATED),
+    VIOLATED(com.neovisionaries.ws.client.WebSocketCloseCode.VIOLATED, Usage.BOTH),
 
     /**
      * 1009;
@@ -109,7 +109,7 @@ public enum WebSocketCloseCode {
      * process.
      * </i>
      */
-    OVERSIZE(com.neovisionaries.ws.client.WebSocketCloseCode.OVERSIZE),
+    OVERSIZE(com.neovisionaries.ws.client.WebSocketCloseCode.OVERSIZE, Usage.BOTH),
 
     /**
      * 1010;
@@ -124,7 +124,7 @@ public enum WebSocketCloseCode {
      * WebSocket handshake instead.
      * </i>
      */
-    UNEXTENDED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXTENDED),
+    UNEXTENDED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXTENDED, Usage.BOTH),
 
     /**
      * 1011;
@@ -134,7 +134,7 @@ public enum WebSocketCloseCode {
      * fulfilling the request.
      * </i>
      */
-    UNEXPECTED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXPECTED),
+    UNEXPECTED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXPECTED, Usage.BOTH),
 
     /**
      * 1015;
@@ -146,77 +146,117 @@ public enum WebSocketCloseCode {
      * (e&#46;g&#46;, the server certificate can't be verified).
      * </i>
      */
-    INSECURE(com.neovisionaries.ws.client.WebSocketCloseCode.INSECURE),
+    INSECURE(com.neovisionaries.ws.client.WebSocketCloseCode.INSECURE, Usage.BOTH),
 
     /**
      * We're not sure what went wrong. Try reconnecting?
      */
-    UNKNOWN_ERROR(4000),
+    UNKNOWN_ERROR(4000, Usage.NORMAL),
 
     /**
      * You sent an invalid
      * <a href="https://discordapp.com/developers/docs/topics/gateway#payloads-and-opcodesspec.html">Gateway opcode</a>
      * or an invalid payload for an opcode. Don't do that!
      */
-    UNKNOWN_OPCODE(4001),
+    UNKNOWN_OPCODE(4001, Usage.BOTH),
 
     /**
      * You sent an invalid <a href="https://discordapp.com/developers/docs/topics/gateway#sending-payloads">payload</a>
      * to us. Don't do that!
      */
-    DECODE_ERROR(4002),
+    DECODE_ERROR(4002, Usage.NORMAL),
 
     /**
      * You sent us a payload prior to <a href="https://discordapp.com/developers/docs/topics/gateway#identify">
      * identifying</a>.
      */
-    NOT_AUTHENTICATED(4003),
+    NOT_AUTHENTICATED(4003, Usage.BOTH),
 
     /**
      * The account token sent with your <a href="https://discordapp.com/developers/docs/topics/gateway#identify">
      * identify payload</a> is incorrect.
      */
-    AUTHENTICATION_FAILED(4004),
+    AUTHENTICATION_FAILED(4004, Usage.BOTH),
 
     /**
      * You sent more than one identify payload. Don't do that!
      */
-    ALREADY_AUTHENTICATED(4005),
+    ALREADY_AUTHENTICATED(4005, Usage.NORMAL),
+
+    /**
+     * Your session is no longer valid.
+     */
+    SESSION_NO_LONGER_VALID(4006, Usage.VOICE),
 
     /**
      * The sequence sent when <a href="https://discordapp.com/developers/docs/topics/gateway#resume">resuming</a>
      * the session was invalid. Reconnect and start a new session.
      */
-    INVALID_SEQ(4007),
+    INVALID_SEQ(4007, Usage.NORMAL),
 
     /**
      * Woah nelly! You're sending payloads to us too quickly. Slow it down!
      */
-    RATE_LIMITED(4008),
+    RATE_LIMITED(4008, Usage.NORMAL),
 
     /**
      * Your session timed out. Reconnect and start a new one.
      */
-    SESSION_TIMEOUT(4009),
+    SESSION_TIMEOUT(4009, Usage.BOTH),
 
     /**
      * You sent us an invalid <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard when
      * identifying</a>.
      */
-    INVALID_SHARD(4010),
+    INVALID_SHARD(4010, Usage.NORMAL),
 
     /**
      * The session would have handled too many guilds - you are required to
      * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
      * your connection in order to connect.
      */
-    SHARDING_REQUIRED(4011),
+    SHARDING_REQUIRED(4011, Usage.NORMAL),
+
+    /**
+     * The session would have handled too many guilds - you are required to
+     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * your connection in order to connect.
+     */
+    SERVER_NOT_FOUND(4011, Usage.VOICE),
+
+    /**
+     * The session would have handled too many guilds - you are required to
+     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * your connection in order to connect.
+     */
+    UNKNOWN_PROTOCOL(4012, Usage.VOICE),
+
+    /**
+     * The session would have handled too many guilds - you are required to
+     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * your connection in order to connect.
+     */
+    DISCONNECTED(4014, Usage.VOICE),
+
+    /**
+     * The session would have handled too many guilds - you are required to
+     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * your connection in order to connect.
+     */
+    VOICE_SERVER_CRASHED(4015, Usage.VOICE),
+
+    /**
+     * The session would have handled too many guilds - you are required to
+     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * your connection in order to connect.
+     */
+    UNKNOWN_ENCRYPTION_MODE(4016, Usage.VOICE),
 
     /**
      * Discord asked for a reconnect, and there is no pre-defined matching close reason,
      * thus 4999 is used which is unlikely to get assigned by Discord.
      */
-    COMMANDED_RECONNECT(4999);
+    COMMANDED_RECONNECT(4999, Usage.NORMAL);
 
     /**
      * A map for retrieving the enum instances by code.
@@ -224,13 +264,29 @@ public enum WebSocketCloseCode {
     private static final Map<Integer, WebSocketCloseCode> instanceByCode;
 
     /**
+     * A map for retrieving the voice enum instances by code.
+     */
+    private static final Map<Integer, WebSocketCloseCode> voiceInstanceByCode;
+
+    /**
      * The actual numeric close code
      */
     private final int code;
 
+    /**
+     * The actual numeric close code
+     */
+    private final Usage usage;
+
     static {
         instanceByCode = Collections.unmodifiableMap(
                 Arrays.stream(values())
+                        .filter(closeCode -> (closeCode.usage == Usage.BOTH) || (closeCode.usage == Usage.NORMAL))
+                        .collect(Collectors.toMap(WebSocketCloseCode::getCode, Function.identity())));
+
+        voiceInstanceByCode = Collections.unmodifiableMap(
+                Arrays.stream(values())
+                        .filter(closeCode -> (closeCode.usage == Usage.BOTH) || (closeCode.usage == Usage.VOICE))
                         .collect(Collectors.toMap(WebSocketCloseCode::getCode, Function.identity())));
     }
 
@@ -239,8 +295,9 @@ public enum WebSocketCloseCode {
      *
      * @param code The actual numeric close code.
      */
-    WebSocketCloseCode(int code) {
+    WebSocketCloseCode(int code, Usage usage) {
         this.code = code;
+        this.usage = usage;
     }
 
     /**
@@ -254,6 +311,16 @@ public enum WebSocketCloseCode {
     }
 
     /**
+     * Gets the voice web socket close code by actual numeric close code.
+     *
+     * @param code The actual numeric close code.
+     * @return The voice web socket close code with the actual numeric close code.
+     */
+    public static Optional<WebSocketCloseCode> fromCodeForVoice(int code) {
+        return Optional.ofNullable(voiceInstanceByCode.get(code));
+    }
+
+    /**
      * Gets the actual numeric close code.
      *
      * @return The actual numeric close code.
@@ -261,4 +328,12 @@ public enum WebSocketCloseCode {
     public int getCode() {
         return code;
     }
+
+    /**
+     * Defines what a close code is used for, normal web socket connections, voice web socket connections or both.
+     */
+    private enum Usage {
+        NORMAL, VOICE, BOTH
+    }
+
 }
