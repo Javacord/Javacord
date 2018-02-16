@@ -329,6 +329,7 @@ public class ImplDiscordApi implements DiscordApi {
                                 ready.complete(this);
                             }
                         } else {
+                            threadPool.shutdown();
                             ready.completeExceptionally(
                                     new IllegalStateException("Websocket closed before READY packet was received!"));
                         }
