@@ -4,7 +4,7 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import de.btobastian.javacord.utils.rest.RestRequestResult;
 
 /**
- * When the bot cannot message a user.
+ * When the user of the connected account cannot message a user.
  * This might have several reasons, e.g.
  * <ul>
  *   <li>The user blocked you</li>
