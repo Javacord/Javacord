@@ -72,6 +72,7 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -108,6 +109,14 @@ public interface Server extends DiscordEntity {
      * @return The nickname of the user.
      */
     Optional<String> getNickname(User user);
+
+    /**
+     * Gets the timestamp of when a user joined the server.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when the user joined the server.
+     */
+    Optional<Instant> getJoinedAtTimestamp(User user);
 
     /**
      * Checks if the server if considered large.
