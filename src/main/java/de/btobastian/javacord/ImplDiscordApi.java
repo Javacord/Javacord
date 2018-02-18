@@ -868,7 +868,7 @@ public class ImplDiscordApi implements DiscordApi {
                     // disconnect web socket
                     websocketAdapter.disconnect();
                     // shutdown thread pool if within one minute no disconnect event was dispatched
-                    threadPool.getScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
+                    threadPool.getDaemonScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
                 }
                 ratelimitManager.cleanup();
             }

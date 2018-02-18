@@ -209,7 +209,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         reconnect = false;
         websocket.get().sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
         // cancel heartbeat timer if within one minute no disconnect event was dispatched
-        api.getThreadPool().getScheduler().schedule(() -> heartbeatTimer.updateAndGet(future -> {
+        api.getThreadPool().getDaemonScheduler().schedule(() -> heartbeatTimer.updateAndGet(future -> {
             if (future != null) {
                 future.cancel(false);
             }

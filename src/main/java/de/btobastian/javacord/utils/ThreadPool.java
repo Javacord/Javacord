@@ -23,6 +23,8 @@ public class ThreadPool {
             new ThreadFactory("Javacord - Central ExecutorService - %d", false));
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
             CORE_POOL_SIZE, new ThreadFactory("Javacord - Central Scheduler - %d", false));
+    private final ScheduledExecutorService daemonScheduler = Executors.newScheduledThreadPool(
+            CORE_POOL_SIZE, new ThreadFactory("Javacord - Central Daemon Scheduler - %d", true));
     private final ConcurrentHashMap<String, ExecutorService> executorServiceSingleThreads = new ConcurrentHashMap<>();
 
     /**
@@ -44,12 +46,22 @@ public class ThreadPool {
     }
 
     /**
+     * Gets the used daemon scheduler.
+     *
+     * @return The used daemon scheduler.
+     */
+    public ScheduledExecutorService getDaemonScheduler() {
+        return daemonScheduler;
+    }
+
+    /**
      * Shutdowns the thread pool.
      * This method is called automatically after disconnecting.
      */
     public void shutdown() {
         executorService.shutdown();
         scheduler.shutdown();
+        daemonScheduler.shutdown();
         executorServiceSingleThreads.values().forEach(ExecutorService::shutdown);
     }
 
