@@ -3,7 +3,7 @@ package de.btobastian.javacord.events.server.role;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.permissions.Role;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * A role change color event.

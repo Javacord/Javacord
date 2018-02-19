@@ -1,6 +1,6 @@
 package de.btobastian.javacord.entities.message.embed;
 
-import java.awt.*;
+import java.awt.Color;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;

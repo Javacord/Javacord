@@ -1,10 +1,10 @@
 package de.btobastian.javacord.events.message;
 
-import java.util.concurrent.CompletableFuture;
-
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A message event where the message is NOT guaranteed to be in the cache, but can be requested from Discord.

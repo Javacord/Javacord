@@ -12,7 +12,7 @@ import de.btobastian.javacord.entities.message.embed.EmbedVideo;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
-import java.awt.*;
+import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;

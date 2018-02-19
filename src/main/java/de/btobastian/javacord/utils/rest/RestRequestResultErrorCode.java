@@ -1,18 +1,18 @@
 package de.btobastian.javacord.utils.rest;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import de.btobastian.javacord.exceptions.CannotMessageUserException;
 import de.btobastian.javacord.exceptions.DiscordException;
 import de.btobastian.javacord.exceptions.DiscordExceptionInstantiator;
 import de.btobastian.javacord.exceptions.ReactionBlockedException;
 import de.btobastian.javacord.exceptions.UnknownEmojiException;
 import de.btobastian.javacord.exceptions.UnknownMessageException;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * An enum with all rest request result codes as defined by

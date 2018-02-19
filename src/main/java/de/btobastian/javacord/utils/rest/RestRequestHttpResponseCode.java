@@ -1,17 +1,17 @@
 package de.btobastian.javacord.utils.rest;
 
+import de.btobastian.javacord.exceptions.BadRequestException;
+import de.btobastian.javacord.exceptions.DiscordException;
+import de.btobastian.javacord.exceptions.DiscordExceptionInstantiator;
+import de.btobastian.javacord.exceptions.MissingPermissionsException;
+import de.btobastian.javacord.exceptions.NotFoundException;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import de.btobastian.javacord.exceptions.BadRequestException;
-import de.btobastian.javacord.exceptions.DiscordException;
-import de.btobastian.javacord.exceptions.DiscordExceptionInstantiator;
-import de.btobastian.javacord.exceptions.MissingPermissionsException;
-import de.btobastian.javacord.exceptions.NotFoundException;
 
 /**
  * An enum with all rest request result codes as defined by
