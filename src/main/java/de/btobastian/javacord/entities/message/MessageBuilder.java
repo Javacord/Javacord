@@ -1,15 +1,27 @@
 package de.btobastian.javacord.entities.message;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
+import de.btobastian.javacord.utils.rest.RestRequest;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -220,11 +232,69 @@ public class MessageBuilder {
     /**
      * Sends the message.
      *
+     * @param user The user to which the message should be sent.
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> send(User user) {
+        return user.openPrivateChannel()
+                .thenComposeAsync(this::send, user.getApi().getThreadPool().getExecutorService());
+    }
+
+    /**
+     * Sends the message.
+     *
      * @param channel The channel to which the message should be sent.
      * @return The sent message.
      */
     public CompletableFuture<Message> send(TextChannel channel) {
-        return channel.sendMessage(toString(), embed, tts, nonce, stream, fileName);
+        ObjectNode body = JsonNodeFactory.instance.objectNode()
+                .put("content", toString() == null ? "" : toString() )
+                .put("tts", tts);
+        body.putArray("mentions");
+        if (embed != null) {
+            embed.toJsonNode(body.putObject("embed"));
+        }
+        if (nonce != null) {
+            body.put("nonce", nonce);
+        }
+
+        RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
+                .setUrlParameters(channel.getIdAsString());
+        if (stream != null && fileName != null) {
+            byte[] bytes;
+            try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                int nRead;
+                byte[] data = new byte[16384];
+
+                while ((nRead = stream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                bytes = buffer.toByteArray();
+                stream.close();
+            } catch (IOException e) {
+                CompletableFuture<Message> future = new CompletableFuture<>();
+                future.completeExceptionally(e);
+                return future;
+            }
+
+            String mediaType = URLConnection.guessContentTypeFromName(fileName);
+            if (mediaType == null) {
+                mediaType = "application/octet-stream";
+            }
+
+            request.setMultipartBody(new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("payload_json", body.toString())
+                    .addFormDataPart("file", fileName,
+                            RequestBody.create(MediaType.parse(mediaType), bytes)
+                    ).build());
+        } else {
+            request.setBody(body);
+        }
+
+        return request.execute(result -> ((ImplDiscordApi) channel.getApi())
+                .getOrCreateMessage(channel, result.getJsonBody()));
     }
 
     @Override

@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageBuilder;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -248,10 +249,13 @@ public class ImplUser implements User, Cleanupable {
     @Override
     public CompletableFuture<Message> sendMessage(
             String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
-        return openPrivateChannel().thenApplyAsync(
-                channel -> channel.sendMessage(content, embed, tts, nonce, stream, fileName).join(),
-                api.getThreadPool().getExecutorService()
-        );
+        return new MessageBuilder()
+                .append(content == null ? "" : content)
+                .setEmbed(embed)
+                .setTts(tts)
+                .setNonce(nonce)
+                .setFile(stream, fileName)
+                .send(this);
     }
 
     @Override

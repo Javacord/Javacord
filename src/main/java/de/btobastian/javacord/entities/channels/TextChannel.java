@@ -10,6 +10,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageBuilder;
 import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
@@ -29,15 +30,9 @@ import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,53 +62,13 @@ public interface TextChannel extends Channel, Messageable {
     @Override
     default CompletableFuture<Message> sendMessage(
             String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
-        ObjectNode body = JsonNodeFactory.instance.objectNode()
-                .put("content", content == null ? "" : content)
-                .put("tts", tts);
-        body.putArray("mentions");
-        if (embed != null) {
-            embed.toJsonNode(body.putObject("embed"));
-        }
-        if (nonce != null) {
-            body.put("nonce", nonce);
-        }
-
-        RestRequest<Message> request = new RestRequest<Message>(getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
-                .setUrlParameters(String.valueOf(getId()));
-        if (stream != null && fileName != null) {
-            byte[] bytes;
-            try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-                int nRead;
-                byte[] data = new byte[16384];
-
-                while ((nRead = stream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
-                }
-                buffer.flush();
-                bytes = buffer.toByteArray();
-                stream.close();
-            } catch (IOException e) {
-                CompletableFuture<Message> future = new CompletableFuture<>();
-                future.completeExceptionally(e);
-                return future;
-            }
-
-            String mediaType = URLConnection.guessContentTypeFromName(fileName);
-            if (mediaType == null) {
-                mediaType = "application/octet-stream";
-            }
-
-            request.setMultipartBody(new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("payload_json", body.toString())
-                    .addFormDataPart("file", fileName,
-                            RequestBody.create(MediaType.parse(mediaType), bytes)
-                    ).build());
-        } else {
-            request.setBody(body);
-        }
-
-        return request.execute(result -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, result.getJsonBody()));
+        return new MessageBuilder()
+                .append(content == null ? "" : content)
+                .setEmbed(embed)
+                .setTts(tts)
+                .setNonce(nonce)
+                .setFile(stream, fileName)
+                .send(this);
     }
 
     /**
