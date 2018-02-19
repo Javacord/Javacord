@@ -125,6 +125,18 @@ public class MessageBuilder {
     }
 
     /**
+     * Appends the string representation of the object (calling {@link String#valueOf(Object)} method) to the message.
+     *
+     * @param object The object to append.
+     * @return The current instance in order to chain call methods.
+     * @see StringBuilder#append(Object)
+     */
+    public MessageBuilder append(Object object) {
+        strBuilder.append(object);
+        return this;
+    }
+
+    /**
      * Appends a new line to the message.
      *
      * @return The current instance in order to chain call methods.
