@@ -1,5 +1,13 @@
 package de.btobastian.javacord.entities.channels;
 
+import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
+import de.btobastian.javacord.utils.ListenerManager;
+
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -11,6 +19,13 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     default ChannelType getType() {
         return ChannelType.SERVER_VOICE_CHANNEL;
     }
+
+    /**
+     * Gets the users that are connected to this server voice channel.
+     *
+     * @return The users that are connected to this server voice channel.
+     */
+    Collection<User> getConnectedUsers();
 
     /**
      * Gets the updater for this channel.
@@ -82,6 +97,50 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      */
     default CompletableFuture<Void> removeCategory() {
         return getUpdater().removeCategory().update();
+    }
+
+    /**
+     * Adds a listener, which listens to users joining this server voice channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
+            ServerVoiceChannelMemberJoinListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberJoinListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server voice channel member join listeners.
+     *
+     * @return A list with all registered server voice channel member join listeners.
+     */
+    default List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberJoinListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to users leaving this server voice channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
+            ServerVoiceChannelMemberLeaveListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberLeaveListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server voice channel member leave listeners.
+     *
+     * @return A list with all registered server voice channel member leave listeners.
+     */
+    default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
     }
 
 }

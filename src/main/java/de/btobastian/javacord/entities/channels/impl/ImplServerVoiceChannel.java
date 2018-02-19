@@ -13,7 +13,8 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -63,9 +64,9 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     private final ConcurrentHashMap<Long, Permissions> overwrittenRolePermissions = new ConcurrentHashMap<>();
 
     /**
-     * List of users connected to this voice-channel.
+     * The connected users of this server voice channel.
      */
-    private final List<User> connectedUsers = new ArrayList<>();
+    private final Collection<User> connectedUsers = new ArrayList<>();
 
     /**
      * Creates a new server voice channel object.
@@ -138,6 +139,24 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
         return overwrittenUserPermissions;
     }
 
+    /**
+     * Adds the given user to the list of connected users.
+     *
+     * @param user The user to add.
+     */
+    public void addConnectedUser(User user) {
+        connectedUsers.add(user);
+    }
+
+    /**
+     * Removes the given user from the list of connected users.
+     *
+     * @param user The user to remove.
+     */
+    public void removeConnectedUser(User user) {
+        connectedUsers.remove(user);
+    }
+
     @Override
     public DiscordApi getApi() {
         return api;
@@ -179,8 +198,8 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     }
 
     @Override
-    public List<User> getConnectedUsers() {
-        return this.connectedUsers;
+    public Collection<User> getConnectedUsers() {
+        return Collections.unmodifiableCollection(connectedUsers);
     }
 
     @Override

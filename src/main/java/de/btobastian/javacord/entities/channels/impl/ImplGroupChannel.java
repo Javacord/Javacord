@@ -62,11 +62,6 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
     private final ImplMessageCache messageCache;
 
     /**
-     * List of users connected to this voice-channel.
-     */
-    private final List<User> connectedUsers = new ArrayList<>();
-
-    /**
      * Creates a new private channel.
      *
      * @param api The discord api instance.
@@ -135,11 +130,6 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
-    }
-
-    @Override
-    public List<User> getConnectedUsers() {
-        return this.connectedUsers;
     }
 
     @Override

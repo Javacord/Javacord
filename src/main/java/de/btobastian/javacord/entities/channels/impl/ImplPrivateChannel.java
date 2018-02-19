@@ -10,9 +10,6 @@ import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * The implementation of {@link PrivateChannel}.
  */
@@ -37,11 +34,6 @@ public class ImplPrivateChannel implements PrivateChannel, Cleanupable {
      * The message cache of the private channel.
      */
     private final ImplMessageCache messageCache;
-
-    /**
-     * List of users connected to this voice-channel.
-     */
-    private final List<User> connectedUsers = new ArrayList<>();
 
     /**
      * Creates a new private channel.
@@ -79,10 +71,6 @@ public class ImplPrivateChannel implements PrivateChannel, Cleanupable {
         return messageCache;
     }
 
-    @Override
-    public List<User> getConnectedUsers() {
-        return this.connectedUsers;
-    }
 
     @Override
     public void cleanup() {
