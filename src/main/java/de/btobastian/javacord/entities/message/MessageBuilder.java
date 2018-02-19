@@ -74,6 +74,9 @@ public class MessageBuilder {
         if (!message.getEmbeds().isEmpty()) {
             builder.setEmbed(message.getEmbeds().get(0).toBuilder());
         }
+        for (MessageAttachment attachment : message.getAttachments()) {
+            builder.addAttachment(attachment.getUrl());
+        }
         return builder;
     }
 
