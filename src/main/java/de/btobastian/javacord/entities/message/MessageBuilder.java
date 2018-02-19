@@ -302,7 +302,7 @@ public class MessageBuilder {
 
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(channel.getIdAsString());
-        if (!attachments.isEmpty()) {
+        if (!attachments.isEmpty() || (embed != null && embed.requiresAttachments())) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             // We access files etc. so this should be async
             channel.getApi().getThreadPool().getExecutorService().submit(() -> {
@@ -310,25 +310,32 @@ public class MessageBuilder {
                     MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("payload_json", body.toString());
-                    for (int i = 0; i < attachments.size(); i++) {
+                    List<Attachment> tempAttachments = new ArrayList<>();
+                    tempAttachments.addAll(attachments);
+                    // Add the attachments required for the embed
+                    if (embed != null) {
+                        embed.consumeRequiredAttachments(
+                                (fileName, stream) -> tempAttachments.add(new Attachment(fileName, stream)));
+                    }
+                    for (int i = 0; i < tempAttachments.size(); i++) {
                         byte[] bytes;
                         try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
                             int nRead;
                             byte[] data = new byte[16384];
 
-                            while ((nRead = attachments.get(i).getStream().read(data, 0, data.length)) != -1) {
+                            while ((nRead = tempAttachments.get(i).getStream().read(data, 0, data.length)) != -1) {
                                 buffer.write(data, 0, nRead);
                             }
                             buffer.flush();
                             bytes = buffer.toByteArray();
-                            attachments.get(i).getStream().close();
+                            tempAttachments.get(i).getStream().close();
                         }
 
-                        String mediaType = URLConnection.guessContentTypeFromName(attachments.get(i).getFileName());
+                        String mediaType = URLConnection.guessContentTypeFromName(tempAttachments.get(i).getFileName());
                         if (mediaType == null) {
                             mediaType = "application/octet-stream";
                         }
-                        multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileName(),
+                        multipartBodyBuilder.addFormDataPart("file" + i, tempAttachments.get(i).getFileName(),
                                 RequestBody.create(MediaType.parse(mediaType), bytes));
                     }
 
