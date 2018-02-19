@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -21,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,29 +119,9 @@ public class MessageBuilder {
      * @param entity The entity to mention.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder appendMentionable(Mentionable entity) {
+    public MessageBuilder append(Mentionable entity) {
         strBuilder.append(entity.getMentionTag());
         return this;
-    }
-
-    /**
-     * Appends a user to the message.
-     *
-     * @param user The user to mention.
-     * @return The current instance in order to chain call methods.
-     */
-    public MessageBuilder appendUser(User user) {
-        return appendMentionable(user);
-    }
-
-    /**
-     * Appends a channel to the message.
-     *
-     * @param channel The channel to mention.
-     * @return The current instance in order to chain call methods.
-     */
-    public MessageBuilder appendChannel(ServerTextChannel channel) {
-        return appendMentionable(channel);
     }
 
     /**
@@ -198,6 +178,17 @@ public class MessageBuilder {
      */
     public MessageBuilder addFile(File file) {
         return addAttachment(file);
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param url The url of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachment(URL url) {
+        attachments.add(new Attachment(url));
+        return this;
     }
 
     /**
@@ -300,43 +291,55 @@ public class MessageBuilder {
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(channel.getIdAsString());
         if (!attachments.isEmpty()) {
-            MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("payload_json", body.toString());
-            for (int i = 0; i < attachments.size(); i++) {
-                byte[] bytes;
-                try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-                    int nRead;
-                    byte[] data = new byte[16384];
+            CompletableFuture<Message> future = new CompletableFuture<>();
+            // We access files etc. so this should be async
+            channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+                try {
+                    MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("payload_json", body.toString());
+                    for (int i = 0; i < attachments.size(); i++) {
+                        byte[] bytes;
+                        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                            int nRead;
+                            byte[] data = new byte[16384];
 
-                    while ((nRead = attachments.get(i).getStream().read(data, 0, data.length)) != -1) {
-                        buffer.write(data, 0, nRead);
+                            while ((nRead = attachments.get(i).getStream().read(data, 0, data.length)) != -1) {
+                                buffer.write(data, 0, nRead);
+                            }
+                            buffer.flush();
+                            bytes = buffer.toByteArray();
+                            attachments.get(i).getStream().close();
+                        }
+
+                        String mediaType = URLConnection.guessContentTypeFromName(attachments.get(i).getFileName());
+                        if (mediaType == null) {
+                            mediaType = "application/octet-stream";
+                        }
+                        multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileName(),
+                                RequestBody.create(MediaType.parse(mediaType), bytes));
                     }
-                    buffer.flush();
-                    bytes = buffer.toByteArray();
-                    attachments.get(i).getStream().close();
-                } catch (IOException e) {
-                    CompletableFuture<Message> future = new CompletableFuture<>();
-                    future.completeExceptionally(e);
-                    return future;
-                }
 
-                String mediaType = URLConnection.guessContentTypeFromName(attachments.get(i).getFileName());
-                if (mediaType == null) {
-                    mediaType = "application/octet-stream";
+                    request.setMultipartBody(multipartBodyBuilder.build());
+                    request.execute(result -> ((ImplDiscordApi) channel.getApi())
+                            .getOrCreateMessage(channel, result.getJsonBody()))
+                            .whenComplete((message, throwable) -> {
+                                if (throwable != null) {
+                                    future.completeExceptionally(throwable);
+                                } else {
+                                    future.complete(message);
+                                }
+                            });
+                } catch (Throwable t) {
+                    future.completeExceptionally(t);
                 }
-                multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileName(),
-                        RequestBody.create(MediaType.parse(mediaType), bytes));
-            }
-
-            request.setMultipartBody(multipartBodyBuilder.build());
+            });
+            return future;
         } else {
             request.setBody(body);
+            return request.execute(result -> ((ImplDiscordApi) channel.getApi())
+                    .getOrCreateMessage(channel, result.getJsonBody()));
         }
-
-
-        return request.execute(result -> ((ImplDiscordApi) channel.getApi())
-                .getOrCreateMessage(channel, result.getJsonBody()));
     }
 
     @Override
@@ -349,8 +352,9 @@ public class MessageBuilder {
      */
     private final class Attachment {
 
-        private final String fileName;
-        private final InputStream stream;
+        private String fileName;
+        private InputStream stream;
+        private final URL url;
 
         /**
          * Creates a new attachment.
@@ -361,6 +365,18 @@ public class MessageBuilder {
         protected Attachment(String fileName, InputStream stream) {
             this.fileName = fileName;
             this.stream = stream;
+            this.url = null;
+        }
+
+        /**
+         * Creates a new attachment.
+         *
+         * @param url The url of the attached file.
+         */
+        protected Attachment(URL url) {
+            this.fileName = null;
+            this.stream = null;
+            this.url = url;
         }
 
         /**
@@ -369,6 +385,12 @@ public class MessageBuilder {
          * @return The name of the attached file.
          */
         protected String getFileName() {
+            if (fileName == null) {
+                fileName = url.getFile();
+                if (fileName.equals("")) {
+                    fileName = "index.html";
+                }
+            }
             return fileName;
         }
 
@@ -377,7 +399,10 @@ public class MessageBuilder {
          *
          * @return The stream which provides the file.
          */
-        protected InputStream getStream() {
+        protected InputStream getStream() throws IOException {
+            if (stream == null) {
+                stream = url.openStream();
+            }
             return stream;
         }
 
