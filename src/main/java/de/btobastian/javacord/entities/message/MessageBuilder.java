@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -51,14 +53,9 @@ public class MessageBuilder {
     private String nonce = null;
 
     /**
-     * The stream for the file.
+     * A list with all attachments which should be added to the message.
      */
-    private InputStream stream = null;
-
-    /**
-     * The name of the file.
-     */
-    private String fileName = null;
+    private final List<Attachment> attachments = new ArrayList<>();
 
     /**
      * Creates a new message builder.
@@ -181,32 +178,58 @@ public class MessageBuilder {
     }
 
     /**
-     * Sets the file of the message.
+     * Adds a file to the message.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(InputStream, String)
+     */
+    public MessageBuilder addFile(InputStream stream, String fileName) {
+        return addAttachment(stream, fileName);
+    }
+
+    /**
+     * Adds a file to the message.
+     *
+     * @param file The file.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(File)
+     */
+    public MessageBuilder addFile(File file) {
+        return addAttachment(file);
+    }
+
+    /**
+     * Adds an attachment to the message.
      *
      * @param stream The stream of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder setFile(InputStream stream, String fileName) {
-        this.stream = stream;
-        this.fileName = fileName;
+    public MessageBuilder addAttachment(InputStream stream, String fileName) {
+        if (stream == null || fileName == null) {
+            throw new IllegalArgumentException("stream and fileName cannot be null!");
+        }
+        attachments.add(new Attachment(fileName, stream));
         return this;
     }
 
     /**
-     * Sets the file of the message.
+     * Adds an attachment to the message.
      *
      * @param file The file.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder setFile(File file) {
+    public MessageBuilder addAttachment(File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("file cannot be null!");
+        }
         try {
-            this.stream = new FileInputStream(file);
+            return addAttachment(new FileInputStream(file), file.getName());
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("The provided file couldn't be found!");
         }
-        this.fileName = file.getName();
-        return this;
     }
 
     /**
@@ -227,6 +250,22 @@ public class MessageBuilder {
      */
     public StringBuilder getStringBuilder() {
         return strBuilder;
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param messageable The messageable (text channel or user) to which the message should be sent.
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> send(Messageable messageable) {
+        if (messageable instanceof TextChannel) {
+            return send((TextChannel) messageable);
+        }
+        if (messageable instanceof User) {
+            return send((User) messageable);
+        }
+        throw new IllegalArgumentException("The provided messageable object is neither a text channel or user!");
     }
 
     /**
@@ -260,38 +299,41 @@ public class MessageBuilder {
 
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(channel.getIdAsString());
-        if (stream != null && fileName != null) {
-            byte[] bytes;
-            try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-                int nRead;
-                byte[] data = new byte[16384];
-
-                while ((nRead = stream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
-                }
-                buffer.flush();
-                bytes = buffer.toByteArray();
-                stream.close();
-            } catch (IOException e) {
-                CompletableFuture<Message> future = new CompletableFuture<>();
-                future.completeExceptionally(e);
-                return future;
-            }
-
-            String mediaType = URLConnection.guessContentTypeFromName(fileName);
-            if (mediaType == null) {
-                mediaType = "application/octet-stream";
-            }
-
-            request.setMultipartBody(new MultipartBody.Builder()
+        if (!attachments.isEmpty()) {
+            MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
-                    .addFormDataPart("payload_json", body.toString())
-                    .addFormDataPart("file", fileName,
-                            RequestBody.create(MediaType.parse(mediaType), bytes)
-                    ).build());
+                    .addFormDataPart("payload_json", body.toString());
+            for (int i = 0; i < attachments.size(); i++) {
+                byte[] bytes;
+                try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                    int nRead;
+                    byte[] data = new byte[16384];
+
+                    while ((nRead = attachments.get(i).getStream().read(data, 0, data.length)) != -1) {
+                        buffer.write(data, 0, nRead);
+                    }
+                    buffer.flush();
+                    bytes = buffer.toByteArray();
+                    attachments.get(i).getStream().close();
+                } catch (IOException e) {
+                    CompletableFuture<Message> future = new CompletableFuture<>();
+                    future.completeExceptionally(e);
+                    return future;
+                }
+
+                String mediaType = URLConnection.guessContentTypeFromName(attachments.get(i).getFileName());
+                if (mediaType == null) {
+                    mediaType = "application/octet-stream";
+                }
+                multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileName(),
+                        RequestBody.create(MediaType.parse(mediaType), bytes));
+            }
+
+            request.setMultipartBody(multipartBodyBuilder.build());
         } else {
             request.setBody(body);
         }
+
 
         return request.execute(result -> ((ImplDiscordApi) channel.getApi())
                 .getOrCreateMessage(channel, result.getJsonBody()));
@@ -300,6 +342,45 @@ public class MessageBuilder {
     @Override
     public String toString() {
         return strBuilder.toString();
+    }
+
+    /**
+     * A simple class only used for file upload.
+     */
+    private final class Attachment {
+
+        private final String fileName;
+        private final InputStream stream;
+
+        /**
+         * Creates a new attachment.
+         *
+         * @param fileName The name of the attached file.
+         * @param stream The stream which provides the file.
+         */
+        protected Attachment(String fileName, InputStream stream) {
+            this.fileName = fileName;
+            this.stream = stream;
+        }
+
+        /**
+         * Gets the name of the attached file.
+         *
+         * @return The name of the attached file.
+         */
+        protected String getFileName() {
+            return fileName;
+        }
+
+        /**
+         * Gets the stream which provides the file.
+         *
+         * @return The stream which provides the file.
+         */
+        protected InputStream getStream() {
+            return stream;
+        }
+
     }
 
 }

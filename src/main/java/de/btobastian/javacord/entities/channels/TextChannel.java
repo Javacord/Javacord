@@ -10,10 +10,8 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.Webhook;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.MessageBuilder;
 import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.Messageable;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -32,7 +30,6 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.slf4j.Logger;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,18 +55,6 @@ public interface TextChannel extends Channel, Messageable {
      * The logger of this class.
      */
     Logger logger = LoggerUtil.getLogger(TextChannel.class);
-
-    @Override
-    default CompletableFuture<Message> sendMessage(
-            String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
-        return new MessageBuilder()
-                .append(content == null ? "" : content)
-                .setEmbed(embed)
-                .setTts(tts)
-                .setNonce(nonce)
-                .setFile(stream, fileName)
-                .send(this);
-    }
 
     /**
      * Displays the "xyz is typing..." message.

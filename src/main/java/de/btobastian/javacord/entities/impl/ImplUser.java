@@ -10,9 +10,6 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.MessageBuilder;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
@@ -20,7 +17,6 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import org.slf4j.Logger;
 
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
@@ -244,18 +240,6 @@ public class ImplUser implements User, Cleanupable {
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public CompletableFuture<Message> sendMessage(
-            String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
-        return new MessageBuilder()
-                .append(content == null ? "" : content)
-                .setEmbed(embed)
-                .setTts(tts)
-                .setNonce(nonce)
-                .setFile(stream, fileName)
-                .send(this);
     }
 
     @Override
