@@ -51,6 +51,11 @@ public class DiscordApiBuilder {
     private int totalShards = 1;
 
     /**
+     * Whether Javacord should wait for all servers to become available on startup or not.
+     */
+    private boolean waitForServersOnStartup = true;
+
+    /**
      * Login to the account with the given token.
      *
      * @return A {@link CompletableFuture} which contains the DiscordApi.
@@ -63,7 +68,7 @@ public class DiscordApiBuilder {
             return future;
         }
         try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard))){
-            new ImplDiscordApi(accountType, token, currentShard, totalShards, future);
+            new ImplDiscordApi(accountType, token, currentShard, totalShards, waitForServersOnStartup, future);
         }
         return future;
     }
@@ -125,7 +130,8 @@ public class DiscordApiBuilder {
         for (int shard : shards) {
             if (currentShard != 0) {
                 CompletableFuture<DiscordApi> future = new CompletableFuture<>();
-                future.completeExceptionally(new IllegalArgumentException("You cannot use loginShards or loginAllShards after setting the current shard!"));
+                future.completeExceptionally(new IllegalArgumentException(
+                        "You cannot use loginShards or loginAllShards after setting the current shard!"));
                 result.add(future);
                 continue;
             }
@@ -198,6 +204,22 @@ public class DiscordApiBuilder {
             throw new IllegalArgumentException("currentShard cannot be less than 0!");
         }
         this.currentShard = currentShard;
+        return this;
+    }
+
+    /**
+     * Sets if Javacord should wait for all servers to become available on startup.
+     * If this is disabled the {@link DiscordApi#getServers()} method will return an empty collection directly after
+     * logging in and fire {@link de.btobastian.javacord.events.server.ServerBecomesAvailableEvent} events once they
+     * become available. You can check the ids of unavailable servers using the
+     * {@link DiscordApi#getUnavailableServers()} method.
+     *
+     * @param waitForServersOnStartup Whether Javacord should wait for all servers
+     *                                to become available on startup or not.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setWaitForServersOnStartup(boolean waitForServersOnStartup) {
+        this.waitForServersOnStartup = waitForServersOnStartup;
         return this;
     }
 

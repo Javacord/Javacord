@@ -189,6 +189,11 @@ public class ImplDiscordApi implements DiscordApi {
     private final int totalShards;
 
     /**
+     * Whether Javacord should wait for all servers to become available on startup or not.
+     */
+    private final boolean waitForServersOnStartup;
+
+    /**
      * The user of the connected account.
      */
     private User you;
@@ -285,7 +290,7 @@ public class ImplDiscordApi implements DiscordApi {
      * @param token The token used to connect without any account type specific prefix.
      */
     public ImplDiscordApi(String token) {
-        this(AccountType.BOT, token, 0, 1, null);
+        this(AccountType.BOT, token, 0, 1, false, null);
     }
 
     /**
@@ -295,6 +300,8 @@ public class ImplDiscordApi implements DiscordApi {
      * @param token The token used to connect without any account type specific prefix.
      * @param currentShard The current shard the bot should connect to.
      * @param totalShards  The total amount of shards.
+     * @param waitForServersOnStartup Whether Javacord should wait for all servers
+     *                                to become available on startup or not.
      * @param ready The future which will be completed when the connection to Discord was successful.
      */
     public ImplDiscordApi(
@@ -302,12 +309,14 @@ public class ImplDiscordApi implements DiscordApi {
             String token,
             int currentShard,
             int totalShards,
+            boolean waitForServersOnStartup,
             CompletableFuture<DiscordApi> ready
     ) {
         this.accountType = accountType;
         this.token = accountType.getTokenPrefix() + token;
         this.currentShard = currentShard;
         this.totalShards = totalShards;
+        this.waitForServersOnStartup = waitForServersOnStartup;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5)-(1/(1/(0.1*x)+1))*Math.pow(x,1.5))+(currentShard*6);
 
@@ -389,8 +398,9 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
         disconnect();
+        super.finalize();
     }
 
     /**
@@ -828,6 +838,11 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public int getTotalShards() {
         return totalShards;
+    }
+
+    @Override
+    public boolean isWaitingForServersOnStartup() {
+        return waitForServersOnStartup;
     }
 
     @Override

@@ -223,6 +223,13 @@ public interface DiscordApi {
     int getTotalShards();
 
     /**
+     * Checks if Javacord is waiting for all servers to become available on startup.
+     *
+     * @return Whether Javacord is waiting for all servers to become available on startup or not.
+     */
+    boolean isWaitingForServersOnStartup();
+
+    /**
      * Updates the status of this bot.
      * The update might not be visible immediately as it's through the websocket and only a limited amount of
      * status changes is allowed per minute.

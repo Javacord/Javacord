@@ -381,7 +381,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                         boolean allServersLoaded = false;
                         int lastUnavailableServerAmount = 0;
                         int sameUnavailableServerCounter = 0;
-                        while (!allServersLoaded || !allUsersLoaded) {
+                        while (api.isWaitingForServersOnStartup() && (!allServersLoaded || !allUsersLoaded)) {
                             if (api.getUnavailableServers().size() == lastUnavailableServerAmount) {
                                 sameUnavailableServerCounter++;
                             } else {
