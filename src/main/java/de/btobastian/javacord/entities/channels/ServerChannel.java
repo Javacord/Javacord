@@ -13,6 +13,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
+import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class represents a server channel.
@@ -442,14 +444,22 @@ public interface ServerChannel extends Channel {
      * @return The managers for the added listener.
      */
     @SuppressWarnings("unchecked")
-    default <T extends ServerChannelAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    default <T extends ServerChannelAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends ServerChannelAttachableListener>>
     addServerChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(ServerChannel.class, getId(),
-                                                                                    listenerClass, listener))
+                .flatMap(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else {
+                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(ServerChannel.class, getId(),
+                                                                                       listenerClass, listener));
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
@@ -466,8 +476,15 @@ public interface ServerChannel extends Channel {
                 .filter(ServerChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(ServerChannel.class, getId(),
-                                                                                           listenerClass, listener));
+                .forEach(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else {
+                        ((ImplDiscordApi) getApi()).removeObjectListener(ServerChannel.class, getId(),
+                                                                         listenerClass, listener);
+                    }
+                });
     }
 
     /**
@@ -480,7 +497,16 @@ public interface ServerChannel extends Channel {
      */
     default <T extends ServerChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getServerChannelAttachableListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(ServerChannel.class, getId());
+        Map<T, List<Class<T>>> serverChannelListeners =
+                ((ImplDiscordApi) getApi()).getObjectListeners(ServerChannel.class, getId());
+        getChannelAttachableListeners().forEach((listener, listenerClasses) -> serverChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        return serverChannelListeners;
     }
 
     /**

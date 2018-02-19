@@ -3,8 +3,10 @@ package de.btobastian.javacord.entities.channels;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.TextChannelAttachableListener;
+import de.btobastian.javacord.listeners.VoiceChannelAttachableListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelAttachableListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
@@ -145,9 +147,15 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
                 .flatMap(listenerClass -> {
-                    if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
                         return addTextChannelAttachableListener(
                                 (TextChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addVoiceChannelAttachableListener(
+                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener).stream();
                     } else {
                         return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(GroupChannel.class, getId(),
                                                                                        listenerClass, listener));
@@ -170,9 +178,15 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
                 .forEach(listenerClass -> {
-                    if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
                         removeTextChannelAttachableListener(
                                 (TextChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeVoiceChannelAttachableListener(
+                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener);
                     } else {
                         ((ImplDiscordApi) getApi()).removeObjectListener(GroupChannel.class, getId(),
                                                                          listenerClass, listener);
@@ -194,6 +208,20 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
         Map<T, List<Class<T>>> groupChannelListeners =
                 ((ImplDiscordApi) getApi()).getObjectListeners(GroupChannel.class, getId());
         getTextChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        getVoiceChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        getChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
                 .merge((T) listener,
                        (List<Class<T>>) (Object) listenerClasses,
                        (listenerClasses1, listenerClasses2) -> {

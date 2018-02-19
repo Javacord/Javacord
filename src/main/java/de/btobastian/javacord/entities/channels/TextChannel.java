@@ -14,6 +14,7 @@ import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
 import de.btobastian.javacord.entities.permissions.PermissionType;
+import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.TextChannelAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
@@ -1353,14 +1354,22 @@ public interface TextChannel extends Channel, Messageable {
      * @return The managers for the added listener.
      */
     @SuppressWarnings("unchecked")
-    default <T extends TextChannelAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    default <T extends TextChannelAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends TextChannelAttachableListener>>
     addTextChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(TextChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(TextChannel.class, getId(),
-                                                                                    listenerClass, listener))
+                .flatMap(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else {
+                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(TextChannel.class, getId(),
+                                                                                       listenerClass, listener));
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
@@ -1377,8 +1386,15 @@ public interface TextChannel extends Channel, Messageable {
                 .filter(TextChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(TextChannel.class, getId(),
-                                                                                           listenerClass, listener));
+                .forEach(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else {
+                        ((ImplDiscordApi) getApi()).removeObjectListener(TextChannel.class, getId(),
+                                                                         listenerClass, listener);
+                    }
+                });
     }
 
     /**
@@ -1391,7 +1407,16 @@ public interface TextChannel extends Channel, Messageable {
      */
     default <T extends TextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getTextChannelAttachableListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId());
+        Map<T, List<Class<T>>> textChannelListeners =
+                ((ImplDiscordApi) getApi()).getObjectListeners(TextChannel.class, getId());
+        getChannelAttachableListeners().forEach((listener, listenerClasses) -> textChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        return textChannelListeners;
     }
 
     /**
