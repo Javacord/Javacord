@@ -74,6 +74,11 @@ public class ImplPermissions implements Permissions {
     }
 
     @Override
+    public boolean isEmpty() {
+        return allowed == 0 && denied == 0;
+    }
+
+    @Override
     public int hashCode() {
         int hash = 42;
 

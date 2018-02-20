@@ -236,10 +236,7 @@ public interface ServerChannel extends Channel {
      * @return The effective allowed permissions of a user in this channel.
      */
     default Collection<PermissionType> getEffectiveAllowedPermissions(User user) {
-        Permissions effectivePermissions = getEffectivePermissions(user);
-        return Arrays.stream(PermissionType.values())
-                .filter(type -> effectivePermissions.getState(type) == PermissionState.ALLOWED)
-                .collect(Collectors.toSet());
+        return getEffectivePermissions(user).getAllowedPermission();
     }
 
     /**
@@ -253,10 +250,7 @@ public interface ServerChannel extends Channel {
      * @return The effective denied permissions of a user in this channel.
      */
     default Collection<PermissionType> getEffectiveDeniedPermissions(User user) {
-        Permissions effectivePermissions = getEffectivePermissions(user);
-        return Arrays.stream(PermissionType.values())
-                .filter(type -> effectivePermissions.getState(type) == PermissionState.DENIED)
-                .collect(Collectors.toSet());
+        return getEffectivePermissions(user).getDeniedPermissions();
     }
 
     /**

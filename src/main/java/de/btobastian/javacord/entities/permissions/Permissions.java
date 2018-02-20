@@ -1,8 +1,9 @@
 package de.btobastian.javacord.entities.permissions;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * A collection of all existing {@link PermissionType permission types} and their states.
@@ -23,13 +24,9 @@ public interface Permissions {
      * @return A collection with all allowed permissions.
      */
     default Collection<PermissionType> getAllowedPermission() {
-        Collection<PermissionType> types = new HashSet<>();
-        for (PermissionType type : PermissionType.values()) {
-            if (getState(type) == PermissionState.ALLOWED) {
-                types.add(type);
-            }
-        }
-        return Collections.unmodifiableCollection(types);
+        return Collections.unmodifiableCollection(Arrays.stream(PermissionType.values())
+                .filter(type -> getState(type) == PermissionState.ALLOWED)
+                .collect(Collectors.toSet()));
     }
 
     /**
@@ -38,13 +35,9 @@ public interface Permissions {
      * @return A collection with all denied permissions.
      */
     default Collection<PermissionType> getDeniedPermissions() {
-        Collection<PermissionType> types = new HashSet<>();
-        for (PermissionType type : PermissionType.values()) {
-            if (getState(type) == PermissionState.DENIED) {
-                types.add(type);
-            }
-        }
-        return Collections.unmodifiableCollection(types);
+        return Collections.unmodifiableCollection(Arrays.stream(PermissionType.values())
+                .filter(type -> getState(type) == PermissionState.DENIED)
+                .collect(Collectors.toSet()));
     }
 
     /**
@@ -53,13 +46,9 @@ public interface Permissions {
      * @return A collection with all unset permissions.
      */
     default Collection<PermissionType> getUnsetPermissions() {
-        Collection<PermissionType> types = new HashSet<>();
-        for (PermissionType type : PermissionType.values()) {
-            if (getState(type) == PermissionState.NONE) {
-                types.add(type);
-            }
-        }
-        return Collections.unmodifiableCollection(types);
+        return Collections.unmodifiableCollection(Arrays.stream(PermissionType.values())
+                .filter(type -> getState(type) == PermissionState.NONE)
+                .collect(Collectors.toSet()));
     }
 
     /**
@@ -67,13 +56,6 @@ public interface Permissions {
      *
      * @return Whether all permission types are set to NONE or not.
      */
-    default boolean isEmpty() {
-        for (PermissionType type : PermissionType.values()) {
-            if (getState(type) != PermissionState.NONE) {
-                return false;
-            }
-        }
-        return true;
-    }
+    boolean isEmpty(); // We could check it in a default method, but it's faster to just check it in the implementation
 
 }
