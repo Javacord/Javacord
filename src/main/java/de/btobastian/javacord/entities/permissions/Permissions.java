@@ -13,4 +13,18 @@ public interface Permissions {
      */
     PermissionState getState(PermissionType type);
 
+    /**
+     * Checks if the all permission types are set to {@link PermissionState#NONE}.
+     *
+     * @return Whether all permission types are set to NONE or not.
+     */
+    default boolean isEmpty() {
+        for (PermissionType type : PermissionType.values()) {
+            if (getState(type) != PermissionState.NONE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
