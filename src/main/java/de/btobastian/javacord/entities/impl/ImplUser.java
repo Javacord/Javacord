@@ -9,6 +9,7 @@ import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplPrivateChannel;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -19,6 +20,9 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -71,6 +75,11 @@ public class ImplUser implements User, Cleanupable {
      * The activity of the user.
      */
     private Activity activity = null;
+
+    /**
+     * The server voice channels the user is connected to.
+     */
+    private final Collection<ServerVoiceChannel> connectedVoiceChannels = new HashSet<>();
 
     /**
      * The status of the user.
@@ -172,6 +181,24 @@ public class ImplUser implements User, Cleanupable {
         }
     }
 
+    /**
+     * Adds the given server voice channel to the ones this user is connected to.
+     *
+     * @param channel The server voice channel this user has connected to.
+     */
+    public void addConnectedVoiceChannel(ServerVoiceChannel channel) {
+        connectedVoiceChannels.add(channel);
+    }
+
+    /**
+     * Removes the given server voice channel from the ones this user is connected to.
+     *
+     * @param channel The server voice channel this user has left.
+     */
+    public void removeConnectedVoiceChannel(ServerVoiceChannel channel) {
+        connectedVoiceChannels.remove(channel);
+    }
+
     @Override
     public String getName() {
         return name;
@@ -190,6 +217,11 @@ public class ImplUser implements User, Cleanupable {
     @Override
     public Optional<Activity> getActivity() {
         return Optional.ofNullable(activity);
+    }
+
+    @Override
+    public Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
+        return Collections.unmodifiableCollection(connectedVoiceChannels);
     }
 
     @Override

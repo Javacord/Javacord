@@ -5,6 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
@@ -14,6 +15,8 @@ import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
@@ -93,6 +96,23 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      * @return The activity of the user.
      */
     Optional<Activity> getActivity();
+
+    /**
+     * Gets the server voice channels the user is connected to.
+     *
+     * @return The server voice channels the user is connected to.
+     */
+    Collection<ServerVoiceChannel> getConnectedVoiceChannels();
+
+    /**
+     * Gets the voice channel this user is connected to on the given server if any.
+     *
+     * @param server The server to check.
+     * @return The server voice channel the user is connected to.
+     */
+    default Optional<ServerVoiceChannel> getConnectedVoiceChannel(Server server) {
+        return server.getConnectedVoiceChannel(this);
+    }
 
     /**
      * Gets the status of the user.
@@ -664,6 +684,50 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
      */
     default List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeAvatarListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this user joining a server voice channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
+            ServerVoiceChannelMemberJoinListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), ServerVoiceChannelMemberJoinListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server voice channel member join listeners.
+     *
+     * @return A list with all registered server voice channel member join listeners.
+     */
+    default List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                User.class, getId(), ServerVoiceChannelMemberJoinListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this user leaving a server voice channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
+            ServerVoiceChannelMemberLeaveListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(User.class, getId(), ServerVoiceChannelMemberLeaveListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server voice channel member leave listeners.
+     *
+     * @return A list with all registered server voice channel member leave listeners.
+     */
+    default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                User.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
     }
 
 }

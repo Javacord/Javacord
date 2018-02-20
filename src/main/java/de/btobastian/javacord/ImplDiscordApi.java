@@ -47,6 +47,8 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
@@ -1440,6 +1442,28 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<UserChangeActivityListener> getUserChangeActivityListeners() {
         return getListeners(UserChangeActivityListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
+            ServerVoiceChannelMemberJoinListener listener) {
+        return addListener(ServerVoiceChannelMemberJoinListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners() {
+        return getListeners(ServerVoiceChannelMemberJoinListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
+            ServerVoiceChannelMemberLeaveListener listener) {
+        return addListener(ServerVoiceChannelMemberLeaveListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
+        return getListeners(ServerVoiceChannelMemberLeaveListener.class);
     }
 
     @Override
