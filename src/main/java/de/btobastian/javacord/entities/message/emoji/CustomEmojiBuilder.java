@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.utils.io.FileUtils;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -95,7 +96,7 @@ public class CustomEmojiBuilder {
         imageAsBufferedImage = null;
         imageAsIcon = image;
         imageAsFile = null;
-        imageType = getExtension(image.getUrl().getFile());
+        imageType = FileUtils.getExtension(image.getUrl().getFile());
         return this;
     }
 
@@ -110,7 +111,7 @@ public class CustomEmojiBuilder {
         imageAsBufferedImage = null;
         imageAsIcon = null;
         imageAsFile = image;
-        imageType = getExtension(image.getName());
+        imageType = FileUtils.getExtension(image.getName());
         return this;
     }
 
@@ -243,19 +244,6 @@ public class CustomEmojiBuilder {
             }
         });
         return future;
-    }
-
-    /**
-     * Gets the extension of the given file name or <code>"jpg"</code> if the file name has no extension.
-     *
-     * @param fileName The file name.
-     * @return The extension of the given file.
-     */
-    private String getExtension(String fileName) {
-        if (fileName.contains(".")) {
-            return fileName.substring(fileName.lastIndexOf(".") + 1);
-        }
-        return "jpg";
     }
 
 }

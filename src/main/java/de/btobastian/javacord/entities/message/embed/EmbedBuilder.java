@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.MessageAuthor;
+import de.btobastian.javacord.utils.io.FileUtils;
 
 import java.awt.Color;
 import java.io.File;
@@ -193,7 +194,7 @@ public class EmbedBuilder {
         footerIconUrl = null;
         footerIconFile = icon;
         footerIconInputStream = null;
-        footerIconFileName = UUID.randomUUID().toString() + "." + getExtension(icon);
+        footerIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
         return this;
     }
 
@@ -252,7 +253,7 @@ public class EmbedBuilder {
         imageUrl = null;
         imageFile = image;
         imageInputStream = null;
-        imageFileName = UUID.randomUUID().toString() + "." + getExtension(image);
+        imageFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(image);
         return this;
     }
 
@@ -369,7 +370,7 @@ public class EmbedBuilder {
         authorIconUrl = null;
         authorIconFile = icon;
         authorIconInputStream = null;
-        authorIconFileName = UUID.randomUUID().toString() + "." + getExtension(icon);
+        authorIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
         return this;
     }
 
@@ -430,7 +431,7 @@ public class EmbedBuilder {
         thumbnailUrl = null;
         thumbnailFile = thumbnail;
         thumbnailInputStream = null;
-        thumbnailFileName = UUID.randomUUID().toString() + "." + getExtension(thumbnail);
+        thumbnailFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(thumbnail);
         return this;
     }
 
@@ -593,19 +594,6 @@ public class EmbedBuilder {
             }
         }
         return object;
-    }
-
-    /**
-     * Gets the extension of the given file or <code>"png"</code> if the file has no extension.
-     *
-     * @param file The file.
-     * @return The extension of the given file.
-     */
-    private String getExtension(File file) {
-        if (file.getName().contains(".")) {
-            return file.getName().substring(file.getName().lastIndexOf(".") + 1);
-        }
-        return "png";
     }
 
 }
