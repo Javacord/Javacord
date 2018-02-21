@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.message.Messageable;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
@@ -23,6 +24,7 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleAddListener;
 import de.btobastian.javacord.listeners.server.role.UserRoleRemoveListener;
+import de.btobastian.javacord.listeners.user.UserAttachableListener;
 import de.btobastian.javacord.listeners.user.UserChangeActivityListener;
 import de.btobastian.javacord.listeners.user.UserChangeAvatarListener;
 import de.btobastian.javacord.listeners.user.UserChangeNameListener;
@@ -31,11 +33,13 @@ import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListener;
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
+import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -728,6 +732,70 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 User.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
+    }
+
+    /**
+     * Adds a listener that implements one or more {@code UserAttachableListener}s.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends UserAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addUserAttachableListener(T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(UserAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(),
+                                                                                    listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code UserAttachableListener}s.
+     *
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends UserAttachableListener & ObjectAttachableListener> void removeUserAttachableListener(
+            T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(UserAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(User.class, getId(),
+                                                                                           listenerClass, listener));
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code UserAttachableListener}s and their
+     * assigned listener classes they listen to.
+     *
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code UserAttachableListener}s and their
+     * assigned listener classes they listen to.
+     */
+    default <T extends UserAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getUserAttachableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId());
+    }
+
+    /**
+     * Removes a listener from this user.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T extends UserAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(User.class, getId(), listenerClass, listener);
     }
 
 }

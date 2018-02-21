@@ -17,6 +17,8 @@ import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
+import de.btobastian.javacord.listeners.GloballyAttachableListener;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.connection.LostConnectionListener;
 import de.btobastian.javacord.listeners.connection.ReconnectListener;
 import de.btobastian.javacord.listeners.connection.ResumeListener;
@@ -56,6 +58,11 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeNameListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
@@ -85,14 +92,19 @@ import org.slf4j.Logger;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -270,20 +282,24 @@ public class ImplDiscordApi implements DiscordApi {
     private final ReferenceQueue<Message> messagesCleanupQueue = new ReferenceQueue<>();
 
     /**
-     * A map which contains all listeners.
+     * A map which contains all globally attachable listeners.
      * The key is the class of the listener.
      */
-    private final ConcurrentHashMap<Class<?>, List<Object>> listeners = new ConcurrentHashMap<>();
+    private final Map<Class<? extends GloballyAttachableListener>,
+            Map<GloballyAttachableListener, ListenerManager<? extends GloballyAttachableListener>>>
+            listeners = Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     /**
      * A map which contains all listeners which are assigned to a specific object instead of being global.
      * The key of the outer map is the class which the listener was registered to (e.g. Message.class).
      * The key of the first inner map is the id of the object.
      * The key of the second inner map is the class of the listener.
-     * The final value is the listener itself.
+     * The key of the third inner map is the listener itself.
+     * The final value is the listener manager.
      */
-    private final ConcurrentHashMap<Class<?>, Map<Long, Map<Class<?>, List<Object>>>> objectListeners =
-            new ConcurrentHashMap<>();
+    private final Map<Class<?>, Map<Long, Map<Class<? extends ObjectAttachableListener>,
+            Map<ObjectAttachableListener, ListenerManager<? extends ObjectAttachableListener>>>>>
+            objectListeners = Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     /**
      * Creates a new discord api instance that can be used for auto-ratelimited REST calls,
@@ -639,6 +655,9 @@ public class ImplDiscordApi implements DiscordApi {
 
     /**
      * Adds an object listener.
+     * Adding a listener multiple times to the same object will only add it once
+     * and return the same listener manager on each invocation.
+     * The order of invocation is according to first addition.
      *
      * @param objectClass The class of the object.
      * @param objectId The id of the object.
@@ -647,17 +666,16 @@ public class ImplDiscordApi implements DiscordApi {
      * @param <T> The type of the listener.
      * @return The manager for the added listener.
      */
-    public <T> ListenerManager<T> addObjectListener(
+    @SuppressWarnings("unchecked")
+    public <T extends ObjectAttachableListener> ListenerManager<T> addObjectListener(
             Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
-        synchronized (objectListeners) {
-            Map<Long, Map<Class<?>, List<Object>>> objectListener =
-                    objectListeners.computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>());
-            Map<Class<?>, List<Object>> listeners =
-                    objectListener.computeIfAbsent(objectId, key -> new ConcurrentHashMap<>());
-            List<Object> classListeners = listeners.computeIfAbsent(listenerClass, c -> new ArrayList<>());
-            classListeners.add(listener);
-        }
-        return new ListenerManager<>(this, listener, listenerClass, objectClass, objectId);
+        Map<ObjectAttachableListener, ListenerManager<? extends ObjectAttachableListener>> listeners =
+                objectListeners
+                        .computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>())
+                        .computeIfAbsent(objectId, key -> new ConcurrentHashMap<>())
+                        .computeIfAbsent(listenerClass, c -> Collections.synchronizedMap(new LinkedHashMap<>()));
+        return (ListenerManager<T>) listeners.computeIfAbsent(
+                listener, key -> new ListenerManager<>(this, listener, listenerClass, objectClass, objectId));
     }
 
     /**
@@ -667,25 +685,36 @@ public class ImplDiscordApi implements DiscordApi {
      * @param objectId The id of the object.
      * @param listenerClass The listener class.
      * @param listener The listener to remove.
+     * @param <T> The type of the listener.
      */
-    public void removeObjectListener(Class<?> objectClass, long objectId, Class<?> listenerClass, Object listener) {
+    public <T extends ObjectAttachableListener> void removeObjectListener(
+            Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
         synchronized (objectListeners) {
             if (objectClass == null) {
                 return;
             }
-            Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
+            Map<Long, Map<Class<? extends ObjectAttachableListener>, Map<ObjectAttachableListener,
+                    ListenerManager<? extends ObjectAttachableListener>>>> objectListener =
+                    objectListeners.get(objectClass);
             if (objectListener == null) {
                 return;
             }
-            Map<Class<?>, List<Object>> listeners = objectListener.get(objectId);
+            Map<Class<? extends ObjectAttachableListener>, Map<ObjectAttachableListener,
+                    ListenerManager<? extends ObjectAttachableListener>>> listeners = objectListener.get(objectId);
             if (listeners == null) {
                 return;
             }
-            List<Object> classListeners = listeners.get(listenerClass);
+            Map<ObjectAttachableListener, ListenerManager<? extends ObjectAttachableListener>> classListeners =
+                    listeners.get(listenerClass);
             if (classListeners == null) {
                 return;
             }
+            ListenerManager<? extends ObjectAttachableListener> listenerManager = classListeners.get(listener);
+            if (listenerManager == null) {
+                return;
+            }
             classListeners.remove(listener);
+            listenerManager.removed();
             // Clean it up
             if (classListeners.isEmpty()) {
                 listeners.remove(listenerClass);
@@ -700,73 +729,112 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
+     * Gets a map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and their
+     * assigned listener classes they listen to.
+     *
+     * @param objectClass The class of the object.
+     * @param objectId The id of the object.
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends ObjectAttachableListener> Map<T, List<Class<T>>> getObjectListeners(
+            Class<?> objectClass, long objectId) {
+        return Optional.ofNullable(objectClass)
+                .map(objectListeners::get)
+                .map(objectListener -> objectListener.get(objectId))
+                .map(Map::entrySet)
+                .map(Set::stream)
+                .map(entryStream -> entryStream
+                        .flatMap(entry -> entry
+                                .getValue()
+                                .keySet()
+                                .stream()
+                                .map(listener -> new SimpleEntry<>((T) listener, (Class<T>) entry.getKey()))))
+                .map(entryStream -> entryStream
+                        .collect(Collectors.groupingBy(Entry::getKey,
+                                                       Collectors.mapping(Entry::getValue, Collectors.toList()))))
+                .orElseGet(HashMap::new);
+    }
+
+    /**
      * Gets all object listeners of the given class.
      *
      * @param objectClass The class of the object.
      * @param objectId The id of the object.
      * @param listenerClass The listener class.
-     * @param <T> The listener class.
+     * @param <T> The type of the listener.
      * @return A list with all object listeners of the given type.
      */
-    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    public <T> List<T> getObjectListeners(Class<?> objectClass, long objectId, Class<?> listenerClass) {
-        Map<Long, Map<Class<?>, List<Object>>> objectListener = objectListeners.get(objectClass);
-        if (objectListener == null) {
-            return Collections.emptyList();
-        }
-        Map<Class<?>, List<Object>> listeners = objectListener.get(objectId);
-        if (listeners == null) {
-            return Collections.emptyList();
-        }
-        List<Object> classListeners = listeners.getOrDefault(listenerClass, Collections.emptyList());
-        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
+    @SuppressWarnings("unchecked")
+    public <T extends ObjectAttachableListener> List<T> getObjectListeners(
+            Class<?> objectClass, long objectId, Class<T> listenerClass) {
+        return (List<T>) Optional.ofNullable(objectClass)
+                .map(objectListeners::get)
+                .map(objectListener -> objectListener.get(objectId))
+                .map(listeners -> listeners.get(listenerClass))
+                .map(Map::keySet)
+                .map(ArrayList::new)
+                .orElseGet(ArrayList::new);
     }
 
-    /**
-     * Adds a listener.
-     *
-     * @param clazz The listener class.
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The manager for the added listener.
-     */
-    public <T> ListenerManager<T> addListener(Class<T> clazz, T listener) {
-        synchronized (listeners) {
-            List<Object> classListeners = listeners.computeIfAbsent(clazz, c -> new ArrayList<>());
-            classListeners.add(listener);
-        }
-        return new ListenerManager<>(this, listener, clazz);
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
+        return (ListenerManager<T>) listeners
+                .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
+                .computeIfAbsent(listener, key -> new ListenerManager<>(this, listener, listenerClass));
     }
 
-    /**
-     * Removes a global listener.
-     *
-     * @param clazz The listener class.
-     * @param listener The listener to remove.
-     */
-    public void removeListener(Class<?> clazz, Object listener) {
+    @Override
+    public <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener) {
         synchronized (listeners) {
-            List<Object> classListeners = listeners.get(clazz);
-            if (classListeners != null) {
-                classListeners.remove(listener);
-                if (classListeners.isEmpty()) {
-                    listeners.remove(clazz);
-                }
+            Map<GloballyAttachableListener, ListenerManager<? extends GloballyAttachableListener>> classListeners =
+                    listeners.get(listenerClass);
+            if (classListeners == null) {
+                return;
+            }
+            ListenerManager<? extends GloballyAttachableListener> listenerManager = classListeners.get(listener);
+            if (listenerManager == null) {
+                return;
+            }
+            classListeners.remove(listener);
+            listenerManager.removed();
+            // Clean it up
+            if (classListeners.isEmpty()) {
+                listeners.remove(listenerClass);
             }
         }
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends GloballyAttachableListener> Map<T, List<Class<T>>> getListeners() {
+        return listeners.entrySet().stream()
+                .flatMap(entry -> entry
+                        .getValue()
+                        .keySet()
+                        .stream()
+                        .map(listener -> new SimpleEntry<>((T) listener, (Class<T>) entry.getKey())))
+                .collect(Collectors.groupingBy(Entry::getKey,
+                                               Collectors.mapping(Entry::getValue, Collectors.toList())));
+    }
+
     /**
-     * Gets all listeners of the given class.
+     * Gets all globally attachable listeners of the given class.
      *
-     * @param clazz The class of the listener.
+     * @param listenerClass The class of the listener.
      * @param <T> The class of the listener.
      * @return A list with all listeners of the given type.
      */
-    @SuppressWarnings("unchecked") // We make sure it's the right type when adding elements
-    public <T> List<T> getListeners(Class<?> clazz) {
-        List<Object> classListeners = listeners.getOrDefault(clazz, new ArrayList<>());
-        return classListeners.stream().map(o -> (T) o).collect(Collectors.toCollection(ArrayList::new));
+    @SuppressWarnings("unchecked")
+    public <T extends GloballyAttachableListener> List<T> getListeners(Class<T> listenerClass) {
+        return (List<T>) Optional.ofNullable(listenerClass)
+                .map(listeners::get)
+                .map(Map::keySet)
+                .map(ArrayList::new)
+                .orElseGet(ArrayList::new);
     }
 
     @Override
@@ -1155,19 +1223,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(
-            long messageId, MessageDeleteListener listener) {
-        return addObjectListener(Message.class, messageId, MessageDeleteListener.class, listener);
-    }
-
-    @Override
     public List<MessageDeleteListener> getMessageDeleteListeners() {
         return getListeners(MessageDeleteListener.class);
-    }
-
-    @Override
-    public List<MessageDeleteListener> getMessageDeleteListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, MessageDeleteListener.class);
     }
 
     @Override
@@ -1176,18 +1233,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener) {
-        return addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
-    }
-
-    @Override
     public List<MessageEditListener> getMessageEditListeners() {
         return getListeners(MessageEditListener.class);
-    }
-
-    @Override
-    public List<MessageEditListener> getMessageEditListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, MessageEditListener.class);
     }
 
     @Override
@@ -1196,18 +1243,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener) {
-        return addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
-    }
-
-    @Override
     public List<ReactionAddListener> getReactionAddListeners() {
         return getListeners(ReactionAddListener.class);
-    }
-
-    @Override
-    public List<ReactionAddListener> getReactionAddListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, ReactionAddListener.class);
     }
 
     @Override
@@ -1216,19 +1253,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(
-            long messageId, ReactionRemoveListener listener) {
-        return addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
-    }
-
-    @Override
     public List<ReactionRemoveListener> getReactionRemoveListeners() {
         return getListeners(ReactionRemoveListener.class);
-    }
-
-    @Override
-    public List<ReactionRemoveListener> getReactionRemoveListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, ReactionRemoveListener.class);
     }
 
     @Override
@@ -1237,19 +1263,8 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
-            long messageId, ReactionRemoveAllListener listener) {
-        return addObjectListener(Message.class, messageId, ReactionRemoveAllListener.class, listener);
-    }
-
-    @Override
     public List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
         return getListeners(ReactionRemoveAllListener.class);
-    }
-
-    @Override
-    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId) {
-        return getObjectListeners(Message.class, messageId, ReactionRemoveAllListener.class);
     }
 
     @Override
@@ -1477,6 +1492,57 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener) {
+        return addListener(RoleChangeColorListener.class, listener);
+    }
+
+    @Override
+    public List<RoleChangeColorListener> getRoleChangeColorListeners() {
+        return getListeners(RoleChangeColorListener.class);
+    }
+
+    @Override
+    public ListenerManager<RoleChangeHoistListener> addRoleChangeHoistListener(RoleChangeHoistListener listener) {
+        return addListener(RoleChangeHoistListener.class, listener);
+    }
+
+    @Override
+    public List<RoleChangeHoistListener> getRoleChangeHoistListeners() {
+        return getListeners(RoleChangeHoistListener.class);
+    }
+
+    @Override
+    public ListenerManager<RoleChangeManagedListener> addRoleChangeManagedListener(RoleChangeManagedListener listener) {
+        return addListener(RoleChangeManagedListener.class, listener);
+    }
+
+    @Override
+    public List<RoleChangeManagedListener> getRoleChangeManagedListeners() {
+        return getListeners(RoleChangeManagedListener.class);
+    }
+
+    @Override
+    public ListenerManager<RoleChangeMentionableListener> addRoleChangeMentionableListener(
+            RoleChangeMentionableListener listener) {
+        return addListener(RoleChangeMentionableListener.class, listener);
+    }
+
+    @Override
+    public List<RoleChangeMentionableListener> getRoleChangeMentionableListeners() {
+        return getListeners(RoleChangeMentionableListener.class);
+    }
+
+    @Override
+    public ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener) {
+        return addListener(RoleChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<RoleChangeNameListener> getRoleChangeNameListeners() {
+        return getListeners(RoleChangeNameListener.class);
+    }
+
+    @Override
     public ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
             RoleChangePermissionsListener listener) {
         return addListener(RoleChangePermissionsListener.class, listener);
@@ -1621,4 +1687,5 @@ public class ImplDiscordApi implements DiscordApi {
     public List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
         return getListeners(UserChangeAvatarListener.class);
     }
+
 }

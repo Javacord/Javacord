@@ -25,12 +25,14 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.PermissionsBuilder;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.RoleBuilder;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionAddListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListener;
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
+import de.btobastian.javacord.listeners.server.ServerAttachableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
@@ -56,6 +58,11 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberJoinListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
+import de.btobastian.javacord.listeners.server.role.RoleChangeNameListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePositionListener;
 import de.btobastian.javacord.listeners.server.role.RoleCreateListener;
@@ -68,6 +75,7 @@ import de.btobastian.javacord.listeners.user.UserChangeNameListener;
 import de.btobastian.javacord.listeners.user.UserChangeNicknameListener;
 import de.btobastian.javacord.listeners.user.UserChangeStatusListener;
 import de.btobastian.javacord.listeners.user.UserStartTypingListener;
+import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
@@ -81,6 +89,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -2032,6 +2041,109 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Adds a listener, which listens to role color changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), RoleChangeColorListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change color listeners.
+     *
+     * @return A list with all registered role change color listeners.
+     */
+    default List<RoleChangeColorListener> getRoleChangeColorListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeColorListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to role hoist changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeHoistListener> addRoleChangeHoistListener(RoleChangeHoistListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), RoleChangeHoistListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change hoist listeners.
+     *
+     * @return A list with all registered role change hoist listeners.
+     */
+    default List<RoleChangeHoistListener> getRoleChangeHoistListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeHoistListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to role managed flag changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeManagedListener> addRoleChangeManagedListener(
+            RoleChangeManagedListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), RoleChangeManagedListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change managed flag listeners.
+     *
+     * @return A list with all registered role change managed flag listeners.
+     */
+    default List<RoleChangeManagedListener> getRoleChangeManagedListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeManagedListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to role mentionable changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeMentionableListener> addRoleChangeMentionableListener(
+            RoleChangeMentionableListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), RoleChangeMentionableListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change mentionable listeners.
+     *
+     * @return A list with all registered role change mentionable listeners.
+     */
+    default List<RoleChangeMentionableListener> getRoleChangeMentionableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                Server.class, getId(), RoleChangeMentionableListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to role name changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), RoleChangeNameListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered role change name listeners.
+     *
+     * @return A list with all registered role change name listeners.
+     */
+    default List<RoleChangeNameListener> getRoleChangeNameListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeNameListener.class);
+    }
+
+    /**
      * Adds a listener, which listens to role permission changes in this server.
      *
      * @param listener The listener to add.
@@ -2301,6 +2413,70 @@ public interface Server extends DiscordEntity {
     default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 Server.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
+    }
+
+    /**
+     * Adds a listener that implements one or more {@code ServerAttachableListener}s.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends ServerAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addServerAttachableListener(T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ServerAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(),
+                                                                                    listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code ServerAttachableListener}s.
+     *
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends ServerAttachableListener & ObjectAttachableListener> void removeServerAttachableListener(
+            T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ServerAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(Server.class, getId(),
+                                                                                           listenerClass, listener));
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code ServerAttachableListener}s and their
+     * assigned listener classes they listen to.
+     *
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code ServerAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    default <T extends ServerAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getServerAttachableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId());
+    }
+
+    /**
+     * Removes a listener from this server.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T extends ServerAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(Server.class, getId(), listenerClass, listener);
     }
 
 }

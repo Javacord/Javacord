@@ -114,6 +114,60 @@ public class ImplRole implements Role {
     }
 
     /**
+     * Gets the color of the role as {@code int}.
+     *
+     * @return The color of the role as {@code int}.
+     */
+    public int getColorAsInt() {
+        return color;
+    }
+
+    /**
+     * Sets the color of the role.
+     *
+     * @param color The color to set.
+     */
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    /**
+     * Sets the hoist flag of the role.
+     *
+     * @param hoist The hoist flag to set.
+     */
+    public void setHoist(boolean hoist) {
+        this.hoist = hoist;
+    }
+
+    /**
+     * Sets the managed flag of the role.
+     *
+     * @param managed The managed flag to set.
+     */
+    public void setManaged(boolean managed) {
+        this.managed = managed;
+    }
+
+    /**
+     * Sets the mentionable flag of the role.
+     *
+     * @param mentionable The mentionable flag to set.
+     */
+    public void setMentionable(boolean mentionable) {
+        this.mentionable = mentionable;
+    }
+
+    /**
+     * Sets the name of the role.
+     *
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Sets the permissions of the role.
      *
      * @param permissions The permissions to set.

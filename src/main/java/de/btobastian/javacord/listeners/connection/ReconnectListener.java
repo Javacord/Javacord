@@ -1,13 +1,14 @@
 package de.btobastian.javacord.listeners.connection;
 
 import de.btobastian.javacord.events.connection.ReconnectEvent;
+import de.btobastian.javacord.listeners.GloballyAttachableListener;
 
 /**
  * This listener listens to reconnected sessions.
  * Reconnecting a session, means that it's likely that events were lost and therefore all objects were replaced.
  */
 @FunctionalInterface
-public interface ReconnectListener {
+public interface ReconnectListener extends GloballyAttachableListener {
 
     /**
      * This method is called every time a connection is reconnected.

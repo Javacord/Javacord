@@ -1,10 +1,19 @@
 package de.btobastian.javacord.entities.channels;
 
+import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionType;
+import de.btobastian.javacord.listeners.ChannelAttachableListener;
+import de.btobastian.javacord.listeners.ObjectAttachableListener;
+import de.btobastian.javacord.utils.ClassHelper;
+import de.btobastian.javacord.utils.ListenerManager;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The class represents a channel.
@@ -127,7 +136,6 @@ public interface Channel extends DiscordEntity {
     }
 
 
-
     /**
      * Checks if the given user can see this channel.
      * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
@@ -161,6 +169,70 @@ public interface Channel extends DiscordEntity {
      */
     default boolean canYouSee() {
         return canSee(getApi().getYourself());
+    }
+
+    /**
+     * Adds a listener that implements one or more {@code ChannelAttachableListener}s.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends ChannelAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addChannelAttachableListener(T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(Channel.class, getId(),
+                                                                                    listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes a listener that implements one or more {@code ChannelAttachableListener}s.
+     *
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends ChannelAttachableListener & ObjectAttachableListener> void removeChannelAttachableListener(
+            T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(Channel.class, getId(),
+                                                                                           listenerClass, listener));
+    }
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code ChannelAttachableListener}s and
+     * their assigned listener classes they listen to.
+     *
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code ChannelAttachableListener}s
+     * and their assigned listener classes they listen to.
+     */
+    default <T extends ChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getChannelAttachableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Channel.class, getId());
+    }
+
+    /**
+     * Removes a listener from this channel.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    default <T extends ChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(Channel.class, getId(), listenerClass, listener);
     }
 
 }

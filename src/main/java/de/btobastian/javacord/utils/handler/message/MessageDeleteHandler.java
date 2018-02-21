@@ -3,6 +3,7 @@ package de.btobastian.javacord.utils.handler.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
+import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.events.message.MessageDeleteEvent;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.utils.PacketHandler;
@@ -37,7 +38,7 @@ public class MessageDeleteHandler extends PacketHandler {
             api.getCachedMessageById(messageId)
                     .ifPresent(((ImplMessageCache) channel.getMessageCache())::removeMessage);
             api.removeMessageFromCache(messageId);
-            listeners.addAll(api.getMessageDeleteListeners(messageId));
+            listeners.addAll(Message.getMessageDeleteListeners(api, messageId));
             listeners.addAll(channel.getMessageDeleteListeners());
             if (channel instanceof ServerTextChannel) {
                 listeners.addAll(((ServerTextChannel) channel).getServer().getMessageDeleteListeners());
