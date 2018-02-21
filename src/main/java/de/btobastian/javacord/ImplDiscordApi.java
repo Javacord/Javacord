@@ -90,6 +90,8 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.slf4j.Logger;
 
 import java.lang.ref.Reference;
@@ -346,6 +348,7 @@ public class ImplDiscordApi implements DiscordApi {
                         .newBuilder()
                         .addHeader("User-Agent", Javacord.USER_AGENT)
                         .build()))
+                .addInterceptor(new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY))
                 .build();
 
         if (ready != null) {
