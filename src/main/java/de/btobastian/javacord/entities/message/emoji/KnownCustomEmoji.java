@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +33,28 @@ public interface KnownCustomEmoji extends CustomEmoji {
      * @return The server of the emoji.
      */
     Server getServer();
+
+    /**
+     * Gets the updater for this emoji.
+     *
+     * @return The updater for this emoji.
+     */
+    default CustomEmojiUpdater getUpdater() {
+        return new CustomEmojiUpdater(this);
+    }
+
+    /**
+     * Updates the name of the emoji.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param name The new name of the emoji.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateName(String name) {
+        return getUpdater().setName(name).update();
+    }
 
     /**
      * Adds a listener, which listens to this custom emoji being updated.
