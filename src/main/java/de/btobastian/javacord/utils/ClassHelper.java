@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class ClassHelper {
 
     private ClassHelper() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("You cannot create an instance of this class");
     }
 
     /**

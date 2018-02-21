@@ -8,7 +8,7 @@ import java.io.File;
 public class FileUtils {
 
     private FileUtils() {
-        throw new IllegalStateException("You cannot create an instance of this class");
+        throw new UnsupportedOperationException("You cannot create an instance of this class");
     }
 
     /**
