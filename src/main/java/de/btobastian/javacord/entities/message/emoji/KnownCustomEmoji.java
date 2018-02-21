@@ -74,6 +74,13 @@ public interface KnownCustomEmoji extends CustomEmoji {
     boolean requiresColons();
 
     /**
+     * Checks if this emoji is managed.
+     *
+     * @return Whether this emoji is managed or not.
+     */
+    boolean isManaged();
+
+    /**
      * Updates the name of the emoji.
      * <p>
      * If you want to update several settings at once, it's recommended to use the

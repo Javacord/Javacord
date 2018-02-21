@@ -31,7 +31,12 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     /**
      * Whether this emoji must be wrapped in colons or not.
      */
-    private boolean requiresColons = true;
+    private final boolean requiresColons;
+
+    /**
+     * Whether this emojiis managed or not.
+     */
+    private final boolean managed;
 
     /**
      * Creates a new known custom emoji.
@@ -49,9 +54,8 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
                 server.getRoleById(roleIdJson.asLong()).ifPresent(whitelist::add);
             }
         }
-        if (data.hasNonNull("require_colons")) {
-            requiresColons = data.get("require_colons").asBoolean();
-        }
+        requiresColons = !data.hasNonNull("require_colons") || data.get("require_colons").asBoolean();
+        managed = data.get("managed").asBoolean(false);
     }
 
     /**
@@ -78,6 +82,11 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     @Override
     public boolean requiresColons() {
         return requiresColons;
+    }
+
+    @Override
+    public boolean isManaged() {
+        return managed;
     }
 
     @Override
