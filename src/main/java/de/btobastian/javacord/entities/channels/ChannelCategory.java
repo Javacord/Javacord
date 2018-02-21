@@ -7,6 +7,7 @@ import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ChannelCategoryAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelAttachableListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
 
@@ -139,6 +140,28 @@ public interface ChannelCategory extends ServerChannel {
             return channel.removeCategory();
         }
         return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Adds a listener, which listens to server channel nsfw flag changes of this channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
+            ServerChannelChangeNsfwFlagListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server channel change nsfw flag listeners.
+     *
+     * @return A list with all registered server channel change nsfw flag listeners.
+     */
+    default List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class);
     }
 
     /**

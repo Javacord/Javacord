@@ -146,6 +146,15 @@ public class ImplServerTextChannel implements ServerTextChannel, Cleanupable {
     }
 
     /**
+     * Sets the nsfw flag.
+     *
+     * @param nsfw The nsfw flag.
+     */
+    public void setNsfwFlag(boolean nsfw) {
+        this.nsfw = nsfw;
+    }
+
+    /**
      * Gets the overwritten role permissions.
      *
      * @return The overwritten role permissions.

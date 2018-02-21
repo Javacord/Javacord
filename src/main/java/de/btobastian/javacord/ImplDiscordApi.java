@@ -44,6 +44,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelList
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -1416,6 +1417,17 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
         return getListeners(ServerChannelChangePositionListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
+            ServerChannelChangeNsfwFlagListener listener) {
+        return addListener(ServerChannelChangeNsfwFlagListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
+        return getListeners(ServerChannelChangeNsfwFlagListener.class);
     }
 
     @Override

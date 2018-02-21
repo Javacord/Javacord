@@ -44,6 +44,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
@@ -1913,6 +1914,28 @@ public interface Server extends DiscordEntity {
     default List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 Server.class, getId(), ServerChannelChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to server channel nsfw flag changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
+            ServerChannelChangeNsfwFlagListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                Server.class, getId(), ServerChannelChangeNsfwFlagListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server channel change nsfw flag listeners.
+     *
+     * @return A list with all registered server channel change nsfw flag listeners.
+     */
+    default List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                Server.class, getId(), ServerChannelChangeNsfwFlagListener.class);
     }
 
     /**
