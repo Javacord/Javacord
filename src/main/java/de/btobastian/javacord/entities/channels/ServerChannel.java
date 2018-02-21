@@ -26,6 +26,7 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -174,7 +175,7 @@ public interface ServerChannel extends Channel {
                 builder.setState(type, PermissionState.ALLOWED);
             }
         }
-        List<Role> rolesOfUser = server.getRolesOf(user);
+        List<Role> rolesOfUser = new ArrayList<>(server.getRolesOf(user));
         rolesOfUser.remove(everyoneRole);
         List<Permissions> permissionOverwrites = rolesOfUser.stream()
                 .map(this::getOverwrittenPermissions)
