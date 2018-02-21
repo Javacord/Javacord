@@ -25,7 +25,6 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.awt.Color;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -201,9 +200,7 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return The allowed permissions of the role.
      */
     default Collection<PermissionType> getAllowedPermissions() {
-        return Arrays.stream(PermissionType.values())
-                .filter(type -> getPermissions().getState(type) == PermissionState.ALLOWED)
-                .collect(Collectors.toSet());
+        return getPermissions().getAllowedPermission();
     }
 
     /**
@@ -212,9 +209,7 @@ public interface Role extends DiscordEntity, Mentionable {
      * @return The unset permissions of the role.
      */
     default Collection<PermissionType> getUnsetPermissions() {
-        return Arrays.stream(PermissionType.values())
-                .filter(type -> getPermissions().getState(type) == PermissionState.NONE)
-                .collect(Collectors.toSet());
+        return getPermissions().getUnsetPermissions();
     }
 
     @Override

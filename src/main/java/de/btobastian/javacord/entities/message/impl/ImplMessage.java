@@ -253,7 +253,7 @@ public class ImplMessage implements Message {
 
     @Override
     public List<Embed> getEmbeds() {
-        return Collections.unmodifiableList(embeds);
+        return Collections.unmodifiableList(new ArrayList<>(embeds));
     }
 
     @Override
@@ -282,17 +282,17 @@ public class ImplMessage implements Message {
 
     @Override
     public List<Reaction> getReactions() {
-        return new ArrayList<>(reactions);
+        return Collections.unmodifiableList(new ArrayList<>(reactions));
     }
 
     @Override
     public List<User> getMentionedUsers() {
-        return mentions;
+        return Collections.unmodifiableList(new ArrayList<>(mentions));
     }
 
     @Override
     public List<Role> getMentionedRoles() {
-        return roleMentions;
+        return Collections.unmodifiableList(new ArrayList<>(roleMentions));
     }
 
     @Override

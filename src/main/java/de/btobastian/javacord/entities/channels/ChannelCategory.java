@@ -12,6 +12,7 @@ import de.btobastian.javacord.utils.ListenerManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public interface ChannelCategory extends ServerChannel {
                 .filter(channel -> channel.getCategory().orElse(null) == this)
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .forEach(channels::add);
-        return channels;
+        return Collections.unmodifiableList(channels);
     }
 
     /**
@@ -58,9 +59,9 @@ public interface ChannelCategory extends ServerChannel {
      * @return The visible channels in the category.
      */
     default List<ServerChannel> getVisibleChannels(User user) {
-        List<ServerChannel> channels = getChannels();
+        List<ServerChannel> channels = new ArrayList<>(getChannels());
         channels.removeIf(channel -> !channel.canSee(user));
-        return channels;
+        return Collections.unmodifiableList(channels);
     }
 
     /**

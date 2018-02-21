@@ -623,7 +623,7 @@ public class ImplServer implements Server, Cleanupable {
 
     @Override
     public Collection<User> getMembers() {
-        return members.values();
+        return Collections.unmodifiableList(new ArrayList<>(members.values()));
     }
 
     @Override
@@ -633,9 +633,9 @@ public class ImplServer implements Server, Cleanupable {
 
     @Override
     public List<Role> getRoles() {
-        return roles.values().stream()
+        return Collections.unmodifiableList(roles.values().stream()
                 .sorted(Comparator.comparingInt(Role::getPosition))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -665,10 +665,10 @@ public class ImplServer implements Server, Cleanupable {
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .forEachOrdered(channels::add);
         getChannelCategories().forEach(category -> {
-                    channels.add(category);
-                    channels.addAll(category.getChannels());
-                });
-        return channels;
+            channels.add(category);
+            channels.addAll(category.getChannels());
+        });
+        return Collections.unmodifiableList(channels);
     }
 
     @Override

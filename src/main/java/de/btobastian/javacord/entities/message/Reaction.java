@@ -10,6 +10,7 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -39,7 +40,7 @@ public interface Reaction {
                     for (JsonNode userJson : result.getJsonBody()) {
                         users.add(((ImplDiscordApi) api).getOrCreateUser(userJson));
                     }
-                    return users;
+                    return Collections.unmodifiableList(users);
                 });
     }
 

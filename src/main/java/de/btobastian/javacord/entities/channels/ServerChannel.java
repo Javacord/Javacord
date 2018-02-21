@@ -28,6 +28,7 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +96,7 @@ public interface ServerChannel extends Channel {
                     for (JsonNode inviteJson : result.getJsonBody()) {
                         invites.add(new ImplInvite(getApi(), inviteJson));
                     }
-                    return invites;
+                    return Collections.unmodifiableCollection(invites);
                 });
     }
 

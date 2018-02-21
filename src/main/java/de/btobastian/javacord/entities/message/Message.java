@@ -983,7 +983,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
                 emojis.add(emoji);
             });
         }
-        return emojis;
+        return Collections.unmodifiableList(emojis);
     }
 
     /**
@@ -1072,7 +1072,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
                     .filter(channel -> !mentionedChannels.contains(channel))
                     .ifPresent(mentionedChannels::add);
         }
-        return mentionedChannels;
+        return Collections.unmodifiableList(mentionedChannels);
     }
 
     /**

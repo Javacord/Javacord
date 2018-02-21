@@ -741,7 +741,7 @@ public class ImplDiscordApi implements DiscordApi {
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> Map<T, List<Class<T>>> getObjectListeners(
             Class<?> objectClass, long objectId) {
-        return Optional.ofNullable(objectClass)
+        return Collections.unmodifiableMap(Optional.ofNullable(objectClass)
                 .map(objectListeners::get)
                 .map(objectListener -> objectListener.get(objectId))
                 .map(Map::entrySet)
@@ -755,7 +755,7 @@ public class ImplDiscordApi implements DiscordApi {
                 .map(entryStream -> entryStream
                         .collect(Collectors.groupingBy(Entry::getKey,
                                                        Collectors.mapping(Entry::getValue, Collectors.toList()))))
-                .orElseGet(HashMap::new);
+                .orElseGet(HashMap::new));
     }
 
     /**
@@ -770,13 +770,13 @@ public class ImplDiscordApi implements DiscordApi {
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> List<T> getObjectListeners(
             Class<?> objectClass, long objectId, Class<T> listenerClass) {
-        return (List<T>) Optional.ofNullable(objectClass)
+        return Collections.unmodifiableList((List<T>) Optional.ofNullable(objectClass)
                 .map(objectListeners::get)
                 .map(objectListener -> objectListener.get(objectId))
                 .map(listeners -> listeners.get(listenerClass))
                 .map(Map::keySet)
                 .map(ArrayList::new)
-                .orElseGet(ArrayList::new);
+                .orElseGet(ArrayList::new));
     }
 
     @Override
@@ -811,14 +811,14 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends GloballyAttachableListener> Map<T, List<Class<T>>> getListeners() {
-        return listeners.entrySet().stream()
+        return Collections.unmodifiableMap(listeners.entrySet().stream()
                 .flatMap(entry -> entry
                         .getValue()
                         .keySet()
                         .stream()
                         .map(listener -> new SimpleEntry<>((T) listener, (Class<T>) entry.getKey())))
                 .collect(Collectors.groupingBy(Entry::getKey,
-                                               Collectors.mapping(Entry::getValue, Collectors.toList())));
+                                               Collectors.mapping(Entry::getValue, Collectors.toList()))));
     }
 
     /**
@@ -830,11 +830,11 @@ public class ImplDiscordApi implements DiscordApi {
      */
     @SuppressWarnings("unchecked")
     public <T extends GloballyAttachableListener> List<T> getListeners(Class<T> listenerClass) {
-        return (List<T>) Optional.ofNullable(listenerClass)
+        return Collections.unmodifiableList((List<T>) Optional.ofNullable(listenerClass)
                 .map(listeners::get)
                 .map(Map::keySet)
                 .map(ArrayList::new)
-                .orElseGet(ArrayList::new);
+                .orElseGet(ArrayList::new));
     }
 
     @Override
@@ -1012,10 +1012,10 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public Collection<User> getCachedUsers() {
         synchronized (users) {
-            return users.values().stream()
+            return Collections.unmodifiableCollection(users.values().stream()
                     .map(Reference::get)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()));
         }
     }
 
@@ -1050,7 +1050,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public Collection<Server> getServers() {
-        return servers.values();
+        return Collections.unmodifiableList(new ArrayList<>(servers.values()));
     }
 
     @Override
@@ -1060,7 +1060,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public Collection<CustomEmoji> getCustomEmojis() {
-        return customEmojis.values();
+        return Collections.unmodifiableCollection(customEmojis.values());
     }
 
     @Override
@@ -1070,7 +1070,7 @@ public class ImplDiscordApi implements DiscordApi {
 
     @Override
     public Collection<GroupChannel> getGroupChannels() {
-        return groupChannels.values();
+        return Collections.unmodifiableCollection(groupChannels.values());
     }
 
     @Override

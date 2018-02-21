@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.impl.ImplWebhook;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,16 +65,16 @@ public class ImplAuditLog implements AuditLog {
 
     @Override
     public Collection<Webhook> getInvolvedWebhooks() {
-        return involvedWebhooks;
+        return Collections.unmodifiableCollection(involvedWebhooks);
     }
 
     @Override
     public Collection<User> getInvolvedUsers() {
-        return involvedUsers;
+        return Collections.unmodifiableCollection(involvedUsers);
     }
 
     @Override
     public List<AuditLogEntry> getEntries() {
-        return entries;
+        return Collections.unmodifiableList(entries);
     }
 }

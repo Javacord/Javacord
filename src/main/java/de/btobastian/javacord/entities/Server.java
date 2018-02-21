@@ -86,6 +86,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -205,7 +206,7 @@ public interface Server extends DiscordEntity {
                     for (JsonNode inviteJson : result.getJsonBody()) {
                         invites.add(new ImplInvite(getApi(), inviteJson));
                     }
-                    return invites;
+                    return Collections.unmodifiableCollection(invites);
                 });
     }
 
@@ -268,9 +269,9 @@ public interface Server extends DiscordEntity {
      * @return A collection with all members with the given name.
      */
     default Collection<User> getMembersByName(String name) {
-        return getMembers().stream()
+        return Collections.unmodifiableList(getMembers().stream()
                 .filter(user -> user.getName().equals(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -281,9 +282,9 @@ public interface Server extends DiscordEntity {
      * @return A collection with all members with the given name.
      */
     default Collection<User> getMembersByNameIgnoreCase(String name) {
-        return getMembers().stream()
+        return Collections.unmodifiableList(getMembers().stream()
                 .filter(user -> user.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -332,9 +333,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all roles with the given name.
      */
     default List<Role> getRolesByName(String name) {
-        return getRoles().stream()
+        return Collections.unmodifiableList(getRoles().stream()
                 .filter(role -> role.getName().equals(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -345,9 +346,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all roles with the given name.
      */
     default List<Role> getRolesByNameIgnoreCase(String name) {
-        return getRoles().stream()
+        return Collections.unmodifiableList(getRoles().stream()
                 .filter(role -> role.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -357,9 +358,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all roles of the user in the server.
      */
     default List<Role> getRolesOf(User user) {
-        return getRoles().stream()
+        return Collections.unmodifiableList(getRoles().stream()
                 .filter(role -> role.getUsers().contains(user))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -390,7 +391,7 @@ public interface Server extends DiscordEntity {
         } else {
             getRolesOf(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
         }
-        return allowed;
+        return Collections.unmodifiableCollection(allowed);
     }
 
     /**
@@ -400,12 +401,12 @@ public interface Server extends DiscordEntity {
      * @return The unset permissions of the given user.
      */
     default Collection<PermissionType> getUnsetPermissionsOf(User user) {
-        Collection<PermissionType> unset = new HashSet<>();
         if (getOwner() == user) {
-            return unset;
+            return Collections.emptySet();
         }
+        Collection<PermissionType> unset = new HashSet<>();
         getRolesOf(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
-        return unset;
+        return Collections.unmodifiableCollection(unset);
     }
 
     /**
@@ -736,7 +737,7 @@ public interface Server extends DiscordEntity {
                     for (JsonNode ban : result.getJsonBody()) {
                         bans.add(new ImplBan(this, ban));
                     }
-                    return bans;
+                    return Collections.unmodifiableCollection(bans);
                 });
     }
 
@@ -753,7 +754,7 @@ public interface Server extends DiscordEntity {
                     for (JsonNode webhookJson : result.getJsonBody()) {
                         webhooks.add(new ImplWebhook(getApi(), webhookJson));
                     }
-                    return webhooks;
+                    return Collections.unmodifiableList(webhooks);
                 });
     }
 
@@ -824,9 +825,9 @@ public interface Server extends DiscordEntity {
      * @return A collection of all custom emojis with the given name in this server.
      */
     default Collection<CustomEmoji> getCustomEmojisByName(String name) {
-        return getCustomEmojis().stream()
+        return Collections.unmodifiableList(getCustomEmojis().stream()
                 .filter(emoji -> emoji.getName().equals(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -837,9 +838,9 @@ public interface Server extends DiscordEntity {
      * @return A collection of all custom emojis with the given name in this server.
      */
     default Collection<CustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
-        return getCustomEmojis().stream()
+        return Collections.unmodifiableCollection(getCustomEmojis().stream()
                 .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -891,11 +892,11 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all channel categories of the server.
      */
     default List<ChannelCategory> getChannelCategories() {
-        return ((ImplServer) this).getUnorderedChannels().stream()
+        return Collections.unmodifiableList(((ImplServer) this).getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ChannelCategory)
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .map(channel -> (ChannelCategory) channel)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -904,11 +905,11 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all text channels of the server.
      */
     default List<ServerTextChannel> getTextChannels() {
-        return ((ImplServer) this).getUnorderedChannels().stream()
+        return Collections.unmodifiableList(((ImplServer) this).getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerTextChannel)
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .map(channel -> (ServerTextChannel) channel)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -917,11 +918,11 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all voice channels of the server.
      */
     default List<ServerVoiceChannel> getVoiceChannels() {
-        return ((ImplServer) this).getUnorderedChannels().stream()
+        return Collections.unmodifiableList(((ImplServer) this).getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerVoiceChannel)
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .map(channel -> (ServerVoiceChannel) channel)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -954,9 +955,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all channels with the given name.
      */
     default List<ServerChannel> getChannelsByName(String name) {
-        return getChannels().stream()
+        return Collections.unmodifiableList(getChannels().stream()
                 .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -967,9 +968,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all channels with the given name.
      */
     default List<ServerChannel> getChannelsByNameIgnoreCase(String name) {
-        return getChannels().stream()
+        return Collections.unmodifiableList(getChannels().stream()
                 .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1006,9 +1007,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all channel categories with the given name.
      */
     default List<ChannelCategory> getChannelCategoriesByName(String name) {
-        return getChannelCategories().stream()
+        return Collections.unmodifiableList(getChannelCategories().stream()
                 .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1019,9 +1020,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all channel categories with the given name.
      */
     default List<ChannelCategory> getChannelCategoriesByNameIgnoreCase(String name) {
-        return getChannelCategories().stream()
+        return Collections.unmodifiableList(getChannelCategories().stream()
                 .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1058,9 +1059,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all text channels with the given name.
      */
     default List<ServerTextChannel> getTextChannelsByName(String name) {
-        return getTextChannels().stream()
+        return Collections.unmodifiableList(getTextChannels().stream()
                 .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1071,9 +1072,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all text channels with the given name.
      */
     default List<ServerTextChannel> getTextChannelsByNameIgnoreCase(String name) {
-        return getTextChannels().stream()
+        return Collections.unmodifiableList(getTextChannels().stream()
                 .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1110,9 +1111,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all voice channels with the given name.
      */
     default List<ServerVoiceChannel> getVoiceChannelsByName(String name) {
-        return getVoiceChannels().stream()
+        return Collections.unmodifiableList(getVoiceChannels().stream()
                 .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1123,9 +1124,9 @@ public interface Server extends DiscordEntity {
      * @return A sorted list (by position) with all voice channels with the given name.
      */
     default List<ServerVoiceChannel> getVoiceChannelsByNameIgnoreCase(String name) {
-        return getVoiceChannels().stream()
+        return Collections.unmodifiableList(getVoiceChannels().stream()
                 .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1150,7 +1151,7 @@ public interface Server extends DiscordEntity {
     default List<ServerChannel> getVisibleChannels(User user) {
         List<ServerChannel> channels = getChannels();
         channels.removeIf(channel -> !channel.canSee(user));
-        return channels;
+        return Collections.unmodifiableList(channels);
     }
 
     /**
