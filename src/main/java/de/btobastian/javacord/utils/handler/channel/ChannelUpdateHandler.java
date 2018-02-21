@@ -19,6 +19,7 @@ import de.btobastian.javacord.events.server.channel.ServerChannelChangeOverwritt
 import de.btobastian.javacord.events.server.channel.ServerChannelChangePositionEvent;
 import de.btobastian.javacord.events.server.channel.ServerTextChannelChangeTopicEvent;
 import de.btobastian.javacord.events.server.channel.ServerVoiceChannelChangeBitrateEvent;
+import de.btobastian.javacord.events.server.channel.ServerVoiceChannelChangeUserLimitEvent;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
@@ -26,6 +27,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwr
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeUserLimitListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -313,6 +315,21 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getServerVoiceChannelChangeBitrateListeners());
 
                 dispatchEvent(listeners, listener -> listener.onServerVoiceChannelChangeBitrate(event));
+            }
+
+            int oldUserLimit = channel.getUserLimit().orElse(0);
+            int newUserLimit = jsonChannel.get("user_limit").asInt();
+            if (oldUserLimit != newUserLimit) {
+                channel.setUserLimit(newUserLimit);
+                ServerVoiceChannelChangeUserLimitEvent event =
+                        new ServerVoiceChannelChangeUserLimitEvent(channel, newUserLimit, oldUserLimit);
+
+                List<ServerVoiceChannelChangeUserLimitListener> listeners = new ArrayList<>();
+                listeners.addAll(channel.getServerVoiceChannelChangeUserLimitListeners());
+                listeners.addAll(channel.getServer().getServerVoiceChannelChangeUserLimitListeners());
+                listeners.addAll(api.getServerVoiceChannelChangeUserLimitListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerVoiceChannelChangeUserLimit(event));
             }
         });
     }

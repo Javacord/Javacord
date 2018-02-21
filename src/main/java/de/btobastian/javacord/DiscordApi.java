@@ -60,6 +60,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListen
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeUserLimitListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
@@ -1972,6 +1973,22 @@ public interface DiscordApi {
      * @return A list with all registered server voice channel change bitrate listeners.
      */
     List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners();
+
+    /**
+     * Adds a listener, which listens to user limit changes of server voice channels.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerVoiceChannelChangeUserLimitListener> addServerVoiceChannelChangeUserLimitListener(
+            ServerVoiceChannelChangeUserLimitListener listener);
+
+    /**
+     * Gets a list with all registered server voice channel change user limit listeners.
+     *
+     * @return A list with all registered server voice channel change user limit listeners.
+     */
+    List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners();
 
     /**
      * Adds a listener, which listens to user status changes.

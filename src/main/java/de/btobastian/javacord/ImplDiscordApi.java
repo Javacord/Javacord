@@ -51,6 +51,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListen
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeUserLimitListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
@@ -1495,13 +1496,25 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(ServerVoiceChannelChangeBitrateListener listener) {
+    public ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
+            ServerVoiceChannelChangeBitrateListener listener) {
         return addListener(ServerVoiceChannelChangeBitrateListener.class, listener);
     }
 
     @Override
     public List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners() {
         return getListeners(ServerVoiceChannelChangeBitrateListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelChangeUserLimitListener> addServerVoiceChannelChangeUserLimitListener(
+            ServerVoiceChannelChangeUserLimitListener listener) {
+        return addListener(ServerVoiceChannelChangeUserLimitListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners() {
+        return getListeners(ServerVoiceChannelChangeUserLimitListener.class);
     }
 
     @Override
