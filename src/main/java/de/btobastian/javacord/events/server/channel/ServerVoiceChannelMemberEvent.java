@@ -2,17 +2,16 @@ package de.btobastian.javacord.events.server.channel;
 
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
-import de.btobastian.javacord.events.user.UserEvent;
 
 /**
  * A server voice channel member event.
  */
-public abstract class ServerVoiceChannelMemberEvent extends UserEvent {
+public abstract class ServerVoiceChannelMemberEvent extends ServerVoiceChannelEvent {
 
     /**
-     * The channel of the event.
+     * The user of the event.
      */
-    private final ServerVoiceChannel channel;
+    private final User user;
 
     /**
      * Creates a new voice channel member event.
@@ -21,17 +20,17 @@ public abstract class ServerVoiceChannelMemberEvent extends UserEvent {
      * @param channel The channel of the event.
      */
     public ServerVoiceChannelMemberEvent(User user, ServerVoiceChannel channel) {
-        super(channel.getApi(), user);
-        this.channel = channel;
+        super(channel);
+        this.user = user;
     }
 
     /**
-     * Gets the channel of the event.
+     * Gets the user of the event.
      *
-     * @return The channel of the event.
+     * @return The user of the event.
      */
-    public ServerVoiceChannel getChannel() {
-        return channel;
+    public User getUser() {
+        return user;
     }
 
 }
