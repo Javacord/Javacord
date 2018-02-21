@@ -16,6 +16,7 @@ import de.btobastian.javacord.utils.ListenerManager;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,6 +37,13 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * @return The bitrate of the channel.
      */
     int getBitrate();
+
+    /**
+     * Gets the user limit of the channel.
+     *
+     * @return The user limit.
+     */
+    Optional<Integer> getUserLimit();
 
     /**
      * Gets the users that are connected to this server voice channel.

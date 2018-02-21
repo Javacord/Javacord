@@ -39,6 +39,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     private int bitrate;
 
     /**
+     * The userLimit of the channel.
+     */
+    private int userLimit;
+
+    /**
      * The name of the channel.
      */
     private String name;
@@ -87,6 +92,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
 
         id = Long.parseLong(data.get("id").asText());
         bitrate = data.get("bitrate").asInt();
+        userLimit = data.get("user_limit").asInt();
         name = data.get("name").asText();
         parentId = Long.valueOf(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
 
@@ -134,6 +140,15 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
      */
     public void setBitrate(int bitrate) {
         this.bitrate = bitrate;
+    }
+
+    /**
+     * Sets the user limit of the channel.
+     *
+     * @param userLimit The user limit to set.
+     */
+    public void setUserLimit(int userLimit) {
+        this.userLimit = userLimit;
     }
 
     /**
@@ -215,6 +230,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     @Override
     public int getBitrate() {
         return bitrate;
+    }
+
+    @Override
+    public Optional<Integer> getUserLimit() {
+        return userLimit == 0 ? Optional.empty() : Optional.of(userLimit);
     }
 
     @Override
