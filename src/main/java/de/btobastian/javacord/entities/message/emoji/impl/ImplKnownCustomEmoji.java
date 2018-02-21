@@ -5,6 +5,12 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
+import de.btobastian.javacord.entities.permissions.Role;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
 
 /**
  * The implementation of {@link CustomEmoji}.
@@ -17,7 +23,13 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     private final Server server;
 
     /**
-     * Creates a new custom emoji.
+     * A list with all whitelisted roles.
+     * Might be <code>null</code>!
+     */
+    private Collection<Role> whitelist;
+
+    /**
+     * Creates a new known custom emoji.
      *
      * @param api The discord api instance.
      * @param server The server of the emoji.
@@ -26,22 +38,19 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     public ImplKnownCustomEmoji(ImplDiscordApi api, Server server, JsonNode data) {
         super(api, data);
         this.server = server;
+        if (data.hasNonNull("roles")) {
+            whitelist = new HashSet<>();
+            for (JsonNode roleIdJson : data.get("roles")) {
+                server.getRoleById(roleIdJson.asLong()).ifPresent(whitelist::add);
+            }
+        }
     }
 
     /**
-     * Creates a new custom emoji.
+     * Sets the name of the custom emoji.
      *
-     * @param api The discord api instance.
-     * @param id The id of the emoji.
-     * @param server The server of the emoji.
-     * @param name The name of the emoji.
-     * @param animated Whether the emoji is animated or not.
+     * @param name The name of the custom emoji.
      */
-    public ImplKnownCustomEmoji(ImplDiscordApi api, long id, Server server, String name, boolean animated) {
-        super(api, id, name, animated);
-        this.server = server;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -49,6 +58,13 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     @Override
     public Server getServer() {
         return server;
+    }
+
+    @Override
+    public Optional<Collection<Role>> getWhitelistedRoles() {
+        return whitelist == null || whitelist.isEmpty() ?
+                Optional.empty() :
+                Optional.of(Collections.unmodifiableCollection(new HashSet<>(whitelist)));
     }
 
     @Override

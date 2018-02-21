@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.emoji;
 
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiAttachableListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,13 @@ public interface KnownCustomEmoji extends CustomEmoji {
     }
 
     /**
+     * Gets a list with all whitelisted roles.
+     *
+     * @return A list with all whitelisted roles.
+     */
+    Optional<Collection<Role>> getWhitelistedRoles();
+
+    /**
      * Updates the name of the emoji.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
@@ -54,6 +63,46 @@ public interface KnownCustomEmoji extends CustomEmoji {
      */
     default CompletableFuture<Void> updateName(String name) {
         return getUpdater().setName(name).update();
+    }
+
+    /**
+     * Updates the whitelist of the emoji.
+     * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param roles The new whitelist.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateWhitelist(Collection<Role> roles) {
+        return getUpdater().setWhitelist(roles).update();
+    }
+
+    /**
+     * Updates the whitelist of the emoji.
+     * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param roles The new whitelist.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateWhitelist(Role... roles) {
+        return getUpdater().setWhitelist(roles).update();
+    }
+
+    /**
+     * Removes the whitelist of the emoji.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeWhitelist() {
+        return getUpdater().removeWhitelist().update();
     }
 
     /**
