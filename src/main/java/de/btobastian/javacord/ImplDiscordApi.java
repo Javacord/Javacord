@@ -50,6 +50,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
@@ -1491,6 +1492,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
         return getListeners(ServerVoiceChannelMemberLeaveListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(ServerVoiceChannelChangeBitrateListener listener) {
+        return addListener(ServerVoiceChannelChangeBitrateListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners() {
+        return getListeners(ServerVoiceChannelChangeBitrateListener.class);
     }
 
     @Override

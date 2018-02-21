@@ -34,6 +34,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     private final long id;
 
     /**
+     * The bitrate of the channel.
+     */
+    private int bitrate;
+
+    /**
      * The name of the channel.
      */
     private String name;
@@ -81,6 +86,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
         position = data.get("position").asInt();
 
         id = Long.parseLong(data.get("id").asText());
+        bitrate = data.get("bitrate").asInt();
         name = data.get("name").asText();
         parentId = Long.valueOf(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
 
@@ -119,6 +125,15 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
      */
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    /**
+     * Sets the bitrate of the channel.
+     *
+     * @param bitrate The new bitrate of the channel.
+     */
+    public void setBitrate(int bitrate) {
+        this.bitrate = bitrate;
     }
 
     /**
@@ -195,6 +210,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     @Override
     public Optional<ChannelCategory> getCategory() {
         return getServer().getChannelCategoryById(parentId);
+    }
+
+    @Override
+    public int getBitrate() {
+        return bitrate;
     }
 
     @Override

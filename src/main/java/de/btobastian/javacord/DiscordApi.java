@@ -59,6 +59,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
@@ -1941,7 +1942,7 @@ public interface DiscordApi {
     List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners();
 
     /**
-     * Adds a listener, which listens to users leaving a server voice channel on this server.
+     * Adds a listener, which listens to users leaving a server voice channel.
      *
      * @param listener The listener to add.
      * @return The manager of the listener.
@@ -1955,6 +1956,22 @@ public interface DiscordApi {
      * @return A list with all registered server voice channel member leave listeners.
      */
     List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners();
+
+    /**
+     * Adds a listener, which listens to birate changes of server voice channels.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
+            ServerVoiceChannelChangeBitrateListener listener);
+
+    /**
+     * Gets a list with all registered server voice channel change bitrate listeners.
+     *
+     * @return A list with all registered server voice channel change bitrate listeners.
+     */
+    List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners();
 
     /**
      * Adds a listener, which listens to user status changes.

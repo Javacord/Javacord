@@ -18,12 +18,14 @@ import de.btobastian.javacord.events.server.channel.ServerChannelChangeNsfwFlagE
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeOverwrittenPermissionsEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangePositionEvent;
 import de.btobastian.javacord.events.server.channel.ServerTextChannelChangeTopicEvent;
+import de.btobastian.javacord.events.server.channel.ServerVoiceChannelChangeBitrateEvent;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
 import java.util.ArrayList;
@@ -293,11 +295,26 @@ public class ChannelUpdateHandler extends PacketHandler {
     /**
      * Handles a server voice channel update.
      *
-     * @param channel The channel data.
+     * @param jsonChannel The channel data.
      */
-    private void handleServerVoiceChannel(JsonNode channel) {
-        long serverId = Long.parseLong(channel.get("guild_id").asText());
+    private void handleServerVoiceChannel(JsonNode jsonChannel) {
+        long channelId = jsonChannel.get("id").asLong();
+        api.getServerVoiceChannelById(channelId).map(ImplServerVoiceChannel.class::cast).ifPresent(channel -> {
+            int oldBitrate = channel.getBitrate();
+            int newBitrate = jsonChannel.get("bitrate").asInt();
+            if (oldBitrate != newBitrate) {
+                channel.setBitrate(newBitrate);
+                ServerVoiceChannelChangeBitrateEvent event =
+                        new ServerVoiceChannelChangeBitrateEvent(channel, newBitrate, oldBitrate);
 
+                List<ServerVoiceChannelChangeBitrateListener> listeners = new ArrayList<>();
+                listeners.addAll(channel.getServerVoiceChannelChangeBitrateListeners());
+                listeners.addAll(channel.getServer().getServerVoiceChannelChangeBitrateListeners());
+                listeners.addAll(api.getServerVoiceChannelChangeBitrateListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerVoiceChannelChangeBitrate(event));
+            }
+        });
     }
 
     /**

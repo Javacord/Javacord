@@ -50,6 +50,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelChangePositi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelCreateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelDeleteListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
@@ -2437,6 +2438,28 @@ public interface Server extends DiscordEntity {
     default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 Server.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to server voice channel bitrate changes on this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
+            ServerVoiceChannelChangeBitrateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerVoiceChannelChangeBitrateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server voice channel change bitrate listeners.
+     *
+     * @return A list with all registered server voice channel change bitrate listeners.
+     */
+    default List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                Server.class, getId(), ServerVoiceChannelChangeBitrateListener.class);
     }
 
     /**

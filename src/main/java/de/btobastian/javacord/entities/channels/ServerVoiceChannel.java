@@ -7,6 +7,7 @@ import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.VoiceChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelAttachableListener;
+import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.utils.ClassHelper;
@@ -28,6 +29,13 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     default ChannelType getType() {
         return ChannelType.SERVER_VOICE_CHANNEL;
     }
+
+    /**
+     * Gets the bitrate (int bits) of the channel.
+     *
+     * @return The bitrate of the channel.
+     */
+    int getBitrate();
 
     /**
      * Gets the users that are connected to this server voice channel.
@@ -150,6 +158,28 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to bitrate changes of this channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
+            ServerVoiceChannelChangeBitrateListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelChangeBitrateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server voice channel change bitrate listeners.
+     *
+     * @return A list with all registered server voice channel change bitrate listeners.
+     */
+    default List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelChangeBitrateListener.class);
     }
 
     /**
