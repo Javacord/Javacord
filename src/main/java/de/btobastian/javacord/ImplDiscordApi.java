@@ -14,7 +14,9 @@ import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageSet;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.impl.ImplKnownCustomEmoji;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
 import de.btobastian.javacord.entities.message.impl.ImplMessageSet;
 import de.btobastian.javacord.listeners.GloballyAttachableListener;
@@ -267,7 +269,7 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * A map with all known custom emoji.
      */
-    private final ConcurrentHashMap<Long, CustomEmoji> customEmojis = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, KnownCustomEmoji> customEmojis = new ConcurrentHashMap<>();
 
     /**
      * A map with all cached messages.
@@ -588,15 +590,49 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     /**
-     * Gets or creates a new custom emoji object.
+     * Gets or creates a new known custom emoji object.
      *
      * @param server The server of the emoji.
      * @param data The data of the emoji.
      * @return The emoji for the given json object.
      */
-    public CustomEmoji getOrCreateCustomEmoji(Server server, JsonNode data) {
+    public KnownCustomEmoji getOrCreateKnownCustomEmoji(Server server, JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
-        return customEmojis.computeIfAbsent(id, key -> new ImplCustomEmoji(this, server, data));
+        return customEmojis.computeIfAbsent(id, key -> new ImplKnownCustomEmoji(this, server, data));
+    }
+
+    /**
+     * Gets a known custom emoji or creates a new (unknown) custom emoji object.
+     *
+     * @param data The data of the emoji.
+     * @return The emoji for the given json object.
+     */
+    public CustomEmoji getKnownCustomEmojiOrCreateCustomEmoji(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        CustomEmoji emoji = customEmojis.get(id);
+        return emoji == null ? new ImplCustomEmoji(this, data) : emoji;
+    }
+
+    /**
+     * Gets a known custom emoji or creates a new (unknown) custom emoji object.
+     *
+     * @param id The id of the emoji.
+     * @param name The name of the emoji.
+     * @param animated Whether the emoji is animated or not.
+     * @return The emoji for the given json object.
+     */
+    public CustomEmoji getKnownCustomEmojiOrCreateCustomEmoji(long id, String name, boolean animated) {
+        CustomEmoji emoji = customEmojis.get(id);
+        return emoji == null ? new ImplCustomEmoji(this, id, name, animated) : emoji;
+    }
+
+    /**
+     * Removes a known custom emoji object.
+     *
+     * @param emoji The emoji to remove.
+     */
+    public void removeCustomEmoji(KnownCustomEmoji emoji) {
+        customEmojis.remove(emoji.getId());
     }
 
     /**
@@ -1065,12 +1101,12 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public Collection<CustomEmoji> getCustomEmojis() {
+    public Collection<KnownCustomEmoji> getCustomEmojis() {
         return Collections.unmodifiableCollection(customEmojis.values());
     }
 
     @Override
-    public Optional<CustomEmoji> getCustomEmojiById(long id) {
+    public Optional<KnownCustomEmoji> getCustomEmojiById(long id) {
         return Optional.ofNullable(customEmojis.get(id));
     }
 

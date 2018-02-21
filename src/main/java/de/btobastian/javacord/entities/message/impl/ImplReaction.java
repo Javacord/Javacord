@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
@@ -47,7 +48,7 @@ public class ImplReaction implements Reaction {
         if (!emojiJson.has("id") || emojiJson.get("id").isNull()) {
             emoji = ImplUnicodeEmoji.fromString(emojiJson.get("name").asText());
         } else {
-            emoji = ((ImplDiscordApi) message.getApi()).getOrCreateCustomEmoji(null, emojiJson);
+            emoji = ((ImplDiscordApi) message.getApi()).getKnownCustomEmojiOrCreateCustomEmoji(emojiJson);
         }
     }
 
@@ -97,7 +98,12 @@ public class ImplReaction implements Reaction {
 
     @Override
     public Emoji getEmoji() {
-        return emoji;
+        // Make sure to always return the known custom emoji, if it is known
+        return emoji.asCustomEmoji()
+                .map(DiscordEntity::getId)
+                .flatMap(id -> message.getApi().getCustomEmojiById(id))
+                .map(Emoji.class::cast)
+                .orElse(emoji);
     }
 
     @Override

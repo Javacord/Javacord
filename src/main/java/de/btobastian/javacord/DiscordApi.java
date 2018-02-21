@@ -24,7 +24,7 @@ import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageSet;
-import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.GloballyAttachableListener;
@@ -685,7 +685,7 @@ public interface DiscordApi {
      *
      * @return A collection with all known custom emojis.
      */
-    Collection<CustomEmoji> getCustomEmojis();
+    Collection<KnownCustomEmoji> getCustomEmojis();
 
     /**
      * Gets a custom emoji in this server by its id.
@@ -693,7 +693,7 @@ public interface DiscordApi {
      * @param id The id of the emoji.
      * @return The emoji with the given id.
      */
-    default Optional<CustomEmoji> getCustomEmojiById(long id) {
+    default Optional<KnownCustomEmoji> getCustomEmojiById(long id) {
         return getCustomEmojis().stream().filter(emoji -> emoji.getId() == id).findAny();
     }
 
@@ -703,7 +703,7 @@ public interface DiscordApi {
      * @param id The id of the emoji.
      * @return The emoji with the given id.
      */
-    default Optional<CustomEmoji> getCustomEmojiById(String id) {
+    default Optional<KnownCustomEmoji> getCustomEmojiById(String id) {
         try {
             return getCustomEmojiById(Long.parseLong(id));
         } catch (NumberFormatException e) {
@@ -718,7 +718,7 @@ public interface DiscordApi {
      * @param name The name of the custom emojis.
      * @return A collection with all custom emojis with the given name in this server.
      */
-    default Collection<CustomEmoji> getCustomEmojisByName(String name) {
+    default Collection<KnownCustomEmoji> getCustomEmojisByName(String name) {
         return Collections.unmodifiableList(getCustomEmojis().stream()
                 .filter(emoji -> emoji.getName().equals(name))
                 .collect(Collectors.toList()));
@@ -731,7 +731,7 @@ public interface DiscordApi {
      * @param name The name of the custom emojis.
      * @return A collection with all custom emojis with the given name in this server.
      */
-    default Collection<CustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
+    default Collection<KnownCustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(getCustomEmojis().stream()
                 .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
                 .collect(Collectors.toList()));

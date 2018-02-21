@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.emoji.impl;
 
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,6 +54,11 @@ public class ImplUnicodeEmoji implements Emoji {
 
     @Override
     public Optional<CustomEmoji> asCustomEmoji() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<KnownCustomEmoji> asKnownCustomEmoji() {
         return Optional.empty();
     }
 

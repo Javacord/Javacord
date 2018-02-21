@@ -16,7 +16,6 @@ import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
-import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
@@ -975,13 +974,12 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         List<CustomEmoji> emojis = new ArrayList<>();
         Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
         while (customEmoji.find()) {
-            getServer().ifPresent(server -> {
-                String id = customEmoji.group("id");
-                CustomEmoji emoji = server.getCustomEmojiById(id)
-                        .orElseGet(() -> new ImplCustomEmoji((ImplDiscordApi) getApi(), null, Long.parseLong(id),
-                                customEmoji.group("name"), customEmoji.group(0).charAt(1) == 'a'));
-                emojis.add(emoji);
-            });
+            long id = Long.parseLong(customEmoji.group("id"));
+            String name = customEmoji.group("name");
+            boolean animated = customEmoji.group(0).charAt(1) == 'a';
+            // TODO Maybe it would be better to cache the custom emoji objects inside the message object instead of creating new ones every time
+            CustomEmoji emoji = ((ImplDiscordApi) getApi()).getKnownCustomEmojiOrCreateCustomEmoji(id, name, animated);
+            emojis.add(emoji);
         }
         return Collections.unmodifiableList(emojis);
     }
@@ -1082,7 +1080,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return The reaction for the given emoji.
      */
     default Optional<Reaction> getReactionByEmoji(Emoji emoji) {
-        return getReactions().stream().filter(reaction -> reaction.getEmoji() == emoji).findAny();
+        return getReactions().stream().filter(reaction -> reaction.getEmoji().equals(emoji)).findAny();
     }
 
     /**
@@ -1192,7 +1190,8 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> removeReactionsByEmoji(User user, String... unicodeEmojis) {
-        return removeReactionsByEmoji(user, Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+        return removeReactionsByEmoji(user,
+                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
     }
 
     /**
@@ -1235,7 +1234,8 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> removeReactionsByEmoji(String... unicodeEmojis) {
-        return removeReactionsByEmoji(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+        return removeReactionsByEmoji(
+                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
     }
 
     /**
@@ -1275,7 +1275,8 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis) {
-        return removeOwnReactionsByEmoji(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+        return removeOwnReactionsByEmoji(
+                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
     }
 
     /**

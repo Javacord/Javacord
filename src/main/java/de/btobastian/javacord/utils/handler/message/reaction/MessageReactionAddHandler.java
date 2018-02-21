@@ -42,7 +42,7 @@ public class MessageReactionAddHandler extends PacketHandler {
             if (!emojiJson.has("id") || emojiJson.get("id").isNull()) {
                 emoji = ImplUnicodeEmoji.fromString(emojiJson.get("name").asText());
             } else {
-                emoji = api.getOrCreateCustomEmoji(null, emojiJson);
+                emoji = api.getKnownCustomEmojiOrCreateCustomEmoji(emojiJson);
             }
 
             message.ifPresent(msg -> ((ImplMessage) msg).addReaction(emoji, user.isYourself()));

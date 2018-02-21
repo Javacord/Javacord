@@ -22,7 +22,7 @@ import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplChannelCategory;
 import de.btobastian.javacord.entities.channels.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplServerVoiceChannel;
-import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.utils.Cleanupable;
@@ -146,7 +146,7 @@ public class ImplServer implements Server, Cleanupable {
     /**
      * A list with all custom emojis from this server.
      */
-    private final Collection<CustomEmoji> customEmojis = new ArrayList<>();
+    private final Collection<KnownCustomEmoji> customEmojis = new ArrayList<>();
 
     /**
      * Creates a new server object.
@@ -215,7 +215,7 @@ public class ImplServer implements Server, Cleanupable {
 
         if (data.has("emojis")) {
             for (JsonNode emojiJson : data.get("emojis")) {
-                CustomEmoji emoji = api.getOrCreateCustomEmoji(this, emojiJson);
+                KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(this, emojiJson);
                 addCustomEmoji(emoji);
             }
         }
@@ -354,7 +354,7 @@ public class ImplServer implements Server, Cleanupable {
      *
      * @param emoji The emoji to add.
      */
-    public void addCustomEmoji(CustomEmoji emoji) {
+    public void addCustomEmoji(KnownCustomEmoji emoji) {
         customEmojis.add(emoji);
     }
 
@@ -363,7 +363,7 @@ public class ImplServer implements Server, Cleanupable {
      *
      * @param emoji The emoji to remove.
      */
-    public void removeCustomEmoji(CustomEmoji emoji) {
+    public void removeCustomEmoji(KnownCustomEmoji emoji) {
         customEmojis.remove(emoji);
     }
 
@@ -644,8 +644,8 @@ public class ImplServer implements Server, Cleanupable {
     }
 
     @Override
-    public Collection<CustomEmoji> getCustomEmojis() {
-        return Collections.unmodifiableCollection(customEmojis);
+    public Collection<KnownCustomEmoji> getCustomEmojis() {
+        return Collections.unmodifiableCollection(new ArrayList<>(customEmojis));
     }
 
     @Override

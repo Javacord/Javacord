@@ -1,6 +1,6 @@
 package de.btobastian.javacord.events.server.emoji;
 
-import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 
 /**
  * A custom emoji change name event.
@@ -24,7 +24,7 @@ public class CustomEmojiChangeNameEvent extends CustomEmojiEvent {
      * @param newName The new name of the custom emoji.
      * @param oldName The old name of the custom emoji.
      */
-    public CustomEmojiChangeNameEvent(CustomEmoji emoji, String newName, String oldName) {
+    public CustomEmojiChangeNameEvent(KnownCustomEmoji emoji, String newName, String oldName) {
         super(emoji);
         this.newName = newName;
         this.oldName = oldName;

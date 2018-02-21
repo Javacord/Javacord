@@ -5,7 +5,7 @@ import de.btobastian.javacord.entities.Mentionable;
 import java.util.Optional;
 
 /**
- * This class represents an emoji which can be a custom emoji or a unicode emoji.
+ * This class represents an emoji which can be a custom emoji (known or unknown) or a unicode emoji.
  */
 public interface Emoji extends Mentionable {
 
@@ -22,6 +22,13 @@ public interface Emoji extends Mentionable {
      * @return The emoji as custom emoji.
      */
     Optional<CustomEmoji> asCustomEmoji();
+
+    /**
+     * Gets the emoji as known custom emoji.
+     *
+     * @return The emoji as known custom emoji.
+     */
+    Optional<KnownCustomEmoji> asKnownCustomEmoji();
 
     /**
      * Checks if the emoji is animated.
@@ -47,6 +54,15 @@ public interface Emoji extends Mentionable {
      */
     default boolean isCustomEmoji() {
         return asCustomEmoji().isPresent();
+    }
+
+    /**
+     * Checks if the emoji is a known custom emoji.
+     *
+     * @return Whether the emoji is a known custom emoji or not.
+     */
+    default boolean isKnownCustomEmoji() {
+        return asKnownCustomEmoji().isPresent();
     }
 
 }

@@ -3,8 +3,7 @@ package de.btobastian.javacord.utils.handler.server;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.impl.ImplServer;
-import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
-import de.btobastian.javacord.entities.message.emoji.impl.ImplCustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.events.server.emoji.CustomEmojiChangeNameEvent;
 import de.btobastian.javacord.events.server.emoji.CustomEmojiCreateEvent;
 import de.btobastian.javacord.events.server.emoji.CustomEmojiDeleteEvent;
@@ -16,9 +15,9 @@ import de.btobastian.javacord.utils.PacketHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Handles the guild update packet.
@@ -44,11 +43,12 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
             }
 
             emojis.entrySet().stream().forEach(entry -> {
-                Optional<CustomEmoji> optionalEmoji = server.getCustomEmojiById(entry.getKey());
+                Optional<KnownCustomEmoji> optionalEmoji = server.getCustomEmojiById(entry.getKey());
                 if (optionalEmoji.isPresent()) {
-                    CustomEmoji emoji = optionalEmoji.get();
+                    KnownCustomEmoji emoji = optionalEmoji.get();
                     String oldName = emoji.getName();
-                    if (((ImplCustomEmoji) emoji).updateFromJson(entry.getValue())) {
+                    String newName = entry.getValue().get("name").asText();
+                    if (!Objects.deepEquals(oldName, newName)) {
                         CustomEmojiChangeNameEvent event =
                                 new CustomEmojiChangeNameEvent(emoji, emoji.getName(), oldName);
 
@@ -60,9 +60,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                         dispatchEvent(listeners, listener -> listener.onCustomEmojiChangeName(event));
                     }
                 } else {
-                    CustomEmoji emoji = api.getOrCreateCustomEmoji(server, entry.getValue());
-                    // update in case it was already present on another server
-                    ((ImplCustomEmoji) emoji).updateFromJson(entry.getValue());
+                    KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(server, entry.getValue());
                     server.addCustomEmoji(emoji);
 
                     CustomEmojiCreateEvent event = new CustomEmojiCreateEvent(emoji);
@@ -78,10 +76,8 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
             Set<Long> emojiIds = emojis.keySet();
             server.getCustomEmojis().stream()
                     .filter(emoji -> !emojiIds.contains(emoji.getId()))
-                    // decouple from original collection
-                    .collect(Collectors.toList())
-                    .stream()
                     .forEach(emoji -> {
+                        api.removeCustomEmoji(emoji);
                         server.removeCustomEmoji(emoji);
 
                         CustomEmojiDeleteEvent event = new CustomEmojiDeleteEvent(emoji);

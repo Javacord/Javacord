@@ -1,6 +1,6 @@
 package de.btobastian.javacord.events.server.emoji;
 
-import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 
 /**
  * A custom emoji delete event.
@@ -12,7 +12,7 @@ public class CustomEmojiDeleteEvent extends CustomEmojiEvent {
      *
      * @param emoji The deleted emoji.
      */
-    public CustomEmojiDeleteEvent(CustomEmoji emoji) {
+    public CustomEmojiDeleteEvent(KnownCustomEmoji emoji) {
         super(emoji);
     }
 

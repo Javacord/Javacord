@@ -1,6 +1,6 @@
 package de.btobastian.javacord.events.server.emoji;
 
-import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 
 /**
  * A custom emoji create event.
@@ -12,7 +12,7 @@ public class CustomEmojiCreateEvent extends CustomEmojiEvent {
      *
      * @param emoji The created emoji.
      */
-    public CustomEmojiCreateEvent(CustomEmoji emoji) {
+    public CustomEmojiCreateEvent(KnownCustomEmoji emoji) {
         super(emoji);
     }
 

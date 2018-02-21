@@ -1,6 +1,6 @@
 package de.btobastian.javacord.events.server.emoji;
 
-import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.events.server.ServerEvent;
 
 /**
@@ -11,16 +11,15 @@ public abstract class CustomEmojiEvent extends ServerEvent {
     /**
      * The custom emoji of the event.
      */
-    private final CustomEmoji emoji;
+    private final KnownCustomEmoji emoji;
 
     /**
      * Creates a new custom emoji event.
      *
      * @param emoji The custom emoji of the event.
      */
-    public CustomEmojiEvent(CustomEmoji emoji) {
-        // these events are currently only dispatched from GuildEmojisUpdateHandler, so server should always be present
-        super(emoji.getApi(), emoji.getServer().orElseThrow(AssertionError::new));
+    public CustomEmojiEvent(KnownCustomEmoji emoji) {
+        super(emoji.getApi(), emoji.getServer());
         this.emoji = emoji;
     }
 
@@ -29,7 +28,7 @@ public abstract class CustomEmojiEvent extends ServerEvent {
      *
      * @return The custom emoji of the event.
      */
-    public CustomEmoji getEmoji() {
+    public KnownCustomEmoji getEmoji() {
         return emoji;
     }
 
