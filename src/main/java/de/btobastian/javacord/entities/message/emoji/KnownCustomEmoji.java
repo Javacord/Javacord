@@ -10,6 +10,9 @@ import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
+import de.btobastian.javacord.utils.rest.RestEndpoint;
+import de.btobastian.javacord.utils.rest.RestMethod;
+import de.btobastian.javacord.utils.rest.RestRequest;
 import org.slf4j.Logger;
 
 import java.util.Collection;
@@ -35,6 +38,17 @@ public interface KnownCustomEmoji extends CustomEmoji {
      * @return The server of the emoji.
      */
     Server getServer();
+
+    /**
+     * Deletes the emoji.
+     *
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete() {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CUSTOM_EMOJI)
+                .setUrlParameters(getServer().getIdAsString(), String.valueOf(getId()))
+                .execute(result -> null);
+    }
 
     /**
      * Gets the updater for this emoji.
