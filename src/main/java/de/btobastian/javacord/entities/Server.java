@@ -18,6 +18,7 @@ import de.btobastian.javacord.entities.impl.ImplBan;
 import de.btobastian.javacord.entities.impl.ImplInvite;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
+import de.btobastian.javacord.entities.message.emoji.CustomEmojiBuilder;
 import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entities.permissions.PermissionState;
 import de.btobastian.javacord.entities.permissions.PermissionType;
@@ -433,6 +434,15 @@ public interface Server extends DiscordEntity {
      */
     default boolean hasAnyPermission(User user, PermissionType... type) {
         return getAllowedPermissionsOf(user).stream().anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
+    }
+
+    /**
+     * Gets a custom emoji builder to create custom emojis.
+     *
+     * @return A custom emoji builder to create custom emojis.
+     */
+    default CustomEmojiBuilder getCustomEmojiBuilder() {
+        return new CustomEmojiBuilder(this);
     }
 
     /**
