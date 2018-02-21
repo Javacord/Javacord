@@ -65,7 +65,6 @@ import de.btobastian.javacord.listeners.server.member.ServerMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberUnbanListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
-import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeNameListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
@@ -1584,16 +1583,6 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<RoleChangeHoistListener> getRoleChangeHoistListeners() {
         return getListeners(RoleChangeHoistListener.class);
-    }
-
-    @Override
-    public ListenerManager<RoleChangeManagedListener> addRoleChangeManagedListener(RoleChangeManagedListener listener) {
-        return addListener(RoleChangeManagedListener.class, listener);
-    }
-
-    @Override
-    public List<RoleChangeManagedListener> getRoleChangeManagedListeners() {
-        return getListeners(RoleChangeManagedListener.class);
     }
 
     @Override

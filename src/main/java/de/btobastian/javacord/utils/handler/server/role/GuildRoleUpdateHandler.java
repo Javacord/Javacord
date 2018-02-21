@@ -7,14 +7,12 @@ import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.events.server.role.RoleChangeColorEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeHoistEvent;
-import de.btobastian.javacord.events.server.role.RoleChangeManagedEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeMentionableEvent;
 import de.btobastian.javacord.events.server.role.RoleChangeNameEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePermissionsEvent;
 import de.btobastian.javacord.events.server.role.RoleChangePositionEvent;
 import de.btobastian.javacord.listeners.server.role.RoleChangeColorListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeHoistListener;
-import de.btobastian.javacord.listeners.server.role.RoleChangeManagedListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeMentionableListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangeNameListener;
 import de.btobastian.javacord.listeners.server.role.RoleChangePermissionsListener;
@@ -74,21 +72,6 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getRoleChangeHoistListeners());
 
                 dispatchEvent(listeners, listener -> listener.onRoleChangeHoist(event));
-            }
-
-            boolean oldManaged = role.isManaged();
-            boolean newManaged = roleJson.get("managed").asBoolean(false);
-            if (oldManaged != newManaged) {
-                role.setManaged(newManaged);
-
-                RoleChangeManagedEvent event = new RoleChangeManagedEvent(api, role, oldManaged);
-
-                List<RoleChangeManagedListener> listeners = new ArrayList<>();
-                listeners.addAll(role.getRoleChangeManagedListeners());
-                listeners.addAll(role.getServer().getRoleChangeManagedListeners());
-                listeners.addAll(api.getRoleChangeManagedListeners());
-
-                dispatchEvent(listeners, listener -> listener.onRoleChangeManaged(event));
             }
 
             boolean oldMentionable = role.isMentionable();
