@@ -29,6 +29,11 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     private Collection<Role> whitelist;
 
     /**
+     * Whether this emoji must be wrapped in colons or not.
+     */
+    private boolean requiresColons = true;
+
+    /**
      * Creates a new known custom emoji.
      *
      * @param api The discord api instance.
@@ -43,6 +48,9 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
             for (JsonNode roleIdJson : data.get("roles")) {
                 server.getRoleById(roleIdJson.asLong()).ifPresent(whitelist::add);
             }
+        }
+        if (data.hasNonNull("require_colons")) {
+            requiresColons = data.get("require_colons").asBoolean();
         }
     }
 
@@ -65,6 +73,11 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
         return whitelist == null || whitelist.isEmpty() ?
                 Optional.empty() :
                 Optional.of(Collections.unmodifiableCollection(new HashSet<>(whitelist)));
+    }
+
+    @Override
+    public boolean requiresColons() {
+        return requiresColons;
     }
 
     @Override

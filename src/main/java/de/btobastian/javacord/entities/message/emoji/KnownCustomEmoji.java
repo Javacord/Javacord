@@ -53,6 +53,13 @@ public interface KnownCustomEmoji extends CustomEmoji {
     Optional<Collection<Role>> getWhitelistedRoles();
 
     /**
+     * Checks if this emoji must be wrapped in colons.
+     *
+     * @return Whether this emoji must be wrapped in colons or not.
+     */
+    boolean requiresColons();
+
+    /**
      * Updates the name of the emoji.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
