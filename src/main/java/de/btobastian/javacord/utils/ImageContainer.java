@@ -171,6 +171,7 @@ public class ImageContainer {
     /**
      * Gets the byte array for the image.
      *
+     * @param api The discord api instance.
      * @return The byte array stream for the image.
      */
     public CompletableFuture<byte[]> asByteArray(DiscordApi api) {
@@ -215,6 +216,7 @@ public class ImageContainer {
     /**
      * Gets the input stream for the image.
      *
+     * @param api The discord api instance.
      * @return The input stream for the image.
      */
     public CompletableFuture<InputStream> asInputStream(DiscordApi api) {
@@ -254,6 +256,24 @@ public class ImageContainer {
             future.completeExceptionally(t);
         }
         return future;
+    }
+
+    /**
+     * Gets the image as {@link BufferedImage}.
+     *
+     * @param api The discord api instance.
+     * @return The image as BufferedImage.
+     */
+    public CompletableFuture<BufferedImage> asBufferedImage(DiscordApi api) {
+        return asByteArray(api)
+                .thenApply(ByteArrayInputStream::new)
+                .thenApply(stream -> {
+                    try {
+                        return ImageIO.read(stream);
+                    } catch (IOException e) {
+                        throw new CompletionException(e);
+                    }
+                });
     }
 
 }
