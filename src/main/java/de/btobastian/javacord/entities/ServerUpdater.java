@@ -12,11 +12,8 @@ import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -90,7 +87,7 @@ public class ServerUpdater {
     /**
      * The splash to update.
      */
-    private BufferedImage splash = null;
+    private ImageContainer splash = null;
 
     /**
      * The system channel to update.
@@ -290,14 +287,109 @@ public class ServerUpdater {
         return this;
     }
 
+
+    /**
+     * Queues the splash to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param splash The new splash of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(BufferedImage splash) {
+        this.splash = new ImageContainer(splash, "png");
+        return this;
+    }
+
+    /**
+     * Queues the splash to be updated.
+     *
+     * @param splash The new splash of the server.
+     * @param fileType The type of the splash, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(BufferedImage splash, String fileType) {
+        this.splash = new ImageContainer(splash, "png");
+        return this;
+    }
+
     /**
      * Queues the splash to be updated.
      *
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerUpdater setSplash(BufferedImage splash) {
-        this.splash = splash;
+    public ServerUpdater setSplash(File splash) {
+        this.splash = new ImageContainer(splash);
+        return this;
+    }
+
+    /**
+     * Queues the splash to be updated.
+     *
+     * @param splash The new splash of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(Icon splash) {
+        this.splash = new ImageContainer(splash);
+        return this;
+    }
+
+    /**
+     * Queues the splash to be updated.
+     *
+     * @param splash The new splash of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(URL splash) {
+        this.splash = new ImageContainer(splash);
+        return this;
+    }
+
+    /**
+     * Queues the splash to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param splash The new splash of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(byte[] splash) {
+        this.splash = new ImageContainer(splash, "png");
+        return this;
+    }
+
+    /**
+     * Queues the splash to be updated.
+     *
+     * @param splash The new splash of the server.
+     * @param fileType The type of the splash, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(byte[] splash, String fileType) {
+        this.splash = new ImageContainer(splash, "png");
+        return this;
+    }
+
+    /**
+     * Queues the splash to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param splash The new splash of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(InputStream splash) {
+        this.splash = new ImageContainer(splash, "png");
+        return this;
+    }
+
+    /**
+     * Queues the splash to be updated.
+     *
+     * @param splash The new splash of the server.
+     * @param fileType The type of the splash, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setSplash(InputStream splash, String fileType) {
+        this.splash = new ImageContainer(splash, "png");
         return this;
     }
 
@@ -424,16 +516,6 @@ public class ServerUpdater {
             patchServer = true;
         }
         if (splash != null) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(splash, "jpg", os);
-                String base64Icon = "data:image/jpg;base64," + Base64.getEncoder().encodeToString(os.toByteArray());
-                body.put("splash", base64Icon);
-            } catch (IOException e) {
-                CompletableFuture<Void> future = new CompletableFuture<>();
-                future.completeExceptionally(e);
-                return future;
-            }
             patchServer = true;
         }
         if (owner != null) {
@@ -446,12 +528,32 @@ public class ServerUpdater {
         }
         // Only make a REST call, if we really want to update something
         if (patchServer) {
-            if (icon != null) {
-                tasks.add(icon.asByteArray(server.getApi()).thenAccept(bytes -> {
-                    String base64Icon = "data:image/" + icon.getImageType() + ";base64," +
-                            Base64.getEncoder().encodeToString(bytes);
-                    body.put("icon", base64Icon);
-                }).thenCompose(aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
+            if (icon != null || splash != null) {
+                CompletableFuture<Void> iconFuture = null;
+                if (icon != null) {
+                    iconFuture = icon.asByteArray(server.getApi()).thenAccept(bytes -> {
+                        String base64Icon = "data:image/" + icon.getImageType() + ";base64," +
+                                Base64.getEncoder().encodeToString(bytes);
+                        body.put("icon", base64Icon);
+                    });
+                }
+                CompletableFuture<Void> splashFuture = null;
+                if (splash != null) {
+                    iconFuture = splash.asByteArray(server.getApi()).thenAccept(bytes -> {
+                        String base64Icon = "data:image/" + splash.getImageType() + ";base64," +
+                                Base64.getEncoder().encodeToString(bytes);
+                        body.put("splash", base64Icon);
+                    });
+                }
+                CompletableFuture<Void> future;
+                if (iconFuture == null) {
+                    future = splashFuture;
+                } else if (splashFuture == null) {
+                    future = iconFuture;
+                } else {
+                    future = CompletableFuture.allOf(splashFuture, iconFuture);
+                }
+                tasks.add(future.thenCompose(aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                         .setUrlParameters(server.getIdAsString())
                         .setBody(body)
                         .execute(result -> null)));
