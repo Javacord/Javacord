@@ -754,13 +754,13 @@ public class EmbedBuilder {
      */
     public ObjectNode toJsonNode(ObjectNode object) {
         object.put("type", "rich");
-        if (title != null) {
+        if (title != null && !title.equals("")) {
             object.put("title", title);
         }
-        if (description != null) {
+        if (description != null && !description.equals("")) {
             object.put("description", description);
         }
-        if (url != null) {
+        if (url != null && !url.equals("")) {
             object.put("url", url);
         }
         if (color != null) {
@@ -769,38 +769,38 @@ public class EmbedBuilder {
         if (timestamp != null) {
             object.put("timestamp", DateTimeFormatter.ISO_INSTANT.format(timestamp));
         }
-        if (footerText != null || footerIconUrl != null) {
+        if ((footerText != null && !footerText.equals("")) || (footerIconUrl != null && !footerIconUrl.equals(""))) {
             ObjectNode footer = object.putObject("footer");
-            if (footerText != null) {
+            if (footerText != null && !footerText.equals("")) {
                 footer.put("text", footerText);
             }
-            if (footerIconUrl != null) {
+            if (footerIconUrl != null && !footerIconUrl.equals("")) {
                 footer.put("icon_url", footerIconUrl);
             }
             if (footerIconFileName != null) {
                 footer.put("icon_url", "attachment://" + footerIconFileName);
             }
         }
-        if (imageUrl != null) {
+        if (imageUrl != null && !imageUrl.equals("")) {
             object.putObject("image").put("url", imageUrl);
         }
         if (imageFileName != null) {
             object.putObject("image").put("url", "attachment://" + imageFileName);
         }
-        if (authorName != null) {
+        if (authorName != null && !authorName.equals("")) {
             ObjectNode author = object.putObject("author");
             author.put("name", authorName);
-            if (authorUrl != null) {
+            if (authorUrl != null && !authorUrl.equals("")) {
                 author.put("url", authorUrl);
             }
-            if (authorIconUrl != null) {
+            if (authorIconUrl != null && !authorIconUrl.equals("")) {
                 author.put("icon_url", authorIconUrl);
             }
             if (authorIconFileName != null) {
                 author.put("url", "attachment://" + authorIconFileName);
             }
         }
-        if (thumbnailUrl != null) {
+        if (thumbnailUrl != null && !thumbnailUrl.equals("")) {
             object.putObject("thumbnailContainer").put("url", thumbnailUrl);
         }
         if (thumbnailFileName != null) {
@@ -810,10 +810,10 @@ public class EmbedBuilder {
             ArrayNode jsonFields = object.putArray("fields");
             for (Object[] field : fields) {
                 ObjectNode jsonField = jsonFields.addObject();
-                if (field[0] != null) {
+                if (field[0] != null && !field[0].equals("")) {
                     jsonField.put("name", (String) field[0]);
                 }
-                if (field[1] != null) {
+                if (field[1] != null && !field[1].equals("")) {
                     jsonField.put("value", (String) field[1]);
                 }
                 if (field[2] != null) {
