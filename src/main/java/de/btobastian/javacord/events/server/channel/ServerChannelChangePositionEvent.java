@@ -18,7 +18,7 @@ public class ServerChannelChangePositionEvent extends ServerChannelEvent {
     private final int oldPosition;
 
     /**
-     * Creates a new server channel change name event.
+     * Creates a new server channel change position event.
      *
      * @param channel The channel of the event.
      * @param newPosition The new position of the channel.
