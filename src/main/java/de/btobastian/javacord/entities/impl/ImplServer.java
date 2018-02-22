@@ -119,6 +119,11 @@ public class ImplServer implements Server, Cleanupable {
     private String splash;
 
     /**
+     * The id of the server's afk channel.
+     */
+    private long afkChannelId = -1;
+
+    /**
      * A map with all roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
@@ -173,6 +178,9 @@ public class ImplServer implements Server, Cleanupable {
         }
         if (data.has("splash") && !data.get("splash").isNull()) {
             splash = data.get("splash").asText();
+        }
+        if (data.hasNonNull("afk_channel_id")) {
+            afkChannelId = data.get("afk_channel_id").asLong();
         }
 
         if (data.has("channels")) {
@@ -258,6 +266,15 @@ public class ImplServer implements Server, Cleanupable {
      */
     public void setIconHash(String iconHash) {
         this.iconHash = iconHash;
+    }
+
+    /**
+     * Sets the afk channel id of the server.
+     *
+     * @param afkChannelId The afk channel id of the server.
+     */
+    public void setAfkChannelId(long afkChannelId) {
+        this.afkChannelId = afkChannelId;
     }
 
     /**
@@ -619,6 +636,11 @@ public class ImplServer implements Server, Cleanupable {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<ServerVoiceChannel> getAfkChannel() {
+        return getVoiceChannelById(afkChannelId);
     }
 
     @Override

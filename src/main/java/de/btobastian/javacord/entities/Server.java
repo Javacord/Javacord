@@ -35,6 +35,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveAllListen
 import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerAttachableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
+import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
@@ -198,6 +199,13 @@ public interface Server extends DiscordEntity {
      * @return The splash of the server.
      */
     Optional<Icon> getSplash();
+
+    /**
+     * Gets the afk channel of the server.
+     *
+     * @return The afk channel of the server.
+     */
+    Optional<ServerVoiceChannel> getAfkChannel();
 
     /**
      * Gets the invites of the server.
@@ -2126,6 +2134,28 @@ public interface Server extends DiscordEntity {
     getServerChangeMultiFactorAuthenticationLevelListeners() {
         return ((ImplDiscordApi) getApi())
                 .getObjectListeners(Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to afk channel changes on this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeAfkChannelListener> addServerChangeAfkChannelListener(
+            ServerChangeAfkChannelListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeAfkChannelListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change afk channel listeners.
+     *
+     * @return A list with all registered server change afk channel listeners.
+     */
+    default List<ServerChangeAfkChannelListener> getServerChangeAfkChannelListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                Server.class, getId(), ServerChangeAfkChannelListener.class);
     }
 
     /**

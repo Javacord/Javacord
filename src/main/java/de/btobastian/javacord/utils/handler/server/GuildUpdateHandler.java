@@ -8,7 +8,9 @@ import de.btobastian.javacord.entities.MultiFactorAuthenticationLevel;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.VerificationLevel;
+import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
+import de.btobastian.javacord.events.server.ServerChangeAfkChannelEvent;
 import de.btobastian.javacord.events.server.ServerChangeDefaultMessageNotificationLevelEvent;
 import de.btobastian.javacord.events.server.ServerChangeExplicitContentFilterLevelEvent;
 import de.btobastian.javacord.events.server.ServerChangeIconEvent;
@@ -17,6 +19,7 @@ import de.btobastian.javacord.events.server.ServerChangeNameEvent;
 import de.btobastian.javacord.events.server.ServerChangeOwnerEvent;
 import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
 import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
+import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
@@ -135,6 +138,23 @@ public class GuildUpdateHandler extends PacketHandler {
                 dispatchEvent(listeners, listener -> listener.onServerChangeOwner(event));
             }
 
+            if (packet.has("afk_channel_id")) {
+                ServerVoiceChannel newAfkChannel = packet.get("afk_channel_id").isNull() ?
+                        null : server.getVoiceChannelById(packet.get("afk_channel_id").asLong()).orElse(null);
+                ServerVoiceChannel oldAfkChannel = server.getAfkChannel().orElse(null);
+                if (oldAfkChannel != newAfkChannel) {
+                    server.setAfkChannelId(newAfkChannel == null ? -1 : newAfkChannel.getId());
+                    ServerChangeAfkChannelEvent event =
+                            new ServerChangeAfkChannelEvent(api, server, newAfkChannel, oldAfkChannel);
+
+                    List<ServerChangeAfkChannelListener> listeners = new ArrayList<>();
+                    listeners.addAll(server.getServerChangeAfkChannelListeners());
+                    listeners.addAll(api.getServerChangeAfkChannelListeners());
+
+                    dispatchEvent(listeners, listener -> listener.onServerChangeAfkChannel(event));
+                }
+            }
+
             ExplicitContentFilterLevel newExplicitContentFilterLevel =
                     ExplicitContentFilterLevel.fromId(packet.get("explicit_content_filter").asInt());
             ExplicitContentFilterLevel oldExplicitContentFilterLevel = server.getExplicitContentFilterLevel();
@@ -166,39 +186,6 @@ public class GuildUpdateHandler extends PacketHandler {
 
                 dispatchEvent(listeners, listener -> listener.onServerChangeMultiFactorAuthenticationLevel(event));
             }
-
-            String oldAfkChannelId = "...";
-            String newAfkChannelId =
-                    packet.get("afk_channel_id").isNull() ? null : packet.get("afk_channel_id").asText();
-            if (!Objects.deepEquals(oldAfkChannelId, newAfkChannelId)) {
-
-            }
-
-            int oldAfkTimeout = -1;
-            int newAfkTimeout = packet.get("afk_timeout").asInt();
-            if (oldAfkTimeout != newAfkTimeout) {
-
-            }
-
-            boolean oldEmbedEnabled = false;
-            boolean newEmbedEnabled = packet.get("embed_enabled").asBoolean();
-            if (oldEmbedEnabled != newEmbedEnabled) {
-
-            }
-
-            String oldEmbedChannelId = "...";
-            String newEmbedChannelId =
-                    packet.get("embed_channel_id").isNull() ? null : packet.get("embed_channel_id").asText();
-            if (!Objects.deepEquals(oldEmbedChannelId, newEmbedChannelId)) {
-
-            }
-
-            // TODO emojis
-            // TODO features
-            // TODO application_id
-            // TODO widget_enabled
-            // TODO widget_channel_id
-
         });
     }
 
