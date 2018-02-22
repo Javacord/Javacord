@@ -31,20 +31,20 @@ public class ServerChannelChangePositionEvent extends ServerChannelEvent {
     }
 
     /**
-     * Gets the new position of the channel.
+     * Gets the new raw position of the channel.
      *
-     * @return The new position of the channel.
+     * @return The new raw position of the channel.
      */
-    public int getNewPosition() {
+    public int getNewRawPosition() {
         return newPosition;
     }
 
     /**
-     * Gets the old position of the channel.
+     * Gets the old raw position of the channel.
      *
-     * @return The old position of the channel.
+     * @return The old raw position of the channel.
      */
-    public int getOldPosition() {
+    public int getOldRawPosition() {
         return oldPosition;
     }
 }
