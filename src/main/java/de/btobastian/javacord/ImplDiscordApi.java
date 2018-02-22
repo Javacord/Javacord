@@ -36,6 +36,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
+import de.btobastian.javacord.listeners.server.ServerChangeAfkTimeoutListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
@@ -1458,6 +1459,17 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerChangeAfkChannelListener> getServerChangeAfkChannelListeners() {
         return getListeners(ServerChangeAfkChannelListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerChangeAfkTimeoutListener> addServerChangeAfkTimeoutListener(
+            ServerChangeAfkTimeoutListener listener) {
+        return addListener(ServerChangeAfkTimeoutListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeAfkTimeoutListener> getServerChangeAfkTimeoutListeners() {
+        return getListeners(ServerChangeAfkTimeoutListener.class);
     }
 
     @Override

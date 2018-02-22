@@ -43,6 +43,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesAvailableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
+import de.btobastian.javacord.listeners.server.ServerChangeAfkTimeoutListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
@@ -1943,6 +1944,22 @@ public interface DiscordApi {
      * @return A list with all registered server change afk channel listeners.
      */
     List<ServerChangeAfkChannelListener> getServerChangeAfkChannelListeners();
+
+    /**
+     * Adds a listener, which listens to server afk timeout changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeAfkTimeoutListener> addServerChangeAfkTimeoutListener(
+            ServerChangeAfkTimeoutListener listener);
+
+    /**
+     * Gets a list with all registered server change afk timeout listeners.
+     *
+     * @return A list with all registered server change afk timeout listeners.
+     */
+    List<ServerChangeAfkTimeoutListener> getServerChangeAfkTimeoutListeners();
 
     /**
      * Adds a listener, which listens to server channel name changes.

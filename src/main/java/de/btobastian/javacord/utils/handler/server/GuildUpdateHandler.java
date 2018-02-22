@@ -11,6 +11,7 @@ import de.btobastian.javacord.entities.VerificationLevel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerChangeAfkChannelEvent;
+import de.btobastian.javacord.events.server.ServerChangeAfkTimeoutEvent;
 import de.btobastian.javacord.events.server.ServerChangeDefaultMessageNotificationLevelEvent;
 import de.btobastian.javacord.events.server.ServerChangeExplicitContentFilterLevelEvent;
 import de.btobastian.javacord.events.server.ServerChangeIconEvent;
@@ -21,6 +22,7 @@ import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
 import de.btobastian.javacord.events.server.ServerChangeSplashEvent;
 import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
 import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
+import de.btobastian.javacord.listeners.server.ServerChangeAfkTimeoutListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
@@ -168,6 +170,20 @@ public class GuildUpdateHandler extends PacketHandler {
 
                     dispatchEvent(listeners, listener -> listener.onServerChangeAfkChannel(event));
                 }
+            }
+
+            int newAfkTimeout = packet.get("afk_timeout").asInt();
+            int oldAfkTimeout = server.getAfkTimeoutInSeconds();
+            if (oldAfkTimeout != newAfkTimeout) {
+                server.setAfkTimeout(newAfkTimeout);
+                ServerChangeAfkTimeoutEvent event =
+                        new ServerChangeAfkTimeoutEvent(api, server, newAfkTimeout, oldAfkTimeout);
+
+                List<ServerChangeAfkTimeoutListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeAfkTimeoutListeners());
+                listeners.addAll(api.getServerChangeAfkTimeoutListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeAfkTimeout(event));
             }
 
             ExplicitContentFilterLevel newExplicitContentFilterLevel =

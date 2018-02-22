@@ -124,6 +124,11 @@ public class ImplServer implements Server, Cleanupable {
     private long afkChannelId = -1;
 
     /**
+     * The server's afk timeout.
+     */
+    private int afkTimeout = 0;
+
+    /**
      * A map with all roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
@@ -181,6 +186,9 @@ public class ImplServer implements Server, Cleanupable {
         }
         if (data.hasNonNull("afk_channel_id")) {
             afkChannelId = data.get("afk_channel_id").asLong();
+        }
+        if (data.hasNonNull("afk_timeout")) {
+            afkTimeout = data.get("afk_timeout").asInt();
         }
 
         if (data.has("channels")) {
@@ -293,6 +301,15 @@ public class ImplServer implements Server, Cleanupable {
      */
     public void setAfkChannelId(long afkChannelId) {
         this.afkChannelId = afkChannelId;
+    }
+
+    /**
+     * Sets the afk timeout of the server.
+     *
+     * @param afkTimeout The afk timeout to set.
+     */
+    public void setAfkTimeout(int afkTimeout) {
+        this.afkTimeout = afkTimeout;
     }
 
     /**
@@ -659,6 +676,11 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Optional<ServerVoiceChannel> getAfkChannel() {
         return getVoiceChannelById(afkChannelId);
+    }
+
+    @Override
+    public int getAfkTimeoutInSeconds() {
+        return afkTimeout;
     }
 
     @Override

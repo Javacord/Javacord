@@ -36,6 +36,7 @@ import de.btobastian.javacord.listeners.message.reaction.ReactionRemoveListener;
 import de.btobastian.javacord.listeners.server.ServerAttachableListener;
 import de.btobastian.javacord.listeners.server.ServerBecomesUnavailableListener;
 import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
+import de.btobastian.javacord.listeners.server.ServerChangeAfkTimeoutListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeExplicitContentFilterLevelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeIconListener;
@@ -207,6 +208,13 @@ public interface Server extends DiscordEntity {
      * @return The afk channel of the server.
      */
     Optional<ServerVoiceChannel> getAfkChannel();
+
+    /**
+     * Gets the afk timeout in seconds of the server.
+     *
+     * @return The afk timeout in seconds of the server.
+     */
+    int getAfkTimeoutInSeconds();
 
     /**
      * Gets the invites of the server.
@@ -2177,6 +2185,28 @@ public interface Server extends DiscordEntity {
     default List<ServerChangeAfkChannelListener> getServerChangeAfkChannelListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 Server.class, getId(), ServerChangeAfkChannelListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to afk timeout changes on this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeAfkTimeoutListener> addServerChangeAfkTimeoutListener(
+            ServerChangeAfkTimeoutListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeAfkTimeoutListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change afk timeout listeners.
+     *
+     * @return A list with all registered server change afk timeout listeners.
+     */
+    default List<ServerChangeAfkTimeoutListener> getServerChangeAfkTimeoutListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                Server.class, getId(), ServerChangeAfkTimeoutListener.class);
     }
 
     /**
