@@ -57,23 +57,14 @@ public class ImageContainer {
     private final byte[] imageAsByteArray;
 
     /**
+     * The image as input stream.
+     */
+    private final InputStream imageAsInputStream;
+
+    /**
      * The type of the image, e.g. "png" or "gif".
      */
     private final String imageType;
-
-    /**
-     * Creates a new image container with a buffered image.
-     *
-     * @param image The image as a buffered image.
-     */
-    public ImageContainer(BufferedImage image) {
-        imageAsBufferedImage = image;
-        imageAsFile = null;
-        imageAsIcon = null;
-        imageAsUrl = null;
-        imageAsByteArray = null;
-        imageType = "png";
-    }
 
     /**
      * Creates a new image container with a buffered image.
@@ -87,6 +78,7 @@ public class ImageContainer {
         imageAsIcon = null;
         imageAsUrl = null;
         imageAsByteArray = null;
+        imageAsInputStream = null;
         imageType = type;
     }
 
@@ -101,6 +93,7 @@ public class ImageContainer {
         imageAsIcon = null;
         imageAsUrl = null;
         imageAsByteArray = null;
+        imageAsInputStream = null;
         imageType = FileUtils.getExtension(image);
     }
 
@@ -115,6 +108,7 @@ public class ImageContainer {
         imageAsIcon = image;
         imageAsUrl = null;
         imageAsByteArray = null;
+        imageAsInputStream = null;
         imageType = FileUtils.getExtension(image.getUrl().getFile());
     }
 
@@ -129,6 +123,7 @@ public class ImageContainer {
         imageAsIcon = null;
         imageAsUrl = image;
         imageAsByteArray = null;
+        imageAsInputStream = null;
         imageType = FileUtils.getExtension(image.getFile());
     }
 
@@ -144,6 +139,23 @@ public class ImageContainer {
         imageAsIcon = null;
         imageAsUrl = null;
         imageAsByteArray = null;
+        imageAsInputStream = null;
+        imageType = type;
+    }
+
+    /**
+     * Creates a new image container with an input stream.
+     *
+     * @param image The image as an input stream.
+     * @param type The type of the image, e.g. "png" or "gif".
+     */
+    public ImageContainer(InputStream image, String type) {
+        imageAsBufferedImage = null;
+        imageAsFile = null;
+        imageAsIcon = null;
+        imageAsUrl = null;
+        imageAsByteArray = null;
+        imageAsInputStream = image;
         imageType = type;
     }
 
@@ -167,7 +179,11 @@ public class ImageContainer {
             if (imageAsByteArray != null) {
                 future.complete(imageAsByteArray);
             }
-            if (imageAsBufferedImage != null || imageAsFile != null || imageAsIcon != null || imageAsUrl != null) {
+            if (imageAsBufferedImage != null ||
+                    imageAsFile != null ||
+                    imageAsIcon != null ||
+                    imageAsUrl != null ||
+                    imageAsInputStream != null) {
                 asInputStream(api).thenApply(stream -> {
                     try (
                             InputStream in = new BufferedInputStream(stream);
@@ -230,6 +246,9 @@ public class ImageContainer {
             }
             if (imageAsByteArray != null) {
                 future.complete(new ByteArrayInputStream(imageAsByteArray));
+            }
+            if (imageAsInputStream != null) {
+                future.complete(imageAsInputStream);
             }
         } catch (Throwable t) {
             future.completeExceptionally(t);
