@@ -1,10 +1,10 @@
 package de.btobastian.javacord;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import de.btobastian.javacord.entities.Activity;
 import de.btobastian.javacord.entities.ActivityType;
 import de.btobastian.javacord.entities.ApplicationInfo;
+import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
@@ -98,12 +98,11 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 import okhttp3.OkHttpClient;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -418,52 +417,148 @@ public interface DiscordApi {
     }
 
     /**
-     * Updates the name of the current account.
+     * Gets an account updater for the current account.
+     *
+     * @return An account updater for the current account.
+     */
+    default AccountUpdater getAccountUpdater() {
+        return new AccountUpdater(this);
+    }
+
+    /**
+     * Updates the username of the current account.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
      *
      * @param username The new username.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateUsername(String username) {
-        return new RestRequest<Void>(this, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
-                .setRatelimitRetries(0)
-                .setBody(JsonNodeFactory.instance.objectNode().put("username", username))
-                .execute(result -> null);
+        return getAccountUpdater().setUsername(username).update();
     }
 
     /**
      * Updates the avatar of the current account.
-     * This assumes the provided image is of type <code>"png"</code>.
+     * This method assumes the file type is "png"!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
-     * @see #updateAvatar(BufferedImage, String)
      */
     default CompletableFuture<Void> updateAvatar(BufferedImage avatar) {
-        return updateAvatar(avatar, "png");
+        return getAccountUpdater().setAvatar(avatar).update();
     }
 
     /**
      * Updates the avatar of the current account.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
-     * @param type The type of the image. Supports <code>"png"</code>, <code>"jpg"</code> and <code>"gif"</code>.
+     * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> updateAvatar(BufferedImage avatar, String type) {
-        String base64Avatar;
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ImageIO.write(avatar, type, os);
-            base64Avatar = "data:image/" + type + ";base64," + Base64.getEncoder().encodeToString(os.toByteArray());
-        } catch (IOException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
-        return new RestRequest<Void>(this, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
-                .setRatelimitRetries(0)
-                .setBody(JsonNodeFactory.instance.objectNode().put("avatar", base64Avatar))
-                .execute(result -> null);
+    default CompletableFuture<Void> updateAvatar(BufferedImage avatar, String fileType) {
+        return getAccountUpdater().setAvatar(avatar, fileType).update();
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     *
+     * @param avatar The new avatar.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(File avatar) {
+        return getAccountUpdater().setAvatar(avatar).update();
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     *
+     * @param avatar The new avatar.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(Icon avatar) {
+        return getAccountUpdater().setAvatar(avatar).update();
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     *
+     * @param avatar The new avatar.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(URL avatar) {
+        return getAccountUpdater().setAvatar(avatar).update();
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     * This method assumes the file type is "png"!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     *
+     * @param avatar The new avatar.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(byte[] avatar) {
+        return getAccountUpdater().setAvatar(avatar).update();
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     *
+     * @param avatar The new avatar.
+     * @param fileType The type of the avatar, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(byte[] avatar, String fileType) {
+        return getAccountUpdater().setAvatar(avatar, fileType).update();
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     * This method assumes the file type is "png"!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     *
+     * @param avatar The new avatar.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(InputStream avatar) {
+        return getAccountUpdater().setAvatar(avatar).update();
+    }
+
+    /**
+     * Updates the avatar of the current account.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     *
+     * @param avatar The new avatar.
+     * @param fileType The type of the avatar, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateAvatar(InputStream avatar, String fileType) {
+        return getAccountUpdater().setAvatar(avatar, fileType).update();
     }
 
     /**
