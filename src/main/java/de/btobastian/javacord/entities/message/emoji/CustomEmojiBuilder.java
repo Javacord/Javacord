@@ -8,17 +8,15 @@ import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.utils.io.FileUtils;
+import de.btobastian.javacord.utils.ImageContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -41,24 +39,9 @@ public class CustomEmojiBuilder {
     private String name = null;
 
     /**
-     * The image of the emoji as buffered image.
+     * The image of the emoji.
      */
-    private BufferedImage imageAsBufferedImage = null;
-
-    /**
-     * The image of the emoji as icon.
-     */
-    private Icon imageAsIcon = null;
-
-    /**
-     * The image of the emoji as file.
-     */
-    private File imageAsFile = null;
-
-    /**
-     * The type of the image.
-     */
-    private String imageType = "jpg";
+    private ImageContainer image = null;
 
     /**
      * The whitelist of the emoji.
@@ -87,46 +70,46 @@ public class CustomEmojiBuilder {
 
     /**
      * Sets the image of the emoji.
-     * This method assumes that the provided image is a jpg.
      *
      * @param image The image of the emoji.
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(Icon image) {
-        imageAsBufferedImage = null;
-        imageAsIcon = image;
-        imageAsFile = null;
-        imageType = FileUtils.getExtension(image.getUrl().getFile());
+        this.image = new ImageContainer(image);
         return this;
     }
 
     /**
      * Sets the image of the emoji.
-     * This method assumes that the provided image is a jpg.
+     *
+     * @param image The image of the emoji.
+     * @return The current instance in order to chain call methods.
+     */
+    public CustomEmojiBuilder setImage(URL image) {
+        this.image = new ImageContainer(image);
+        return this;
+    }
+
+    /**
+     * Sets the image of the emoji.
      *
      * @param image The image file of the emoji.
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(File image) {
-        imageAsBufferedImage = null;
-        imageAsIcon = null;
-        imageAsFile = image;
-        imageType = FileUtils.getExtension(image.getName());
+        this.image = new ImageContainer(image);
         return this;
     }
 
     /**
      * Sets the image of the emoji.
-     * This method assumes that the provided image is a jpg.
+     * This method assumes that the provided image is a png.
      *
      * @param image The image of the emoji.
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(BufferedImage image) {
-        imageAsBufferedImage = image;
-        imageAsIcon = null;
-        imageAsFile = null;
-        imageType = "jpg";
+        this.image = new ImageContainer(image, "png");
         return this;
     }
 
@@ -138,10 +121,55 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(BufferedImage image, String type) {
-        imageAsBufferedImage = image;
-        imageAsIcon = null;
-        imageAsFile = null;
-        imageType = type;
+        this.image = new ImageContainer(image, type);
+        return this;
+    }
+
+    /**
+     * Sets the image of the emoji.
+     * This method assumes that the provided image is a png.
+     *
+     * @param image The image of the emoji.
+     * @return The current instance in order to chain call methods.
+     */
+    public CustomEmojiBuilder setImage(byte[] image) {
+        this.image = new ImageContainer(image, "png");
+        return this;
+    }
+
+    /**
+     * Sets the image of the emoji.
+     *
+     * @param image The image of the emoji.
+     * @param type The type of the image, e.g. "png", "jpg" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public CustomEmojiBuilder setImage(byte[] image, String type) {
+        this.image = new ImageContainer(image, type);
+        return this;
+    }
+
+    /**
+     * Sets the image of the emoji.
+     * This method assumes that the provided image is a png.
+     *
+     * @param image The image of the emoji.
+     * @return The current instance in order to chain call methods.
+     */
+    public CustomEmojiBuilder setImage(InputStream image) {
+        this.image = new ImageContainer(image, "png");
+        return this;
+    }
+
+    /**
+     * Sets the image of the emoji.
+     *
+     * @param image The image of the emoji.
+     * @param type The type of the image, e.g. "png", "jpg" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public CustomEmojiBuilder setImage(InputStream image, String type) {
+        this.image = new ImageContainer(image, type);
         return this;
     }
 
@@ -192,58 +220,28 @@ public class CustomEmojiBuilder {
         if (name == null) {
             throw new IllegalStateException("The name is no optional parameter!");
         }
-        if (imageAsIcon == null && imageAsBufferedImage == null && imageAsFile == null) {
+        if (image == null) {
             throw new IllegalStateException("The image is no optional parameter!");
         }
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("name", name);
-        if (imageAsBufferedImage != null) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(imageAsBufferedImage, imageType, os);
-                String base64Icon = "data:image/" + imageType + ";base64," +
-                        Base64.getEncoder().encodeToString(os.toByteArray());
-                body.put("image", base64Icon);
-            } catch (IOException e) {
-                CompletableFuture<KnownCustomEmoji> future = new CompletableFuture<>();
-                future.completeExceptionally(e);
-                return future;
-            }
+
+        if (whitelist != null) {
+            ArrayNode jsonRoles = body.putArray("roles");
+            whitelist.stream().map(Role::getIdAsString).forEach(jsonRoles::add);
         }
-        CompletableFuture<KnownCustomEmoji> future = new CompletableFuture<>();
-        server.getApi().getThreadPool().getExecutorService().submit(() -> {
-            try {
-                if (imageAsIcon != null) {
-                    String base64Icon = "data:image/" + imageType + ";base64," +
-                            Base64.getEncoder().encodeToString(imageAsIcon.asByteArray().join());
-                    body.put("image", base64Icon);
-                }
-                if (imageAsFile != null) {
-                    String base64Icon = "data:image/" + imageType + ";base64," +
-                            Base64.getEncoder().encodeToString(Files.readAllBytes(imageAsFile.toPath()));
-                    body.put("image", base64Icon);
-                }
-                if (whitelist != null) {
-                    ArrayNode jsonRoles = body.putArray("roles");
-                    whitelist.stream().map(Role::getIdAsString).forEach(jsonRoles::add);
-                }
+
+        return image.asByteArray(server.getApi()).thenAccept(bytes -> {
+            String base64Icon = "data:image/" + image.getImageType() + ";base64," +
+                    Base64.getEncoder().encodeToString(bytes);
+            body.put("image", base64Icon);
+        }).thenCompose(aVoid ->
                 new RestRequest<KnownCustomEmoji>(server.getApi(), RestMethod.POST, RestEndpoint.CUSTOM_EMOJI)
                         .setUrlParameters(server.getIdAsString())
                         .setBody(body)
                         .execute(result -> ((ImplDiscordApi) server.getApi())
                                 .getOrCreateKnownCustomEmoji(server, result.getJsonBody()))
-                        .whenComplete((emoji, throwable) -> {
-                            if (throwable != null) {
-                                future.completeExceptionally(throwable);
-                            } else {
-                                future.complete(emoji);
-                            }
-                        });
-            } catch (Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-        return future;
+        );
     }
 
 }
