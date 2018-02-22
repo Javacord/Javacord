@@ -75,7 +75,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(BufferedImage avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = new ImageContainer(avatar, fileType);
         return this;
     }
 
@@ -132,7 +132,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(byte[] avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = new ImageContainer(avatar, fileType);
         return this;
     }
 
@@ -156,7 +156,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(InputStream avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = new ImageContainer(avatar, fileType);
         return this;
     }
 

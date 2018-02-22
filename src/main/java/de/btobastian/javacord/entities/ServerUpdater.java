@@ -190,7 +190,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(BufferedImage icon, String fileType) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -247,7 +247,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(byte[] icon, String fileType) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -271,7 +271,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(InputStream icon, String fileType) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -308,7 +308,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(BufferedImage splash, String fileType) {
-        this.splash = new ImageContainer(splash, "png");
+        this.splash = new ImageContainer(splash, fileType);
         return this;
     }
 
@@ -365,7 +365,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(byte[] splash, String fileType) {
-        this.splash = new ImageContainer(splash, "png");
+        this.splash = new ImageContainer(splash, fileType);
         return this;
     }
 
@@ -389,7 +389,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(InputStream splash, String fileType) {
-        this.splash = new ImageContainer(splash, "png");
+        this.splash = new ImageContainer(splash, fileType);
         return this;
     }
 
