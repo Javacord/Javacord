@@ -317,8 +317,8 @@ public class MessageBuilder {
                     tempAttachments.addAll(attachments);
                     // Add the attachments required for the embed
                     if (embed != null) {
-                        embed.consumeRequiredAttachments(
-                                (fileName, stream) -> tempAttachments.add(new Attachment(fileName, stream)));
+                        embed.consumeRequiredAttachments((fileName, image) -> tempAttachments.add(
+                                new Attachment(fileName, image.asInputStream(channel.getApi()).join())));
                     }
                     for (int i = 0; i < tempAttachments.size(); i++) {
                         byte[] bytes;

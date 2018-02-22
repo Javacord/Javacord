@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.MessageAuthor;
+import de.btobastian.javacord.utils.ImageContainer;
 import de.btobastian.javacord.utils.io.FileUtils;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -35,28 +35,24 @@ public class EmbedBuilder {
     // Footer
     private String footerText = null;
     private String footerIconUrl = null;
-    private File footerIconFile = null;
-    private InputStream footerIconInputStream = null;
+    private ImageContainer footerIconContainer = null;
     private String footerIconFileName = null; // Only used if an attachment is used
 
     // Image
     private String imageUrl = null;
-    private File imageFile = null;
-    private InputStream imageInputStream = null;
+    private ImageContainer imageContainer = null;
     private String imageFileName = null; // Only used if an attachment is used
 
     // Author
     private String authorName = null;
     private String authorUrl = null;
     private String authorIconUrl = null;
-    private File authorIconFile = null;
-    private InputStream authorIconInputStream = null;
+    private ImageContainer authorIconContainer = null;
     private String authorIconFileName = null; // Only used if an attachment is used
 
     // Thumbnail
     private String thumbnailUrl = null;
-    private File thumbnailFile = null;
-    private InputStream thumbnailInputStream = null;
+    private ImageContainer thumbnailContainer = null;
     private String thumbnailFileName = null; // Only used if an attachment is used
 
     // Fields
@@ -144,8 +140,7 @@ public class EmbedBuilder {
     public EmbedBuilder setFooter(String text) {
         footerText = text;
         footerIconUrl = null;
-        footerIconFile = null;
-        footerIconInputStream = null;
+        footerIconContainer = null;
         footerIconFileName = null;
         return this;
     }
@@ -160,8 +155,7 @@ public class EmbedBuilder {
     public EmbedBuilder setFooter(String text, String iconUrl) {
         footerText = text;
         footerIconUrl = iconUrl;
-        footerIconFile = null;
-        footerIconInputStream = null;
+        footerIconContainer = null;
         footerIconFileName = null;
         return this;
     }
@@ -176,8 +170,7 @@ public class EmbedBuilder {
     public EmbedBuilder setFooter(String text, Icon icon) {
         footerText = text;
         footerIconUrl = icon.getUrl().toString();
-        footerIconFile = null;
-        footerIconInputStream = null;
+        footerIconContainer = null;
         footerIconFileName = null;
         return this;
     }
@@ -186,31 +179,97 @@ public class EmbedBuilder {
      * Sets the footer of the embed.
      *
      * @param text The text of the footer.
-     * @param icon The file of the footer's icon.
+     * @param icon The footer's icon.
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, File icon) {
         footerText = text;
         footerIconUrl = null;
-        footerIconFile = icon;
-        footerIconInputStream = null;
+        footerIconContainer = new ImageContainer(icon);
         footerIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
         return this;
     }
 
     /**
      * Sets the footer of the embed.
+     * This method assumes the file type is "png"!
      *
      * @param text The text of the footer.
-     * @param icon The stream for the footer's icon.
-     * @param fileType The type of the file, e.g. <code>"png"</code> or <code>"gif"</code>.
+     * @param icon The footer's icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setFooter(String text, InputStream icon) {
+        return setFooter(text, icon, "png");
+    }
+
+    /**
+     * Sets the footer of the embed.
+     *
+     * @param text The text of the footer.
+     * @param icon The footer's icon.
+     * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, InputStream icon, String fileType) {
         footerText = text;
         footerIconUrl = null;
-        footerIconFile = null;
-        footerIconInputStream = icon;
+        footerIconContainer = new ImageContainer(icon, fileType);
+        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the footer of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param text The text of the footer.
+     * @param icon The footer's icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setFooter(String text, byte[] icon) {
+        return setFooter(text, icon, "png");
+    }
+
+    /**
+     * Sets the footer of the embed.
+     *
+     * @param text The text of the footer.
+     * @param icon The footer's icon.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setFooter(String text, byte[] icon, String fileType) {
+        footerText = text;
+        footerIconUrl = null;
+        footerIconContainer = new ImageContainer(icon, fileType);
+        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the footer of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param text The text of the footer.
+     * @param icon The footer's icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setFooter(String text, BufferedImage icon) {
+        return setFooter(text, icon, "png");
+    }
+
+    /**
+     * Sets the footer of the embed.
+     *
+     * @param text The text of the footer.
+     * @param icon The footer's icon.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setFooter(String text, BufferedImage icon, String fileType) {
+        footerText = text;
+        footerIconUrl = null;
+        footerIconContainer = new ImageContainer(icon, fileType);
         thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
@@ -223,8 +282,7 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setImage(String url) {
         imageUrl = url;
-        imageFile = null;
-        imageInputStream = null;
+        imageContainer = null;
         imageFileName = null;
         return this;
     }
@@ -237,8 +295,7 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setImage(Icon image) {
         imageUrl = image.getUrl().toString();
-        imageFile = null;
-        imageInputStream = null;
+        imageContainer = null;
         imageFileName = null;
         return this;
     }
@@ -246,29 +303,88 @@ public class EmbedBuilder {
     /**
      * Sets the image of the embed.
      *
-     * @param image The file of the image.
+     * @param image The image.
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(File image) {
         imageUrl = null;
-        imageFile = image;
-        imageInputStream = null;
+        imageContainer = new ImageContainer(image);
         imageFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(image);
         return this;
     }
 
     /**
      * Sets the image of the embed.
+     * This method assumes the file type is "png"!
      *
-     * @param image The stream for the image.
-     * @param fileType The type of the file, e.g. <code>"png"</code> or <code>"gif"</code>.
+     * @param image The image.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setImage(InputStream image) {
+        return setImage(image, "png");
+    }
+
+    /**
+     * Sets the image of the embed.
+     *
+     * @param image The image.
+     * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(InputStream image, String fileType) {
         imageUrl = null;
-        imageFile = null;
-        imageInputStream = image;
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        imageContainer = new ImageContainer(image, fileType);
+        imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the image of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param image The image.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setImage(byte[] image) {
+        return setImage(image, "png");
+    }
+
+    /**
+     * Sets the image of the embed.
+     *
+     * @param image The image.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setImage(byte[] image, String fileType) {
+        imageUrl = null;
+        imageContainer = new ImageContainer(image, fileType);
+        imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the image of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param image The image.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setImage(BufferedImage image) {
+        return setImage(image, "png");
+    }
+
+    /**
+     * Sets the image of the embed.
+     *
+     * @param image The image.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setImage(BufferedImage image, String fileType) {
+        imageUrl = null;
+        imageContainer = new ImageContainer(image, fileType);
+        imageFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
 
@@ -282,8 +398,7 @@ public class EmbedBuilder {
         authorName = author.getDisplayName();
         authorUrl = null;
         authorIconUrl = author.getAvatar().getUrl().toString();
-        authorIconFile = null;
-        authorIconInputStream = null;
+        authorIconContainer = null;
         authorIconFileName = null;
         return this;
     }
@@ -298,8 +413,7 @@ public class EmbedBuilder {
         authorName = author.getName();
         authorUrl = null;
         authorIconUrl = author.getAvatar().getUrl().toString();
-        authorIconFile = null;
-        authorIconInputStream = null;
+        authorIconContainer = null;
         authorIconFileName = null;
         return this;
     }
@@ -314,8 +428,7 @@ public class EmbedBuilder {
         authorName = name;
         authorUrl = null;
         authorIconUrl = null;
-        authorIconFile = null;
-        authorIconInputStream = null;
+        authorIconContainer = null;
         authorIconFileName = null;
         return this;
     }
@@ -332,8 +445,7 @@ public class EmbedBuilder {
         authorName = name;
         authorUrl = url;
         authorIconUrl = iconUrl;
-        authorIconFile = null;
-        authorIconInputStream = null;
+        authorIconContainer = null;
         authorIconFileName = null;
         return this;
     }
@@ -350,8 +462,7 @@ public class EmbedBuilder {
         authorName = name;
         authorUrl = url;
         authorIconUrl = icon.getUrl().toString();
-        authorIconFile = null;
-        authorIconInputStream = null;
+        authorIconContainer = null;
         authorIconFileName = null;
         return this;
     }
@@ -361,17 +472,29 @@ public class EmbedBuilder {
      *
      * @param name The name of the author.
      * @param url The url of the author.
-     * @param icon The file for the author's icon.
+     * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, File icon) {
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
-        authorIconFile = icon;
-        authorIconInputStream = null;
+        authorIconContainer = new ImageContainer(icon);
         authorIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
         return this;
+    }
+
+    /**
+     * Sets the author of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param name The name of the author.
+     * @param url The url of the author.
+     * @param icon The author's icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setAuthor(String name, String url, InputStream icon) {
+        return setAuthor(name, url, icon, "png");
     }
 
     /**
@@ -379,16 +502,77 @@ public class EmbedBuilder {
      *
      * @param name The name of the author.
      * @param url The url of the author.
-     * @param icon The input stream for the author's icon.
-     * @param fileType The type of the file, e.g. <code>"png"</code> or <code>"gif"</code>.
+     * @param icon The author's icon.
+     * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, InputStream icon, String fileType) {
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
-        authorIconFile = null;
-        authorIconInputStream = icon;
+        authorIconContainer = new ImageContainer(icon, fileType);
+        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the author of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param name The name of the author.
+     * @param url The url of the author.
+     * @param icon The author's icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setAuthor(String name, String url, byte[] icon) {
+        return setAuthor(name, url, icon, "png");
+    }
+
+    /**
+     * Sets the author of the embed.
+     *
+     * @param name The name of the author.
+     * @param url The url of the author.
+     * @param icon The author's icon.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setAuthor(String name, String url, byte[] icon, String fileType) {
+        authorName = name;
+        authorUrl = url;
+        authorIconUrl = null;
+        authorIconContainer = new ImageContainer(icon, fileType);
+        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the author of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param name The name of the author.
+     * @param url The url of the author.
+     * @param icon The author's icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setAuthor(String name, String url, BufferedImage icon) {
+        return setAuthor(name, url, icon, "png");
+    }
+
+    /**
+     * Sets the author of the embed.
+     *
+     * @param name The name of the author.
+     * @param url The url of the author.
+     * @param icon The author's icon.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setAuthor(String name, String url, BufferedImage icon, String fileType) {
+        authorName = name;
+        authorUrl = url;
+        authorIconUrl = null;
+        authorIconContainer = new ImageContainer(icon, fileType);
         thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
@@ -401,8 +585,7 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setThumbnail(String url) {
         thumbnailUrl = url;
-        thumbnailFile = null;
-        thumbnailInputStream = null;
+        thumbnailContainer = null;
         thumbnailFileName = null;
         return this;
     }
@@ -415,8 +598,7 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setThumbnail(Icon thumbnail) {
         thumbnailUrl = thumbnail.getUrl().toString();
-        thumbnailFile = null;
-        thumbnailInputStream = null;
+        thumbnailContainer = null;
         thumbnailFileName = null;
         return this;
     }
@@ -424,28 +606,87 @@ public class EmbedBuilder {
     /**
      * Sets the thumbnail of the embed.
      *
-     * @param thumbnail The file of the thumbnail.
+     * @param thumbnail The thumbnail.
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(File thumbnail) {
         thumbnailUrl = null;
-        thumbnailFile = thumbnail;
-        thumbnailInputStream = null;
+        thumbnailContainer = new ImageContainer(thumbnail);
         thumbnailFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(thumbnail);
         return this;
     }
 
     /**
      * Sets the thumbnail of the embed.
+     * This method assumes the file type is "png"!
      *
-     * @param thumbnail The input stream of the thumbnail.
-     * @param fileType The type of the file, e.g. <code>"png"</code> or <code>"gif"</code>.
+     * @param thumbnail The thumbnail.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setThumbnail(InputStream thumbnail) {
+        return setThumbnail(thumbnail, "png");
+    }
+
+    /**
+     * Sets the thumbnail of the embed.
+     *
+     * @param thumbnail The thumbnail.
+     * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(InputStream thumbnail, String fileType) {
         thumbnailUrl = null;
-        thumbnailFile = null;
-        thumbnailInputStream = thumbnail;
+        thumbnailContainer = new ImageContainer(thumbnail, fileType);
+        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the thumbnail of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param thumbnail The thumbnail.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setThumbnail(byte[] thumbnail) {
+        return setThumbnail(thumbnail, "png");
+    }
+
+    /**
+     * Sets the thumbnail of the embed.
+     *
+     * @param thumbnail The thumbnail.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setThumbnail(byte[] thumbnail, String fileType) {
+        thumbnailUrl = null;
+        thumbnailContainer = new ImageContainer(thumbnail, fileType);
+        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        return this;
+    }
+
+    /**
+     * Sets the thumbnail of the embed.
+     * This method assumes the file type is "png"!
+     *
+     * @param thumbnail The thumbnail.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setThumbnail(BufferedImage thumbnail) {
+        return setThumbnail(thumbnail, "png");
+    }
+
+    /**
+     * Sets the thumbnail of the embed.
+     *
+     * @param thumbnail The thumbnail.
+     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder setThumbnail(BufferedImage thumbnail, String fileType) {
+        thumbnailUrl = null;
+        thumbnailContainer = new ImageContainer(thumbnail, fileType);
         thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
@@ -489,32 +730,19 @@ public class EmbedBuilder {
      * Passes the required attachments for this embed to the given consumer.
      *
      * @param consumer The consumer which takes the required attachments.
-     * @throws FileNotFoundException If one of the required files was now found.
      */
-    public void consumeRequiredAttachments(BiConsumer<String, InputStream> consumer) throws FileNotFoundException {
-        if (footerIconFile != null) {
-            consumer.accept(footerIconFileName, new FileInputStream(footerIconFile));
+    public void consumeRequiredAttachments(BiConsumer<String, ImageContainer> consumer) {
+        if (footerIconContainer != null) {
+            consumer.accept(footerIconFileName, footerIconContainer);
         }
-        if (footerIconInputStream != null) {
-            consumer.accept(footerIconFileName, footerIconInputStream);
+        if (imageContainer != null) {
+            consumer.accept(imageFileName, imageContainer);
         }
-        if (imageFile != null) {
-            consumer.accept(imageFileName, new FileInputStream(imageFile));
+        if (authorIconContainer != null) {
+            consumer.accept(authorIconFileName, authorIconContainer);
         }
-        if (imageInputStream != null) {
-            consumer.accept(imageFileName, imageInputStream);
-        }
-        if (authorIconFile != null) {
-            consumer.accept(authorIconFileName, new FileInputStream(authorIconFile));
-        }
-        if (authorIconInputStream != null) {
-            consumer.accept(authorIconFileName, authorIconInputStream);
-        }
-        if (thumbnailFile != null) {
-            consumer.accept(thumbnailFileName, new FileInputStream(thumbnailFile));
-        }
-        if (thumbnailInputStream != null) {
-            consumer.accept(thumbnailFileName, thumbnailInputStream);
+        if (thumbnailContainer != null) {
+            consumer.accept(thumbnailFileName, thumbnailContainer);
         }
     }
 
@@ -573,10 +801,10 @@ public class EmbedBuilder {
             }
         }
         if (thumbnailUrl != null) {
-            object.putObject("thumbnail").put("url", thumbnailUrl);
+            object.putObject("thumbnailContainer").put("url", thumbnailUrl);
         }
         if (thumbnailFileName != null) {
-            object.putObject("thumbnail").put("url", "attachment://" + thumbnailFileName);
+            object.putObject("thumbnailContainer").put("url", "attachment://" + thumbnailFileName);
         }
         if (fields.size() > 0) {
             ArrayNode jsonFields = object.putArray("fields");
