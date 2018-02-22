@@ -85,6 +85,9 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -535,6 +538,7 @@ public interface Server extends DiscordEntity {
 
     /**
      * Updates the icon of the server.
+     * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
@@ -544,6 +548,115 @@ public interface Server extends DiscordEntity {
      */
     default CompletableFuture<Void> updateIcon(BufferedImage icon) {
         return getUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(BufferedImage icon, String fileType) {
+        return getUpdater().setIcon(icon, fileType).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(File icon) {
+        return getUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(Icon icon) {
+        return getUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(URL icon) {
+        return getUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * This method assumes the file type is "png"!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(byte[] icon) {
+        return getUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(byte[] icon, String fileType) {
+        return getUpdater().setIcon(icon, fileType).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * This method assumes the file type is "png"!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(InputStream icon) {
+        return getUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the server.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(InputStream icon, String fileType) {
+        return getUpdater().setIcon(icon, fileType).update();
     }
 
     /**
@@ -562,6 +675,7 @@ public interface Server extends DiscordEntity {
 
     /**
      * Updates the splash of the server.
+     * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
@@ -571,6 +685,115 @@ public interface Server extends DiscordEntity {
      */
     default CompletableFuture<Void> updateSplash(BufferedImage splash) {
         return getUpdater().setSplash(splash).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @param fileType The type of the splash, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(BufferedImage splash, String fileType) {
+        return getUpdater().setSplash(splash, fileType).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(File splash) {
+        return getUpdater().setSplash(splash).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(Icon splash) {
+        return getUpdater().setSplash(splash).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(URL splash) {
+        return getUpdater().setSplash(splash).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * This method assumes the file type is "png"!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(byte[] splash) {
+        return getUpdater().setSplash(splash).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @param fileType The type of the splash, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(byte[] splash, String fileType) {
+        return getUpdater().setSplash(splash, fileType).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * This method assumes the file type is "png"!
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(InputStream splash) {
+        return getUpdater().setSplash(splash).update();
+    }
+
+    /**
+     * Updates the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @param splash The new splash of the server.
+     * @param fileType The type of the splash, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateSplash(InputStream splash, String fileType) {
+        return getUpdater().setSplash(splash, fileType).update();
     }
 
     /**
