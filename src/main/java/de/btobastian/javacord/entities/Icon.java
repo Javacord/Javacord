@@ -1,21 +1,14 @@
 package de.btobastian.javacord.entities;
 
-import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.impl.ImplIcon;
+import de.btobastian.javacord.utils.ImageContainer;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
-import javax.imageio.ImageIO;
-import javax.net.ssl.HttpsURLConnection;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 /**
  * This class represents a discord icon, for example a server icon or a user avatar.
@@ -49,21 +42,7 @@ public interface Icon {
      * @return The icon as byte array.
      */
     default CompletableFuture<byte[]> asByteArray() {
-        return asInputStream().thenApply(stream -> {
-            try (
-                    InputStream in = new BufferedInputStream(stream);
-                    ByteArrayOutputStream out = new ByteArrayOutputStream()
-            ) {
-                byte[] buf = new byte[1024];
-                int n;
-                while (-1 != (n = in.read(buf))) {
-                    out.write(buf, 0, n);
-                }
-                return out.toByteArray();
-            } catch (IOException e) {
-                throw new CompletionException(e);
-            }
-        });
+        return new ImageContainer(getUrl()).asByteArray(((ImplIcon) this).getApi());
     }
 
     /**
@@ -73,21 +52,7 @@ public interface Icon {
      * @return The input stream for the icon.
      */
     default CompletableFuture<InputStream> asInputStream() {
-        CompletableFuture<InputStream> future = new CompletableFuture<>();
-        ((ImplIcon) this).getApi().getThreadPool().getExecutorService().submit(() -> {
-            try {
-                logger.debug("Trying to download icon from {}", getUrl());
-                HttpsURLConnection conn = (HttpsURLConnection) getUrl().openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
-                future.complete(conn.getInputStream());
-                logger.debug("Downloaded icon from {} (content length: {})", getUrl(), conn.getContentLength());
-            } catch (Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-        return future;
+        return new ImageContainer(getUrl()).asInputStream(((ImplIcon) this).getApi());
     }
 
     /**
@@ -96,15 +61,7 @@ public interface Icon {
      * @return The icon as BufferedImage.
      */
     default CompletableFuture<BufferedImage> asBufferedImage() {
-        return asByteArray()
-                .thenApply(ByteArrayInputStream::new)
-                .thenApply(stream -> {
-                    try {
-                        return ImageIO.read(stream);
-                    } catch (IOException e) {
-                        throw new CompletionException(e);
-                    }
-                });
+        return new ImageContainer(getUrl()).asBufferedImage(((ImplIcon) this).getApi());
     }
 
 }
