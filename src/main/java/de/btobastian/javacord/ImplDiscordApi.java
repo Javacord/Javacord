@@ -43,6 +43,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthentica
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
@@ -1368,6 +1369,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerChangeIconListener> getServerChangeIconListeners() {
         return getListeners(ServerChangeIconListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(ServerChangeSplashListener listener) {
+        return addListener(ServerChangeSplashListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeSplashListener> getServerChangeSplashListeners() {
+        return getListeners(ServerChangeSplashListener.class);
     }
 
     @Override

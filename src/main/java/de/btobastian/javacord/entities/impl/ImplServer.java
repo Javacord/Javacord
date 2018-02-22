@@ -269,6 +269,24 @@ public class ImplServer implements Server, Cleanupable {
     }
 
     /**
+     * Gets the splash hash of the server.
+     *
+     * @return The splash hash of the server.
+     */
+    public String getSplashHash() {
+        return splash;
+    }
+
+    /**
+     * Sets the splash hash of the server.
+     *
+     * @param splashHash The splash hash of the server.
+     */
+    public void setSplashHash(String splashHash) {
+        this.splash = splashHash;
+    }
+
+    /**
      * Sets the afk channel id of the server.
      *
      * @param afkChannelId The afk channel id of the server.

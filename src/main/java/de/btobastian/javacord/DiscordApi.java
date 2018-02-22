@@ -50,6 +50,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthentica
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
@@ -1816,6 +1817,21 @@ public interface DiscordApi {
      * @return A list with all registered server change icon listeners.
      */
     List<ServerChangeIconListener> getServerChangeIconListeners();
+
+    /**
+     * Adds a listener, which listens to server splash changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(ServerChangeSplashListener listener);
+
+    /**
+     * Gets a list with all registered server change splash listeners.
+     *
+     * @return A list with all registered server change splash listeners.
+     */
+    List<ServerChangeSplashListener> getServerChangeSplashListeners();
 
     /**
      * Adds a listener, which listens to server verification level changes.

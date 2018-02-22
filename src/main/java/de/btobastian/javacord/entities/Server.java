@@ -43,6 +43,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthentica
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
@@ -2001,6 +2002,26 @@ public interface Server extends DiscordEntity {
      */
     default List<ServerChangeIconListener> getServerChangeIconListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeIconListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to server splash changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(ServerChangeSplashListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeSplashListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change splash listeners.
+     *
+     * @return A list with all registered server change splash listeners.
+     */
+    default List<ServerChangeSplashListener> getServerChangeSplashListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeSplashListener.class);
     }
 
     /**

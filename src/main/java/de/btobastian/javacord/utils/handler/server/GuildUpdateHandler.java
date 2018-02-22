@@ -18,6 +18,7 @@ import de.btobastian.javacord.events.server.ServerChangeMultiFactorAuthenticatio
 import de.btobastian.javacord.events.server.ServerChangeNameEvent;
 import de.btobastian.javacord.events.server.ServerChangeOwnerEvent;
 import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
+import de.btobastian.javacord.events.server.ServerChangeSplashEvent;
 import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
 import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeDefaultMessageNotificationLevelListener;
@@ -27,6 +28,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeMultiFactorAuthentica
 import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
@@ -79,6 +81,19 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getServerChangeIconListeners());
 
                 dispatchEvent(listeners, listener -> listener.onServerChangeIcon(event));
+            }
+
+            String newSplashHash = packet.get("splash").asText(null);
+            String oldSplashHash = server.getSplashHash();
+            if (!Objects.deepEquals(oldSplashHash, newSplashHash)) {
+                server.setSplashHash(newSplashHash);
+                ServerChangeSplashEvent event = new ServerChangeSplashEvent(api, server, newSplashHash, oldSplashHash);
+
+                List<ServerChangeSplashListener> listeners = new ArrayList<>();
+                listeners.addAll(server.getServerChangeSplashListeners());
+                listeners.addAll(api.getServerChangeSplashListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChangeSplash(event));
             }
 
             VerificationLevel newVerificationLevel = VerificationLevel.fromId(packet.get("verification_level").asInt());
