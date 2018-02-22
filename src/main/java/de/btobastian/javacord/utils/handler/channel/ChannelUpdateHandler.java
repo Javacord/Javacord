@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.channels.ChannelCategory;
 import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.impl.ImplChannelCategory;
 import de.btobastian.javacord.entities.channels.impl.ImplGroupChannel;
@@ -13,6 +14,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 import de.btobastian.javacord.events.group.channel.GroupChannelChangeNameEvent;
+import de.btobastian.javacord.events.server.channel.ServerChannelChangeCategoryEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeNameEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeNsfwFlagEvent;
 import de.btobastian.javacord.events.server.channel.ServerChannelChangeOverwrittenPermissionsEvent;
@@ -21,6 +23,7 @@ import de.btobastian.javacord.events.server.channel.ServerTextChannelChangeTopic
 import de.btobastian.javacord.events.server.channel.ServerVoiceChannelChangeBitrateEvent;
 import de.btobastian.javacord.events.server.channel.ServerVoiceChannelChangeUserLimitEvent;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeCategoryListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
@@ -291,6 +294,22 @@ public class ChannelUpdateHandler extends PacketHandler {
 
                 dispatchEvent(listeners, listener -> listener.onServerChannelChangeNsfwFlag(event));
             }
+
+            ChannelCategory oldCategory = channel.getCategory().orElse(null);
+            ChannelCategory newCategory = channel.getServer()
+                    .getChannelCategoryById(jsonChannel.get("parent_id").asLong(-1)).orElse(null);
+            if (!Objects.deepEquals(oldCategory, newCategory)) {
+                channel.setParentId(newCategory == null ? -1 : newCategory.getId());
+                ServerChannelChangeCategoryEvent event =
+                        new ServerChannelChangeCategoryEvent(channel, newCategory, oldCategory);
+
+                List<ServerChannelChangeCategoryListener> listeners = new ArrayList<>();
+                listeners.addAll(channel.getServerChannelChangeCategoryListeners());
+                listeners.addAll(channel.getServer().getServerChannelChangeCategoryListeners());
+                listeners.addAll(api.getServerChannelChangeCategoryListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChannelChangeCategory(event));
+            }
         });
     }
 
@@ -330,6 +349,22 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(api.getServerVoiceChannelChangeUserLimitListeners());
 
                 dispatchEvent(listeners, listener -> listener.onServerVoiceChannelChangeUserLimit(event));
+            }
+
+            ChannelCategory oldCategory = channel.getCategory().orElse(null);
+            ChannelCategory newCategory = channel.getServer()
+                    .getChannelCategoryById(jsonChannel.get("parent_id").asLong(-1)).orElse(null);
+            if (!Objects.deepEquals(oldCategory, newCategory)) {
+                channel.setParentId(newCategory == null ? -1 : newCategory.getId());
+                ServerChannelChangeCategoryEvent event =
+                        new ServerChannelChangeCategoryEvent(channel, newCategory, oldCategory);
+
+                List<ServerChannelChangeCategoryListener> listeners = new ArrayList<>();
+                listeners.addAll(channel.getServerChannelChangeCategoryListeners());
+                listeners.addAll(channel.getServer().getServerChannelChangeCategoryListeners());
+                listeners.addAll(api.getServerChannelChangeCategoryListeners());
+
+                dispatchEvent(listeners, listener -> listener.onServerChannelChangeCategory(event));
             }
         });
     }

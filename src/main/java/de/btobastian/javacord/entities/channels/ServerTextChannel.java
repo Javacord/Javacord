@@ -6,6 +6,7 @@ import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.TextChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelAttachableListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeCategoryListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
@@ -145,6 +146,28 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     default List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to category changes of this channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChannelChangeCategoryListener> addServerChannelChangeCategoryListener(
+            ServerChannelChangeCategoryListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerTextChannel.class, getId(), ServerChannelChangeCategoryListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server channel change category listeners.
+     *
+     * @return A list with all registered server channel change category listeners.
+     */
+    default List<ServerChannelChangeCategoryListener> getServerChannelChangeCategoryListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerTextChannel.class, getId(), ServerChannelChangeCategoryListener.class);
     }
 
     /**

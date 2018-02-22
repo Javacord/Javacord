@@ -6,6 +6,7 @@ import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.VoiceChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelAttachableListener;
+import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeCategoryListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeBitrateListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeUserLimitListener;
@@ -66,7 +67,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * Updates the bitrate of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param bitrate The new bitrate of the channel.
      * @return A future to check if the update was successful.
@@ -79,7 +80,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * Updates the user limit of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param userLimit The new user limit of the channel.
      * @return A future to check if the update was successful.
@@ -104,7 +105,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
      * @param category The new category of the channel.
      * @return A future to check if the update was successful.
@@ -211,6 +212,28 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     default List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 ServerVoiceChannel.class, getId(), ServerVoiceChannelChangeUserLimitListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to category changes of this channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChannelChangeCategoryListener> addServerChannelChangeCategoryListener(
+            ServerChannelChangeCategoryListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerChannelChangeCategoryListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server channel change category listeners.
+     *
+     * @return A list with all registered server channel change category listeners.
+     */
+    default List<ServerChannelChangeCategoryListener> getServerChannelChangeCategoryListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerChannelChangeCategoryListener.class);
     }
 
     /**

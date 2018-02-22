@@ -152,6 +152,15 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     }
 
     /**
+     * Sets the parent id of the channel.
+     *
+     * @param parentId The parent id to set.
+     */
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
+    }
+
+    /**
      * Gets the overwritten role permissions.
      *
      * @return The overwritten role permissions.
