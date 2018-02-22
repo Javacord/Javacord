@@ -214,7 +214,7 @@ public class EmbedBuilder {
         footerText = text;
         footerIconUrl = null;
         footerIconContainer = new ImageContainer(icon, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
 
@@ -242,7 +242,7 @@ public class EmbedBuilder {
         footerText = text;
         footerIconUrl = null;
         footerIconContainer = new ImageContainer(icon, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
 
@@ -270,7 +270,7 @@ public class EmbedBuilder {
         footerText = text;
         footerIconUrl = null;
         footerIconContainer = new ImageContainer(icon, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
 
@@ -511,7 +511,7 @@ public class EmbedBuilder {
         authorUrl = url;
         authorIconUrl = null;
         authorIconContainer = new ImageContainer(icon, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
 
@@ -542,7 +542,7 @@ public class EmbedBuilder {
         authorUrl = url;
         authorIconUrl = null;
         authorIconContainer = new ImageContainer(icon, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
 
@@ -573,7 +573,7 @@ public class EmbedBuilder {
         authorUrl = url;
         authorIconUrl = null;
         authorIconContainer = new ImageContainer(icon, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
         return this;
     }
 
