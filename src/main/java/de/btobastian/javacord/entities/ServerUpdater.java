@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
+import de.btobastian.javacord.utils.ImageContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -14,7 +15,10 @@ import de.btobastian.javacord.utils.rest.RestRequest;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -76,7 +80,7 @@ public class ServerUpdater {
     /**
      * The icon to update.
      */
-    private BufferedImage icon = null;
+    private ImageContainer icon = null;
 
     /**
      * The owner to update.
@@ -171,12 +175,106 @@ public class ServerUpdater {
 
     /**
      * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
      *
      * @param icon The new icon of the server.
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(BufferedImage icon) {
-        this.icon = icon;
+        this.icon = new ImageContainer(icon, "png");
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the server.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(BufferedImage icon, String fileType) {
+        this.icon = new ImageContainer(icon, "png");
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(File icon) {
+        this.icon = new ImageContainer(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(Icon icon) {
+        this.icon = new ImageContainer(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(URL icon) {
+        this.icon = new ImageContainer(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(byte[] icon) {
+        this.icon = new ImageContainer(icon, "png");
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the server.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(byte[] icon, String fileType) {
+        this.icon = new ImageContainer(icon, "png");
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(InputStream icon) {
+        this.icon = new ImageContainer(icon, "png");
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the server.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setIcon(InputStream icon, String fileType) {
+        this.icon = new ImageContainer(icon, "png");
         return this;
     }
 
@@ -323,16 +421,6 @@ public class ServerUpdater {
             patchServer = true;
         }
         if (icon != null) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(icon, "jpg", os);
-                String base64Icon = "data:image/jpg;base64," + Base64.getEncoder().encodeToString(os.toByteArray());
-                body.put("icon", base64Icon);
-            } catch (IOException e) {
-                CompletableFuture<Void> future = new CompletableFuture<>();
-                future.completeExceptionally(e);
-                return future;
-            }
             patchServer = true;
         }
         if (splash != null) {
@@ -358,10 +446,21 @@ public class ServerUpdater {
         }
         // Only make a REST call, if we really want to update something
         if (patchServer) {
-            tasks.add(new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
-                    .setUrlParameters(server.getIdAsString())
-                    .setBody(body)
-                    .execute(result -> null));
+            if (icon != null) {
+                tasks.add(icon.asByteArray(server.getApi()).thenAccept(bytes -> {
+                    String base64Icon = "data:image/" + icon.getImageType() + ";base64," +
+                            Base64.getEncoder().encodeToString(bytes);
+                    body.put("icon", base64Icon);
+                }).thenCompose(aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
+                        .setUrlParameters(server.getIdAsString())
+                        .setBody(body)
+                        .execute(result -> null)));
+            } else {
+                tasks.add(new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
+                        .setUrlParameters(server.getIdAsString())
+                        .setBody(body)
+                        .execute(result -> null));
+            }
         }
 
         CompletableFuture<?>[] tasksArray = tasks.toArray(new CompletableFuture<?>[tasks.size()]);
