@@ -8,7 +8,6 @@ import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
-import javax.net.ssl.HttpsURLConnection;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -17,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -235,7 +235,7 @@ public class ImageContainer {
                 api.getThreadPool().getExecutorService().submit(() -> {
                     try {
                         logger.debug("Trying to download image from {}", url);
-                        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                         conn.setRequestMethod("GET");
                         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
                         conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
