@@ -59,6 +59,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeB
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeUserLimitListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
+import de.btobastian.javacord.listeners.server.channel.WebhooksUpdateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
@@ -1787,4 +1788,13 @@ public class ImplDiscordApi implements DiscordApi {
         return getListeners(UserChangeAvatarListener.class);
     }
 
+    @Override
+    public ListenerManager<WebhooksUpdateListener> addWebhooksUpdateListener(WebhooksUpdateListener listener) {
+        return addListener(WebhooksUpdateListener.class, listener);
+    }
+
+    @Override
+    public List<WebhooksUpdateListener> getWebhooksUpdateListeners() {
+        return getListeners(WebhooksUpdateListener.class);
+    }
 }

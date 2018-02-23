@@ -9,6 +9,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerChannelAttachableLi
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listeners.server.channel.WebhooksUpdateListener;
 import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
 
@@ -145,6 +146,27 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     default List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to webhook updates of this channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<WebhooksUpdateListener> addWebhooksUpdateListener(WebhooksUpdateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(ServerTextChannel.class, getId(), WebhooksUpdateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered webhooks update listeners.
+     *
+     * @return A list with all registered webhooks update listeners.
+     */
+    default List<WebhooksUpdateListener> getWebhooksUpdateListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(ServerTextChannel.class, getId(), WebhooksUpdateListener.class);
     }
 
     /**

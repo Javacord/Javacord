@@ -66,6 +66,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeB
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeUserLimitListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
+import de.btobastian.javacord.listeners.server.channel.WebhooksUpdateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
@@ -2422,6 +2423,21 @@ public interface DiscordApi {
      * @return A list with all registered user change avatar listeners.
      */
     List<UserChangeAvatarListener> getUserChangeAvatarListeners();
+
+    /**
+     * Adds a listener, which listens to channel webhook updates.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<WebhooksUpdateListener> addWebhooksUpdateListener(WebhooksUpdateListener listener);
+
+    /**
+     * Gets a list with all registered webhooks update listeners.
+     *
+     * @return A list with all registered webhooks update listeners.
+     */
+    List<WebhooksUpdateListener> getWebhooksUpdateListeners();
 
     /**
      * Adds a {@code GloballyAttachableListener}.

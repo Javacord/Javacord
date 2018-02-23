@@ -58,6 +58,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeB
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelChangeUserLimitListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJoinListener;
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
+import de.btobastian.javacord.listeners.server.channel.WebhooksUpdateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
@@ -2775,6 +2776,26 @@ public interface Server extends DiscordEntity {
     default List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 Server.class, getId(), ServerVoiceChannelChangeUserLimitListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to webhook updates on this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<WebhooksUpdateListener> addWebhooksUpdateListener(WebhooksUpdateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), WebhooksUpdateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered webhooks update listeners.
+     *
+     * @return A list with all registered webhooks update listeners.
+     */
+    default List<WebhooksUpdateListener> getWebhooksUpdateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), WebhooksUpdateListener.class);
     }
 
     /**
