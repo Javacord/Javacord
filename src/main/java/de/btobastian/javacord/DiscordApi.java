@@ -55,7 +55,6 @@ import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeCategoryListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
@@ -2009,22 +2008,6 @@ public interface DiscordApi {
      * @return A list with all registered server channel change nsfw flag listeners.
      */
     List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners();
-
-    /**
-     * Adds a listener, which listens to server channel category changes.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerChannelChangeCategoryListener> addServerChannelChangeCategoryListener(
-            ServerChannelChangeCategoryListener listener);
-
-    /**
-     * Gets a list with all registered server channel change category listeners.
-     *
-     * @return A list with all registered server channel change category listeners.
-     */
-    List<ServerChannelChangeCategoryListener> getServerChannelChangeCategoryListeners();
 
     /**
      * Adds a listener, which listens to custom emoji creations.

@@ -47,7 +47,6 @@ import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
 import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
-import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeCategoryListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNsfwFlagListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
@@ -2274,28 +2273,6 @@ public interface Server extends DiscordEntity {
     default List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
         return ((ImplDiscordApi) getApi()).getObjectListeners(
                 Server.class, getId(), ServerChannelChangePositionListener.class);
-    }
-
-    /**
-     * Adds a listener, which listens to server channel category changes in this server.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    default ListenerManager<ServerChannelChangeCategoryListener> addServerChannelChangeCategoryListener(
-            ServerChannelChangeCategoryListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChannelChangeCategoryListener.class, listener);
-    }
-
-    /**
-     * Gets a list with all registered server channel change category listeners.
-     *
-     * @return A list with all registered server channel change category listeners.
-     */
-    default List<ServerChannelChangeCategoryListener> getServerChannelChangeCategoryListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChannelChangeCategoryListener.class);
     }
 
     /**
