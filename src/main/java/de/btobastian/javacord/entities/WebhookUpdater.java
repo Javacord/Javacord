@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
+import de.btobastian.javacord.utils.ImageContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,7 +39,7 @@ public class WebhookUpdater {
     /**
      * The avatar to update.
      */
-    protected BufferedImage avatar = null;
+    private ImageContainer avatar = null;
 
     /**
      * Whether the avatar should be updated or not.
@@ -78,12 +79,114 @@ public class WebhookUpdater {
 
     /**
      * Queues the avatar to be updated.
+     * This method assumes the file type is "png"!
      *
-     * @param avatar The new avatar of the webhook.
+     * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(BufferedImage avatar) {
-        this.avatar = avatar;
+        this.avatar = new ImageContainer(avatar, "png");
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     *
+     * @param avatar The avatar to set.
+     * @param fileType The type of the avatar, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(BufferedImage avatar, String fileType) {
+        this.avatar = new ImageContainer(avatar, fileType);
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     *
+     * @param avatar The avatar to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(File avatar) {
+        this.avatar = new ImageContainer(avatar);
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     *
+     * @param avatar The avatar to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(Icon avatar) {
+        this.avatar = new ImageContainer(avatar);
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     *
+     * @param avatar The avatar to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(URL avatar) {
+        this.avatar = new ImageContainer(avatar);
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param avatar The avatar to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(byte[] avatar) {
+        this.avatar = new ImageContainer(avatar, "png");
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     *
+     * @param avatar The avatar to set.
+     * @param fileType The type of the avatar, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(byte[] avatar, String fileType) {
+        this.avatar = new ImageContainer(avatar, fileType);
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param avatar The avatar to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(InputStream avatar) {
+        this.avatar = new ImageContainer(avatar, "png");
+        updateAvatar = true;
+        return this;
+    }
+
+    /**
+     * Queues the avatar to be updated.
+     *
+     * @param avatar The avatar to set.
+     * @param fileType The type of the avatar, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAvatar(InputStream avatar, String fileType) {
+        this.avatar = new ImageContainer(avatar, fileType);
         updateAvatar = true;
         return this;
     }
@@ -94,7 +197,9 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater removeAvatar() {
-        return setAvatar(null);
+        this.avatar = null;
+        updateAvatar = true;
+        return this;
     }
 
     /**
@@ -114,19 +219,22 @@ public class WebhookUpdater {
             patchWebhook = true;
         }
         if (updateAvatar) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(avatar, "jpg", os);
-                String base64Avatar = "data:image/jpg;base64," + Base64.getEncoder().encodeToString(os.toByteArray());
-                body.put("avatar", base64Avatar);
-            } catch (IOException e) {
-                CompletableFuture<Webhook> future = new CompletableFuture<>();
-                future.completeExceptionally(e);
-                return future;
+            if (avatar == null) {
+                body.putNull("avatar");
             }
             patchWebhook = true;
         }
         if (patchWebhook) {
+            if (avatar != null) {
+                return avatar.asByteArray(webhook.getApi()).thenAccept(bytes -> {
+                    String base64Avatar = "data:image/" + avatar.getImageType() + ";base64," +
+                            Base64.getEncoder().encodeToString(bytes);
+                    body.put("avatar", base64Avatar);
+                }).thenCompose(aVoid -> new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
+                        .setUrlParameters(webhook.getIdAsString())
+                        .setBody(body)
+                        .execute(result -> new ImplWebhook(webhook.getApi(), result.getJsonBody())));
+            }
             return new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                     .setUrlParameters(webhook.getIdAsString())
                     .setBody(body)
