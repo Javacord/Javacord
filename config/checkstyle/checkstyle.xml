@@ -238,7 +238,9 @@
         <module name="EmptyCatchBlock">
             <property name="exceptionVariableName" value="ignored"/>
         </module>
-        <module name="CommentsIndentation"/>
+        <module name="CommentsIndentation">
+            <property name="id" value="CommentsIndentation"/>
+        </module>
         <module name="AnnotationLocation">
             <property name="allowSamelineMultipleAnnotations" value="false" />
             <property name="allowSamelineSingleParameterlessAnnotation" value="false" />

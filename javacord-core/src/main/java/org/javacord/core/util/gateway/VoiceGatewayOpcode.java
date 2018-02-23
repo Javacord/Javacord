@@ -15,56 +15,85 @@ public enum VoiceGatewayOpcode {
 
     /**
      * begin a voice websocket connection.
+     *
+     * <p>Sent by client
      */
     IDENTIFY(0),
 
     /**
      * select the voice protocol.
+     *
+     * <p>Sent by client
      */
     SELECT_PROTOCOL(1),
 
     /**
      * complete the websocket handshake.
+     *
+     * <p>Sent by server
      */
     READY(2),
 
     /**
      * keep the websocket connection alive.
+     *
+     * <p>Sent by client
      */
     HEARTBEAT(3),
 
     /**
      * describe the session.
+     *
+     * <p>Sent by server
      */
     SESSION_DESCRIPTION(4),
 
     /**
      * indicate which users are speaking.
+     *
+     * <p>Sent by client and server
      */
     SPEAKING(5),
 
     /**
      * sent immediately following a received client heartbeat.
+     *
+     * <p>Sent by server
      */
     HEARTBEAT_ACK(6),
 
     /**
      * resume a connection.
+     *
+     * <p>Sent by client
      */
     RESUME(7),
 
     /**
      * the continuous interval in milliseconds after which the client should send a heartbeat.
+     *
+     * <p>Sent by server
      */
     HELLO(8),
 
     /**
      * acknowledge Resume.
+     *
+     * <p>Sent by server
      */
     RESUMED(9),
 
     /**
+     * a client has connected to the voice channel.
+     *
+     * <p>Sent by server
+     */
+    CLIENT_CONNECT(12),
+
+    /**
      * a client has disconnected from the voice channel.
+     *
+     * <p>Sent by server
      */
     CLIENT_DISCONNECT(13);
 

@@ -20,6 +20,26 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     }
 
     /**
+     * Connect to this server voice channel self-deafened.
+     */
+    default void connect() {
+        connect(false, true);
+    }
+
+    /**
+     * Connect to this server voice channel.
+     *
+     * @param muted Whether to connect self-muted.
+     * @param deafened Whether to connect self-deafened.
+     */
+    void connect(boolean muted, boolean deafened);
+
+    /**
+     * Disconnect from this server voice channel.
+     */
+    void disconnect();
+
+    /**
      * Gets the bitrate (int bits) of the channel.
      *
      * @return The bitrate of the channel.

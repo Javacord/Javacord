@@ -8,4 +8,5 @@
     <suppress id="finalizer" files=".*[\\/]DiscordApiImpl.java$" />
     <suppress checks="LineLength|CustomImportOrder|OverloadMethodsDeclarationOrder|Indentation"
               files="[\\/]build[\\/][^\\/]+[\\/]generated[\\/]" />
+    <suppress id="CommentsIndentation" files=".*[\\/]DiscordVoiceWebSocketAdapter.java$" />
 </suppressions>

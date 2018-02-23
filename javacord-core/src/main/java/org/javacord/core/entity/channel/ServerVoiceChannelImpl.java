@@ -107,6 +107,18 @@ public class ServerVoiceChannelImpl extends ServerChannelImpl
     }
 
     @Override
+    public void connect(boolean muted, boolean deafened) {
+        ((ServerImpl) getServer()).connectVoice(this, muted, deafened);
+    }
+
+    @Override
+    public void disconnect() {
+        getServer().getConnectedVoiceChannel(getApi().getYourself())
+                .filter(this::equals)
+                .ifPresent(channel -> ((ServerImpl) getServer()).disconnectVoice());
+    }
+
+    @Override
     public int getBitrate() {
         return bitrate;
     }
