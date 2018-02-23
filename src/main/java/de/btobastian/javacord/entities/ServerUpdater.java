@@ -539,7 +539,7 @@ public class ServerUpdater {
                 }
                 CompletableFuture<Void> splashFuture = null;
                 if (splash != null) {
-                    iconFuture = splash.asByteArray(server.getApi()).thenAccept(bytes -> {
+                    splashFuture = splash.asByteArray(server.getApi()).thenAccept(bytes -> {
                         String base64Icon = "data:image/" + splash.getImageType() + ";base64," +
                                 Base64.getEncoder().encodeToString(bytes);
                         body.put("splash", base64Icon);
