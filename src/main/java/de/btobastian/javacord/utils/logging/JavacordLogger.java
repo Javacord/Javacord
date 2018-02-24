@@ -220,11 +220,11 @@ public class JavacordLogger extends MarkerIgnoringBase {
      */
     private void log(String level, String msg, Throwable t) {
         if (msg != null && t == null) {
-            System.out.println("[" + level + "][" + name + "] " + msg);
+            System.out.println("[" + level + "][" + Thread.currentThread().getName() + "][" + name + "] " + msg);
         }
         if (t != null) {
             if (msg != null) {
-                System.err.println("[" + level + "][" + name + "] " + msg);
+                System.err.println("[" + level + "][\" + Thread.currentThread().getName() + \"][" + name + "] " + msg);
             }
             t.printStackTrace();
         }
