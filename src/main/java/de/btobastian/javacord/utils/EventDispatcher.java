@@ -95,7 +95,7 @@ public class EventDispatcher {
                                             " an unusual long time for a listener task. Make sure to not do" +
                                             " any heavy computations in listener threads!",
                                     entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
-                                            String.format("listener thread for server %s", entry.getValue()[1]),
+                                            String.format("listener thread for %s", entry.getValue()[1]),
                                     DEBUG_WARNING_DELAY_IN_MILLIS, (int) (difference/1_000_000L));
                             lastDebugWarning = currentNanoTime;
                         }
@@ -108,7 +108,7 @@ public class EventDispatcher {
                                             " This is a very unusual long time for a listener task. Make sure to not do" +
                                             " any heavy computations in listener threads!",
                                     entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
-                                            String.format("listener thread for server %s", entry.getValue()[1]),
+                                            String.format("listener thread for %s", entry.getValue()[1]),
                                     INFO_WARNING_DELAY_IN_SECONDS, (int) (difference/1_000_000L));
                             lastInfoWarning = currentNanoTime;
                         }
@@ -119,7 +119,7 @@ public class EventDispatcher {
                                 " caused by a deadlock or very heavy computation/blocking operations in the listener" +
                                 " thread. Make sure to not block listener threads!",
                                 entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
-                                        String.format("listener thread for server %s", entry.getValue()[1]),
+                                        String.format("listener thread for %s", entry.getValue()[1]),
                                 MAX_EXECUTION_TIME_IN_SECONDS);
                         synchronized (runningListeners) {
                             activeListeners.remove(entry.getKey());
@@ -186,7 +186,12 @@ public class EventDispatcher {
                                     activeListeners.put(activeListener[0], new Object[]{System.nanoTime(), object});
                                 }
                             }
-                            queue.poll().run();
+                            try {
+                                queue.poll().run();
+                            } catch (Throwable t) {
+                                logger.error("Unhandled exception in {}!", object instanceof DiscordApi ?
+                                        "global listener thread" : String.format("listener thread for %s", object), t);
+                            }
                             synchronized (activeListeners) {
                                 synchronized (runningListeners) {
                                     if (!Thread.interrupted()) {
