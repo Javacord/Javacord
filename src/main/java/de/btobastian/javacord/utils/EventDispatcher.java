@@ -80,8 +80,8 @@ public class EventDispatcher {
                     if (difference > DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L &&
                             difference < DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L + 201_000_000L) {
                         logger.debug("Detected a {} which is now running for over {}ms ({}ms). This is" +
-                                        " an unusual long time for a listener task. Make sure to not do" +
-                                        " any heavy computations in listener threads!",
+                                        " an unusually long execution time for a listener task. Make" +
+                                        " sure to not do any heavy computations in listener threads!",
                                 entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
                                         String.format("listener thread for %s", entry.getValue()[1]),
                                 DEBUG_WARNING_DELAY_IN_MILLIS, (int) (difference/1_000_000L));
@@ -89,8 +89,8 @@ public class EventDispatcher {
                     if (difference > INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L &&
                             difference < INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L + 201_000_000L) {
                         logger.warn("Detected a {} which is now running for over {} seconds ({}ms)." +
-                                        " This is a very unusual long time for a listener task. Make sure to not do" +
-                                        " any heavy computations in listener threads!",
+                                        " This is a very unusually long execution time for a listener task. Make" +
+                                        " sure to not do any heavy computations in listener threads!",
                                 entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
                                         String.format("listener thread for %s", entry.getValue()[1]),
                                 INFO_WARNING_DELAY_IN_SECONDS, (int) (difference/1_000_000L));
