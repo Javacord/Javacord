@@ -6,9 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Consumer;
 
 /**
  * This class is extended by all PacketHandlers.
@@ -72,18 +70,6 @@ public abstract class PacketHandler {
      * @param packet The packet (the "d"-object).
      */
     protected abstract void handle(JsonNode packet);
-
-    /**
-     * Dispatches an event in a the listener thread.
-     *
-     * @param listeners The listeners for the event.
-     * @param consumer The consumer which consumes the listeners and calls the event.
-     * @param <T> The listener class.
-     * @see DiscordWebSocketAdapter#dispatchEvent(List, Consumer)
-     */
-    protected <T> void dispatchEvent(List<T> listeners, Consumer<T> consumer) {
-        api.getWebSocketAdapter().dispatchEvent(listeners, consumer);
-    }
 
     /**
      * Gets the type of packet the handler handles.

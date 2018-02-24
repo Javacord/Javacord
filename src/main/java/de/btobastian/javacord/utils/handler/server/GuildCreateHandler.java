@@ -33,7 +33,7 @@ public class GuildCreateHandler extends PacketHandler {
             Server server = new ImplServer(api, packet);
             ServerBecomesAvailableEvent event = new ServerBecomesAvailableEvent(api, server);
 
-            dispatchEvent(
+            api.getEventDispatcher().dispatchEvent(server,
                     api.getServerBecomesAvailableListeners(), listener -> listener.onServerBecomesAvailable(event));
             return;
         }
@@ -41,7 +41,7 @@ public class GuildCreateHandler extends PacketHandler {
         Server server = new ImplServer(api, packet);
         ServerJoinEvent event = new ServerJoinEvent(api, server);
 
-        dispatchEvent(api.getServerJoinListeners(), listener -> listener.onServerJoin(event));
+        api.getEventDispatcher().dispatchEvent(server, api.getServerJoinListeners(), listener -> listener.onServerJoin(event));
     }
 
 }

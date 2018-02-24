@@ -73,7 +73,7 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(server.getServerChannelCreateListeners());
             listeners.addAll(api.getServerChannelCreateListeners());
 
-            dispatchEvent(listeners, listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onServerChannelCreate(event));
         });
     }
 
@@ -92,7 +92,7 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(server.getServerChannelCreateListeners());
             listeners.addAll(api.getServerChannelCreateListeners());
 
-            dispatchEvent(listeners, listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onServerChannelCreate(event));
         });
     }
 
@@ -111,7 +111,7 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(server.getServerChannelCreateListeners());
             listeners.addAll(api.getServerChannelCreateListeners());
 
-            dispatchEvent(listeners, listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onServerChannelCreate(event));
         });
     }
 
@@ -132,7 +132,7 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(recipient.getPrivateChannelCreateListeners());
             listeners.addAll(api.getPrivateChannelCreateListeners());
 
-            dispatchEvent(listeners, listener -> listener.onPrivateChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onPrivateChannelCreate(event));
         }
     }
 
@@ -153,7 +153,7 @@ public class ChannelCreateHandler extends PacketHandler {
                     .forEach(listeners::addAll);
             listeners.addAll(api.getGroupChannelCreateListeners());
 
-            dispatchEvent(listeners, listener -> listener.onGroupChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onGroupChannelCreate(event));
         }
     }
 

@@ -45,7 +45,12 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
             }
             listeners.addAll(api.getReactionRemoveAllListeners());
 
-            dispatchEvent(listeners, listener -> listener.onReactionRemoveAll(event));
+            if (channel instanceof ServerTextChannel) {
+                api.getEventDispatcher().dispatchEvent(((ServerTextChannel) channel).getServer(),
+                        listeners, listener -> listener.onReactionRemoveAll(event));
+            } else {
+                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onReactionRemoveAll(event));
+            }
         });
     }
 

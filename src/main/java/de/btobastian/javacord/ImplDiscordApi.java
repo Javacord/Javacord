@@ -87,6 +87,7 @@ import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListene
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
+import de.btobastian.javacord.utils.EventDispatcher;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -141,6 +142,8 @@ public class ImplDiscordApi implements DiscordApi {
      * The http client for this instance.
      */
     private final OkHttpClient httpClient;
+
+    private final EventDispatcher eventDispatcher;
 
     /**
      * The object mapper for this instance.
@@ -355,6 +358,7 @@ public class ImplDiscordApi implements DiscordApi {
                         .build()))
                 .addInterceptor(new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY))
                 .build();
+        this.eventDispatcher = new EventDispatcher(this);
 
         if (ready != null) {
             getThreadPool().getExecutorService().submit(() -> {
@@ -895,6 +899,11 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public OkHttpClient getHttpClient() {
         return httpClient;
+    }
+
+    @Override
+    public EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
     }
 
     @Override

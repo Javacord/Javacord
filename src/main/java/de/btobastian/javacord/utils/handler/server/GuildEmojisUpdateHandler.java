@@ -57,7 +57,8 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                         listeners.addAll(server.getCustomEmojiChangeNameListeners());
                         listeners.addAll(api.getCustomEmojiChangeNameListeners());
 
-                        dispatchEvent(listeners, listener -> listener.onCustomEmojiChangeName(event));
+                        api.getEventDispatcher().dispatchEvent(server,
+                                listeners, listener -> listener.onCustomEmojiChangeName(event));
                     }
                 } else {
                     KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(server, entry.getValue());
@@ -69,7 +70,8 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     listeners.addAll(server.getCustomEmojiCreateListeners());
                     listeners.addAll(api.getCustomEmojiCreateListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onCustomEmojiCreate(event));
+                    api.getEventDispatcher().dispatchEvent(server,
+                            listeners, listener -> listener.onCustomEmojiCreate(event));
                 }
             });
 
@@ -87,7 +89,8 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                         listeners.addAll(server.getCustomEmojiDeleteListeners());
                         listeners.addAll(api.getCustomEmojiDeleteListeners());
 
-                        dispatchEvent(listeners, listener -> listener.onCustomEmojiDelete(event));
+                        api.getEventDispatcher().dispatchEvent(server,
+                                listeners, listener -> listener.onCustomEmojiDelete(event));
                     });
         });
     }

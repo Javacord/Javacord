@@ -110,7 +110,7 @@ public class ChannelDeleteHandler extends PacketHandler {
             listeners.addAll(recipient.getPrivateChannelDeleteListeners());
             listeners.addAll(api.getPrivateChannelDeleteListeners());
 
-            dispatchEvent(listeners, listener -> listener.onPrivateChannelDelete(event));
+            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onPrivateChannelDelete(event));
 
             recipient.setChannel(null);
         });
@@ -134,7 +134,7 @@ public class ChannelDeleteHandler extends PacketHandler {
                     .forEach(listeners::addAll);
             listeners.addAll(api.getGroupChannelDeleteListeners());
 
-            dispatchEvent(listeners, listener -> listener.onGroupChannelDelete(event));
+            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onGroupChannelDelete(event));
             api.removeGroupChannelFromCache(channelId);
         });
     }
@@ -152,7 +152,8 @@ public class ChannelDeleteHandler extends PacketHandler {
         listeners.addAll(channel.getServer().getServerChannelDeleteListeners());
         listeners.addAll(api.getServerChannelDeleteListeners());
 
-        dispatchEvent(listeners, listener -> listener.onServerChannelDelete(event));
+        api.getEventDispatcher()
+                .dispatchEvent(channel.getServer(), listeners, listener -> listener.onServerChannelDelete(event));
     }
 
 }

@@ -94,6 +94,7 @@ import de.btobastian.javacord.listeners.user.channel.PrivateChannelCreateListene
 import de.btobastian.javacord.listeners.user.channel.PrivateChannelDeleteListener;
 import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
+import de.btobastian.javacord.utils.EventDispatcher;
 import de.btobastian.javacord.utils.ListenerManager;
 import de.btobastian.javacord.utils.ThreadPool;
 import de.btobastian.javacord.utils.ratelimits.RatelimitManager;
@@ -145,6 +146,13 @@ public interface DiscordApi {
      * @return The used http client.
      */
     OkHttpClient getHttpClient();
+
+    /**
+     * Gets the event dispatcher which is used to dispatch events.
+     *
+     * @return The used event dispatcher.
+     */
+    EventDispatcher getEventDispatcher();
 
     /**
      * Gets the object mapper used by this api instance.

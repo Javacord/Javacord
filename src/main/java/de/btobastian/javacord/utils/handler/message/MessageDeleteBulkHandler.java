@@ -46,7 +46,12 @@ public class MessageDeleteBulkHandler extends PacketHandler {
                 }
                 listeners.addAll(api.getMessageDeleteListeners());
 
-                dispatchEvent(listeners, listener -> listener.onMessageDelete(event));
+                if (channel instanceof ServerTextChannel) {
+                    api.getEventDispatcher().dispatchEvent(((ServerTextChannel) channel).getServer(),
+                            listeners, listener -> listener.onMessageDelete(event));
+                } else {
+                    api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onMessageDelete(event));
+                }
             }
         });
     }

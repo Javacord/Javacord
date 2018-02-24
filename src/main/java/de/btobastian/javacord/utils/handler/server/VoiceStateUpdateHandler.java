@@ -117,7 +117,8 @@ public class VoiceStateUpdateHandler extends PacketHandler {
         }
         listeners.addAll(api.getServerVoiceChannelMemberJoinListeners());
 
-        dispatchEvent(listeners, listener -> listener.onServerVoiceChannelMemberJoin(event));
+        api.getEventDispatcher().dispatchEvent(server,
+                listeners, listener -> listener.onServerVoiceChannelMemberJoin(event));
     }
 
     private void dispatchServerVoiceChannelMemberLeaveEvent(
@@ -132,7 +133,8 @@ public class VoiceStateUpdateHandler extends PacketHandler {
         }
         listeners.addAll(api.getServerVoiceChannelMemberLeaveListeners());
 
-        dispatchEvent(listeners, listener -> listener.onServerVoiceChannelMemberLeave(event));
+        api.getEventDispatcher().dispatchEvent(server,
+                listeners, listener -> listener.onServerVoiceChannelMemberLeave(event));
     }
 
 }

@@ -41,7 +41,8 @@ public class GuildMemberAddHandler extends PacketHandler {
                     listeners.addAll(user.getServerMemberJoinListeners());
                     listeners.addAll(api.getServerMemberJoinListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onServerMemberJoin(event));
+                    api.getEventDispatcher().dispatchEvent(server,
+                            listeners, listener -> listener.onServerMemberJoin(event));
                 });
     }
 

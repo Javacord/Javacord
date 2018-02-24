@@ -52,7 +52,8 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     listeners.addAll(server.getUserChangeNicknameListeners());
                     listeners.addAll(api.getUserChangeNicknameListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onUserChangeNickname(event));
+                    api.getEventDispatcher().dispatchEvent(server,
+                            listeners, listener -> listener.onUserChangeNickname(event));
                 }
             }
 
@@ -87,7 +88,8 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     listeners.addAll(role.getServer().getUserRoleAddListeners());
                     listeners.addAll(api.getUserRoleAddListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onUserRoleAdd(event));
+                    api.getEventDispatcher().dispatchEvent(server,
+                            listeners, listener -> listener.onUserRoleAdd(event));
                 }
 
                 // Removed roles
@@ -106,7 +108,8 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     listeners.addAll(role.getServer().getUserRoleRemoveListeners());
                     listeners.addAll(api.getUserRoleRemoveListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onUserRoleRemove(event));
+                    api.getEventDispatcher().dispatchEvent(server,
+                            listeners, listener -> listener.onUserRoleRemove(event));
                 }
             }
         });

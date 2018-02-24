@@ -102,7 +102,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerChannelChangeNameListeners());
                 listeners.addAll(api.getServerChannelChangeNameListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChannelChangeName(event));
+                api.getEventDispatcher().dispatchEvent(
+                        channel.getServer(), listeners, listener -> listener.onServerChannelChangeName(event));
             }
 
             ChannelCategory oldCategory = channel.asCategorizable().flatMap(Categorizable::getCategory).orElse(null);
@@ -132,7 +133,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerChannelChangePositionListeners());
                 listeners.addAll(api.getServerChannelChangePositionListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChannelChangePosition(event));
+                api.getEventDispatcher().dispatchEvent(
+                        channel.getServer(), listeners, listener -> listener.onServerChannelChangePosition(event));
             }
 
             Collection<Long> rolesWithOverwrittenPermissions = new HashSet<>();
@@ -246,7 +248,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerChannelChangeNameListeners());
                 listeners.addAll(api.getServerChannelChangeNameListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChannelChangeName(event));
+                api.getEventDispatcher().dispatchEvent(
+                        channel.getServer(), listeners, listener -> listener.onServerChannelChangeName(event));
             }
 
             boolean oldNsfwFlaf = channel.isNsfw();
@@ -261,7 +264,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerChannelChangeNsfwFlagListeners());
                 listeners.addAll(api.getServerChannelChangeNsfwFlagListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChannelChangeNsfwFlag(event));
+                api.getEventDispatcher().dispatchEvent(
+                        channel.getServer(), listeners, listener -> listener.onServerChannelChangeNsfwFlag(event));
             }
         });
     }
@@ -288,7 +292,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerTextChannelChangeTopicListeners());
                 listeners.addAll(api.getServerTextChannelChangeTopicListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerTextChannelChangeTopic(event));
+                api.getEventDispatcher().dispatchEvent(
+                        channel.getServer(), listeners, listener -> listener.onServerTextChannelChangeTopic(event));
             }
 
             boolean oldNsfwFlaf = channel.isNsfw();
@@ -303,7 +308,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerChannelChangeNsfwFlagListeners());
                 listeners.addAll(api.getServerChannelChangeNsfwFlagListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChannelChangeNsfwFlag(event));
+                api.getEventDispatcher().dispatchEvent(
+                        channel.getServer(), listeners, listener -> listener.onServerChannelChangeNsfwFlag(event));
             }
         });
     }
@@ -328,7 +334,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerVoiceChannelChangeBitrateListeners());
                 listeners.addAll(api.getServerVoiceChannelChangeBitrateListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerVoiceChannelChangeBitrate(event));
+                api.getEventDispatcher().dispatchEvent(
+                        channel.getServer(), listeners, listener -> listener.onServerVoiceChannelChangeBitrate(event));
             }
 
             int oldUserLimit = channel.getUserLimit().orElse(0);
@@ -343,7 +350,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 listeners.addAll(channel.getServer().getServerVoiceChannelChangeUserLimitListeners());
                 listeners.addAll(api.getServerVoiceChannelChangeUserLimitListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerVoiceChannelChangeUserLimit(event));
+                api.getEventDispatcher().dispatchEvent(channel.getServer(),
+                        listeners, listener -> listener.onServerVoiceChannelChangeUserLimit(event));
             }
         });
     }
@@ -379,7 +387,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                         .forEach(listeners::addAll);
                 listeners.addAll(api.getGroupChannelChangeNameListeners());
 
-                dispatchEvent(listeners, listener -> listener.onGroupChannelChangeName(event));
+                api.getEventDispatcher()
+                        .dispatchEvent(api, listeners, listener -> listener.onGroupChannelChangeName(event));
             }
         });
     }
@@ -414,7 +423,8 @@ public class ChannelUpdateHandler extends PacketHandler {
         listeners.addAll(channel.getServer().getServerChannelChangeOverwrittenPermissionsListeners());
         listeners.addAll(api.getServerChannelChangeOverwrittenPermissionsListeners());
 
-        dispatchEvent(listeners, listener -> listener.onServerChannelChangeOverwrittenPermissions(event));
+        api.getEventDispatcher().dispatchEvent(channel.getServer(),
+                listeners, listener -> listener.onServerChannelChangeOverwrittenPermissions(event));
     }
 
 }

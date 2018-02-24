@@ -71,7 +71,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
@@ -82,7 +81,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Consumer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -122,8 +120,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
-    private final ExecutorService listenerExecutorService;
-
     // A reconnect attempt counter
     private int reconnectAttempt = 0;
 
@@ -152,7 +148,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     public DiscordWebSocketAdapter(DiscordApi api) {
         this.api = api;
-        this.listenerExecutorService = api.getThreadPool().getSingleThreadExecutorService("listeners");
 
         registerHandlers();
         connect();
@@ -316,7 +311,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         LostConnectionEvent lostConnectionEvent = new LostConnectionEvent(api);
         List<LostConnectionListener> listeners = new ArrayList<>();
         listeners.addAll(api.getLostConnectionListeners());
-        dispatchEvent(listeners, listener -> listener.onLostConnection(lostConnectionEvent));
+        api.getEventDispatcher()
+                .dispatchEvent(api, listeners, listener -> listener.onLostConnection(lostConnectionEvent));
 
         heartbeatTimer.updateAndGet(future -> {
             if (future != null) {
@@ -373,7 +369,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     ResumeEvent resumeEvent = new ResumeEvent(api);
                     List<ResumeListener> listeners = new ArrayList<>();
                     listeners.addAll(api.getResumeListeners());
-                    dispatchEvent(listeners, listener -> listener.onResume(resumeEvent));
+                    api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onResume(resumeEvent));
                 }
                 if (type.equals("READY")) {
                     reconnectAttempt = 0;
@@ -412,7 +408,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                         ReconnectEvent reconnectEvent = new ReconnectEvent(api);
                         List<ReconnectListener> listeners = new ArrayList<>();
                         listeners.addAll(api.getReconnectListeners());
-                        dispatchEvent(listeners, listener -> listener.onReconnect(reconnectEvent));
+                        api.getEventDispatcher()
+                                .dispatchEvent(api, listeners, listener -> listener.onReconnect(reconnectEvent));
                         ready.complete(true);
                     });
                     logger.debug("Received READY packet");
@@ -679,23 +676,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     public CompletableFuture<Boolean> isReady() {
         return ready;
-    }
-
-    /**
-     * Dispatches an event in a the listener thread.
-     *
-     * @param listeners The listeners for the event.
-     * @param consumer The consumer which consumes the listeners and calls the event.
-     * @param <T> The listener class.
-     */
-    protected <T> void dispatchEvent(List<T> listeners, Consumer<T> consumer) {
-        listenerExecutorService.submit(() -> listeners.stream().forEach(listener -> {
-            try {
-                consumer.accept(listener);
-            } catch (Throwable t) {
-                logger.error("An error occurred while calling a listener method!", t);
-            }
-        }));
     }
 
     /**

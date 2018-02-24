@@ -37,7 +37,8 @@ public class GuildDeleteHandler extends PacketHandler {
                 listeners.addAll(server.getServerBecomesUnavailableListeners());
                 listeners.addAll(api.getServerBecomesUnavailableListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerBecomesUnavailable(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerBecomesUnavailable(event));
             });
             api.removeServerFromCache(serverId);
             return;
@@ -49,7 +50,7 @@ public class GuildDeleteHandler extends PacketHandler {
             listeners.addAll(server.getServerLeaveListeners());
             listeners.addAll(api.getServerLeaveListeners());
 
-            dispatchEvent(listeners, listener -> listener.onServerLeave(event));
+            api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onServerLeave(event));
         });
         api.removeServerFromCache(serverId);
     }

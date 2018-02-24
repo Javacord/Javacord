@@ -34,7 +34,8 @@ public class WebhooksUpdateHandler extends PacketHandler {
             listeners.addAll(channel.getServer().getWebhooksUpdateListeners());
             listeners.addAll(api.getWebhooksUpdateListeners());
 
-            dispatchEvent(listeners, listener -> listener.onWebhooksUpdate(event));
+            api.getEventDispatcher()
+                    .dispatchEvent(channel.getServer(), listeners, listener -> listener.onWebhooksUpdate(event));
         });
     }
 

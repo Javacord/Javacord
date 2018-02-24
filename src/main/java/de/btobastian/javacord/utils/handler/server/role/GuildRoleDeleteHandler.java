@@ -39,7 +39,7 @@ public class GuildRoleDeleteHandler extends PacketHandler {
                 listeners.addAll(server.getRoleDeleteListeners());
                 listeners.addAll(api.getRoleDeleteListeners());
 
-                dispatchEvent(listeners, listener -> listener.onRoleDelete(event));
+                api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onRoleDelete(event));
             });
         });
     }

@@ -56,7 +56,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(role.getServer().getRoleChangeColorListeners());
                 listeners.addAll(api.getRoleChangeColorListeners());
 
-                dispatchEvent(listeners, listener -> listener.onRoleChangeColor(event));
+                api.getEventDispatcher().dispatchEvent(
+                        role.getServer(), listeners, listener -> listener.onRoleChangeColor(event));
             }
 
             boolean oldHoist = role.isDisplayedSeparately();
@@ -71,7 +72,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(role.getServer().getRoleChangeHoistListeners());
                 listeners.addAll(api.getRoleChangeHoistListeners());
 
-                dispatchEvent(listeners, listener -> listener.onRoleChangeHoist(event));
+                api.getEventDispatcher().dispatchEvent(
+                        role.getServer(), listeners, listener -> listener.onRoleChangeHoist(event));
             }
 
             boolean oldMentionable = role.isMentionable();
@@ -86,7 +88,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(role.getServer().getRoleChangeMentionableListeners());
                 listeners.addAll(api.getRoleChangeMentionableListeners());
 
-                dispatchEvent(listeners, listener -> listener.onRoleChangeMentionable(event));
+                api.getEventDispatcher().dispatchEvent(role.getServer(),
+                        listeners, listener -> listener.onRoleChangeMentionable(event));
             }
 
             String oldName = role.getName();
@@ -101,7 +104,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(role.getServer().getRoleChangeNameListeners());
                 listeners.addAll(api.getRoleChangeNameListeners());
 
-                dispatchEvent(listeners, listener -> listener.onRoleChangeName(event));
+                api.getEventDispatcher().dispatchEvent(role.getServer(),
+                        listeners, listener -> listener.onRoleChangeName(event));
             }
 
             Permissions oldPermissions = role.getPermissions();
@@ -117,7 +121,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(role.getServer().getRoleChangePermissionsListeners());
                 listeners.addAll(api.getRoleChangePermissionsListeners());
 
-                dispatchEvent(listeners, listener -> listener.onRoleChangePermissions(event));
+                api.getEventDispatcher().dispatchEvent(role.getServer(),
+                        listeners, listener -> listener.onRoleChangePermissions(event));
             }
 
             int oldPosition = role.getPosition();
@@ -132,7 +137,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 listeners.addAll(role.getServer().getRoleChangePositionListeners());
                 listeners.addAll(api.getRoleChangePositionListeners());
 
-                dispatchEvent(listeners, listener -> listener.onRoleChangePosition(event));
+                api.getEventDispatcher().dispatchEvent(role.getServer(),
+                        listeners, listener -> listener.onRoleChangePosition(event));
             }
         });
     }

@@ -40,7 +40,8 @@ public class GuildBanAddHandler extends PacketHandler {
                     listeners.addAll(user.getServerMemberBanListeners());
                     listeners.addAll(api.getServerMemberBanListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onServerMemberBan(event));
+                    api.getEventDispatcher()
+                            .dispatchEvent(server, listeners, listener -> listener.onServerMemberBan(event));
                 });
     }
 

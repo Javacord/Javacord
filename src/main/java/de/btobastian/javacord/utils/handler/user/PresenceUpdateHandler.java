@@ -94,7 +94,7 @@ public class PresenceUpdateHandler extends PacketHandler {
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeActivityListeners()));
         listeners.addAll(api.getUserChangeActivityListeners());
 
-        dispatchEvent(listeners, listener -> listener.onUserChangeActivity(event));
+        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeActivity(event));
     }
 
     private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {
@@ -105,7 +105,7 @@ public class PresenceUpdateHandler extends PacketHandler {
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeStatusListeners()));
         listeners.addAll(api.getUserChangeStatusListeners());
 
-        dispatchEvent(listeners, listener -> listener.onUserChangeStatus(event));
+        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeStatus(event));
     }
 
     private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
@@ -116,7 +116,7 @@ public class PresenceUpdateHandler extends PacketHandler {
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeNameListeners()));
         listeners.addAll(api.getUserChangeNameListeners());
 
-        dispatchEvent(listeners, listener -> listener.onUserChangeName(event));
+        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeName(event));
     }
 
     private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
@@ -127,7 +127,7 @@ public class PresenceUpdateHandler extends PacketHandler {
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeAvatarListeners()));
         listeners.addAll(api.getUserChangeAvatarListeners());
 
-        dispatchEvent(listeners, listener -> listener.onUserChangeAvatar(event));
+        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeAvatar(event));
     }
 
 }

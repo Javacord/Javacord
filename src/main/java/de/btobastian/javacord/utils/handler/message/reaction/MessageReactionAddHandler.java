@@ -57,8 +57,12 @@ public class MessageReactionAddHandler extends PacketHandler {
             }
             listeners.addAll(user.getReactionAddListeners());
             listeners.addAll(api.getReactionAddListeners());
-
-            dispatchEvent(listeners, listener -> listener.onReactionAdd(event));
+            if (channel instanceof ServerTextChannel) {
+                api.getEventDispatcher().dispatchEvent(((ServerTextChannel) channel).getServer(),
+                        listeners, listener -> listener.onReactionAdd(event));
+            } else {
+                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onReactionAdd(event));
+            }
         });
     }
 

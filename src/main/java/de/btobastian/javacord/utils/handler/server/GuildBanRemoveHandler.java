@@ -39,7 +39,8 @@ public class GuildBanRemoveHandler extends PacketHandler {
                     listeners.addAll(user.getServerMemberUnbanListeners());
                     listeners.addAll(api.getServerMemberUnbanListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onServerMemberUnban(event));
+                    api.getEventDispatcher()
+                            .dispatchEvent(server, listeners, listener -> listener.onServerMemberUnban(event));
                 });
     }
 

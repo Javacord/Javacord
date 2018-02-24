@@ -132,7 +132,12 @@ public class MessageUpdateHandler extends PacketHandler {
         }
         listeners.addAll(api.getMessageEditListeners());
 
-        dispatchEvent(listeners, listener -> listener.onMessageEdit(event));
+        if (event.getChannel() instanceof ServerTextChannel) {
+            api.getEventDispatcher().dispatchEvent(((ServerTextChannel) event.getChannel()).getServer(),
+                    listeners, listener -> listener.onMessageEdit(event));
+        } else {
+            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onMessageEdit(event));
+        }
     }
 
 }

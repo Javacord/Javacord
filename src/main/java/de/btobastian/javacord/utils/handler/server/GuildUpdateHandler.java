@@ -69,7 +69,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeNameListeners());
                 listeners.addAll(api.getServerChangeNameListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeName(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeName(event));
             }
 
             String newIconHash = packet.get("icon").asText(null);
@@ -82,7 +83,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeIconListeners());
                 listeners.addAll(api.getServerChangeIconListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeIcon(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeIcon(event));
             }
 
             String newSplashHash = packet.get("splash").asText(null);
@@ -95,7 +97,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeSplashListeners());
                 listeners.addAll(api.getServerChangeSplashListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeSplash(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeSplash(event));
             }
 
             VerificationLevel newVerificationLevel = VerificationLevel.fromId(packet.get("verification_level").asInt());
@@ -109,7 +112,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeVerificationLevelListeners());
                 listeners.addAll(api.getServerChangeVerificationLevelListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeVerificationLevel(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeVerificationLevel(event));
             }
 
             Region newRegion = Region.getRegionByKey(packet.get("region").asText());
@@ -122,7 +126,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeRegionListeners());
                 listeners.addAll(api.getServerChangeRegionListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeRegion(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeRegion(event));
             }
 
             DefaultMessageNotificationLevel newDefaultMessageNotificationLevel =
@@ -139,7 +144,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeDefaultMessageNotificationLevelListeners());
                 listeners.addAll(api.getServerChangeDefaultMessageNotificationLevelListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeDefaultMessageNotificationLevel(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeDefaultMessageNotificationLevel(event));
             }
 
             User newOwner = api.getCachedUserById(packet.get("owner_id").asText()).orElse(null);
@@ -152,7 +158,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeOwnerListeners());
                 listeners.addAll(api.getServerChangeOwnerListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeOwner(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeOwner(event));
             }
 
             if (packet.has("afk_channel_id")) {
@@ -168,7 +175,8 @@ public class GuildUpdateHandler extends PacketHandler {
                     listeners.addAll(server.getServerChangeAfkChannelListeners());
                     listeners.addAll(api.getServerChangeAfkChannelListeners());
 
-                    dispatchEvent(listeners, listener -> listener.onServerChangeAfkChannel(event));
+                    api.getEventDispatcher().dispatchEvent(server,
+                            listeners, listener -> listener.onServerChangeAfkChannel(event));
                 }
             }
 
@@ -183,7 +191,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeAfkTimeoutListeners());
                 listeners.addAll(api.getServerChangeAfkTimeoutListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeAfkTimeout(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeAfkTimeout(event));
             }
 
             ExplicitContentFilterLevel newExplicitContentFilterLevel =
@@ -198,7 +207,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeExplicitContentFilterLevelListeners());
                 listeners.addAll(api.getServerChangeExplicitContentFilterLevelListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeExplicitContentFilterLevel(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeExplicitContentFilterLevel(event));
             }
 
             MultiFactorAuthenticationLevel newMultiFactorAuthenticationLevel =
@@ -215,7 +225,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 listeners.addAll(server.getServerChangeMultiFactorAuthenticationLevelListeners());
                 listeners.addAll(api.getServerChangeMultiFactorAuthenticationLevelListeners());
 
-                dispatchEvent(listeners, listener -> listener.onServerChangeMultiFactorAuthenticationLevel(event));
+                api.getEventDispatcher().dispatchEvent(server,
+                        listeners, listener -> listener.onServerChangeMultiFactorAuthenticationLevel(event));
             }
         });
     }
