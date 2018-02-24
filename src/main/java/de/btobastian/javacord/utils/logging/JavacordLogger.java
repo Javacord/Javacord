@@ -4,6 +4,7 @@ import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
 
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -219,12 +220,13 @@ public class JavacordLogger extends MarkerIgnoringBase {
      * @param t The exception.
      */
     private void log(String level, String msg, Throwable t) {
+        PrintStream printStream = level.equals("ERROR") || t != null ? System.err : System.out;
         if (msg != null && t == null) {
-            System.out.println("[" + level + "][" + Thread.currentThread().getName() + "][" + name + "] " + msg);
+            printStream.println("[" + level + "][" + Thread.currentThread().getName() + "][" + name + "] " + msg);
         }
         if (t != null) {
             if (msg != null) {
-                System.err.println("[" + level + "][\" + Thread.currentThread().getName() + \"][" + name + "] " + msg);
+                printStream.println("[" + level + "][" + Thread.currentThread().getName() + "][" + name + "] " + msg);
             }
             t.printStackTrace();
         }
