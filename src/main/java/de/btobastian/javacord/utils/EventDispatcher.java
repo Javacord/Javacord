@@ -41,16 +41,6 @@ public class EventDispatcher {
     private static final int DEBUG_WARNING_DELAY_IN_MILLIS = 500; // 500 milliseconds
 
     /**
-     * The last time a warning was sent on DEBUG log level.
-     */
-    private volatile long lastDebugWarning = System.nanoTime() - 60*60*1_000_000_000L; // 1 hour ago
-
-    /**
-     * The last time a warning was sent on INFO log level.
-     */
-    private volatile long lastInfoWarning = System.nanoTime() - 60*60*1_000_000_000L; // 1 hour ago
-
-    /**
      * The discord api instance.
      */
     private final DiscordApi api;
@@ -89,29 +79,21 @@ public class EventDispatcher {
                     long difference = currentNanoTime - ((long) entry.getValue()[0]);
                     if (difference > DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L &&
                             difference < DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L + 201_000_000L) {
-                        // Only log this message once every 20 seconds
-                        if (currentNanoTime - lastDebugWarning > 21*1_000_000_000L) {
-                            logger.debug("Detected a {} which is now running for over {}ms ({}ms). This is" +
-                                            " an unusual long time for a listener task. Make sure to not do" +
-                                            " any heavy computations in listener threads!",
-                                    entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
-                                            String.format("listener thread for %s", entry.getValue()[1]),
-                                    DEBUG_WARNING_DELAY_IN_MILLIS, (int) (difference/1_000_000L));
-                            lastDebugWarning = currentNanoTime;
-                        }
+                        logger.debug("Detected a {} which is now running for over {}ms ({}ms). This is" +
+                                        " an unusual long time for a listener task. Make sure to not do" +
+                                        " any heavy computations in listener threads!",
+                                entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
+                                        String.format("listener thread for %s", entry.getValue()[1]),
+                                DEBUG_WARNING_DELAY_IN_MILLIS, (int) (difference/1_000_000L));
                     }
                     if (difference > INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L &&
                             difference < INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L + 201_000_000L) {
-                        // Only log this message once every 1 minute
-                        if (currentNanoTime - lastInfoWarning > 61*1_000_000_000L) {
-                            logger.warn("Detected a {} which is now running for over {} seconds ({}ms)." +
-                                            " This is a very unusual long time for a listener task. Make sure to not do" +
-                                            " any heavy computations in listener threads!",
-                                    entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
-                                            String.format("listener thread for %s", entry.getValue()[1]),
-                                    INFO_WARNING_DELAY_IN_SECONDS, (int) (difference/1_000_000L));
-                            lastInfoWarning = currentNanoTime;
-                        }
+                        logger.warn("Detected a {} which is now running for over {} seconds ({}ms)." +
+                                        " This is a very unusual long time for a listener task. Make sure to not do" +
+                                        " any heavy computations in listener threads!",
+                                entry.getValue()[1] instanceof DiscordApi ? "global listener thread" :
+                                        String.format("listener thread for %s", entry.getValue()[1]),
+                                INFO_WARNING_DELAY_IN_SECONDS, (int) (difference/1_000_000L));
                     }
                     if (difference > MAX_EXECUTION_TIME_IN_SECONDS * 1_000_000_000L) {
                         entry.getKey().cancel(true);
