@@ -41,6 +41,11 @@ public class EventDispatcher {
     private static final int DEBUG_WARNING_DELAY_IN_MILLIS = 500; // 500 milliseconds
 
     /**
+     * Whether execution time checking should be enabled or not.
+     */
+    private volatile boolean executionTimeCheckingEnabled = true;
+
+    /**
      * The discord api instance.
      */
     private final DiscordApi api;
@@ -70,6 +75,9 @@ public class EventDispatcher {
     public EventDispatcher(DiscordApi api) {
         this.api = api;
         api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
+            if (!executionTimeCheckingEnabled) {
+                return;
+            }
             List<Object> canceledObjects = new ArrayList<>();
             synchronized (activeListeners) {
                 long currentNanoTime = System.nanoTime();
@@ -113,6 +121,15 @@ public class EventDispatcher {
             }
             canceledObjects.forEach(this::checkRunningListenersAndStartIfPossible);
         }, 200, 200, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Sets whether execution time checking should be enabled or not.
+     *
+     * @param enable Whether execution time checking should be enabled or not.
+     */
+    public void setExecutionTimeCheckingEnabled(boolean enable) {
+        executionTimeCheckingEnabled = enable;
     }
 
     /**
