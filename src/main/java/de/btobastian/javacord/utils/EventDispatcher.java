@@ -173,14 +173,19 @@ public class EventDispatcher {
             synchronized (runningListeners) {
                 if (!runningListeners.contains(object) && !queue.isEmpty()) {
                     runningListeners.add(object);
-                    // Add the future to the list of active listeners
-                    synchronized (activeListeners) {
-                        // Yes, an array is a hacky solution, but whatever works ;-)
-                        // Because of the synchronization on activeListeners we can be sure, that activeListener[0] gets
-                        // initialized before being accessed inside the runnable.
-                        Future<?>[] activeListener = new Future<?>[1];
-                        // Call the listener
+                    // Yes, an array is a hacky solution, but whatever works ;-)
+                    // Because of the synchronization on activeListener we can be sure, that activeListener[0] gets
+                    // initialized before being accessed inside the runnable.
+                    Future<?>[] activeListener = new Future<?>[1];
+                    // Call the listener
+                    synchronized (activeListener) {
                         activeListener[0] = api.getThreadPool().getExecutorService().submit(() -> {
+                            synchronized (activeListeners) {
+                                synchronized (activeListener) {
+                                    // Add the future to the list of active listeners
+                                    activeListeners.put(activeListener[0], new Object[]{System.nanoTime(), object});
+                                }
+                            }
                             queue.poll().run();
                             synchronized (activeListeners) {
                                 synchronized (runningListeners) {
@@ -192,9 +197,8 @@ public class EventDispatcher {
                             }
                             checkRunningListenersAndStartIfPossible(object);
                         });
-
-                        activeListeners.put(activeListener[0], new Object[]{System.nanoTime(), object});
                     }
+
                 }
             }
         }
