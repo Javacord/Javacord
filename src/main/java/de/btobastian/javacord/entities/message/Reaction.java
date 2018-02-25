@@ -29,19 +29,38 @@ public interface Reaction {
      * @return A list with all users who used this reaction.
      */
     static CompletableFuture<List<User>> getUsers(DiscordApi api, long channelId, long messageId, Emoji emoji) {
-        String value = emoji.asUnicodeEmoji().orElseGet(() ->
-                emoji.asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
-        return new RestRequest<List<User>>(api, RestMethod.GET, RestEndpoint.REACTION)
-                .setUrlParameters(
-                        String.valueOf(channelId), String.valueOf(messageId), value)
-                .setRatelimitRetries(250)
-                .execute(result -> {
-                    List<User> users = new ArrayList<>();
-                    for (JsonNode userJson : result.getJsonBody()) {
-                        users.add(((ImplDiscordApi) api).getOrCreateUser(userJson));
+        CompletableFuture<List<User>> future = new CompletableFuture<>();
+        api.getThreadPool().getExecutorService().submit(() -> {
+            try {
+                final String value = emoji.asUnicodeEmoji().orElseGet(() -> emoji.asCustomEmoji()
+                        .map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
+                List<User> users = new ArrayList<>();
+                boolean requestMore = true;
+                while (requestMore) {
+                    RestRequest<List<User>> request =
+                            new RestRequest<List<User>>(api, RestMethod.GET, RestEndpoint.REACTION)
+                                    .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), value)
+                                    .addQueryParameter("limit", "100")
+                                    .setRatelimitRetries(250);
+                    if (!users.isEmpty()) {
+                        request.addQueryParameter("after", users.get(users.size()-1).getIdAsString());
                     }
-                    return Collections.unmodifiableList(users);
-                });
+                    List<User> incompleteUsers = request.execute(result -> {
+                        List<User> paginatedUsers = new ArrayList<>();
+                        for (JsonNode userJson : result.getJsonBody()) {
+                            paginatedUsers.add(((ImplDiscordApi) api).getOrCreateUser(userJson));
+                        }
+                        return Collections.unmodifiableList(paginatedUsers);
+                    }).join();
+                    users.addAll(incompleteUsers);
+                    requestMore = incompleteUsers.size() >= 100;
+                }
+                future.complete(Collections.unmodifiableList(users));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
     }
 
     /**
