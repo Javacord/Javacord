@@ -21,6 +21,11 @@ public class ServerVoiceChannelBuilder {
     private ImplServer server;
 
     /**
+     * The reason for the creation.
+     */
+    private String reason = null;
+
+    /**
      * The name of the channel.
      */
     private String name = null;
@@ -47,6 +52,17 @@ public class ServerVoiceChannelBuilder {
      */
     public ServerVoiceChannelBuilder(Server server) {
         this.server = (ImplServer) server;
+    }
+
+    /**
+     * Sets the reason for this creation. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerVoiceChannelBuilder setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -117,6 +133,7 @@ public class ServerVoiceChannelBuilder {
         return new RestRequest<ServerVoiceChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)
+                .setAuditLogReason(reason)
                 .execute(result -> server.getOrCreateServerVoiceChannel(result.getJsonBody()));
     }
 
