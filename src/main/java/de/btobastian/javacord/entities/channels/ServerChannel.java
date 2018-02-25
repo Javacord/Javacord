@@ -491,6 +491,7 @@ public interface ServerChannel extends Channel {
      * @return A map with all registered listeners that implement one or more {@code ServerChannelAttachableListener}s
      * and their assigned listener classes they listen to.
      */
+    @SuppressWarnings("unchecked")
     default <T extends ServerChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getServerChannelAttachableListeners() {
         Map<T, List<Class<T>>> serverChannelListeners =
