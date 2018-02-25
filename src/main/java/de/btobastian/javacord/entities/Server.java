@@ -716,6 +716,18 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Removes the icon of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @return A future to check if the removal was successful.
+     */
+    default CompletableFuture<Void> removeIcon() {
+        return getUpdater().removeIcon().update();
+    }
+
+    /**
      * Updates the owner of the server.
      * You must be the owner of this server in order to transfer it!
      * <p>

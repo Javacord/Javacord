@@ -91,6 +91,11 @@ public class ServerUpdater {
     private ImageContainer icon = null;
 
     /**
+     * Whether the icon should be updated or not.
+     */
+    private boolean updateIcon = false;
+
+    /**
      * The owner to update.
      */
     private User owner = null;
@@ -201,6 +206,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(BufferedImage icon) {
         this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
+        updateIcon = true;
         return this;
     }
 
@@ -213,6 +219,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(BufferedImage icon, String fileType) {
         this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
+        updateIcon = true;
         return this;
     }
 
@@ -224,6 +231,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(File icon) {
         this.icon = (icon == null) ? null : new ImageContainer(icon);
+        updateIcon = true;
         return this;
     }
 
@@ -235,6 +243,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(Icon icon) {
         this.icon = (icon == null) ? null : new ImageContainer(icon);
+        updateIcon = true;
         return this;
     }
 
@@ -246,6 +255,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(URL icon) {
         this.icon = (icon == null) ? null : new ImageContainer(icon);
+        updateIcon = true;
         return this;
     }
 
@@ -258,6 +268,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(byte[] icon) {
         this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
+        updateIcon = true;
         return this;
     }
 
@@ -270,6 +281,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(byte[] icon, String fileType) {
         this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
+        updateIcon = true;
         return this;
     }
 
@@ -282,6 +294,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(InputStream icon) {
         this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
+        updateIcon = true;
         return this;
     }
 
@@ -294,6 +307,18 @@ public class ServerUpdater {
      */
     public ServerUpdater setIcon(InputStream icon, String fileType) {
         this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
+        updateIcon = true;
+        return this;
+    }
+
+    /**
+     * Queues the icon to be removed.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeIcon() {
+        icon = null;
+        updateIcon = true;
         return this;
     }
 
@@ -548,7 +573,10 @@ public class ServerUpdater {
             body.put("afk_timeout", afkTimeout.intValue());
             patchServer = true;
         }
-        if (icon != null) {
+        if (updateIcon) {
+            if (icon == null) {
+                body.putNull("icon");
+            }
             patchServer = true;
         }
         if (splash != null) {
