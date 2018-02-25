@@ -20,6 +20,11 @@ public class InviteBuilder {
     private final ServerChannel channel;
 
     /**
+     * The reason for the creation.
+     */
+    private String reason = null;
+
+    /**
      * The duration of the invite in seconds before expiry, or 0 for never.
      */
     private int maxAge = 86400;
@@ -46,6 +51,17 @@ public class InviteBuilder {
      */
     public InviteBuilder(ServerChannel channel) {
         this.channel = channel;
+    }
+
+    /**
+     * Sets the reason for the creation. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public InviteBuilder setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -109,6 +125,7 @@ public class InviteBuilder {
                         .put("max_uses", maxUses)
                         .put("temporary", temporary)
                         .put("unique", unique))
+                .setAuditLogReason(reason)
                 .execute(result -> new ImplInvite(channel.getApi(), result.getJsonBody()));
     }
 
