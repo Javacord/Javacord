@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -43,6 +44,11 @@ public class ServerUpdater {
      * A map with all user nicknames to update.
      */
     private final Map<User, String> userNicknames = new HashMap<>();
+
+    /**
+     * A list with the new order of the roles.
+     */
+    private List<Role> newRolesOrder = null;
 
     /**
      * The name to update.
@@ -417,6 +423,17 @@ public class ServerUpdater {
     }
 
     /**
+     * Sets the new order for the server's roles.
+     *
+     * @param roles An ordered list with the new role positions.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater reorderRoles(List<Role> roles) {
+        newRolesOrder = roles;
+        return this;
+    }
+
+    /**
      * Queues a role to be assigned to the user.
      *
      * @param user The user to whom the role should be assigned.
@@ -482,6 +499,9 @@ public class ServerUpdater {
         tasks.addAll(userNicknames.entrySet().stream()
                 .map(entry -> server.updateNickname(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList()));
+        if (newRolesOrder != null) {
+            tasks.add(server.reorderRoles(newRolesOrder));
+        }
 
         // TODO nickname update and role update use the same endpoint -> There's potential for saving some REST calls
 

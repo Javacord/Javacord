@@ -901,6 +901,27 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Reorders the roles of the server.
+     *
+     * @param roles An ordered list with the new role positions.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> reorderRoles(List<Role> roles) {
+        roles = new ArrayList<>(roles); // Copy the list to safely modify it
+        ArrayNode body = JsonNodeFactory.instance.arrayNode();
+        roles.removeIf(Role::isEveryoneRole);
+        for (int i = 0; i < roles.size(); i++) {
+            body.addObject()
+                    .put("id", roles.get(i).getIdAsString())
+                    .put("position", i+1);
+        }
+        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
+                .setUrlParameters(getIdAsString())
+                .setBody(body)
+                .execute(result -> null);
+    }
+
+    /**
      * Kicks the given user from the server.
      *
      * @param user The user to kick.
