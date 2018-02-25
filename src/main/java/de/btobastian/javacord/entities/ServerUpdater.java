@@ -36,6 +36,11 @@ public class ServerUpdater {
     private final ImplServer server;
 
     /**
+     * The reason for the update.
+     */
+    private String reason = null;
+
+    /**
      * A map with all user roles to update.
      */
     private final Map<User, Collection<Role>> userRoles = new HashMap<>();
@@ -107,6 +112,17 @@ public class ServerUpdater {
      */
     public ServerUpdater(Server server) {
         this.server = (ImplServer) server;
+    }
+
+    /**
+     * Sets the reason for this update. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -493,14 +509,14 @@ public class ServerUpdater {
     public CompletableFuture<Void> update() {
         // A list with all tasks, initialized with all role updates
         ArrayList<CompletableFuture<?>> tasks = userRoles.entrySet().stream()
-                .map(entry -> server.updateRoles(entry.getKey(), entry.getValue()))
+                .map(entry -> server.updateRoles(entry.getKey(), entry.getValue(), reason))
                 .collect(Collectors.toCollection(ArrayList::new));
         // User nicknames
         tasks.addAll(userNicknames.entrySet().stream()
-                .map(entry -> server.updateNickname(entry.getKey(), entry.getValue()))
+                .map(entry -> server.updateNickname(entry.getKey(), entry.getValue(), reason))
                 .collect(Collectors.toList()));
         if (newRolesOrder != null) {
-            tasks.add(server.reorderRoles(newRolesOrder));
+            tasks.add(server.reorderRoles(newRolesOrder, reason));
         }
 
         // TODO nickname update and role update use the same endpoint -> There's potential for saving some REST calls
@@ -576,11 +592,13 @@ public class ServerUpdater {
                 tasks.add(future.thenCompose(aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                         .setUrlParameters(server.getIdAsString())
                         .setBody(body)
+                        .setAuditLogReason(reason)
                         .execute(result -> null)));
             } else {
                 tasks.add(new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                         .setUrlParameters(server.getIdAsString())
                         .setBody(body)
+                        .setAuditLogReason(reason)
                         .execute(result -> null));
             }
         }
