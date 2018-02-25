@@ -853,6 +853,18 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Removes the splash of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @return A future to check if the removal was successful.
+     */
+    default CompletableFuture<Void> removeSplash() {
+        return getUpdater().removeSplash().update();
+    }
+
+    /**
      * Updates the system channel of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
