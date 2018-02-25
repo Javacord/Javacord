@@ -92,6 +92,12 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
     }
 
     @Override
+    public ServerTextChannelUpdater setAuditLogReason(String reason) {
+        super.setAuditLogReason(reason);
+        return this;
+    }
+
+    @Override
     public ServerTextChannelUpdater setName(String name) {
         super.setName(name);
         return this;
@@ -178,6 +184,7 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
             return new RestRequest<Void>(channel.getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                     .setUrlParameters(channel.getIdAsString())
                     .setBody(body)
+                    .setAuditLogReason(reason)
                     .execute(result -> null);
         } else {
             return CompletableFuture.completedFuture(null);

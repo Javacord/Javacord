@@ -29,6 +29,11 @@ public class ServerChannelUpdater {
     protected final ServerChannel channel;
 
     /**
+     * The reason for the update.
+     */
+    protected String reason = null;
+
+    /**
      * The name to update.
      */
     protected String name = null;
@@ -55,6 +60,17 @@ public class ServerChannelUpdater {
      */
     public ServerChannelUpdater(ServerChannel channel) {
         this.channel = channel;
+    }
+
+    /**
+     * Sets the reason for this update. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerChannelUpdater setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -174,6 +190,7 @@ public class ServerChannelUpdater {
             return new RestRequest<Void>(channel.getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
                     .setUrlParameters(channel.getIdAsString())
                     .setBody(body)
+                    .setAuditLogReason(reason)
                     .execute(result -> null);
         } else {
             return CompletableFuture.completedFuture(null);
