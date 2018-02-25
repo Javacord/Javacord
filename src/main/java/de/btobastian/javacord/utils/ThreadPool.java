@@ -3,6 +3,7 @@ package de.btobastian.javacord.utils;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -72,8 +73,8 @@ public class ThreadPool {
      * @return The executor service with the given id. Never <code>null</code>!
      */
     public ExecutorService getSingleThreadExecutorService(String id) {
-        return executorServiceSingleThreads.computeIfAbsent(id, key ->
-                Executors.newSingleThreadExecutor(new ThreadFactory("Javacord - '" + id + "' Processor", false)));
+        return executorServiceSingleThreads.computeIfAbsent(id, key -> new ThreadPoolExecutor(0, 1, KEEP_ALIVE_TIME,
+                TIME_UNIT, new LinkedBlockingQueue<>(), new ThreadFactory("Javacord - '" + id + "' Processor", false)));
     }
 
 }
