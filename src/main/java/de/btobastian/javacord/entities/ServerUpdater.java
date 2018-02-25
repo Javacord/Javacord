@@ -200,7 +200,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(BufferedImage icon) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
         return this;
     }
 
@@ -212,7 +212,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(BufferedImage icon, String fileType) {
-        this.icon = new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -223,7 +223,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(File icon) {
-        this.icon = new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new ImageContainer(icon);
         return this;
     }
 
@@ -234,7 +234,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(Icon icon) {
-        this.icon = new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new ImageContainer(icon);
         return this;
     }
 
@@ -245,7 +245,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(URL icon) {
-        this.icon = new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new ImageContainer(icon);
         return this;
     }
 
@@ -257,7 +257,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(byte[] icon) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
         return this;
     }
 
@@ -269,7 +269,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(byte[] icon, String fileType) {
-        this.icon = new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -281,7 +281,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(InputStream icon) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
         return this;
     }
 
@@ -293,7 +293,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setIcon(InputStream icon, String fileType) {
-        this.icon = new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -318,7 +318,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(BufferedImage splash) {
-        this.splash = new ImageContainer(splash, "png");
+        this.splash = (splash == null) ? null : new ImageContainer(splash, "png");
         return this;
     }
 
@@ -330,7 +330,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(BufferedImage splash, String fileType) {
-        this.splash = new ImageContainer(splash, fileType);
+        this.splash = (splash == null) ? null : new ImageContainer(splash, fileType);
         return this;
     }
 
@@ -341,7 +341,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(File splash) {
-        this.splash = new ImageContainer(splash);
+        this.splash = (splash == null) ? null : new ImageContainer(splash);
         return this;
     }
 
@@ -352,7 +352,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(Icon splash) {
-        this.splash = new ImageContainer(splash);
+        this.splash = (splash == null) ? null : new ImageContainer(splash);
         return this;
     }
 
@@ -363,7 +363,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(URL splash) {
-        this.splash = new ImageContainer(splash);
+        this.splash = (splash == null) ? null : new ImageContainer(splash);
         return this;
     }
 
@@ -375,7 +375,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(byte[] splash) {
-        this.splash = new ImageContainer(splash, "png");
+        this.splash = (splash == null) ? null : new ImageContainer(splash, "png");
         return this;
     }
 
@@ -387,7 +387,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(byte[] splash, String fileType) {
-        this.splash = new ImageContainer(splash, fileType);
+        this.splash = (splash == null) ? null : new ImageContainer(splash, fileType);
         return this;
     }
 
@@ -399,7 +399,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(InputStream splash) {
-        this.splash = new ImageContainer(splash, "png");
+        this.splash = (splash == null) ? null : new ImageContainer(splash, "png");
         return this;
     }
 
@@ -411,7 +411,7 @@ public class ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater setSplash(InputStream splash, String fileType) {
-        this.splash = new ImageContainer(splash, fileType);
+        this.splash = (splash == null) ? null : new ImageContainer(splash, fileType);
         return this;
     }
 

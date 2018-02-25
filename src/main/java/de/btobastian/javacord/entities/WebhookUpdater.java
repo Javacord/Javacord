@@ -101,7 +101,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(BufferedImage avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         updateAvatar = true;
         return this;
     }
@@ -114,7 +114,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(BufferedImage avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         updateAvatar = true;
         return this;
     }
@@ -126,7 +126,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(File avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         updateAvatar = true;
         return this;
     }
@@ -138,7 +138,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(Icon avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         updateAvatar = true;
         return this;
     }
@@ -150,7 +150,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(URL avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         updateAvatar = true;
         return this;
     }
@@ -163,7 +163,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(byte[] avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         updateAvatar = true;
         return this;
     }
@@ -176,7 +176,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(byte[] avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         updateAvatar = true;
         return this;
     }
@@ -189,7 +189,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(InputStream avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         updateAvatar = true;
         return this;
     }
@@ -202,7 +202,7 @@ public class WebhookUpdater {
      * @return The current instance in order to chain call methods.
      */
     public WebhookUpdater setAvatar(InputStream avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         updateAvatar = true;
         return this;
     }

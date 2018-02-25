@@ -91,7 +91,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(Icon image) {
-        this.image = new ImageContainer(image);
+        this.image = (image == null) ? null : new ImageContainer(image);
         return this;
     }
 
@@ -102,7 +102,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(URL image) {
-        this.image = new ImageContainer(image);
+        this.image = (image == null) ? null : new ImageContainer(image);
         return this;
     }
 
@@ -113,7 +113,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(File image) {
-        this.image = new ImageContainer(image);
+        this.image = (image == null) ? null : new ImageContainer(image);
         return this;
     }
 
@@ -125,7 +125,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(BufferedImage image) {
-        this.image = new ImageContainer(image, "png");
+        this.image = (image == null) ? null : new ImageContainer(image, "png");
         return this;
     }
 
@@ -137,7 +137,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(BufferedImage image, String type) {
-        this.image = new ImageContainer(image, type);
+        this.image = (image == null) ? null : new ImageContainer(image, type);
         return this;
     }
 
@@ -149,7 +149,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(byte[] image) {
-        this.image = new ImageContainer(image, "png");
+        this.image = (image == null) ? null : new ImageContainer(image, "png");
         return this;
     }
 
@@ -161,7 +161,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(byte[] image, String type) {
-        this.image = new ImageContainer(image, type);
+        this.image = (image == null) ? null : new ImageContainer(image, type);
         return this;
     }
 
@@ -173,7 +173,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(InputStream image) {
-        this.image = new ImageContainer(image, "png");
+        this.image = (image == null) ? null : new ImageContainer(image, "png");
         return this;
     }
 
@@ -185,7 +185,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(InputStream image, String type) {
-        this.image = new ImageContainer(image, type);
+        this.image = (image == null) ? null : new ImageContainer(image, type);
         return this;
     }
 

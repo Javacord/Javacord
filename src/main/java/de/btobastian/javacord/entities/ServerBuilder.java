@@ -128,7 +128,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(BufferedImage icon) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
         return this;
     }
 
@@ -140,7 +140,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(BufferedImage icon, String fileType) {
-        this.icon = new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -151,7 +151,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(File icon) {
-        this.icon = new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new ImageContainer(icon);
         return this;
     }
 
@@ -162,7 +162,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(Icon icon) {
-        this.icon = new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new ImageContainer(icon);
         return this;
     }
 
@@ -173,7 +173,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(URL icon) {
-        this.icon = new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new ImageContainer(icon);
         return this;
     }
 
@@ -185,7 +185,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(byte[] icon) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
         return this;
     }
 
@@ -197,7 +197,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(byte[] icon, String fileType) {
-        this.icon = new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
         return this;
     }
 
@@ -209,7 +209,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(InputStream icon) {
-        this.icon = new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
         return this;
     }
 
@@ -221,7 +221,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(InputStream icon, String fileType) {
-        this.icon = new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
         return this;
     }
 
