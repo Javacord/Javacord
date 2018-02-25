@@ -23,6 +23,11 @@ public class RoleBuilder {
     private final ImplServer server;
 
     /**
+     * The reason for the creation.
+     */
+    private String reason = null;
+
+    /**
      * The name of the role.
      */
     private String name = null;
@@ -54,6 +59,17 @@ public class RoleBuilder {
      */
     public RoleBuilder(Server server) {
         this.server = (ImplServer) server;
+    }
+
+    /**
+     * Sets the reason for the creation. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -135,6 +151,7 @@ public class RoleBuilder {
         return new RestRequest<Role>(server.getApi(), RestMethod.POST, RestEndpoint.ROLE)
                 .setUrlParameters(server.getIdAsString())
                 .setBody(body)
+                .setAuditLogReason(reason)
                 .execute(result -> server.getOrCreateRole(result.getJsonBody()));
     }
 
