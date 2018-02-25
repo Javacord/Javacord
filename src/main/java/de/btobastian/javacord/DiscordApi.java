@@ -667,9 +667,10 @@ public interface DiscordApi {
      * @return A collection with all users with the given name.
      */
     default Collection<User> getCachedUsersByName(String name) {
-        return Collections.unmodifiableList(getCachedUsers().stream()
-                .filter(user -> user.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getCachedUsers().stream()
+                        .filter(user -> user.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -680,9 +681,10 @@ public interface DiscordApi {
      * @return A collection with all users with the given name.
      */
     default Collection<User> getCachedUsersByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getCachedUsers().stream()
-                .filter(user -> user.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getCachedUsers().stream()
+                        .filter(user -> user.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -779,9 +781,10 @@ public interface DiscordApi {
      * @return A collection with all servers with the given name.
      */
     default Collection<Server> getServersByName(String name) {
-        return Collections.unmodifiableList(getServers().stream()
-                .filter(server -> server.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServers().stream()
+                        .filter(server -> server.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -792,9 +795,10 @@ public interface DiscordApi {
      * @return A collection with all servers with the given name.
      */
     default Collection<Server> getServersByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getServers().stream()
-                .filter(server -> server.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServers().stream()
+                        .filter(server -> server.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -836,9 +840,10 @@ public interface DiscordApi {
      * @return A collection with all custom emojis with the given name in this server.
      */
     default Collection<KnownCustomEmoji> getCustomEmojisByName(String name) {
-        return Collections.unmodifiableList(getCustomEmojis().stream()
-                .filter(emoji -> emoji.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getCustomEmojis().stream()
+                        .filter(emoji -> emoji.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -849,9 +854,10 @@ public interface DiscordApi {
      * @return A collection with all custom emojis with the given name in this server.
      */
     default Collection<KnownCustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getCustomEmojis().stream()
-                .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getCustomEmojis().stream()
+                        .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -901,9 +907,10 @@ public interface DiscordApi {
      * @return A collection with all roles with the given name.
      */
     default Collection<Role> getRolesByName(String name) {
-        return Collections.unmodifiableList(getRoles().stream()
-                .filter(role -> role.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getRoles().stream()
+                        .filter(role -> role.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -914,9 +921,10 @@ public interface DiscordApi {
      * @return A collection with all roles with the given name.
      */
     default Collection<Role> getRolesByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getRoles().stream()
-                .filter(role -> role.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getRoles().stream()
+                        .filter(role -> role.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -945,11 +953,12 @@ public interface DiscordApi {
      * @return A collection with all private channels of the bot.
      */
     default Collection<PrivateChannel> getPrivateChannels() {
-        return Collections.unmodifiableList(getCachedUsers().stream()
-                .map(User::getPrivateChannel)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getCachedUsers().stream()
+                        .map(User::getPrivateChannel)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1218,9 +1227,10 @@ public interface DiscordApi {
      * @return A collection with all server channels with the given name.
      */
     default Collection<ServerChannel> getServerChannelsByName(String name) {
-        return Collections.unmodifiableList(getServerChannels().stream()
-                .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServerChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1231,9 +1241,10 @@ public interface DiscordApi {
      * @return A collection with all server channels with the given name.
      */
     default Collection<ServerChannel> getServerChannelsByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getServerChannels().stream()
-                .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServerChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1270,9 +1281,10 @@ public interface DiscordApi {
      * @return A collection with all channel categories with the given name.
      */
     default Collection<ChannelCategory> getChannelCategoriesByName(String name) {
-        return Collections.unmodifiableList(getChannelCategories().stream()
-                .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getChannelCategories().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1283,9 +1295,10 @@ public interface DiscordApi {
      * @return A collection with all channel categories with the given name.
      */
     default Collection<ChannelCategory> getChannelCategoriesByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getChannelCategories().stream()
-                .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getChannelCategories().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1322,9 +1335,10 @@ public interface DiscordApi {
      * @return A collection with all server text channels with the given name.
      */
     default Collection<ServerTextChannel> getServerTextChannelsByName(String name) {
-        return Collections.unmodifiableList(getServerTextChannels().stream()
-                .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServerTextChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1335,9 +1349,10 @@ public interface DiscordApi {
      * @return A collection with all server text channels with the given name.
      */
     default Collection<ServerTextChannel> getServerTextChannelsByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getServerTextChannels().stream()
-                .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServerTextChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1374,9 +1389,10 @@ public interface DiscordApi {
      * @return A collection with all server voice channels with the given name.
      */
     default Collection<ServerVoiceChannel> getServerVoiceChannelsByName(String name) {
-        return Collections.unmodifiableList(getServerVoiceChannels().stream()
-                .filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServerVoiceChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1387,9 +1403,10 @@ public interface DiscordApi {
      * @return A collection with all server voice channels with the given name.
      */
     default Collection<ServerVoiceChannel> getServerVoiceChannelsByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getServerVoiceChannels().stream()
-                .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getServerVoiceChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1452,9 +1469,10 @@ public interface DiscordApi {
      * @return A collection with all group channels with the given name.
      */
     default Collection<GroupChannel> getGroupChannelsByName(String name) {
-        return Collections.unmodifiableList(getGroupChannels().stream()
-                .filter(channel -> Objects.deepEquals(channel.getName().orElse(null), name))
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getGroupChannels().stream()
+                        .filter(channel -> Objects.deepEquals(channel.getName().orElse(null), name))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1465,15 +1483,16 @@ public interface DiscordApi {
      * @return A collection with all group channels with the given name.
      */
     default Collection<GroupChannel> getGroupChannelsByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(getGroupChannels().stream()
-                .filter(channel -> {
-                    String channelName = channel.getName().orElse(null);
-                    if (name == null || channelName == null) {
-                        return Objects.deepEquals(channelName, name);
-                    }
-                    return name.equalsIgnoreCase(channelName);
-                })
-                .collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                getGroupChannels().stream()
+                        .filter(channel -> {
+                            String channelName = channel.getName().orElse(null);
+                            if (name == null || channelName == null) {
+                                return Objects.deepEquals(channelName, name);
+                            }
+                            return name.equalsIgnoreCase(channelName);
+                        })
+                        .collect(Collectors.toList()));
     }
 
     /**
