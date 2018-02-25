@@ -7,7 +7,7 @@ import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.ServerCreator;
+import de.btobastian.javacord.entities.ServerBuilder;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.Webhook;
@@ -430,12 +430,12 @@ public interface DiscordApi {
     }
 
     /**
-     * Gets a server creator which can be used to create servers.
+     * Gets a server builder which can be used to create servers.
      *
-     * @return A server creator.
+     * @return A server builder.
      */
-    default ServerCreator getServerCreator() {
-        return new ServerCreator(this);
+    default ServerBuilder getServerBuilder() {
+        return new ServerBuilder(this);
     }
 
     /**

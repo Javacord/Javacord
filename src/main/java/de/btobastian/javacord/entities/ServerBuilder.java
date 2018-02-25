@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to create a server.
  */
-public class ServerCreator {
+public class ServerBuilder {
 
     /**
      * The discord api instance.
@@ -60,7 +60,7 @@ public class ServerCreator {
      *
      * @param api The discord api instance.
      */
-    public ServerCreator(DiscordApi api) {
+    public ServerBuilder(DiscordApi api) {
         this.api = api;
     }
 
@@ -70,7 +70,7 @@ public class ServerCreator {
      * @param name The name of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setName(String name) {
+    public ServerBuilder setName(String name) {
         this.name = name;
         return this;
     }
@@ -81,7 +81,7 @@ public class ServerCreator {
      * @param region The region of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setRegion(Region region) {
+    public ServerBuilder setRegion(Region region) {
         this.region = region;
         return this;
     }
@@ -92,7 +92,7 @@ public class ServerCreator {
      * @param verificationLevel The verification level of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setVerificationLevel(VerificationLevel verificationLevel) {
+    public ServerBuilder setVerificationLevel(VerificationLevel verificationLevel) {
         this.verificationLevel = verificationLevel;
         return this;
     }
@@ -103,7 +103,7 @@ public class ServerCreator {
      * @param defaultMessageNotificationLevel The default message notification level of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setDefaultMessageNotificationLevel(
+    public ServerBuilder setDefaultMessageNotificationLevel(
             DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
         this.defaultMessageNotificationLevel = defaultMessageNotificationLevel;
         return this;
@@ -115,7 +115,7 @@ public class ServerCreator {
      * @param afkTimeout The afk timeout in seconds of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setAfkTimeoutInSeconds(int afkTimeout) {
+    public ServerBuilder setAfkTimeoutInSeconds(int afkTimeout) {
         this.afkTimeout = afkTimeout;
         return this;
     }
@@ -127,7 +127,7 @@ public class ServerCreator {
      * @param icon The icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(BufferedImage icon) {
+    public ServerBuilder setIcon(BufferedImage icon) {
         this.icon = new ImageContainer(icon, "png");
         return this;
     }
@@ -139,7 +139,7 @@ public class ServerCreator {
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(BufferedImage icon, String fileType) {
+    public ServerBuilder setIcon(BufferedImage icon, String fileType) {
         this.icon = new ImageContainer(icon, fileType);
         return this;
     }
@@ -150,7 +150,7 @@ public class ServerCreator {
      * @param icon The icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(File icon) {
+    public ServerBuilder setIcon(File icon) {
         this.icon = new ImageContainer(icon);
         return this;
     }
@@ -161,7 +161,7 @@ public class ServerCreator {
      * @param icon The icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(Icon icon) {
+    public ServerBuilder setIcon(Icon icon) {
         this.icon = new ImageContainer(icon);
         return this;
     }
@@ -172,7 +172,7 @@ public class ServerCreator {
      * @param icon The icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(URL icon) {
+    public ServerBuilder setIcon(URL icon) {
         this.icon = new ImageContainer(icon);
         return this;
     }
@@ -184,7 +184,7 @@ public class ServerCreator {
      * @param icon The icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(byte[] icon) {
+    public ServerBuilder setIcon(byte[] icon) {
         this.icon = new ImageContainer(icon, "png");
         return this;
     }
@@ -196,7 +196,7 @@ public class ServerCreator {
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(byte[] icon, String fileType) {
+    public ServerBuilder setIcon(byte[] icon, String fileType) {
         this.icon = new ImageContainer(icon, fileType);
         return this;
     }
@@ -208,7 +208,7 @@ public class ServerCreator {
      * @param icon The icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(InputStream icon) {
+    public ServerBuilder setIcon(InputStream icon) {
         this.icon = new ImageContainer(icon, "png");
         return this;
     }
@@ -220,7 +220,7 @@ public class ServerCreator {
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    public ServerCreator setIcon(InputStream icon, String fileType) {
+    public ServerBuilder setIcon(InputStream icon, String fileType) {
         this.icon = new ImageContainer(icon, fileType);
         return this;
     }
