@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.channels;
 
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Mentionable;
+import de.btobastian.javacord.entities.WebhookBuilder;
 import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.TextChannelAttachableListener;
@@ -43,6 +44,15 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @return The topic of the channel.
      */
     String getTopic();
+
+    /**
+     * Gets a webhook builder for this channel.
+     *
+     * @return A webhook builder.
+     */
+    default WebhookBuilder getWebhookBuilder() {
+        return new WebhookBuilder(this);
+    }
 
     /**
      * Gets the updater for this channel.
