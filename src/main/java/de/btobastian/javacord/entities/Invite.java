@@ -108,8 +108,19 @@ public interface Invite {
      * @return A future to check if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
+        return delete(null);
+    }
+
+    /**
+     * Deletes the invite.
+     *
+     * @param reason The audit log reason for the deletion.
+     * @return A future to check if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete(String reason) {
         return new RestRequest<Void>(((ImplInvite) this).getApi(), RestMethod.DELETE, RestEndpoint.INVITE)
                 .setUrlParameters(getCode())
+                .setAuditLogReason(reason)
                 .execute(result -> null);
     }
 
