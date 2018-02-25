@@ -81,8 +81,19 @@ public interface Webhook extends DiscordEntity {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
+        return delete(null);
+    }
+
+    /**
+     * Deletes the webhook.
+     *
+     * @param reason The audit log reason for the deletion.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete(String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.WEBHOOK)
                 .setUrlParameters(getIdAsString())
+                .setAuditLogReason(reason)
                 .execute(result -> null);
     }
 
