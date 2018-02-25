@@ -54,7 +54,7 @@ public class AccountUpdater {
         this.username = username;
         return this;
     }
-    
+
     /**
      * Queues the avatar of the connected account to get updated.
      * This method assumes the file type is "png"!
@@ -63,7 +63,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(BufferedImage avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         return this;
     }
 
@@ -75,7 +75,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(BufferedImage avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         return this;
     }
 
@@ -86,7 +86,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(File avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         return this;
     }
 
@@ -97,7 +97,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(Icon avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         return this;
     }
 
@@ -108,7 +108,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(URL avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         return this;
     }
 
@@ -120,7 +120,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(byte[] avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         return this;
     }
 
@@ -132,7 +132,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(byte[] avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         return this;
     }
 
@@ -144,7 +144,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(InputStream avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         return this;
     }
 
@@ -156,7 +156,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(InputStream avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         return this;
     }
 

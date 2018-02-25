@@ -185,8 +185,13 @@ public class EmbedBuilder {
     public EmbedBuilder setFooter(String text, File icon) {
         footerText = text;
         footerIconUrl = null;
-        footerIconContainer = new ImageContainer(icon);
-        footerIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
+        if (icon == null) {
+            footerIconContainer = null;
+            footerIconFileName = null;
+        } else {
+            footerIconContainer = new ImageContainer(icon);
+            footerIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
+        }
         return this;
     }
 
@@ -213,8 +218,13 @@ public class EmbedBuilder {
     public EmbedBuilder setFooter(String text, InputStream icon, String fileType) {
         footerText = text;
         footerIconUrl = null;
-        footerIconContainer = new ImageContainer(icon, fileType);
-        footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (icon == null) {
+            footerIconContainer = null;
+            footerIconFileName = null;
+        } else {
+            footerIconContainer = new ImageContainer(icon, fileType);
+            footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -241,8 +251,13 @@ public class EmbedBuilder {
     public EmbedBuilder setFooter(String text, byte[] icon, String fileType) {
         footerText = text;
         footerIconUrl = null;
-        footerIconContainer = new ImageContainer(icon, fileType);
-        footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (icon == null) {
+            footerIconContainer = null;
+            footerIconFileName = null;
+        } else {
+            footerIconContainer = new ImageContainer(icon, fileType);
+            footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -269,8 +284,13 @@ public class EmbedBuilder {
     public EmbedBuilder setFooter(String text, BufferedImage icon, String fileType) {
         footerText = text;
         footerIconUrl = null;
-        footerIconContainer = new ImageContainer(icon, fileType);
-        footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (icon == null) {
+            footerIconContainer = null;
+            footerIconFileName = null;
+        } else {
+            footerIconContainer = new ImageContainer(icon, fileType);
+            footerIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -308,8 +328,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setImage(File image) {
         imageUrl = null;
-        imageContainer = new ImageContainer(image);
-        imageFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(image);
+        if (image == null) {
+            imageContainer = null;
+            imageFileName = null;
+        } else {
+            imageContainer = new ImageContainer(image);
+            imageFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(image);
+        }
         return this;
     }
 
@@ -333,8 +358,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setImage(InputStream image, String fileType) {
         imageUrl = null;
-        imageContainer = new ImageContainer(image, fileType);
-        imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (image == null) {
+            imageContainer = null;
+            imageFileName = null;
+        } else {
+            imageContainer = new ImageContainer(image, fileType);
+            imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -358,8 +388,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setImage(byte[] image, String fileType) {
         imageUrl = null;
-        imageContainer = new ImageContainer(image, fileType);
-        imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (image == null) {
+            imageContainer = null;
+            imageFileName = null;
+        } else {
+            imageContainer = new ImageContainer(image, fileType);
+            imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -383,8 +418,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setImage(BufferedImage image, String fileType) {
         imageUrl = null;
-        imageContainer = new ImageContainer(image, fileType);
-        imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (image == null) {
+            imageContainer = null;
+            imageFileName = null;
+        } else {
+            imageContainer = new ImageContainer(image, fileType);
+            imageFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -479,8 +519,13 @@ public class EmbedBuilder {
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
-        authorIconContainer = new ImageContainer(icon);
-        authorIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
+        if (icon == null) {
+            authorIconContainer = null;
+            authorIconFileName = null;
+        } else {
+            authorIconContainer = new ImageContainer(icon);
+            authorIconFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon);
+        }
         return this;
     }
 
@@ -510,8 +555,13 @@ public class EmbedBuilder {
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
-        authorIconContainer = new ImageContainer(icon, fileType);
-        authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (icon == null) {
+            authorIconContainer = null;
+            authorIconFileName = null;
+        } else {
+            authorIconContainer = new ImageContainer(icon, fileType);
+            authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -541,8 +591,13 @@ public class EmbedBuilder {
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
-        authorIconContainer = new ImageContainer(icon, fileType);
-        authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (icon == null) {
+            authorIconContainer = null;
+            authorIconFileName = null;
+        } else {
+            authorIconContainer = new ImageContainer(icon, fileType);
+            authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -572,8 +627,13 @@ public class EmbedBuilder {
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
-        authorIconContainer = new ImageContainer(icon, fileType);
-        authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (icon == null) {
+            authorIconContainer = null;
+            authorIconFileName = null;
+        } else {
+            authorIconContainer = new ImageContainer(icon, fileType);
+            authorIconFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -611,8 +671,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setThumbnail(File thumbnail) {
         thumbnailUrl = null;
-        thumbnailContainer = new ImageContainer(thumbnail);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(thumbnail);
+        if (thumbnail == null) {
+            thumbnailContainer = null;
+            thumbnailFileName = null;
+        } else {
+            thumbnailContainer = new ImageContainer(thumbnail);
+            thumbnailFileName = UUID.randomUUID().toString() + "." + FileUtils.getExtension(thumbnail);
+        }
         return this;
     }
 
@@ -636,8 +701,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setThumbnail(InputStream thumbnail, String fileType) {
         thumbnailUrl = null;
-        thumbnailContainer = new ImageContainer(thumbnail, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (thumbnail == null) {
+            thumbnailContainer = null;
+            thumbnailFileName = null;
+        } else {
+            thumbnailContainer = new ImageContainer(thumbnail, fileType);
+            thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -661,8 +731,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setThumbnail(byte[] thumbnail, String fileType) {
         thumbnailUrl = null;
-        thumbnailContainer = new ImageContainer(thumbnail, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (thumbnail == null) {
+            thumbnailContainer = null;
+            thumbnailFileName = null;
+        } else {
+            thumbnailContainer = new ImageContainer(thumbnail, fileType);
+            thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 
@@ -686,8 +761,13 @@ public class EmbedBuilder {
      */
     public EmbedBuilder setThumbnail(BufferedImage thumbnail, String fileType) {
         thumbnailUrl = null;
-        thumbnailContainer = new ImageContainer(thumbnail, fileType);
-        thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        if (thumbnail == null) {
+            thumbnailContainer = null;
+            thumbnailFileName = null;
+        } else {
+            thumbnailContainer = new ImageContainer(thumbnail, fileType);
+            thumbnailFileName = UUID.randomUUID().toString() + "." + fileType;
+        }
         return this;
     }
 

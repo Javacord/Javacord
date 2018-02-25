@@ -80,7 +80,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(BufferedImage avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         return this;
     }
 
@@ -92,7 +92,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(BufferedImage avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         return this;
     }
 
@@ -103,7 +103,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(File avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         return this;
     }
 
@@ -114,7 +114,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(Icon avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         return this;
     }
 
@@ -125,7 +125,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(URL avatar) {
-        this.avatar = new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
         return this;
     }
 
@@ -137,7 +137,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(byte[] avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         return this;
     }
 
@@ -149,7 +149,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(byte[] avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         return this;
     }
 
@@ -161,7 +161,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(InputStream avatar) {
-        this.avatar = new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
         return this;
     }
 
@@ -173,7 +173,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(InputStream avatar, String fileType) {
-        this.avatar = new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
         return this;
     }
 
