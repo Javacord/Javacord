@@ -69,15 +69,15 @@ public class ServerChannelUpdater {
     }
 
     /**
-     * Queues the position to be updated.
+     * Queues the raw position to be updated.
      *
-     * @param position The new position of the channel.
-     *                 If you want to update the position based on other channels, make sure to use
-     *                 {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
+     * @param rawPosition The new position of the channel.
+     *                    If you want to update the position based on other channels, make sure to use
+     *                    {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
      * @return The current instance in order to chain call methods.
      */
-    public ServerChannelUpdater setPosition(int position) {
-        this.position = position;
+    public ServerChannelUpdater setRawPosition(int rawPosition) {
+        this.position = rawPosition;
         return this;
     }
 

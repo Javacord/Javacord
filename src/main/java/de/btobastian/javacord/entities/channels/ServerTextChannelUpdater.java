@@ -98,8 +98,8 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
     }
 
     @Override
-    public ServerTextChannelUpdater setPosition(int position) {
-        super.setPosition(position);
+    public ServerTextChannelUpdater setRawPosition(int rawPosition) {
+        super.setRawPosition(rawPosition);
         return this;
     }
 

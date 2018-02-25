@@ -124,18 +124,18 @@ public interface ServerChannel extends Channel {
     }
 
     /**
-     * Updates the position of the channel.
+     * Updates the raw position of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerChannelUpdater} from {@link #getUpdater()} which provides a better performance!
      *
-     * @param position The new position of the channel.
-     *                 If you want to update the position based on other channels, make sure to use
-     *                 {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
+     * @param rawPosition The new position of the channel.
+     *                    If you want to update the position based on other channels, make sure to use
+     *                    {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> updatePosition(int position) {
-        return getUpdater().setPosition(position).update();
+    default CompletableFuture<Void> updateRawPosition(int rawPosition) {
+        return getUpdater().setRawPosition(rawPosition).update();
     }
 
     /**

@@ -108,8 +108,8 @@ public class ServerVoiceChannelUpdater extends ServerChannelUpdater {
     }
 
     @Override
-    public ServerVoiceChannelUpdater setPosition(int position) {
-        super.setPosition(position);
+    public ServerVoiceChannelUpdater setRawPosition(int rawPosition) {
+        super.setRawPosition(rawPosition);
         return this;
     }
 
