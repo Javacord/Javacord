@@ -106,6 +106,11 @@ public class ServerUpdater {
     private ImageContainer splash = null;
 
     /**
+     * Whether the splash should be updated or not.
+     */
+    private boolean updateSplash = false;
+
+    /**
      * The system channel to update.
      */
     private ServerChannel systemChannel = null;
@@ -344,6 +349,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(BufferedImage splash) {
         this.splash = (splash == null) ? null : new ImageContainer(splash, "png");
+        updateSplash = true;
         return this;
     }
 
@@ -356,6 +362,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(BufferedImage splash, String fileType) {
         this.splash = (splash == null) ? null : new ImageContainer(splash, fileType);
+        updateSplash = true;
         return this;
     }
 
@@ -367,6 +374,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(File splash) {
         this.splash = (splash == null) ? null : new ImageContainer(splash);
+        updateSplash = true;
         return this;
     }
 
@@ -378,6 +386,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(Icon splash) {
         this.splash = (splash == null) ? null : new ImageContainer(splash);
+        updateSplash = true;
         return this;
     }
 
@@ -389,6 +398,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(URL splash) {
         this.splash = (splash == null) ? null : new ImageContainer(splash);
+        updateSplash = true;
         return this;
     }
 
@@ -401,6 +411,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(byte[] splash) {
         this.splash = (splash == null) ? null : new ImageContainer(splash, "png");
+        updateSplash = true;
         return this;
     }
 
@@ -413,6 +424,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(byte[] splash, String fileType) {
         this.splash = (splash == null) ? null : new ImageContainer(splash, fileType);
+        updateSplash = true;
         return this;
     }
 
@@ -425,6 +437,7 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(InputStream splash) {
         this.splash = (splash == null) ? null : new ImageContainer(splash, "png");
+        updateSplash = true;
         return this;
     }
 
@@ -437,6 +450,18 @@ public class ServerUpdater {
      */
     public ServerUpdater setSplash(InputStream splash, String fileType) {
         this.splash = (splash == null) ? null : new ImageContainer(splash, fileType);
+        updateSplash = true;
+        return this;
+    }
+
+    /**
+     * Queues the splash to be removed.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeSplash() {
+        splash = null;
+        updateSplash = true;
         return this;
     }
 
@@ -579,7 +604,10 @@ public class ServerUpdater {
             }
             patchServer = true;
         }
-        if (splash != null) {
+        if (updateSplash) {
+            if (splash == null) {
+                body.putNull("splash");
+            }
             patchServer = true;
         }
         if (owner != null) {
