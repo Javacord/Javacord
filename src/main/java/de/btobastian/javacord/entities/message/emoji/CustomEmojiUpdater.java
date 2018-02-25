@@ -25,6 +25,11 @@ public class CustomEmojiUpdater {
     private final ImplKnownCustomEmoji emoji;
 
     /**
+     * The reason for the update.
+     */
+    private String reason = null;
+
+    /**
      * The name to update.
      */
     private String name = null;
@@ -46,6 +51,17 @@ public class CustomEmojiUpdater {
      */
     public CustomEmojiUpdater(KnownCustomEmoji emoji) {
         this.emoji = (ImplKnownCustomEmoji) emoji;
+    }
+
+    /**
+     * Sets the reason for this update. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public CustomEmojiUpdater setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -152,6 +168,7 @@ public class CustomEmojiUpdater {
             return new RestRequest<Void>(emoji.getApi(), RestMethod.PATCH, RestEndpoint.CUSTOM_EMOJI)
                     .setUrlParameters(emoji.getServer().getIdAsString(), emoji.getIdAsString())
                     .setBody(body)
+                    .setAuditLogReason(reason)
                     .execute(result -> null);
         }
         return CompletableFuture.completedFuture(null);
