@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiAttachableListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.utils.ClassHelper;
 import de.btobastian.javacord.utils.ListenerManager;
@@ -164,6 +165,28 @@ public interface KnownCustomEmoji extends CustomEmoji {
     default List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
         return ((ImplDiscordApi) getApi())
                 .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to custom emoji whitelisted roles changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
+            CustomEmojiChangeWhitelistedRolesListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                KnownCustomEmoji.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered custom emoji change whitelisted roles listeners.
+     *
+     * @return A list with all registered custom emoji change whitelisted roles listeners.
+     */
+    default List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class);
     }
 
     /**

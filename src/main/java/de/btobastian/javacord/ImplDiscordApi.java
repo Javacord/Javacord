@@ -61,6 +61,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJ
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.WebhooksUpdateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
@@ -1534,6 +1535,17 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
         return getListeners(CustomEmojiChangeNameListener.class);
+    }
+
+    @Override
+    public ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
+            CustomEmojiChangeWhitelistedRolesListener listener) {
+        return addListener(CustomEmojiChangeWhitelistedRolesListener.class, listener);
+    }
+
+    @Override
+    public List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners() {
+        return getListeners(CustomEmojiChangeWhitelistedRolesListener.class);
     }
 
     @Override

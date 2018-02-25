@@ -61,10 +61,19 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     /**
      * Sets the name of the custom emoji.
      *
-     * @param name The name of the custom emoji.
+     * @param name The name to set.
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the whitelist of the custom emoji.
+     *
+     * @param whitelist The whitelist to set.
+     */
+    public void setWhitelist(Collection<Role> whitelist) {
+        this.whitelist = whitelist;
     }
 
     @Override

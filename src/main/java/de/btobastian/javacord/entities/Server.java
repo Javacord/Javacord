@@ -60,6 +60,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJ
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.WebhooksUpdateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
@@ -2509,6 +2510,28 @@ public interface Server extends DiscordEntity {
     default List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
         return ((ImplDiscordApi) getApi())
                 .getObjectListeners(Server.class, getId(), CustomEmojiChangeNameListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to custom emoji whitelisted roles changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
+            CustomEmojiChangeWhitelistedRolesListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered custom emoji change whitelisted roles listeners.
+     *
+     * @return A list with all registered custom emoji change whitelisted roles listeners.
+     */
+    default List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(Server.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class);
     }
 
     /**

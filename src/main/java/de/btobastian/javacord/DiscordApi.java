@@ -69,6 +69,7 @@ import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberJ
 import de.btobastian.javacord.listeners.server.channel.ServerVoiceChannelMemberLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.WebhooksUpdateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeNameListener;
+import de.btobastian.javacord.listeners.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiCreateListener;
 import de.btobastian.javacord.listeners.server.emoji.CustomEmojiDeleteListener;
 import de.btobastian.javacord.listeners.server.member.ServerMemberBanListener;
@@ -2058,6 +2059,22 @@ public interface DiscordApi {
      * @return A list with all registered custom emoji change name listeners.
      */
     List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners();
+
+    /**
+     * Adds a listener, which listens to custom emoji whitelisted roles changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
+            CustomEmojiChangeWhitelistedRolesListener listener);
+
+    /**
+     * Gets a list with all registered custom emoji change whitelisted roles listeners.
+     *
+     * @return A list with all registered custom emoji change whitelisted roles listeners.
+     */
+    List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners();
 
     /**
      * Adds a listener, which listens to custom emoji deletions.
