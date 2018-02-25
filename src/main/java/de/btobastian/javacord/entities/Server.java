@@ -218,6 +218,44 @@ public interface Server extends DiscordEntity {
     int getAfkTimeoutInSeconds();
 
     /**
+     * Gets the amount of members without a role which were inactive at least the given amount of days.
+     *
+     * @param days The amount of days the member has to be inactive.
+     * @return The amount of member who would get kicked.
+     */
+    default CompletableFuture<Integer> getPruneCount(int days) {
+        return new RestRequest<Integer>(getApi(), RestMethod.GET, RestEndpoint.SERVER_PRUNE)
+                .setUrlParameters(getIdAsString())
+                .addQueryParameter("days", String.valueOf(days))
+                .execute(result -> result.getJsonBody().get("pruned").asInt());
+    }
+
+    /**
+     * Kicks all members without a role which were inactive at least the given amount of days.
+     *
+     * @param days The amount of days the member has to be inactive.
+     * @return The amount of member who got kicked.
+     */
+    default CompletableFuture<Integer> pruneMembers(int days) {
+        return pruneMembers(days, null);
+    }
+
+    /**
+     * Kicks all members without a role which were inactive at least the given amount of days.
+     *
+     * @param days The amount of days the member has to be inactive.
+     * @param reason The audit log reason for the prune.
+     * @return The amount of member who got kicked.
+     */
+    default CompletableFuture<Integer> pruneMembers(int days, String reason) {
+        return new RestRequest<Integer>(getApi(), RestMethod.POST, RestEndpoint.SERVER_PRUNE)
+                .setUrlParameters(getIdAsString())
+                .addQueryParameter("days", String.valueOf(days))
+                .setAuditLogReason(reason)
+                .execute(result -> result.getJsonBody().get("pruned").asInt());
+    }
+
+    /**
      * Gets the invites of the server.
      *
      * @return The invites of the server.
