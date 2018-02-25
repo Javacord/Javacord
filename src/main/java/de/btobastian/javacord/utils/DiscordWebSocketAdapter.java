@@ -2,6 +2,7 @@ package de.btobastian.javacord.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neovisionaries.ws.client.WebSocket;
@@ -13,6 +14,7 @@ import com.neovisionaries.ws.client.WebSocketListener;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.Activity;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.events.connection.LostConnectionEvent;
 import de.btobastian.javacord.events.connection.ReconnectEvent;
 import de.btobastian.javacord.events.connection.ResumeEvent;
@@ -68,11 +70,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -123,6 +127,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     // A reconnect attempt counter
     private int reconnectAttempt = 0;
 
+    // A queue which contains server ids for the "request guild members" packet
+    private BlockingQueue<Long> requestGuildMembersQueue = new LinkedBlockingQueue<>();
+
     private static final Map<String, Long> lastIdentificationPerAccount = Collections.synchronizedMap(new HashMap<>());
     private static final ConcurrentMap<String, Semaphore> connectionDelaySemaphorePerAccount =
             new ConcurrentHashMap<>();
@@ -151,6 +158,35 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
         registerHandlers();
         connect();
+
+        api.getThreadPool().getSingleThreadExecutorService("Request Guild Members Queue Consumer")
+                .submit(() -> {
+                    try {
+                        List<Long> serverIds = new ArrayList<>();
+                        while (!Thread.interrupted()) {
+                            serverIds.add(requestGuildMembersQueue.take());
+                            requestGuildMembersQueue.drainTo(serverIds, 49);
+                            ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
+                                    .put("op", GatewayOpcode.REQUEST_GUILD_MEMBERS.getCode());
+                            ObjectNode data = requestGuildMembersPacket.putObject("d")
+                                    .put("query","")
+                                    .put("limit", 0);
+                            if (serverIds.size() == 1) {
+                                data.put("guild_id", String.valueOf(serverIds.get(0)));
+                            } else {
+                                ArrayNode guildIds = data.putArray("guild_id");
+                                for (long serverId : serverIds) {
+                                    guildIds.add(String.valueOf(serverId));
+                                }
+                            }
+                            logger.debug("Sending request guild members packet {}",
+                                    requestGuildMembersPacket.toString());
+                            getWebSocket().sendText(requestGuildMembersPacket.toString());
+                            serverIds.clear();
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException ignored) { } // Break the loop when the thread pool shuts down
+                });
     }
 
     /**
@@ -695,6 +731,16 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
         logger.debug("Updating status (content: {})", updateStatus.toString());
         websocket.get().sendText(updateStatus.toString());
+    }
+
+    /**
+     * Adds a server id to be queued for the "request guild members" packet.
+     *
+     * @param server The server.
+     */
+    public void queueRequestGuildMembers(Server server) {
+        logger.debug("Queued {} for request guild members packet", server);
+        requestGuildMembersQueue.add(server.getId());
     }
 
     @Override

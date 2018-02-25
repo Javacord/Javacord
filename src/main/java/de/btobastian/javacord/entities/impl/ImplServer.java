@@ -1,8 +1,6 @@
 package de.btobastian.javacord.entities.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Activity;
@@ -26,7 +24,6 @@ import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplRole;
 import de.btobastian.javacord.utils.Cleanupable;
-import de.btobastian.javacord.utils.GatewayOpcode;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -219,14 +216,7 @@ public class ImplServer implements Server, Cleanupable {
         }
 
         if (isLarge() && getMembers().size() < getMemberCount()) {
-            ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
-                    .put("op", GatewayOpcode.REQUEST_GUILD_MEMBERS.getCode());
-            requestGuildMembersPacket.putObject("d")
-                            .put("guild_id", String.valueOf(getId()))
-                            .put("query","")
-                            .put("limit", 0);
-            logger.debug("Sending request guild members packet for server {}", this);
-            this.api.getWebSocketAdapter().getWebSocket().sendText(requestGuildMembersPacket.toString());
+            this.api.getWebSocketAdapter().queueRequestGuildMembers(this);
         }
 
         if (data.has("emojis")) {
