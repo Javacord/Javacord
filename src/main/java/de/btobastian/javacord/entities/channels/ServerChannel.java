@@ -305,8 +305,19 @@ public interface ServerChannel extends Channel {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
+        return delete(null);
+    }
+
+    /**
+     * Deletes the channel.
+     *
+     * @param reason The audit log reason for the deletion.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete(String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CHANNEL)
                 .setUrlParameters(String.valueOf(getId()))
+                .setAuditLogReason(reason)
                 .execute(result -> null);
     }
 
