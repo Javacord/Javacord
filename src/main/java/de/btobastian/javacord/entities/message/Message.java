@@ -65,10 +65,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .setRatelimitRetries(250)
-                .execute(result -> null);
+        return delete(api, channelId, messageId, null);
     }
 
     /**
@@ -80,8 +77,38 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, String channelId, String messageId) {
+        return delete(api, channelId, messageId, null);
+    }
+
+    /**
+     * Deletes the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param reason The audit log reason for the deletion.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId, String reason) {
+        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setRatelimitRetries(250)
+                .setAuditLogReason(reason)
+                .execute(result -> null);
+    }
+
+    /**
+     * Deletes the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param reason The audit log reason for the deletion.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> delete(DiscordApi api, String channelId, String messageId, String reason) {
         try {
-            return delete(api, Long.parseLong(channelId), Long.parseLong(messageId));
+            return delete(api, Long.parseLong(channelId), Long.parseLong(messageId), reason);
         } catch (NumberFormatException e) {
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);
@@ -1355,7 +1382,17 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
-       return Message.delete(getApi(), getChannel().getId(), getId());
+       return delete(null);
+    }
+
+    /**
+     * Deletes the message.
+     *
+     * @param reason The audit log reason for the deletion.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> delete(String reason) {
+        return Message.delete(getApi(), getChannel().getId(), getId(), reason);
     }
 
     /**

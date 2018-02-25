@@ -77,7 +77,17 @@ public abstract class MessageEvent extends Event {
      * @return A future to tell us if the deletion was successful.
      */
     public CompletableFuture<Void> deleteMessage() {
-        return Message.delete(getApi(), getChannel().getId(), getMessageId());
+        return deleteMessage(null);
+    }
+
+    /**
+     * Deletes the message involved in the event.
+     *
+     * @param reason The audit log reason for the deletion.
+     * @return A future to tell us if the deletion was successful.
+     */
+    public CompletableFuture<Void> deleteMessage(String reason) {
+        return Message.delete(getApi(), getChannel().getId(), getMessageId(), reason);
     }
 
     /**
