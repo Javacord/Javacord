@@ -36,6 +36,7 @@ public class RestRequest<T> {
     private int ratelimitRetries = 50;
     private String[] urlParameters = new String[0];
     private List<String[]> queryParameters = new ArrayList<>();
+    private List<String[]> headers = new ArrayList<>();
     private String body = null;
 
     private int retryCounter = 0;
@@ -155,6 +156,30 @@ public class RestRequest<T> {
      */
     public RestRequest<T> addQueryParameter(String key, String value) {
         this.queryParameters.add(new String[]{key, value});
+        return this;
+    }
+
+    /**
+     * Adds a header to the request.
+     *
+     * @param name The name of the header.
+     * @param value The value of the header.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest<T> addHeader(String name, String value) {
+        this.headers.add(new String[]{name, value});
+        return this;
+    }
+
+    /**
+     * Adds a {@code X-Audit-Log-Reason} header to the request with the given reason.
+     *
+     * @param reason The reason.
+     */
+    public RestRequest<T> setAuditLogReason(String reason) {
+        if (reason != null) {
+            addHeader("X-Audit-Log-Reason", reason);
+        }
         return this;
     }
 
@@ -323,6 +348,9 @@ public class RestRequest<T> {
         }
         if (includeAuthorizationHeader) {
             requestBuilder.addHeader("authorization", api.getToken());
+        }
+        for (String[] header : headers) {
+            requestBuilder.addHeader(header[0], header[1]);
         }
         logger.debug("Trying to send {} request to {}{}",
                 method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
