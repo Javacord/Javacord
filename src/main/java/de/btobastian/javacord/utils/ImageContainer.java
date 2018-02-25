@@ -138,7 +138,7 @@ public class ImageContainer {
         imageAsFile = null;
         imageAsIcon = null;
         imageAsUrl = null;
-        imageAsByteArray = null;
+        imageAsByteArray = image;
         imageAsInputStream = null;
         imageType = type;
     }
