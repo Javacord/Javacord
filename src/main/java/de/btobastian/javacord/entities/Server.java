@@ -835,15 +835,29 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNickname(User user, String nickname) {
+        return updateNickname(user, nickname, null);
+    }
+
+    /**
+     * Changes the nickname of the given user.
+     *
+     * @param user The user.
+     * @param nickname The new nickname of the user.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
         if (user.isYourself()) {
             return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
                     .setUrlParameters(String.valueOf(getId()))
                     .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
+                    .setAuditLogReason(reason)
                     .execute(result -> null);
         } else {
             return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
                     .setUrlParameters(String.valueOf(getId()), String.valueOf(user.getId()))
                     .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
+                    .setAuditLogReason(reason)
                     .execute(result -> null);
         }
     }
@@ -856,6 +870,17 @@ public interface Server extends DiscordEntity {
      */
     default CompletableFuture<Void> resetNickname(User user) {
         return updateNickname(user, null);
+    }
+
+    /**
+     * Removes the nickname of the given user.
+     *
+     * @param user The user.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> resetNickname(User user, String reason) {
+        return updateNickname(user, null, reason);
     }
 
     /**
@@ -889,6 +914,19 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles) {
+        return updateRoles(user, roles, null);
+    }
+
+    /**
+     * Updates the roles of a server member.
+     * This will replace the roles of the server member with a provided collection.
+     *
+     * @param user The user to update the roles of.
+     * @param roles The collection of roles to replace the user's roles.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason) {
         ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
         ArrayNode rolesJson = updateNode.putArray("roles");
         for (Role role : roles) {
@@ -897,6 +935,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
                 .setBody(updateNode)
+                .setAuditLogReason(reason)
                 .execute(result -> null);
     }
 
@@ -907,6 +946,17 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> reorderRoles(List<Role> roles) {
+        return reorderRoles(roles, null);
+    }
+
+    /**
+     * Reorders the roles of the server.
+     *
+     * @param roles An ordered list with the new role positions.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> reorderRoles(List<Role> roles, String reason) {
         roles = new ArrayList<>(roles); // Copy the list to safely modify it
         ArrayNode body = JsonNodeFactory.instance.arrayNode();
         roles.removeIf(Role::isEveryoneRole);
@@ -918,6 +968,7 @@ public interface Server extends DiscordEntity {
         return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
                 .setUrlParameters(getIdAsString())
                 .setBody(body)
+                .setAuditLogReason(reason)
                 .execute(result -> null);
     }
 
@@ -928,8 +979,20 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the kick was successful.
      */
     default CompletableFuture<Void> kickUser(User user) {
+        return kickUser(user, null);
+    }
+
+    /**
+     * Kicks the given user from the server.
+     *
+     * @param user The user to kick.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the kick was successful.
+     */
+    default CompletableFuture<Void> kickUser(User user, String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
+                .setAuditLogReason(reason)
                 .execute(result -> null);
     }
 
@@ -940,10 +1003,7 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(User user) {
-        return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("delete-message-days", 0))
-                .execute(result -> null);
+        return banUser(user, 0, null);
     }
 
     /**
@@ -954,10 +1014,25 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(User user, int deleteMessageDays) {
-        return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
+        return banUser(user, deleteMessageDays, null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user The user to ban.
+     * @param deleteMessageDays The number of days to delete messages for (0-7).
+     * @param reason The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason) {
+        RestRequest<Void> request =  new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("delete-message-days", deleteMessageDays))
-                .execute(result -> null);
+                .addQueryParameter("delete-message-days", String.valueOf(deleteMessageDays));
+        if (reason != null) {
+            request.addHeader("reason", reason);
+        }
+        return request.execute(result -> null);
     }
 
     /**
@@ -967,7 +1042,7 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the unban was successful.
      */
     default CompletableFuture<Void> unbanUser(User user) {
-        return unbanUser(user.getId());
+        return unbanUser(user.getId(), null);
     }
 
     /**
@@ -977,9 +1052,7 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the unban was successful.
      */
     default CompletableFuture<Void> unbanUser(long userId) {
-        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString(), String.valueOf(userId))
-                .execute(result -> null);
+        return unbanUser(userId, null);
     }
 
     /**
@@ -989,8 +1062,44 @@ public interface Server extends DiscordEntity {
      * @return A future to check if the unban was successful.
      */
     default CompletableFuture<Void> unbanUser(String userId) {
+        return unbanUser(userId, null);
+    }
+
+    /**
+     * Unbans the given user from the server.
+     *
+     * @param user The user to ban.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the unban was successful.
+     */
+    default CompletableFuture<Void> unbanUser(User user, String reason) {
+        return unbanUser(user.getId(), reason);
+    }
+
+    /**
+     * Unbans the given user from the server.
+     *
+     * @param userId The id of the user to unban.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the unban was successful.
+     */
+    default CompletableFuture<Void> unbanUser(long userId, String reason) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString(), String.valueOf(userId))
+                .setAuditLogReason(reason)
+                .execute(result -> null);
+    }
+
+    /**
+     * Unbans the given user from the server.
+     *
+     * @param userId The id of the user to unban.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the unban was successful.
+     */
+    default CompletableFuture<Void> unbanUser(String userId, String reason) {
         try {
-            return unbanUser(Long.parseLong(userId));
+            return unbanUser(Long.parseLong(userId), reason);
         } catch (NumberFormatException e) {
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);
