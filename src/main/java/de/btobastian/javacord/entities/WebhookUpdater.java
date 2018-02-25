@@ -27,6 +27,11 @@ public class WebhookUpdater {
     protected final Webhook webhook;
 
     /**
+     * The reason for the update.
+     */
+    private String reason = null;
+
+    /**
      * The name to update.
      */
     protected String name = null;
@@ -53,6 +58,17 @@ public class WebhookUpdater {
      */
     public WebhookUpdater(Webhook webhook) {
         this.webhook = webhook;
+    }
+
+    /**
+     * Sets the reason for this update. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookUpdater setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -233,11 +249,13 @@ public class WebhookUpdater {
                 }).thenCompose(aVoid -> new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                         .setUrlParameters(webhook.getIdAsString())
                         .setBody(body)
+                        .setAuditLogReason(reason)
                         .execute(result -> new ImplWebhook(webhook.getApi(), result.getJsonBody())));
             }
             return new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                     .setUrlParameters(webhook.getIdAsString())
                     .setBody(body)
+                    .setAuditLogReason(reason)
                     .execute(result -> new ImplWebhook(webhook.getApi(), result.getJsonBody()));
         } else {
             return CompletableFuture.completedFuture(webhook);
