@@ -271,6 +271,10 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             websocket.connect();
         } catch (Throwable t) {
             logger.warn("An error occurred while connecting to websocket", t);
+            if (!ready.isDone()) {
+                ready.complete(false);
+                return;
+            }
             if (reconnect) {
                 reconnectAttempt++;
                 logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
