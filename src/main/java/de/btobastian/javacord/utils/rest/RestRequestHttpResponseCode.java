@@ -120,7 +120,7 @@ public enum RestRequestHttpResponseCode {
                                         restRequestHttpResponseCode.getDiscordExceptionClass().isPresent())
                         .collect(Collectors.toMap(restRequestHttpResponseCode ->
                                                           restRequestHttpResponseCode.getDiscordExceptionClass()
-                                                                  .orElseThrow(AssertionError::new),
+                                                                  .orElse(null),
                                                   Function.identity())));
     }
 
