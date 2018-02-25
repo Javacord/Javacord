@@ -21,6 +21,11 @@ public class RoleUpdater {
     private final Role role;
 
     /**
+     * The reason for the update.
+     */
+    private String reason = null;
+
+    /**
      * The name to update.
      */
     private String name = null;
@@ -52,6 +57,17 @@ public class RoleUpdater {
      */
     public RoleUpdater(Role role) {
         this.role = role;
+    }
+
+    /**
+     * Sets the reason for this update. This reason will be visible in the audit log entry(s).
+     *
+     * @param reason The reason for this update.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setAuditLogReason(String reason) {
+        this.reason = reason;
+        return this;
     }
 
     /**
@@ -141,6 +157,7 @@ public class RoleUpdater {
             return new RestRequest<Void>(role.getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
                     .setUrlParameters(role.getServer().getIdAsString(), role.getIdAsString())
                     .setBody(body)
+                    .setAuditLogReason(reason)
                     .execute(result -> null);
         } else {
             return CompletableFuture.completedFuture(null);
