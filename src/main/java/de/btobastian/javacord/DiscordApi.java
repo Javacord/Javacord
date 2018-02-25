@@ -7,6 +7,7 @@ import de.btobastian.javacord.entities.ApplicationInfo;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Invite;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.ServerCreator;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.UserStatus;
 import de.btobastian.javacord.entities.Webhook;
@@ -426,6 +427,15 @@ public interface DiscordApi {
         return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
                 .setUrlParameters(code)
                 .execute(result -> new ImplInvite(this, result.getJsonBody()));
+    }
+
+    /**
+     * Gets a server creator which can be used to create servers.
+     *
+     * @return A server creator.
+     */
+    default ServerCreator getServerCreator() {
+        return new ServerCreator(this);
     }
 
     /**
