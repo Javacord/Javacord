@@ -142,7 +142,7 @@ public class EventDispatcher {
     /**
      * Dispatches an event to the given listeners using the provided consumer.
      * Calling this method usually looks like this:
-     * <code>dispatchEvent(server, listeners, listener -> listener.onXyz(event));</code>
+     * {@code dispatchEvent(server, listeners, listener -> listener.onXyz(event));}
      *
      * @param object The object which is used to determine in which thread the consumer should be executed.
      *               Usually the object is a server object (for server-dependent events), the discord api instance
