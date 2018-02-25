@@ -179,6 +179,7 @@ public class ImageContainer {
         try {
             if (imageAsByteArray != null) {
                 future.complete(imageAsByteArray);
+                return future;
             }
             if (imageAsBufferedImage != null ||
                     imageAsFile != null ||
@@ -206,7 +207,9 @@ public class ImageContainer {
                         future.complete(bytes);
                     }
                 });
+                return future;
             }
+            future.completeExceptionally(new IllegalStateException("No image variant is set"));
         } catch (Throwable t) {
             future.completeExceptionally(t);
         }
@@ -226,9 +229,11 @@ public class ImageContainer {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 ImageIO.write(imageAsBufferedImage, imageType, os);
                 future.complete(new ByteArrayInputStream(os.toByteArray()));
+                return future;
             }
             if (imageAsFile != null) {
                 future.complete(new FileInputStream(imageAsFile));
+                return future;
             }
             if (imageAsIcon != null || imageAsUrl != null) {
                 URL url = imageAsUrl == null ? imageAsIcon.getUrl() : imageAsUrl;
@@ -245,13 +250,17 @@ public class ImageContainer {
                         future.completeExceptionally(t);
                     }
                 });
+                return future;
             }
             if (imageAsByteArray != null) {
                 future.complete(new ByteArrayInputStream(imageAsByteArray));
+                return future;
             }
             if (imageAsInputStream != null) {
                 future.complete(imageAsInputStream);
+                return future;
             }
+            future.completeExceptionally(new IllegalStateException("No image variant is set"));
         } catch (Throwable t) {
             future.completeExceptionally(t);
         }
