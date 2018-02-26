@@ -315,6 +315,7 @@ public interface Server extends DiscordEntity {
 
     /**
      * Gets a member by its name and discriminator.
+     * This method is case sensitive!
      *
      * @param name The name of the member.
      * @param discriminator The discriminator of the member.
@@ -323,6 +324,20 @@ public interface Server extends DiscordEntity {
     default Optional<User> getMemberByNameAndDiscriminator(String name, String discriminator) {
         return getMembersByName(name).stream()
                 .filter(user -> user.getDiscriminator().equals(discriminator))
+                .findAny();
+    }
+
+    /**
+     * Gets a member by its name and discriminator.
+     * This method is case insensitive!
+     *
+     * @param name The name of the member.
+     * @param discriminator The discriminator of the member.
+     * @return The member with the given name and discriminator.
+     */
+    default Optional<User> getMemberByNameAndDiscriminatorIgnoreCase(String name, String discriminator) {
+        return getMembersByNameIgnoreCase(name).stream()
+                .filter(user -> user.getDiscriminator().equalsIgnoreCase(discriminator))
                 .findAny();
     }
 
