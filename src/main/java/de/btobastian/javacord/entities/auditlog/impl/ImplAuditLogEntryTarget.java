@@ -1,10 +1,11 @@
 package de.btobastian.javacord.entities.auditlog.impl;
 
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.auditlog.AuditLogEntry;
 import de.btobastian.javacord.entities.auditlog.AuditLogEntryTarget;
 
-;
+import java.util.Objects;
 
 /**
  * The implementation of {@link AuditLogEntryTarget}.
@@ -45,6 +46,24 @@ public class ImplAuditLogEntryTarget implements AuditLogEntryTarget {
     @Override
     public AuditLogEntry getAuditLogEntry() {
         return auditLogEntry;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("AuditLogEntryTarget (id: %s)", getId());
     }
 
 }

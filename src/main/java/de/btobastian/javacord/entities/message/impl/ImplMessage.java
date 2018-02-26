@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.message.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
@@ -21,6 +22,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -322,17 +324,21 @@ public class ImplMessage implements Message {
     }
 
     @Override
-    public String toString() {
-        return String.format("Message (id: %s, content: %s)", getId(), getContent());
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override
     public int hashCode() {
-        return String.valueOf(getId()).hashCode();
+        return Objects.hash(getId());
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return obj instanceof Message && ((Message) obj).getId() == getId();
+    public String toString() {
+        return String.format("Message (id: %s, content: %s)", getId(), getContent());
     }
+
 }

@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.emoji.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
 import de.btobastian.javacord.entities.message.emoji.KnownCustomEmoji;
@@ -10,6 +11,7 @@ import de.btobastian.javacord.entities.permissions.Role;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -103,4 +105,5 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
         return String.format("KnownCustomEmoji (id: %s, name: %s, animated: %b, server: %s)",
                 getId(), getName(), isAnimated(), getServer());
     }
+
 }
