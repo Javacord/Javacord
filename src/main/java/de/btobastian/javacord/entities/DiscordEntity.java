@@ -10,6 +10,19 @@ import java.time.Instant;
 public interface DiscordEntity {
 
     /**
+     * Calculates the creation date from the given Discord entity id.
+     *
+     * @param entityId The entity it to calculate from.
+     * @return The creation date of the Discord entity.
+     * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
+     */
+    static Instant getCreationTimestamp(long entityId) {
+        // The first 42 bits (of the total 64) are the timestamp
+        // Discord starts its counter at the first second of 2015
+        return Instant.ofEpochMilli((entityId >>> 22) + 1420070400000L);
+    }
+
+    /**
      * Gets the discord api instance.
      *
      * @return The discord api instance.
@@ -40,9 +53,7 @@ public interface DiscordEntity {
      * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
      */
     default Instant getCreationTimestamp() {
-        // The first 42 bits (of the total 64) are the timestamp
-        // Discord starts its counter at the first second of 2015
-        return Instant.ofEpochMilli((getId() >>> 22) + 1420070400000L);
+        return getCreationTimestamp(getId());
     }
 
 }
