@@ -3,12 +3,15 @@ package de.btobastian.javacord.entities.channels.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.impl.ImplUser;
 import de.btobastian.javacord.utils.Cleanupable;
 import de.btobastian.javacord.utils.cache.ImplMessageCache;
 import de.btobastian.javacord.utils.cache.MessageCache;
+
+import java.util.Objects;
 
 /**
  * The implementation of {@link PrivateChannel}.
@@ -75,6 +78,19 @@ public class ImplPrivateChannel implements PrivateChannel, Cleanupable {
     @Override
     public void cleanup() {
         messageCache.cleanup();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 
     @Override

@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.channels.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.ChannelCategory;
@@ -11,6 +12,7 @@ import de.btobastian.javacord.entities.permissions.Permissions;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -177,6 +179,19 @@ public class ImplChannelCategory implements ChannelCategory {
     @Override
     public Permissions getOverwrittenPermissions(Role role) {
         return overwrittenRolePermissions.getOrDefault(role.getId(), ImplPermissions.EMPTY_PERMISSIONS);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 
     @Override

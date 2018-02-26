@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.MessageAttachment;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -134,7 +136,21 @@ public class ImplMessageAttachment implements MessageAttachment {
     }
 
     @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
     public String toString() {
         return String.format("MessageAttachment (file name: %s, url: %s)", getFileName(), getUrl().toString());
     }
+
 }

@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.impl.ImplIcon;
 import de.btobastian.javacord.entities.message.Message;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -98,6 +100,23 @@ public class ImplMessageAuthor implements MessageAuthor {
     @Override
     public boolean isWebhook() {
         return webhookId != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    public String toString() {
+        return String.format("MessageAuthor (id: %s, name: %s)", getId(), getName());
     }
 
 }

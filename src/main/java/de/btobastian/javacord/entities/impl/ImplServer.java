@@ -5,6 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.Activity;
 import de.btobastian.javacord.entities.DefaultMessageNotificationLevel;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.ExplicitContentFilterLevel;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.MultiFactorAuthenticationLevel;
@@ -36,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -734,6 +736,19 @@ public class ImplServer implements Server, Cleanupable {
                 .filter(Cleanupable.class::isInstance)
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 
     @Override

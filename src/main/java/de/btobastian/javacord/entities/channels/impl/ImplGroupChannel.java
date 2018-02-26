@@ -3,6 +3,7 @@ package de.btobastian.javacord.entities.channels.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -135,6 +137,19 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
     @Override
     public void cleanup() {
         messageCache.cleanup();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 
     @Override

@@ -3,7 +3,10 @@ package de.btobastian.javacord.entities.message.emoji.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.message.emoji.CustomEmoji;
+
+import java.util.Objects;
 
 /**
  * The implementation of {@link CustomEmoji}.
@@ -79,7 +82,21 @@ public class ImplCustomEmoji implements CustomEmoji {
     }
 
     @Override
+    public boolean equals(Object o) {
+        return (this == o)
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
     public String toString() {
         return String.format("CustomEmoji (id: %s, name: %s, animated: %b)", getId(), getName(), isAnimated());
     }
+
 }
