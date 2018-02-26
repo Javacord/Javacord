@@ -439,6 +439,20 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Gets a collection with all members with the given display name on this server.
+     * This method is case insensitive!
+     *
+     * @param displayName The display name of the members.
+     * @return A collection with all members with the given display name on this server.
+     */
+    default Collection<User> getMembersByDisplayNameIgnoreCase(String displayName) {
+        return Collections.unmodifiableList(
+                getMembers().stream()
+                        .filter(user -> user.getDisplayName(this).equalsIgnoreCase(displayName))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
      * Gets a sorted list (by position) with all roles of the server.
      *
      * @return A sorted list (by position) with all roles of the server.
