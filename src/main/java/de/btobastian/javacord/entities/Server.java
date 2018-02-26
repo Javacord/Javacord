@@ -137,6 +137,17 @@ public interface Server extends DiscordEntity {
     Optional<String> getNickname(User user);
 
     /**
+     * Gets the display name of the user on this server.
+     * If the user has a nickname, it will return the nickname, otherwise it will return the "normal" name.
+     *
+     * @param user The user.
+     * @return The display name of the user on this server.
+     */
+    default String getDisplayName(User user) {
+        return user.getDisplayName(this);
+    }
+
+    /**
      * Gets the timestamp of when a user joined the server.
      *
      * @param user The user to check.
