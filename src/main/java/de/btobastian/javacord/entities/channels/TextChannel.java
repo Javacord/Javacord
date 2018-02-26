@@ -274,7 +274,7 @@ public interface TextChannel extends Channel, Messageable {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> bulkDelete(String... messageIds) {
-        long[] messageLongIds = Arrays.asList(messageIds).stream().filter(s -> {
+        long[] messageLongIds = Arrays.stream(messageIds).filter(s -> {
             try {
                 //noinspection ResultOfMethodCallIgnored
                 Long.parseLong(s);
@@ -296,7 +296,7 @@ public interface TextChannel extends Channel, Messageable {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> bulkDelete(Message... messages) {
-        return bulkDelete(Arrays.asList(messages).stream().mapToLong(Message::getId).toArray());
+        return bulkDelete(Arrays.stream(messages).mapToLong(Message::getId).toArray());
     }
 
     /**
