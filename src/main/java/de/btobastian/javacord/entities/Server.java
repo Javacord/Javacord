@@ -397,6 +397,20 @@ public interface Server extends DiscordEntity {
     }
 
     /**
+     * Gets a collection with all members with the given nickname on this server.
+     * This method is case insensitive!
+     *
+     * @param nickname The nickname of the members.
+     * @return A collection with all members with the given nickname on this server.
+     */
+    default Collection<User> getMembersByNicknameIgnoreCase(String nickname) {
+        return Collections.unmodifiableList(
+                getMembers().stream()
+                        .filter(user -> user.getNickname(this).map(nickname::equalsIgnoreCase).orElse(false))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
      * Gets a sorted list (by position) with all roles of the server.
      *
      * @return A sorted list (by position) with all roles of the server.
