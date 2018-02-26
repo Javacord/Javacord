@@ -716,6 +716,21 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all users with the given nickname on the given server.
+     * This method is case sensitive!
+     *
+     * @param nickname The nickname of the users.
+     * @param server The server where to lookup the nickname.
+     * @return A collection with all users with the given nickname on the given server.
+     */
+    default Collection<User> getCachedUsersByNickname(String nickname, Server server) {
+        return Collections.unmodifiableList(
+                getCachedUsers().stream()
+                        .filter(user -> user.getNickname(server).map(nickname::equals).orElse(false))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
      * Gets a message set with all currently cached messages.
      *
      * @return A message set with all currently cached messages.
