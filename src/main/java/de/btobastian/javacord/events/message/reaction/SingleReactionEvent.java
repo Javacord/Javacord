@@ -6,6 +6,7 @@ import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.emoji.Emoji;
+import de.btobastian.javacord.events.message.RequestableMessageEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,17 @@ public class SingleReactionEvent extends ReactionEvent {
      */
     public Optional<Reaction> getReaction() {
         return getMessage().flatMap(msg -> msg.getReactionByEmoji(getEmoji()));
+    }
+
+    /**
+     * Gets the reaction if it exists.
+     * If the message is not cached, it will be requested from Discord first.
+     *
+     * @return The reaction.
+     * @see RequestableMessageEvent#requestMessage()
+     */
+    public CompletableFuture<Optional<Reaction>> requestReaction() {
+        return requestMessage().thenApply(msg -> msg.getReactionByEmoji(getEmoji()));
     }
 
     /**
