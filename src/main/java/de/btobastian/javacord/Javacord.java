@@ -1,21 +1,9 @@
 package de.btobastian.javacord;
 
-import de.btobastian.javacord.utils.logging.LoggerUtil;
-import org.slf4j.Logger;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.function.Function;
-
 /**
  * This class contains some static information about Javacord.
  */
 public class Javacord {
-
-    /**
-     * The logger of this class.
-     */
-    private static final Logger logger = LoggerUtil.getLogger(Javacord.class);
 
     /**
      * The current javacord version.
@@ -46,25 +34,7 @@ public class Javacord {
      */
     public static final String DISCORD_API_VERSION = "6";
 
-    private Javacord() { }
-
-    /**
-     * This method can be used as method reference in the
-     * {@link CompletableFuture#exceptionally(Function)} method. It unwraps
-     * {@link CompletionException CompletionExceptions} first and logs it afterwards.
-     *
-     * @param throwable The exception to print.
-     * @param <T> The return type of the function.
-     * @return <code>null</code>
-     */
-    public static <T> T exceptionLogger(Throwable throwable) {
-        Throwable cause = throwable.getCause();
-        while ((throwable instanceof CompletionException) && (cause != null)) {
-            throwable = cause;
-            cause = throwable.getCause();
-        }
-        logger.error("Caught unhandled exception!", throwable);
-        return null;
+    private Javacord() {
+        throw new UnsupportedOperationException();
     }
-
 }
