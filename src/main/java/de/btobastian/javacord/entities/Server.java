@@ -48,6 +48,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
 import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSystemChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeNameListener;
@@ -156,7 +157,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     Optional<Instant> getJoinedAtTimestamp(User user);
 
     /**
-     * Checks if the server if considered large.
+     * Checks if the server is considered large.
      *
      * @return Whether the server is large or not.
      */
@@ -217,6 +218,13 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The splash of the server.
      */
     Optional<Icon> getSplash();
+
+    /**
+     * Gets the system channel of the server.
+     *
+     * @return The system channel of the server.
+     */
+    Optional<ServerTextChannel> getSystemChannel();
 
     /**
      * Gets the afk channel of the server.
@@ -2475,6 +2483,28 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     getServerChangeMultiFactorAuthenticationLevelListeners() {
         return ((ImplDiscordApi) getApi())
                 .getObjectListeners(Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to system channel changes on this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ServerChangeSystemChannelListener> addServerChangeSystemChannelListener(
+            ServerChangeSystemChannelListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Server.class, getId(), ServerChangeSystemChannelListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered server change system channel listeners.
+     *
+     * @return A list with all registered server change system channel listeners.
+     */
+    default List<ServerChangeSystemChannelListener> getServerChangeSystemChannelListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                Server.class, getId(), ServerChangeSystemChannelListener.class);
     }
 
     /**

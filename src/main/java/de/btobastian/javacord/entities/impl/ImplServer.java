@@ -118,6 +118,11 @@ public class ImplServer implements Server, Cleanupable {
     private String splash;
 
     /**
+     * The id of the server's system channel.
+     */
+    private long systemChannelId = -1;
+
+    /**
      * The id of the server's afk channel.
      */
     private long afkChannelId = -1;
@@ -188,6 +193,9 @@ public class ImplServer implements Server, Cleanupable {
         }
         if (data.hasNonNull("afk_timeout")) {
             afkTimeout = data.get("afk_timeout").asInt();
+        }
+        if (data.hasNonNull("system_channel_id")) {
+            systemChannelId = data.get("system_channel_id").asLong();
         }
 
         if (data.has("channels")) {
@@ -284,6 +292,15 @@ public class ImplServer implements Server, Cleanupable {
      */
     public void setSplashHash(String splashHash) {
         this.splash = splashHash;
+    }
+
+    /**
+     * Sets the system channel id of the server.
+     *
+     * @param systemChannelId The system channel id of the server.
+     */
+    public void setSystemChannelId(long systemChannelId) {
+        this.systemChannelId = systemChannelId;
     }
 
     /**
@@ -663,6 +680,11 @@ public class ImplServer implements Server, Cleanupable {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<ServerTextChannel> getSystemChannel() {
+        return getTextChannelById(systemChannelId);
     }
 
     @Override

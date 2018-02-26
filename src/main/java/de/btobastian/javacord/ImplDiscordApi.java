@@ -48,6 +48,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
 import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSystemChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
@@ -1462,6 +1463,17 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners() {
         return getListeners(ServerChangeExplicitContentFilterLevelListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerChangeSystemChannelListener> addServerChangeSystemChannelListener(
+            ServerChangeSystemChannelListener listener) {
+        return addListener(ServerChangeSystemChannelListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChangeSystemChannelListener> getServerChangeSystemChannelListeners() {
+        return getListeners(ServerChangeSystemChannelListener.class);
     }
 
     @Override

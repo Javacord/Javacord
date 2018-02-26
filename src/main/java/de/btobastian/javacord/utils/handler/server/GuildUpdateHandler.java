@@ -8,6 +8,7 @@ import de.btobastian.javacord.entities.MultiFactorAuthenticationLevel;
 import de.btobastian.javacord.entities.Region;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.VerificationLevel;
+import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.channels.ServerVoiceChannel;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.events.server.ServerChangeAfkChannelEvent;
@@ -20,6 +21,7 @@ import de.btobastian.javacord.events.server.ServerChangeNameEvent;
 import de.btobastian.javacord.events.server.ServerChangeOwnerEvent;
 import de.btobastian.javacord.events.server.ServerChangeRegionEvent;
 import de.btobastian.javacord.events.server.ServerChangeSplashEvent;
+import de.btobastian.javacord.events.server.ServerChangeSystemChannelEvent;
 import de.btobastian.javacord.events.server.ServerChangeVerificationLevelEvent;
 import de.btobastian.javacord.listeners.server.ServerChangeAfkChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeAfkTimeoutListener;
@@ -31,6 +33,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
 import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSystemChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
@@ -160,6 +163,24 @@ public class GuildUpdateHandler extends PacketHandler {
 
                 api.getEventDispatcher().dispatchEvent(server,
                         listeners, listener -> listener.onServerChangeOwner(event));
+            }
+
+            if (packet.has("system_channel_id")) {
+                ServerTextChannel newSystemChannel = packet.get("system_channel_id").isNull() ?
+                        null : server.getTextChannelById(packet.get("system_channel_id").asLong()).orElse(null);
+                ServerTextChannel oldSystemChannel = server.getSystemChannel().orElse(null);
+                if (oldSystemChannel != newSystemChannel) {
+                    server.setSystemChannelId(newSystemChannel == null ? -1 : newSystemChannel.getId());
+                    ServerChangeSystemChannelEvent event =
+                            new ServerChangeSystemChannelEvent(api, server, newSystemChannel, oldSystemChannel);
+
+                    List<ServerChangeSystemChannelListener> listeners = new ArrayList<>();
+                    listeners.addAll(server.getServerChangeSystemChannelListeners());
+                    listeners.addAll(api.getServerChangeSystemChannelListeners());
+
+                    api.getEventDispatcher().dispatchEvent(server,
+                            listeners, listener -> listener.onServerChangeSystemChannel(event));
+                }
             }
 
             if (packet.has("afk_channel_id")) {

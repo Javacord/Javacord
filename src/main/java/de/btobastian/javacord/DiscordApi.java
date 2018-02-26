@@ -56,6 +56,7 @@ import de.btobastian.javacord.listeners.server.ServerChangeNameListener;
 import de.btobastian.javacord.listeners.server.ServerChangeOwnerListener;
 import de.btobastian.javacord.listeners.server.ServerChangeRegionListener;
 import de.btobastian.javacord.listeners.server.ServerChangeSplashListener;
+import de.btobastian.javacord.listeners.server.ServerChangeSystemChannelListener;
 import de.btobastian.javacord.listeners.server.ServerChangeVerificationLevelListener;
 import de.btobastian.javacord.listeners.server.ServerJoinListener;
 import de.btobastian.javacord.listeners.server.ServerLeaveListener;
@@ -2058,6 +2059,22 @@ public interface DiscordApi {
      * @return A list with all registered server change explicit content filter level listeners.
      */
     List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners();
+
+    /**
+     * Adds a listener, which listens to server system channel changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ServerChangeSystemChannelListener> addServerChangeSystemChannelListener(
+            ServerChangeSystemChannelListener listener);
+
+    /**
+     * Gets a list with all registered server change system channel listeners.
+     *
+     * @return A list with all registered server change system channel listeners.
+     */
+    List<ServerChangeSystemChannelListener> getServerChangeSystemChannelListeners();
 
     /**
      * Adds a listener, which listens to server afk channel changes.
