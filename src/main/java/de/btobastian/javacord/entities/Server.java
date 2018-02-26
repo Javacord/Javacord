@@ -137,6 +137,17 @@ public interface Server extends DiscordEntity {
     Optional<String> getNickname(User user);
 
     /**
+     * Gets the display name of the user on this server.
+     * If the user has a nickname, it will return the nickname, otherwise it will return the "normal" name.
+     *
+     * @param user The user.
+     * @return The display name of the user on this server.
+     */
+    default String getDisplayName(User user) {
+        return user.getDisplayName(this);
+    }
+
+    /**
      * Gets the timestamp of when a user joined the server.
      *
      * @param user The user to check.
@@ -410,6 +421,34 @@ public interface Server extends DiscordEntity {
         return Collections.unmodifiableList(
                 getMembers().stream()
                         .filter(user -> user.getNickname(this).map(nickname::equalsIgnoreCase).orElse(false))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a collection with all members with the given display name on this server.
+     * This method is case sensitive!
+     *
+     * @param displayName The display name of the members.
+     * @return A collection with all members with the given display name on this server.
+     */
+    default Collection<User> getMembersByDisplayName(String displayName) {
+        return Collections.unmodifiableList(
+                getMembers().stream()
+                        .filter(user -> user.getDisplayName(this).equals(displayName))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a collection with all members with the given display name on this server.
+     * This method is case insensitive!
+     *
+     * @param displayName The display name of the members.
+     * @return A collection with all members with the given display name on this server.
+     */
+    default Collection<User> getMembersByDisplayNameIgnoreCase(String displayName) {
+        return Collections.unmodifiableList(
+                getMembers().stream()
+                        .filter(user -> user.getDisplayName(this).equalsIgnoreCase(displayName))
                         .collect(Collectors.toList()));
     }
 
