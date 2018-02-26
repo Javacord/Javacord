@@ -379,7 +379,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onTextMessage(WebSocket websocket, String text) throws Exception {
-        logger.trace("onTextMessage: text='{}'", text);
         ObjectMapper mapper = api.getObjectMapper();
         JsonNode packet = mapper.readTree(text);
 
@@ -530,7 +529,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         } catch (IOException ignored) { }
         byte[] decompressedData = bos.toByteArray();
         try {
-            onTextMessage(websocket, new String(decompressedData, "UTF-8"));
+            String message = new String(decompressedData, "UTF-8");
+            logger.trace("onTextMessage: text='{}'", message);
+            onTextMessage(websocket, message);
         } catch (UnsupportedEncodingException e) {
             logger.warn("An error occurred while decompressing data", e);
         }
