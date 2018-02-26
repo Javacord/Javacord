@@ -65,11 +65,7 @@ public class SingleReactionEvent extends ReactionEvent {
      * @return The reaction.
      */
     public Optional<Reaction> getReaction() {
-        Optional<Message> message = getMessage();
-        if (message.isPresent()) {
-            return message.get().getReactionByEmoji(getEmoji());
-        }
-        return Optional.empty();
+        return getMessage().flatMap(msg -> msg.getReactionByEmoji(getEmoji()));
     }
 
     /**
