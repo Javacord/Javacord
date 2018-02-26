@@ -260,7 +260,7 @@ public class ImplRole implements Role {
 
     @Override
     public String toString() {
-        return String.format("Role (id: %s, name: %s, server: %s)", getId(), getName(), getServer());
+        return String.format("Role (id: %s, name: %s, server: %s)", getIdAsString(), getName(), getServer());
     }
 
 }

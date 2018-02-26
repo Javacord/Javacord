@@ -118,7 +118,7 @@ public class ImplReaction implements Reaction {
 
     @Override
     public String toString() {
-        return String.format(
-                "Reaction (message id: %s, emoji: %s, count: %s)", getMessage().getId(), getEmoji(), getCount());
+        return String.format("Reaction (message id: %s, emoji: %s, count: %s)",
+                             getMessage().getIdAsString(), getEmoji(), getCount());
     }
 }

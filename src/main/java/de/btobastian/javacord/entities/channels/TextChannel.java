@@ -79,7 +79,7 @@ public interface TextChannel extends Channel, Messageable {
     default CompletableFuture<Void> type() {
         return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.CHANNEL_TYPING)
                 .setRatelimitRetries(0)
-                .setUrlParameters(String.valueOf(getId()))
+                .setUrlParameters(getIdAsString())
                 .execute(result -> null);
     }
 
@@ -254,12 +254,12 @@ public interface TextChannel extends Channel, Messageable {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         ArrayNode messages = body.putArray("messages");
         LongStream.of(messageIds).boxed()
-                .map(String::valueOf)
+                .map(Long::toUnsignedString)
                 .forEach(messages::add);
 
         return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
                 .setRatelimitRetries(0)
-                .setUrlParameters(String.valueOf(getId()))
+                .setUrlParameters(getIdAsString())
                 .setBody(body)
                 .execute(result -> null);
     }
@@ -370,7 +370,7 @@ public interface TextChannel extends Channel, Messageable {
         return getApi().getCachedMessageById(id)
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> new RestRequest<Message>(getApi(), RestMethod.GET, RestEndpoint.MESSAGE)
-                .setUrlParameters(String.valueOf(getId()), String.valueOf(id))
+                .setUrlParameters(getIdAsString(), Long.toUnsignedString(id))
                 .execute(result -> ((ImplDiscordApi) getApi()).getOrCreateMessage(this, result.getJsonBody())));
     }
 

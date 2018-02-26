@@ -127,7 +127,8 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
         }
         try {
             return Optional.of(new ImplIcon(
-                    getApi(), new URL("https://cdn.discordapp.com/channel-icons/" + getId() + "/" + iconId + ".png")));
+                    getApi(),
+                    new URL("https://cdn.discordapp.com/channel-icons/" + getIdAsString() + "/" + iconId + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
@@ -154,7 +155,7 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
 
     @Override
     public String toString() {
-        return String.format("GroupChannel (id: %s, name: %s)", getId(), getName());
+        return String.format("GroupChannel (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

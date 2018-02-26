@@ -58,7 +58,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      */
     default CompletableFuture<Void> delete(String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CUSTOM_EMOJI)
-                .setUrlParameters(getServer().getIdAsString(), String.valueOf(getId()))
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .setAuditLogReason(reason)
                 .execute(result -> null);
     }

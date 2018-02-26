@@ -90,10 +90,10 @@ public class ServerTextChannelBuilder {
         }
         body.put("name", name);
         if (category != null) {
-            body.put("parent_id", String.valueOf(category.getId()));
+            body.put("parent_id", category.getIdAsString());
         }
         return new RestRequest<ServerTextChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
-                .setUrlParameters(String.valueOf(server.getId()))
+                .setUrlParameters(server.getIdAsString())
                 .setBody(body)
                 .setAuditLogReason(reason)
                 .execute(result -> server.getOrCreateServerTextChannel(result.getJsonBody()));

@@ -411,7 +411,7 @@ public interface DiscordApi {
      */
     default CompletableFuture<Webhook> getWebhookById(long id) {
         return new RestRequest<Webhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
-                .setUrlParameters(String.valueOf(id))
+                .setUrlParameters(Long.toUnsignedString(id))
                 .execute(result -> new ImplWebhook(this, result.getJsonBody()));
     }
 

@@ -1025,13 +1025,13 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     default CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
         if (user.isYourself()) {
             return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
-                    .setUrlParameters(String.valueOf(getId()))
+                    .setUrlParameters(getIdAsString())
                     .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
                     .setAuditLogReason(reason)
                     .execute(result -> null);
         } else {
             return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                    .setUrlParameters(String.valueOf(getId()), String.valueOf(user.getId()))
+                    .setUrlParameters(getIdAsString(), user.getIdAsString())
                     .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
                     .setAuditLogReason(reason)
                     .execute(result -> null);
@@ -1261,7 +1261,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      */
     default CompletableFuture<Void> unbanUser(long userId, String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString(), String.valueOf(userId))
+                .setUrlParameters(getIdAsString(), Long.toUnsignedString(userId))
                 .setAuditLogReason(reason)
                 .execute(result -> null);
     }

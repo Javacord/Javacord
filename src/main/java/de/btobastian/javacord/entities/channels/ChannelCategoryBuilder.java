@@ -70,7 +70,7 @@ public class ChannelCategoryBuilder {
             throw new IllegalStateException("Name is no optional parameter!");
         }
         return new RestRequest<ChannelCategory>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
-                .setUrlParameters(String.valueOf(server.getId()))
+                .setUrlParameters(server.getIdAsString())
                 .setBody(JsonNodeFactory.instance.objectNode().put("type", 4).put("name", name))
                 .setAuditLogReason(reason)
                 .execute(result -> server.getOrCreateChannelCategory(result.getJsonBody()));

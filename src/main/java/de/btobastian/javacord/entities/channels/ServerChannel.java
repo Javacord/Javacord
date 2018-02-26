@@ -318,7 +318,7 @@ public interface ServerChannel extends Channel {
      */
     default CompletableFuture<Void> delete(String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CHANNEL)
-                .setUrlParameters(String.valueOf(getId()))
+                .setUrlParameters(getIdAsString())
                 .setAuditLogReason(reason)
                 .execute(result -> null);
     }

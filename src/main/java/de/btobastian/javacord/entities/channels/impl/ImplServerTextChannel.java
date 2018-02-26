@@ -240,7 +240,7 @@ public class ImplServerTextChannel implements ServerTextChannel, Cleanupable {
 
     @Override
     public String getMentionTag() {
-        return "<#" + getId() + ">";
+        return "<#" + getIdAsString() + ">";
     }
 
     @Override
@@ -263,7 +263,7 @@ public class ImplServerTextChannel implements ServerTextChannel, Cleanupable {
 
     @Override
     public String toString() {
-        return String.format("ServerTextChannel (id: %s, name: %s)", getId(), getName());
+        return String.format("ServerTextChannel (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

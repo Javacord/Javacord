@@ -145,9 +145,9 @@ public class ImplAuditLogEntry implements AuditLogEntry {
                         baseUrl = (baseUrl == null) ? "https://cdn.discordapp.com/splashes/" : baseUrl;
                         try {
                             Icon oldIcon = oldValue != null ? new ImplIcon(getApi(), new URL(baseUrl + getTarget()
-                                    .map(DiscordEntity::getId).orElse(0L) + "/" + oldValue.asText() + ".png")) : null;
+                                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldValue.asText() + ".png")) : null;
                             Icon newIcon = newValue != null ? new ImplIcon(getApi(), new URL(baseUrl + getTarget()
-                                    .map(DiscordEntity::getId).orElse(0L) + "/" + oldValue.asText() + ".png")) : null;
+                                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldValue.asText() + ".png")) : null;
                             change = new ImplAuditLogChange<>(type, oldIcon, newIcon);
                         } catch (MalformedURLException e) {
                             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
@@ -213,7 +213,7 @@ public class ImplAuditLogEntry implements AuditLogEntry {
                         break;
                     case AVATAR:
                         baseUrl = "https://cdn.discordapp.com/avatars/" +
-                                getTarget().map(DiscordEntity::getId).orElse(0L) + "/";
+                                getTarget().map(DiscordEntity::getIdAsString).orElse("0") + "/";
                         String oldUrl = oldValue != null ? (baseUrl + oldValue.asText() +
                                 (oldValue.asText().startsWith("a_") ? ".gif" : ".png")) : null;
                         String newUrl = newValue != null ? (baseUrl + newValue.asText() +
@@ -295,7 +295,7 @@ public class ImplAuditLogEntry implements AuditLogEntry {
 
     @Override
     public String toString() {
-        return String.format("AuditLogEntry (id: %s)", getId());
+        return String.format("AuditLogEntry (id: %s)", getIdAsString());
     }
 
 }

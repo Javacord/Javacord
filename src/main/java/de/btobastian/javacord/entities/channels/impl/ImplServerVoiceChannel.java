@@ -268,7 +268,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
 
     @Override
     public String toString() {
-        return String.format("ServerVoiceChannel (id: %s, name: %s)", getId(), getName());
+        return String.format("ServerVoiceChannel (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

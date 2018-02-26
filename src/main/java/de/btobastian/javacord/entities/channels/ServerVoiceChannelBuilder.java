@@ -122,7 +122,7 @@ public class ServerVoiceChannelBuilder {
         }
         body.put("name", name);
         if (category != null) {
-            body.put("parent_id", String.valueOf(category.getId()));
+            body.put("parent_id", category.getIdAsString());
         }
         if (bitrate != null) {
             body.put("bitrate", (int) bitrate);
@@ -131,7 +131,7 @@ public class ServerVoiceChannelBuilder {
             body.put("user_limit", (int) userlimit);
         }
         return new RestRequest<ServerVoiceChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
-                .setUrlParameters(String.valueOf(server.getId()))
+                .setUrlParameters(server.getIdAsString())
                 .setBody(body)
                 .setAuditLogReason(reason)
                 .execute(result -> server.getOrCreateServerVoiceChannel(result.getJsonBody()));

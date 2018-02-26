@@ -33,13 +33,14 @@ public interface Reaction {
         api.getThreadPool().getExecutorService().submit(() -> {
             try {
                 final String value = emoji.asUnicodeEmoji().orElseGet(() -> emoji.asCustomEmoji()
-                        .map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
+                        .map(e -> e.getName() + ":" + e.getIdAsString()).orElse("UNKNOWN"));
                 List<User> users = new ArrayList<>();
                 boolean requestMore = true;
                 while (requestMore) {
                     RestRequest<List<User>> request =
                             new RestRequest<List<User>>(api, RestMethod.GET, RestEndpoint.REACTION)
-                                    .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), value)
+                                    .setUrlParameters(
+                                            Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), value)
                                     .addQueryParameter("limit", "100")
                                     .setRatelimitRetries(250);
                     if (!users.isEmpty()) {
@@ -94,13 +95,13 @@ public interface Reaction {
      */
     static CompletableFuture<Void> removeUser(DiscordApi api, long channelId, long messageId, Emoji emoji, User user) {
         String value = emoji.asUnicodeEmoji().orElseGet(() ->
-                emoji.asCustomEmoji().map(e -> e.getName() + ":" + String.valueOf(e.getId())).orElse("UNKNOWN"));
+                emoji.asCustomEmoji().map(e -> e.getName() + ":" + e.getIdAsString()).orElse("UNKNOWN"));
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
                 .setUrlParameters(
-                        String.valueOf(channelId),
-                        String.valueOf(messageId),
+                        Long.toUnsignedString(channelId),
+                        Long.toUnsignedString(messageId),
                         value,
-                        user.isYourself() ? "@me" : String.valueOf(user.getId()))
+                        user.isYourself() ? "@me" : user.getIdAsString())
                 .setRatelimitRetries(250)
                 .execute(result -> null);
     }

@@ -176,7 +176,8 @@ public class ImplInvite implements RichInvite {
         }
         try {
             return Optional.of(new ImplIcon(
-                    api, new URL("https://cdn.discordapp.com/icons/" + getServerId() + "/" + serverIcon + ".png")));
+                    api, new URL("https://cdn.discordapp.com/icons/"
+                                 + Long.toUnsignedString(getServerId()) + "/" + serverIcon + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
@@ -190,7 +191,8 @@ public class ImplInvite implements RichInvite {
         }
         try {
             return Optional.of(new ImplIcon(
-                    api, new URL("https://cdn.discordapp.com/splashes/" + getServerId() + "/" + serverSplash + ".png")));
+                    api, new URL("https://cdn.discordapp.com/splashes/"
+                                 + Long.toUnsignedString(getServerId()) + "/" + serverSplash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();

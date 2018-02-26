@@ -338,7 +338,7 @@ public class ImplMessage implements Message {
 
     @Override
     public String toString() {
-        return String.format("Message (id: %s, content: %s)", getId(), getContent());
+        return String.format("Message (id: %s, content: %s)", getIdAsString(), getContent());
     }
 
 }

@@ -90,7 +90,7 @@ public class UserChangeAvatarEvent extends UserEvent {
         String url = "https://cdn.discordapp.com/embed/avatars/" +
                 Integer.parseInt(getUser().getDiscriminator()) % 5 + ".png";
         if (avatarHash != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getUser().getId() + "/" + avatarHash +
+            url = "https://cdn.discordapp.com/avatars/" + getUser().getIdAsString() + "/" + avatarHash +
                     (avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
         try {
