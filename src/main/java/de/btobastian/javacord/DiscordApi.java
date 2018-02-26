@@ -35,6 +35,7 @@ import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
+import de.btobastian.javacord.listeners.message.ChannelPinsUpdateListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -2550,6 +2551,21 @@ public interface DiscordApi {
      * @return A list with all registered webhooks update listeners.
      */
     List<WebhooksUpdateListener> getWebhooksUpdateListeners();
+
+    /**
+     * Adds a listener, which listens to channel pin updates.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ChannelPinsUpdateListener> addChannelPinsUpdateListener(ChannelPinsUpdateListener listener);
+
+    /**
+     * Gets a list with all registered channel pins update listeners.
+     *
+     * @return A list with all registered channel pins update listeners.
+     */
+    List<ChannelPinsUpdateListener> getChannelPinsUpdateListeners();
 
     /**
      * Adds a {@code GloballyAttachableListener}.

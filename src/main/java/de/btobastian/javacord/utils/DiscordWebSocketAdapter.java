@@ -25,6 +25,7 @@ import de.btobastian.javacord.utils.handler.ReadyHandler;
 import de.btobastian.javacord.utils.handler.ResumedHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelCreateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelDeleteHandler;
+import de.btobastian.javacord.utils.handler.channel.ChannelPinsUpdateHandler;
 import de.btobastian.javacord.utils.handler.channel.ChannelUpdateHandler;
 import de.btobastian.javacord.utils.handler.channel.WebhooksUpdateHandler;
 import de.btobastian.javacord.utils.handler.message.MessageCreateHandler;
@@ -671,6 +672,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         // channel
         addHandler(new ChannelCreateHandler(api));
         addHandler(new ChannelDeleteHandler(api));
+        addHandler(new ChannelPinsUpdateHandler(api));
         addHandler(new ChannelUpdateHandler(api));
         addHandler(new WebhooksUpdateHandler(api));
 

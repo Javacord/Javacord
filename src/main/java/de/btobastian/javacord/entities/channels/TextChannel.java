@@ -17,6 +17,7 @@ import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.ChannelAttachableListener;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.TextChannelAttachableListener;
+import de.btobastian.javacord.listeners.message.ChannelPinsUpdateListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -1345,6 +1346,28 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
+     * Adds a listener, which listens to all pin updates in this channel.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<ChannelPinsUpdateListener> addChannelPinsUpdateListener(
+            ChannelPinsUpdateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(TextChannel.class, getId(), ChannelPinsUpdateListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered channel pins update listeners.
+     *
+     * @return A list with all registered channel pins update listeners.
+     */
+    default List<ChannelPinsUpdateListener> getChannelPinsUpdateListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(TextChannel.class, getId(), ChannelPinsUpdateListener.class);
+    }
+
+    /**
      * Adds a listener that implements one or more {@code TextChannelAttachableListener}s.
      * Adding a listener multiple times will only add it once
      * and return the same listener managers on each invocation.
@@ -1406,6 +1429,7 @@ public interface TextChannel extends Channel, Messageable {
      * @return A map with all registered listeners that implement one or more {@code TextChannelAttachableListener}s and
      * their assigned listener classes they listen to.
      */
+    @SuppressWarnings("unchecked")
     default <T extends TextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getTextChannelAttachableListeners() {
         Map<T, List<Class<T>>> textChannelListeners =

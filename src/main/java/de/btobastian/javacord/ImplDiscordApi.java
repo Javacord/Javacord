@@ -27,6 +27,7 @@ import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
+import de.btobastian.javacord.listeners.message.ChannelPinsUpdateListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -1817,5 +1818,15 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<WebhooksUpdateListener> getWebhooksUpdateListeners() {
         return getListeners(WebhooksUpdateListener.class);
+    }
+
+    @Override
+    public ListenerManager<ChannelPinsUpdateListener> addChannelPinsUpdateListener(ChannelPinsUpdateListener listener) {
+        return addListener(ChannelPinsUpdateListener.class, listener);
+    }
+
+    @Override
+    public List<ChannelPinsUpdateListener> getChannelPinsUpdateListeners() {
+        return getListeners(ChannelPinsUpdateListener.class);
     }
 }
