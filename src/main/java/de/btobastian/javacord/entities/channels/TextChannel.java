@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -239,9 +238,7 @@ public interface TextChannel extends Channel, Messageable {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> bulkDelete(Iterable<Message> messages) {
-        Collection<Long> messageIds = new HashSet<>();
-        messages.forEach(message -> messageIds.add(message.getId()));
-        return bulkDelete(messageIds.stream().mapToLong(Long::longValue).toArray());
+        return bulkDelete(StreamSupport.stream(messages.spliterator(), false).mapToLong(Message::getId).toArray());
     }
 
     /**
