@@ -1,5 +1,6 @@
 package de.btobastian.javacord.entities.message;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
@@ -37,6 +38,7 @@ import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,11 +47,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * This class represents a Discord message.
@@ -117,6 +121,114 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             future.completeExceptionally(e);
             return future;
         }
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageIds The ids of the messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> deleteAll(DiscordApi api, long channelId, long... messageIds) {
+        // split by younger than two weeks / older than two weeks
+        Instant twoWeeksAgo = Instant.now().minus(14, ChronoUnit.DAYS);
+        Map<Boolean, List<Long>> messageIdsByAge = Arrays.stream(messageIds).distinct().boxed()
+                .collect(Collectors.groupingBy(
+                        messageId -> DiscordEntity.getCreationTimestamp(messageId).isAfter(twoWeeksAgo)));
+
+        AtomicInteger batchCounter = new AtomicInteger();
+        return CompletableFuture.allOf(Stream.concat(
+                // for messages younger than 2 weeks
+                messageIdsByAge.getOrDefault(true, Collections.emptyList()).stream()
+                        // send batches of 100 messages
+                        .collect(Collectors.groupingBy(messageId -> batchCounter.getAndIncrement() / 100))
+                        .values().stream()
+                        .map(messageIdBatch -> {
+                            // do not use batch deletion for a single message
+                            if (messageIdBatch.size() == 1) {
+                                return Message.delete(api, channelId, messageIdBatch.get(0));
+                            }
+
+                            ObjectNode body = JsonNodeFactory.instance.objectNode();
+                            ArrayNode messages = body.putArray("messages");
+                            messageIdBatch.stream()
+                                    .map(String::valueOf)
+                                    .forEach(messages::add);
+
+                            return new RestRequest<Void>(api, RestMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
+                                    .setRatelimitRetries(0)
+                                    .setUrlParameters(String.valueOf(channelId))
+                                    .setBody(body)
+                                    .execute(result -> null);
+                        }),
+                // for messages older than 2 weeks use single message deletion
+                messageIdsByAge.getOrDefault(false, Collections.emptyList()).stream()
+                        .map(messageId -> Message.delete(api, channelId, messageId))
+        ).toArray(CompletableFuture[]::new));
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageIds The ids of the messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> deleteAll(DiscordApi api, String channelId, String... messageIds) {
+        long[] messageLongIds = Arrays.stream(messageIds).filter(s -> {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                Long.parseLong(s);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }).mapToLong(Long::parseLong).toArray();
+        return deleteAll(api, Long.parseLong(channelId), messageLongIds);
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param api The discord api instance.
+     * @param messages The messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> deleteAll(DiscordApi api, Message... messages) {
+        return CompletableFuture.allOf(
+                Arrays.stream(messages)
+                        .collect(Collectors.groupingBy(message -> message.getChannel().getId(),
+                                                       Collectors.mapping(Message::getId, Collectors.toList())))
+                        .entrySet().stream()
+                        .map(entry -> deleteAll(api, entry.getKey(),
+                                                entry.getValue().stream().mapToLong(Long::longValue).toArray()))
+                        .toArray(CompletableFuture[]::new));
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param api The discord api instance.
+     * @param messages The messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    static CompletableFuture<Void> deleteAll(DiscordApi api, Iterable<Message> messages) {
+        return deleteAll(api, StreamSupport.stream(messages.spliterator(), false).toArray(Message[]::new));
     }
 
     /**
