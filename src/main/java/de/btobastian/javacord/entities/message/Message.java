@@ -128,7 +128,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, String content) {
-        return edit(api, channelId, messageId, content, null);
+        return edit(api, channelId, messageId, content, true, null, false);
     }
 
     /**
@@ -141,7 +141,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, String content) {
-        return edit(api, channelId, messageId, content, null);
+        return edit(api, channelId, messageId, content, true, null, false);
     }
 
     /**
@@ -154,7 +154,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder embed) {
-        return edit(api, channelId, messageId, null, embed);
+        return edit(api, channelId, messageId, null, false, embed, true);
     }
 
     /**
@@ -167,7 +167,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, EmbedBuilder embed) {
-        return edit(api, channelId, messageId, null, embed);
+        return edit(api, channelId, messageId, null, false, embed, true);
     }
 
     /**
@@ -182,17 +182,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     static CompletableFuture<Void> edit(
             DiscordApi api, long channelId, long messageId, String content, EmbedBuilder embed) {
-        ObjectNode body = JsonNodeFactory.instance.objectNode();
-        if (content != null) {
-            body.put("content", content);
-        }
-        if (embed != null) {
-            embed.toJsonNode(body.putObject("embed"));
-        }
-        return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
-                .setBody(body)
-                .execute(result -> null);
+        return edit(api, channelId, messageId, content, true, embed, true);
     }
 
     /**
@@ -207,13 +197,137 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     static CompletableFuture<Void> edit(
             DiscordApi api, String channelId, String messageId, String content, EmbedBuilder embed) {
+        return edit(api, channelId, messageId, content, true, embed, true);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @param updateContent Whether to update or remove the content.
+     * @param embed The new embed of the message.
+     * @param updateEmbed Whether to update or remove the embed.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, String content,
+                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        if (updateContent) {
+            if (content == null) {
+                body.putNull("content");
+            } else {
+                body.put("content", content);
+            }
+        }
+        if (updateEmbed) {
+            if (embed == null) {
+                body.putNull("embed");
+            } else {
+                embed.toJsonNode(body.putObject("embed"));
+            }
+        }
+        return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
+                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setBody(body)
+                .execute(result -> null);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @param updateContent Whether to update or remove the content.
+     * @param embed The new embed of the message.
+     * @param updateEmbed Whether to update or remove the embed.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, String content,
+                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
         try {
-            return edit(api, Long.parseLong(channelId), Long.parseLong(messageId), content, embed);
+            return edit(api, Long.parseLong(channelId), Long.parseLong(messageId), content, true, embed, true);
         } catch (NumberFormatException e) {
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;
         }
+    }
+
+    /**
+     * Removes the content of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to check if the removal was successful.
+     */
+    static CompletableFuture<Void> removeContent(DiscordApi api, long channelId, long messageId) {
+        return edit(api, channelId, messageId, null, true, null, false);
+    }
+
+    /**
+     * Removes the content of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to check if the removal was successful.
+     */
+    static CompletableFuture<Void> removeContent(DiscordApi api, String channelId, String messageId) {
+        return edit(api, channelId, messageId, null, true, null, false);
+    }
+
+    /**
+     * Removes the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to check if the removal was successful.
+     */
+    static CompletableFuture<Void> removeEmbed(DiscordApi api, long channelId, long messageId) {
+        return edit(api, channelId, messageId, null, false, null, true);
+    }
+
+    /**
+     * Removes the embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to check if the removal was successful.
+     */
+    static CompletableFuture<Void> removeEmbed(DiscordApi api, String channelId, String messageId) {
+        return edit(api, channelId, messageId, null, false, null, true);
+    }
+
+    /**
+     * Removes the content and embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to check if the removal was successful.
+     */
+    static CompletableFuture<Void> removeContentAndEmbed(DiscordApi api, long channelId, long messageId) {
+        return edit(api, channelId, messageId, null, true, null, true);
+    }
+
+    /**
+     * Removes the content and embed of the message.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return A future to check if the removal was successful.
+     */
+    static CompletableFuture<Void> removeContentAndEmbed(DiscordApi api, String channelId, String messageId) {
+        return edit(api, channelId, messageId, null, true, null, true);
     }
 
     /**
@@ -1361,7 +1475,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> edit(String content) {
-        return edit(content, null);
+        return Message.edit(getApi(), getChannel().getId(), getId(), content, true, null, false);
     }
 
     /**
@@ -1371,7 +1485,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> edit(EmbedBuilder embed) {
-        return edit(null, embed);
+        return Message.edit(getApi(), getChannel().getId(), getId(), null, false, embed, true);
     }
 
     /**
@@ -1382,7 +1496,34 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> edit(String content, EmbedBuilder embed) {
-        return Message.edit(getApi(), getChannel().getId(), getId(), content, embed);
+        return Message.edit(getApi(), getChannel().getId(), getId(), content, true, embed, true);
+    }
+
+    /**
+     * Removes the content of the message.
+     *
+     * @return A future to check if the removal was successful.
+     */
+    default CompletableFuture<Void> removeContent() {
+        return Message.edit(getApi(), getChannel().getId(), getId(), null, true, null, false);
+    }
+
+    /**
+     * Removes the embed of the message.
+     *
+     * @return A future to check if the removal was successful.
+     */
+    default CompletableFuture<Void> removeEmbed() {
+        return Message.edit(getApi(), getChannel().getId(), getId(), null, false, null, true);
+    }
+
+    /**
+     * Removes the content and embed of the message.
+     *
+     * @return A future to check if the removal was successful.
+     */
+    default CompletableFuture<Void> removeContentAndEmbed() {
+        return Message.edit(getApi(), getChannel().getId(), getId(), null, true, null, true);
     }
 
     /**
