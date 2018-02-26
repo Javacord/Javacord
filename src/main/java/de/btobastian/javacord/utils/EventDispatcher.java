@@ -156,7 +156,7 @@ public class EventDispatcher {
      * @param <T> The type of the listener.
      */
     public <T> void dispatchEvent(Object object, List<T> listeners, Consumer<T> consumer) {
-        api.getThreadPool().getSingleThreadExecutorService("Event dispatch adder").submit(() -> { // (horrible name)
+        api.getThreadPool().getSingleThreadExecutorService("Event Dispatch Adder").submit(() -> { // (horrible name)
             if (object != null) { // Object dependent listeners
                 // Don't allow adding of more events while there are unfinished object independent tasks
                 synchronized (queuedListenerTasks) {

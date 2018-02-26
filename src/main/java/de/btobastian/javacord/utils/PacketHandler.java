@@ -35,7 +35,7 @@ public abstract class PacketHandler {
         this.async = async;
         this.type = type;
         if (async) {
-            executorService = api.getThreadPool().getSingleThreadExecutorService("handlers");
+            executorService = api.getThreadPool().getSingleThreadExecutorService("Handlers Processor");
         }
     }
 

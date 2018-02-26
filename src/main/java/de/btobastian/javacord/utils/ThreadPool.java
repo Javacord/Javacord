@@ -69,12 +69,14 @@ public class ThreadPool {
     /**
      * Gets an executor service which only uses a single thread.
      *
-     * @param id The id of the executor service. Will create a new one if the id is used the first time.
-     * @return The executor service with the given id. Never <code>null</code>!
+     * @param threadName The thread name of the executor service.
+     *                   Will create a new one if the thread name is used the first time.
+     * @return The executor service with the given thread name. Never {@code null}!
      */
-    public ExecutorService getSingleThreadExecutorService(String id) {
-        return executorServiceSingleThreads.computeIfAbsent(id, key -> new ThreadPoolExecutor(0, 1, KEEP_ALIVE_TIME,
-                TIME_UNIT, new LinkedBlockingQueue<>(), new ThreadFactory("Javacord - '" + id + "' Processor", false)));
+    public ExecutorService getSingleThreadExecutorService(String threadName) {
+        return executorServiceSingleThreads.computeIfAbsent(threadName, key ->
+                new ThreadPoolExecutor(0, 1, KEEP_ALIVE_TIME, TIME_UNIT, new LinkedBlockingQueue<>(),
+                                       new ThreadFactory("Javacord - " + threadName, false)));
     }
 
 }

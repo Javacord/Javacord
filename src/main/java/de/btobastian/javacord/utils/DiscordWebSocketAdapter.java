@@ -417,7 +417,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     reconnectAttempt = 0;
                     sessionId = packet.get("d").get("session_id").asText();
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
-                    api.getThreadPool().getSingleThreadExecutorService("startupWait").submit(() -> {
+                    api.getThreadPool().getSingleThreadExecutorService("Startup Servers Wait Thread").submit(() -> {
                         boolean allUsersLoaded = false;
                         boolean allServersLoaded = false;
                         int lastUnavailableServerAmount = 0;
