@@ -304,6 +304,7 @@ public interface Server extends DiscordEntity {
 
     /**
      * Gets a member by its discriminated name like e. g. {@code Bastian#8222}.
+     * This method is case sensitive!
      *
      * @param discriminatedName The discriminated name of the member.
      * @return The member with the given discriminated name.
@@ -311,6 +312,18 @@ public interface Server extends DiscordEntity {
     default Optional<User> getMemberByDiscriminatedName(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return getMemberByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]);
+    }
+
+    /**
+     * Gets a member by its discriminated name like e. g. {@code Bastian#8222}.
+     * This method is case insensitive!
+     *
+     * @param discriminatedName The discriminated name of the member.
+     * @return The member with the given discriminated name.
+     */
+    default Optional<User> getMemberByDiscriminatedNameIgnoreCase(String discriminatedName) {
+        String[] nameAndDiscriminator = discriminatedName.split("#", 2);
+        return getMemberByNameAndDiscriminatorIgnoreCase(nameAndDiscriminator[0], nameAndDiscriminator[1]);
     }
 
     /**
