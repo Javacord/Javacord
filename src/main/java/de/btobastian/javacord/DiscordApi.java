@@ -764,6 +764,21 @@ public interface DiscordApi {
     }
 
     /**
+     * Gets a collection with all users with the given display name on the given server.
+     * This method is case insensitive!
+     *
+     * @param displayName The display name of the users.
+     * @param server The server where to lookup the display name.
+     * @return A collection with all users with the given display name on the given server.
+     */
+    default Collection<User> getCachedUsersByDisplayNameIgnoreCase(String displayName, Server server) {
+        return Collections.unmodifiableList(
+                getCachedUsers().stream()
+                        .filter(user -> user.getDisplayName(server).equalsIgnoreCase(displayName))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
      * Gets a message set with all currently cached messages.
      *
      * @return A message set with all currently cached messages.
