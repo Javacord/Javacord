@@ -648,6 +648,7 @@ public interface DiscordApi {
 
     /**
      * Gets a user by its name and discriminator.
+     * This method is case sensitive!
      *
      * @param name The name of the user.
      * @param discriminator The discriminator of the user.
@@ -656,6 +657,20 @@ public interface DiscordApi {
     default Optional<User> getCachedUserByNameAndDiscriminator(String name, String discriminator) {
         return getCachedUsersByName(name).stream()
                 .filter(user -> user.getDiscriminator().equals(discriminator))
+                .findAny();
+    }
+
+    /**
+     * Gets a user by its name and discriminator.
+     * This method is case insensitive!
+     *
+     * @param name The name of the user.
+     * @param discriminator The discriminator of the user.
+     * @return The user with the given name and discriminator.
+     */
+    default Optional<User> getCachedUserByNameAndDiscriminatorIgnoreCase(String name, String discriminator) {
+        return getCachedUsersByNameIgnoreCase(name).stream()
+                .filter(user -> user.getDiscriminator().equalsIgnoreCase(discriminator))
                 .findAny();
     }
 
