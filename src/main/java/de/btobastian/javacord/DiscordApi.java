@@ -637,6 +637,7 @@ public interface DiscordApi {
 
     /**
      * Gets a user by its discriminated name like e. g. {@code Bastian#8222}.
+     * This method is case sensitive!
      *
      * @param discriminatedName The discriminated name of the user.
      * @return The user with the given discriminated name.
@@ -644,6 +645,18 @@ public interface DiscordApi {
     default Optional<User> getCachedUserByDiscriminatedName(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return getCachedUserByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]);
+    }
+
+    /**
+     * Gets a user by its discriminated name like e. g. {@code Bastian#8222}.
+     * This method is case insensitive!
+     *
+     * @param discriminatedName The discriminated name of the user.
+     * @return The user with the given discriminated name.
+     */
+    default Optional<User> getCachedUserByDiscriminatedNameIgnoreCase(String discriminatedName) {
+        String[] nameAndDiscriminator = discriminatedName.split("#", 2);
+        return getCachedUserByNameAndDiscriminatorIgnoreCase(nameAndDiscriminator[0], nameAndDiscriminator[1]);
     }
 
     /**
