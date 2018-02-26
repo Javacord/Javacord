@@ -2,12 +2,18 @@ package de.btobastian.javacord.utils.handler.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
+import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.channels.ServerChannel;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.Embed;
 import de.btobastian.javacord.entities.message.embed.impl.ImplEmbed;
 import de.btobastian.javacord.entities.message.impl.ImplMessage;
+import de.btobastian.javacord.events.message.CachedMessagePinEvent;
+import de.btobastian.javacord.events.message.CachedMessageUnpinEvent;
 import de.btobastian.javacord.events.message.MessageEditEvent;
+import de.btobastian.javacord.listeners.message.CachedMessagePinListener;
+import de.btobastian.javacord.listeners.message.CachedMessageUnpinListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
 import de.btobastian.javacord.utils.PacketHandler;
 
@@ -49,6 +55,54 @@ public class MessageUpdateHandler extends PacketHandler {
 
         api.getTextChannelById(channelId).ifPresent(channel -> {
             Optional<ImplMessage> message = api.getCachedMessageById(messageId).map(msg -> (ImplMessage) msg);
+
+            message.ifPresent(msg -> {
+                boolean newPinnedFlag = packet.hasNonNull("pinned") ? packet.get("pinned").asBoolean() : msg.isPinned();
+                boolean oldPinnedFlag = msg.isPinned();
+                if (newPinnedFlag != oldPinnedFlag) {
+                    msg.setPinned(newPinnedFlag);
+
+                    if (newPinnedFlag) {
+                        CachedMessagePinEvent event = new CachedMessagePinEvent(msg);
+
+                        List<CachedMessagePinListener> listeners = new ArrayList<>();
+                        listeners.addAll(msg.getCachedMessagePinListeners());
+                        listeners.addAll(msg.getChannel().getCachedMessagePinListeners());
+                        msg.getChannel().asServerChannel()
+                                .map(ServerChannel::getServer)
+                                .map(Server::getCachedMessagePinListeners)
+                                .ifPresent(listeners::addAll);
+                        listeners.addAll(api.getCachedMessagePinListeners());
+
+                        if (msg.getChannel() instanceof ServerChannel) {
+                            api.getEventDispatcher().dispatchEvent(((ServerChannel) msg.getChannel()).getServer(),
+                                    listeners, listener -> listener.onCachedMessagePin(event));
+                        } else {
+                            api.getEventDispatcher().dispatchEvent(
+                                    api, listeners, listener -> listener.onCachedMessagePin(event));
+                        }
+                    } else {
+                        CachedMessageUnpinEvent event = new CachedMessageUnpinEvent(msg);
+
+                        List<CachedMessageUnpinListener> listeners = new ArrayList<>();
+                        listeners.addAll(msg.getCachedMessageUnpinListeners());
+                        listeners.addAll(msg.getChannel().getCachedMessageUnpinListeners());
+                        msg.getChannel().asServerChannel()
+                                .map(ServerChannel::getServer)
+                                .map(Server::getCachedMessageUnpinListeners)
+                                .ifPresent(listeners::addAll);
+                        listeners.addAll(api.getCachedMessageUnpinListeners());
+
+                        if (msg.getChannel() instanceof ServerChannel) {
+                            api.getEventDispatcher().dispatchEvent(((ServerChannel) msg.getChannel()).getServer(),
+                                    listeners, listener -> listener.onCachedMessageUnpin(event));
+                        } else {
+                            api.getEventDispatcher().dispatchEvent(
+                                    api, listeners, listener -> listener.onCachedMessageUnpin(event));
+                        }
+                    }
+                }
+            });
 
             MessageEditEvent editEvent = null;
             if (packet.has("edited_timestamp") && !packet.get("edited_timestamp").isNull()) {

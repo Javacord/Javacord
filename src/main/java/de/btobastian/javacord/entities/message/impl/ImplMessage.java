@@ -54,6 +54,11 @@ public class ImplMessage implements Message {
     private final MessageType type;
 
     /**
+     * The pinned flag of the message.
+     */
+    private boolean pinned;
+
+    /**
      * Gets the last edit time.
      */
     private Instant lastEditTime = null;
@@ -106,6 +111,8 @@ public class ImplMessage implements Message {
 
         id = data.get("id").asLong();
         content = data.get("content").asText();
+
+        pinned = data.get("pinned").asBoolean(false);
 
         lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull() ?
                 OffsetDateTime.parse(data.get("edited_timestamp").asText()).toInstant() : null;
@@ -163,6 +170,15 @@ public class ImplMessage implements Message {
      */
     public void setContent(String content) {
         this.content = content;
+    }
+
+    /**
+     * Sets the pinned flag if the message.
+     *
+     * @param pinned The pinned flag to set.
+     */
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 
     /**
@@ -249,6 +265,11 @@ public class ImplMessage implements Message {
     @Override
     public TextChannel getChannel() {
         return channel;
+    }
+
+    @Override
+    public boolean isPinned() {
+        return pinned;
     }
 
     @Override

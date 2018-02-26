@@ -35,6 +35,8 @@ import de.btobastian.javacord.listeners.connection.ResumeListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelCreateListener;
 import de.btobastian.javacord.listeners.group.channel.GroupChannelDeleteListener;
+import de.btobastian.javacord.listeners.message.CachedMessagePinListener;
+import de.btobastian.javacord.listeners.message.CachedMessageUnpinListener;
 import de.btobastian.javacord.listeners.message.ChannelPinsUpdateListener;
 import de.btobastian.javacord.listeners.message.MessageCreateListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
@@ -2566,6 +2568,36 @@ public interface DiscordApi {
      * @return A list with all registered channel pins update listeners.
      */
     List<ChannelPinsUpdateListener> getChannelPinsUpdateListeners();
+
+    /**
+     * Adds a listener, which listens to cached message pins.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener);
+
+    /**
+     * Gets a list with all registered cached message pin listeners.
+     *
+     * @return A list with all registered cached message pin listeners.
+     */
+    List<CachedMessagePinListener> getCachedMessagePinListeners();
+
+    /**
+     * Adds a listener, which listens to cached message unpins.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(CachedMessageUnpinListener listener);
+
+    /**
+     * Gets a list with all registered cached message unpin listeners.
+     *
+     * @return A list with all registered cached message unpin listeners.
+     */
+    List<CachedMessageUnpinListener> getCachedMessageUnpinListeners();
 
     /**
      * Adds a {@code GloballyAttachableListener}.

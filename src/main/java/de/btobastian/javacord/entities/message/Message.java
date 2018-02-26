@@ -20,6 +20,8 @@ import de.btobastian.javacord.entities.message.emoji.impl.ImplUnicodeEmoji;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
+import de.btobastian.javacord.listeners.message.CachedMessagePinListener;
+import de.btobastian.javacord.listeners.message.CachedMessageUnpinListener;
 import de.btobastian.javacord.listeners.message.MessageAttachableListener;
 import de.btobastian.javacord.listeners.message.MessageDeleteListener;
 import de.btobastian.javacord.listeners.message.MessageEditListener;
@@ -1026,6 +1028,13 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     TextChannel getChannel();
 
     /**
+     * Checks if the message is pinned.
+     *
+     * @return Whether the message is pinned or not.
+     */
+    boolean isPinned();
+
+    /**
      * Gets a list with all embeds of the message.
      *
      * @return A list with all embeds of the message.
@@ -1848,6 +1857,47 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      */
     default List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
         return getReactionRemoveAllListeners(getApi(), getId());
+    }
+
+    /**
+     * Adds a listener, which listens to this message getting pinned while it is in the cache.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Message.class, getId(), CachedMessagePinListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered cached message pin listeners.
+     *
+     * @return A list with all registered cached message pin listeners.
+     */
+    default List<CachedMessagePinListener> getCachedMessagePinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), CachedMessagePinListener.class);
+    }
+
+    /**
+     * Adds a listener, which listens to this message getting unpinned while it is in the cache.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    default ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(
+            CachedMessageUnpinListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Message.class, getId(), CachedMessageUnpinListener.class, listener);
+    }
+
+    /**
+     * Gets a list with all registered cached message unpin listeners.
+     *
+     * @return A list with all registered cached message unpin listeners.
+     */
+    default List<CachedMessageUnpinListener> getCachedMessageUnpinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), CachedMessageUnpinListener.class);
     }
 
     /**
