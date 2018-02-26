@@ -196,7 +196,7 @@ public class ImplChannelCategory implements ChannelCategory {
 
     @Override
     public String toString() {
-        return String.format("ChannelCategory (id: %s, name: %s)", getId(), getName());
+        return String.format("ChannelCategory (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

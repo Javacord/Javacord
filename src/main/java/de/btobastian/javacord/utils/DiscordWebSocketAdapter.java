@@ -173,11 +173,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                     .put("query","")
                                     .put("limit", 0);
                             if (serverIds.size() == 1) {
-                                data.put("guild_id", String.valueOf(serverIds.get(0)));
+                                data.put("guild_id", Long.toUnsignedString(serverIds.get(0)));
                             } else {
                                 ArrayNode guildIds = data.putArray("guild_id");
                                 for (long serverId : serverIds) {
-                                    guildIds.add(String.valueOf(serverId));
+                                    guildIds.add(Long.toUnsignedString(serverId));
                                 }
                             }
                             logger.debug("Sending request guild members packet {}",

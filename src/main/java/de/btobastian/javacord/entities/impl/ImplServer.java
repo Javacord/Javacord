@@ -661,7 +661,8 @@ public class ImplServer implements Server, Cleanupable {
         }
         try {
             return Optional.of(new ImplIcon(
-                    getApi(), new URL("https://cdn.discordapp.com/icons/" + getId() + "/" + iconHash + ".png")));
+                    getApi(),
+                    new URL("https://cdn.discordapp.com/icons/" + getIdAsString() + "/" + iconHash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
@@ -675,7 +676,8 @@ public class ImplServer implements Server, Cleanupable {
         }
         try {
             return Optional.of(new ImplIcon(
-                    getApi(), new URL("https://cdn.discordapp.com/splashes/" + getId() + "/" + splash + ".png")));
+                    getApi(),
+                    new URL("https://cdn.discordapp.com/splashes/" + getIdAsString() + "/" + splash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
@@ -775,7 +777,7 @@ public class ImplServer implements Server, Cleanupable {
 
     @Override
     public String toString() {
-        return String.format("Server (id: %s, name: %s)", getId(), getName());
+        return String.format("Server (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

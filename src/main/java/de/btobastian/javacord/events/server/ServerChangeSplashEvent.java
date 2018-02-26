@@ -75,7 +75,8 @@ public class ServerChangeSplashEvent extends ServerEvent {
         }
         try {
             return Optional.of(new ImplIcon(getApi(),
-                    new URL("https://cdn.discordapp.com/splashs/" + getServer().getId() + "/" + splashHash + ".png")));
+                    new URL("https://cdn.discordapp.com/splashs/" + getServer().getIdAsString()
+                            + "/" + splashHash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the splash is malformed! Please contact the developer!", e);
             return Optional.empty();

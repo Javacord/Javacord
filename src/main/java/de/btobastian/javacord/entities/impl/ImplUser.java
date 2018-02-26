@@ -235,7 +235,7 @@ public class ImplUser implements User, Cleanupable {
     public Icon getAvatar() {
         String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
         if (avatarHash != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarHash +
+            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarHash +
                     (avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
         try {
@@ -298,7 +298,7 @@ public class ImplUser implements User, Cleanupable {
 
     @Override
     public String toString() {
-        return String.format("User (id: %s, name: %s)", getId(), getName());
+        return String.format("User (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

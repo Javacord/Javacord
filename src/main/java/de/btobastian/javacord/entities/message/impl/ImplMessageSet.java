@@ -792,16 +792,16 @@ public class ImplMessageSet implements MessageSet {
     private static List<JsonNode> requestAsJsonNodes(TextChannel channel, int limit, long before, long after) {
         RestRequest<List<JsonNode>> restRequest =
                 new RestRequest<List<JsonNode>>(channel.getApi(), RestMethod.GET, RestEndpoint.MESSAGE)
-                .setUrlParameters(String.valueOf(channel.getId()));
+                .setUrlParameters(channel.getIdAsString());
 
         if (limit != -1) {
             restRequest.addQueryParameter("limit", String.valueOf(limit));
         }
         if (before != -1) {
-            restRequest.addQueryParameter("before", String.valueOf(before));
+            restRequest.addQueryParameter("before", Long.toUnsignedString(before));
         }
         if (after != -1) {
-            restRequest.addQueryParameter("after", String.valueOf(after));
+            restRequest.addQueryParameter("after", Long.toUnsignedString(after));
         }
 
         return restRequest.execute(result -> {

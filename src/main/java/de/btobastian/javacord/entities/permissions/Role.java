@@ -190,7 +190,7 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      */
     default CompletableFuture<Void> delete() {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.ROLE)
-                .setUrlParameters(String.valueOf(getServer().getId()), String.valueOf(getId()))
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .execute(result -> null);
     }
 
@@ -214,7 +214,7 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     @Override
     default String getMentionTag() {
-        return "<@&" + getId() + ">";
+        return "<@&" + getIdAsString() + ">";
     }
 
     /**

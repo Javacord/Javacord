@@ -153,7 +153,7 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
         if (overwrittenUserPermissions != null) {
             for (Map.Entry<Long, Permissions> entry : overwrittenUserPermissions.entrySet()) {
                 permissionOverwrites.addObject()
-                        .put("id", String.valueOf(entry.getKey().longValue()))
+                        .put("id", Long.toUnsignedString(entry.getKey()))
                         .put("type", "member")
                         .put("allow", ((ImplPermissions) entry.getValue()).getAllowed())
                         .put("deny", ((ImplPermissions) entry.getValue()).getDenied());
@@ -162,7 +162,7 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
         if (overwrittenRolePermissions != null) {
             for (Map.Entry<Long, Permissions> entry : overwrittenRolePermissions.entrySet()) {
                 permissionOverwrites.addObject()
-                        .put("id", String.valueOf(entry.getKey().longValue()))
+                        .put("id", Long.toUnsignedString(entry.getKey()))
                         .put("type", "role")
                         .put("allow", ((ImplPermissions) entry.getValue()).getAllowed())
                         .put("deny", ((ImplPermissions) entry.getValue()).getDenied());

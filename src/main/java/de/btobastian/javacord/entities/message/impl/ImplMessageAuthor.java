@@ -81,7 +81,7 @@ public class ImplMessageAuthor implements MessageAuthor {
     public Icon getAvatar() {
         String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
         if (avatarId != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
+            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId +
                     (avatarId.startsWith("a_") ? ".gif" : ".png");
         }
         try {
@@ -116,7 +116,7 @@ public class ImplMessageAuthor implements MessageAuthor {
     }
 
     public String toString() {
-        return String.format("MessageAuthor (id: %s, name: %s)", getId(), getName());
+        return String.format("MessageAuthor (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

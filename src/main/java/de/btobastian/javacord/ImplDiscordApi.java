@@ -1088,7 +1088,7 @@ public class ImplDiscordApi implements DiscordApi {
         return getCachedUserById(id)
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> new RestRequest<User>(this, RestMethod.GET, RestEndpoint.USER)
-                .setUrlParameters(String.valueOf(id))
+                .setUrlParameters(Long.toUnsignedString(id))
                 .execute(result -> this.getOrCreateUser(result.getJsonBody())));
     }
 

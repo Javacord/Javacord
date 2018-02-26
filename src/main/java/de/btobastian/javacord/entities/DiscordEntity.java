@@ -43,7 +43,7 @@ public interface DiscordEntity {
      * @return The id of the Discord entity as a string.
      */
     default String getIdAsString() {
-        return String.valueOf(getId());
+        return Long.toUnsignedString(getId());
     }
 
     /**

@@ -51,7 +51,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     @Override
     default String getMentionTag() {
-        return "<@" + getId() + ">";
+        return "<@" + getIdAsString() + ">";
     }
 
     /**
@@ -60,7 +60,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return The mention tag, to mention the user with its nickname.
      */
     default String getNicknameMentionTag() {
-        return "<@!" + getId() + ">";
+        return "<@!" + getIdAsString() + ">";
     }
 
     /**

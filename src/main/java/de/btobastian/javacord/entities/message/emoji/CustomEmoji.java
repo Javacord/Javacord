@@ -36,7 +36,7 @@ public interface CustomEmoji extends DiscordEntity, Emoji, UpdatableFromCache<Kn
      * @return The image of the emoji.
      */
     default Icon getImage() {
-        String urlString = "https://cdn.discordapp.com/emojis/" + getId() + (isAnimated() ? ".gif" : ".png");
+        String urlString = "https://cdn.discordapp.com/emojis/" + getIdAsString() + (isAnimated() ? ".gif" : ".png");
         try {
             return new ImplIcon(getApi(), new URL(urlString));
         } catch (MalformedURLException e) {
@@ -47,7 +47,7 @@ public interface CustomEmoji extends DiscordEntity, Emoji, UpdatableFromCache<Kn
 
     @Override
     default String getMentionTag() {
-        return "<" + (isAnimated() ? "a" : "") + ":" + getName() + ":" + getId() + ">";
+        return "<" + (isAnimated() ? "a" : "") + ":" + getName() + ":" + getIdAsString() + ">";
     }
 
     @Override

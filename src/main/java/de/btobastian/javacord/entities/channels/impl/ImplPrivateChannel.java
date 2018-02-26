@@ -95,7 +95,7 @@ public class ImplPrivateChannel implements PrivateChannel, Cleanupable {
 
     @Override
     public String toString() {
-        return String.format("PrivateChannel (id: %s, recipient: %s)", getId(), getRecipient());
+        return String.format("PrivateChannel (id: %s, recipient: %s)", getIdAsString(), getRecipient());
     }
 
 }

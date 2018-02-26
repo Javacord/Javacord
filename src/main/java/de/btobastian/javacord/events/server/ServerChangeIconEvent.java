@@ -75,7 +75,8 @@ public class ServerChangeIconEvent extends ServerEvent {
         }
         try {
             return Optional.of(new ImplIcon(getApi(),
-                    new URL("https://cdn.discordapp.com/icons/" + getServer().getId() + "/" + iconHash + ".png")));
+                    new URL("https://cdn.discordapp.com/icons/" + getServer().getIdAsString()
+                            + "/" + iconHash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();

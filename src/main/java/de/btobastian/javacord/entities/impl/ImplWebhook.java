@@ -98,7 +98,7 @@ public class ImplWebhook implements Webhook {
     @Override
     public Optional<Icon> getAvatar() {
         if (avatarId != null) {
-            String url = "https://cdn.discordapp.com/avatars/" + getId() + "/" + avatarId +
+            String url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId +
                     (avatarId.startsWith("a_") ? ".gif" : ".png");
             try {
                 return Optional.of(new ImplIcon(getApi(), new URL(url)));
@@ -129,7 +129,7 @@ public class ImplWebhook implements Webhook {
 
     @Override
     public String toString() {
-        return String.format("Webhook (id: %s, name: %s)", getId(), getName());
+        return String.format("Webhook (id: %s, name: %s)", getIdAsString(), getName());
     }
 
 }

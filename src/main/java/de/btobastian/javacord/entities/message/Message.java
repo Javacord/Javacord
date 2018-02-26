@@ -98,7 +98,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId, String reason) {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
                 .setRatelimitRetries(250)
                 .setAuditLogReason(reason)
                 .execute(result -> null);
@@ -157,12 +157,12 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
                             ObjectNode body = JsonNodeFactory.instance.objectNode();
                             ArrayNode messages = body.putArray("messages");
                             messageIdBatch.stream()
-                                    .map(String::valueOf)
+                                    .map(Long::toUnsignedString)
                                     .forEach(messages::add);
 
                             return new RestRequest<Void>(api, RestMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
                                     .setRatelimitRetries(0)
-                                    .setUrlParameters(String.valueOf(channelId))
+                                    .setUrlParameters(Long.toUnsignedString(channelId))
                                     .setBody(body)
                                     .execute(result -> null);
                         }),
@@ -343,7 +343,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             }
         }
         return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
                 .setBody(body)
                 .execute(result -> null);
     }
@@ -454,7 +454,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, String unicodeEmoji) {
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), unicodeEmoji, "@me")
+                .setUrlParameters(
+                        Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), unicodeEmoji, "@me")
                 .setRatelimitRetries(500)
                 .execute(result -> null);
     }
@@ -491,11 +492,11 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, Emoji emoji) {
         String value = emoji.asUnicodeEmoji().orElseGet(() ->
                 emoji.asCustomEmoji()
-                        .map(e -> e.getName() + ":" + String.valueOf(e.getId()))
+                        .map(e -> e.getName() + ":" + e.getIdAsString())
                         .orElse("UNKNOWN")
         );
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId), value, "@me")
+                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), value, "@me")
                 .setRatelimitRetries(500)
                 .execute(result -> null);
     }
@@ -529,7 +530,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> removeAllReactions(DiscordApi api, long channelId, long messageId) {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
                 .execute(result -> null);
     }
 
@@ -561,7 +562,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> pin(DiscordApi api, long channelId, long messageId) {
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.PINS)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
                 .execute(result -> null);
     }
 
@@ -593,7 +594,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> unpin(DiscordApi api, long channelId, long messageId) {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.PINS)
-                .setUrlParameters(String.valueOf(channelId), String.valueOf(messageId))
+                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
                 .execute(result -> null);
     }
 

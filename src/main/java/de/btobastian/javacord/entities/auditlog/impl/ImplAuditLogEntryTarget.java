@@ -63,7 +63,7 @@ public class ImplAuditLogEntryTarget implements AuditLogEntryTarget {
 
     @Override
     public String toString() {
-        return String.format("AuditLogEntryTarget (id: %s)", getId());
+        return String.format("AuditLogEntryTarget (id: %s)", getIdAsString());
     }
 
 }
