@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -239,9 +238,7 @@ public interface TextChannel extends Channel, Messageable {
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> bulkDelete(Iterable<Message> messages) {
-        Collection<Long> messageIds = new HashSet<>();
-        messages.forEach(message -> messageIds.add(message.getId()));
-        return bulkDelete(messageIds.stream().mapToLong(Long::longValue).toArray());
+        return bulkDelete(StreamSupport.stream(messages.spliterator(), false).mapToLong(Message::getId).toArray());
     }
 
     /**
@@ -300,6 +297,67 @@ public interface TextChannel extends Channel, Messageable {
      */
     default CompletableFuture<Void> bulkDelete(Message... messages) {
         return bulkDelete(Arrays.asList(messages).stream().mapToLong(Message::getId).toArray());
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param messages The messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> deleteAll(Iterable<Message> messages) {
+        return deleteAll(StreamSupport.stream(messages.spliterator(), false).mapToLong(Message::getId).toArray());
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param messageIds The ids of the messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> deleteAll(long... messageIds) {
+        return Message.deleteAll(getApi(), getId(), messageIds);
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param messageIds The ids of the messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> deleteAll(String... messageIds) {
+        long[] messageLongIds = Arrays.stream(messageIds).filter(s -> {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                Long.parseLong(s);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }).mapToLong(Long::parseLong).toArray();
+        return deleteAll(messageLongIds);
+    }
+
+    /**
+     * Deletes multiple messages at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @param messages The messages to delete.
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> deleteAll(Message... messages) {
+        return deleteAll(Arrays.stream(messages).mapToLong(Message::getId).toArray());
     }
 
     /**

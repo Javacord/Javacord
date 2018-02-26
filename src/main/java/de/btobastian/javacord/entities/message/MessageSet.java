@@ -1,7 +1,11 @@
 package de.btobastian.javacord.entities.message;
 
+import de.btobastian.javacord.entities.DiscordEntity;
+
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * This class represents an unmodifiable set of messages that is always sorted from oldest
@@ -25,6 +29,22 @@ public interface MessageSet extends NavigableSet<Message> {
      */
     default Optional<Message> getNewestMessage() {
         return isEmpty() ? Optional.empty() : Optional.of(last());
+    }
+
+    /**
+     * Deletes all messages in this message set at once.
+     * This method does not have a size or age restriction.
+     * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
+     * older messages are deleted with individual delete requests.
+     *
+     * @return A future to tell us if the deletion was successful.
+     */
+    default CompletableFuture<Void> deleteAll() {
+        return CompletableFuture.allOf(
+                stream().collect(Collectors.groupingBy(DiscordEntity::getApi, Collectors.toList()))
+                        .entrySet().stream()
+                        .map(entry -> Message.deleteAll(entry.getKey(), entry.getValue()))
+                        .toArray(CompletableFuture[]::new));
     }
 
     @Override
