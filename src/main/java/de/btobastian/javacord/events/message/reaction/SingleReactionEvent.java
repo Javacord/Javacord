@@ -81,13 +81,23 @@ public class SingleReactionEvent extends ReactionEvent {
     }
 
     /**
-     * Gets the amount of users who used the reaction.
-     * This is not present, if the message is not cached!
+     * Gets the amount of users who used the reaction if the message is cached.
      *
      * @return The amount of users who used the reaction.
      */
     public Optional<Integer> getCount() {
         return getMessage().map(msg -> msg.getReactionByEmoji(getEmoji()).map(Reaction::getCount).orElse(0));
+    }
+
+    /**
+     * Gets the amount of users who used the reaction.
+     * If the message is not cached, it will be requested from Discord first.
+     *
+     * @return The amount of users who used the reaction.
+     * @see RequestableMessageEvent#requestMessage()
+     */
+    public CompletableFuture<Integer> requestCount() {
+        return requestMessage().thenApply(msg -> msg.getReactionByEmoji(getEmoji()).map(Reaction::getCount).orElse(0));
     }
 
     /**
