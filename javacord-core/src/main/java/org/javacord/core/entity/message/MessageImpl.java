@@ -361,6 +361,9 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         if (cachedForever) {
             // Just make sure it's in the cache
             ((MessageCacheImpl) channel.getMessageCache()).addMessage(this);
+            ((MessageCacheImpl) channel.getMessageCache()).addCacheForeverMessage(this);
+        } else {
+            ((MessageCacheImpl) channel.getMessageCache()).removeCacheForeverMessage(this);
         }
     }
 
