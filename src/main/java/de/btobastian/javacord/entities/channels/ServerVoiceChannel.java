@@ -17,6 +17,7 @@ import de.btobastian.javacord.utils.ListenerManager;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -326,6 +327,23 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     default <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(ServerVoiceChannel.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<ServerVoiceChannel> getCurrentCachedInstance() {
+        return getApi().getServerById(getServer().getId()).flatMap(server -> server.getVoiceChannelById(getId()));
+    }
+
+    @Override
+    default CompletableFuture<ServerVoiceChannel> getLatestInstance() {
+        Optional<ServerVoiceChannel> currentCachedInstance = getCurrentCachedInstance();
+        if (currentCachedInstance.isPresent()) {
+            return CompletableFuture.completedFuture(currentCachedInstance.get());
+        } else {
+            CompletableFuture<ServerVoiceChannel> result = new CompletableFuture<>();
+            result.completeExceptionally(new NoSuchElementException());
+            return result;
+        }
     }
 
 }

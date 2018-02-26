@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.channels;
 
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
+import de.btobastian.javacord.entities.UpdatableFromCache;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.listeners.ChannelAttachableListener;
@@ -12,13 +13,15 @@ import de.btobastian.javacord.utils.ListenerManager;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
  * The class represents a channel.
  */
-public interface Channel extends DiscordEntity {
+public interface Channel extends DiscordEntity, UpdatableFromCache {
 
     /**
      * Gets the type of the channel.
@@ -233,6 +236,23 @@ public interface Channel extends DiscordEntity {
     default <T extends ChannelAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(Channel.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<? extends Channel> getCurrentCachedInstance() {
+        return getApi().getChannelById(getId());
+    }
+
+    @Override
+    default CompletableFuture<? extends Channel> getLatestInstance() {
+        Optional<? extends Channel> currentCachedInstance = getCurrentCachedInstance();
+        if (currentCachedInstance.isPresent()) {
+            return CompletableFuture.completedFuture(currentCachedInstance.get());
+        } else {
+            CompletableFuture<? extends Channel> result = new CompletableFuture<>();
+            result.completeExceptionally(new NoSuchElementException());
+            return result;
+        }
     }
 
 }

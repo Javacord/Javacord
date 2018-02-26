@@ -2,6 +2,7 @@ package de.btobastian.javacord.entities.message.emoji;
 
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Icon;
+import de.btobastian.javacord.entities.UpdatableFromCache;
 import de.btobastian.javacord.entities.impl.ImplIcon;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ import java.util.Optional;
  * If it's an unknown custom emoji, the object won't be unique and won't receive any updates!
  * Only {@link KnownCustomEmoji} receive updates!
  */
-public interface CustomEmoji extends DiscordEntity, Emoji {
+public interface CustomEmoji extends DiscordEntity, Emoji, UpdatableFromCache<KnownCustomEmoji> {
 
     /**
      * The logger of this class.
@@ -63,4 +64,10 @@ public interface CustomEmoji extends DiscordEntity, Emoji {
     default Optional<KnownCustomEmoji> asKnownCustomEmoji() {
         return this instanceof KnownCustomEmoji ? Optional.of((KnownCustomEmoji) this) : Optional.empty();
     }
+
+    @Override
+    default Optional<KnownCustomEmoji> getCurrentCachedInstance() {
+        return getApi().getCustomEmojiById(getId());
+    }
+
 }

@@ -112,7 +112,7 @@ import java.util.stream.Collectors;
 /**
  * The class represents a Discord server, sometimes also called guild.
  */
-public interface Server extends DiscordEntity {
+public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Gets the name of the server.
@@ -3255,6 +3255,11 @@ public interface Server extends DiscordEntity {
     default <T extends ServerAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(Server.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<Server> getCurrentCachedInstance() {
+        return getApi().getServerById(getId());
     }
 
 }

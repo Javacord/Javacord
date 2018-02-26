@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -264,6 +266,23 @@ public interface ChannelCategory extends ServerChannel {
     default <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(ChannelCategory.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<ChannelCategory> getCurrentCachedInstance() {
+        return getApi().getServerById(getServer().getId()).flatMap(server -> server.getChannelCategoryById(getId()));
+    }
+
+    @Override
+    default CompletableFuture<ChannelCategory> getLatestInstance() {
+        Optional<ChannelCategory> currentCachedInstance = getCurrentCachedInstance();
+        if (currentCachedInstance.isPresent()) {
+            return CompletableFuture.completedFuture(currentCachedInstance.get());
+        } else {
+            CompletableFuture<ChannelCategory> result = new CompletableFuture<>();
+            result.completeExceptionally(new NoSuchElementException());
+            return result;
+        }
     }
 
 }

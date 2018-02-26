@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -1499,6 +1500,23 @@ public interface TextChannel extends Channel, Messageable {
     default <T extends TextChannelAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(TextChannel.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<? extends TextChannel> getCurrentCachedInstance() {
+        return getApi().getTextChannelById(getId());
+    }
+
+    @Override
+    default CompletableFuture<? extends TextChannel> getLatestInstance() {
+        Optional<? extends TextChannel> currentCachedInstance = getCurrentCachedInstance();
+        if (currentCachedInstance.isPresent()) {
+            return CompletableFuture.completedFuture(currentCachedInstance.get());
+        } else {
+            CompletableFuture<? extends TextChannel> result = new CompletableFuture<>();
+            result.completeExceptionally(new NoSuchElementException());
+            return result;
+        }
     }
 
 }

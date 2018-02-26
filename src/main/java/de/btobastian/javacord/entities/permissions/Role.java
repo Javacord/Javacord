@@ -4,6 +4,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.UpdatableFromCache;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.listeners.ObjectAttachableListener;
 import de.btobastian.javacord.listeners.server.channel.ServerChannelChangeOverwrittenPermissionsListener;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * This class represents a Discord role, e.g. "moderator".
  */
-public interface Role extends DiscordEntity, Mentionable {
+public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Role> {
 
     /**
      * Gets the server of the role.
@@ -494,6 +495,11 @@ public interface Role extends DiscordEntity, Mentionable {
     default <T extends RoleAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(Role.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<Role> getCurrentCachedInstance() {
+        return getApi().getServerById(getServer().getId()).flatMap(server -> server.getRoleById(getId()));
     }
 
 }

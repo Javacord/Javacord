@@ -14,6 +14,9 @@ import de.btobastian.javacord.utils.ListenerManager;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -171,6 +174,25 @@ public interface PrivateChannel extends TextChannel, VoiceChannel {
     default <T extends PrivateChannelAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((ImplDiscordApi) getApi()).removeObjectListener(PrivateChannel.class, getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<PrivateChannel> getCurrentCachedInstance() {
+        return getApi().getCachedUserById(getRecipient().getId())
+                .flatMap(User::getPrivateChannel)
+                .filter(privateChannel -> privateChannel.getId() == getId());
+    }
+
+    @Override
+    default CompletableFuture<PrivateChannel> getLatestInstance() {
+        Optional<PrivateChannel> currentCachedInstance = getCurrentCachedInstance();
+        if (currentCachedInstance.isPresent()) {
+            return CompletableFuture.completedFuture(currentCachedInstance.get());
+        } else {
+            CompletableFuture<PrivateChannel> result = new CompletableFuture<>();
+            result.completeExceptionally(new NoSuchElementException());
+            return result;
+        }
     }
 
 }

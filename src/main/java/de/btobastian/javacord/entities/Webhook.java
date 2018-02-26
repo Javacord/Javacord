@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a webhook.
  * Webhook objects won't receive any updates!
  */
-public interface Webhook extends DiscordEntity {
+public interface Webhook extends DiscordEntity, Updatable<Webhook> {
 
     /**
      * Gets the server id of the webhook.
@@ -265,6 +265,11 @@ public interface Webhook extends DiscordEntity {
      */
     default CompletableFuture<Webhook> removeAvatar() {
         return getUpdater().removeAvatar().update();
+    }
+
+    @Override
+    default CompletableFuture<Webhook> getLatestInstance() {
+        return getApi().getWebhookById(getId());
     }
 
 }

@@ -6,6 +6,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Server;
+import de.btobastian.javacord.entities.UpdatableFromCache;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
@@ -53,7 +54,7 @@ import java.util.stream.Stream;
 /**
  * This class represents a Discord message.
  */
-public interface Message extends DiscordEntity, Comparable<Message> {
+public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFromCache<Message> {
 
     Pattern ESCAPED_CHARACTER =
             Pattern.compile("\\\\(?<char>[^a-zA-Z0-9\\p{javaWhitespace}\\xa0\\u2007\\u202E\\u202F])");
@@ -2090,6 +2091,16 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     default <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         removeListener(getApi(), getId(), listenerClass, listener);
+    }
+
+    @Override
+    default Optional<Message> getCurrentCachedInstance() {
+        return getApi().getCachedMessageById(getId());
+    }
+
+    @Override
+    default CompletableFuture<Message> getLatestInstance() {
+        return getChannel().getMessageById(getId());
     }
 
 }
