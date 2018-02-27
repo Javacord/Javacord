@@ -1,7 +1,7 @@
 package de.btobastian.javacord.entities;
 
 import de.btobastian.javacord.entities.impl.ImplIcon;
-import de.btobastian.javacord.utils.ImageContainer;
+import de.btobastian.javacord.utils.FileContainer;
 import de.btobastian.javacord.utils.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -42,7 +42,7 @@ public interface Icon {
      * @return The icon as byte array.
      */
     default CompletableFuture<byte[]> asByteArray() {
-        return new ImageContainer(getUrl()).asByteArray(((ImplIcon) this).getApi());
+        return new FileContainer(getUrl()).asByteArray(((ImplIcon) this).getApi());
     }
 
     /**
@@ -52,7 +52,7 @@ public interface Icon {
      * @return The input stream for the icon.
      */
     default CompletableFuture<InputStream> asInputStream() {
-        return new ImageContainer(getUrl()).asInputStream(((ImplIcon) this).getApi());
+        return new FileContainer(getUrl()).asInputStream(((ImplIcon) this).getApi());
     }
 
     /**
@@ -61,7 +61,7 @@ public interface Icon {
      * @return The icon as BufferedImage.
      */
     default CompletableFuture<BufferedImage> asBufferedImage() {
-        return new ImageContainer(getUrl()).asBufferedImage(((ImplIcon) this).getApi());
+        return new FileContainer(getUrl()).asBufferedImage(((ImplIcon) this).getApi());
     }
 
 }

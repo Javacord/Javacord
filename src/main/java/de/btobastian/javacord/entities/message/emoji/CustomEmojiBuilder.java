@@ -8,7 +8,7 @@ import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.impl.ImplServer;
 import de.btobastian.javacord.entities.permissions.Role;
-import de.btobastian.javacord.utils.ImageContainer;
+import de.btobastian.javacord.utils.FileContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -46,7 +46,7 @@ public class CustomEmojiBuilder {
     /**
      * The image of the emoji.
      */
-    private ImageContainer image = null;
+    private FileContainer image = null;
 
     /**
      * The whitelist of the emoji.
@@ -91,7 +91,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(Icon image) {
-        this.image = (image == null) ? null : new ImageContainer(image);
+        this.image = (image == null) ? null : new FileContainer(image);
         return this;
     }
 
@@ -102,7 +102,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(URL image) {
-        this.image = (image == null) ? null : new ImageContainer(image);
+        this.image = (image == null) ? null : new FileContainer(image);
         return this;
     }
 
@@ -113,7 +113,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(File image) {
-        this.image = (image == null) ? null : new ImageContainer(image);
+        this.image = (image == null) ? null : new FileContainer(image);
         return this;
     }
 
@@ -125,7 +125,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(BufferedImage image) {
-        this.image = (image == null) ? null : new ImageContainer(image, "png");
+        this.image = (image == null) ? null : new FileContainer(image, "png");
         return this;
     }
 
@@ -137,7 +137,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(BufferedImage image, String type) {
-        this.image = (image == null) ? null : new ImageContainer(image, type);
+        this.image = (image == null) ? null : new FileContainer(image, type);
         return this;
     }
 
@@ -149,7 +149,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(byte[] image) {
-        this.image = (image == null) ? null : new ImageContainer(image, "png");
+        this.image = (image == null) ? null : new FileContainer(image, "png");
         return this;
     }
 
@@ -161,7 +161,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(byte[] image, String type) {
-        this.image = (image == null) ? null : new ImageContainer(image, type);
+        this.image = (image == null) ? null : new FileContainer(image, type);
         return this;
     }
 
@@ -173,7 +173,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(InputStream image) {
-        this.image = (image == null) ? null : new ImageContainer(image, "png");
+        this.image = (image == null) ? null : new FileContainer(image, "png");
         return this;
     }
 
@@ -185,7 +185,7 @@ public class CustomEmojiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public CustomEmojiBuilder setImage(InputStream image, String type) {
-        this.image = (image == null) ? null : new ImageContainer(image, type);
+        this.image = (image == null) ? null : new FileContainer(image, type);
         return this;
     }
 
@@ -248,7 +248,7 @@ public class CustomEmojiBuilder {
         }
 
         return image.asByteArray(server.getApi()).thenAccept(bytes -> {
-            String base64Icon = "data:image/" + image.getImageType() + ";base64," +
+            String base64Icon = "data:image/" + image.getFileType() + ";base64," +
                     Base64.getEncoder().encodeToString(bytes);
             body.put("image", base64Icon);
         }).thenCompose(aVoid ->

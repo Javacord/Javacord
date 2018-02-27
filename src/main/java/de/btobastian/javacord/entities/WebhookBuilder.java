@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entities.channels.ServerTextChannel;
 import de.btobastian.javacord.entities.impl.ImplWebhook;
-import de.btobastian.javacord.utils.ImageContainer;
+import de.btobastian.javacord.utils.FileContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -39,7 +39,7 @@ public class WebhookBuilder {
     /**
      * The avatar to update.
      */
-    private ImageContainer avatar = null;
+    private FileContainer avatar = null;
 
     /**
      * Creates a new webhook builder.
@@ -80,7 +80,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(BufferedImage avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
         return this;
     }
 
@@ -92,7 +92,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(BufferedImage avatar, String fileType) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
         return this;
     }
 
@@ -103,7 +103,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(File avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
         return this;
     }
 
@@ -114,7 +114,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(Icon avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
         return this;
     }
 
@@ -125,7 +125,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(URL avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
         return this;
     }
 
@@ -137,7 +137,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(byte[] avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
         return this;
     }
 
@@ -149,7 +149,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(byte[] avatar, String fileType) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
         return this;
     }
 
@@ -161,7 +161,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(InputStream avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
         return this;
     }
 
@@ -173,7 +173,7 @@ public class WebhookBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookBuilder setAvatar(InputStream avatar, String fileType) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
         return this;
     }
 
@@ -192,7 +192,7 @@ public class WebhookBuilder {
         }
         if (avatar != null) {
             return avatar.asByteArray(channel.getApi()).thenAccept(bytes -> {
-                String base64Avatar = "data:image/" + avatar.getImageType() + ";base64," +
+                String base64Avatar = "data:image/" + avatar.getFileType() + ";base64," +
                         Base64.getEncoder().encodeToString(bytes);
                 body.put("avatar", base64Avatar);
             }).thenCompose(aVoid ->

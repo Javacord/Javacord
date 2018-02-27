@@ -3,7 +3,7 @@ package de.btobastian.javacord.entities;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.DiscordApi;
-import de.btobastian.javacord.utils.ImageContainer;
+import de.btobastian.javacord.utils.FileContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -53,7 +53,7 @@ public class ServerBuilder {
     /**
      * The icon.
      */
-    private ImageContainer icon = null;
+    private FileContainer icon = null;
 
     /**
      * Creates a new server creator.
@@ -128,7 +128,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(BufferedImage icon) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new FileContainer(icon, "png");
         return this;
     }
 
@@ -140,7 +140,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(BufferedImage icon, String fileType) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
         return this;
     }
 
@@ -151,7 +151,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(File icon) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new FileContainer(icon);
         return this;
     }
 
@@ -162,7 +162,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(Icon icon) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new FileContainer(icon);
         return this;
     }
 
@@ -173,7 +173,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(URL icon) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon);
+        this.icon = (icon == null) ? null : new FileContainer(icon);
         return this;
     }
 
@@ -185,7 +185,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(byte[] icon) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new FileContainer(icon, "png");
         return this;
     }
 
@@ -197,7 +197,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(byte[] icon, String fileType) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
         return this;
     }
 
@@ -209,7 +209,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(InputStream icon) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon, "png");
+        this.icon = (icon == null) ? null : new FileContainer(icon, "png");
         return this;
     }
 
@@ -221,7 +221,7 @@ public class ServerBuilder {
      * @return The current instance in order to chain call methods.
      */
     public ServerBuilder setIcon(InputStream icon, String fileType) {
-        this.icon = (icon == null) ? null : new ImageContainer(icon, fileType);
+        this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
         return this;
     }
 
@@ -250,7 +250,7 @@ public class ServerBuilder {
         }
         if (icon != null) {
             return icon.asByteArray(api).thenAccept(bytes -> {
-                String base64Icon = "data:image/" + icon.getImageType() + ";base64," +
+                String base64Icon = "data:image/" + icon.getFileType() + ";base64," +
                         Base64.getEncoder().encodeToString(bytes);
                 body.put("icon", base64Icon);
             }).thenCompose(aVoid -> new RestRequest<Long>(api, RestMethod.POST, RestEndpoint.SERVER)

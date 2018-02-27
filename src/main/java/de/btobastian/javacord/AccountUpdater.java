@@ -3,7 +3,7 @@ package de.btobastian.javacord;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entities.Icon;
-import de.btobastian.javacord.utils.ImageContainer;
+import de.btobastian.javacord.utils.FileContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -33,7 +33,7 @@ public class AccountUpdater {
     /**
      * The avatar to update.
      */
-    private ImageContainer avatar = null;
+    private FileContainer avatar = null;
 
     /**
      * Creates a new account updater.
@@ -63,7 +63,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(BufferedImage avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
         return this;
     }
 
@@ -75,7 +75,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(BufferedImage avatar, String fileType) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
         return this;
     }
 
@@ -86,7 +86,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(File avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
         return this;
     }
 
@@ -97,7 +97,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(Icon avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
         return this;
     }
 
@@ -108,7 +108,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(URL avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
         return this;
     }
 
@@ -120,7 +120,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(byte[] avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
         return this;
     }
 
@@ -132,7 +132,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(byte[] avatar, String fileType) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
         return this;
     }
 
@@ -144,7 +144,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(InputStream avatar) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, "png");
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
         return this;
     }
 
@@ -156,7 +156,7 @@ public class AccountUpdater {
      * @return The current instance in order to chain call methods.
      */
     public AccountUpdater setAvatar(InputStream avatar, String fileType) {
-        this.avatar = (avatar == null) ? null : new ImageContainer(avatar, fileType);
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
         return this;
     }
 
@@ -178,7 +178,7 @@ public class AccountUpdater {
         if (patchAccount) {
             if (avatar != null) {
                 return avatar.asByteArray(api).thenAccept(bytes -> {
-                    String base64Avatar = "data:image/" + avatar.getImageType() + ";base64," +
+                    String base64Avatar = "data:image/" + avatar.getFileType() + ";base64," +
                             Base64.getEncoder().encodeToString(bytes);
                     body.put("avatar", base64Avatar);
                 }).thenCompose(aVoid -> new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
