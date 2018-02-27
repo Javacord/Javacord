@@ -1,7 +1,7 @@
 package de.btobastian.javacord;
 
-import de.btobastian.javacord.entities.permissions.Permissions;
-import de.btobastian.javacord.entities.permissions.impl.ImplPermissions;
+import de.btobastian.javacord.entity.permission.Permissions;
+import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
 
 /**
  * A tool to create bot invites.
