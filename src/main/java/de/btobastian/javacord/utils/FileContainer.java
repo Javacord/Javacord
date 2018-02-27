@@ -62,15 +62,15 @@ public class FileContainer {
     private final InputStream fileAsInputStream;
 
     /**
-     * The type of the file, e.g. "txt", "png" or "gif".
+     * The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
-    private final String fileType;
+    private final String fileTypeOrName;
 
     /**
      * Creates a new file container with a buffered image.
      *
      * @param file The file as a buffered image.
-     * @param type The type of the file, e.g. "txt", "png" or "gif".
+     * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
     public FileContainer(BufferedImage file, String type) {
         fileAsBufferedImage = file;
@@ -79,7 +79,7 @@ public class FileContainer {
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileType = type;
+        fileTypeOrName = type;
     }
 
     /**
@@ -94,7 +94,7 @@ public class FileContainer {
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileType = FileUtils.getExtension(file);
+        fileTypeOrName = file.getName();
     }
 
     /**
@@ -109,7 +109,7 @@ public class FileContainer {
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileType = FileUtils.getExtension(file.getUrl().getFile());
+        fileTypeOrName = file.getUrl().getFile();
     }
 
     /**
@@ -124,14 +124,14 @@ public class FileContainer {
         fileAsUrl = file;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileType = FileUtils.getExtension(file.getFile());
+        fileTypeOrName = file.getFile();
     }
 
     /**
      * Creates a new file container with an url.
      *
      * @param file The file as a byte array.
-     * @param type The type of the file, e.g. "txt", "png" or "gif".
+     * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
     public FileContainer(byte[] file, String type) {
         fileAsBufferedImage = null;
@@ -140,14 +140,14 @@ public class FileContainer {
         fileAsUrl = null;
         fileAsByteArray = file;
         fileAsInputStream = null;
-        fileType = type;
+        fileTypeOrName = type;
     }
 
     /**
      * Creates a new file container with an input stream.
      *
      * @param file The file as an input stream.
-     * @param type The type of the file, e.g. "txt", "png" or "gif".
+     * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
     public FileContainer(InputStream file, String type) {
         fileAsBufferedImage = null;
@@ -156,16 +156,29 @@ public class FileContainer {
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = file;
-        fileType = type;
+        fileTypeOrName = type;
     }
 
     /**
-     * Gets the type of the file, e.g. "txt", "png" or "gif".
+     * Gets the type ("png", "txt", ...) of the file.
      *
      * @return The type of the file.
      */
     public String getFileType() {
-        return fileType;
+        if (fileTypeOrName != null && fileTypeOrName.contains(".")) {
+            return FileUtils.getExtension(fileTypeOrName);
+        } else {
+            return fileTypeOrName;
+        }
+    }
+
+    /**
+     * Gets the type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
+     *
+     * @return The type or name of the file.
+     */
+    public String getFileTypeOrName() {
+        return fileTypeOrName;
     }
 
     /**
@@ -227,7 +240,7 @@ public class FileContainer {
         try {
             if (fileAsBufferedImage != null) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(fileAsBufferedImage, fileType, os);
+                ImageIO.write(fileAsBufferedImage, fileTypeOrName, os);
                 future.complete(new ByteArrayInputStream(os.toByteArray()));
                 return future;
             }
