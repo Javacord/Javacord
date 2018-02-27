@@ -83,6 +83,11 @@ public class ImplServer implements Server, Cleanupable {
     private long ownerId;
 
     /**
+     * The application id of the owner.
+     */
+    private long applicationId = -1;
+
+    /**
      * The verification level of the server.
      */
     private VerificationLevel verificationLevel;
@@ -196,6 +201,9 @@ public class ImplServer implements Server, Cleanupable {
         }
         if (data.hasNonNull("system_channel_id")) {
             systemChannelId = data.get("system_channel_id").asLong();
+        }
+        if (data.hasNonNull("application_id")) {
+            applicationId = data.get("application_id").asLong();
         }
 
         if (data.has("channels")) {
@@ -355,6 +363,15 @@ public class ImplServer implements Server, Cleanupable {
      */
     public void setOwnerId(long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    /**
+     * Sets the application id.
+     *
+     * @param applicationId The application id to set.
+     */
+    public void setApplicationId(long applicationId) {
+        this.applicationId = applicationId;
     }
 
     /**
@@ -632,6 +649,11 @@ public class ImplServer implements Server, Cleanupable {
     public User getOwner() {
         return api.getCachedUserById(ownerId)
                 .orElseThrow(() -> new IllegalStateException("Owner of server " + toString() + " is not cached!"));
+    }
+
+    @Override
+    public Optional<Long> getApplicationId() {
+        return applicationId != -1 ? Optional.of(applicationId) : Optional.empty();
     }
 
     @Override

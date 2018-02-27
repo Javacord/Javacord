@@ -178,6 +178,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     User getOwner();
 
     /**
+     * Gets the application id of the server's owner.
+     * The application id is only present for bot-created servers.
+     *
+     * @return The application id of the server's owner.
+     */
+    Optional<Long> getApplicationId();
+
+    /**
      * Gets the verification level of the server.
      *
      * @return The verification level of the server.
