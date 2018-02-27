@@ -177,7 +177,7 @@ public class MessageBuilder {
      * @param image The image to add as an attachment.
      * @param fileName The file name of the image.
      * @return The current instance in order to chain call methods.
-     * @see ##addAttachment(BufferedImage, String)
+     * @see #addAttachment(BufferedImage, String)
      */
     public MessageBuilder addFile(BufferedImage image, String fileName) {
         return addAttachment(image, fileName);
