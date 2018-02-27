@@ -3,10 +3,12 @@ package de.btobastian.javacord.entities.message;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.ImplDiscordApi;
+import de.btobastian.javacord.entities.Icon;
 import de.btobastian.javacord.entities.Mentionable;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.channels.TextChannel;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import de.btobastian.javacord.utils.FileContainer;
 import de.btobastian.javacord.utils.rest.RestEndpoint;
 import de.btobastian.javacord.utils.rest.RestMethod;
 import de.btobastian.javacord.utils.rest.RestRequest;
@@ -14,11 +16,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
-import java.io.ByteArrayOutputStream;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -55,7 +54,7 @@ public class MessageBuilder {
     /**
      * A list with all attachments which should be added to the message.
      */
-    private final List<Attachment> attachments = new ArrayList<>();
+    private final List<FileContainer> attachments = new ArrayList<>();
 
     /**
      * Creates a new message builder.
@@ -175,6 +174,63 @@ public class MessageBuilder {
     /**
      * Adds a file to the message.
      *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @return The current instance in order to chain call methods.
+     * @see ##addAttachment(BufferedImage, String)
+     */
+    public MessageBuilder addFile(BufferedImage image, String fileName) {
+        return addAttachment(image, fileName);
+    }
+
+    /**
+     * Adds a file to the message.
+     *
+     * @param file The file to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(File)
+     */
+    public MessageBuilder addFile(File file) {
+        return addAttachment(file);
+    }
+
+    /**
+     * Adds a file to the message.
+     *
+     * @param icon The icon to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(Icon)
+     */
+    public MessageBuilder addFile(Icon icon) {
+        return addAttachment(icon);
+    }
+
+    /**
+     * Adds a file to the message.
+     *
+     * @param url The url of the attachment.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(URL)
+     */
+    public MessageBuilder addFile(URL url) {
+        return addAttachment(url);
+    }
+
+    /**
+     * Adds a file to the message.
+     *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(byte[], String)
+     */
+    public MessageBuilder addFile(byte[] bytes, String fileName) {
+        return addAttachment(bytes, fileName);
+    }
+
+    /**
+     * Adds a file to the message.
+     *
      * @param stream The stream of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
@@ -185,14 +241,46 @@ public class MessageBuilder {
     }
 
     /**
-     * Adds a file to the message.
+     * Adds an attachment to the message.
      *
-     * @param file The file.
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
      * @return The current instance in order to chain call methods.
-     * @see #addAttachment(File)
      */
-    public MessageBuilder addFile(File file) {
-        return addAttachment(file);
+    public MessageBuilder addAttachment(BufferedImage image, String fileName) {
+        if (image == null || fileName == null) {
+            throw new IllegalArgumentException("image and fileName cannot be null!");
+        }
+        attachments.add(new FileContainer(image, fileName));
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param file The file to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachment(File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("file cannot be null!");
+        }
+        attachments.add(new FileContainer(file));
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param icon The icon to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachment(Icon icon) {
+        if (icon == null) {
+            throw new IllegalArgumentException("icon cannot be null!");
+        }
+        attachments.add(new FileContainer(icon));
+        return this;
     }
 
     /**
@@ -202,7 +290,25 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder addAttachment(URL url) {
-        attachments.add(new Attachment(url));
+        if (url == null) {
+            throw new IllegalArgumentException("url cannot be null!");
+        }
+        attachments.add(new FileContainer(url));
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachment(byte[] bytes, String fileName) {
+        if (bytes == null || fileName == null) {
+            throw new IllegalArgumentException("bytes and fileName cannot be null!");
+        }
+        attachments.add(new FileContainer(bytes, fileName));
         return this;
     }
 
@@ -217,25 +323,8 @@ public class MessageBuilder {
         if (stream == null || fileName == null) {
             throw new IllegalArgumentException("stream and fileName cannot be null!");
         }
-        attachments.add(new Attachment(fileName, stream));
+        attachments.add(new FileContainer(stream, fileName));
         return this;
-    }
-
-    /**
-     * Adds an attachment to the message.
-     *
-     * @param file The file.
-     * @return The current instance in order to chain call methods.
-     */
-    public MessageBuilder addAttachment(File file) {
-        if (file == null) {
-            throw new IllegalArgumentException("file cannot be null!");
-        }
-        try {
-            return addAttachment(new FileInputStream(file), file.getName());
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("The provided file couldn't be found!");
-        }
     }
 
     /**
@@ -313,32 +402,21 @@ public class MessageBuilder {
                     MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("payload_json", body.toString());
-                    List<Attachment> tempAttachments = new ArrayList<>();
+                    List<FileContainer> tempAttachments = new ArrayList<>();
                     tempAttachments.addAll(attachments);
                     // Add the attachments required for the embed
                     if (embed != null) {
-                        embed.consumeRequiredAttachments((fileName, image) -> tempAttachments.add(
-                                new Attachment(fileName, image.asInputStream(channel.getApi()).join())));
+                        tempAttachments.addAll(embed.getRequiredAttachments());
                     }
                     for (int i = 0; i < tempAttachments.size(); i++) {
-                        byte[] bytes;
-                        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-                            int nRead;
-                            byte[] data = new byte[16384];
+                        byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();
 
-                            while ((nRead = tempAttachments.get(i).getStream().read(data, 0, data.length)) != -1) {
-                                buffer.write(data, 0, nRead);
-                            }
-                            buffer.flush();
-                            bytes = buffer.toByteArray();
-                            tempAttachments.get(i).getStream().close();
-                        }
-
-                        String mediaType = URLConnection.guessContentTypeFromName(tempAttachments.get(i).getFileName());
+                        String mediaType = URLConnection
+                                .guessContentTypeFromName(tempAttachments.get(i).getFileTypeOrName());
                         if (mediaType == null) {
                             mediaType = "application/octet-stream";
                         }
-                        multipartBodyBuilder.addFormDataPart("file" + i, tempAttachments.get(i).getFileName(),
+                        multipartBodyBuilder.addFormDataPart("file" + i, tempAttachments.get(i).getFileTypeOrName(),
                                 RequestBody.create(MediaType.parse(mediaType), bytes));
                     }
 
@@ -367,67 +445,6 @@ public class MessageBuilder {
     @Override
     public String toString() {
         return strBuilder.toString();
-    }
-
-    /**
-     * A simple class only used for file upload.
-     */
-    private final class Attachment {
-
-        private String fileName;
-        private InputStream stream;
-        private final URL url;
-
-        /**
-         * Creates a new attachment.
-         *
-         * @param fileName The name of the attached file.
-         * @param stream The stream which provides the file.
-         */
-        protected Attachment(String fileName, InputStream stream) {
-            this.fileName = fileName;
-            this.stream = stream;
-            this.url = null;
-        }
-
-        /**
-         * Creates a new attachment.
-         *
-         * @param url The url of the attached file.
-         */
-        protected Attachment(URL url) {
-            this.fileName = null;
-            this.stream = null;
-            this.url = url;
-        }
-
-        /**
-         * Gets the name of the attached file.
-         *
-         * @return The name of the attached file.
-         */
-        protected String getFileName() {
-            if (fileName == null) {
-                fileName = url.getFile();
-                if (fileName.equals("")) {
-                    fileName = "index.html";
-                }
-            }
-            return fileName;
-        }
-
-        /**
-         * Gets the stream which provides the file.
-         *
-         * @return The stream which provides the file.
-         */
-        protected InputStream getStream() throws IOException {
-            if (stream == null) {
-                stream = url.openStream();
-            }
-            return stream;
-        }
-
     }
 
 }

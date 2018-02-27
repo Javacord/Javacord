@@ -64,7 +64,7 @@ public class FileContainer {
     /**
      * The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
-    private final String fileTypeOrName;
+    private String fileTypeOrName;
 
     /**
      * Creates a new file container with a buffered image.
@@ -156,6 +156,15 @@ public class FileContainer {
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = file;
+        fileTypeOrName = type;
+    }
+
+    /**
+     * Sets the type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
+     *
+     * @param type The type or name of the file.
+     */
+    public void setFileTypeOrName(String type) {
         fileTypeOrName = type;
     }
 
