@@ -21,7 +21,6 @@ import de.btobastian.javacord.event.connection.ResumeEvent;
 import de.btobastian.javacord.listener.connection.LostConnectionListener;
 import de.btobastian.javacord.listener.connection.ReconnectListener;
 import de.btobastian.javacord.listener.connection.ResumeListener;
-import de.btobastian.javacord.util.GatewayOpcode;
 import de.btobastian.javacord.util.concurrent.ThreadFactory;
 import de.btobastian.javacord.util.handler.ReadyHandler;
 import de.btobastian.javacord.util.handler.ResumedHandler;

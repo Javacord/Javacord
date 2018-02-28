@@ -1,4 +1,4 @@
-package de.btobastian.javacord.util;
+package de.btobastian.javacord.util.gateway;
 
 import java.util.Arrays;
 import java.util.Collections;
