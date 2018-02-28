@@ -2,11 +2,11 @@ package de.btobastian.javacord;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.btobastian.javacord.entities.Icon;
-import de.btobastian.javacord.utils.FileContainer;
-import de.btobastian.javacord.utils.rest.RestEndpoint;
-import de.btobastian.javacord.utils.rest.RestMethod;
-import de.btobastian.javacord.utils.rest.RestRequest;
+import de.btobastian.javacord.entity.Icon;
+import de.btobastian.javacord.util.FileContainer;
+import de.btobastian.javacord.util.rest.RestEndpoint;
+import de.btobastian.javacord.util.rest.RestMethod;
+import de.btobastian.javacord.util.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

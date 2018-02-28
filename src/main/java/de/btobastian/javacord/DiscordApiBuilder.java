@@ -1,12 +1,12 @@
 package de.btobastian.javacord;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.btobastian.javacord.utils.DiscordWebSocketAdapter;
-import de.btobastian.javacord.utils.logging.LoggerUtil;
-import de.btobastian.javacord.utils.rest.RestEndpoint;
-import de.btobastian.javacord.utils.rest.RestMethod;
-import de.btobastian.javacord.utils.rest.RestRequest;
-import de.btobastian.javacord.utils.rest.RestRequestResult;
+import de.btobastian.javacord.util.gateway.DiscordWebSocketAdapter;
+import de.btobastian.javacord.util.logging.LoggerUtil;
+import de.btobastian.javacord.util.rest.RestEndpoint;
+import de.btobastian.javacord.util.rest.RestMethod;
+import de.btobastian.javacord.util.rest.RestRequest;
+import de.btobastian.javacord.util.rest.RestRequestResult;
 import org.slf4j.Logger;
 import org.slf4j.MDC.MDCCloseable;
 
@@ -210,7 +210,7 @@ public class DiscordApiBuilder {
     /**
      * Sets if Javacord should wait for all servers to become available on startup.
      * If this is disabled the {@link DiscordApi#getServers()} method will return an empty collection directly after
-     * logging in and fire {@link de.btobastian.javacord.events.server.ServerBecomesAvailableEvent} events once they
+     * logging in and fire {@link de.btobastian.javacord.event.server.ServerBecomesAvailableEvent} events once they
      * become available. You can check the ids of unavailable servers using the
      * {@link DiscordApi#getUnavailableServers()} method.
      *
