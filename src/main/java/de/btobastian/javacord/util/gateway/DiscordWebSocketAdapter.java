@@ -316,39 +316,24 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     @Override
     public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
                                WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
-        if (closedByServer) {
-            String closeReason = serverCloseFrame != null ? serverCloseFrame.getCloseReason() : "unknown";
-            String closeCodeString;
-            if (serverCloseFrame != null) {
-                int code = serverCloseFrame.getCloseCode();
-                closeCodeString = WebSocketCloseCode.fromCode(code)
-                        .map(closeCode -> closeCode + " (" + code + ")")
-                        .orElseGet(() -> String.valueOf(code));
-            } else {
-                closeCodeString = "'unknown'";
-            }
-            logger.info("Websocket closed with reason '{}' and code {} by server!", closeReason, closeCodeString);
-        } else {
-            switch (clientCloseFrame == null ? -1 : clientCloseFrame.getCloseCode()) {
-                case com.neovisionaries.ws.client.WebSocketCloseCode.UNCONFORMED:
-                case com.neovisionaries.ws.client.WebSocketCloseCode.VIOLATED:
-                    logger.debug("Websocket closed!");
-                    break;
-                default:
-                    String closeReason = clientCloseFrame != null ? clientCloseFrame.getCloseReason() : "unknown";
-                    String closeCodeString;
-                    if (clientCloseFrame != null) {
-                        int code = clientCloseFrame.getCloseCode();
-                        closeCodeString = WebSocketCloseCode.fromCode(code)
-                                .map(closeCode -> closeCode + " (" + code + ")")
-                                .orElseGet(() -> String.valueOf(code));
-                    } else {
-                        closeCodeString = "'unknown'";
-                    }
-                    logger.info("Websocket closed with reason '{}' and code {} by client!", closeReason, closeCodeString);
-                    break;
-            }
-        }
+        Optional<WebSocketFrame> closeFrameOptional =
+                Optional.ofNullable(closedByServer ? serverCloseFrame : clientCloseFrame);
+
+        String closeReason = closeFrameOptional
+                .map(WebSocketFrame::getCloseReason)
+                .orElse("unknown");
+
+        String closeCodeString = closeFrameOptional
+                .map(closeFrame -> {
+                    int code = closeFrame.getCloseCode();
+                    return WebSocketCloseCode.fromCode(code)
+                            .map(closeCode -> closeCode + " (" + code + ")")
+                            .orElseGet(() -> String.valueOf(code));
+                })
+                .orElse("'unknown'");
+
+        logger.info("Websocket closed with reason '{}' and code {} by {}!",
+                    closeReason, closeCodeString, closedByServer ? "server" : "client");
 
         LostConnectionEvent lostConnectionEvent = new LostConnectionEvent(api);
         List<LostConnectionListener> listeners = new ArrayList<>();
