@@ -1,4 +1,4 @@
-package de.btobastian.javacord.util.handler.server;
+package de.btobastian.javacord.util.handler.guild;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;

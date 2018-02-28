@@ -1,4 +1,4 @@
-package de.btobastian.javacord.util.handler.server.role;
+package de.btobastian.javacord.util.handler.guild.role;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
