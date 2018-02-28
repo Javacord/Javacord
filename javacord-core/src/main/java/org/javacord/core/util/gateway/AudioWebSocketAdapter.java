@@ -54,7 +54,11 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     public AudioWebSocketAdapter(AudioConnectionImpl connection) {
         this.connection = connection;
         this.api = (DiscordApiImpl) connection.getChannel().getApi();
-        this.heart = new Heart(api, websocket, true);
+        this.heart = new Heart(
+                api,
+                heartbeatFrame -> websocket.get().sendFrame(heartbeatFrame),
+                (code, reason) -> websocket.get().sendClose(code, reason),
+                true);
         connect();
     }
 
