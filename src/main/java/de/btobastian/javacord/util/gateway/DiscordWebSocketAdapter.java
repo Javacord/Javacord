@@ -54,6 +54,7 @@ import de.btobastian.javacord.util.handler.user.PresenceUpdateHandler;
 import de.btobastian.javacord.util.handler.user.PresencesReplaceHandler;
 import de.btobastian.javacord.util.handler.user.TypingStartHandler;
 import de.btobastian.javacord.util.handler.user.UserUpdateHandler;
+import de.btobastian.javacord.util.logging.ExceptionLogger;
 import de.btobastian.javacord.util.logging.LoggerUtil;
 import de.btobastian.javacord.util.logging.WebSocketLogger;
 import de.btobastian.javacord.util.rest.RestEndpoint;
@@ -76,17 +77,20 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -161,34 +165,49 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         registerHandlers();
         connect();
 
-        api.getThreadPool().getSingleThreadExecutorService("Request Guild Members Queue Consumer")
-                .submit(() -> {
-                    try {
-                        List<Long> serverIds = new ArrayList<>();
-                        while (!Thread.interrupted()) {
-                            serverIds.add(requestGuildMembersQueue.take());
-                            requestGuildMembersQueue.drainTo(serverIds, 49);
-                            ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
-                                    .put("op", GatewayOpcode.REQUEST_GUILD_MEMBERS.getCode());
-                            ObjectNode data = requestGuildMembersPacket.putObject("d")
-                                    .put("query","")
-                                    .put("limit", 0);
-                            if (serverIds.size() == 1) {
-                                data.put("guild_id", Long.toUnsignedString(serverIds.get(0)));
-                            } else {
-                                ArrayNode guildIds = data.putArray("guild_id");
-                                for (long serverId : serverIds) {
-                                    guildIds.add(Long.toUnsignedString(serverId));
+        ExecutorService requestGuildMembersQueueConsumer =
+                api.getThreadPool().getSingleDaemonThreadExecutorService("Request Server Members Queue Consumer");
+        requestGuildMembersQueueConsumer.submit(() -> {
+            while (!requestGuildMembersQueueConsumer.isShutdown()) {
+                try {
+                    // wait 1 minute for a request being queued
+                    Long nextServerId = requestGuildMembersQueue.poll(1, TimeUnit.MINUTES);
+                    // timed out => check whether the abort condition triggers
+                    if (nextServerId == null) {
+                        continue;
+                    }
+                    // put the element back to the queue
+                    requestGuildMembersQueue.add(nextServerId);
+                    // send requests in up-to 50 guilds batches
+                    AtomicInteger batchCounter = new AtomicInteger();
+                    requestGuildMembersQueue.stream().distinct()
+                            .collect(Collectors.groupingBy(serverId -> batchCounter.getAndIncrement() / 50))
+                            .values().stream()
+                            .forEach(serverIdBatch -> {
+                                requestGuildMembersQueue.removeAll(serverIdBatch);
+                                ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
+                                        .put("op", GatewayOpcode.REQUEST_GUILD_MEMBERS.getCode());
+                                ObjectNode data = requestGuildMembersPacket.putObject("d")
+                                        .put("query", "")
+                                        .put("limit", 0);
+                                if (serverIdBatch.size() == 1) {
+                                    data.put("guild_id", Long.toUnsignedString(serverIdBatch.get(0)));
+                                } else {
+                                    ArrayNode guildIds = data.putArray("guild_id");
+                                    serverIdBatch.stream()
+                                            .map(Long::toUnsignedString)
+                                            .forEach(guildIds::add);
                                 }
-                            }
-                            logger.debug("Sending request guild members packet {}",
-                                    requestGuildMembersPacket.toString());
-                            getWebSocket().sendText(requestGuildMembersPacket.toString());
-                            serverIds.clear();
-                            Thread.sleep(1000);
-                        }
-                    } catch (InterruptedException ignored) { } // Break the loop when the thread pool shuts down
-                });
+                                logger.debug("Sending request guild members packet {}",
+                                             requestGuildMembersPacket.toString());
+                                getWebSocket().sendText(requestGuildMembersPacket.toString());
+                            });
+                    Thread.sleep(1000);
+                } catch (Throwable t) {
+                    ExceptionLogger.getConsumer(InterruptedException.class).accept(t);
+                }
+            }
+        });
     }
 
     /**

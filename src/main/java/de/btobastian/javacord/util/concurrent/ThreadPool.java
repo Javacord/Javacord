@@ -79,4 +79,17 @@ public class ThreadPool {
                                        new ThreadFactory("Javacord - " + threadName, false)));
     }
 
+    /**
+     * Gets an executor service which only uses a single daemon thread.
+     *
+     * @param threadName The thread name of the executor service.
+     *                   Will create a new one if the thread name is used the first time.
+     * @return The executor service with the given thread name. Never {@code null}!
+     */
+    public ExecutorService getSingleDaemonThreadExecutorService(String threadName) {
+        return executorServiceSingleThreads.computeIfAbsent(threadName, key ->
+                new ThreadPoolExecutor(0, 1, KEEP_ALIVE_TIME, TIME_UNIT, new LinkedBlockingQueue<>(),
+                                       new ThreadFactory("Javacord - " + threadName, true)));
+    }
+
 }
