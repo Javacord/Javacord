@@ -1,7 +1,6 @@
-package de.btobastian.javacord.util;
+package de.btobastian.javacord.util.logging;
 
 import de.btobastian.javacord.entity.channel.TextChannel;
-import de.btobastian.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
 import java.lang.Thread.UncaughtExceptionHandler;
