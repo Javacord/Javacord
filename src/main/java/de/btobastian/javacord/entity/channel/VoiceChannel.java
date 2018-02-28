@@ -143,6 +143,7 @@ public interface VoiceChannel extends Channel {
      * @return A map with all registered listeners that implement one or more {@code VoiceChannelAttachableListener}s
      * and their assigned listener classes they listen to.
      */
+    @SuppressWarnings("unchecked")
     default <T extends VoiceChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getVoiceChannelAttachableListeners() {
         Map<T, List<Class<T>>> voiceChannelListeners =
