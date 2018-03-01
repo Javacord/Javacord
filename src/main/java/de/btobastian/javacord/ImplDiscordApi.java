@@ -148,6 +148,9 @@ public class ImplDiscordApi implements DiscordApi {
      */
     private final OkHttpClient httpClient;
 
+    /**
+     * The event dispatcher.
+     */
     private final EventDispatcher eventDispatcher;
 
     /**
