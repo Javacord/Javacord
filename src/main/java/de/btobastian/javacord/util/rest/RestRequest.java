@@ -175,6 +175,7 @@ public class RestRequest<T> {
      * Adds a {@code X-Audit-Log-Reason} header to the request with the given reason.
      *
      * @param reason The reason.
+     * @return The current instance in order to chain call methods.
      */
     public RestRequest<T> setAuditLogReason(String reason) {
         if (reason != null) {
