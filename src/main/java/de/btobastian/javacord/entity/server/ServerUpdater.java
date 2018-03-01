@@ -84,6 +84,11 @@ public class ServerUpdater {
     private ServerChannel afkChannel = null;
 
     /**
+     * Whether the afk channel should be updated or not.
+     */
+    private boolean updateAfkChannel = false;
+
+    /**
      * The afk timeout to update.
      */
     private Integer afkTimeout = null;
@@ -117,6 +122,11 @@ public class ServerUpdater {
      * The system channel to update.
      */
     private ServerChannel systemChannel = null;
+
+    /**
+     * Whether the system channel should be updated or not.
+     */
+    private boolean updateSystemChannel = false;
 
     /**
      * Creates a new server updater.
@@ -191,7 +201,17 @@ public class ServerUpdater {
      */
     public ServerUpdater setAfkChannel(ServerVoiceChannel afkChannel) {
         this.afkChannel = afkChannel;
+        updateAfkChannel = true;
         return this;
+    }
+
+    /**
+     * Queues the afk channel to be removed.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeAfkChannel() {
+        return setAfkChannel(null);
     }
 
     /**
@@ -342,7 +362,6 @@ public class ServerUpdater {
         return this;
     }
 
-
     /**
      * Queues the splash to be updated.
      * This method assumes the file type is "png"!
@@ -476,7 +495,17 @@ public class ServerUpdater {
      */
     public ServerUpdater setSystemChannel(ServerTextChannel systemChannel) {
         this.systemChannel = systemChannel;
+        updateSystemChannel = true;
         return this;
+    }
+
+    /**
+     * Queues the system channel to be removed.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeSystemChannel() {
+        return setSystemChannel(null);
     }
 
     /**
@@ -593,8 +622,12 @@ public class ServerUpdater {
             body.put("default_message_notifications", defaultMessageNotificationLevel.getId());
             patchServer = true;
         }
-        if (afkChannel != null) {
-            body.put("afk_channel_id", afkChannel.getIdAsString());
+        if (updateAfkChannel) {
+            if (afkChannel != null) {
+                body.put("afk_channel_id", afkChannel.getIdAsString());
+            } else {
+                body.putNull("afk_channel_id");
+            }
             patchServer = true;
         }
         if (afkTimeout != null) {
@@ -617,8 +650,12 @@ public class ServerUpdater {
             body.put("owner_id", owner.getIdAsString());
             patchServer = true;
         }
-        if (systemChannel != null) {
-            body.put("system_channel_id", systemChannel.getIdAsString());
+        if (updateSystemChannel) {
+            if (systemChannel != null) {
+                body.put("system_channel_id", systemChannel.getIdAsString());
+            } else {
+                body.putNull("system_channel_id");
+            }
             patchServer = true;
         }
         // Only make a REST call, if we really want to update something

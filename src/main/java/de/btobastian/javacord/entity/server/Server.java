@@ -709,6 +709,18 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Removes the afk channel of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeAfkChannel() {
+        return getUpdater().removeAfkChannel().update();
+    }
+
+    /**
      * Updates the afk timeout of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
@@ -1016,6 +1028,18 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      */
     default CompletableFuture<Void> setSystemChannel(ServerTextChannel systemChannel) {
         return getUpdater().setSystemChannel(systemChannel).update();
+    }
+
+    /**
+     * Removes the system channel of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeSystemChannel() {
+        return getUpdater().removeSystemChannel().update();
     }
 
     /**
