@@ -1,0 +1,47 @@
+pom {
+    name 'Javacord'
+    description project.description
+    url 'https://github.com/BtoBastian/Javacord/wiki'
+    issueManagement {
+        system 'GitHub'
+        url 'https://github.com/BtoBastian/Javacord/issues'
+    }
+    ciManagement {
+        system 'CircleCI'
+        url 'https://circleci.com/gh/BtoBastian/Javacord'
+    }
+    inceptionYear '2015'
+    developers {
+        developer {
+            id 'BtoBastian'
+            name 'Bastian Oppermann'
+            email 'bastianoppermann1997@gmail.com'
+            url 'https://github.com/BtoBastian'
+            timezone 'Europe/Berlin'
+        }
+    }
+    contributors {
+        contributor {
+            name 'Björn Kautler'
+            email 'Bjoern@Kautler.net'
+            url 'https://github.com/Vampire'
+            timezone 'Europe/Berlin'
+        }
+    }
+    licenses {
+        license {
+            name 'Apache License, Version 2.0'
+            url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+            comments 'A business-friendly OSS license'
+        }
+    }
+    scm {
+        connection 'scm:git:https://github.com/BtoBastian/Javacord.git'
+        developerConnection 'scm:git:git@github.com:BtoBastian/Javacord.git'
+        url 'https://github.com/BtoBastian/Javacord'
+    }
+    distributionManagement {
+        downloadUrl 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.javacord%22'
+    }
+}

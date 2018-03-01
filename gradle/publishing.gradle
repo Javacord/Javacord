@@ -1,0 +1,10 @@
+publishing {
+    publications {
+        javacord(MavenPublication) {
+            from components.java
+            artifact shadowJar
+            artifact javadocJar
+            artifact sourcesJar
+        }
+    }
+}

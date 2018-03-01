@@ -1,0 +1,27 @@
+plugins {
+    id 'java-library'
+    id 'nebula.java-cross-compile' version '0.10.0'
+    id 'com.github.johnrengelman.shadow' version '2.0.2'
+    id 'maven-publish'
+    id 'me.tatarka.gradle.pom' version '1.0'
+}
+
+group = 'org.javacord'
+version = '3.0.0'
+description = 'A multithreaded but easy to use Discord Java API'
+
+sourceCompatibility = 1.8
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.incremental true
+}
+
+tasks.remove knows
+
+defaultTasks 'build'
+
+apply from: 'gradle/dependencies.gradle'
+apply from: 'gradle/jars.gradle'
+apply from: 'gradle/pom.gradle'
+apply from: 'gradle/publishing.gradle'
