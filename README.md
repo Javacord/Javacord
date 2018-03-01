@@ -1,3 +1,4 @@
+![](http://bastian-oppermann.de/javacord3_banner.png)
 # Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg" alt="Latest version"></a> <a href="https://jitpack.io/com/github/btobastian/javacord/v_3-SNAPSHOT/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Javacord Wiki"></a>
 A multithreaded but simple to use library to create a Discord bot in Java.
 
