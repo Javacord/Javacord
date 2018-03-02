@@ -52,9 +52,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      *
      * @return A webhook builder.
      */
-    default WebhookBuilder getWebhookBuilder() {
-        return new WebhookBuilder(this);
-    }
+    WebhookBuilder createWebhookBuilder();
 
     /**
      * Gets the updater for this channel.

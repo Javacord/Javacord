@@ -15,6 +15,8 @@ import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.server.impl.ImplServer;
 import de.btobastian.javacord.entity.user.User;
+import de.btobastian.javacord.entity.webhook.WebhookBuilder;
+import de.btobastian.javacord.entity.webhook.impl.ImplWebhookBuilder;
 import de.btobastian.javacord.util.Cleanupable;
 import de.btobastian.javacord.util.cache.ImplMessageCache;
 import de.btobastian.javacord.util.cache.MessageCache;
@@ -214,6 +216,11 @@ public class ImplServerTextChannel implements ServerTextChannel, Cleanupable {
     @Override
     public String getTopic() {
         return topic;
+    }
+
+    @Override
+    public WebhookBuilder createWebhookBuilder() {
+        return new ImplWebhookBuilder(this);
     }
 
     @Override
