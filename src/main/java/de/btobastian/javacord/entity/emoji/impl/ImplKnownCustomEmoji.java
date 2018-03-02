@@ -3,6 +3,7 @@ package de.btobastian.javacord.entity.emoji.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.emoji.CustomEmoji;
+import de.btobastian.javacord.entity.emoji.CustomEmojiUpdater;
 import de.btobastian.javacord.entity.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.server.Server;
@@ -79,6 +80,11 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     @Override
     public Server getServer() {
         return server;
+    }
+
+    @Override
+    public CustomEmojiUpdater createUpdater() {
+        return new ImplCustomEmojiUpdater(this);
     }
 
     @Override

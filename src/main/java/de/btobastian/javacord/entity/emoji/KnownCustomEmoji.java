@@ -64,13 +64,11 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     }
 
     /**
-     * Gets the updater for this emoji.
+     * Creates an updater for this emoji.
      *
-     * @return The updater for this emoji.
+     * @return An updater for this emoji.
      */
-    default CustomEmojiUpdater getUpdater() {
-        return new CustomEmojiUpdater(this);
-    }
+    CustomEmojiUpdater createUpdater();
 
     /**
      * Gets a list with all whitelisted roles.
@@ -97,13 +95,13 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * Updates the name of the emoji.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the emoji.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return getUpdater().setName(name).update();
+        return createUpdater().setName(name).update();
     }
 
     /**
@@ -111,13 +109,13 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param roles The new whitelist.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateWhitelist(Collection<Role> roles) {
-        return getUpdater().setWhitelist(roles).update();
+        return createUpdater().setWhitelist(roles).update();
     }
 
     /**
@@ -125,25 +123,25 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param roles The new whitelist.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateWhitelist(Role... roles) {
-        return getUpdater().setWhitelist(roles).update();
+        return createUpdater().setWhitelist(roles).update();
     }
 
     /**
      * Removes the whitelist of the emoji.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link CustomEmojiUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeWhitelist() {
-        return getUpdater().removeWhitelist().update();
+        return createUpdater().removeWhitelist().update();
     }
 
     /**
