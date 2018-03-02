@@ -1,20 +1,15 @@
 package de.btobastian.javacord;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import de.btobastian.javacord.util.gateway.DiscordWebSocketAdapter;
 import de.btobastian.javacord.util.logging.LoggerUtil;
-import de.btobastian.javacord.util.rest.RestEndpoint;
-import de.btobastian.javacord.util.rest.RestMethod;
-import de.btobastian.javacord.util.rest.RestRequest;
-import de.btobastian.javacord.util.rest.RestRequestResult;
 import org.slf4j.Logger;
-import org.slf4j.MDC.MDCCloseable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
@@ -30,30 +25,25 @@ public class DiscordApiBuilder {
     private static final Logger logger = LoggerUtil.getLogger(DiscordApiBuilder.class);
 
     /**
-     * The token which is used to login. Must be present in order to login!
+     * The factory used to create a {@link DiscordApi} instance.
      */
-    private String token = null;
+    private DiscordApiFactory factory;
 
     /**
-     * The account type of the account with the given token.
+     * Creates a new discord api builder.
      */
-    private AccountType accountType = AccountType.BOT;
-
-    /**
-     * The current shard starting with <code>0</code>.
-     */
-    private int currentShard = 0;
-
-    /**
-     * The total amount of shards.
-     * If the total amount is <code>1</code>, sharding will be disabled.
-     */
-    private int totalShards = 1;
-
-    /**
-     * Whether Javacord should wait for all servers to become available on startup or not.
-     */
-    private boolean waitForServersOnStartup = true;
+    public DiscordApiBuilder() {
+        ServiceLoader<DiscordApiFactory> factoryServiceLoader = ServiceLoader.load(DiscordApiFactory.class);
+        Iterator<DiscordApiFactory> factoryIterator = factoryServiceLoader.iterator();
+        if (factoryIterator.hasNext()) {
+            factory = factoryIterator.next();
+            if (factoryIterator.hasNext()) {
+                throw new IllegalStateException("Found more than one DiscordApiFactory implementation!");
+            }
+        } else {
+            throw new IllegalStateException("No DiscordApiFactory implementation was found!");
+        }
+    }
 
     /**
      * Login to the account with the given token.
@@ -61,16 +51,7 @@ public class DiscordApiBuilder {
      * @return A {@link CompletableFuture} which contains the DiscordApi.
      */
     public CompletableFuture<DiscordApi> login() {
-        logger.debug("Creating shard {} of {}", currentShard, totalShards);
-        CompletableFuture<DiscordApi> future = new CompletableFuture<>();
-        if (token == null) {
-            future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
-            return future;
-        }
-        try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard))){
-            new ImplDiscordApi(accountType, token, currentShard, totalShards, waitForServersOnStartup, future);
-        }
-        return future;
+        return factory.login();
     }
 
     /**
@@ -93,7 +74,7 @@ public class DiscordApiBuilder {
      * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
     public Collection<CompletableFuture<DiscordApi>> loginShards(IntPredicate shardsCondition) {
-        return loginShards(IntStream.range(0, totalShards).filter(shardsCondition).toArray());
+        return loginShards(IntStream.range(0, factory.getTotalShards()).filter(shardsCondition).toArray());
     }
 
     /**
@@ -112,21 +93,21 @@ public class DiscordApiBuilder {
         if (Arrays.stream(shards).distinct().count() != shards.length) {
             throw new IllegalArgumentException("shards cannot be started multiple times!");
         }
-        if (Arrays.stream(shards).max().orElseThrow(AssertionError::new) >= totalShards) {
+        if (Arrays.stream(shards).max().orElseThrow(AssertionError::new) >= factory.getTotalShards()) {
             throw new IllegalArgumentException("shard cannot be greater or equal than totalShards!");
         }
         if (Arrays.stream(shards).min().orElseThrow(AssertionError::new) < 0) {
             throw new IllegalArgumentException("shard cannot be less than 0!");
         }
 
-        if (shards.length == totalShards) {
-            logger.info("Creating {} {}", totalShards, (totalShards == 1) ? "shard" : "shards");
+        if (shards.length == factory.getTotalShards()) {
+            logger.info("Creating {} {}", factory.getTotalShards(), (factory.getTotalShards() == 1) ? "shard" : "shards");
         } else {
-            logger.info("Creating {} out of {} shards ({})", shards.length, totalShards, shards);
+            logger.info("Creating {} out of {} shards ({})", shards.length, factory.getTotalShards(), shards);
         }
 
         Collection<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
-        int currentShard = this.currentShard;
+        int currentShard = factory.getCurrentShard();
         for (int shard : shards) {
             if (currentShard != 0) {
                 CompletableFuture<DiscordApi> future = new CompletableFuture<>();
@@ -137,7 +118,7 @@ public class DiscordApiBuilder {
             }
             result.add(setCurrentShard(shard).login());
         }
-        this.currentShard = currentShard;
+        factory.setCurrentShard(currentShard);
         return result;
     }
 
@@ -150,7 +131,7 @@ public class DiscordApiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public DiscordApiBuilder setToken(String token) {
-        this.token = token;
+        factory.setToken(token);
         return this;
     }
 
@@ -163,7 +144,7 @@ public class DiscordApiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public DiscordApiBuilder setAccountType(AccountType type) {
-        this.accountType = type;
+        factory.setAccountType(type);
         return this;
     }
 
@@ -177,13 +158,7 @@ public class DiscordApiBuilder {
      * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public DiscordApiBuilder setTotalShards(int totalShards) {
-        if (currentShard >= totalShards) {
-            throw new IllegalArgumentException("currentShard cannot be greater or equal than totalShards!");
-        }
-        if (totalShards < 1) {
-            throw new IllegalArgumentException("totalShards cannot be less than 1!");
-        }
-        this.totalShards = totalShards;
+        factory.setTotalShards(totalShards);
         return this;
     }
 
@@ -197,13 +172,7 @@ public class DiscordApiBuilder {
      * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public DiscordApiBuilder setCurrentShard(int currentShard) {
-        if (currentShard >= totalShards) {
-            throw new IllegalArgumentException("currentShard cannot be greater or equal than totalShards!");
-        }
-        if (currentShard < 0) {
-            throw new IllegalArgumentException("currentShard cannot be less than 0!");
-        }
-        this.currentShard = currentShard;
+        factory.setCurrentShard(currentShard);
         return this;
     }
 
@@ -219,7 +188,7 @@ public class DiscordApiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public DiscordApiBuilder setWaitForServersOnStartup(boolean waitForServersOnStartup) {
-        this.waitForServersOnStartup = waitForServersOnStartup;
+        factory.setWaitForServersOnStartup(waitForServersOnStartup);
         return this;
     }
 
@@ -228,30 +197,10 @@ public class DiscordApiBuilder {
      * Sharding allows you to split your bot into several independent instances.
      * A shard only handles a subset of a bot's servers.
      *
-     * @return The current instance in order to chain call methods.
+     * @return A future to with the current api builder.
      * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public CompletableFuture<DiscordApiBuilder> setRecommendedTotalShards() {
-        CompletableFuture<DiscordApiBuilder> future = new CompletableFuture<>();
-        if (token == null) {
-            future.completeExceptionally(new IllegalArgumentException("You cannot request the recommended total shards without a token!"));
-            return future;
-        }
-
-        RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(new ImplDiscordApi(token), RestMethod.GET, RestEndpoint.GATEWAY_BOT);
-        botGatewayRequest
-                .execute(RestRequestResult::getJsonBody)
-                .thenAccept(resultJson -> {
-                    DiscordWebSocketAdapter.setGateway(resultJson.get("url").asText());
-                    setTotalShards(resultJson.get("shards").asInt());
-                    future.complete(DiscordApiBuilder.this);
-                })
-                .exceptionally(t -> {
-                    future.completeExceptionally(t);
-                    return null;
-                })
-                .whenComplete((nothing, throwable) -> botGatewayRequest.getApi().disconnect());
-
-        return future;
+        return factory.setRecommendedTotalShards().thenCompose(factory -> CompletableFuture.completedFuture(this));
     }
 }
