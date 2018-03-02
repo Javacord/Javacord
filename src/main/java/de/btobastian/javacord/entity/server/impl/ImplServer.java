@@ -245,6 +245,18 @@ public class ImplServer implements Server, Cleanupable {
             addMembers(data.get("members"));
         }
 
+        if (data.hasNonNull("voice_states")) {
+            for (JsonNode voiceStateJson : data.get("voice_states")) {
+                ImplServerVoiceChannel channel =
+                        (ImplServerVoiceChannel) getVoiceChannelById(voiceStateJson.get("channel_id").asLong())
+                                .orElseThrow(AssertionError::new);
+                ImplUser user = (ImplUser) api.getCachedUserById(voiceStateJson.get("user_id").asLong())
+                        .orElseThrow(AssertionError::new);
+                channel.addConnectedUser(user);
+                user.addConnectedVoiceChannel(channel);
+            }
+        }
+
         if (isLarge() && getMembers().size() < getMemberCount()) {
             this.api.getWebSocketAdapter().queueRequestGuildMembers(this);
         }
