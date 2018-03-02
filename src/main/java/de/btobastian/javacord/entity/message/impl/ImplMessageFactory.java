@@ -7,8 +7,8 @@ import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.Mentionable;
 import de.btobastian.javacord.entity.channel.TextChannel;
 import de.btobastian.javacord.entity.message.Message;
-import de.btobastian.javacord.entity.message.MessageBuilder;
 import de.btobastian.javacord.entity.message.MessageDecoration;
+import de.btobastian.javacord.entity.message.MessageFactory;
 import de.btobastian.javacord.entity.message.Messageable;
 import de.btobastian.javacord.entity.message.embed.EmbedBuilder;
 import de.btobastian.javacord.entity.message.embed.impl.ImplEmbedFactory;
@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link MessageBuilder}.
+ * The implementation of {@link MessageFactory}.
  */
-public class ImplMessageBuilder implements MessageBuilder {
+public class ImplMessageFactory implements MessageFactory {
 
     /**
      * The receiver of the message.
@@ -66,18 +66,17 @@ public class ImplMessageBuilder implements MessageBuilder {
     private final List<FileContainer> attachments = new ArrayList<>();
 
     /**
-     * Creates a new message builder.
+     * Creates a new message factory.
      */
-    public ImplMessageBuilder() { }
+    public ImplMessageFactory() { }
 
     @Override
-    public MessageBuilder setReceiver(Messageable messageable) {
-        this.messageable = messageable;
-        return this;
+    public ImplMessageFactory getNewInstance() {
+        return new ImplMessageFactory();
     }
 
     @Override
-    public ImplMessageBuilder append(String message, MessageDecoration... decorations) {
+    public void append(String message, MessageDecoration... decorations) {
         for (MessageDecoration decoration : decorations) {
             strBuilder.append(decoration.getPrefix());
         }
@@ -85,11 +84,10 @@ public class ImplMessageBuilder implements MessageBuilder {
         for (int i = decorations.length - 1; i >= 0; i--) {
             strBuilder.append(decorations[i].getSuffix());
         }
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder appendCode(String language, String code) {
+    public void appendCode(String language, String code) {
         strBuilder
                 .append("\n")
                 .append(MessageDecoration.CODE_LONG.getPrefix())
@@ -97,134 +95,120 @@ public class ImplMessageBuilder implements MessageBuilder {
                 .append("\n")
                 .append(code)
                 .append(MessageDecoration.CODE_LONG.getSuffix());
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder append(Mentionable entity) {
+    public void append(Mentionable entity) {
         strBuilder.append(entity.getMentionTag());
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder append(Object object) {
+    public void append(Object object) {
         strBuilder.append(object);
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder appendNewLine() {
+    public void appendNewLine() {
         strBuilder.append("\n");
-        return this;
     }
 
     @Override
-    public MessageBuilder setContent(String content) {
+    public void setContent(String content) {
         strBuilder.setLength(0);
         strBuilder.append(content);
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder setEmbed(EmbedBuilder embed) {
+    public void setEmbed(EmbedBuilder embed) {
         this.embed = embed;
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder setTts(boolean tts) {
+    public void setTts(boolean tts) {
         this.tts = tts;
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder addFile(BufferedImage image, String fileName) {
-        return addAttachment(image, fileName);
+    public void addFile(BufferedImage image, String fileName) {
+        addAttachment(image, fileName);
     }
 
     @Override
-    public ImplMessageBuilder addFile(File file) {
-        return addAttachment(file);
+    public void addFile(File file) {
+        addAttachment(file);
     }
 
     @Override
-    public ImplMessageBuilder addFile(Icon icon) {
-        return addAttachment(icon);
+    public void addFile(Icon icon) {
+        addAttachment(icon);
     }
 
     @Override
-    public ImplMessageBuilder addFile(URL url) {
-        return addAttachment(url);
+    public void addFile(URL url) {
+        addAttachment(url);
     }
 
     @Override
-    public ImplMessageBuilder addFile(byte[] bytes, String fileName) {
-        return addAttachment(bytes, fileName);
+    public void addFile(byte[] bytes, String fileName) {
+        addAttachment(bytes, fileName);
     }
 
     @Override
-    public ImplMessageBuilder addFile(InputStream stream, String fileName) {
-        return addAttachment(stream, fileName);
+    public void addFile(InputStream stream, String fileName) {
+        addAttachment(stream, fileName);
     }
 
     @Override
-    public ImplMessageBuilder addAttachment(BufferedImage image, String fileName) {
+    public void addAttachment(BufferedImage image, String fileName) {
         if (image == null || fileName == null) {
             throw new IllegalArgumentException("image and fileName cannot be null!");
         }
         attachments.add(new FileContainer(image, fileName));
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder addAttachment(File file) {
+    public void addAttachment(File file) {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
         attachments.add(new FileContainer(file));
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder addAttachment(Icon icon) {
+    public void addAttachment(Icon icon) {
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
         attachments.add(new FileContainer(icon));
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder addAttachment(URL url) {
+    public void addAttachment(URL url) {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
         attachments.add(new FileContainer(url));
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder addAttachment(byte[] bytes, String fileName) {
+    public void addAttachment(byte[] bytes, String fileName) {
         if (bytes == null || fileName == null) {
             throw new IllegalArgumentException("bytes and fileName cannot be null!");
         }
         attachments.add(new FileContainer(bytes, fileName));
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder addAttachment(InputStream stream, String fileName) {
+    public void addAttachment(InputStream stream, String fileName) {
         if (stream == null || fileName == null) {
             throw new IllegalArgumentException("stream and fileName cannot be null!");
         }
         attachments.add(new FileContainer(stream, fileName));
-        return this;
     }
 
     @Override
-    public ImplMessageBuilder setNonce(String nonce) {
+    public void setNonce(String nonce) {
         this.nonce = nonce;
-        return this;
     }
 
     @Override
@@ -233,31 +217,25 @@ public class ImplMessageBuilder implements MessageBuilder {
     }
 
     @Override
-    public CompletableFuture<Message> send() {
+    public CompletableFuture<Message> send(User user) {
+        return send((Messageable) user);
+    }
+
+    @Override
+    public CompletableFuture<Message> send(Messageable messageable) {
         if (messageable == null) {
             throw new IllegalStateException("Cannot send message without knowing the receiver");
         }
         if (messageable instanceof TextChannel) {
             return send((TextChannel) messageable);
         } else if (messageable instanceof User) {
-            return ((User) messageable).openPrivateChannel()
-                    .thenCompose(this::send);
+            return ((User) messageable).openPrivateChannel().thenCompose(this::send);
         }
         throw new IllegalStateException("Messageable of unknown type");
     }
 
     @Override
-    public String toString() {
-        return strBuilder.toString();
-    }
-
-    /**
-     * Sends the message to the given text channel.
-     *
-     * @param channel The channel to which the message should be sent.
-     * @return The sent message.
-     */
-    private CompletableFuture<Message> send(TextChannel channel) {
+    public CompletableFuture<Message> send(TextChannel channel) {
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("content", toString() == null ? "" : toString() )
                 .put("tts", tts);
@@ -316,6 +294,11 @@ public class ImplMessageBuilder implements MessageBuilder {
             return request.execute(result -> ((ImplDiscordApi) channel.getApi())
                     .getOrCreateMessage(channel, result.getJsonBody()));
         }
+    }
+
+    @Override
+    public String toString() {
+        return strBuilder.toString();
     }
 
 }

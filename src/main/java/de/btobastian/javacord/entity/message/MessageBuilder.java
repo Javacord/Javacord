@@ -4,17 +4,51 @@ import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.Mentionable;
 import de.btobastian.javacord.entity.channel.TextChannel;
 import de.btobastian.javacord.entity.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entity.user.User;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class can help you to create messages.
  */
-public interface MessageBuilder {
+public class MessageBuilder {
+
+    /**
+     * The base factory. It's only used to create new factories.
+     */
+    private static final MessageFactory baseFactory;
+
+    // Load it static, because it has a better performance to load it only once
+    static {
+        ServiceLoader<MessageFactory> factoryServiceLoader = ServiceLoader.load(MessageFactory.class);
+        Iterator<MessageFactory> factoryIterator = factoryServiceLoader.iterator();
+        if (factoryIterator.hasNext()) {
+            baseFactory = factoryIterator.next();
+            if (factoryIterator.hasNext()) {
+                throw new IllegalStateException("Found more than one MessageFactory implementation!");
+            }
+        } else {
+            throw new IllegalStateException("No MessageFactory implementation was found!");
+        }
+    }
+
+    /**
+     * The message factory used by this instance.
+     */
+    private final MessageFactory factory;
+
+    /**
+     * Creates a new message builder.
+     */
+    public MessageBuilder() {
+        factory = baseFactory.getNewInstance();
+    }
 
     /**
      * Creates a message builder from a message.
@@ -22,8 +56,8 @@ public interface MessageBuilder {
      * @param message The message to copy.
      * @return A message builder which would produce the same text as the given message.
      */
-    static MessageBuilder fromMessage(Message message) {
-        MessageBuilder builder = message.getChannel().createMessageBuilder();
+    static public MessageBuilder fromMessage(Message message) {
+        MessageBuilder builder = new MessageBuilder();
         builder.getStringBuilder().append(message.getContent());
         if (!message.getEmbeds().isEmpty()) {
             builder.setEmbed(message.getEmbeds().get(0).toBuilder());
@@ -35,31 +69,16 @@ public interface MessageBuilder {
     }
 
     /**
-     * Sets the channel to which the message should be send.
-     *
-     * @param channel The channel to set.
-     * @return The current instance in order to chain call methods.
-     */
-    default MessageBuilder setChannel(TextChannel channel) {
-        return setReceiver(channel);
-    }
-
-    /**
-     * Sets the entity which should receive the message.
-     *
-     * @param messageable The entity to set.
-     * @return The current instance in order to chain call methods.
-     */
-    MessageBuilder setReceiver(Messageable messageable);
-
-    /**
      * Appends a sting with or without decoration to the message.
      *
      * @param message The string to append.
      * @param decorations The decorations of the string.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder append(String message, MessageDecoration... decorations);
+    public MessageBuilder append(String message, MessageDecoration... decorations) {
+        factory.append(message, decorations);
+        return this;
+    }
 
     /**
      * Appends code to the message.
@@ -68,7 +87,10 @@ public interface MessageBuilder {
      * @param code The code.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder appendCode(String language, String code);
+    public MessageBuilder appendCode(String language, String code) {
+        factory.appendCode(language, code);
+        return this;
+    }
 
     /**
      * Appends a mentionable entity (usually a user or channel) to the message.
@@ -76,7 +98,10 @@ public interface MessageBuilder {
      * @param entity The entity to mention.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder append(Mentionable entity);
+    public MessageBuilder append(Mentionable entity) {
+        factory.append(entity);
+        return this;
+    }
 
     /**
      * Appends the string representation of the object (calling {@link String#valueOf(Object)} method) to the message.
@@ -85,14 +110,20 @@ public interface MessageBuilder {
      * @return The current instance in order to chain call methods.
      * @see StringBuilder#append(Object)
      */
-    MessageBuilder append(Object object);
+    public MessageBuilder append(Object object) {
+        factory.append(object);
+        return this;
+    }
 
     /**
      * Appends a new line to the message.
      *
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder appendNewLine();
+    public MessageBuilder appendNewLine() {
+        factory.appendNewLine();
+        return this;
+    }
 
     /**
      * Sets the content of the message.
@@ -102,7 +133,10 @@ public interface MessageBuilder {
      * @param content The new content of the message.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder setContent(String content);
+    public MessageBuilder setContent(String content) {
+        factory.setContent(content);
+        return this;
+    }
 
     /**
      * Sets the embed of the message.
@@ -110,7 +144,10 @@ public interface MessageBuilder {
      * @param embed The embed to set.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder setEmbed(EmbedBuilder embed);
+    public MessageBuilder setEmbed(EmbedBuilder embed) {
+        factory.setEmbed(embed);
+        return this;
+    }
 
     /**
      * Sets if the message should be text to speech.
@@ -118,7 +155,10 @@ public interface MessageBuilder {
      * @param tts Whether the message should be text to speech or not.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder setTts(boolean tts);
+    public MessageBuilder setTts(boolean tts) {
+        factory.setTts(tts);
+        return this;
+    }
 
     /**
      * Adds a file to the message.
@@ -128,7 +168,10 @@ public interface MessageBuilder {
      * @return The current instance in order to chain call methods.
      * @see #addAttachment(BufferedImage, String)
      */
-    MessageBuilder addFile(BufferedImage image, String fileName);
+    public MessageBuilder addFile(BufferedImage image, String fileName) {
+        factory.addFile(image, fileName);
+        return this;
+    }
 
     /**
      * Adds a file to the message.
@@ -137,7 +180,10 @@ public interface MessageBuilder {
      * @return The current instance in order to chain call methods.
      * @see #addAttachment(File)
      */
-    MessageBuilder addFile(File file);
+    public MessageBuilder addFile(File file) {
+        factory.addFile(file);
+        return this;
+    }
 
     /**
      * Adds a file to the message.
@@ -146,7 +192,10 @@ public interface MessageBuilder {
      * @return The current instance in order to chain call methods.
      * @see #addAttachment(Icon)
      */
-    MessageBuilder addFile(Icon icon);
+    public MessageBuilder addFile(Icon icon) {
+        factory.addFile(icon);
+        return this;
+    }
 
     /**
      * Adds a file to the message.
@@ -155,7 +204,10 @@ public interface MessageBuilder {
      * @return The current instance in order to chain call methods.
      * @see #addAttachment(URL)
      */
-    MessageBuilder addFile(URL url);
+    public MessageBuilder addFile(URL url) {
+        factory.addFile(url);
+        return this;
+    }
 
     /**
      * Adds a file to the message.
@@ -165,7 +217,10 @@ public interface MessageBuilder {
      * @return The current instance in order to chain call methods.
      * @see #addAttachment(byte[], String)
      */
-    MessageBuilder addFile(byte[] bytes, String fileName);
+    public MessageBuilder addFile(byte[] bytes, String fileName) {
+        factory.addFile(bytes, fileName);
+        return this;
+    }
 
     /**
      * Adds a file to the message.
@@ -175,7 +230,10 @@ public interface MessageBuilder {
      * @return The current instance in order to chain call methods.
      * @see #addAttachment(InputStream, String)
      */
-    MessageBuilder addFile(InputStream stream, String fileName);
+    public MessageBuilder addFile(InputStream stream, String fileName) {
+        factory.addFile(stream, fileName);
+        return this;
+    }
 
     /**
      * Adds an attachment to the message.
@@ -184,7 +242,10 @@ public interface MessageBuilder {
      * @param fileName The file name of the image.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder addAttachment(BufferedImage image, String fileName);
+    public MessageBuilder addAttachment(BufferedImage image, String fileName) {
+        factory.addAttachment(image, fileName);
+        return this;
+    }
 
     /**
      * Adds an attachment to the message.
@@ -192,7 +253,10 @@ public interface MessageBuilder {
      * @param file The file to add as an attachment.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder addAttachment(File file);
+    public MessageBuilder addAttachment(File file) {
+        factory.addAttachment(file);
+        return this;
+    }
 
     /**
      * Adds an attachment to the message.
@@ -200,7 +264,10 @@ public interface MessageBuilder {
      * @param icon The icon to add as an attachment.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder addAttachment(Icon icon);
+    public MessageBuilder addAttachment(Icon icon) {
+        factory.addAttachment(icon);
+        return this;
+    }
 
     /**
      * Adds an attachment to the message.
@@ -208,7 +275,10 @@ public interface MessageBuilder {
      * @param url The url of the attachment.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder addAttachment(URL url);
+    public MessageBuilder addAttachment(URL url) {
+        factory.addAttachment(url);
+        return this;
+    }
 
     /**
      * Adds an attachment to the message.
@@ -217,7 +287,10 @@ public interface MessageBuilder {
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder addAttachment(byte[] bytes, String fileName);
+    public MessageBuilder addAttachment(byte[] bytes, String fileName) {
+        factory.addAttachment(bytes, fileName);
+        return this;
+    }
 
     /**
      * Adds an attachment to the message.
@@ -226,7 +299,10 @@ public interface MessageBuilder {
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder addAttachment(InputStream stream, String fileName);
+    public MessageBuilder addAttachment(InputStream stream, String fileName) {
+        factory.addAttachment(stream, fileName);
+        return this;
+    }
 
     /**
      * Sets the nonce of the message.
@@ -234,23 +310,48 @@ public interface MessageBuilder {
      * @param nonce The nonce to set.
      * @return The current instance in order to chain call methods.
      */
-    MessageBuilder setNonce(String nonce);
+    public MessageBuilder setNonce(String nonce) {
+        factory.setNonce(nonce);
+        return this;
+    }
 
     /**
      * Gets the {@link StringBuilder} which is used to build the message.
      *
      * @return The StringBuilder which is used to build the message.
      */
-    StringBuilder getStringBuilder();
+    public StringBuilder getStringBuilder() {
+        return factory.getStringBuilder();
+    }
 
     /**
      * Sends the message.
      *
+     * @param user The user to which the message should be sent.
      * @return The sent message.
-     * @throws IllegalStateException If no receiver/channel was set.
-     * @see #setChannel(TextChannel)
-     * @see #setReceiver(Messageable)
      */
-    CompletableFuture<Message> send();
+    public CompletableFuture<Message> send(User user) {
+        return factory.send(user);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param channel The channel in which the message should be sent.
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> send(TextChannel channel) {
+        return factory.send(channel);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param messageable The receiver of the message.
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> send(Messageable messageable) {
+        return factory.send(messageable);
+    }
 
 }

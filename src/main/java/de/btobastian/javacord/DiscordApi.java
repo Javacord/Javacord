@@ -17,7 +17,6 @@ import de.btobastian.javacord.entity.channel.TextChannel;
 import de.btobastian.javacord.entity.channel.VoiceChannel;
 import de.btobastian.javacord.entity.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entity.message.Message;
-import de.btobastian.javacord.entity.message.MessageBuilder;
 import de.btobastian.javacord.entity.message.MessageSet;
 import de.btobastian.javacord.entity.permission.Permissions;
 import de.btobastian.javacord.entity.permission.Role;
@@ -434,13 +433,6 @@ public interface DiscordApi {
                 .setUrlParameters(code)
                 .execute(result -> new ImplInvite(this, result.getJsonBody()));
     }
-
-    /**
-     * Creates a new message builder.
-     *
-     * @return The newly created message builder.
-     */
-    MessageBuilder createMessageBuilder();
 
     /**
      * Creates a server builder which can be used to create servers.

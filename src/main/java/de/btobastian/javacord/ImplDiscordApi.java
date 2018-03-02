@@ -12,10 +12,8 @@ import de.btobastian.javacord.entity.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entity.emoji.impl.ImplCustomEmoji;
 import de.btobastian.javacord.entity.emoji.impl.ImplKnownCustomEmoji;
 import de.btobastian.javacord.entity.message.Message;
-import de.btobastian.javacord.entity.message.MessageBuilder;
 import de.btobastian.javacord.entity.message.MessageSet;
 import de.btobastian.javacord.entity.message.impl.ImplMessage;
-import de.btobastian.javacord.entity.message.impl.ImplMessageBuilder;
 import de.btobastian.javacord.entity.message.impl.ImplMessageSet;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.server.ServerBuilder;
@@ -1073,11 +1071,6 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public Collection<Long> getUnavailableServers() {
         return Collections.unmodifiableCollection(unavailableServers);
-    }
-
-    @Override
-    public MessageBuilder createMessageBuilder() {
-        return new ImplMessageBuilder();
     }
 
     @Override

@@ -8,8 +8,6 @@ import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.channel.GroupChannel;
 import de.btobastian.javacord.entity.channel.GroupChannelUpdater;
 import de.btobastian.javacord.entity.impl.ImplIcon;
-import de.btobastian.javacord.entity.message.MessageBuilder;
-import de.btobastian.javacord.entity.message.impl.ImplMessageBuilder;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.util.Cleanupable;
 import de.btobastian.javacord.util.cache.ImplMessageCache;
@@ -97,11 +95,6 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public MessageBuilder createMessageBuilder() {
-        return new ImplMessageBuilder().setReceiver(this);
     }
 
     @Override
