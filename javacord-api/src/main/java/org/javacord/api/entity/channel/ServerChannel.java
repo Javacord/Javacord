@@ -140,6 +140,13 @@ public interface ServerChannel extends Channel {
     Map<User, Permissions> getOverwrittenUserPermissions();
 
     /**
+     * Gets the overwritten permissions for roles in this channel.
+     *
+     * @return The overwritten permissions for roles.
+     */
+    Map<Role, Permissions> getOverwrittenRolePermissions();
+
+    /**
      * Gets the effective overwritten permissions of a user.
      * This method also takes into account the roles of the user.
      * It doesn't take into account the "global" permissions!
