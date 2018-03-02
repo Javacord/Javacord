@@ -11,12 +11,16 @@ import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.webhook.Webhook;
 import de.btobastian.javacord.util.logging.LoggerUtil;
+import de.btobastian.javacord.util.rest.RestEndpoint;
+import de.btobastian.javacord.util.rest.RestMethod;
+import de.btobastian.javacord.util.rest.RestRequest;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link Webhook}.
@@ -113,6 +117,14 @@ public class ImplWebhook implements Webhook {
     @Override
     public Optional<String> getToken() {
         return Optional.ofNullable(token);
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(String reason) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .setAuditLogReason(reason)
+                .execute(result -> null);
     }
 
     @Override

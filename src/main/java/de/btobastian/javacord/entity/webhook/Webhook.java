@@ -7,9 +7,6 @@ import de.btobastian.javacord.entity.channel.ServerTextChannel;
 import de.btobastian.javacord.entity.channel.TextChannel;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.user.User;
-import de.btobastian.javacord.util.rest.RestEndpoint;
-import de.btobastian.javacord.util.rest.RestMethod;
-import de.btobastian.javacord.util.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -95,12 +92,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook> {
      * @param reason The audit log reason for the deletion.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> delete(String reason) {
-        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.WEBHOOK)
-                .setUrlParameters(getIdAsString())
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> delete(String reason);
 
     /**
      * Gets the updater for this webhook.
