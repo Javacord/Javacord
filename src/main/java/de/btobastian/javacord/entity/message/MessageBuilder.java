@@ -56,7 +56,7 @@ public class MessageBuilder {
      * @param message The message to copy.
      * @return A message builder which would produce the same text as the given message.
      */
-    static public MessageBuilder fromMessage(Message message) {
+    public static MessageBuilder fromMessage(Message message) {
         MessageBuilder builder = new MessageBuilder();
         builder.getStringBuilder().append(message.getContent());
         if (!message.getEmbeds().isEmpty()) {
