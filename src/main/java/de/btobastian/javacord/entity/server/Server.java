@@ -1446,27 +1446,21 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return The builder to create a new channel category.
      */
-    default ChannelCategoryBuilder getChannelCategoryBuilder() {
-        return new ChannelCategoryBuilder(this);
-    }
+    ChannelCategoryBuilder getChannelCategoryBuilder();
 
     /**
      * Gets a new server text channel builder.
      *
      * @return The builder to create a new server text channel.
      */
-    default ServerTextChannelBuilder getTextChannelBuilder() {
-        return new ServerTextChannelBuilder(this);
-    }
+    ServerTextChannelBuilder getTextChannelBuilder();
 
     /**
      * Gets a new server voice channel builder.
      *
      * @return The builder to create a new server voice channel.
      */
-    default ServerVoiceChannelBuilder getVoiceChannelBuilder() {
-        return new ServerVoiceChannelBuilder(this);
-    }
+    ServerVoiceChannelBuilder getVoiceChannelBuilder();
 
     /**
      * Gets a new role builder.

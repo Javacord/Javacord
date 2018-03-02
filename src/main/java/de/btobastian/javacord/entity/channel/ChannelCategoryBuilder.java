@@ -1,42 +1,11 @@
 package de.btobastian.javacord.entity.channel;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import de.btobastian.javacord.entity.server.Server;
-import de.btobastian.javacord.entity.server.impl.ImplServer;
-import de.btobastian.javacord.util.rest.RestEndpoint;
-import de.btobastian.javacord.util.rest.RestMethod;
-import de.btobastian.javacord.util.rest.RestRequest;
-
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is used to create new channel categories.
  */
-public class ChannelCategoryBuilder {
-
-    /**
-     * The server of the channel.
-     */
-    private ImplServer server;
-
-    /**
-     * The reason for the creation.
-     */
-    private String reason = null;
-
-    /**
-     * The name of the channel.
-     */
-    private String name = null;
-
-    /**
-     * Creates a new channel category builder.
-     *
-     * @param server The server of the channel.
-     */
-    public ChannelCategoryBuilder(Server server) {
-        this.server = (ImplServer) server;
-    }
+public interface ChannelCategoryBuilder {
 
     /**
      * Sets the reason for this creation. This reason will be visible in the audit log entry(s).
@@ -44,10 +13,7 @@ public class ChannelCategoryBuilder {
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    public ChannelCategoryBuilder setAuditLogReason(String reason) {
-        this.reason = reason;
-        return this;
-    }
+    ChannelCategoryBuilder setAuditLogReason(String reason);
 
     /**
      * Sets the name of the channel.
@@ -55,25 +21,13 @@ public class ChannelCategoryBuilder {
      * @param name The name of the channel.
      * @return The current instance in order to chain call methods.
      */
-    public ChannelCategoryBuilder setName(String name) {
-        this.name = name;
-        return this;
-    }
+    ChannelCategoryBuilder setName(String name);
 
     /**
      * Creates the channel category.
      *
      * @return The created channel category.
      */
-    public CompletableFuture<ChannelCategory> create() {
-        if (name == null) {
-            throw new IllegalStateException("Name is no optional parameter!");
-        }
-        return new RestRequest<ChannelCategory>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
-                .setUrlParameters(server.getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode().put("type", 4).put("name", name))
-                .setAuditLogReason(reason)
-                .execute(result -> server.getOrCreateChannelCategory(result.getJsonBody()));
-    }
+    CompletableFuture<ChannelCategory> create();
 
 }

@@ -9,12 +9,18 @@ import de.btobastian.javacord.entity.Region;
 import de.btobastian.javacord.entity.activity.Activity;
 import de.btobastian.javacord.entity.activity.impl.ImplActivity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
+import de.btobastian.javacord.entity.channel.ChannelCategoryBuilder;
 import de.btobastian.javacord.entity.channel.ServerChannel;
 import de.btobastian.javacord.entity.channel.ServerTextChannel;
+import de.btobastian.javacord.entity.channel.ServerTextChannelBuilder;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannel;
+import de.btobastian.javacord.entity.channel.ServerVoiceChannelBuilder;
 import de.btobastian.javacord.entity.channel.impl.ImplChannelCategory;
+import de.btobastian.javacord.entity.channel.impl.ImplChannelCategoryBuilder;
 import de.btobastian.javacord.entity.channel.impl.ImplServerTextChannel;
+import de.btobastian.javacord.entity.channel.impl.ImplServerTextChannelBuilder;
 import de.btobastian.javacord.entity.channel.impl.ImplServerVoiceChannel;
+import de.btobastian.javacord.entity.channel.impl.ImplServerVoiceChannelBuilder;
 import de.btobastian.javacord.entity.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entity.impl.ImplIcon;
 import de.btobastian.javacord.entity.permission.Role;
@@ -755,6 +761,21 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Collection<KnownCustomEmoji> getCustomEmojis() {
         return Collections.unmodifiableCollection(new ArrayList<>(customEmojis));
+    }
+
+    @Override
+    public ChannelCategoryBuilder getChannelCategoryBuilder() {
+        return new ImplChannelCategoryBuilder(this);
+    }
+
+    @Override
+    public ServerTextChannelBuilder getTextChannelBuilder() {
+        return new ImplServerTextChannelBuilder(this);
+    }
+
+    @Override
+    public ServerVoiceChannelBuilder getVoiceChannelBuilder() {
+        return new ImplServerVoiceChannelBuilder(this);
     }
 
     @Override
