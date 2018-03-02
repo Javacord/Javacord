@@ -21,7 +21,9 @@ import de.btobastian.javacord.entity.channel.impl.ImplServerTextChannel;
 import de.btobastian.javacord.entity.channel.impl.ImplServerTextChannelBuilder;
 import de.btobastian.javacord.entity.channel.impl.ImplServerVoiceChannel;
 import de.btobastian.javacord.entity.channel.impl.ImplServerVoiceChannelBuilder;
+import de.btobastian.javacord.entity.emoji.CustomEmojiBuilder;
 import de.btobastian.javacord.entity.emoji.KnownCustomEmoji;
+import de.btobastian.javacord.entity.emoji.impl.ImplCustomEmojiBuilder;
 import de.btobastian.javacord.entity.impl.ImplIcon;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.permission.impl.ImplRole;
@@ -751,6 +753,11 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
+    }
+
+    @Override
+    public CustomEmojiBuilder createCustomEmojiBuilder() {
+        return new ImplCustomEmojiBuilder(this);
     }
 
     @Override
