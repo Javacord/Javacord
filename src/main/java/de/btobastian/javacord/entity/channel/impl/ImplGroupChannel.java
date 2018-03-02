@@ -144,7 +144,7 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
     }
 
     @Override
-    public GroupChannelUpdater getUpdater() {
+    public GroupChannelUpdater createUpdater() {
         return new ImplGroupChannelUpdater(this);
     }
 

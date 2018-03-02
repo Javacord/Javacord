@@ -104,30 +104,30 @@ public interface ServerChannel extends Channel {
     }
 
     /**
-     * Gets the updater for this channel.
+     * Create an updater for this channel.
      *
-     * @return The updater for this channel.
+     * @return An updater for this channel.
      */
-    ServerChannelUpdater getUpdater();
+    ServerChannelUpdater createUpdater();
 
     /**
      * Updates the name of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return getUpdater().setName(name).update();
+        return createUpdater().setName(name).update();
     }
 
     /**
      * Updates the raw position of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param rawPosition The new position of the channel.
      *                    If you want to update the position based on other channels, make sure to use
@@ -135,7 +135,7 @@ public interface ServerChannel extends Channel {
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRawPosition(int rawPosition) {
-        return getUpdater().setRawPosition(rawPosition).update();
+        return createUpdater().setRawPosition(rawPosition).update();
     }
 
     /**

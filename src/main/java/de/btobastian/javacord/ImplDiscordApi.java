@@ -1081,7 +1081,7 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
-    public ServerBuilder getServerBuilder() {
+    public ServerBuilder createServerBuilder() {
         return new ImplServerBuilder(this);
     }
 

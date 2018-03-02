@@ -55,73 +55,73 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     Collection<User> getConnectedUsers();
 
     /**
-     * Gets the updater for this channel.
+     * Creates an updater for this channel.
      *
-     * @return The updater for this channel.
+     * @return An updater for this channel.
      */
-    ServerVoiceChannelUpdater getUpdater();
+    ServerVoiceChannelUpdater createUpdater();
 
     /**
      * Updates the bitrate of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param bitrate The new bitrate of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateBitrate(int bitrate) {
-        return getUpdater().setBitrate(bitrate).update();
+        return createUpdater().setBitrate(bitrate).update();
     }
 
     /**
      * Updates the user limit of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param userLimit The new user limit of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateUserLimit(int userLimit) {
-        return getUpdater().setUserLimit(userLimit).update();
+        return createUpdater().setUserLimit(userLimit).update();
     }
 
     /**
      * Removes the user limit of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeUserLimit() {
-        return getUpdater().removeUserLimit().update();
+        return createUpdater().removeUserLimit().update();
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param category The new category of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return getUpdater().setCategory(category).update();
+        return createUpdater().setCategory(category).update();
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerVoiceChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeCategory() {
-        return getUpdater().removeCategory().update();
+        return createUpdater().removeCategory().update();
     }
 
     /**

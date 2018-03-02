@@ -173,7 +173,7 @@ public class ImplChannelCategory implements ChannelCategory {
     }
 
     @Override
-    public ServerChannelUpdater getUpdater() {
+    public ServerChannelUpdater createUpdater() {
         return new ImplServerChannelUpdater(this);
     }
 

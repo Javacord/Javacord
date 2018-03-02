@@ -255,7 +255,7 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     }
 
     @Override
-    public ServerVoiceChannelUpdater getUpdater() {
+    public ServerVoiceChannelUpdater createUpdater() {
         return new ImplServerVoiceChannelUpdater(this);
     }
 

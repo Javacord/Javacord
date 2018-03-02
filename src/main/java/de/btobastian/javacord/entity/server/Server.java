@@ -625,110 +625,110 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
-     * Gets a custom emoji builder to create custom emojis.
+     * Creates a custom emoji builder to create custom emojis.
      *
      * @return A custom emoji builder to create custom emojis.
      */
-    default CustomEmojiBuilder getCustomEmojiBuilder() {
+    default CustomEmojiBuilder createCustomEmojiBuilder() {
         return new CustomEmojiBuilder(this);
     }
 
     /**
-     * Gets the updater for this server.
+     * Creates an updater for this server.
      *
-     * @return The updater for this server.
+     * @return An updater for this server.
      */
-    ServerUpdater getUpdater();
+    ServerUpdater createUpdater();
 
     /**
      * Updates the name of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return getUpdater().setName(name).update();
+        return createUpdater().setName(name).update();
     }
 
     /**
      * Updates the region of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param region The new region of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRegion(Region region) {
-        return getUpdater().setRegion(region).update();
+        return createUpdater().setRegion(region).update();
     }
 
     /**
      * Updates the verification level of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param verificationLevel The new verification level of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateVerificationLevel(VerificationLevel verificationLevel) {
-        return getUpdater().setVerificationLevel(verificationLevel).update();
+        return createUpdater().setVerificationLevel(verificationLevel).update();
     }
 
     /**
      * Updates the default message notification level of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param defaultMessageNotificationLevel The new default message notification level of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateDefaultMessageNotificationLevel(
             DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
-        return getUpdater().setDefaultMessageNotificationLevel(defaultMessageNotificationLevel).update();
+        return createUpdater().setDefaultMessageNotificationLevel(defaultMessageNotificationLevel).update();
     }
 
     /**
      * Updates the afk channel of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param afkChannel The new afk channel of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAfkChannel(ServerVoiceChannel afkChannel) {
-        return getUpdater().setAfkChannel(afkChannel).update();
+        return createUpdater().setAfkChannel(afkChannel).update();
     }
 
     /**
      * Removes the afk channel of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeAfkChannel() {
-        return getUpdater().removeAfkChannel().update();
+        return createUpdater().removeAfkChannel().update();
     }
 
     /**
      * Updates the afk timeout of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param afkTimeout The new afk timeout of the server in seconds.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAfkTimeoutInSeconds(int afkTimeout) {
-        return getUpdater().setAfkTimeoutInSeconds(afkTimeout).update();
+        return createUpdater().setAfkTimeoutInSeconds(afkTimeout).update();
     }
 
     /**
@@ -736,66 +736,66 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(BufferedImage icon) {
-        return getUpdater().setIcon(icon).update();
+        return createUpdater().setIcon(icon).update();
     }
 
     /**
      * Updates the icon of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(BufferedImage icon, String fileType) {
-        return getUpdater().setIcon(icon, fileType).update();
+        return createUpdater().setIcon(icon, fileType).update();
     }
 
     /**
      * Updates the icon of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(File icon) {
-        return getUpdater().setIcon(icon).update();
+        return createUpdater().setIcon(icon).update();
     }
 
     /**
      * Updates the icon of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(Icon icon) {
-        return getUpdater().setIcon(icon).update();
+        return createUpdater().setIcon(icon).update();
     }
 
     /**
      * Updates the icon of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(URL icon) {
-        return getUpdater().setIcon(icon).update();
+        return createUpdater().setIcon(icon).update();
     }
 
     /**
@@ -803,27 +803,27 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(byte[] icon) {
-        return getUpdater().setIcon(icon).update();
+        return createUpdater().setIcon(icon).update();
     }
 
     /**
      * Updates the icon of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(byte[] icon, String fileType) {
-        return getUpdater().setIcon(icon, fileType).update();
+        return createUpdater().setIcon(icon, fileType).update();
     }
 
     /**
@@ -831,39 +831,39 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(InputStream icon) {
-        return getUpdater().setIcon(icon).update();
+        return createUpdater().setIcon(icon).update();
     }
 
     /**
      * Updates the icon of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param icon The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateIcon(InputStream icon, String fileType) {
-        return getUpdater().setIcon(icon, fileType).update();
+        return createUpdater().setIcon(icon, fileType).update();
     }
 
     /**
      * Removes the icon of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the removal was successful.
      */
     default CompletableFuture<Void> removeIcon() {
-        return getUpdater().removeIcon().update();
+        return createUpdater().removeIcon().update();
     }
 
     /**
@@ -871,13 +871,13 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * You must be the owner of this server in order to transfer it!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param owner The new owner of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateOwner(User owner) {
-        return getUpdater().setOwner(owner).update();
+        return createUpdater().setOwner(owner).update();
     }
 
     /**
@@ -885,66 +885,66 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(BufferedImage splash) {
-        return getUpdater().setSplash(splash).update();
+        return createUpdater().setSplash(splash).update();
     }
 
     /**
      * Updates the splash of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(BufferedImage splash, String fileType) {
-        return getUpdater().setSplash(splash, fileType).update();
+        return createUpdater().setSplash(splash, fileType).update();
     }
 
     /**
      * Updates the splash of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(File splash) {
-        return getUpdater().setSplash(splash).update();
+        return createUpdater().setSplash(splash).update();
     }
 
     /**
      * Updates the splash of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(Icon splash) {
-        return getUpdater().setSplash(splash).update();
+        return createUpdater().setSplash(splash).update();
     }
 
     /**
      * Updates the splash of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(URL splash) {
-        return getUpdater().setSplash(splash).update();
+        return createUpdater().setSplash(splash).update();
     }
 
     /**
@@ -952,27 +952,27 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(byte[] splash) {
-        return getUpdater().setSplash(splash).update();
+        return createUpdater().setSplash(splash).update();
     }
 
     /**
      * Updates the splash of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(byte[] splash, String fileType) {
-        return getUpdater().setSplash(splash, fileType).update();
+        return createUpdater().setSplash(splash, fileType).update();
     }
 
     /**
@@ -980,64 +980,64 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(InputStream splash) {
-        return getUpdater().setSplash(splash).update();
+        return createUpdater().setSplash(splash).update();
     }
 
     /**
      * Updates the splash of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param splash The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateSplash(InputStream splash, String fileType) {
-        return getUpdater().setSplash(splash, fileType).update();
+        return createUpdater().setSplash(splash, fileType).update();
     }
 
     /**
      * Removes the splash of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the removal was successful.
      */
     default CompletableFuture<Void> removeSplash() {
-        return getUpdater().removeSplash().update();
+        return createUpdater().removeSplash().update();
     }
 
     /**
      * Updates the system channel of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param systemChannel The new system channel of the server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> setSystemChannel(ServerTextChannel systemChannel) {
-        return getUpdater().setSystemChannel(systemChannel).update();
+        return createUpdater().setSystemChannel(systemChannel).update();
     }
 
     /**
      * Removes the system channel of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeSystemChannel() {
-        return getUpdater().removeSystemChannel().update();
+        return createUpdater().removeSystemChannel().update();
     }
 
     /**
@@ -1442,32 +1442,32 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
-     * Gets a new channel category builder.
+     * Creates a new channel category builder.
      *
-     * @return The builder to create a new channel category.
+     * @return A builder to create a new channel category.
      */
-    ChannelCategoryBuilder getChannelCategoryBuilder();
+    ChannelCategoryBuilder createChannelCategoryBuilder();
 
     /**
-     * Gets a new server text channel builder.
+     * Creates a new server text channel builder.
      *
-     * @return The builder to create a new server text channel.
+     * @return A builder to create a new server text channel.
      */
-    ServerTextChannelBuilder getTextChannelBuilder();
+    ServerTextChannelBuilder createTextChannelBuilder();
 
     /**
-     * Gets a new server voice channel builder.
+     * Creates a new server voice channel builder.
      *
-     * @return The builder to create a new server voice channel.
+     * @return A builder to create a new server voice channel.
      */
-    ServerVoiceChannelBuilder getVoiceChannelBuilder();
+    ServerVoiceChannelBuilder createVoiceChannelBuilder();
 
     /**
-     * Gets a new role builder.
+     * Creates a new role builder.
      *
-     * @return The builder to create a new role.
+     * @return A builder to create a new role.
      */
-    default RoleBuilder getRoleBuilder() {
+    default RoleBuilder createRoleBuilder() {
         return new RoleBuilder(this);
     }
 

@@ -64,23 +64,23 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
     }
 
     /**
-     * Gets the updater for this channel.
+     * Creates an updater for this channel.
      *
-     * @return The updater for this channel.
+     * @return An updater for this channel.
      */
-    GroupChannelUpdater getUpdater();
+    GroupChannelUpdater createUpdater();
 
     /**
      * Updates the name of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link GroupChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link GroupChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return getUpdater().setName(name).update();
+        return createUpdater().setName(name).update();
     }
 
     /**

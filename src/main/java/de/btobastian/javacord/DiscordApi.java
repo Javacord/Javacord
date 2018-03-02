@@ -443,18 +443,18 @@ public interface DiscordApi {
     MessageBuilder createMessageBuilder();
 
     /**
-     * Gets a server builder which can be used to create servers.
+     * Creates a server builder which can be used to create servers.
      *
      * @return A server builder.
      */
-    ServerBuilder getServerBuilder();
+    ServerBuilder createServerBuilder();
 
     /**
-     * Gets an account updater for the current account.
+     * Creates an account updater for the current account.
      *
      * @return An account updater for the current account.
      */
-    default AccountUpdater getAccountUpdater() {
+    default AccountUpdater createAccountUpdater() {
         return new AccountUpdater(this);
     }
 
@@ -462,13 +462,13 @@ public interface DiscordApi {
      * Updates the username of the current account.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param username The new username.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateUsername(String username) {
-        return getAccountUpdater().setUsername(username).update();
+        return createAccountUpdater().setUsername(username).update();
     }
 
     /**
@@ -476,66 +476,66 @@ public interface DiscordApi {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(BufferedImage avatar) {
-        return getAccountUpdater().setAvatar(avatar).update();
+        return createAccountUpdater().setAvatar(avatar).update();
     }
 
     /**
      * Updates the avatar of the current account.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(BufferedImage avatar, String fileType) {
-        return getAccountUpdater().setAvatar(avatar, fileType).update();
+        return createAccountUpdater().setAvatar(avatar, fileType).update();
     }
 
     /**
      * Updates the avatar of the current account.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(File avatar) {
-        return getAccountUpdater().setAvatar(avatar).update();
+        return createAccountUpdater().setAvatar(avatar).update();
     }
 
     /**
      * Updates the avatar of the current account.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(Icon avatar) {
-        return getAccountUpdater().setAvatar(avatar).update();
+        return createAccountUpdater().setAvatar(avatar).update();
     }
 
     /**
      * Updates the avatar of the current account.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(URL avatar) {
-        return getAccountUpdater().setAvatar(avatar).update();
+        return createAccountUpdater().setAvatar(avatar).update();
     }
 
     /**
@@ -543,27 +543,27 @@ public interface DiscordApi {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(byte[] avatar) {
-        return getAccountUpdater().setAvatar(avatar).update();
+        return createAccountUpdater().setAvatar(avatar).update();
     }
 
     /**
      * Updates the avatar of the current account.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(byte[] avatar, String fileType) {
-        return getAccountUpdater().setAvatar(avatar, fileType).update();
+        return createAccountUpdater().setAvatar(avatar, fileType).update();
     }
 
     /**
@@ -571,27 +571,27 @@ public interface DiscordApi {
      * This method assumes the file type is "png"!
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(InputStream avatar) {
-        return getAccountUpdater().setAvatar(avatar).update();
+        return createAccountUpdater().setAvatar(avatar).update();
     }
 
     /**
      * Updates the avatar of the current account.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link AccountUpdater} from {@link #getAccountUpdater()} ()} which provides a better performance!
+     * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateAvatar(InputStream avatar, String fileType) {
-        return getAccountUpdater().setAvatar(avatar, fileType).update();
+        return createAccountUpdater().setAvatar(avatar, fileType).update();
     }
 
     /**

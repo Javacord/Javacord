@@ -224,7 +224,7 @@ public class ImplServerTextChannel implements ServerTextChannel, Cleanupable {
     }
 
     @Override
-    public ServerTextChannelUpdater getUpdater() {
+    public ServerTextChannelUpdater createUpdater() {
         return new ImplServerTextChannelUpdater(this);
     }
 

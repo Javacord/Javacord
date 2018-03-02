@@ -48,68 +48,68 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
     String getTopic();
 
     /**
-     * Gets a webhook builder for this channel.
+     * Creates a webhook builder for this channel.
      *
      * @return A webhook builder.
      */
     WebhookBuilder createWebhookBuilder();
 
     /**
-     * Gets the updater for this channel.
+     * Creates an updater for this channel.
      *
-     * @return The updater for this channel.
+     * @return An updater for this channel.
      */
-    ServerTextChannelUpdater getUpdater();
+    ServerTextChannelUpdater createUpdater();
 
     /**
      * Updates the topic of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param topic The new topic of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateTopic(String topic) {
-        return getUpdater().setTopic(topic).update();
+        return createUpdater().setTopic(topic).update();
     }
 
     /**
      * Updates the nsfw flag of the channel.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param nsfw The new nsfw flag of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNsfwFlag(boolean nsfw) {
-        return getUpdater().setNsfwFlag(nsfw).update();
+        return createUpdater().setNsfwFlag(nsfw).update();
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param category The new category of the channel.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return getUpdater().setCategory(category).update();
+        return createUpdater().setCategory(category).update();
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeCategory() {
-        return getUpdater().removeCategory().update();
+        return createUpdater().removeCategory().update();
     }
 
     /**

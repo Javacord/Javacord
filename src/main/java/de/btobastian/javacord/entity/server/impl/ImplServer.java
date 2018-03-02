@@ -754,7 +754,7 @@ public class ImplServer implements Server, Cleanupable {
     }
 
     @Override
-    public ServerUpdater getUpdater() {
+    public ServerUpdater createUpdater() {
         return new ImplServerUpdater(this);
     }
 
@@ -764,17 +764,17 @@ public class ImplServer implements Server, Cleanupable {
     }
 
     @Override
-    public ChannelCategoryBuilder getChannelCategoryBuilder() {
+    public ChannelCategoryBuilder createChannelCategoryBuilder() {
         return new ImplChannelCategoryBuilder(this);
     }
 
     @Override
-    public ServerTextChannelBuilder getTextChannelBuilder() {
+    public ServerTextChannelBuilder createTextChannelBuilder() {
         return new ImplServerTextChannelBuilder(this);
     }
 
     @Override
-    public ServerVoiceChannelBuilder getVoiceChannelBuilder() {
+    public ServerVoiceChannelBuilder createVoiceChannelBuilder() {
         return new ImplServerVoiceChannelBuilder(this);
     }
 
