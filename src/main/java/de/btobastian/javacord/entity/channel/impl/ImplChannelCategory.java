@@ -5,6 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
+import de.btobastian.javacord.entity.channel.ServerChannelUpdater;
 import de.btobastian.javacord.entity.permission.Permissions;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
@@ -169,6 +170,11 @@ public class ImplChannelCategory implements ChannelCategory {
     @Override
     public int getRawPosition() {
         return position;
+    }
+
+    @Override
+    public ServerChannelUpdater getUpdater() {
+        return new ImplServerChannelUpdater(this);
     }
 
     @Override

@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannel;
+import de.btobastian.javacord.entity.channel.ServerVoiceChannelUpdater;
 import de.btobastian.javacord.entity.permission.Permissions;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
@@ -251,6 +252,11 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     @Override
     public Collection<User> getConnectedUsers() {
         return Collections.unmodifiableCollection(connectedUsers);
+    }
+
+    @Override
+    public ServerVoiceChannelUpdater getUpdater() {
+        return new ImplServerVoiceChannelUpdater(this);
     }
 
     @Override

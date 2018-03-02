@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.channel.GroupChannel;
+import de.btobastian.javacord.entity.channel.GroupChannelUpdater;
 import de.btobastian.javacord.entity.impl.ImplIcon;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.util.Cleanupable;
@@ -133,6 +134,11 @@ public class ImplGroupChannel implements GroupChannel, Cleanupable {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public GroupChannelUpdater getUpdater() {
+        return new ImplGroupChannelUpdater(this);
     }
 
     @Override

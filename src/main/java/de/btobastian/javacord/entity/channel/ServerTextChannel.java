@@ -61,9 +61,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      *
      * @return The updater for this channel.
      */
-    default ServerTextChannelUpdater getUpdater() {
-        return new ServerTextChannelUpdater(this);
-    }
+    ServerTextChannelUpdater getUpdater();
 
     /**
      * Updates the topic of the channel.

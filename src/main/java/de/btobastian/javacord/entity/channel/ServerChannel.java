@@ -108,9 +108,7 @@ public interface ServerChannel extends Channel {
      *
      * @return The updater for this channel.
      */
-    default ServerChannelUpdater getUpdater() {
-        return new ServerChannelUpdater(this);
-    }
+    ServerChannelUpdater getUpdater();
 
     /**
      * Updates the name of the channel.

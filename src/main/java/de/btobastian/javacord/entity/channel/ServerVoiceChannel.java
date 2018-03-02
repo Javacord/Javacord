@@ -59,9 +59,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      *
      * @return The updater for this channel.
      */
-    default ServerVoiceChannelUpdater getUpdater() {
-        return new ServerVoiceChannelUpdater(this);
-    }
+    ServerVoiceChannelUpdater getUpdater();
 
     /**
      * Updates the bitrate of the channel.
