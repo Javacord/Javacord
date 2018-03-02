@@ -10,6 +10,7 @@ import de.btobastian.javacord.entity.impl.ImplIcon;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.webhook.Webhook;
+import de.btobastian.javacord.entity.webhook.WebhookUpdater;
 import de.btobastian.javacord.util.logging.LoggerUtil;
 import de.btobastian.javacord.util.rest.RestEndpoint;
 import de.btobastian.javacord.util.rest.RestMethod;
@@ -125,6 +126,11 @@ public class ImplWebhook implements Webhook {
                 .setUrlParameters(getIdAsString())
                 .setAuditLogReason(reason)
                 .execute(result -> null);
+    }
+
+    @Override
+    public WebhookUpdater createUpdater() {
+        return new ImplWebhookUpdater(this);
     }
 
     @Override
