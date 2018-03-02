@@ -7,6 +7,8 @@ import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
 import de.btobastian.javacord.entity.channel.ServerTextChannel;
 import de.btobastian.javacord.entity.channel.ServerTextChannelUpdater;
+import de.btobastian.javacord.entity.message.MessageBuilder;
+import de.btobastian.javacord.entity.message.impl.ImplMessageBuilder;
 import de.btobastian.javacord.entity.permission.Permissions;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
@@ -192,6 +194,11 @@ public class ImplServerTextChannel implements ServerTextChannel, Cleanupable {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public MessageBuilder createMessageBuilder() {
+        return new ImplMessageBuilder().setReceiver(this);
     }
 
     @Override

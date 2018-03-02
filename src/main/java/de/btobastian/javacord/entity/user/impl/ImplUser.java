@@ -11,6 +11,8 @@ import de.btobastian.javacord.entity.channel.PrivateChannel;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannel;
 import de.btobastian.javacord.entity.channel.impl.ImplPrivateChannel;
 import de.btobastian.javacord.entity.impl.ImplIcon;
+import de.btobastian.javacord.entity.message.MessageBuilder;
+import de.btobastian.javacord.entity.message.impl.ImplMessageBuilder;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.user.UserStatus;
 import de.btobastian.javacord.util.Cleanupable;
@@ -200,6 +202,11 @@ public class ImplUser implements User, Cleanupable {
      */
     public void removeConnectedVoiceChannel(ServerVoiceChannel channel) {
         connectedVoiceChannels.remove(channel);
+    }
+
+    @Override
+    public MessageBuilder createMessageBuilder() {
+        return new ImplMessageBuilder().setReceiver(this);
     }
 
     @Override

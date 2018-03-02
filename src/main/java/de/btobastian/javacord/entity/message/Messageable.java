@@ -12,6 +12,13 @@ import java.util.concurrent.CompletableFuture;
 public interface Messageable {
 
     /**
+     * Creates a new message builder for this entity.
+     *
+     * @return The newly created message builder.
+     */
+    MessageBuilder createMessageBuilder();
+
+    /**
      * Sends a message.
      *
      * @param content The content of the message.
@@ -24,13 +31,13 @@ public interface Messageable {
      */
     default CompletableFuture<Message> sendMessage(
             String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
                 .setTts(tts)
                 .setNonce(nonce)
                 .addAttachment(stream, fileName)
-                .send(this);
+                .send();
     }
 
     /**
@@ -45,7 +52,7 @@ public interface Messageable {
      */
     default CompletableFuture<Message> sendMessage(
             String content, EmbedBuilder embed, boolean tts, String nonce, File... files) {
-        MessageBuilder messageBuilder = new MessageBuilder()
+        MessageBuilder messageBuilder = createMessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
                 .setTts(tts)
@@ -53,7 +60,7 @@ public interface Messageable {
         for (File file : files) {
             messageBuilder.addAttachment(file);
         }
-        return messageBuilder.send(this);
+        return messageBuilder.send();
     }
 
     /**
@@ -66,12 +73,12 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
                 .setTts(tts)
                 .setNonce(nonce)
-                .send(this);
+                .send();
     }
 
     /**
@@ -82,10 +89,10 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
-                .send(this);
+                .send();
     }
 
     /**
@@ -95,9 +102,9 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .append(content == null ? "" : content)
-                .send(this);
+                .send();
     }
 
     /**
@@ -107,9 +114,9 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(EmbedBuilder embed) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .setEmbed(embed)
-                .send(this);
+                .send();
     }
 
     /**
@@ -119,11 +126,11 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(File... files) {
-        MessageBuilder messageBuilder = new MessageBuilder();
+        MessageBuilder messageBuilder = createMessageBuilder();
         for (File file : files) {
             messageBuilder.addAttachment(file);
         }
-        return messageBuilder.send(this);
+        return messageBuilder.send();
     }
 
     /**
@@ -134,9 +141,9 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(InputStream stream, String fileName) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .addAttachment(stream, fileName)
-                .send(this);
+                .send();
     }
 
     /**
@@ -147,12 +154,12 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content, File... files) {
-        MessageBuilder messageBuilder = new MessageBuilder()
+        MessageBuilder messageBuilder = createMessageBuilder()
                 .append(content == null ? "" : content);
         for (File file : files) {
             messageBuilder.addAttachment(file);
         }
-        return messageBuilder.send(this);
+        return messageBuilder.send();
     }
 
     /**
@@ -164,10 +171,10 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content, InputStream stream, String fileName) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .append(content == null ? "" : content)
                 .addAttachment(stream, fileName)
-                .send(this);
+                .send();
     }
 
     /**
@@ -178,12 +185,12 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(EmbedBuilder embed, File... files) {
-        MessageBuilder messageBuilder = new MessageBuilder()
+        MessageBuilder messageBuilder = createMessageBuilder()
                 .setEmbed(embed);
         for (File file : files) {
             messageBuilder.addAttachment(file);
         }
-        return messageBuilder.send(this);
+        return messageBuilder.send();
     }
 
     /**
@@ -195,10 +202,10 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(EmbedBuilder embed, InputStream stream, String fileName) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .setEmbed(embed)
                 .addAttachment(stream, fileName)
-                .send(this);
+                .send();
     }
 
     /**
@@ -210,13 +217,13 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, File... files) {
-        MessageBuilder messageBuilder = new MessageBuilder()
+        MessageBuilder messageBuilder = createMessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed);
         for (File file : files) {
             messageBuilder.addAttachment(file);
         }
-        return messageBuilder.send(this);
+        return messageBuilder.send();
     }
 
     /**
@@ -229,11 +236,11 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, InputStream stream, String fileName) {
-        return new MessageBuilder()
+        return createMessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
                 .addAttachment(stream, fileName)
-                .send(this);
+                .send();
     }
 
 }

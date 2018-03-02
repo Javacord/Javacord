@@ -5,6 +5,8 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.PrivateChannel;
+import de.btobastian.javacord.entity.message.MessageBuilder;
+import de.btobastian.javacord.entity.message.impl.ImplMessageBuilder;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.user.impl.ImplUser;
 import de.btobastian.javacord.util.Cleanupable;
@@ -62,6 +64,11 @@ public class ImplPrivateChannel implements PrivateChannel, Cleanupable {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public MessageBuilder createMessageBuilder() {
+        return new ImplMessageBuilder().setReceiver(this);
     }
 
     @Override
