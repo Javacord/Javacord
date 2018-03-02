@@ -439,9 +439,7 @@ public interface DiscordApi {
      *
      * @return A server builder.
      */
-    default ServerBuilder getServerBuilder() {
-        return new ServerBuilder(this);
-    }
+    ServerBuilder getServerBuilder();
 
     /**
      * Gets an account updater for the current account.

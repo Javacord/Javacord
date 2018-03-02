@@ -16,6 +16,8 @@ import de.btobastian.javacord.entity.message.MessageSet;
 import de.btobastian.javacord.entity.message.impl.ImplMessage;
 import de.btobastian.javacord.entity.message.impl.ImplMessageSet;
 import de.btobastian.javacord.entity.server.Server;
+import de.btobastian.javacord.entity.server.ServerBuilder;
+import de.btobastian.javacord.entity.server.impl.ImplServerBuilder;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.user.UserStatus;
 import de.btobastian.javacord.entity.user.impl.ImplUser;
@@ -1069,6 +1071,11 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public Collection<Long> getUnavailableServers() {
         return Collections.unmodifiableCollection(unavailableServers);
+    }
+
+    @Override
+    public ServerBuilder getServerBuilder() {
+        return new ImplServerBuilder(this);
     }
 
     @Override

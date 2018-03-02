@@ -30,6 +30,9 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * The implementation of {@link ServerUpdater}.
+ */
 public class ImplServerUpdater implements ServerUpdater {
 
     /**
