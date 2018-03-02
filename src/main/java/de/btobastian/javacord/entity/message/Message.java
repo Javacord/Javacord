@@ -17,6 +17,7 @@ import de.btobastian.javacord.entity.emoji.Emoji;
 import de.btobastian.javacord.entity.emoji.impl.ImplUnicodeEmoji;
 import de.btobastian.javacord.entity.message.embed.Embed;
 import de.btobastian.javacord.entity.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entity.message.embed.impl.ImplEmbedFactory;
 import de.btobastian.javacord.entity.permission.PermissionType;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.server.Server;
@@ -339,7 +340,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             if (embed == null) {
                 body.putNull("embed");
             } else {
-                embed.toJsonNode(body.putObject("embed"));
+                ((ImplEmbedFactory) embed.getFactory()).toJsonNode(body.putObject("embed"));
             }
         }
         return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)

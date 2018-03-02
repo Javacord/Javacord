@@ -11,6 +11,7 @@ import de.btobastian.javacord.entity.message.MessageBuilder;
 import de.btobastian.javacord.entity.message.MessageDecoration;
 import de.btobastian.javacord.entity.message.Messageable;
 import de.btobastian.javacord.entity.message.embed.EmbedBuilder;
+import de.btobastian.javacord.entity.message.embed.impl.ImplEmbedFactory;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.util.FileContainer;
 import de.btobastian.javacord.util.rest.RestEndpoint;
@@ -262,7 +263,7 @@ public class ImplMessageBuilder implements MessageBuilder {
                 .put("tts", tts);
         body.putArray("mentions");
         if (embed != null) {
-            embed.toJsonNode(body.putObject("embed"));
+            ((ImplEmbedFactory) embed.getFactory()).toJsonNode(body.putObject("embed"));
         }
         if (nonce != null) {
             body.put("nonce", nonce);
@@ -281,7 +282,7 @@ public class ImplMessageBuilder implements MessageBuilder {
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
                     // Add the attachments required for the embed
                     if (embed != null) {
-                        tempAttachments.addAll(embed.getRequiredAttachments());
+                        tempAttachments.addAll(((ImplEmbedFactory) embed.getFactory()).getRequiredAttachments());
                     }
                     for (int i = 0; i < tempAttachments.size(); i++) {
                         byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();

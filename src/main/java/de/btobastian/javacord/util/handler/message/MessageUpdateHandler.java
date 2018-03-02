@@ -7,6 +7,7 @@ import de.btobastian.javacord.entity.channel.ServerTextChannel;
 import de.btobastian.javacord.entity.message.Message;
 import de.btobastian.javacord.entity.message.embed.Embed;
 import de.btobastian.javacord.entity.message.embed.impl.ImplEmbed;
+import de.btobastian.javacord.entity.message.embed.impl.ImplEmbedFactory;
 import de.btobastian.javacord.entity.message.impl.ImplMessage;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.event.message.CachedMessagePinEvent;
@@ -152,8 +153,10 @@ public class MessageUpdateHandler extends PacketHandler {
                         isMostLikelyAnEdit = true;
                     } else {
                         for (int i = 0; i < newEmbeds.size(); i++) {
-                            if (!newEmbeds.get(i).toBuilder().toJsonNode().toString()
-                                    .equals(oldEmbeds.get(i).toBuilder().toJsonNode().toString())) {
+                            if (!((ImplEmbedFactory) newEmbeds.get(i)
+                                    .toBuilder().getFactory()).toJsonNode().toString()
+                                    .equals(((ImplEmbedFactory) oldEmbeds.get(i)
+                                            .toBuilder().getFactory()).toJsonNode().toString())) {
                                 isMostLikelyAnEdit = true;
                             }
                         }

@@ -1,64 +1,60 @@
 package de.btobastian.javacord.entity.message.embed;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.message.MessageAuthor;
 import de.btobastian.javacord.entity.user.User;
-import de.btobastian.javacord.util.FileContainer;
-import de.btobastian.javacord.util.io.FileUtils;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 /**
  * This class is used to create embeds.
  */
 public class EmbedBuilder {
 
-    // General embed stuff
-    private String title = null;
-    private String description = null;
-    private String url = null;
-    private Instant timestamp = null;
-    private Color color = null;
+    /**
+     * The base factory. It's only used to create new factories.
+     */
+    private static final EmbedFactory baseFactory;
 
-    // Footer
-    private String footerText = null;
-    private String footerIconUrl = null;
-    private FileContainer footerIconContainer = null;
+    // Load it static, because it has a better performance to load it only once
+    static {
+        ServiceLoader<EmbedFactory> factoryServiceLoader = ServiceLoader.load(EmbedFactory.class);
+        Iterator<EmbedFactory> factoryIterator = factoryServiceLoader.iterator();
+        if (factoryIterator.hasNext()) {
+            baseFactory = factoryIterator.next();
+            if (factoryIterator.hasNext()) {
+                throw new IllegalStateException("Found more than one EmbedFactory implementation!");
+            }
+        } else {
+            throw new IllegalStateException("No EmbedFactory implementation was found!");
+        }
+    }
 
-    // Image
-    private String imageUrl = null;
-    private FileContainer imageContainer = null;
-
-    // Author
-    private String authorName = null;
-    private String authorUrl = null;
-    private String authorIconUrl = null;
-    private FileContainer authorIconContainer = null;
-
-    // Thumbnail
-    private String thumbnailUrl = null;
-    private FileContainer thumbnailContainer = null;
-
-    // Fields
-    // (Array indices: 0: name (String), 1: value (String), 2: inline (boolean)
-    private List<Object[]> fields = new ArrayList<>();
+    /**
+     * The embed factory used by this instance.
+     */
+    private final EmbedFactory factory;
 
     /**
      * Creates a new embed builder.
      */
     public EmbedBuilder() {
-        // Default constructor
+        factory = baseFactory.getNewInstance();
+    }
+
+    /**
+     * Gets the factory used by this embed builder internally.
+     *
+     * @return The factory used by this embed builder internally.
+     */
+    public EmbedFactory getFactory() {
+        return factory;
     }
 
     /**
@@ -68,7 +64,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setTitle(String title) {
-        this.title = title;
+        factory.setTitle(title);
         return this;
     }
 
@@ -79,7 +75,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setDescription(String description) {
-        this.description = description;
+        factory.setDescription(description);
         return this;
     }
 
@@ -90,7 +86,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setUrl(String url) {
-        this.url = url;
+        factory.setUrl(url);
         return this;
     }
 
@@ -100,7 +96,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setTimestamp() {
-        this.timestamp = Instant.now();
+        factory.setTimestamp();
         return this;
     }
 
@@ -111,7 +107,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setTimestamp(Instant timestamp) {
-        this.timestamp = timestamp;
+        factory.setTimestamp(timestamp);
         return this;
     }
 
@@ -122,7 +118,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setColor(Color color) {
-        this.color = color;
+        factory.setColor(color);
         return this;
     }
 
@@ -133,9 +129,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text) {
-        footerText = text;
-        footerIconUrl = null;
-        footerIconContainer = null;
+        factory.setFooter(text);
         return this;
     }
 
@@ -147,9 +141,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, String iconUrl) {
-        footerText = text;
-        footerIconUrl = iconUrl;
-        footerIconContainer = null;
+        factory.setFooter(text, iconUrl);
         return this;
     }
 
@@ -161,9 +153,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, Icon icon) {
-        footerText = text;
-        footerIconUrl = icon.getUrl().toString();
-        footerIconContainer = null;
+        factory.setFooter(text, icon);
         return this;
     }
 
@@ -175,14 +165,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, File icon) {
-        footerText = text;
-        footerIconUrl = null;
-        if (icon == null) {
-            footerIconContainer = null;
-        } else {
-            footerIconContainer = new FileContainer(icon);
-            footerIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon));
-        }
+        factory.setFooter(text, icon);
         return this;
     }
 
@@ -195,7 +178,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, InputStream icon) {
-        return setFooter(text, icon, "png");
+        factory.setFooter(text, icon);
+        return this;
     }
 
     /**
@@ -207,14 +191,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, InputStream icon, String fileType) {
-        footerText = text;
-        footerIconUrl = null;
-        if (icon == null) {
-            footerIconContainer = null;
-        } else {
-            footerIconContainer = new FileContainer(icon, fileType);
-            footerIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setFooter(text, icon, fileType);
         return this;
     }
 
@@ -227,7 +204,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, byte[] icon) {
-        return setFooter(text, icon, "png");
+        factory.setFooter(text, icon);
+        return this;
     }
 
     /**
@@ -239,14 +217,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, byte[] icon, String fileType) {
-        footerText = text;
-        footerIconUrl = null;
-        if (icon == null) {
-            footerIconContainer = null;
-        } else {
-            footerIconContainer = new FileContainer(icon, fileType);
-            footerIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setFooter(text, icon, fileType);
         return this;
     }
 
@@ -259,7 +230,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, BufferedImage icon) {
-        return setFooter(text, icon, "png");
+        factory.setFooter(text, icon);
+        return this;
     }
 
     /**
@@ -271,14 +243,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, BufferedImage icon, String fileType) {
-        footerText = text;
-        footerIconUrl = null;
-        if (icon == null) {
-            footerIconContainer = null;
-        } else {
-            footerIconContainer = new FileContainer(icon, fileType);
-            footerIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setFooter(text, icon, fileType);
         return this;
     }
 
@@ -289,8 +254,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(String url) {
-        imageUrl = url;
-        imageContainer = null;
+        factory.setImage(url);
         return this;
     }
 
@@ -301,8 +265,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(Icon image) {
-        imageUrl = image.getUrl().toString();
-        imageContainer = null;
+        factory.setImage(image);
         return this;
     }
 
@@ -313,13 +276,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(File image) {
-        imageUrl = null;
-        if (image == null) {
-            imageContainer = null;
-        } else {
-            imageContainer = new FileContainer(image);
-            imageContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + FileUtils.getExtension(image));
-        }
+        factory.setImage(image);
         return this;
     }
 
@@ -331,7 +288,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(InputStream image) {
-        return setImage(image, "png");
+        factory.setImage(image);
+        return this;
     }
 
     /**
@@ -342,13 +300,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(InputStream image, String fileType) {
-        imageUrl = null;
-        if (image == null) {
-            imageContainer = null;
-        } else {
-            imageContainer = new FileContainer(image, fileType);
-            imageContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setImage(image, fileType);
         return this;
     }
 
@@ -360,7 +312,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(byte[] image) {
-        return setImage(image, "png");
+        factory.setImage(image);
+        return this;
     }
 
     /**
@@ -371,13 +324,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(byte[] image, String fileType) {
-        imageUrl = null;
-        if (image == null) {
-            imageContainer = null;
-        } else {
-            imageContainer = new FileContainer(image, fileType);
-            imageContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setImage(image, fileType);
         return this;
     }
 
@@ -389,7 +336,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(BufferedImage image) {
-        return setImage(image, "png");
+        factory.setImage(image);
+        return this;
     }
 
     /**
@@ -400,13 +348,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(BufferedImage image, String fileType) {
-        imageUrl = null;
-        if (image == null) {
-            imageContainer = null;
-        } else {
-            imageContainer = new FileContainer(image, fileType);
-            imageContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setImage(image, fileType);
         return this;
     }
 
@@ -417,10 +359,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(MessageAuthor author) {
-        authorName = author.getDisplayName();
-        authorUrl = null;
-        authorIconUrl = author.getAvatar().getUrl().toString();
-        authorIconContainer = null;
+        factory.setAuthor(author);
         return this;
     }
 
@@ -431,10 +370,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(User author) {
-        authorName = author.getName();
-        authorUrl = null;
-        authorIconUrl = author.getAvatar().getUrl().toString();
-        authorIconContainer = null;
+        factory.setAuthor(author);
         return this;
     }
 
@@ -445,10 +381,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name) {
-        authorName = name;
-        authorUrl = null;
-        authorIconUrl = null;
-        authorIconContainer = null;
+        factory.setAuthor(name);
         return this;
     }
 
@@ -461,10 +394,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, String iconUrl) {
-        authorName = name;
-        authorUrl = url;
-        authorIconUrl = iconUrl;
-        authorIconContainer = null;
+        factory.setAuthor(name, url, iconUrl);
         return this;
     }
 
@@ -477,10 +407,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, Icon icon) {
-        authorName = name;
-        authorUrl = url;
-        authorIconUrl = icon.getUrl().toString();
-        authorIconContainer = null;
+        factory.setAuthor(name, url, icon);
         return this;
     }
 
@@ -493,15 +420,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, File icon) {
-        authorName = name;
-        authorUrl = url;
-        authorIconUrl = null;
-        if (icon == null) {
-            authorIconContainer = null;
-        } else {
-            authorIconContainer = new FileContainer(icon);
-            authorIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + FileUtils.getExtension(icon));
-        }
+        factory.setAuthor(name, url, icon);
         return this;
     }
 
@@ -515,7 +434,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, InputStream icon) {
-        return setAuthor(name, url, icon, "png");
+        factory.setAuthor(name, url, icon);
+        return this;
     }
 
     /**
@@ -528,15 +448,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, InputStream icon, String fileType) {
-        authorName = name;
-        authorUrl = url;
-        authorIconUrl = null;
-        if (icon == null) {
-            authorIconContainer = null;
-        } else {
-            authorIconContainer = new FileContainer(icon, fileType);
-            authorIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setAuthor(name, url, icon, fileType);
         return this;
     }
 
@@ -550,7 +462,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, byte[] icon) {
-        return setAuthor(name, url, icon, "png");
+        factory.setAuthor(name, url, icon);
+        return this;
     }
 
     /**
@@ -563,15 +476,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, byte[] icon, String fileType) {
-        authorName = name;
-        authorUrl = url;
-        authorIconUrl = null;
-        if (icon == null) {
-            authorIconContainer = null;
-        } else {
-            authorIconContainer = new FileContainer(icon, fileType);
-            authorIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setAuthor(name, url, icon, fileType);
         return this;
     }
 
@@ -585,7 +490,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, BufferedImage icon) {
-        return setAuthor(name, url, icon, "png");
+        factory.setAuthor(name, url, icon);
+        return this;
     }
 
     /**
@@ -598,15 +504,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, BufferedImage icon, String fileType) {
-        authorName = name;
-        authorUrl = url;
-        authorIconUrl = null;
-        if (icon == null) {
-            authorIconContainer = null;
-        } else {
-            authorIconContainer = new FileContainer(icon, fileType);
-            authorIconContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setAuthor(name, url, icon, fileType);
         return this;
     }
 
@@ -617,8 +515,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(String url) {
-        thumbnailUrl = url;
-        thumbnailContainer = null;
+        factory.setThumbnail(url);
         return this;
     }
 
@@ -629,8 +526,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(Icon thumbnail) {
-        thumbnailUrl = thumbnail.getUrl().toString();
-        thumbnailContainer = null;
+        factory.setThumbnail(thumbnail);
         return this;
     }
 
@@ -641,14 +537,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(File thumbnail) {
-        thumbnailUrl = null;
-        if (thumbnail == null) {
-            thumbnailContainer = null;
-        } else {
-            thumbnailContainer = new FileContainer(thumbnail);
-            thumbnailContainer.setFileTypeOrName(
-                    UUID.randomUUID().toString() + "." + FileUtils.getExtension(thumbnail));
-        }
+        factory.setThumbnail(thumbnail);
         return this;
     }
 
@@ -660,7 +549,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(InputStream thumbnail) {
-        return setThumbnail(thumbnail, "png");
+        factory.setThumbnail(thumbnail);
+        return this;
     }
 
     /**
@@ -671,13 +561,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(InputStream thumbnail, String fileType) {
-        thumbnailUrl = null;
-        if (thumbnail == null) {
-            thumbnailContainer = null;
-        } else {
-            thumbnailContainer = new FileContainer(thumbnail, fileType);
-            thumbnailContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setThumbnail(thumbnail, fileType);
         return this;
     }
 
@@ -689,7 +573,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(byte[] thumbnail) {
-        return setThumbnail(thumbnail, "png");
+        factory.setThumbnail(thumbnail);
+        return this;
     }
 
     /**
@@ -700,13 +585,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(byte[] thumbnail, String fileType) {
-        thumbnailUrl = null;
-        if (thumbnail == null) {
-            thumbnailContainer = null;
-        } else {
-            thumbnailContainer = new FileContainer(thumbnail, fileType);
-            thumbnailContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setThumbnail(thumbnail, fileType);
         return this;
     }
 
@@ -718,7 +597,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(BufferedImage thumbnail) {
-        return setThumbnail(thumbnail, "png");
+        factory.setThumbnail(thumbnail);
+        return this;
     }
 
     /**
@@ -729,13 +609,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(BufferedImage thumbnail, String fileType) {
-        thumbnailUrl = null;
-        if (thumbnail == null) {
-            thumbnailContainer = null;
-        } else {
-            thumbnailContainer = new FileContainer(thumbnail, fileType);
-            thumbnailContainer.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
-        }
+        factory.setThumbnail(thumbnail, fileType);
         return this;
     }
 
@@ -748,18 +622,8 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder addField(String name, String value, boolean inline) {
-        fields.add(new Object[]{name, value, inline});
+        factory.addField(name, value, inline);
         return this;
-    }
-
-    /**
-     * Gets the embed as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @return The embed as a ObjectNode.
-     */
-    public ObjectNode toJsonNode() {
-        ObjectNode object = JsonNodeFactory.instance.objectNode();
-        return toJsonNode(object);
     }
 
     /**
@@ -768,110 +632,6 @@ public class EmbedBuilder {
      * @return Whether the embed requires attachments or not.
      */
     public boolean requiresAttachments() {
-        return footerIconContainer != null ||
-                imageContainer != null ||
-                authorIconContainer != null ||
-                thumbnailContainer != null;
+        return factory.requiresAttachments();
     }
-
-    /**
-     * Gets the required attachments for this embed.
-     *
-     * @return The required attachments for this embed.
-     */
-    public List<FileContainer> getRequiredAttachments() {
-        List<FileContainer> requiredAttachments = new ArrayList<>();
-        if (footerIconContainer != null) {
-            requiredAttachments.add(footerIconContainer);
-        }
-        if (imageContainer != null) {
-            requiredAttachments.add(imageContainer);
-        }
-        if (authorIconContainer != null) {
-            requiredAttachments.add(authorIconContainer);
-        }
-        if (thumbnailContainer != null) {
-            requiredAttachments.add(thumbnailContainer);
-        }
-        return requiredAttachments;
-    }
-
-    /**
-     * Adds the json data to the given object node.
-     *
-     * @param object The object, the data should be added to.
-     * @return The provided object with the data of the embed.
-     */
-    public ObjectNode toJsonNode(ObjectNode object) {
-        object.put("type", "rich");
-        if (title != null && !title.equals("")) {
-            object.put("title", title);
-        }
-        if (description != null && !description.equals("")) {
-            object.put("description", description);
-        }
-        if (url != null && !url.equals("")) {
-            object.put("url", url);
-        }
-        if (color != null) {
-            object.put("color", color.getRGB() & 0xFFFFFF);
-        }
-        if (timestamp != null) {
-            object.put("timestamp", DateTimeFormatter.ISO_INSTANT.format(timestamp));
-        }
-        if ((footerText != null && !footerText.equals("")) || (footerIconUrl != null && !footerIconUrl.equals(""))) {
-            ObjectNode footer = object.putObject("footer");
-            if (footerText != null && !footerText.equals("")) {
-                footer.put("text", footerText);
-            }
-            if (footerIconUrl != null && !footerIconUrl.equals("")) {
-                footer.put("icon_url", footerIconUrl);
-            }
-            if (footerIconContainer != null) {
-                footer.put("icon_url", "attachment://" + footerIconContainer.getFileTypeOrName());
-            }
-        }
-        if (imageUrl != null && !imageUrl.equals("")) {
-            object.putObject("image").put("url", imageUrl);
-        }
-        if (imageContainer != null) {
-            object.putObject("image").put("url", "attachment://" + imageContainer.getFileTypeOrName());
-        }
-        if (authorName != null && !authorName.equals("")) {
-            ObjectNode author = object.putObject("author");
-            author.put("name", authorName);
-            if (authorUrl != null && !authorUrl.equals("")) {
-                author.put("url", authorUrl);
-            }
-            if (authorIconUrl != null && !authorIconUrl.equals("")) {
-                author.put("icon_url", authorIconUrl);
-            }
-            if (authorIconContainer != null) {
-                author.put("url", "attachment://" + authorIconContainer.getFileTypeOrName());
-            }
-        }
-        if (thumbnailUrl != null && !thumbnailUrl.equals("")) {
-            object.putObject("thumbnailContainer").put("url", thumbnailUrl);
-        }
-        if (thumbnailContainer != null) {
-            object.putObject("thumbnailContainer").put("url", "attachment://" + thumbnailContainer.getFileTypeOrName());
-        }
-        if (fields.size() > 0) {
-            ArrayNode jsonFields = object.putArray("fields");
-            for (Object[] field : fields) {
-                ObjectNode jsonField = jsonFields.addObject();
-                if (field[0] != null && !field[0].equals("")) {
-                    jsonField.put("name", (String) field[0]);
-                }
-                if (field[1] != null && !field[1].equals("")) {
-                    jsonField.put("value", (String) field[1]);
-                }
-                if (field[2] != null) {
-                    jsonField.put("inline", (boolean) field[2]);
-                }
-            }
-        }
-        return object;
-    }
-
 }
