@@ -638,9 +638,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return The updater for this server.
      */
-    default ServerUpdater getUpdater() {
-        return new ServerUpdater(this);
-    }
+    ServerUpdater getUpdater();
 
     /**
      * Updates the name of the server.

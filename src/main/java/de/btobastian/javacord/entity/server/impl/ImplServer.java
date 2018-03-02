@@ -23,6 +23,7 @@ import de.btobastian.javacord.entity.server.DefaultMessageNotificationLevel;
 import de.btobastian.javacord.entity.server.ExplicitContentFilterLevel;
 import de.btobastian.javacord.entity.server.MultiFactorAuthenticationLevel;
 import de.btobastian.javacord.entity.server.Server;
+import de.btobastian.javacord.entity.server.ServerUpdater;
 import de.btobastian.javacord.entity.server.VerificationLevel;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.user.UserStatus;
@@ -113,7 +114,7 @@ public class ImplServer implements Server, Cleanupable {
     /**
      * The amount of members in this server.
      */
-    private int memberCount = -1;
+    private int memberCount;
 
     /**
      * The icon hash of the server. Might be <code>null</code>.
@@ -744,6 +745,11 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
+    }
+
+    @Override
+    public ServerUpdater getUpdater() {
+        return new ImplServerUpdater(this);
     }
 
     @Override
