@@ -155,11 +155,11 @@ public class ServerChannelUpdaterDelegateImpl implements ServerChannelUpdaterDel
     private void populatePermissionOverwrites() {
         if (overwrittenUserPermissions == null) {
             overwrittenUserPermissions = new HashMap<>();
-            overwrittenUserPermissions.putAll(((ServerChannelImpl) channel).getOverwrittenUserPermissions());
+            overwrittenUserPermissions.putAll(((ServerChannelImpl) channel).getInternalOverwrittenUserPermissions());
         }
         if (overwrittenRolePermissions == null) {
             overwrittenRolePermissions = new HashMap<>();
-            overwrittenRolePermissions.putAll(((ServerChannelImpl) channel).getOverwrittenRolePermissions());
+            overwrittenRolePermissions.putAll(((ServerChannelImpl) channel).getInternalOverwrittenRolePermissions());
         }
     }
 
