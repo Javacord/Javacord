@@ -7,6 +7,7 @@ import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.channel.GroupChannel;
 import de.btobastian.javacord.entity.channel.GroupChannelUpdater;
+import de.btobastian.javacord.entity.channel.InternalChannel;
 import de.btobastian.javacord.entity.impl.ImplIcon;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.util.Cleanupable;
@@ -27,7 +28,7 @@ import java.util.Optional;
 /**
  * The implementation of {@link GroupChannel}.
  */
-public class ImplGroupChannel implements GroupChannel, Cleanupable {
+public class ImplGroupChannel implements GroupChannel, Cleanupable, InternalChannel {
 
     /**
      * The logger of this class.

@@ -5,6 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
+import de.btobastian.javacord.entity.channel.InternalChannel;
 import de.btobastian.javacord.entity.channel.ServerChannelUpdater;
 import de.btobastian.javacord.entity.permission.Permissions;
 import de.btobastian.javacord.entity.permission.Role;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The implementation of {@link ChannelCategory}.
  */
-public class ImplChannelCategory implements ChannelCategory {
+public class ImplChannelCategory implements ChannelCategory, InternalChannel {
 
     /**
      * The discord api instance.

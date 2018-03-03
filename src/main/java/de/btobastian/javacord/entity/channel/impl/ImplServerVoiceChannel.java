@@ -5,6 +5,7 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
+import de.btobastian.javacord.entity.channel.InternalChannel;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannel;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannelUpdater;
 import de.btobastian.javacord.entity.permission.Permissions;
@@ -24,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The implementation of {@link ServerVoiceChannel}.
  */
-public class ImplServerVoiceChannel implements ServerVoiceChannel {
+public class ImplServerVoiceChannel implements ServerVoiceChannel, InternalChannel {
 
     /**
      * The discord api instance.
