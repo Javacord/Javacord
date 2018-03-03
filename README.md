@@ -5,9 +5,16 @@ A multithreaded but simple to use library to create a Discord bot in Java.
 ## IMPORTANT
 This README is for the rewrite of Javacord (aka. Javacord 3) and is not complete (e.g. the wiki is still for version 2.x). If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) and ask for help there.
 
+## Feature Coverage
+
+Javacord covers every action a Discord bot is able to perform (e.g. sending messages, banning users, editing servers, etc.)
+**besides** sending voice, which will be added in a later release. New features introduced by Discord are usually added
+in less than one week, depending on their size.
+
 ## Download
 The recommended way to "download" Javacord is to use a build manager like Maven.
-If you are not familiar with Maven, you can take a look at the [Setup Guide](https://github.com/BtoBastian/Javacord/wiki#setup) or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/).
+If you are not familiar with Maven, you can take a look at the [Setup Guide](https://github.com/BtoBastian/Javacord/wiki#setup) 
+or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/).
 
 **Repository**
 ```xml
@@ -25,7 +32,8 @@ If you are not familiar with Maven, you can take a look at the [Setup Guide](htt
     <version>COMMIT_ID</version>
 </dependency>
 ```
-Replace `COMMIT_ID` with the latest commit id. Once the rewrite is finished, there will be proper version numbers. In this example the version would be `5255914`:
+Replace `COMMIT_ID` with the latest commit id. Once the rewrite is finished, there will be proper version numbers.
+In this example the version would be `5255914`:
 ![](https://i.imgur.com/FSAYqVq.png)
 
 **Optional Logger Dependency**
@@ -68,11 +76,17 @@ public class MyFirstBot {
         String token = args[0];
 
         new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
-            // Login successful
-            api.getTextChannelById(123L).ifPresent(channel -> channel.sendMessage("I'm online now!"));
+            
+            // Add a listener which answers with "Pong!" if someone writes "!ping"
+            api.addMessageCreateListener(event -> {
+                if (event.getMessage().getContent().equalsIgnoreCase("!ping")) {
+                    event.getChannel().sendMessage("Pong!");
+                }
+            });
             
             // Print the invite url of bot
             System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
+            
         }).exceptionally(ExceptionLogger.get());
     }
 
@@ -87,8 +101,13 @@ public class MyFirstBot {
         String token = args[0];
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
-        // Login successful
-        api.getTextChannelById("123").ifPresent(channel -> channel.sendMessage("I'm online now!"));
+        
+        // Add a listener which answers with "Pong!" if someone writes "!ping"
+        api.addMessageCreateListener(event -> {
+            if (event.getMessage().getContent().equalsIgnoreCase("!ping")) {
+                event.getChannel().sendMessage("Pong!");
+            }
+        });
         
         // Print the invite url of bot
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
@@ -114,7 +133,11 @@ The version number has the a 3-digit format: `major.minor.trivial`
  
 ## Deprecation policy
 
-A method/class which was marked as deprecated can be removed with the next minor release (but it will usually stay for several minor releases). A minor release might remove a class/method without having it deprecated, but we will do our best to deprecate it before removing it. We cannot guarantee this though, as we might have to remove/replace something due to a change from Discord, we didn't have control over. Usually you can expect a deprecated method/class to stay for at least 6 month before it finally gets removed, but there are no guarantees.
+A method/class which was marked as deprecated can be removed with the next minor release (but it will usually stay for
+ several minor releases). A minor release might remove a class/method without having it deprecated, but we will do our
+  best to deprecate it before removing it. We cannot guarantee this though, as we might have to remove/replace something
+   due to a change from Discord, we didn't have control over. Usually you can expect a deprecated method/class to stay
+    for at least 6 month before it finally gets removed, but there are no guarantees.
 
 ## Command Framework
 
