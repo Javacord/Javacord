@@ -414,4 +414,10 @@ public interface EmbedFactory {
      */
     boolean requiresAttachments();
 
+    /**
+     * Returns this embed as {@link Embed}.
+     *
+     * @return this embed as {@code Embed}.
+     */
+    Embed asEmbed();
 }
