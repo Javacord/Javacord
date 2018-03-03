@@ -3,8 +3,6 @@ package de.btobastian.javacord.entity.emoji;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.UpdatableFromCache;
-import de.btobastian.javacord.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 
@@ -14,11 +12,6 @@ import java.util.Optional;
  * Only {@link KnownCustomEmoji} receive updates!
  */
 public interface CustomEmoji extends DiscordEntity, Emoji, UpdatableFromCache<KnownCustomEmoji> {
-
-    /**
-     * The logger of this class.
-     */
-    Logger logger = LoggerUtil.getLogger(CustomEmoji.class);
 
     /**
      * Gets the name of the emoji.

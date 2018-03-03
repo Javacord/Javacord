@@ -7,6 +7,8 @@ import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.emoji.CustomEmoji;
 import de.btobastian.javacord.entity.impl.ImplIcon;
+import de.btobastian.javacord.util.logging.LoggerUtil;
+import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,6 +18,11 @@ import java.util.Objects;
  * The implementation of {@link CustomEmoji}.
  */
 public class ImplCustomEmoji implements CustomEmoji {
+
+    /**
+     * The logger of this class.
+     */
+    Logger logger = LoggerUtil.getLogger(ImplCustomEmoji.class);
 
     /**
      * The discord api instance.

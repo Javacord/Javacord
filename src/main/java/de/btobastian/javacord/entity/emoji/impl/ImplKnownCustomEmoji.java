@@ -7,11 +7,25 @@ import de.btobastian.javacord.entity.emoji.CustomEmojiUpdater;
 import de.btobastian.javacord.entity.emoji.KnownCustomEmoji;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.server.Server;
+import de.btobastian.javacord.listener.ObjectAttachableListener;
+import de.btobastian.javacord.listener.server.emoji.CustomEmojiAttachableListener;
+import de.btobastian.javacord.listener.server.emoji.CustomEmojiChangeNameListener;
+import de.btobastian.javacord.listener.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
+import de.btobastian.javacord.listener.server.emoji.CustomEmojiDeleteListener;
+import de.btobastian.javacord.util.ClassHelper;
+import de.btobastian.javacord.util.event.ListenerManager;
+import de.btobastian.javacord.util.rest.RestEndpoint;
+import de.btobastian.javacord.util.rest.RestMethod;
+import de.btobastian.javacord.util.rest.RestRequest;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link CustomEmoji}.
@@ -83,6 +97,14 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     }
 
     @Override
+    public CompletableFuture<Void> delete(String reason) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CUSTOM_EMOJI)
+                .setUrlParameters(getServer().getIdAsString(), getIdAsString())
+                .setAuditLogReason(reason)
+                .execute(result -> null);
+    }
+
+    @Override
     public CustomEmojiUpdater createUpdater() {
         return new ImplCustomEmojiUpdater(this);
     }
@@ -102,6 +124,82 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
     @Override
     public boolean isManaged() {
         return managed;
+    }
+
+    @Override
+    public ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
+            CustomEmojiChangeNameListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(KnownCustomEmoji.class, getId(), CustomEmojiChangeNameListener.class, listener);
+    }
+
+    @Override
+    public List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiChangeNameListener.class);
+    }
+
+    @Override
+    public ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
+            CustomEmojiChangeWhitelistedRolesListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                KnownCustomEmoji.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class, listener);
+    }
+
+    @Override
+    public List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class);
+    }
+
+    @Override
+    public ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(
+            CustomEmojiDeleteListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(KnownCustomEmoji.class, getId(), CustomEmojiDeleteListener.class, listener);
+    }
+
+    @Override
+    public List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiDeleteListener.class);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addCustomEmojiAttachableListener(T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(CustomEmojiAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(KnownCustomEmoji.class, getId(),
+                        listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> void
+    removeCustomEmojiAttachableListener(T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(CustomEmojiAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(KnownCustomEmoji.class, getId(),
+                        listenerClass, listener));
+    }
+
+    @Override
+    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getCustomEmojiAttachableListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(KnownCustomEmoji.class, getId());
+    }
+
+    @Override
+    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(KnownCustomEmoji.class, getId(), listenerClass, listener);
     }
 
     @Override
