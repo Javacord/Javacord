@@ -7,6 +7,7 @@ import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
 import de.btobastian.javacord.entity.channel.InternalChannel;
 import de.btobastian.javacord.entity.channel.InternalServerChannel;
+import de.btobastian.javacord.entity.channel.InternalVoiceChannel;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannel;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannelUpdater;
 import de.btobastian.javacord.entity.permission.Permissions;
@@ -41,7 +42,8 @@ import java.util.stream.Stream;
 /**
  * The implementation of {@link ServerVoiceChannel}.
  */
-public class ImplServerVoiceChannel implements ServerVoiceChannel, InternalChannel, InternalServerChannel {
+public class ImplServerVoiceChannel
+        implements ServerVoiceChannel, InternalChannel, InternalServerChannel, InternalVoiceChannel {
 
     /**
      * The discord api instance.

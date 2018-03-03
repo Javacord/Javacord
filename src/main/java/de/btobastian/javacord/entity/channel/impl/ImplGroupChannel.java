@@ -9,6 +9,7 @@ import de.btobastian.javacord.entity.channel.GroupChannel;
 import de.btobastian.javacord.entity.channel.GroupChannelUpdater;
 import de.btobastian.javacord.entity.channel.InternalChannel;
 import de.btobastian.javacord.entity.channel.InternalTextChannel;
+import de.btobastian.javacord.entity.channel.InternalVoiceChannel;
 import de.btobastian.javacord.entity.impl.ImplIcon;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.listener.ChannelAttachableListener;
@@ -41,7 +42,8 @@ import java.util.stream.Stream;
 /**
  * The implementation of {@link GroupChannel}.
  */
-public class ImplGroupChannel implements GroupChannel, Cleanupable, InternalChannel, InternalTextChannel {
+public class ImplGroupChannel
+        implements GroupChannel, Cleanupable, InternalChannel, InternalTextChannel, InternalVoiceChannel {
 
     /**
      * The logger of this class.

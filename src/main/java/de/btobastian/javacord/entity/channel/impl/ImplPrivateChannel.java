@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.InternalChannel;
 import de.btobastian.javacord.entity.channel.InternalTextChannel;
+import de.btobastian.javacord.entity.channel.InternalVoiceChannel;
 import de.btobastian.javacord.entity.channel.PrivateChannel;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.user.impl.ImplUser;
@@ -31,7 +32,8 @@ import java.util.stream.Stream;
 /**
  * The implementation of {@link PrivateChannel}.
  */
-public class ImplPrivateChannel implements PrivateChannel, Cleanupable, InternalChannel, InternalTextChannel {
+public class ImplPrivateChannel
+        implements PrivateChannel, Cleanupable, InternalChannel, InternalTextChannel, InternalVoiceChannel {
 
     /**
      * The discord api instance.
