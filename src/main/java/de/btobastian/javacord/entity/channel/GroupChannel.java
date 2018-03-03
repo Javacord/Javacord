@@ -1,16 +1,11 @@
 package de.btobastian.javacord.entity.channel;
 
-import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.user.User;
-import de.btobastian.javacord.listener.ChannelAttachableListener;
 import de.btobastian.javacord.listener.ObjectAttachableListener;
-import de.btobastian.javacord.listener.TextChannelAttachableListener;
-import de.btobastian.javacord.listener.VoiceChannelAttachableListener;
 import de.btobastian.javacord.listener.channel.group.GroupChannelAttachableListener;
 import de.btobastian.javacord.listener.channel.group.GroupChannelChangeNameListener;
 import de.btobastian.javacord.listener.channel.group.GroupChannelDeleteListener;
-import de.btobastian.javacord.util.ClassHelper;
 import de.btobastian.javacord.util.event.ListenerManager;
 
 import java.util.Collection;
@@ -19,8 +14,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class represents a group channel. Group channels are not supported by bot accounts!
@@ -89,21 +82,15 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
-            GroupChannelChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                GroupChannel.class, getId(), GroupChannelChangeNameListener.class, listener);
-    }
+    ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
+            GroupChannelChangeNameListener listener);
 
     /**
      * Gets a list with all registered group channel change name listeners.
      *
      * @return A list with all registered group channel change name listeners.
      */
-    default List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                GroupChannel.class, getId(), GroupChannelChangeNameListener.class);
-    }
+    List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners();
 
     /**
      * Adds a listener, which listens to this channel being deleted.
@@ -111,21 +98,14 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
-            GroupChannelDeleteListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                GroupChannel.class, getId(), GroupChannelDeleteListener.class, listener);
-    }
+    ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(GroupChannelDeleteListener listener);
 
     /**
      * Gets a list with all registered group channel delete listeners.
      *
      * @return A list with all registered group channel delete listeners.
      */
-    default List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                GroupChannel.class, getId(), GroupChannelDeleteListener.class);
-    }
+    List<GroupChannelDeleteListener> getGroupChannelDeleteListeners();
 
     /**
      * Adds a listener that implements one or more {@code GroupChannelAttachableListener}s.
@@ -137,31 +117,8 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @param <T> The type of the listener.
      * @return The managers for the added listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends GroupChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends GroupChannelAttachableListener>> addGroupChannelAttachableListener(
-            T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(GroupChannelAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .flatMap(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addTextChannelAttachableListener(
-                                (TextChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addVoiceChannelAttachableListener(
-                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else {
-                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(GroupChannel.class, getId(),
-                                                                                       listenerClass, listener));
-                    }
-                })
-                .collect(Collectors.toList());
-    }
+    <T extends GroupChannelAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends GroupChannelAttachableListener>> addGroupChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code GroupChannelAttachableListener}s.
@@ -169,29 +126,8 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends GroupChannelAttachableListener & ObjectAttachableListener> void
-    removeGroupChannelAttachableListener(T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(GroupChannelAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeTextChannelAttachableListener(
-                                (TextChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeVoiceChannelAttachableListener(
-                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else {
-                        ((ImplDiscordApi) getApi()).removeObjectListener(GroupChannel.class, getId(),
-                                                                         listenerClass, listener);
-                    }
-                });
-    }
+    <T extends GroupChannelAttachableListener & ObjectAttachableListener> void removeGroupChannelAttachableListener(
+            T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code GroupChannelAttachableListener}s and
@@ -201,34 +137,8 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @return A map with all registered listeners that implement one or more {@code GroupChannelAttachableListener}s
      * and their assigned listener classes they listen to.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends GroupChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getGroupChannelAttachableListeners() {
-        Map<T, List<Class<T>>> groupChannelListeners =
-                ((ImplDiscordApi) getApi()).getObjectListeners(GroupChannel.class, getId());
-        getTextChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
-                .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
-        getVoiceChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
-                .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
-        getChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
-                .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
-        return groupChannelListeners;
-    }
+    <T extends GroupChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getGroupChannelAttachableListeners();
 
     /**
      * Removes a listener from this group channel.
@@ -237,10 +147,8 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T extends GroupChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-        ((ImplDiscordApi) getApi()).removeObjectListener(GroupChannel.class, getId(), listenerClass, listener);
-    }
+    <T extends GroupChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<GroupChannel> getCurrentCachedInstance() {
