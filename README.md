@@ -1,9 +1,11 @@
 ![](http://bastian-oppermann.de/javacord3_banner.png)
 # Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg?&style=flat-square" alt="Latest version"></a> <a href="https://jitpack.io/com/github/btobastian/javacord/v_3-SNAPSHOT/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg?style=flat-square" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg?style=flat-square" alt="Javacord Wiki"></a> <a href="https://discord.gg/0qJ2jjyneLEgG7y3"><img src="https://img.shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square" alt="Discord Server"></a>
-A multithreaded but simple to use library to create a Discord bot in Java.
+A multithreaded but easy to use library to create a Discord bot in Java.
 
 ## IMPORTANT
-This README is for the rewrite of Javacord (aka. Javacord 3) and is not complete (e.g. the wiki is still for version 2.x). If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) and ask for help there.
+This README is for the rewrite of Javacord (aka. Javacord 3) and not complete yet (e.g. the wiki is still for version 2.x).
+If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3))
+and ask for help there.
 
 ## Feature Coverage
 
@@ -84,7 +86,7 @@ public class MyFirstBot {
                 }
             });
             
-            // Print the invite url of bot
+            // Print the invite url of your bot
             System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
             
         }).exceptionally(ExceptionLogger.get());
@@ -93,7 +95,7 @@ public class MyFirstBot {
 }
 ```
 
-You can also login blocking which throws an exception, if the login failed:
+You can also login blocking which throws an exception if the login failed:
 ```java
 public class MyFirstBot {
 
@@ -109,7 +111,7 @@ public class MyFirstBot {
             }
         });
         
-        // Print the invite url of bot
+        // Print the invite url of your bot
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
     }
 
@@ -129,15 +131,20 @@ The version number has the a 3-digit format: `major.minor.trivial`
  You can expect this digit to not change for several years.
 * `minor`: Any backwards incompatible change to the api. You can expect this digit to change about 1-3 times per year.
 * `trivial`: A backwards compatible change to the **api**. This is usually an important bugfix (or a bunch of smaller ones)
- or a backwards compatible feature addition. You can expect this digit to change 1-2 times per month
+ or a backwards compatible feature addition. You can expect this digit to change 1-2 times per month.
  
 ## Deprecation policy
 
 A method/class which was marked as deprecated can be removed with the next minor release (but it will usually stay for
- several minor releases). A minor release might remove a class/method without having it deprecated, but we will do our
-  best to deprecate it before removing it. We cannot guarantee this though, as we might have to remove/replace something
-   due to a change from Discord, we didn't have control over. Usually you can expect a deprecated method/class to stay
-    for at least 6 month before it finally gets removed, but there are no guarantees.
+several minor releases). A minor release might remove a class/method without having it deprecated, but we will do our
+best to deprecate it before removing it. We are unable to guarantee this though, because we might have to remove/replace
+something due to changes made by Discord which we are unable to control. Usually you can expect a deprecated method/class
+to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
+
+## Discord Server
+
+Javacord has its own Discord Server. You can join it ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) for support,
+status updates or just chatting with other users.
 
 ## Command Framework
 
