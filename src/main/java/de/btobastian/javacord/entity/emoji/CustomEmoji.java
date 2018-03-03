@@ -3,12 +3,9 @@ package de.btobastian.javacord.entity.emoji;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.UpdatableFromCache;
-import de.btobastian.javacord.entity.impl.ImplIcon;
 import de.btobastian.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Optional;
 
 /**
@@ -35,15 +32,7 @@ public interface CustomEmoji extends DiscordEntity, Emoji, UpdatableFromCache<Kn
      *
      * @return The image of the emoji.
      */
-    default Icon getImage() {
-        String urlString = "https://cdn.discordapp.com/emojis/" + getIdAsString() + (isAnimated() ? ".gif" : ".png");
-        try {
-            return new ImplIcon(getApi(), new URL(urlString));
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
-            return null;
-        }
-    }
+    Icon getImage();
 
     @Override
     default String getMentionTag() {

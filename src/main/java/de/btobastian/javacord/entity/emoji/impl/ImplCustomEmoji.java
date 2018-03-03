@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
+import de.btobastian.javacord.entity.Icon;
 import de.btobastian.javacord.entity.emoji.CustomEmoji;
+import de.btobastian.javacord.entity.impl.ImplIcon;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -74,6 +78,17 @@ public class ImplCustomEmoji implements CustomEmoji {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Icon getImage() {
+        String urlString = "https://cdn.discordapp.com/emojis/" + getIdAsString() + (isAnimated() ? ".gif" : ".png");
+        try {
+            return new ImplIcon(getApi(), new URL(urlString));
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
+            return null;
+        }
     }
 
     @Override
