@@ -5,21 +5,40 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
+import de.btobastian.javacord.entity.channel.InternalChannel;
+import de.btobastian.javacord.entity.channel.InternalServerChannel;
+import de.btobastian.javacord.entity.channel.ServerChannel;
 import de.btobastian.javacord.entity.channel.ServerChannelUpdater;
+import de.btobastian.javacord.entity.channel.ServerTextChannel;
 import de.btobastian.javacord.entity.permission.Permissions;
 import de.btobastian.javacord.entity.permission.Role;
 import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.server.impl.ImplServer;
 import de.btobastian.javacord.entity.user.User;
+import de.btobastian.javacord.listener.ChannelAttachableListener;
+import de.btobastian.javacord.listener.ObjectAttachableListener;
+import de.btobastian.javacord.listener.channel.server.ChannelCategoryAttachableListener;
+import de.btobastian.javacord.listener.channel.server.ServerChannelAttachableListener;
+import de.btobastian.javacord.listener.channel.server.ServerChannelChangeNsfwFlagListener;
+import de.btobastian.javacord.util.ClassHelper;
+import de.btobastian.javacord.util.event.ListenerManager;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The implementation of {@link ChannelCategory}.
  */
-public class ImplChannelCategory implements ChannelCategory {
+public class ImplChannelCategory implements ChannelCategory, InternalChannel, InternalServerChannel {
 
     /**
      * The discord api instance.
@@ -153,8 +172,112 @@ public class ImplChannelCategory implements ChannelCategory {
     }
 
     @Override
+    public List<ServerChannel> getChannels() {
+        List<ServerChannel> channels = new ArrayList<>();
+        ((ImplServer) getServer()).getUnorderedChannels().stream()
+                .filter(channel -> channel.asServerTextChannel().isPresent())
+                .map(channel -> channel.asServerTextChannel().get())
+                .filter(channel -> channel.getCategory().orElse(null) == this)
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .forEach(channels::add);
+        ((ImplServer) getServer()).getUnorderedChannels().stream()
+                .filter(channel -> channel.asServerVoiceChannel().isPresent())
+                .map(channel -> channel.asServerVoiceChannel().get())
+                .filter(channel -> channel.getCategory().orElse(null) == this)
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .forEach(channels::add);
+        return Collections.unmodifiableList(channels);
+    }
+
+    @Override
     public boolean isNsfw() {
         return nsfw;
+    }
+
+    @Override
+    public ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
+            ServerChannelChangeNsfwFlagListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends ChannelCategoryAttachableListener>> addChannelCategoryAttachableListener(
+            T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ChannelCategoryAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .flatMap(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addServerChannelAttachableListener(
+                                (ServerChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else {
+                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(ChannelCategory.class, getId(),
+                                                                                       listenerClass, listener));
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void removeChannelCategoryAttachableListener(T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ChannelCategoryAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeServerChannelAttachableListener(
+                                (ServerChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else {
+                        ((ImplDiscordApi) getApi()).removeObjectListener(ChannelCategory.class, getId(),
+                                                                         listenerClass, listener);
+                    }
+                });
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>> getChannelCategoryAttachableListeners() {
+        Map<T, List<Class<T>>> channelCategoryListeners =
+                ((ImplDiscordApi) getApi()).getObjectListeners(ChannelCategory.class, getId());
+        getServerChannelAttachableListeners().forEach((listener, listenerClasses) -> channelCategoryListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        getChannelAttachableListeners().forEach((listener, listenerClasses) -> channelCategoryListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        return channelCategoryListeners;
+    }
+
+    @Override
+    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(ChannelCategory.class, getId(), listenerClass, listener);
     }
 
     @Override

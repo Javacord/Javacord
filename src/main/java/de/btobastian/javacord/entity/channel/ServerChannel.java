@@ -1,43 +1,29 @@
 package de.btobastian.javacord.entity.channel;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.permission.PermissionState;
 import de.btobastian.javacord.entity.permission.PermissionType;
 import de.btobastian.javacord.entity.permission.Permissions;
 import de.btobastian.javacord.entity.permission.PermissionsBuilder;
 import de.btobastian.javacord.entity.permission.Role;
-import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.server.invite.InviteBuilder;
 import de.btobastian.javacord.entity.server.invite.RichInvite;
-import de.btobastian.javacord.entity.server.invite.impl.ImplInvite;
 import de.btobastian.javacord.entity.user.User;
-import de.btobastian.javacord.listener.ChannelAttachableListener;
 import de.btobastian.javacord.listener.ObjectAttachableListener;
 import de.btobastian.javacord.listener.channel.server.ServerChannelAttachableListener;
 import de.btobastian.javacord.listener.channel.server.ServerChannelChangeNameListener;
 import de.btobastian.javacord.listener.channel.server.ServerChannelChangeOverwrittenPermissionsListener;
 import de.btobastian.javacord.listener.channel.server.ServerChannelChangePositionListener;
 import de.btobastian.javacord.listener.channel.server.ServerChannelDeleteListener;
-import de.btobastian.javacord.util.ClassHelper;
 import de.btobastian.javacord.util.event.ListenerManager;
-import de.btobastian.javacord.util.rest.RestEndpoint;
-import de.btobastian.javacord.util.rest.RestMethod;
-import de.btobastian.javacord.util.rest.RestRequest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class represents a server channel.
@@ -91,17 +77,7 @@ public interface ServerChannel extends Channel {
      *
      * @return The invites of the server.
      */
-    default CompletableFuture<Collection<RichInvite>> getInvites() {
-        return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_INVITE)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    Collection<RichInvite> invites = new HashSet<>();
-                    for (JsonNode inviteJson : result.getJsonBody()) {
-                        invites.add(new ImplInvite(getApi(), inviteJson));
-                    }
-                    return Collections.unmodifiableCollection(invites);
-                });
-    }
+    CompletableFuture<Collection<RichInvite>> getInvites();
 
     /**
      * Create an updater for this channel.
@@ -130,8 +106,8 @@ public interface ServerChannel extends Channel {
      * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param rawPosition The new position of the channel.
-     *                    If you want to update the position based on other channels, make sure to use
-     *                    {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
+     * If you want to update the position based on other channels, make sure to use
+     * {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRawPosition(int rawPosition) {
@@ -162,49 +138,7 @@ public interface ServerChannel extends Channel {
      * @param user The user.
      * @return The effective overwritten permissions of the user.
      */
-    default Permissions getEffectiveOverwrittenPermissions(User user) {
-        PermissionsBuilder builder = new PermissionsBuilder(ImplPermissions.EMPTY_PERMISSIONS);
-        Server server = getServer();
-        Role everyoneRole = server.getEveryoneRole();
-        Permissions everyoneRolePermissionOverwrites = getOverwrittenPermissions(everyoneRole);
-        for (PermissionType type : PermissionType.values()) {
-            if (everyoneRolePermissionOverwrites.getState(type) == PermissionState.DENIED) {
-                builder.setState(type, PermissionState.DENIED);
-            }
-            if (everyoneRolePermissionOverwrites.getState(type) == PermissionState.ALLOWED) {
-                builder.setState(type, PermissionState.ALLOWED);
-            }
-        }
-        List<Role> rolesOfUser = new ArrayList<>(server.getRolesOf(user));
-        rolesOfUser.remove(everyoneRole);
-        List<Permissions> permissionOverwrites = rolesOfUser.stream()
-                .map(this::getOverwrittenPermissions)
-                .collect(Collectors.toList());
-        for (Permissions permissions : permissionOverwrites) {
-            for (PermissionType type : PermissionType.values()) {
-                if (permissions.getState(type) == PermissionState.DENIED) {
-                    builder.setState(type, PermissionState.DENIED);
-                }
-            }
-        }
-        for (Permissions permissions : permissionOverwrites) {
-            for (PermissionType type : PermissionType.values()) {
-                if (permissions.getState(type) == PermissionState.ALLOWED) {
-                    builder.setState(type, PermissionState.ALLOWED);
-                }
-            }
-        }
-        for (PermissionType type : PermissionType.values()) {
-            Permissions permissions = getOverwrittenPermissions(user);
-            if (permissions.getState(type) == PermissionState.DENIED) {
-                builder.setState(type, PermissionState.DENIED);
-            }
-            if (permissions.getState(type) == PermissionState.ALLOWED) {
-                builder.setState(type, PermissionState.ALLOWED);
-            }
-        }
-        return builder.build();
-    }
+    Permissions getEffectiveOverwrittenPermissions(User user);
 
     /**
      * Gets the effective permissions of a user in this channel.
@@ -314,12 +248,7 @@ public interface ServerChannel extends Channel {
      * @param reason The audit log reason for the deletion.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> delete(String reason) {
-        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.CHANNEL)
-                .setUrlParameters(getIdAsString())
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> delete(String reason);
 
     /**
      * Checks if the given user can create an instant invite to this channel.
@@ -357,21 +286,14 @@ public interface ServerChannel extends Channel {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(
-            ServerChannelDeleteListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                ServerChannel.class, getId(), ServerChannelDeleteListener.class, listener);
-    }
+    ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(ServerChannelDeleteListener listener);
 
     /**
      * Gets a list with all registered server channel delete listeners.
      *
      * @return A list with all registered server channel delete listeners.
      */
-    default List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                ServerChannel.class, getId(), ServerChannelDeleteListener.class);
-    }
+    List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
 
     /**
      * Adds a listener, which listens to this server channel name changes.
@@ -379,21 +301,15 @@ public interface ServerChannel extends Channel {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
-            ServerChannelChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                ServerChannel.class, getId(), ServerChannelChangeNameListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
+            ServerChannelChangeNameListener listener);
 
     /**
      * Gets a list with all registered server channel change name listeners.
      *
      * @return A list with all registered server channel change name listeners.
      */
-    default List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                ServerChannel.class, getId(), ServerChannelChangeNameListener.class);
-    }
+    List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners();
 
     /**
      * Adds a listener, which listens this server channel position changes.
@@ -401,21 +317,15 @@ public interface ServerChannel extends Channel {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
-            ServerChannelChangePositionListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                ServerChannel.class, getId(), ServerChannelChangePositionListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
+            ServerChannelChangePositionListener listener);
 
     /**
      * Gets a list with all registered server channel change position listeners.
      *
      * @return A list with all registered server channel change position listeners.
      */
-    default List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                ServerChannel.class, getId(), ServerChannelChangePositionListener.class);
-    }
+    List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
 
     /**
      * Adds a listener, which listens to overwritten permission changes of this server.
@@ -423,22 +333,15 @@ public interface ServerChannel extends Channel {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
      *
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
-    default List<ServerChannelChangeOverwrittenPermissionsListener>
-    getServerChannelChangeOverwrittenPermissionsListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
-    }
+    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
 
     /**
      * Adds a listener that implements one or more {@code ServerChannelAttachableListener}s.
@@ -450,25 +353,9 @@ public interface ServerChannel extends Channel {
      * @param <T> The type of the listener.
      * @return The managers for the added listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ServerChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ServerChannelAttachableListener>>
-    addServerChannelAttachableListener(T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(ServerChannelAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .flatMap(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else {
-                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(ServerChannel.class, getId(),
-                                                                                       listenerClass, listener));
-                    }
-                })
-                .collect(Collectors.toList());
-    }
+    <T extends ServerChannelAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends ServerChannelAttachableListener>> addServerChannelAttachableListener(
+            T listener);
 
     /**
      * Removes a listener that implements one or more {@code ServerChannelAttachableListener}s.
@@ -476,23 +363,8 @@ public interface ServerChannel extends Channel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ServerChannelAttachableListener & ObjectAttachableListener> void
-    removeServerChannelAttachableListener(T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(ServerChannelAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else {
-                        ((ImplDiscordApi) getApi()).removeObjectListener(ServerChannel.class, getId(),
-                                                                         listenerClass, listener);
-                    }
-                });
-    }
+    <T extends ServerChannelAttachableListener & ObjectAttachableListener> void removeServerChannelAttachableListener(
+            T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code ServerChannelAttachableListener}s and
@@ -502,20 +374,8 @@ public interface ServerChannel extends Channel {
      * @return A map with all registered listeners that implement one or more {@code ServerChannelAttachableListener}s
      * and their assigned listener classes they listen to.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ServerChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerChannelAttachableListeners() {
-        Map<T, List<Class<T>>> serverChannelListeners =
-                ((ImplDiscordApi) getApi()).getObjectListeners(ServerChannel.class, getId());
-        getChannelAttachableListeners().forEach((listener, listenerClasses) -> serverChannelListeners
-                .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
-        return serverChannelListeners;
-    }
+    <T extends ServerChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getServerChannelAttachableListeners();
 
     /**
      * Removes a listener from this server channel.
@@ -524,10 +384,8 @@ public interface ServerChannel extends Channel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T extends ServerChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-        ((ImplDiscordApi) getApi()).removeObjectListener(ServerChannel.class, getId(), listenerClass, listener);
-    }
+    <T extends ServerChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<? extends ServerChannel> getCurrentCachedInstance() {

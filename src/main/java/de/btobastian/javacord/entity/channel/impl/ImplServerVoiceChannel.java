@@ -5,6 +5,9 @@ import de.btobastian.javacord.DiscordApi;
 import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
+import de.btobastian.javacord.entity.channel.InternalChannel;
+import de.btobastian.javacord.entity.channel.InternalServerChannel;
+import de.btobastian.javacord.entity.channel.InternalVoiceChannel;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannel;
 import de.btobastian.javacord.entity.channel.ServerVoiceChannelUpdater;
 import de.btobastian.javacord.entity.permission.Permissions;
@@ -13,18 +16,34 @@ import de.btobastian.javacord.entity.permission.impl.ImplPermissions;
 import de.btobastian.javacord.entity.server.Server;
 import de.btobastian.javacord.entity.server.impl.ImplServer;
 import de.btobastian.javacord.entity.user.User;
+import de.btobastian.javacord.listener.ChannelAttachableListener;
+import de.btobastian.javacord.listener.ObjectAttachableListener;
+import de.btobastian.javacord.listener.VoiceChannelAttachableListener;
+import de.btobastian.javacord.listener.channel.server.ServerChannelAttachableListener;
+import de.btobastian.javacord.listener.channel.server.voice.ServerVoiceChannelAttachableListener;
+import de.btobastian.javacord.listener.channel.server.voice.ServerVoiceChannelChangeBitrateListener;
+import de.btobastian.javacord.listener.channel.server.voice.ServerVoiceChannelChangeUserLimitListener;
+import de.btobastian.javacord.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
+import de.btobastian.javacord.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
+import de.btobastian.javacord.util.ClassHelper;
+import de.btobastian.javacord.util.event.ListenerManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The implementation of {@link ServerVoiceChannel}.
  */
-public class ImplServerVoiceChannel implements ServerVoiceChannel {
+public class ImplServerVoiceChannel
+        implements ServerVoiceChannel, InternalChannel, InternalServerChannel, InternalVoiceChannel {
 
     /**
      * The discord api instance.
@@ -257,6 +276,146 @@ public class ImplServerVoiceChannel implements ServerVoiceChannel {
     @Override
     public ServerVoiceChannelUpdater createUpdater() {
         return new ImplServerVoiceChannelUpdater(this);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
+            ServerVoiceChannelMemberJoinListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberJoinListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberJoinListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
+            ServerVoiceChannelMemberLeaveListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberLeaveListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
+            ServerVoiceChannelChangeBitrateListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelChangeBitrateListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelChangeBitrateListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerVoiceChannelChangeUserLimitListener> addServerVoiceChannelChangeUserLimitListener(
+            ServerVoiceChannelChangeUserLimitListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelChangeUserLimitListener.class, listener);
+    }
+
+    @Override
+    public List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerVoiceChannel.class, getId(), ServerVoiceChannelChangeUserLimitListener.class);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends ServerVoiceChannelAttachableListener>> addServerVoiceChannelAttachableListener(
+            T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ServerVoiceChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .flatMap(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addServerChannelAttachableListener(
+                                (ServerChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addVoiceChannelAttachableListener(
+                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else {
+                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(
+                                ServerVoiceChannel.class, getId(), listenerClass, listener));
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> void
+    removeServerVoiceChannelAttachableListener(T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ServerVoiceChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeServerChannelAttachableListener(
+                                (ServerChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeVoiceChannelAttachableListener(
+                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else {
+                        ((ImplDiscordApi) getApi()).removeObjectListener(ServerVoiceChannel.class, getId(),
+                                                                         listenerClass, listener);
+                    }
+                });
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getServerVoiceChannelAttachableListeners() {
+        Map<T, List<Class<T>>> serverVoiceChannelListeners =
+                ((ImplDiscordApi) getApi()).getObjectListeners(ServerVoiceChannel.class, getId());
+        getVoiceChannelAttachableListeners().forEach((listener, listenerClasses) -> serverVoiceChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        getServerChannelAttachableListeners().forEach((listener, listenerClasses) -> serverVoiceChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        getChannelAttachableListeners().forEach((listener, listenerClasses) -> serverVoiceChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        return serverVoiceChannelListeners;
+    }
+
+    @Override
+    public <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(ServerVoiceChannel.class, getId(), listenerClass, listener);
     }
 
     @Override

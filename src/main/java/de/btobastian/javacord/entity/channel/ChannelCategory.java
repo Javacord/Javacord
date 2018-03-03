@@ -1,27 +1,19 @@
 package de.btobastian.javacord.entity.channel;
 
-import de.btobastian.javacord.ImplDiscordApi;
-import de.btobastian.javacord.entity.server.impl.ImplServer;
 import de.btobastian.javacord.entity.user.User;
-import de.btobastian.javacord.listener.ChannelAttachableListener;
 import de.btobastian.javacord.listener.ObjectAttachableListener;
 import de.btobastian.javacord.listener.channel.server.ChannelCategoryAttachableListener;
-import de.btobastian.javacord.listener.channel.server.ServerChannelAttachableListener;
 import de.btobastian.javacord.listener.channel.server.ServerChannelChangeNsfwFlagListener;
-import de.btobastian.javacord.util.ClassHelper;
 import de.btobastian.javacord.util.event.ListenerManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class represents a channel category.
@@ -33,27 +25,7 @@ public interface ChannelCategory extends ServerChannel {
         return ChannelType.CHANNEL_CATEGORY;
     }
 
-    /**
-     * Gets a sorted (by position) list of all channels in the category.
-     *
-     * @return The channels in the category.
-     */
-    default List<ServerChannel> getChannels() {
-        List<ServerChannel> channels = new ArrayList<>();
-        ((ImplServer) getServer()).getUnorderedChannels().stream()
-                .filter(channel -> channel.asServerTextChannel().isPresent())
-                .map(channel -> channel.asServerTextChannel().get())
-                .filter(channel -> channel.getCategory().orElse(null) == this)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
-                .forEach(channels::add);
-        ((ImplServer) getServer()).getUnorderedChannels().stream()
-                .filter(channel -> channel.asServerVoiceChannel().isPresent())
-                .map(channel -> channel.asServerVoiceChannel().get())
-                .filter(channel -> channel.getCategory().orElse(null) == this)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
-                .forEach(channels::add);
-        return Collections.unmodifiableList(channels);
-    }
+    List<ServerChannel> getChannels();
 
     /**
      * Gets a sorted (by position) list with all channels in this category the given user can see.
@@ -150,21 +122,15 @@ public interface ChannelCategory extends ServerChannel {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
-            ServerChannelChangeNsfwFlagListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
+            ServerChannelChangeNsfwFlagListener listener);
 
     /**
      * Gets a list with all registered server channel change nsfw flag listeners.
      *
      * @return A list with all registered server channel change nsfw flag listeners.
      */
-    default List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class);
-    }
+    List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners();
 
     /**
      * Adds a listener that implements one or more {@code ChannelCategoryAttachableListener}s.
@@ -176,28 +142,9 @@ public interface ChannelCategory extends ServerChannel {
      * @param <T> The type of the listener.
      * @return The managers for the added listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ChannelCategoryAttachableListener>>
-    addChannelCategoryAttachableListener(T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(ChannelCategoryAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .flatMap(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addServerChannelAttachableListener(
-                                (ServerChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else {
-                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(ChannelCategory.class, getId(),
-                                                                                       listenerClass, listener));
-                    }
-                })
-                .collect(Collectors.toList());
-    }
+    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends ChannelCategoryAttachableListener>> addChannelCategoryAttachableListener(
+            T listener);
 
     /**
      * Removes a listener that implements one or more {@code ChannelCategoryAttachableListener}s.
@@ -205,26 +152,8 @@ public interface ChannelCategory extends ServerChannel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void
-    removeChannelCategoryAttachableListener(T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(ChannelCategoryAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeServerChannelAttachableListener(
-                                (ServerChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else {
-                        ((ImplDiscordApi) getApi()).removeObjectListener(ChannelCategory.class, getId(),
-                                                                         listenerClass, listener);
-                    }
-                });
-    }
+    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void
+    removeChannelCategoryAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code ChannelCategoryAttachableListener}s
@@ -234,27 +163,8 @@ public interface ChannelCategory extends ServerChannel {
      * @return A map with all registered listeners that implement one or more
      * {@code ChannelCategoryAttachableListener}s and their assigned listener classes they listen to.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getChannelCategoryAttachableListeners() {
-        Map<T, List<Class<T>>> channelCategoryListeners =
-                ((ImplDiscordApi) getApi()).getObjectListeners(ChannelCategory.class, getId());
-        getServerChannelAttachableListeners().forEach((listener, listenerClasses) -> channelCategoryListeners
-                .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
-        getChannelAttachableListeners().forEach((listener, listenerClasses) -> channelCategoryListeners
-                .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
-        return channelCategoryListeners;
-    }
+    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getChannelCategoryAttachableListeners();
 
     /**
      * Removes a listener from this server text channel.
@@ -263,10 +173,8 @@ public interface ChannelCategory extends ServerChannel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-        ((ImplDiscordApi) getApi()).removeObjectListener(ChannelCategory.class, getId(), listenerClass, listener);
-    }
+    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<ChannelCategory> getCurrentCachedInstance() {
