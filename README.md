@@ -1,9 +1,9 @@
 ![](http://bastian-oppermann.de/javacord3_banner.png)
-# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg" alt="Latest version"></a> <a href="https://jitpack.io/com/github/btobastian/javacord/v_3-SNAPSHOT/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Javacord Wiki"></a>
+# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg" alt="Latest version"></a> <a href="https://jitpack.io/com/github/btobastian/javacord/v_3-SNAPSHOT/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg" alt="Javacord Wiki"></a> <a href="https://discord.gg/0qJ2jjyneLEgG7y3"><img src="https://img.shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord"></a>
 A multithreaded but simple to use library to create a Discord bot in Java.
 
 ## IMPORTANT
-This README is for the rewrite of Javacord (aka. Javacord 3) and is not compelete (e.g. the wiki is still for version 2.x). If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) and ask for help there.
+This README is for the rewrite of Javacord (aka. Javacord 3) and is not complete (e.g. the wiki is still for version 2.x). If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) and ask for help there.
 
 ## Download
 The recommended way to "download" Javacord is to use a build manager like Maven.
@@ -30,7 +30,7 @@ Replace `COMMIT_ID` with the latest commit id. Once the rewrite is finished, the
 
 **Optional Logger Dependency**
 ```xml
-<!-- Any SLF4J comaptible logging framework. logback-classic is recommended -->
+<!-- Any SLF4J compatible logging framework. logback-classic is recommended -->
 <dependency>
   <groupId>ch.qos.logback</groupId>
   <artifactId>logback-classic</artifactId>
@@ -41,8 +41,8 @@ Replace `COMMIT_ID` with the latest commit id. Once the rewrite is finished, the
 ## IDE Setup (for beginners)
 
 If you never used maven before you should take a look at the setup tutorial:
-* [Eclipse Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))
-* [IntelliJ Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
+* [IntelliJ Maven Setup](https://github.com/BtoBastian/Javacord3-Docs/wiki/How-to-setup-(IntelliJ-and-Maven))
+* Eclipse Maven Setup - coming soon
 
 ## Support
 
@@ -70,6 +70,9 @@ public class MyFirstBot {
         new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
             // Login successful
             api.getTextChannelById(123L).ifPresent(channel -> channel.sendMessage("I'm online now!"));
+            
+            // Print the invite url of bot
+            System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
         }).exceptionally(ExceptionLogger.get());
     }
 
@@ -86,42 +89,36 @@ public class MyFirstBot {
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
         // Login successful
         api.getTextChannelById("123").ifPresent(channel -> channel.sendMessage("I'm online now!"));
+        
+        // Print the invite url of bot
+        System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
     }
 
 }
 ```
 
-More examples can be found in the wiki: [Examples](https://github.com/BtoBastian/Javacord/wiki/Examples)
+An example bot can be found here: [Example Bot](https://github.com/BtoBastian/JavacordExampleBot)
 
-## How to get the token
+## How to create a bot user and get its token 
 
-**1.** Open https://discordapp.com/developers/applications/me and click on "New App".
+Click here: [Creating a Bot Account](https://github.com/BtoBastian/Javacord3-Docs/wiki/Creating-a-Bot-Account)
 
-**2.** Enter a name for your bot and click "Create App"
+## Version numbers
 
-**3.** Click on "Create a Bot user"
+The version number has the a 3-digit format: `major.minor.trivial`
+* `major`: Increased extremely rarely to mark a major release (usually a rewrite affecting very huge parts of the library).
+ You can expect this digit to not change for several years.
+* `minor`: Any backwards incompatible change to the api. You can expect this digit to change about 1-3 times per year.
+* `trivial`: A backwards compatible change to the **api**. This is usually an important bugfix (or a bunch of smaller ones)
+ or a backwards compatible feature addition. You can expect this digit to change 1-2 times per month
+ 
+## Deprecation policy
 
-**4.** Reveal the bot's token. This token is used to login your bot.
-
->![](http://i.imgur.com/EbexbiD.gif)
-
-## How to add a bot to your server
-
-In order to add a bot to your server you need it's client id.
-
-You can get your client id from the [same page](https://discordapp.com/developers/applications/me) where you created it.
-
->![](http://i.imgur.com/qzPDsp2.png)
-
-With this id you can create an invite link for your bot:
-
-**https://discordapp.com/api/oauth2/authorize?client_id=123456789&scope=bot&permissions=0**
-
-If you are the owner or admin of the server you can use this link to add your bot to your server. Otherwise you have to give the link to the server owner/admin and ask him to add your bot.
+A method/class which was marked as deprecated can be removed with the next minor release (but it will usually stay for several minor releases). A minor release might remove a class/method without having it deprecated, but we will do our best to deprecate it before removing it. We cannot guarantee this though, as we might have to remove/replace something due to a change from Discord, we didn't have control over. Usually you can expect a deprecated method/class to stay for at least 6 month before it finally gets removed, but there are no guarantees.
 
 ## Command Framework
 
-I would recommend to use [sdcf4j](https://github.com/BtoBastian/sdcf4j) in order to create commands. It provides a clean and simple way to create commands. A ping-pong command would be as easy as this:
+Depending on the use-case of your bot you can use [sdcf4j](https://github.com/BtoBastian/sdcf4j) in order to create commands. It provides a clean and simple way to create commands. A ping-pong command would be as easy as this:
 ```java
 public class PingCommand implements CommandExecutor {
 
