@@ -17,13 +17,28 @@ import de.btobastian.javacord.entity.server.impl.ImplServer;
 import de.btobastian.javacord.entity.user.User;
 import de.btobastian.javacord.entity.webhook.WebhookBuilder;
 import de.btobastian.javacord.entity.webhook.impl.ImplWebhookBuilder;
+import de.btobastian.javacord.listener.ChannelAttachableListener;
+import de.btobastian.javacord.listener.ObjectAttachableListener;
+import de.btobastian.javacord.listener.TextChannelAttachableListener;
+import de.btobastian.javacord.listener.channel.server.ServerChannelAttachableListener;
+import de.btobastian.javacord.listener.channel.server.ServerChannelChangeNsfwFlagListener;
+import de.btobastian.javacord.listener.channel.server.text.ServerTextChannelAttachableListener;
+import de.btobastian.javacord.listener.channel.server.text.ServerTextChannelChangeTopicListener;
+import de.btobastian.javacord.listener.channel.text.WebhooksUpdateListener;
+import de.btobastian.javacord.util.ClassHelper;
 import de.btobastian.javacord.util.Cleanupable;
 import de.btobastian.javacord.util.cache.ImplMessageCache;
 import de.btobastian.javacord.util.cache.MessageCache;
+import de.btobastian.javacord.util.event.ListenerManager;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The implementation of {@link ServerTextChannel}.
@@ -221,6 +236,132 @@ public class ImplServerTextChannel implements ServerTextChannel, Cleanupable, In
     @Override
     public ServerTextChannelUpdater createUpdater() {
         return new ImplServerTextChannelUpdater(this);
+    }
+
+    @Override
+    public ListenerManager<ServerTextChannelChangeTopicListener> addServerTextChannelChangeTopicListener(
+            ServerTextChannelChangeTopicListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerTextChannel.class, getId(), ServerTextChannelChangeTopicListener.class, listener);
+    }
+
+    @Override
+    public List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(ServerTextChannel.class, getId(), ServerTextChannelChangeTopicListener.class);
+    }
+
+    @Override
+    public ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
+            ServerChannelChangeNsfwFlagListener listener) {
+        return ((ImplDiscordApi) getApi()).addObjectListener(
+                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class, listener);
+    }
+
+    @Override
+    public List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(
+                ServerTextChannel.class, getId(), ServerChannelChangeNsfwFlagListener.class);
+    }
+
+    @Override
+    public ListenerManager<WebhooksUpdateListener> addWebhooksUpdateListener(WebhooksUpdateListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(ServerTextChannel.class, getId(), WebhooksUpdateListener.class, listener);
+    }
+
+    @Override
+    public List<WebhooksUpdateListener> getWebhooksUpdateListeners() {
+        return ((ImplDiscordApi) getApi())
+                .getObjectListeners(ServerTextChannel.class, getId(), WebhooksUpdateListener.class);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ServerTextChannelAttachableListener & ObjectAttachableListener>
+    Collection<ListenerManager<? extends ServerTextChannelAttachableListener>> addServerTextChannelAttachableListener(
+            T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ServerTextChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .flatMap(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addServerChannelAttachableListener(
+                                (ServerChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        return addTextChannelAttachableListener(
+                                (TextChannelAttachableListener & ObjectAttachableListener) listener).stream();
+                    } else {
+                        return Stream.of(((ImplDiscordApi) getApi()).addObjectListener(ServerTextChannel.class, getId(),
+                                                                                       listenerClass, listener));
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> void
+    removeServerTextChannelAttachableListener(T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(ServerTextChannelAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> {
+                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeChannelAttachableListener(
+                                (ChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else if (ServerChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeServerChannelAttachableListener(
+                                (ServerChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
+                        removeTextChannelAttachableListener(
+                                (TextChannelAttachableListener & ObjectAttachableListener) listener);
+                    } else {
+                        ((ImplDiscordApi) getApi()).removeObjectListener(ServerTextChannel.class, getId(),
+                                                                         listenerClass, listener);
+                    }
+                });
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getServerTextChannelAttachableListeners() {
+        Map<T, List<Class<T>>> serverTextChannelListeners =
+                ((ImplDiscordApi) getApi()).getObjectListeners(ServerTextChannel.class, getId());
+        getTextChannelAttachableListeners().forEach((listener, listenerClasses) -> serverTextChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        getServerChannelAttachableListeners().forEach((listener, listenerClasses) -> serverTextChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        getChannelAttachableListeners().forEach((listener, listenerClasses) -> serverTextChannelListeners
+                .merge((T) listener,
+                       (List<Class<T>>) (Object) listenerClasses,
+                       (listenerClasses1, listenerClasses2) -> {
+                           listenerClasses1.addAll(listenerClasses2);
+                           return listenerClasses1;
+                       }));
+        return serverTextChannelListeners;
+    }
+
+    @Override
+    public <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        ((ImplDiscordApi) getApi()).removeObjectListener(ServerTextChannel.class, getId(), listenerClass, listener);
     }
 
     @Override
