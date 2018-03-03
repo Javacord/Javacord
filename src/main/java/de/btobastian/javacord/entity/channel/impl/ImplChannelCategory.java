@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
 import de.btobastian.javacord.entity.channel.InternalChannel;
+import de.btobastian.javacord.entity.channel.InternalServerChannel;
 import de.btobastian.javacord.entity.channel.ServerChannel;
 import de.btobastian.javacord.entity.channel.ServerChannelUpdater;
 import de.btobastian.javacord.entity.channel.ServerTextChannel;
@@ -37,7 +38,7 @@ import java.util.stream.Stream;
 /**
  * The implementation of {@link ChannelCategory}.
  */
-public class ImplChannelCategory implements ChannelCategory, InternalChannel {
+public class ImplChannelCategory implements ChannelCategory, InternalChannel, InternalServerChannel {
 
     /**
      * The discord api instance.

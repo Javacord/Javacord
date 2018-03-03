@@ -6,6 +6,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entity.DiscordEntity;
 import de.btobastian.javacord.entity.channel.ChannelCategory;
 import de.btobastian.javacord.entity.channel.InternalChannel;
+import de.btobastian.javacord.entity.channel.InternalServerChannel;
 import de.btobastian.javacord.entity.channel.ServerTextChannel;
 import de.btobastian.javacord.entity.channel.ServerTextChannelUpdater;
 import de.btobastian.javacord.entity.permission.Permissions;
@@ -27,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The implementation of {@link ServerTextChannel}.
  */
-public class ImplServerTextChannel implements ServerTextChannel, Cleanupable, InternalChannel {
+public class ImplServerTextChannel implements ServerTextChannel, Cleanupable, InternalChannel, InternalServerChannel {
 
     /**
      * The discord api instance.
