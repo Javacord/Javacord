@@ -993,14 +993,12 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     default List<ServerTextChannel> extractChannels() {
         String content = getContent();
         List<ServerTextChannel> channels = new ArrayList<>();
-        List<String> matches = new ArrayList<>();
+        String x;
         Optional<Channel> chlOpt;
-        Matcher matcher = Pattern.compile("(<#)[0-9]+(>)")
+        Matcher matcher = Pattern.compile("<#([0-9]+)>")
                 .matcher(content);
         while (matcher.find()) {
-            matches.add(matcher.group());
-        }
-        for (String x : matches) {
+            x = matcher.group();
             getApi().getChannelById(x.substring(x.indexOf("<#")+2, x.indexOf(">"))).ifPresent(a -> a.asServerTextChannel().ifPresent(channels::add));
         }
         return channels;
