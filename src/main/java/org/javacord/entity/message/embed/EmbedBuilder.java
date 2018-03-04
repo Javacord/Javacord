@@ -617,6 +617,30 @@ public class EmbedBuilder {
     }
 
     /**
+     * Adds an inline field to the embed.
+     *
+     * @param name The name of the field.
+     * @param value The value of the field.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder addInlineField(String name, String value) {
+        factory.addField(name, value, true);
+        return this;
+    }
+
+    /**
+     * Adds a non-inline field to the embed.
+     *
+     * @param name The name of the field.
+     * @param value The value of the field.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder addField(String name, String value) {
+        factory.addField(name, value, false);
+        return this;
+    }
+
+    /**
      * Adds a field to the embed.
      *
      * @param name The name of the field.
