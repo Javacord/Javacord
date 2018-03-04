@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.Icon;
 import org.javacord.entity.message.MessageAuthor;
+import org.javacord.entity.message.embed.Embed;
 import org.javacord.entity.message.embed.EmbedFactory;
 import org.javacord.entity.user.User;
 import org.javacord.util.FileContainer;
@@ -558,4 +559,8 @@ public class ImplEmbedFactory implements EmbedFactory {
         return object;
     }
 
+    @Override
+    public Embed asEmbed() {
+        return new ImplEmbed(this.toJsonNode());
+    }
 }

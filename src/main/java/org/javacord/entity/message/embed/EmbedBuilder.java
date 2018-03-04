@@ -661,4 +661,13 @@ public class EmbedBuilder {
     public boolean requiresAttachments() {
         return factory.requiresAttachments();
     }
+
+    /**
+     * Returns this embed as {@link Embed}.
+     *
+     * @return this embed as {@code Embed}.
+     */
+    public Embed asEmbed() {
+        return factory.asEmbed();
+    }
 }
