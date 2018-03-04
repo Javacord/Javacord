@@ -36,7 +36,7 @@ public interface RichInvite extends Invite {
      *
      * @return The duration (in seconds) after which the invite expires.
      */
-    int getMaxAge();
+    int getMaxAgeInSeconds();
 
     /**
      * Checks if the invite only grants temporary membership.

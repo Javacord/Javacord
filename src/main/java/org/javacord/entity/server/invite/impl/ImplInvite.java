@@ -242,7 +242,7 @@ public class ImplInvite implements RichInvite {
     }
 
     @Override
-    public int getMaxAge() {
+    public int getMaxAgeInSeconds() {
         return maxAge;
     }
 

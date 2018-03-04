@@ -72,9 +72,20 @@ public class InviteBuilder {
      * @param maxAge The duration of the invite in seconds before expiry, or 0 for never.
      * @return The current instance in order to chain call methods.
      */
-    public InviteBuilder setMaxAge(int maxAge) {
+    public InviteBuilder setMaxAgeInSeconds(int maxAge) {
         this.maxAge = maxAge;
         return this;
+    }
+
+    /**
+     * Sets the invite to never expire.
+     * This is the same as setting the max age to 0.
+     *
+     * @return The current instance in order to chain call methods.
+     * @see #setMaxAgeInSeconds(int) 
+     */
+    public InviteBuilder setNeverExpire() {
+        return setMaxAgeInSeconds(0);
     }
 
     /**
