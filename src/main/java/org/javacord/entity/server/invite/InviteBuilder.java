@@ -129,7 +129,7 @@ public class InviteBuilder {
      *
      * @return The created invite.
      */
-    public CompletableFuture<Invite> build() {
+    public CompletableFuture<Invite> create() {
         return new RestRequest<Invite>(channel.getApi(), RestMethod.POST, RestEndpoint.CHANNEL_INVITE)
                 .setUrlParameters(channel.getIdAsString())
                 .setBody(JsonNodeFactory.instance.objectNode()
