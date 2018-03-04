@@ -7,6 +7,7 @@ import de.btobastian.javacord.ImplDiscordApi;
 import de.btobastian.javacord.entities.DiscordEntity;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
+import de.btobastian.javacord.entities.channels.Channel;
 import de.btobastian.javacord.entities.channels.GroupChannel;
 import de.btobastian.javacord.entities.channels.PrivateChannel;
 import de.btobastian.javacord.entities.channels.ServerChannel;
@@ -982,6 +983,27 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             emojis.add(emoji);
         }
         return Collections.unmodifiableList(emojis);
+    }
+
+    /**
+     * Gets a collection of all <code>ServerTextChannels</code> mentioned in the message.
+     *
+     * @return The collection of
+     */
+    default List<ServerTextChannel> extractChannels() {
+        String content = getContent();
+        List<ServerTextChannel> channels = new ArrayList<>();
+        List<String> matches = new ArrayList<>();
+        Optional<Channel> chlOpt;
+        Matcher matcher = Pattern.compile("(<#)[0-9]+(>)")
+                .matcher(content);
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+        for (String x : matches) {
+            getApi().getChannelById(x.substring(x.indexOf("<#")+2, x.indexOf(">"))).ifPresent(a -> a.asServerTextChannel().ifPresent(channels::add));
+        }
+        return channels;
     }
 
     /**
