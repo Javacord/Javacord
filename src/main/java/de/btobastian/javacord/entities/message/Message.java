@@ -994,7 +994,6 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         String content = getContent();
         List<ServerTextChannel> channels = new ArrayList<>();
         String x;
-        Optional<Channel> chlOpt;
         Matcher matcher = Pattern.compile("<#([0-9]+)>")
                 .matcher(content);
         while (matcher.find()) {
