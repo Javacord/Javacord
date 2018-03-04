@@ -68,11 +68,11 @@ public interface ServerChannel extends Channel {
     }
 
     /**
-     * Gets an invite builder for this channel.
+     * Creates an invite builder for this channel.
      *
      * @return An invite builder for this channel.
      */
-    default InviteBuilder getInviteBuilder() {
+    default InviteBuilder createInviteBuilder() {
         return new InviteBuilder(this);
     }
 

@@ -82,7 +82,7 @@ public class InviteBuilder {
      * This is the same as setting the max age to 0.
      *
      * @return The current instance in order to chain call methods.
-     * @see #setMaxAgeInSeconds(int) 
+     * @see #setMaxAgeInSeconds(int)
      */
     public InviteBuilder setNeverExpire() {
         return setMaxAgeInSeconds(0);
