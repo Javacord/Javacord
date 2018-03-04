@@ -998,8 +998,8 @@ public interface Message extends DiscordEntity, Comparable<Message> {
         Matcher matcher = Pattern.compile("<#([0-9]+)>")
                 .matcher(content);
         while (matcher.find()) {
-            x = matcher.group();
-            getApi().getChannelById(x.substring(x.indexOf("<#")+2, x.indexOf(">"))).ifPresent(a -> a.asServerTextChannel().ifPresent(channels::add));
+            x = matcher.group(1);
+            getApi().getChannelById(x).ifPresent(a -> a.asServerTextChannel().ifPresent(channels::add));
         }
         return channels;
     }
