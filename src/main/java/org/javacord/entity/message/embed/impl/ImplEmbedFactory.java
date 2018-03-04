@@ -535,10 +535,10 @@ public class ImplEmbedFactory implements EmbedFactory {
             }
         }
         if (thumbnailUrl != null && !thumbnailUrl.equals("")) {
-            object.putObject("thumbnailContainer").put("url", thumbnailUrl);
+            object.putObject("thumbnail").put("url", thumbnailUrl);
         }
         if (thumbnailContainer != null) {
-            object.putObject("thumbnailContainer").put("url", "attachment://" + thumbnailContainer.getFileTypeOrName());
+            object.putObject("thumbnail").put("url", "attachment://" + thumbnailContainer.getFileTypeOrName());
         }
         if (fields.size() > 0) {
             ArrayNode jsonFields = object.putArray("fields");
