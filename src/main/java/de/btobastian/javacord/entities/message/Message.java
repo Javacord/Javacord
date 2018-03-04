@@ -1000,7 +1000,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
             x = matcher.group(1);
             getApi().getChannelById(x).ifPresent(a -> a.asServerTextChannel().ifPresent(channels::add));
         }
-        return channels;
+        return Collections.unmodifiableList(channels);
     }
 
     /**
