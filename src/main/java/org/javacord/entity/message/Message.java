@@ -780,7 +780,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param <T> The type of the listener.
      * @return The managers for the added listener.
      */
-    @SuppressWarnings("unchecked")
     static <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
     addMessageAttachableListener(DiscordApi api, long messageId, T listener) {
         return api.getUncachedMessageUtil().addMessageAttachableListener(messageId, listener);
@@ -871,7 +870,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    @SuppressWarnings("unchecked")
     static <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
             DiscordApi api, long messageId, T listener) {
         api.getUncachedMessageUtil().removeMessageAttachableListener(messageId, listener);
