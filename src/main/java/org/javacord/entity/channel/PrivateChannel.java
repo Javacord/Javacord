@@ -89,9 +89,8 @@ public interface PrivateChannel extends TextChannel, VoiceChannel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T extends PrivateChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-    }
+    <T extends PrivateChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<PrivateChannel> getCurrentCachedInstance() {

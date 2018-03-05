@@ -193,9 +193,8 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-    }
+    <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<ServerTextChannel> getCurrentCachedInstance() {
