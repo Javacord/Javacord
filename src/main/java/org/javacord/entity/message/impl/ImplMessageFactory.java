@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -270,6 +271,7 @@ public class ImplMessageFactory implements MessageFactory {
                     if (embed != null) {
                         tempAttachments.addAll(((ImplEmbedFactory) embed.getFactory()).getRequiredAttachments());
                     }
+                    Collections.reverse(tempAttachments);
                     for (int i = 0; i < tempAttachments.size(); i++) {
                         byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();
 
