@@ -22,6 +22,7 @@ import org.javacord.entity.message.UncachedMessageUtil;
 import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.entity.message.impl.ImplMessageSet;
 import org.javacord.entity.message.impl.ImplUncachedMessageUtil;
+import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilder;
 import org.javacord.entity.server.impl.ImplServerBuilder;
@@ -959,6 +960,16 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public AccountType getAccountType() {
         return accountType;
+    }
+
+    @Override
+    public String createBotInvite() {
+        return new ImplBotInviteBuilder(getClientId()).build();
+    }
+
+    @Override
+    public String createBotInvite(Permissions permissions) {
+        return new ImplBotInviteBuilder(getClientId()).setPermissions(permissions).build();
     }
 
     @Override
@@ -1938,4 +1949,5 @@ public class ImplDiscordApi implements DiscordApi {
                 .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
                 .forEach(listenerClass -> removeListener(listenerClass, listener));
     }
+
 }

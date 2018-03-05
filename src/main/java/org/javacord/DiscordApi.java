@@ -196,9 +196,7 @@ public interface DiscordApi {
      * @return An invite link for this bot.
      * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
      */
-    default String createBotInvite() {
-        return new BotInviteBuilder(getClientId()).build();
-    }
+    String createBotInvite();
 
     /**
      * Creates an invite link for the this bot.
@@ -208,9 +206,7 @@ public interface DiscordApi {
      * @return An invite link for this bot.
      * @throws IllegalStateException If the current account is not {@link AccountType#BOT}.
      */
-    default String createBotInvite(Permissions permissions) {
-        return new BotInviteBuilder(getClientId()).setPermissions(permissions).build();
-    }
+    String createBotInvite(Permissions permissions);
 
     /**
      * Sets the cache size of all caches.
