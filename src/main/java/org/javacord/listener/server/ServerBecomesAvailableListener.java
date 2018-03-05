@@ -2,8 +2,6 @@ package org.javacord.listener.server;
 
 import org.javacord.event.server.ServerBecomesAvailableEvent;
 import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.event.server.ServerBecomesAvailableEvent;
-import org.javacord.listener.GloballyAttachableListener;
 
 /**
  * This listener listens to servers becoming unavailable.

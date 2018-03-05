@@ -3,7 +3,6 @@ package org.javacord.entity.message.embed.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.entity.message.embed.EmbedProvider;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.message.embed.EmbedProvider;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;

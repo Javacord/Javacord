@@ -3,7 +3,6 @@ package org.javacord.listener.server;
 import org.javacord.event.server.ServerLeaveEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.event.server.ServerLeaveEvent;
 
 /**
  * This listener listens to server leaves.

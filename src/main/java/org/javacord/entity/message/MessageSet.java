@@ -1,7 +1,6 @@
 package org.javacord.entity.message;
 
 import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.DiscordEntity;
 
 import java.util.NavigableSet;
 import java.util.Optional;

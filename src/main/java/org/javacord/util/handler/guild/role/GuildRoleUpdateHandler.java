@@ -18,16 +18,6 @@ import org.javacord.listener.server.role.RoleChangeNameListener;
 import org.javacord.listener.server.role.RoleChangePermissionsListener;
 import org.javacord.listener.server.role.RoleChangePositionListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.impl.ImplPermissions;
-import org.javacord.entity.permission.impl.ImplRole;
-import org.javacord.event.server.role.RoleChangeColorEvent;
-import org.javacord.event.server.role.RoleChangeHoistEvent;
-import org.javacord.event.server.role.RoleChangeMentionableEvent;
-import org.javacord.event.server.role.RoleChangeNameEvent;
-import org.javacord.event.server.role.RoleChangePermissionsEvent;
-import org.javacord.event.server.role.RoleChangePositionEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.awt.Color;
 import java.util.ArrayList;

@@ -16,15 +16,6 @@ import org.javacord.listener.user.UserChangeAvatarListener;
 import org.javacord.listener.user.UserChangeNameListener;
 import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.activity.Activity;
-import org.javacord.entity.activity.impl.ImplActivity;
-import org.javacord.entity.user.User;
-import org.javacord.entity.user.UserStatus;
-import org.javacord.entity.user.impl.ImplUser;
-import org.javacord.event.user.UserChangeNameEvent;
-import org.javacord.listener.user.UserChangeNameListener;
-import org.javacord.listener.user.UserChangeStatusListener;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

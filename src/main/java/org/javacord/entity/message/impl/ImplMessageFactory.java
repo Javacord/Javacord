@@ -2,6 +2,9 @@ package org.javacord.entity.message.impl;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.Icon;
 import org.javacord.entity.Mentionable;
@@ -17,17 +20,6 @@ import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import org.javacord.entity.Icon;
-import org.javacord.entity.Mentionable;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.MessageDecoration;
-import org.javacord.entity.message.MessageFactory;
-import org.javacord.entity.message.Messageable;
-import org.javacord.entity.user.User;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

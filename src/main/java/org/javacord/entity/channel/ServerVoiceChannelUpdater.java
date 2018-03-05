@@ -3,7 +3,6 @@ package org.javacord.entity.channel;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.user.User;
-import org.javacord.entity.user.User;
 
 import java.util.concurrent.CompletableFuture;
 

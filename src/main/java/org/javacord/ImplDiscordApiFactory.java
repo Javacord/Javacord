@@ -7,12 +7,6 @@ import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestResult;
-import org.javacord.util.gateway.DiscordWebSocketAdapter;
-import org.javacord.util.logging.LoggerUtil;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
 import org.slf4j.Logger;
 import org.slf4j.MDC.MDCCloseable;
 

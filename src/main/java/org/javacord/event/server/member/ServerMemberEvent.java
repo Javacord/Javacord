@@ -4,7 +4,6 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
 import org.javacord.event.server.ServerEvent;
-import org.javacord.event.server.ServerEvent;
 
 /**
  * A server member event.

@@ -6,12 +6,6 @@ import org.javacord.entity.channel.PrivateChannel;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.user.User;
-import org.javacord.DiscordApi;
-import org.javacord.entity.channel.GroupChannel;
-import org.javacord.entity.channel.PrivateChannel;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.user.User;
 
 import java.util.Optional;
 

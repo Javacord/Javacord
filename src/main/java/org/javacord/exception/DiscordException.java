@@ -1,8 +1,5 @@
 package org.javacord.exception;
 
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestHttpResponseCode;
-import org.javacord.util.rest.RestRequestResult;
 import okhttp3.Response;
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestHttpResponseCode;

@@ -8,11 +8,6 @@ import org.javacord.entity.auditlog.AuditLogEntry;
 import org.javacord.entity.user.User;
 import org.javacord.entity.webhook.Webhook;
 import org.javacord.entity.webhook.impl.ImplWebhook;
-import org.javacord.entity.auditlog.AuditLog;
-import org.javacord.entity.auditlog.AuditLogEntry;
-import org.javacord.entity.user.User;
-import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.webhook.impl.ImplWebhook;
 
 import java.util.ArrayList;
 import java.util.Collection;

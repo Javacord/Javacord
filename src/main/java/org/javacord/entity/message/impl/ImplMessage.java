@@ -16,15 +16,6 @@ import org.javacord.entity.message.embed.impl.ImplEmbed;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.user.User;
 import org.javacord.util.cache.ImplMessageCache;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.emoji.Emoji;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.MessageAttachment;
-import org.javacord.entity.message.MessageAuthor;
-import org.javacord.entity.message.MessageType;
-import org.javacord.entity.message.Reaction;
-import org.javacord.entity.user.User;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;

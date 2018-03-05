@@ -24,10 +24,6 @@ import org.javacord.util.event.ListenerManager;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.server.invite.RichInvite;
-import org.javacord.entity.server.invite.impl.ImplInvite;
-import org.javacord.entity.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;

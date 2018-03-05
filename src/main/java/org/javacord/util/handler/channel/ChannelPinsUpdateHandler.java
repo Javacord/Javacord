@@ -7,10 +7,6 @@ import org.javacord.entity.server.Server;
 import org.javacord.event.message.ChannelPinsUpdateEvent;
 import org.javacord.listener.message.ChannelPinsUpdateListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.server.Server;
-import org.javacord.event.message.ChannelPinsUpdateEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;

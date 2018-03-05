@@ -4,9 +4,6 @@ import org.javacord.event.channel.group.GroupChannelDeleteEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.user.UserAttachableListener;
-import org.javacord.event.channel.group.GroupChannelDeleteEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
 
 /**
  * This listener listens to group channel deletions.

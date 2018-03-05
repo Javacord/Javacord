@@ -5,10 +5,6 @@ import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
 import org.javacord.listener.user.UserAttachableListener;
-import org.javacord.event.server.role.UserRoleRemoveEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to users being removed from a role.

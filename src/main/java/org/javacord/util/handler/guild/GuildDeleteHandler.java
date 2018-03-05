@@ -7,10 +7,6 @@ import org.javacord.event.server.ServerLeaveEvent;
 import org.javacord.listener.server.ServerBecomesUnavailableListener;
 import org.javacord.listener.server.ServerLeaveListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.event.server.ServerBecomesUnavailableEvent;
-import org.javacord.event.server.ServerLeaveEvent;
-import org.javacord.listener.server.ServerLeaveListener;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

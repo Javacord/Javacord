@@ -5,10 +5,6 @@ import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.channel.server.text.ServerTextChannelAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.event.channel.server.ServerChannelChangeNsfwFlagEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to server channel nsfw flag changes.

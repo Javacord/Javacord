@@ -2,8 +2,6 @@ package org.javacord.entity.webhook;
 
 import org.javacord.entity.Icon;
 import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.Icon;
-import org.javacord.entity.channel.ServerTextChannel;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

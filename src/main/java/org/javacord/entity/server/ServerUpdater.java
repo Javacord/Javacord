@@ -6,9 +6,6 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.user.User;
-import org.javacord.entity.Icon;
-import org.javacord.entity.Region;
-import org.javacord.entity.user.User;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
  * This class can be used to update the settings of a server.
  */
 public interface ServerUpdater {
-    
+
     /**
      * Sets the reason for this update. This reason will be visible in the audit log entry(s).
      *
@@ -30,7 +27,7 @@ public interface ServerUpdater {
      * @return The current instance in order to chain call methods.
      */
     ServerUpdater setAuditLogReason(String reason);
-    
+
     /**
      * Queues the name to be updated.
      *

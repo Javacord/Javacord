@@ -3,7 +3,6 @@ package org.javacord.listener.server;
 import org.javacord.event.server.ServerJoinEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.server.member.ServerMemberJoinListener;
-import org.javacord.event.server.ServerJoinEvent;
 
 /**
  * This listener listens to server joins.

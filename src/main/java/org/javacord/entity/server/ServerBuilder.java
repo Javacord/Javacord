@@ -2,8 +2,6 @@ package org.javacord.entity.server;
 
 import org.javacord.entity.Icon;
 import org.javacord.entity.Region;
-import org.javacord.entity.Icon;
-import org.javacord.entity.Region;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

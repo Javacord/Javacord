@@ -13,14 +13,6 @@ import org.javacord.listener.channel.group.GroupChannelDeleteListener;
 import org.javacord.listener.channel.server.ServerChannelDeleteListener;
 import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.entity.user.User;
-import org.javacord.entity.user.impl.ImplUser;
-import org.javacord.event.channel.group.GroupChannelDeleteEvent;
-import org.javacord.event.channel.server.ServerChannelDeleteEvent;
-import org.javacord.event.channel.user.PrivateChannelDeleteEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

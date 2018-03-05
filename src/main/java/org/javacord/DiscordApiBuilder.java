@@ -1,6 +1,5 @@
 package org.javacord;
 
-import org.javacord.util.logging.LoggerUtil;
 import org.javacord.event.server.ServerBecomesAvailableEvent;
 import org.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;

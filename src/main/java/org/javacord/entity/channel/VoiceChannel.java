@@ -5,7 +5,6 @@ import org.javacord.entity.user.User;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.VoiceChannelAttachableListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.user.User;
 
 import java.util.Collection;
 import java.util.List;

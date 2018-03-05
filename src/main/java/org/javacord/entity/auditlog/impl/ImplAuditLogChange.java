@@ -2,8 +2,6 @@ package org.javacord.entity.auditlog.impl;
 
 import org.javacord.entity.auditlog.AuditLogChange;
 import org.javacord.entity.auditlog.AuditLogChangeType;
-import org.javacord.entity.auditlog.AuditLogChange;
-import org.javacord.entity.auditlog.AuditLogChangeType;
 
 import java.util.Optional;
 

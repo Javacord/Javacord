@@ -2,7 +2,6 @@ package org.javacord.event.server.emoji;
 
 import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.event.server.ServerEvent;
-import org.javacord.event.server.ServerEvent;
 
 /**
  * A custom emoji event.

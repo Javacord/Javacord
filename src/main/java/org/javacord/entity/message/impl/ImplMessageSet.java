@@ -9,10 +9,6 @@ import org.javacord.entity.message.MessageSet;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.MessageSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;

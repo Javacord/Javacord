@@ -9,10 +9,6 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.channel.ChannelCategory;
-import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannelBuilder;
-import org.javacord.entity.server.impl.ImplServer;
 
 import java.util.concurrent.CompletableFuture;
 

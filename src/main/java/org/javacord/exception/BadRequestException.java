@@ -2,8 +2,6 @@ package org.javacord.exception;
 
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestResult;
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
 
 /**
  * When we sent a bad request (HTTP response code 400).

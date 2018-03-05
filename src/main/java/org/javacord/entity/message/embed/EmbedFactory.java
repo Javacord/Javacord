@@ -3,11 +3,8 @@ package org.javacord.entity.message.embed;
 import org.javacord.entity.Icon;
 import org.javacord.entity.message.MessageAuthor;
 import org.javacord.entity.user.User;
-import org.javacord.entity.Icon;
-import org.javacord.entity.message.MessageAuthor;
-import org.javacord.entity.user.User;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;

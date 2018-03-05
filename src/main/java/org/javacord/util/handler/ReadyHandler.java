@@ -6,10 +6,6 @@ import org.javacord.entity.channel.impl.ImplGroupChannel;
 import org.javacord.entity.channel.impl.ImplPrivateChannel;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.impl.ImplGroupChannel;
-import org.javacord.entity.channel.impl.ImplPrivateChannel;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.util.gateway.PacketHandler;
 
 /**
  * This class handles the ready packet.

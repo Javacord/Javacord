@@ -3,7 +3,6 @@ package org.javacord.event.server.role;
 import org.javacord.DiscordApi;
 import org.javacord.entity.permission.Role;
 import org.javacord.event.server.ServerEvent;
-import org.javacord.event.server.ServerEvent;
 
 /**
  * A Role event.

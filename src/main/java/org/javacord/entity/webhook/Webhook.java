@@ -7,13 +7,6 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Icon;
-import org.javacord.entity.Updatable;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

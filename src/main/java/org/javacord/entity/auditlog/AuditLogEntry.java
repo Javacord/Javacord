@@ -2,8 +2,6 @@ package org.javacord.entity.auditlog;
 
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.user.User;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.user.User;
 
 import java.util.List;
 import java.util.Optional;

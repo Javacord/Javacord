@@ -7,8 +7,6 @@ import org.javacord.entity.channel.GroupChannelUpdater;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.channel.GroupChannel;
-import org.javacord.entity.channel.GroupChannelUpdater;
 
 import java.util.concurrent.CompletableFuture;
 

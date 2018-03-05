@@ -6,12 +6,6 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.TextChannelAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
 import org.javacord.listener.user.UserAttachableListener;
-import org.javacord.event.message.MessageCreateEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.TextChannelAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.listener.user.UserAttachableListener;
 
 /**
  * This listener listens to message creations.

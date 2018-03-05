@@ -8,11 +8,6 @@ import org.javacord.entity.channel.Categorizable;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
 import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Icon;
-import org.javacord.entity.channel.Categorizable;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

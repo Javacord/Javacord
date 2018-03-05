@@ -12,12 +12,6 @@ import org.javacord.entity.server.invite.Invite;
 import org.javacord.entity.server.invite.RichInvite;
 import org.javacord.entity.user.User;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.Icon;
-import org.javacord.entity.impl.ImplIcon;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.server.invite.Invite;
-import org.javacord.entity.server.invite.RichInvite;
-import org.javacord.entity.user.User;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;

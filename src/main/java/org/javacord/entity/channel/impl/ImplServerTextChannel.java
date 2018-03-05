@@ -31,16 +31,6 @@ import org.javacord.util.Cleanupable;
 import org.javacord.util.cache.ImplMessageCache;
 import org.javacord.util.cache.MessageCache;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.channel.ChannelCategory;
-import org.javacord.entity.channel.InternalChannel;
-import org.javacord.entity.channel.InternalServerChannel;
-import org.javacord.entity.channel.InternalTextChannel;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.ServerTextChannelUpdater;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.entity.user.User;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,7 +1,6 @@
 package org.javacord.entity.activity;
 
 import org.javacord.entity.Icon;
-import org.javacord.entity.Icon;
 
 import java.util.Optional;
 

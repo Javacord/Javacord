@@ -1,7 +1,6 @@
 package org.javacord.entity.emoji;
 
 import org.javacord.entity.Mentionable;
-import org.javacord.entity.Mentionable;
 
 import java.util.Optional;
 

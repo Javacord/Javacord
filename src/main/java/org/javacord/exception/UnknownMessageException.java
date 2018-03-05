@@ -2,8 +2,6 @@ package org.javacord.exception;
 
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestResult;
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
 
 /**
  * When the message that was referenced, for example for adding a reaction to, is not a message Discord knows about

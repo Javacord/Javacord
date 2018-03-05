@@ -10,10 +10,6 @@ import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.Icon;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.webhook.WebhookBuilder;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

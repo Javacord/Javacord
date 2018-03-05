@@ -2,7 +2,6 @@ package org.javacord.entity.activity.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.entity.activity.ActivityParty;
-import org.javacord.entity.activity.ActivityParty;
 
 import java.util.Objects;
 import java.util.Optional;

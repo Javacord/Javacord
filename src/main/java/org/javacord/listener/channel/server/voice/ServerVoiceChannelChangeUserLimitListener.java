@@ -4,10 +4,6 @@ import org.javacord.event.channel.server.voice.ServerVoiceChannelChangeUserLimit
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to server voice channel user limit changes.

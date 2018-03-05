@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.entity.Icon;
 import org.javacord.entity.activity.ActivityAssets;
 import org.javacord.entity.impl.ImplIcon;
-import org.javacord.entity.Icon;
-import org.javacord.entity.activity.ActivityAssets;
-import org.javacord.entity.impl.ImplIcon;
 
 import java.net.MalformedURLException;
 import java.net.URL;

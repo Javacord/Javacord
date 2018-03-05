@@ -8,11 +8,6 @@ import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.event.message.reaction.ReactionRemoveAllEvent;
 import org.javacord.listener.message.reaction.ReactionRemoveAllListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.impl.ImplMessage;
-import org.javacord.event.message.reaction.ReactionRemoveAllEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

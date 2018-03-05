@@ -6,7 +6,6 @@ import org.javacord.entity.server.invite.impl.ImplInvite;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.server.invite.impl.ImplInvite;
 
 import java.util.concurrent.CompletableFuture;
 

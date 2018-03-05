@@ -6,9 +6,6 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.event.server.role.RoleDeleteEvent;
 import org.javacord.listener.server.role.RoleDeleteListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.event.server.role.RoleDeleteEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

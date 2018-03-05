@@ -5,11 +5,6 @@ import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
 import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
-import org.javacord.entity.webhook.Webhook;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

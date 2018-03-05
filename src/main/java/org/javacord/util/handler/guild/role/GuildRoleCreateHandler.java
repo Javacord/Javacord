@@ -7,10 +7,6 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.event.server.role.RoleCreateEvent;
 import org.javacord.listener.server.role.RoleCreateListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.permission.Role;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.event.server.role.RoleCreateEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

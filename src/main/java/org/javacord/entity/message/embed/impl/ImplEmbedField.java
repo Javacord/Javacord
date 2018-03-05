@@ -2,7 +2,6 @@ package org.javacord.entity.message.embed.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.entity.message.embed.EmbedField;
-import org.javacord.entity.message.embed.EmbedField;
 
 /**
  * The implementation of {@link EmbedField}.

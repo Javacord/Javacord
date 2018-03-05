@@ -2,8 +2,6 @@ package org.javacord.exception;
 
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestResult;
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
 
 /**
  * Represents a function that accepts four arguments ({@code Exception}, {@code String}, {@code RestRequest<?>} and

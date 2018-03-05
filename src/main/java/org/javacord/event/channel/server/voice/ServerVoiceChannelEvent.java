@@ -2,7 +2,6 @@ package org.javacord.event.channel.server.voice;
 
 import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.event.server.ServerEvent;
-import org.javacord.event.server.ServerEvent;
 
 /**
  * A server voice channel event.

@@ -17,12 +17,6 @@ import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.Icon;
-import org.javacord.entity.Region;
-import org.javacord.entity.server.DefaultMessageNotificationLevel;
-import org.javacord.entity.server.ServerUpdater;
-import org.javacord.entity.server.VerificationLevel;
-import org.javacord.entity.user.User;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

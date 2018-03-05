@@ -2,7 +2,6 @@ package org.javacord.event.channel.server.text;
 
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.event.server.ServerEvent;
-import org.javacord.event.server.ServerEvent;
 
 /**
  * A server text channel event.

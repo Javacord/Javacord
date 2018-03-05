@@ -3,9 +3,6 @@ package org.javacord.listener.server;
 import org.javacord.event.server.ServerChangeMultiFactorAuthenticationLevelEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.event.server.ServerChangeMultiFactorAuthenticationLevelEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
 
 /**
  * This listener listens to server multi factor authentication level changes.

@@ -1,7 +1,6 @@
 package org.javacord.entity.server.invite;
 
 import org.javacord.entity.user.User;
-import org.javacord.entity.user.User;
 
 import java.time.Instant;
 

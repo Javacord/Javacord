@@ -7,8 +7,6 @@ import org.javacord.listener.channel.group.GroupChannelAttachableListener;
 import org.javacord.listener.channel.group.GroupChannelChangeNameListener;
 import org.javacord.listener.channel.group.GroupChannelDeleteListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.Icon;
-import org.javacord.entity.user.User;
 
 import java.util.Collection;
 import java.util.List;

@@ -5,11 +5,6 @@ import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.TextChannelAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.event.message.CachedMessagePinEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.TextChannelAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to message pins of <b>cached</b> messages.

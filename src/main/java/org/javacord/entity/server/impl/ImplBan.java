@@ -5,9 +5,6 @@ import org.javacord.ImplDiscordApi;
 import org.javacord.entity.server.Ban;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
-import org.javacord.entity.server.Ban;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
 
 import java.util.Optional;
 

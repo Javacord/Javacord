@@ -16,10 +16,6 @@ import org.javacord.listener.channel.server.ServerChannelChangeOverwrittenPermis
 import org.javacord.listener.channel.server.ServerChannelChangePositionListener;
 import org.javacord.listener.channel.server.ServerChannelDeleteListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.server.invite.InviteBuilder;
-import org.javacord.entity.server.invite.RichInvite;
-import org.javacord.entity.user.User;
 
 import java.util.Arrays;
 import java.util.Collection;

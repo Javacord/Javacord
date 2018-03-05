@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.DiscordApi;
 import org.javacord.entity.ApplicationInfo;
 import org.javacord.entity.user.User;
-import org.javacord.entity.ApplicationInfo;
-import org.javacord.entity.user.User;
 
 import java.util.concurrent.CompletableFuture;
 

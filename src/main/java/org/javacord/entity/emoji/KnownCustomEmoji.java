@@ -9,7 +9,6 @@ import org.javacord.listener.server.emoji.CustomEmojiChangeNameListener;
 import org.javacord.listener.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
 import org.javacord.listener.server.emoji.CustomEmojiDeleteListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.UpdatableFromCache;
 
 import java.util.Collection;
 import java.util.List;

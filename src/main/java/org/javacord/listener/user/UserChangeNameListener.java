@@ -4,7 +4,6 @@ import org.javacord.event.user.UserChangeNameEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.event.user.UserChangeNameEvent;
 
 /**
  * This listener listens to user name changes.

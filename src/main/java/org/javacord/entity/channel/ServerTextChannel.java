@@ -8,7 +8,6 @@ import org.javacord.listener.channel.server.text.ServerTextChannelAttachableList
 import org.javacord.listener.channel.server.text.ServerTextChannelChangeTopicListener;
 import org.javacord.listener.channel.text.WebhooksUpdateListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.Mentionable;
 
 import java.util.Collection;
 import java.util.List;

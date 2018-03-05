@@ -17,9 +17,6 @@ import org.javacord.util.event.ListenerManager;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.emoji.CustomEmoji;
-import org.javacord.entity.emoji.CustomEmojiUpdater;
-import org.javacord.entity.emoji.KnownCustomEmoji;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -7,10 +7,6 @@ import org.javacord.entity.message.Message;
 import org.javacord.event.message.MessageCreateEvent;
 import org.javacord.listener.message.MessageCreateListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.message.Message;
-import org.javacord.event.message.MessageCreateEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

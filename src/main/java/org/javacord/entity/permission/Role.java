@@ -23,11 +23,6 @@ import org.javacord.util.event.ListenerManager;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Mentionable;
-import org.javacord.entity.UpdatableFromCache;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
 
 import java.awt.Color;
 import java.util.Collection;

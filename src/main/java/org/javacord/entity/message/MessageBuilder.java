@@ -5,10 +5,6 @@ import org.javacord.entity.Mentionable;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.message.embed.EmbedBuilder;
 import org.javacord.entity.user.User;
-import org.javacord.entity.Icon;
-import org.javacord.entity.Mentionable;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.user.User;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

@@ -16,18 +16,6 @@ import org.javacord.event.channel.server.voice.ServerVoiceChannelMemberLeaveEven
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.GroupChannel;
-import org.javacord.entity.channel.PrivateChannel;
-import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.impl.ImplGroupChannel;
-import org.javacord.entity.channel.impl.ImplPrivateChannel;
-import org.javacord.entity.channel.impl.ImplServerVoiceChannel;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
-import org.javacord.entity.user.impl.ImplUser;
-import org.javacord.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
-import org.javacord.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
