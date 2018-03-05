@@ -4,10 +4,6 @@ import org.javacord.entity.Icon;
 import org.javacord.entity.channel.ChannelType;
 import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.server.Server;
-import org.javacord.entity.server.invite.impl.ImplInvite;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -119,11 +115,6 @@ public interface Invite {
      * @param reason The audit log reason for the deletion.
      * @return A future to check if the deletion was successful.
      */
-    default CompletableFuture<Void> delete(String reason) {
-        return new RestRequest<Void>(((ImplInvite) this).getApi(), RestMethod.DELETE, RestEndpoint.INVITE)
-                .setUrlParameters(getCode())
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> delete(String reason);
 
 }
