@@ -5,13 +5,16 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.MessageAttachment;
+import org.javacord.util.FileContainer;
 import org.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
+import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link MessageAttachment}.
@@ -133,6 +136,16 @@ public class ImplMessageAttachment implements MessageAttachment {
     @Override
     public Optional<Integer> getWidth() {
         return Optional.ofNullable(width);
+    }
+
+    @Override
+    public CompletableFuture<byte[]> downloadAsByteArray() {
+        return new FileContainer(getProxyUrl()).asByteArray(getApi());
+    }
+
+    @Override
+    public CompletableFuture<BufferedImage> downloadAsImage() {
+        return new FileContainer(getProxyUrl()).asBufferedImage(getApi());
     }
 
     @Override
