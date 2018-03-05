@@ -2,7 +2,6 @@ package org.javacord.entity.user;
 
 import org.javacord.AccountType;
 import org.javacord.DiscordApi;
-import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.Icon;
 import org.javacord.entity.Mentionable;
@@ -39,7 +38,6 @@ import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.listener.user.channel.PrivateChannelCreateListener;
 import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
-import org.javacord.util.ClassHelper;
 import org.javacord.util.event.ListenerManager;
 
 import java.time.Instant;
@@ -273,20 +271,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(
-            PrivateChannelCreateListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                User.class, getId(), PrivateChannelCreateListener.class, listener);
-    }
+    ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(
+            PrivateChannelCreateListener listener);
 
     /**
      * Gets a list with all registered private channel create listeners.
      *
      * @return A list with all registered private channel create listeners.
      */
-    default List<PrivateChannelCreateListener> getPrivateChannelCreateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelCreateListener.class);
-    }
+    List<PrivateChannelCreateListener> getPrivateChannelCreateListeners();
 
     /**
      * Adds a listener, which listens to private channel deletions for this user.
@@ -294,20 +287,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(
-            PrivateChannelDeleteListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                User.class, getId(), PrivateChannelDeleteListener.class, listener);
-    }
+    ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(
+            PrivateChannelDeleteListener listener);
 
     /**
      * Gets a list with all registered private channel delete listeners.
      *
      * @return A list with all registered private channel delete listeners.
      */
-    default List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), PrivateChannelDeleteListener.class);
-    }
+    List<PrivateChannelDeleteListener> getPrivateChannelDeleteListeners();
 
     /**
      * Adds a listener, which listens to group channel creations for this user.
@@ -315,20 +303,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<GroupChannelCreateListener> addGroupChannelCreateListener(
-            GroupChannelCreateListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                User.class, getId(), GroupChannelCreateListener.class, listener);
-    }
+    ListenerManager<GroupChannelCreateListener> addGroupChannelCreateListener(GroupChannelCreateListener listener);
 
     /**
      * Gets a list with all registered group channel create listeners.
      *
      * @return A list with all registered group channel create listeners.
      */
-    default List<GroupChannelCreateListener> getGroupChannelCreateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), GroupChannelCreateListener.class);
-    }
+    List<GroupChannelCreateListener> getGroupChannelCreateListeners();
 
     /**
      * Adds a listener, which listens to group channel name changes for this user.
@@ -336,21 +318,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
-            GroupChannelChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                User.class, getId(), GroupChannelChangeNameListener.class, listener);
-    }
+    ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
+            GroupChannelChangeNameListener listener);
 
     /**
      * Gets a list with all registered group channel change name listeners.
      *
      * @return A list with all registered group channel change name listeners.
      */
-    default List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                User.class, getId(), GroupChannelChangeNameListener.class);
-    }
+    List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners();
 
     /**
      * Adds a listener, which listens to group channel deletions for this user.
@@ -358,20 +334,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
-            GroupChannelDeleteListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                User.class, getId(), GroupChannelDeleteListener.class, listener);
-    }
+    ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(GroupChannelDeleteListener listener);
 
     /**
      * Gets a list with all registered group channel delete listeners.
      *
      * @return A list with all registered group channel delete listeners.
      */
-    default List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), GroupChannelDeleteListener.class);
-    }
+    List<GroupChannelDeleteListener> getGroupChannelDeleteListeners();
 
     /**
      * Adds a listener, which listens to message creates from this user.
@@ -379,19 +349,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), MessageCreateListener.class, listener);
-    }
+    ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener);
 
     /**
      * Gets a list with all registered message create listeners.
      *
      * @return A list with all registered message create listeners.
      */
-    default List<MessageCreateListener> getMessageCreateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), MessageCreateListener.class);
-    }
+    List<MessageCreateListener> getMessageCreateListeners();
 
     /**
      * Adds a listener, which listens to this user starting to type.
@@ -399,19 +364,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserStartTypingListener.class, listener);
-    }
+    ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener);
 
     /**
      * Gets a list with all registered user starts typing listeners.
      *
      * @return A list with all registered user starts typing listeners.
      */
-    default List<UserStartTypingListener> getUserStartTypingListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserStartTypingListener.class);
-    }
+    List<UserStartTypingListener> getUserStartTypingListeners();
 
     /**
      * Adds a listener, which listens to reactions being added by this user.
@@ -419,18 +379,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), ReactionAddListener.class, listener);
-    }
+    ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener);
 
     /**
      * Gets a list with all registered reaction add listeners.
      *
      * @return A list with all registered reaction add listeners.
      */
-    default List<ReactionAddListener> getReactionAddListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ReactionAddListener.class);
-    }
+    List<ReactionAddListener> getReactionAddListeners();
 
     /**
      * Adds a listener, which listens to reactions being removed by this user.
@@ -438,19 +394,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ReactionRemoveListener.class, listener);
-    }
+    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener);
 
     /**
      * Gets a list with all registered reaction remove listeners.
      *
      * @return A list with all registered reaction remove listeners.
      */
-    default List<ReactionRemoveListener> getReactionRemoveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ReactionRemoveListener.class);
-    }
+    List<ReactionRemoveListener> getReactionRemoveListeners();
 
     /**
      * Adds a listener, which listens to this user joining known servers.
@@ -458,19 +409,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberJoinListener> addServerMemberJoinListener(ServerMemberJoinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerMemberJoinListener.class, listener);
-    }
+    ListenerManager<ServerMemberJoinListener> addServerMemberJoinListener(ServerMemberJoinListener listener);
 
     /**
      * Gets a list with all registered server member join listeners.
      *
      * @return A list with all registered server member join listeners.
      */
-    default List<ServerMemberJoinListener> getServerMemberJoinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberJoinListener.class);
-    }
+    List<ServerMemberJoinListener> getServerMemberJoinListeners();
 
     /**
      * Adds a listener, which listens to this user leaving known servers.
@@ -478,20 +424,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberLeaveListener> addServerMemberLeaveListener(
-            ServerMemberLeaveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerMemberLeaveListener.class, listener);
-    }
+    ListenerManager<ServerMemberLeaveListener> addServerMemberLeaveListener(ServerMemberLeaveListener listener);
 
     /**
      * Gets a list with all registered server member leave listeners.
      *
      * @return A list with all registered server member leave listeners.
      */
-    default List<ServerMemberLeaveListener> getServerMemberLeaveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberLeaveListener.class);
-    }
+    List<ServerMemberLeaveListener> getServerMemberLeaveListeners();
 
     /**
      * Adds a listener, which listens to this user getting banned from known servers.
@@ -499,19 +439,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerMemberBanListener.class, listener);
-    }
+    ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener);
 
     /**
      * Gets a list with all registered server member ban listeners.
      *
      * @return A list with all registered server member ban listeners.
      */
-    default List<ServerMemberBanListener> getServerMemberBanListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberBanListener.class);
-    }
+    List<ServerMemberBanListener> getServerMemberBanListeners();
 
     /**
      * Adds a listener, which listens to this user getting unbanned from known servers.
@@ -519,19 +454,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberUnbanListener> addServerMemberUnbanListener(ServerMemberUnbanListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerMemberUnbanListener.class, listener);
-    }
+    ListenerManager<ServerMemberUnbanListener> addServerMemberUnbanListener(ServerMemberUnbanListener listener);
 
     /**
      * Gets a list with all registered server member unban listeners.
      *
      * @return A list with all registered server member unban listeners.
      */
-    default List<ServerMemberUnbanListener> getServerMemberUnbanListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), ServerMemberUnbanListener.class);
-    }
+    List<ServerMemberUnbanListener> getServerMemberUnbanListeners();
 
     /**
      * Adds a listener, which listens to this user's activity changes.
@@ -539,19 +469,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserChangeActivityListener.class, listener);
-    }
+    ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener);
 
     /**
      * Gets a list with all registered user change activity listeners.
      *
      * @return A list with all registered user change activity listeners.
      */
-    default List<UserChangeActivityListener> getUserChangeActivityListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeActivityListener.class);
-    }
+    List<UserChangeActivityListener> getUserChangeActivityListeners();
 
     /**
      * Adds a listener, which listens to this user's status changes.
@@ -559,19 +484,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserChangeStatusListener.class, listener);
-    }
+    ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener);
 
     /**
      * Gets a list with all registered user change status listeners.
      *
      * @return A list with all registered user change status listeners.
      */
-    default List<UserChangeStatusListener> getUserChangeStatusListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeStatusListener.class);
-    }
+    List<UserChangeStatusListener> getUserChangeStatusListeners();
 
     /**
      * Adds a listener, which listens to overwritten permission changes of this user.
@@ -579,22 +499,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                User.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
      *
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
-    default List<ServerChannelChangeOverwrittenPermissionsListener>
-            getServerChannelChangeOverwrittenPermissionsListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                User.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
-    }
+    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
 
     /**
      * Adds a listener, which listens to nickname changes of this user.
@@ -602,20 +515,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(
-            UserChangeNicknameListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserChangeNicknameListener.class, listener);
-    }
+    ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(UserChangeNicknameListener listener);
 
     /**
      * Gets a list with all registered user change nickname listeners.
      *
      * @return A list with all registered user change nickname listeners.
      */
-    default List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeNicknameListener.class);
-    }
+    List<UserChangeNicknameListener> getUserChangeNicknameListeners();
 
     /**
      * Adds a listener, which listens to this user being added to roles.
@@ -623,18 +530,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(), UserRoleAddListener.class, listener);
-    }
+    ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener);
 
     /**
      * Gets a list with all registered user role add listeners.
      *
      * @return A list with all registered user role add listeners.
      */
-    default List<UserRoleAddListener> getUserRoleAddListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserRoleAddListener.class);
-    }
+    List<UserRoleAddListener> getUserRoleAddListeners();
 
     /**
      * Adds a listener, which listens to this user being removed from roles in this server.
@@ -642,19 +545,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserRoleRemoveListener.class, listener);
-    }
+    ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener);
 
     /**
      * Gets a list with all registered user role remove listeners.
      *
      * @return A list with all registered user role remove listeners.
      */
-    default List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserRoleRemoveListener.class);
-    }
+    List<UserRoleRemoveListener> getUserRoleRemoveListeners();
 
     /**
      * Adds a listener, which listens to name changes of this user.
@@ -662,19 +560,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserChangeNameListener.class, listener);
-    }
+    ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener);
 
     /**
      * Gets a list with all registered user change name listeners.
      *
      * @return A list with all registered user change name listeners.
      */
-    default List<UserChangeNameListener> getUserChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeNameListener.class);
-    }
+    List<UserChangeNameListener> getUserChangeNameListeners();
 
     /**
      * Adds a listener, which listens to avatar changes of this user.
@@ -682,19 +575,14 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), UserChangeAvatarListener.class, listener);
-    }
+    ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener);
 
     /**
      * Gets a list with all registered user change avatar listeners.
      *
      * @return A list with all registered user change avatar listeners.
      */
-    default List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId(), UserChangeAvatarListener.class);
-    }
+    List<UserChangeAvatarListener> getUserChangeAvatarListeners();
 
     /**
      * Adds a listener, which listens to this user joining a server voice channel.
@@ -702,21 +590,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
-            ServerVoiceChannelMemberJoinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerVoiceChannelMemberJoinListener.class, listener);
-    }
+    ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
+            ServerVoiceChannelMemberJoinListener listener);
 
     /**
      * Gets a list with all registered server voice channel member join listeners.
      *
      * @return A list with all registered server voice channel member join listeners.
      */
-    default List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                User.class, getId(), ServerVoiceChannelMemberJoinListener.class);
-    }
+    List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners();
 
     /**
      * Adds a listener, which listens to this user leaving a server voice channel.
@@ -724,21 +606,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
-            ServerVoiceChannelMemberLeaveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(User.class, getId(), ServerVoiceChannelMemberLeaveListener.class, listener);
-    }
+    ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
+            ServerVoiceChannelMemberLeaveListener listener);
 
     /**
      * Gets a list with all registered server voice channel member leave listeners.
      *
      * @return A list with all registered server voice channel member leave listeners.
      */
-    default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                User.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
-    }
+    List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners();
 
     /**
      * Adds a listener that implements one or more {@code UserAttachableListener}s.
@@ -750,17 +626,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param <T> The type of the listener.
      * @return The managers for the added listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends UserAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addUserAttachableListener(T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(UserAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(User.class, getId(),
-                                                                                    listenerClass, listener))
-                .collect(Collectors.toList());
-    }
+    <T extends UserAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addUserAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code UserAttachableListener}s.
@@ -768,16 +635,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends UserAttachableListener & ObjectAttachableListener> void removeUserAttachableListener(
-            T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(UserAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(User.class, getId(),
-                                                                                           listenerClass, listener));
-    }
+    <T extends UserAttachableListener & ObjectAttachableListener> void removeUserAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code UserAttachableListener}s and their
@@ -787,10 +645,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return A map with all registered listeners that implement one or more {@code UserAttachableListener}s and their
      * assigned listener classes they listen to.
      */
-    default <T extends UserAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getUserAttachableListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(User.class, getId());
-    }
+    <T extends UserAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>> getUserAttachableListeners();
 
     /**
      * Removes a listener from this user.
@@ -799,10 +654,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T extends UserAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-        ((ImplDiscordApi) getApi()).removeObjectListener(User.class, getId(), listenerClass, listener);
-    }
+    <T extends UserAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<User> getCurrentCachedInstance() {
