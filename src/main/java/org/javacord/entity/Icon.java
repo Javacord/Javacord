@@ -1,10 +1,5 @@
 package org.javacord.entity;
 
-import org.javacord.entity.impl.ImplIcon;
-import org.javacord.util.FileContainer;
-import org.javacord.util.logging.LoggerUtil;
-import org.slf4j.Logger;
-
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.net.URL;
@@ -14,11 +9,6 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a discord icon, for example a server icon or a user avatar.
  */
 public interface Icon {
-
-    /**
-     * The logger of this class.
-     */
-    Logger logger = LoggerUtil.getLogger(Icon.class);
 
     /**
      * Gets the url of the icon.
@@ -41,9 +31,7 @@ public interface Icon {
      *
      * @return The icon as byte array.
      */
-    default CompletableFuture<byte[]> asByteArray() {
-        return new FileContainer(getUrl()).asByteArray(((ImplIcon) this).getApi());
-    }
+    CompletableFuture<byte[]> asByteArray();
 
     /**
      * Gets the input stream for the icon.
@@ -51,17 +39,13 @@ public interface Icon {
      *
      * @return The input stream for the icon.
      */
-    default CompletableFuture<InputStream> asInputStream() {
-        return new FileContainer(getUrl()).asInputStream(((ImplIcon) this).getApi());
-    }
+    CompletableFuture<InputStream> asInputStream();
 
     /**
      * Gets the icon as {@link BufferedImage}.
      *
      * @return The icon as BufferedImage.
      */
-    default CompletableFuture<BufferedImage> asBufferedImage() {
-        return new FileContainer(getUrl()).asBufferedImage(((ImplIcon) this).getApi());
-    }
+    CompletableFuture<BufferedImage> asBufferedImage();
 
 }
