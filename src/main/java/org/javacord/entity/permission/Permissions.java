@@ -11,6 +11,20 @@ import java.util.stream.Collectors;
 public interface Permissions {
 
     /**
+     * Gets the integer containing all allowed permission types.
+     *
+     * @return The integer containing all allowed permission types.
+     */
+    int getAllowedBitmask();
+
+    /**
+     * Gets the integer containing all denied permission types.
+     *
+     * @return The integer containing all denied permission types.
+     */
+    int getDeniedBitmask();
+
+    /**
      * Gets the state of the given type.
      *
      * @param type The type.

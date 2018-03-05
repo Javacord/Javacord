@@ -138,7 +138,7 @@ public class RoleUpdater {
             patchRole = true;
         }
         if (permissions != null) {
-            body.put("permissions", ((ImplPermissions) permissions).getAllowed());
+            body.put("permissions", permissions.getAllowedBitmask());
             patchRole = true;
         }
         if (color != null) {

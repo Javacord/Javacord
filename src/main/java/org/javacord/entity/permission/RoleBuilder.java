@@ -141,7 +141,7 @@ public class RoleBuilder {
             body.put("name", name);
         }
         if (permissions != null) {
-            body.put("permissions", ((ImplPermissions) permissions).getAllowed());
+            body.put("permissions", permissions.getAllowedBitmask());
         }
         if (color != null) {
             body.put("color", color.getRGB() & 0xFFFFFF);
