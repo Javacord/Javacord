@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
+import org.javacord.entity.ApplicationInfo;
 import org.javacord.entity.activity.Activity;
 import org.javacord.entity.activity.ActivityType;
 import org.javacord.entity.activity.impl.ImplActivity;
+import org.javacord.entity.activity.impl.ImplApplicationInfo;
 import org.javacord.entity.channel.GroupChannel;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.emoji.CustomEmoji;
@@ -21,9 +23,13 @@ import org.javacord.entity.message.impl.ImplMessageSet;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilder;
 import org.javacord.entity.server.impl.ImplServerBuilder;
+import org.javacord.entity.server.invite.Invite;
+import org.javacord.entity.server.invite.impl.ImplInvite;
 import org.javacord.entity.user.User;
 import org.javacord.entity.user.UserStatus;
 import org.javacord.entity.user.impl.ImplUser;
+import org.javacord.entity.webhook.Webhook;
+import org.javacord.entity.webhook.impl.ImplWebhook;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.channel.group.GroupChannelChangeNameListener;
@@ -95,6 +101,7 @@ import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.listener.user.channel.PrivateChannelCreateListener;
 import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
+import org.javacord.util.ClassHelper;
 import org.javacord.util.Cleanupable;
 import org.javacord.util.concurrent.ThreadPool;
 import org.javacord.util.event.EventDispatcher;
@@ -1070,8 +1077,28 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public CompletableFuture<ApplicationInfo> getApplicationInfo() {
+        return new RestRequest<ApplicationInfo>(this, RestMethod.GET, RestEndpoint.SELF_INFO)
+                .execute(result -> new ImplApplicationInfo(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Webhook> getWebhookById(long id) {
+        return new RestRequest<Webhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
+                .setUrlParameters(Long.toUnsignedString(id))
+                .execute(result -> new ImplWebhook(this, result.getJsonBody()));
+    }
+
+    @Override
     public Collection<Long> getUnavailableServers() {
         return Collections.unmodifiableCollection(unavailableServers);
+    }
+
+    @Override
+    public CompletableFuture<Invite> getInviteByCode(String code) {
+        return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
+                .setUrlParameters(code)
+                .execute(result -> new ImplInvite(this, result.getJsonBody()));
     }
 
     @Override
@@ -1877,5 +1904,26 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public List<CachedMessageUnpinListener> getCachedMessageUnpinListeners() {
         return getListeners(CachedMessageUnpinListener.class);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(GloballyAttachableListener listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(GloballyAttachableListener.class::isAssignableFrom)
+                .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
+                .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
+                .map(listenerClass -> addListener(listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void removeListener(GloballyAttachableListener listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(GloballyAttachableListener.class::isAssignableFrom)
+                .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
+                .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
+                .forEach(listenerClass -> removeListener(listenerClass, listener));
     }
 }

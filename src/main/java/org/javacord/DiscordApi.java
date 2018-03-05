@@ -6,7 +6,6 @@ import org.javacord.entity.ApplicationInfo;
 import org.javacord.entity.Icon;
 import org.javacord.entity.activity.Activity;
 import org.javacord.entity.activity.ActivityType;
-import org.javacord.entity.activity.impl.ImplApplicationInfo;
 import org.javacord.entity.channel.Channel;
 import org.javacord.entity.channel.ChannelCategory;
 import org.javacord.entity.channel.GroupChannel;
@@ -24,11 +23,9 @@ import org.javacord.entity.permission.Role;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilder;
 import org.javacord.entity.server.invite.Invite;
-import org.javacord.entity.server.invite.impl.ImplInvite;
 import org.javacord.entity.user.User;
 import org.javacord.entity.user.UserStatus;
 import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.webhook.impl.ImplWebhook;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.channel.group.GroupChannelChangeNameListener;
 import org.javacord.listener.channel.group.GroupChannelCreateListener;
@@ -99,15 +96,11 @@ import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.listener.user.channel.PrivateChannelCreateListener;
 import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
-import org.javacord.util.ClassHelper;
 import org.javacord.util.concurrent.ThreadPool;
 import org.javacord.util.event.EventDispatcher;
 import org.javacord.util.event.ListenerManager;
 import org.javacord.util.gateway.DiscordWebSocketAdapter;
 import org.javacord.util.ratelimit.RatelimitManager;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -398,10 +391,7 @@ public interface DiscordApi {
      *
      * @return The application info of the bot.
      */
-    default CompletableFuture<ApplicationInfo> getApplicationInfo() {
-        return new RestRequest<ApplicationInfo>(this, RestMethod.GET, RestEndpoint.SELF_INFO)
-                .execute(result -> new ImplApplicationInfo(this, result.getJsonBody()));
-    }
+    CompletableFuture<ApplicationInfo> getApplicationInfo();
 
     /**
      * Gets a webhook by its id.
@@ -409,11 +399,7 @@ public interface DiscordApi {
      * @param id The id of the webhook.
      * @return The webhook with the given id.
      */
-    default CompletableFuture<Webhook> getWebhookById(long id) {
-        return new RestRequest<Webhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
-                .setUrlParameters(Long.toUnsignedString(id))
-                .execute(result -> new ImplWebhook(this, result.getJsonBody()));
-    }
+    CompletableFuture<Webhook> getWebhookById(long id);
 
     /**
      * Gets a collection with the ids of all unavailable servers.
@@ -428,11 +414,7 @@ public interface DiscordApi {
      * @param code The code of the invite.
      * @return The invite with the given code.
      */
-    default CompletableFuture<Invite> getInviteByCode(String code) {
-        return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
-                .setUrlParameters(code)
-                .execute(result -> new ImplInvite(this, result.getJsonBody()));
-    }
+    CompletableFuture<Invite> getInviteByCode(String code);
 
     /**
      * Creates a server builder which can be used to create servers.
@@ -1711,7 +1693,8 @@ public interface DiscordApi {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(PrivateChannelCreateListener listener);
+    ListenerManager<PrivateChannelCreateListener> addPrivateChannelCreateListener(
+            PrivateChannelCreateListener listener);
 
     /**
      * Gets a list with all registered private channel create listeners.
@@ -1726,7 +1709,8 @@ public interface DiscordApi {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(PrivateChannelDeleteListener listener);
+    ListenerManager<PrivateChannelDeleteListener> addPrivateChannelDeleteListener(
+            PrivateChannelDeleteListener listener);
 
     /**
      * Gets a list with all registered private channel delete listeners.
@@ -2664,16 +2648,7 @@ public interface DiscordApi {
      * @param listener The listener to add.
      * @return The managers for the added listener.
      */
-    @SuppressWarnings("unchecked")
-    default Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(
-            GloballyAttachableListener listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(GloballyAttachableListener.class::isAssignableFrom)
-                .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
-                .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
-                .map(listenerClass -> addListener(listenerClass, listener))
-                .collect(Collectors.toList());
-    }
+    Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(GloballyAttachableListener listener);
 
     /**
      * Removes a {@code GloballyAttachableListener}.
@@ -2689,14 +2664,7 @@ public interface DiscordApi {
      *
      * @param listener The listener to remove.
      */
-    @SuppressWarnings("unchecked")
-    default void removeListener(GloballyAttachableListener listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(GloballyAttachableListener.class::isAssignableFrom)
-                .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
-                .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
-                .forEach(listenerClass -> removeListener(listenerClass, listener));
-    }
+    void removeListener(GloballyAttachableListener listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code GloballyAttachableListener}s and their
