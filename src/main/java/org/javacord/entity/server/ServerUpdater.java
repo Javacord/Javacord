@@ -48,6 +48,14 @@ public interface ServerUpdater {
     ServerUpdater setRegion(Region region);
 
     /**
+     * Queues the explicit content filter level to be updated.
+     *
+     * @param explicitContentFilterLevel The new explicit content filter level of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    ServerUpdater setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel);
+
+    /**
      * Queues the verification level to be updated.
      *
      * @param verificationLevel The new verification level of the server.

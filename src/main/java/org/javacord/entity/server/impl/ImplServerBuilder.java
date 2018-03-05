@@ -6,6 +6,7 @@ import org.javacord.ImplDiscordApi;
 import org.javacord.entity.Icon;
 import org.javacord.entity.Region;
 import org.javacord.entity.server.DefaultMessageNotificationLevel;
+import org.javacord.entity.server.ExplicitContentFilterLevel;
 import org.javacord.entity.server.ServerBuilder;
 import org.javacord.entity.server.VerificationLevel;
 import org.javacord.util.FileContainer;
@@ -46,6 +47,11 @@ public class ImplServerBuilder implements ServerBuilder {
     private Region region = null;
 
     /**
+     * The explicit content filter level.
+     */
+    private ExplicitContentFilterLevel explicitContentFilterLevel = null;
+
+    /**
      * The verification level.
      */
     private VerificationLevel verificationLevel = null;
@@ -83,6 +89,12 @@ public class ImplServerBuilder implements ServerBuilder {
     @Override
     public ServerBuilder setRegion(Region region) {
         this.region = region;
+        return this;
+    }
+
+    @Override
+    public ServerBuilder setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
+        this.explicitContentFilterLevel = explicitContentFilterLevel;
         return this;
     }
 
@@ -168,6 +180,9 @@ public class ImplServerBuilder implements ServerBuilder {
         }
         if (region != null) {
             body.put("region", region.getKey());
+        }
+        if (explicitContentFilterLevel != null) {
+            body.put("explicit_content_filter", explicitContentFilterLevel.getId());
         }
         if (verificationLevel != null) {
             body.put("verification_level", verificationLevel.getId());

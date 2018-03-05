@@ -680,6 +680,20 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Updates the explicit content filter level of the server.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param explicitContentFilterLevel The new explicit content filter level of the server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateExplicitContentFilterLevel(
+            ExplicitContentFilterLevel explicitContentFilterLevel) {
+        return createUpdater().setExplicitContentFilterLevel(explicitContentFilterLevel).update();
+    }
+
+    /**
      * Updates the verification level of the server.
      * <p>
      * If you want to update several settings at once, it's recommended to use the

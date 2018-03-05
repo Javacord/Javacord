@@ -33,6 +33,14 @@ public interface ServerBuilder {
     ServerBuilder setRegion(Region region);
 
     /**
+     * Sets the server's explicit content filter level.
+     *
+     * @param explicitContentFilterLevel The explicit content filter level of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    ServerBuilder setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel);
+
+    /**
      * Sets the server's verification level.
      *
      * @param verificationLevel The verification level of the server.

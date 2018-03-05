@@ -9,6 +9,7 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.server.DefaultMessageNotificationLevel;
+import org.javacord.entity.server.ExplicitContentFilterLevel;
 import org.javacord.entity.server.ServerUpdater;
 import org.javacord.entity.server.VerificationLevel;
 import org.javacord.entity.user.User;
@@ -75,6 +76,11 @@ public class ImplServerUpdater implements ServerUpdater {
      * The region to update.
      */
     private Region region = null;
+
+    /**
+     * The explicit content filter level to update.
+     */
+    private ExplicitContentFilterLevel explicitContentFilterLevel = null;
 
     /**
      * The verification level to update.
@@ -160,6 +166,12 @@ public class ImplServerUpdater implements ServerUpdater {
     @Override
     public ServerUpdater setRegion(Region region) {
         this.region = region;
+        return this;
+    }
+
+    @Override
+    public ServerUpdater setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
+        this.explicitContentFilterLevel = explicitContentFilterLevel;
         return this;
     }
 
@@ -417,6 +429,10 @@ public class ImplServerUpdater implements ServerUpdater {
         }
         if (region != null) {
             body.put("region", region.getKey());
+            patchServer = true;
+        }
+        if (explicitContentFilterLevel != null) {
+            body.put("explicit_content_filter", explicitContentFilterLevel.getId());
             patchServer = true;
         }
         if (verificationLevel != null) {
