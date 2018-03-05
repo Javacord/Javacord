@@ -1,16 +1,10 @@
 package org.javacord.entity.server;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.Icon;
 import org.javacord.entity.Region;
 import org.javacord.entity.UpdatableFromCache;
 import org.javacord.entity.auditlog.AuditLog;
-import org.javacord.entity.auditlog.impl.ImplAuditLog;
 import org.javacord.entity.channel.ChannelCategory;
 import org.javacord.entity.channel.ChannelCategoryBuilder;
 import org.javacord.entity.channel.ServerChannel;
@@ -26,13 +20,9 @@ import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilder;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.RoleBuilder;
-import org.javacord.entity.server.impl.ImplBan;
-import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.server.invite.RichInvite;
-import org.javacord.entity.server.invite.impl.ImplInvite;
 import org.javacord.entity.user.User;
 import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.webhook.impl.ImplWebhook;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.channel.server.ServerChannelChangeNameListener;
 import org.javacord.listener.channel.server.ServerChannelChangeNsfwFlagListener;
@@ -94,22 +84,16 @@ import org.javacord.listener.user.UserChangeNameListener;
 import org.javacord.listener.user.UserChangeNicknameListener;
 import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
-import org.javacord.util.ClassHelper;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -261,12 +245,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param days The amount of days the member has to be inactive.
      * @return The amount of member who would get kicked.
      */
-    default CompletableFuture<Integer> getPruneCount(int days) {
-        return new RestRequest<Integer>(getApi(), RestMethod.GET, RestEndpoint.SERVER_PRUNE)
-                .setUrlParameters(getIdAsString())
-                .addQueryParameter("days", String.valueOf(days))
-                .execute(result -> result.getJsonBody().get("pruned").asInt());
-    }
+    CompletableFuture<Integer> getPruneCount(int days);
 
     /**
      * Kicks all members without a role which were inactive at least the given amount of days.
@@ -285,30 +264,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param reason The audit log reason for the prune.
      * @return The amount of member who got kicked.
      */
-    default CompletableFuture<Integer> pruneMembers(int days, String reason) {
-        return new RestRequest<Integer>(getApi(), RestMethod.POST, RestEndpoint.SERVER_PRUNE)
-                .setUrlParameters(getIdAsString())
-                .addQueryParameter("days", String.valueOf(days))
-                .setAuditLogReason(reason)
-                .execute(result -> result.getJsonBody().get("pruned").asInt());
-    }
+    CompletableFuture<Integer> pruneMembers(int days, String reason);
 
     /**
      * Gets the invites of the server.
      *
      * @return The invites of the server.
      */
-    default CompletableFuture<Collection<RichInvite>> getInvites() {
-        return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_INVITE)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    Collection<RichInvite> invites = new HashSet<>();
-                    for (JsonNode inviteJson : result.getJsonBody()) {
-                        invites.add(new ImplInvite(getApi(), inviteJson));
-                    }
-                    return Collections.unmodifiableCollection(invites);
-                });
-    }
+    CompletableFuture<Collection<RichInvite>> getInvites();
 
     /**
      * Gets a collection with all members of the server.
@@ -621,7 +584,8 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @see #getAllowedPermissionsOf(User)
      */
     default boolean hasAnyPermission(User user, PermissionType... type) {
-        return getAllowedPermissionsOf(user).stream().anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
+        return getAllowedPermissionsOf(user).stream()
+                .anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
     }
 
     /**
@@ -1071,21 +1035,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
-        if (user.isYourself()) {
-            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
-                    .setUrlParameters(getIdAsString())
-                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .setAuditLogReason(reason)
-                    .execute(result -> null);
-        } else {
-            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                    .setUrlParameters(getIdAsString(), user.getIdAsString())
-                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .setAuditLogReason(reason)
-                    .execute(result -> null);
-        }
-    }
+    CompletableFuture<Void> updateNickname(User user, String nickname, String reason);
 
     /**
      * Removes the nickname of the given user.
@@ -1113,22 +1063,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return A future to check if the deletion was successful.
      */
-    default CompletableFuture<Void> delete() {
-        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> delete();
 
     /**
      * Leaves the server.
      *
      * @return A future to check if the bot successfully left the server.
      */
-    default CompletableFuture<Void> leave() {
-        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_SELF)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> leave();
 
     /**
      * Updates the roles of a server member.
@@ -1151,18 +1093,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason) {
-        ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
-        ArrayNode rolesJson = updateNode.putArray("roles");
-        for (Role role : roles) {
-            rolesJson.add(role.getIdAsString());
-        }
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setBody(updateNode)
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason);
 
     /**
      * Reorders the roles of the server.
@@ -1181,21 +1112,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> reorderRoles(List<Role> roles, String reason) {
-        roles = new ArrayList<>(roles); // Copy the list to safely modify it
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        roles.removeIf(Role::isEveryoneRole);
-        for (int i = 0; i < roles.size(); i++) {
-            body.addObject()
-                    .put("id", roles.get(i).getIdAsString())
-                    .put("position", i + 1);
-        }
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.ROLE)
-                .setUrlParameters(getIdAsString())
-                .setBody(body)
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> reorderRoles(List<Role> roles, String reason);
 
     /**
      * Kicks the given user from the server.
@@ -1214,12 +1131,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param reason The audit log reason for this action.
      * @return A future to check if the kick was successful.
      */
-    default CompletableFuture<Void> kickUser(User user, String reason) {
-        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER)
-                .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> kickUser(User user, String reason);
 
     /**
      * Bans the given user from the server.
@@ -1250,15 +1162,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param reason The reason for the ban.
      * @return A future to check if the ban was successful.
      */
-    default CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason) {
-        RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .addQueryParameter("delete-message-days", String.valueOf(deleteMessageDays));
-        if (reason != null) {
-            request.addHeader("reason", reason);
-        }
-        return request.execute(result -> null);
-    }
+    CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason);
 
     /**
      * Unbans the given user from the server.
@@ -1308,12 +1212,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param reason The audit log reason for this action.
      * @return A future to check if the unban was successful.
      */
-    default CompletableFuture<Void> unbanUser(long userId, String reason) {
-        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString(), Long.toUnsignedString(userId))
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
+    CompletableFuture<Void> unbanUser(long userId, String reason);
 
     /**
      * Unbans the given user from the server.
@@ -1337,34 +1236,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return A collection with all server bans.
      */
-    default CompletableFuture<Collection<Ban>> getBans() {
-        return new RestRequest<Collection<Ban>>(getApi(), RestMethod.GET, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    Collection<Ban> bans = new ArrayList<>();
-                    for (JsonNode ban : result.getJsonBody()) {
-                        bans.add(new ImplBan(this, ban));
-                    }
-                    return Collections.unmodifiableCollection(bans);
-                });
-    }
+    CompletableFuture<Collection<Ban>> getBans();
 
     /**
      * Gets a list of all webhooks in this server.
      *
      * @return A list of all webhooks in this server.
      */
-    default CompletableFuture<List<Webhook>> getWebhooks() {
-        return new RestRequest<List<Webhook>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_WEBHOOK)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    List<Webhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhookJson : result.getJsonBody()) {
-                        webhooks.add(new ImplWebhook(getApi(), webhookJson));
-                    }
-                    return Collections.unmodifiableList(webhooks);
-                });
-    }
+    CompletableFuture<List<Webhook>> getWebhooks();
 
     /**
      * Gets the audit log of this server.
@@ -1372,12 +1251,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param limit The maximum amount of audit log entries.
      * @return The audit log.
      */
-    default CompletableFuture<AuditLog> getAuditLog(int limit) {
-        return new RestRequest<AuditLog>(getApi(), RestMethod.GET, RestEndpoint.AUDIT_LOG)
-                .setUrlParameters(getIdAsString())
-                .addQueryParameter("limit", String.valueOf(limit))
-                .execute(result -> new ImplAuditLog(getApi(), result.getJsonBody()));
-    }
+    CompletableFuture<AuditLog> getAuditLog(int limit);
 
     /**
      * Checks if a user has a given permission.
@@ -1495,42 +1369,21 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return A sorted list (by position) with all channel categories of the server.
      */
-    default List<ChannelCategory> getChannelCategories() {
-        return Collections.unmodifiableList(
-                ((ImplServer) this).getUnorderedChannels().stream()
-                        .filter(channel -> channel instanceof ChannelCategory)
-                        .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
-                        .map(channel -> (ChannelCategory) channel)
-                        .collect(Collectors.toList()));
-    }
+    List<ChannelCategory> getChannelCategories();
 
     /**
      * Gets a sorted list (by position) with all text channels of the server.
      *
      * @return A sorted list (by position) with all text channels of the server.
      */
-    default List<ServerTextChannel> getTextChannels() {
-        return Collections.unmodifiableList(
-                ((ImplServer) this).getUnorderedChannels().stream()
-                        .filter(channel -> channel instanceof ServerTextChannel)
-                        .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
-                        .map(channel -> (ServerTextChannel) channel)
-                        .collect(Collectors.toList()));
-    }
+    List<ServerTextChannel> getTextChannels();
 
     /**
      * Gets a sorted list (by position) with all voice channels of the server.
      *
      * @return A sorted list (by position) with all voice channels of the server.
      */
-    default List<ServerVoiceChannel> getVoiceChannels() {
-        return Collections.unmodifiableList(
-                ((ImplServer) this).getUnorderedChannels().stream()
-                        .filter(channel -> channel instanceof ServerVoiceChannel)
-                        .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
-                        .map(channel -> (ServerVoiceChannel) channel)
-                        .collect(Collectors.toList()));
-    }
+    List<ServerVoiceChannel> getVoiceChannels();
 
     /**
      * Gets a channel by its id.
@@ -2035,19 +1888,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), MessageCreateListener.class, listener);
-    }
+    ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener);
 
     /**
      * Gets a list with all registered message create listeners.
      *
      * @return A list with all registered message create listeners.
      */
-    default List<MessageCreateListener> getMessageCreateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), MessageCreateListener.class);
-    }
+    List<MessageCreateListener> getMessageCreateListeners();
 
     /**
      * Adds a listener, which listens to you leaving this server.
@@ -2055,19 +1903,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerLeaveListener> addServerLeaveListener(ServerLeaveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerLeaveListener.class, listener);
-    }
+    ListenerManager<ServerLeaveListener> addServerLeaveListener(ServerLeaveListener listener);
 
     /**
      * Gets a list with all registered server leaves listeners.
      *
      * @return A list with all registered server leaves listeners.
      */
-    default List<ServerLeaveListener> getServerLeaveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerLeaveListener.class);
-    }
+    List<ServerLeaveListener> getServerLeaveListeners();
 
     /**
      * Adds a listener, which listens to this server becoming unavailable.
@@ -2075,21 +1918,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerBecomesUnavailableListener> addServerBecomesUnavailableListener(
-            ServerBecomesUnavailableListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerBecomesUnavailableListener.class, listener);
-    }
+    ListenerManager<ServerBecomesUnavailableListener> addServerBecomesUnavailableListener(
+            ServerBecomesUnavailableListener listener);
 
     /**
      * Gets a list with all registered server becomes unavailable listeners.
      *
      * @return A list with all registered server becomes unavailable listeners.
      */
-    default List<ServerBecomesUnavailableListener> getServerBecomesUnavailableListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerBecomesUnavailableListener.class);
-    }
+    List<ServerBecomesUnavailableListener> getServerBecomesUnavailableListeners();
 
     /**
      * Adds a listener, which listens to users starting to type in this server.
@@ -2097,19 +1934,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserStartTypingListener.class, listener);
-    }
+    ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener);
 
     /**
      * Gets a list with all registered user starts typing listeners.
      *
      * @return A list with all registered user starts typing listeners.
      */
-    default List<UserStartTypingListener> getUserStartTypingListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserStartTypingListener.class);
-    }
+    List<UserStartTypingListener> getUserStartTypingListeners();
 
     /**
      * Adds a listener, which listens to server channel creations in this server.
@@ -2117,20 +1949,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelCreateListener> addServerChannelCreateListener(
-            ServerChannelCreateListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChannelCreateListener.class, listener);
-    }
+    ListenerManager<ServerChannelCreateListener> addServerChannelCreateListener(ServerChannelCreateListener listener);
 
     /**
      * Gets a list with all registered server channel create listeners.
      *
      * @return A list with all registered server channel create listeners.
      */
-    default List<ServerChannelCreateListener> getServerChannelCreateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChannelCreateListener.class);
-    }
+    List<ServerChannelCreateListener> getServerChannelCreateListeners();
 
     /**
      * Adds a listener, which listens to server channel deletions in this server.
@@ -2138,20 +1964,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(
-            ServerChannelDeleteListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChannelDeleteListener.class, listener);
-    }
+    ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(ServerChannelDeleteListener listener);
 
     /**
      * Gets a list with all registered server channel delete listeners.
      *
      * @return A list with all registered server channel delete listeners.
      */
-    default List<ServerChannelDeleteListener> getServerChannelDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChannelDeleteListener.class);
-    }
+    List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
 
     /**
      * Adds a listener, which listens to message deletions in this server.
@@ -2159,19 +1979,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), MessageDeleteListener.class, listener);
-    }
+    ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener);
 
     /**
      * Gets a list with all registered message delete listeners.
      *
      * @return A list with all registered message delete listeners.
      */
-    default List<MessageDeleteListener> getMessageDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), MessageDeleteListener.class);
-    }
+    List<MessageDeleteListener> getMessageDeleteListeners();
 
     /**
      * Adds a listener, which listens to message edits in this server.
@@ -2179,19 +1994,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), MessageEditListener.class, listener);
-    }
+    ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener);
 
     /**
      * Gets a list with all registered message edit listeners.
      *
      * @return A list with all registered message edit listeners.
      */
-    default List<MessageEditListener> getMessageEditListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), MessageEditListener.class);
-    }
+    List<MessageEditListener> getMessageEditListeners();
 
     /**
      * Adds a listener, which listens to reactions being added on this server.
@@ -2199,19 +2009,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ReactionAddListener.class, listener);
-    }
+    ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener);
 
     /**
      * Gets a list with all registered reaction add listeners.
      *
      * @return A list with all registered reaction add listeners.
      */
-    default List<ReactionAddListener> getReactionAddListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ReactionAddListener.class);
-    }
+    List<ReactionAddListener> getReactionAddListeners();
 
     /**
      * Adds a listener, which listens to reactions being removed on this server.
@@ -2219,19 +2024,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ReactionRemoveListener.class, listener);
-    }
+    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener);
 
     /**
      * Gets a list with all registered reaction remove listeners.
      *
      * @return A list with all registered reaction remove listeners.
      */
-    default List<ReactionRemoveListener> getReactionRemoveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ReactionRemoveListener.class);
-    }
+    List<ReactionRemoveListener> getReactionRemoveListeners();
 
     /**
      * Adds a listener, which listens to all reactions being removed at once from a message on this server.
@@ -2239,20 +2039,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
-            ReactionRemoveAllListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ReactionRemoveAllListener.class, listener);
-    }
+    ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(ReactionRemoveAllListener listener);
 
     /**
      * Gets a list with all registered reaction remove all listeners.
      *
      * @return A list with all registered reaction remove all listeners.
      */
-    default List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ReactionRemoveAllListener.class);
-    }
+    List<ReactionRemoveAllListener> getReactionRemoveAllListeners();
 
     /**
      * Adds a listener, which listens to users joining this server.
@@ -2260,19 +2054,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberJoinListener> addServerMemberJoinListener(ServerMemberJoinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerMemberJoinListener.class, listener);
-    }
+    ListenerManager<ServerMemberJoinListener> addServerMemberJoinListener(ServerMemberJoinListener listener);
 
     /**
      * Gets a list with all registered server member join listeners.
      *
      * @return A list with all registered server member join listeners.
      */
-    default List<ServerMemberJoinListener> getServerMemberJoinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberJoinListener.class);
-    }
+    List<ServerMemberJoinListener> getServerMemberJoinListeners();
 
     /**
      * Adds a listener, which listens to users leaving this server.
@@ -2280,20 +2069,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberLeaveListener> addServerMemberLeaveListener(
-            ServerMemberLeaveListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerMemberLeaveListener.class, listener);
-    }
+    ListenerManager<ServerMemberLeaveListener> addServerMemberLeaveListener(ServerMemberLeaveListener listener);
 
     /**
      * Gets a list with all registered server member leave listeners.
      *
      * @return A list with all registered server member leave listeners.
      */
-    default List<ServerMemberLeaveListener> getServerMemberLeaveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberLeaveListener.class);
-    }
+    List<ServerMemberLeaveListener> getServerMemberLeaveListeners();
 
     /**
      * Adds a listener, which listens to users getting banned from this server.
@@ -2301,19 +2084,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerMemberBanListener.class, listener);
-    }
+    ListenerManager<ServerMemberBanListener> addServerMemberBanListener(ServerMemberBanListener listener);
 
     /**
      * Gets a list with all registered server member ban listeners.
      *
      * @return A list with all registered server member ban listeners.
      */
-    default List<ServerMemberBanListener> getServerMemberBanListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberBanListener.class);
-    }
+    List<ServerMemberBanListener> getServerMemberBanListeners();
 
     /**
      * Adds a listener, which listens to users getting unbanned from this server.
@@ -2321,19 +2099,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerMemberUnbanListener> addServerMemberUnbanListener(ServerMemberUnbanListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerMemberUnbanListener.class, listener);
-    }
+    ListenerManager<ServerMemberUnbanListener> addServerMemberUnbanListener(ServerMemberUnbanListener listener);
 
     /**
      * Gets a list with all registered server member unban listeners.
      *
      * @return A list with all registered server member unban listeners.
      */
-    default List<ServerMemberUnbanListener> getServerMemberUnbanListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerMemberUnbanListener.class);
-    }
+    List<ServerMemberUnbanListener> getServerMemberUnbanListeners();
 
     /**
      * Adds a listener, which listens to server name changes.
@@ -2341,19 +2114,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeNameListener> addServerChangeNameListener(ServerChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeNameListener.class, listener);
-    }
+    ListenerManager<ServerChangeNameListener> addServerChangeNameListener(ServerChangeNameListener listener);
 
     /**
      * Gets a list with all registered server change name listeners.
      *
      * @return A list with all registered server change name listeners.
      */
-    default List<ServerChangeNameListener> getServerChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeNameListener.class);
-    }
+    List<ServerChangeNameListener> getServerChangeNameListeners();
 
     /**
      * Adds a listener, which listens to server icon changes.
@@ -2361,19 +2129,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeIconListener> addServerChangeIconListener(ServerChangeIconListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeIconListener.class, listener);
-    }
+    ListenerManager<ServerChangeIconListener> addServerChangeIconListener(ServerChangeIconListener listener);
 
     /**
      * Gets a list with all registered server change icon listeners.
      *
      * @return A list with all registered server change icon listeners.
      */
-    default List<ServerChangeIconListener> getServerChangeIconListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeIconListener.class);
-    }
+    List<ServerChangeIconListener> getServerChangeIconListeners();
 
     /**
      * Adds a listener, which listens to server splash changes.
@@ -2381,19 +2144,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(ServerChangeSplashListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeSplashListener.class, listener);
-    }
+    ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(ServerChangeSplashListener listener);
 
     /**
      * Gets a list with all registered server change splash listeners.
      *
      * @return A list with all registered server change splash listeners.
      */
-    default List<ServerChangeSplashListener> getServerChangeSplashListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeSplashListener.class);
-    }
+    List<ServerChangeSplashListener> getServerChangeSplashListeners();
 
     /**
      * Adds a listener, which listens to server verification level changes.
@@ -2401,21 +2159,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeVerificationLevelListener> addServerChangeVerificationLevelListener(
-            ServerChangeVerificationLevelListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeVerificationLevelListener.class, listener);
-    }
+    ListenerManager<ServerChangeVerificationLevelListener> addServerChangeVerificationLevelListener(
+            ServerChangeVerificationLevelListener listener);
 
     /**
      * Gets a list with all registered server change verification level listeners.
      *
      * @return A list with all registered server change verification level listeners.
      */
-    default List<ServerChangeVerificationLevelListener> getServerChangeVerificationLevelListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), ServerChangeVerificationLevelListener.class);
-    }
+    List<ServerChangeVerificationLevelListener> getServerChangeVerificationLevelListeners();
 
     /**
      * Adds a listener, which listens to server region changes.
@@ -2423,20 +2175,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeRegionListener> addServerChangeRegionListener(
-            ServerChangeRegionListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeRegionListener.class, listener);
-    }
+    ListenerManager<ServerChangeRegionListener> addServerChangeRegionListener(ServerChangeRegionListener listener);
 
     /**
      * Gets a list with all registered server change region listeners.
      *
      * @return A list with all registered server change region listeners.
      */
-    default List<ServerChangeRegionListener> getServerChangeRegionListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeRegionListener.class);
-    }
+    List<ServerChangeRegionListener> getServerChangeRegionListeners();
 
     /**
      * Adds a listener, which listens to server default message notification level changes.
@@ -2444,23 +2190,16 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
+    ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
     addServerChangeDefaultMessageNotificationLevelListener(
-            ServerChangeDefaultMessageNotificationLevelListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChangeDefaultMessageNotificationLevelListener.class, listener);
-    }
+            ServerChangeDefaultMessageNotificationLevelListener listener);
 
     /**
      * Gets a list with all registered server change default message notification level listeners.
      *
      * @return A list with all registered server change default message notification level listeners.
      */
-    default List<ServerChangeDefaultMessageNotificationLevelListener>
-    getServerChangeDefaultMessageNotificationLevelListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), ServerChangeDefaultMessageNotificationLevelListener.class);
-    }
+    List<ServerChangeDefaultMessageNotificationLevelListener> getServerChangeDefaultMessageNotificationLevelListeners();
 
     /**
      * Adds a listener, which listens to server owner changes.
@@ -2468,20 +2207,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeOwnerListener> addServerChangeOwnerListener(
-            ServerChangeOwnerListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeOwnerListener.class, listener);
-    }
+    ListenerManager<ServerChangeOwnerListener> addServerChangeOwnerListener(ServerChangeOwnerListener listener);
 
     /**
      * Gets a list with all registered server change owner listeners.
      *
      * @return A list with all registered server change owner listeners.
      */
-    default List<ServerChangeOwnerListener> getServerChangeOwnerListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), ServerChangeOwnerListener.class);
-    }
+    List<ServerChangeOwnerListener> getServerChangeOwnerListeners();
 
     /**
      * Adds a listener, which listens to server explicit content filter level changes.
@@ -2489,21 +2222,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeExplicitContentFilterLevelListener>
-    addServerChangeExplicitContentFilterLevelListener(ServerChangeExplicitContentFilterLevelListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChangeExplicitContentFilterLevelListener.class, listener);
-    }
+    ListenerManager<ServerChangeExplicitContentFilterLevelListener> addServerChangeExplicitContentFilterLevelListener(
+            ServerChangeExplicitContentFilterLevelListener listener);
 
     /**
      * Gets a list with all registered server change explicit content filter level listeners.
      *
      * @return A list with all registered server change explicit content filter level listeners.
      */
-    default List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), ServerChangeExplicitContentFilterLevelListener.class);
-    }
+    List<ServerChangeExplicitContentFilterLevelListener> getServerChangeExplicitContentFilterLevelListeners();
 
     /**
      * Adds a listener, which listens to server multi factor authentication level changes.
@@ -2511,22 +2238,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
-    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class, listener);
-    }
+    ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
+    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener);
 
     /**
      * Gets a list with all registered server change multi factor authentication level listeners.
      *
      * @return A list with all registered server change multi factor authentication level listeners.
      */
-    default List<ServerChangeMultiFactorAuthenticationLevelListener>
-    getServerChangeMultiFactorAuthenticationLevelListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class);
-    }
+    List<ServerChangeMultiFactorAuthenticationLevelListener> getServerChangeMultiFactorAuthenticationLevelListeners();
 
     /**
      * Adds a listener, which listens to system channel changes on this server.
@@ -2534,21 +2254,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeSystemChannelListener> addServerChangeSystemChannelListener(
-            ServerChangeSystemChannelListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeSystemChannelListener.class, listener);
-    }
+    ListenerManager<ServerChangeSystemChannelListener> addServerChangeSystemChannelListener(
+            ServerChangeSystemChannelListener listener);
 
     /**
      * Gets a list with all registered server change system channel listeners.
      *
      * @return A list with all registered server change system channel listeners.
      */
-    default List<ServerChangeSystemChannelListener> getServerChangeSystemChannelListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChangeSystemChannelListener.class);
-    }
+    List<ServerChangeSystemChannelListener> getServerChangeSystemChannelListeners();
 
     /**
      * Adds a listener, which listens to afk channel changes on this server.
@@ -2556,21 +2270,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeAfkChannelListener> addServerChangeAfkChannelListener(
-            ServerChangeAfkChannelListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeAfkChannelListener.class, listener);
-    }
+    ListenerManager<ServerChangeAfkChannelListener> addServerChangeAfkChannelListener(
+            ServerChangeAfkChannelListener listener);
 
     /**
      * Gets a list with all registered server change afk channel listeners.
      *
      * @return A list with all registered server change afk channel listeners.
      */
-    default List<ServerChangeAfkChannelListener> getServerChangeAfkChannelListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChangeAfkChannelListener.class);
-    }
+    List<ServerChangeAfkChannelListener> getServerChangeAfkChannelListeners();
 
     /**
      * Adds a listener, which listens to afk timeout changes on this server.
@@ -2578,21 +2286,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChangeAfkTimeoutListener> addServerChangeAfkTimeoutListener(
-            ServerChangeAfkTimeoutListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerChangeAfkTimeoutListener.class, listener);
-    }
+    ListenerManager<ServerChangeAfkTimeoutListener> addServerChangeAfkTimeoutListener(
+            ServerChangeAfkTimeoutListener listener);
 
     /**
      * Gets a list with all registered server change afk timeout listeners.
      *
      * @return A list with all registered server change afk timeout listeners.
      */
-    default List<ServerChangeAfkTimeoutListener> getServerChangeAfkTimeoutListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChangeAfkTimeoutListener.class);
-    }
+    List<ServerChangeAfkTimeoutListener> getServerChangeAfkTimeoutListeners();
 
     /**
      * Adds a listener, which listens to server channel name changes in this server.
@@ -2600,21 +2302,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
-            ServerChannelChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChannelChangeNameListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
+            ServerChannelChangeNameListener listener);
 
     /**
      * Gets a list with all registered server channel change name listeners.
      *
      * @return A list with all registered server channel change name listeners.
      */
-    default List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChannelChangeNameListener.class);
-    }
+    List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners();
 
     /**
      * Adds a listener, which listens to server channel nsfw flag changes in this server.
@@ -2622,21 +2318,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
-            ServerChannelChangeNsfwFlagListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChannelChangeNsfwFlagListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
+            ServerChannelChangeNsfwFlagListener listener);
 
     /**
      * Gets a list with all registered server channel change nsfw flag listeners.
      *
      * @return A list with all registered server channel change nsfw flag listeners.
      */
-    default List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChannelChangeNsfwFlagListener.class);
-    }
+    List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners();
 
     /**
      * Adds a listener, which listens to server channel position changes in this server.
@@ -2644,21 +2334,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
-            ServerChannelChangePositionListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChannelChangePositionListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
+            ServerChannelChangePositionListener listener);
 
     /**
      * Gets a list with all registered server channel change position listeners.
      *
      * @return A list with all registered server channel change position listeners.
      */
-    default List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChannelChangePositionListener.class);
-    }
+    List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
 
     /**
      * Adds a listener, which listens to custom emoji creations in this server.
@@ -2666,20 +2350,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CustomEmojiCreateListener> addCustomEmojiCreateListener(
-            CustomEmojiCreateListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), CustomEmojiCreateListener.class, listener);
-    }
+    ListenerManager<CustomEmojiCreateListener> addCustomEmojiCreateListener(CustomEmojiCreateListener listener);
 
     /**
      * Gets a list with all registered custom emoji create listeners.
      *
      * @return A list with all registered custom emoji create listeners.
      */
-    default List<CustomEmojiCreateListener> getCustomEmojiCreateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), CustomEmojiCreateListener.class);
-    }
+    List<CustomEmojiCreateListener> getCustomEmojiCreateListeners();
 
     /**
      * Adds a listener, which listens to custom emoji name changes in this server.
@@ -2687,21 +2365,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
-            CustomEmojiChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), CustomEmojiChangeNameListener.class, listener);
-    }
+    ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
+            CustomEmojiChangeNameListener listener);
 
     /**
      * Gets a list with all registered custom emoji change name listeners.
      *
      * @return A list with all registered custom emoji change name listeners.
      */
-    default List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), CustomEmojiChangeNameListener.class);
-    }
+    List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners();
 
     /**
      * Adds a listener, which listens to custom emoji whitelisted roles changes in this server.
@@ -2709,21 +2381,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
-            CustomEmojiChangeWhitelistedRolesListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class, listener);
-    }
+    ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
+            CustomEmojiChangeWhitelistedRolesListener listener);
 
     /**
      * Gets a list with all registered custom emoji change whitelisted roles listeners.
      *
      * @return A list with all registered custom emoji change whitelisted roles listeners.
      */
-    default List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class);
-    }
+    List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners();
 
     /**
      * Adds a listener, which listens to custom emoji deletions in this server.
@@ -2731,20 +2397,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(
-            CustomEmojiDeleteListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), CustomEmojiDeleteListener.class, listener);
-    }
+    ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(CustomEmojiDeleteListener listener);
 
     /**
      * Gets a list with all registered custom emoji delete listeners.
      *
      * @return A list with all registered custom emoji delete listeners.
      */
-    default List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), CustomEmojiDeleteListener.class);
-    }
+    List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners();
 
     /**
      * Adds a listener, which listens to activity changes of users in this server.
@@ -2752,19 +2412,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserChangeActivityListener.class, listener);
-    }
+    ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener);
 
     /**
      * Gets a list with all registered user change activity listeners.
      *
      * @return A list with all registered custom emoji create listeners.
      */
-    default List<UserChangeActivityListener> getUserChangeActivityListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeActivityListener.class);
-    }
+    List<UserChangeActivityListener> getUserChangeActivityListeners();
 
     /**
      * Adds a listener, which listens to status changes of users in this server.
@@ -2772,19 +2427,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserChangeStatusListener.class, listener);
-    }
+    ListenerManager<UserChangeStatusListener> addUserChangeStatusListener(UserChangeStatusListener listener);
 
     /**
      * Gets a list with all registered user change status listeners.
      *
      * @return A list with all registered custom emoji create listeners.
      */
-    default List<UserChangeStatusListener> getUserChangeStatusListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeStatusListener.class);
-    }
+    List<UserChangeStatusListener> getUserChangeStatusListeners();
 
     /**
      * Adds a listener, which listens to role color changes in this server.
@@ -2792,19 +2442,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), RoleChangeColorListener.class, listener);
-    }
+    ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener);
 
     /**
      * Gets a list with all registered role change color listeners.
      *
      * @return A list with all registered role change color listeners.
      */
-    default List<RoleChangeColorListener> getRoleChangeColorListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeColorListener.class);
-    }
+    List<RoleChangeColorListener> getRoleChangeColorListeners();
 
     /**
      * Adds a listener, which listens to role hoist changes in this server.
@@ -2812,19 +2457,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleChangeHoistListener> addRoleChangeHoistListener(RoleChangeHoistListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), RoleChangeHoistListener.class, listener);
-    }
+    ListenerManager<RoleChangeHoistListener> addRoleChangeHoistListener(RoleChangeHoistListener listener);
 
     /**
      * Gets a list with all registered role change hoist listeners.
      *
      * @return A list with all registered role change hoist listeners.
      */
-    default List<RoleChangeHoistListener> getRoleChangeHoistListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeHoistListener.class);
-    }
+    List<RoleChangeHoistListener> getRoleChangeHoistListeners();
 
     /**
      * Adds a listener, which listens to role mentionable changes in this server.
@@ -2832,21 +2472,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleChangeMentionableListener> addRoleChangeMentionableListener(
-            RoleChangeMentionableListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), RoleChangeMentionableListener.class, listener);
-    }
+    ListenerManager<RoleChangeMentionableListener> addRoleChangeMentionableListener(
+            RoleChangeMentionableListener listener);
 
     /**
      * Gets a list with all registered role change mentionable listeners.
      *
      * @return A list with all registered role change mentionable listeners.
      */
-    default List<RoleChangeMentionableListener> getRoleChangeMentionableListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), RoleChangeMentionableListener.class);
-    }
+    List<RoleChangeMentionableListener> getRoleChangeMentionableListeners();
 
     /**
      * Adds a listener, which listens to role name changes in this server.
@@ -2854,19 +2488,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), RoleChangeNameListener.class, listener);
-    }
+    ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener);
 
     /**
      * Gets a list with all registered role change name listeners.
      *
      * @return A list with all registered role change name listeners.
      */
-    default List<RoleChangeNameListener> getRoleChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangeNameListener.class);
-    }
+    List<RoleChangeNameListener> getRoleChangeNameListeners();
 
     /**
      * Adds a listener, which listens to role permission changes in this server.
@@ -2874,21 +2503,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
-            RoleChangePermissionsListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), RoleChangePermissionsListener.class, listener);
-    }
+    ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
+            RoleChangePermissionsListener listener);
 
     /**
      * Gets a list with all registered role change permissions listeners.
      *
      * @return A list with all registered role change permissions listeners.
      */
-    default List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), RoleChangePermissionsListener.class);
-    }
+    List<RoleChangePermissionsListener> getRoleChangePermissionsListeners();
 
     /**
      * Adds a listener, which listens to role position changes in this server.
@@ -2896,20 +2519,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(
-            RoleChangePositionListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), RoleChangePositionListener.class, listener);
-    }
+    ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(RoleChangePositionListener listener);
 
     /**
      * Gets a list with all registered role change position listeners.
      *
      * @return A list with all registered role change position listeners.
      */
-    default List<RoleChangePositionListener> getRoleChangePositionListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleChangePositionListener.class);
-    }
+    List<RoleChangePositionListener> getRoleChangePositionListeners();
 
     /**
      * Adds a listener, which listens to overwritten permission changes in this server.
@@ -2917,22 +2534,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
-    }
+    ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
+    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
      *
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
-    default List<ServerChannelChangeOverwrittenPermissionsListener>
-    getServerChannelChangeOverwrittenPermissionsListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
-    }
+    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
 
     /**
      * Adds a listener, which listens to role creations in this server.
@@ -2940,19 +2550,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleCreateListener> addRoleCreateListener(RoleCreateListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), RoleCreateListener.class, listener);
-    }
+    ListenerManager<RoleCreateListener> addRoleCreateListener(RoleCreateListener listener);
 
     /**
      * Gets a list with all registered role create listeners.
      *
      * @return A list with all registered role create listeners.
      */
-    default List<RoleCreateListener> getRoleCreateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleCreateListener.class);
-    }
+    List<RoleCreateListener> getRoleCreateListeners();
 
     /**
      * Adds a listener, which listens to role deletions in this server.
@@ -2960,18 +2565,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(), RoleDeleteListener.class, listener);
-    }
+    ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener);
 
     /**
      * Gets a list with all registered role delete listeners.
      *
      * @return A list with all registered role delete listeners.
      */
-    default List<RoleDeleteListener> getRoleDeleteListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), RoleDeleteListener.class);
-    }
+    List<RoleDeleteListener> getRoleDeleteListeners();
 
     /**
      * Adds a listener, which listens to user nickname changes in this server.
@@ -2979,20 +2580,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(
-            UserChangeNicknameListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), UserChangeNicknameListener.class, listener);
-    }
+    ListenerManager<UserChangeNicknameListener> addUserChangeNicknameListener(UserChangeNicknameListener listener);
 
     /**
      * Gets a list with all registered user change nickname listeners.
      *
      * @return A list with all registered user change nickname listeners.
      */
-    default List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeNicknameListener.class);
-    }
+    List<UserChangeNicknameListener> getUserChangeNicknameListeners();
 
     /**
      * Adds a listener, which listens to server text channel topic changes in this server.
@@ -3000,21 +2595,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerTextChannelChangeTopicListener> addServerTextChannelChangeTopicListener(
-            ServerTextChannelChangeTopicListener listener) {
-        return ((ImplDiscordApi) getApi()).addObjectListener(
-                Server.class, getId(), ServerTextChannelChangeTopicListener.class, listener);
-    }
+    ListenerManager<ServerTextChannelChangeTopicListener> addServerTextChannelChangeTopicListener(
+            ServerTextChannelChangeTopicListener listener);
 
     /**
      * Gets a list with all registered server text channel change topic listeners.
      *
      * @return A list with all registered server text channel change topic listeners.
      */
-    default List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), ServerTextChannelChangeTopicListener.class);
-    }
+    List<ServerTextChannelChangeTopicListener> getServerTextChannelChangeTopicListeners();
 
     /**
      * Adds a listener, which listens to users being added to roles in this server.
@@ -3022,19 +2611,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserRoleAddListener.class, listener);
-    }
+    ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener);
 
     /**
      * Gets a list with all registered user role add listeners.
      *
      * @return A list with all registered user role add listeners.
      */
-    default List<UserRoleAddListener> getUserRoleAddListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserRoleAddListener.class);
-    }
+    List<UserRoleAddListener> getUserRoleAddListeners();
 
     /**
      * Adds a listener, which listens to users being removed from roles in this server.
@@ -3042,19 +2626,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserRoleRemoveListener.class, listener);
-    }
+    ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener);
 
     /**
      * Gets a list with all registered user role remove listeners.
      *
      * @return A list with all registered user role remove listeners.
      */
-    default List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserRoleRemoveListener.class);
-    }
+    List<UserRoleRemoveListener> getUserRoleRemoveListeners();
 
     /**
      * Adds a listener, which listens to members of this server changing their name.
@@ -3062,19 +2641,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserChangeNameListener.class, listener);
-    }
+    ListenerManager<UserChangeNameListener> addUserChangeNameListener(UserChangeNameListener listener);
 
     /**
      * Gets a list with all registered user change name listeners.
      *
      * @return A list with all registered user change name listeners.
      */
-    default List<UserChangeNameListener> getUserChangeNameListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeNameListener.class);
-    }
+    List<UserChangeNameListener> getUserChangeNameListeners();
 
     /**
      * Adds a listener, which listens to members of this server changing their avatar.
@@ -3082,19 +2656,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), UserChangeAvatarListener.class, listener);
-    }
+    ListenerManager<UserChangeAvatarListener> addUserChangeAvatarListener(UserChangeAvatarListener listener);
 
     /**
      * Gets a list with all registered user change avatar listeners.
      *
      * @return A list with all registered user change avatar listeners.
      */
-    default List<UserChangeAvatarListener> getUserChangeAvatarListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), UserChangeAvatarListener.class);
-    }
+    List<UserChangeAvatarListener> getUserChangeAvatarListeners();
 
     /**
      * Adds a listener, which listens to users joining a server voice channel on this server.
@@ -3102,21 +2671,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
-            ServerVoiceChannelMemberJoinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerVoiceChannelMemberJoinListener.class, listener);
-    }
+    ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
+            ServerVoiceChannelMemberJoinListener listener);
 
     /**
      * Gets a list with all registered server voice channel member join listeners.
      *
      * @return A list with all registered server voice channel member join listeners.
      */
-    default List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerVoiceChannelMemberJoinListener.class);
-    }
+    List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners();
 
     /**
      * Adds a listener, which listens to users leaving a server voice channel on this server.
@@ -3124,21 +2687,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
-            ServerVoiceChannelMemberLeaveListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerVoiceChannelMemberLeaveListener.class, listener);
-    }
+    ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
+            ServerVoiceChannelMemberLeaveListener listener);
 
     /**
      * Gets a list with all registered server voice channel member leave listeners.
      *
      * @return A list with all registered server voice channel member leave listeners.
      */
-    default List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerVoiceChannelMemberLeaveListener.class);
-    }
+    List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners();
 
     /**
      * Adds a listener, which listens to server voice channel bitrate changes on this server.
@@ -3146,21 +2703,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
-            ServerVoiceChannelChangeBitrateListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerVoiceChannelChangeBitrateListener.class, listener);
-    }
+    ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
+            ServerVoiceChannelChangeBitrateListener listener);
 
     /**
      * Gets a list with all registered server voice channel change bitrate listeners.
      *
      * @return A list with all registered server voice channel change bitrate listeners.
      */
-    default List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerVoiceChannelChangeBitrateListener.class);
-    }
+    List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners();
 
     /**
      * Adds a listener, which listens to server voice channel user limit changes on this server.
@@ -3168,21 +2719,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ServerVoiceChannelChangeUserLimitListener> addServerVoiceChannelChangeUserLimitListener(
-            ServerVoiceChannelChangeUserLimitListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ServerVoiceChannelChangeUserLimitListener.class, listener);
-    }
+    ListenerManager<ServerVoiceChannelChangeUserLimitListener> addServerVoiceChannelChangeUserLimitListener(
+            ServerVoiceChannelChangeUserLimitListener listener);
 
     /**
      * Gets a list with all registered server voice channel change user limit listeners.
      *
      * @return A list with all registered server voice channel change user limit listeners.
      */
-    default List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(
-                Server.class, getId(), ServerVoiceChannelChangeUserLimitListener.class);
-    }
+    List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners();
 
     /**
      * Adds a listener, which listens to webhook updates on this server.
@@ -3190,19 +2735,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<WebhooksUpdateListener> addWebhooksUpdateListener(WebhooksUpdateListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), WebhooksUpdateListener.class, listener);
-    }
+    ListenerManager<WebhooksUpdateListener> addWebhooksUpdateListener(WebhooksUpdateListener listener);
 
     /**
      * Gets a list with all registered webhooks update listeners.
      *
      * @return A list with all registered webhooks update listeners.
      */
-    default List<WebhooksUpdateListener> getWebhooksUpdateListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), WebhooksUpdateListener.class);
-    }
+    List<WebhooksUpdateListener> getWebhooksUpdateListeners();
 
     /**
      * Adds a listener, which listens to all pin updates in channels of this server.
@@ -3210,21 +2750,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<ChannelPinsUpdateListener> addChannelPinsUpdateListener(
-            ChannelPinsUpdateListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), ChannelPinsUpdateListener.class, listener);
-    }
+    ListenerManager<ChannelPinsUpdateListener> addChannelPinsUpdateListener(ChannelPinsUpdateListener listener);
 
     /**
      * Gets a list with all registered channel pins update listeners.
      *
      * @return A list with all registered channel pins update listeners.
      */
-    default List<ChannelPinsUpdateListener> getChannelPinsUpdateListeners() {
-        return ((ImplDiscordApi) getApi())
-                .getObjectListeners(Server.class, getId(), ChannelPinsUpdateListener.class);
-    }
+    List<ChannelPinsUpdateListener> getChannelPinsUpdateListeners();
 
     /**
      * Adds a listener, which listens to all cached message pins in this server.
@@ -3232,19 +2765,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), CachedMessagePinListener.class, listener);
-    }
+    ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener);
 
     /**
      * Gets a list with all registered cached message pin listeners.
      *
      * @return A list with all registered cached message pin listeners.
      */
-    default List<CachedMessagePinListener> getCachedMessagePinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), CachedMessagePinListener.class);
-    }
+    List<CachedMessagePinListener> getCachedMessagePinListeners();
 
     /**
      * Adds a listener, which listens to all cached message unpins in this server.
@@ -3252,19 +2780,14 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(CachedMessageUnpinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Server.class, getId(), CachedMessageUnpinListener.class, listener);
-    }
+    ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(CachedMessageUnpinListener listener);
 
     /**
      * Gets a list with all registered cached message unpin listeners.
      *
      * @return A list with all registered cached message unpin listeners.
      */
-    default List<CachedMessageUnpinListener> getCachedMessageUnpinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId(), CachedMessageUnpinListener.class);
-    }
+    List<CachedMessageUnpinListener> getCachedMessageUnpinListeners();
 
     /**
      * Adds a listener that implements one or more {@code ServerAttachableListener}s.
@@ -3276,17 +2799,8 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param <T> The type of the listener.
      * @return The managers for the added listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ServerAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addServerAttachableListener(T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(ServerAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> ((ImplDiscordApi) getApi()).addObjectListener(Server.class, getId(),
-                                                                                    listenerClass, listener))
-                .collect(Collectors.toList());
-    }
+    <T extends ServerAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addServerAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code ServerAttachableListener}s.
@@ -3294,16 +2808,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    @SuppressWarnings("unchecked")
-    default <T extends ServerAttachableListener & ObjectAttachableListener> void removeServerAttachableListener(
-            T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(ServerAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> ((ImplDiscordApi) getApi()).removeObjectListener(Server.class, getId(),
-                                                                                           listenerClass, listener));
-    }
+    <T extends ServerAttachableListener & ObjectAttachableListener> void removeServerAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code ServerAttachableListener}s and their
@@ -3313,10 +2818,8 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return A map with all registered listeners that implement one or more {@code ServerAttachableListener}s and
      * their assigned listener classes they listen to.
      */
-    default <T extends ServerAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerAttachableListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Server.class, getId());
-    }
+    <T extends ServerAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getServerAttachableListeners();
 
     /**
      * Removes a listener from this server.
@@ -3325,10 +2828,8 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    default <T extends ServerAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-        ((ImplDiscordApi) getApi()).removeObjectListener(Server.class, getId(), listenerClass, listener);
-    }
+    <T extends ServerAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<Server> getCurrentCachedInstance() {
