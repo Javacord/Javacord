@@ -27,7 +27,6 @@ import org.javacord.listener.message.MessageEditListener;
 import org.javacord.listener.message.reaction.ReactionAddListener;
 import org.javacord.listener.message.reaction.ReactionRemoveAllListener;
 import org.javacord.listener.message.reaction.ReactionRemoveListener;
-import org.javacord.util.ClassHelper;
 import org.javacord.util.DiscordRegexPattern;
 import org.javacord.util.event.ListenerManager;
 
@@ -43,7 +42,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -485,8 +483,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static ListenerManager<MessageDeleteListener> addMessageDeleteListener(
             DiscordApi api, long messageId, MessageDeleteListener listener) {
-        return ((ImplDiscordApi) api).addObjectListener(
-                Message.class, messageId, MessageDeleteListener.class, listener);
+        return api.getUncachedMessageUtil().addMessageDeleteListener(messageId, listener);
     }
 
     /**
@@ -499,7 +496,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static ListenerManager<MessageDeleteListener> addMessageDeleteListener(
             DiscordApi api, Message message, MessageDeleteListener listener) {
-        return addMessageDeleteListener(api, message.getId(), listener);
+        return api.getUncachedMessageUtil().addMessageDeleteListener(message, listener);
     }
 
     /**
@@ -510,7 +507,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered message delete listeners.
      */
     static List<MessageDeleteListener> getMessageDeleteListeners(DiscordApi api, long messageId) {
-        return ((ImplDiscordApi) api).getObjectListeners(Message.class, messageId, MessageDeleteListener.class);
+        return api.getUncachedMessageUtil().getMessageDeleteListeners(messageId);
     }
 
     /**
@@ -521,11 +518,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered message delete listeners.
      */
     static List<MessageDeleteListener> getMessageDeleteListeners(DiscordApi api, String messageId) {
-        try {
-            return getMessageDeleteListeners(api, Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
+        return api.getUncachedMessageUtil().getMessageDeleteListeners(messageId);
     }
 
     /**
@@ -536,7 +529,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered message delete listeners.
      */
     static List<MessageDeleteListener> getMessageDeleteListeners(DiscordApi api, Message message) {
-        return getMessageDeleteListeners(api, message.getId());
+        return api.getUncachedMessageUtil().getMessageDeleteListeners(message);
     }
 
     /**
@@ -547,9 +540,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    static ListenerManager<MessageEditListener> addMessageEditListener(
-            DiscordApi api, long messageId, MessageEditListener listener) {
-        return ((ImplDiscordApi) api).addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
+    static ListenerManager<MessageEditListener> addMessageEditListener(DiscordApi api, long messageId,
+                                                                       MessageEditListener listener) {
+        return api.getUncachedMessageUtil().addMessageEditListener(messageId, listener);
     }
 
     /**
@@ -560,9 +553,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    static ListenerManager<MessageEditListener> addMessageEditListener(
-            DiscordApi api, Message message, MessageEditListener listener) {
-        return addMessageEditListener(api, message.getId(), listener);
+    static ListenerManager<MessageEditListener> addMessageEditListener(DiscordApi api, Message message,
+                                                                       MessageEditListener listener) {
+        return api.getUncachedMessageUtil().addMessageEditListener(message, listener);
     }
 
     /**
@@ -573,7 +566,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered message edit listeners.
      */
     static List<MessageEditListener> getMessageEditListeners(DiscordApi api, long messageId) {
-        return ((ImplDiscordApi) api).getObjectListeners(Message.class, messageId, MessageEditListener.class);
+        return api.getUncachedMessageUtil().getMessageEditListeners(messageId);
     }
 
     /**
@@ -584,11 +577,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered message edit listeners.
      */
     static List<MessageEditListener> getMessageEditListeners(DiscordApi api, String messageId) {
-        try {
-            return getMessageEditListeners(api, Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
+        return api.getUncachedMessageUtil().getMessageEditListeners(messageId);
     }
 
     /**
@@ -599,7 +588,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered message edit listeners.
      */
     static List<MessageEditListener> getMessageEditListeners(DiscordApi api, Message message) {
-        return getMessageEditListeners(api, message.getId());
+        return api.getUncachedMessageUtil().getMessageEditListeners(message);
     }
 
     /**
@@ -610,9 +599,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    static ListenerManager<ReactionAddListener> addReactionAddListener(
-            DiscordApi api, long messageId, ReactionAddListener listener) {
-        return ((ImplDiscordApi) api).addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
+    static ListenerManager<ReactionAddListener> addReactionAddListener(DiscordApi api, long messageId,
+                                                                       ReactionAddListener listener) {
+        return api.getUncachedMessageUtil().addReactionAddListener(messageId, listener);
     }
 
     /**
@@ -625,7 +614,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static ListenerManager<ReactionAddListener> addReactionAddListener(
             DiscordApi api, Message message, ReactionAddListener listener) {
-        return addReactionAddListener(api, message.getId(), listener);
+        return api.getUncachedMessageUtil().addReactionAddListener(message, listener);
     }
 
     /**
@@ -636,7 +625,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction add listeners.
      */
     static List<ReactionAddListener> getReactionAddListeners(DiscordApi api, long messageId) {
-        return ((ImplDiscordApi) api).getObjectListeners(Message.class, messageId, ReactionAddListener.class);
+        return api.getUncachedMessageUtil().getReactionAddListeners(messageId);
     }
 
     /**
@@ -647,11 +636,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction add listeners.
      */
     static List<ReactionAddListener> getReactionAddListeners(DiscordApi api, String messageId) {
-        try {
-            return getReactionAddListeners(api, Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
+        return api.getUncachedMessageUtil().getReactionAddListeners(messageId);
     }
 
     /**
@@ -662,7 +647,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction add listeners.
      */
     static List<ReactionAddListener> getReactionAddListeners(DiscordApi api, Message message) {
-        return getReactionAddListeners(api, message.getId());
+        return api.getUncachedMessageUtil().getReactionAddListeners(message);
     }
 
     /**
@@ -675,8 +660,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static ListenerManager<ReactionRemoveListener> addReactionRemoveListener(
             DiscordApi api, long messageId, ReactionRemoveListener listener) {
-        return ((ImplDiscordApi) api).addObjectListener(
-                Message.class, messageId, ReactionRemoveListener.class, listener);
+        return api.getUncachedMessageUtil().addReactionRemoveListener(messageId, listener);
     }
 
     /**
@@ -689,7 +673,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static ListenerManager<ReactionRemoveListener> addReactionRemoveListener(
             DiscordApi api, Message message, ReactionRemoveListener listener) {
-        return addReactionRemoveListener(api, message.getId(), listener);
+        return api.getUncachedMessageUtil().addReactionRemoveListener(message, listener);
     }
 
     /**
@@ -700,7 +684,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction remove listeners.
      */
     static List<ReactionRemoveListener> getReactionRemoveListeners(DiscordApi api, long messageId) {
-        return ((ImplDiscordApi) api).getObjectListeners(Message.class, messageId, ReactionRemoveListener.class);
+        return api.getUncachedMessageUtil().getReactionRemoveListeners(messageId);
     }
 
     /**
@@ -711,11 +695,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction remove listeners.
      */
     static List<ReactionRemoveListener> getReactionRemoveListeners(DiscordApi api, String messageId) {
-        try {
-            return getReactionRemoveListeners(api, Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
+        return api.getUncachedMessageUtil().getReactionRemoveListeners(messageId);
     }
 
     /**
@@ -726,7 +706,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction remove listeners.
      */
     static List<ReactionRemoveListener> getReactionRemoveListeners(DiscordApi api, Message message) {
-        return getReactionRemoveListeners(api, message.getId());
+        return api.getUncachedMessageUtil().getReactionRemoveListeners(message);
     }
 
     /**
@@ -739,8 +719,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
             DiscordApi api, long messageId, ReactionRemoveAllListener listener) {
-        return ((ImplDiscordApi) api).addObjectListener(
-                Message.class, messageId, ReactionRemoveAllListener.class, listener);
+        return api.getUncachedMessageUtil().addReactionRemoveAllListener(messageId, listener);
     }
 
     /**
@@ -753,7 +732,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
             DiscordApi api, Message message, ReactionRemoveAllListener listener) {
-        return addReactionRemoveAllListener(api, message.getId(), listener);
+        return api.getUncachedMessageUtil().addReactionRemoveAllListener(message, listener);
     }
 
     /**
@@ -764,7 +743,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction remove all listeners.
      */
     static List<ReactionRemoveAllListener> getReactionRemoveAllListeners(DiscordApi api, long messageId) {
-        return ((ImplDiscordApi) api).getObjectListeners(Message.class, messageId, ReactionRemoveAllListener.class);
+        return api.getUncachedMessageUtil().getReactionRemoveAllListeners(messageId);
     }
 
     /**
@@ -775,11 +754,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction remove all listeners.
      */
     static List<ReactionRemoveAllListener> getReactionRemoveAllListeners(DiscordApi api, String messageId) {
-        try {
-            return getReactionRemoveAllListeners(api, Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
+        return api.getUncachedMessageUtil().getReactionRemoveAllListeners(messageId);
     }
 
     /**
@@ -790,7 +765,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all registered reaction remove all listeners.
      */
     static List<ReactionRemoveAllListener> getReactionRemoveAllListeners(DiscordApi api, Message message) {
-        return getReactionRemoveAllListeners(api, message.getId());
+        return api.getUncachedMessageUtil().getReactionRemoveAllListeners(message);
     }
 
     /**
@@ -808,13 +783,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     @SuppressWarnings("unchecked")
     static <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
     addMessageAttachableListener(DiscordApi api, long messageId, T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(MessageAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> ((ImplDiscordApi) api).addObjectListener(
-                        Message.class, messageId, listenerClass, listener))
-                .collect(Collectors.toList());
+        return api.getUncachedMessageUtil().addMessageAttachableListener(messageId, listener);
     }
 
     /**
@@ -831,11 +800,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
     addMessageAttachableListener(DiscordApi api, String messageId, T listener) {
-        try {
-            return addMessageAttachableListener(api, Long.valueOf(messageId), listener);
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
+        return api.getUncachedMessageUtil().addMessageAttachableListener(messageId, listener);
     }
 
     /**
@@ -852,7 +817,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
     addMessageAttachableListener(DiscordApi api, Message message, T listener) {
-        return addMessageAttachableListener(api, message.getId(), listener);
+        return api.getUncachedMessageUtil().addMessageAttachableListener(message, listener);
     }
 
     /**
@@ -866,7 +831,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
             DiscordApi api, long messageId, Class<T> listenerClass, T listener) {
-        ((ImplDiscordApi) api).removeObjectListener(Message.class, messageId, listenerClass, listener);
+        api.getUncachedMessageUtil().removeListener(messageId, listenerClass, listener);
     }
 
     /**
@@ -880,9 +845,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
             DiscordApi api, String messageId, Class<T> listenerClass, T listener) {
-        try {
-            removeListener(api, Long.valueOf(messageId), listenerClass, listener);
-        } catch (NumberFormatException ignored) { }
+        api.getUncachedMessageUtil().removeListener(messageId, listenerClass, listener);
     }
 
     /**
@@ -896,7 +859,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
             DiscordApi api, Message message, Class<T> listenerClass, T listener) {
-        removeListener(api, message.getId(), listenerClass, listener);
+        api.getUncachedMessageUtil().removeListener(message, listenerClass, listener);
     }
 
     /**
@@ -911,11 +874,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     @SuppressWarnings("unchecked")
     static <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
             DiscordApi api, long messageId, T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(MessageAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> removeListener(api, messageId, listenerClass, listener));
+        api.getUncachedMessageUtil().removeMessageAttachableListener(messageId, listener);
     }
 
     /**
@@ -929,9 +888,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
             DiscordApi api, String messageId, T listener) {
-        try {
-            removeMessageAttachableListener(api, Long.valueOf(messageId), listener);
-        } catch (NumberFormatException ignored) { }
+        api.getUncachedMessageUtil().removeMessageAttachableListener(messageId, listener);
     }
 
     /**
@@ -944,7 +901,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
             DiscordApi api, Message message, T listener) {
-        removeMessageAttachableListener(api, message.getId(), listener);
+        api.getUncachedMessageUtil().removeMessageAttachableListener(message, listener);
     }
 
     /**
@@ -959,7 +916,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getMessageAttachableListeners(DiscordApi api, long messageId) {
-        return ((ImplDiscordApi) api).getObjectListeners(Message.class, messageId);
+        return api.getUncachedMessageUtil().getMessageAttachableListeners(messageId);
     }
 
     /**
@@ -974,11 +931,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getMessageAttachableListeners(DiscordApi api, String messageId) {
-        try {
-            return getMessageAttachableListeners(api, Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyMap();
-        }
+        return api.getUncachedMessageUtil().getMessageAttachableListeners(messageId);
     }
 
     /**
@@ -993,7 +946,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getMessageAttachableListeners(DiscordApi api, Message message) {
-        return getMessageAttachableListeners(api, message.getId());
+        return api.getUncachedMessageUtil().getMessageAttachableListeners(message);
     }
 
     /**

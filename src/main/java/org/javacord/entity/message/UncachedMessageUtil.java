@@ -2,7 +2,18 @@ package org.javacord.entity.message;
 
 import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.message.embed.EmbedBuilder;
+import org.javacord.listener.ObjectAttachableListener;
+import org.javacord.listener.message.MessageAttachableListener;
+import org.javacord.listener.message.MessageDeleteListener;
+import org.javacord.listener.message.MessageEditListener;
+import org.javacord.listener.message.reaction.ReactionAddListener;
+import org.javacord.listener.message.reaction.ReactionRemoveAllListener;
+import org.javacord.listener.message.reaction.ReactionRemoveListener;
+import org.javacord.util.event.ListenerManager;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -331,5 +342,360 @@ public interface UncachedMessageUtil {
      * @return A future to tell us if the action was successful.
      */
     CompletableFuture<Void> unpin(String channelId, String messageId);
+
+    /**
+     * Adds a listener, which listens to message deletions of a specific message.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<MessageDeleteListener> addMessageDeleteListener(long messageId, MessageDeleteListener listener);
+
+    /**
+     * Adds a listener, which listens to message deletions of a specific message.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<MessageDeleteListener> addMessageDeleteListener(Message message, MessageDeleteListener listener);
+
+    /**
+     * Gets a list with all registered message delete listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered message delete listeners.
+     */
+    List<MessageDeleteListener> getMessageDeleteListeners(long messageId);
+
+    /**
+     * Gets a list with all registered message delete listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered message delete listeners.
+     */
+    List<MessageDeleteListener> getMessageDeleteListeners(String messageId);
+
+    /**
+     * Gets a list with all registered message delete listeners of a specific message.
+     *
+     * @param message The message.
+     * @return A list with all registered message delete listeners.
+     */
+    List<MessageDeleteListener> getMessageDeleteListeners(Message message);
+
+    /**
+     * Adds a listener, which listens to message edits of a specific message.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener);
+
+    /**
+     * Adds a listener, which listens to message edits of a specific message.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<MessageEditListener> addMessageEditListener(Message message, MessageEditListener listener);
+
+    /**
+     * Gets a list with all registered message edit listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered message edit listeners.
+     */
+    List<MessageEditListener> getMessageEditListeners(long messageId);
+
+    /**
+     * Gets a list with all registered message edit listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered message edit listeners.
+     */
+    List<MessageEditListener> getMessageEditListeners(String messageId);
+
+    /**
+     * Gets a list with all registered message edit listeners of a specific message.
+     *
+     * @param message The message.
+     * @return A list with all registered message edit listeners.
+     */
+    List<MessageEditListener> getMessageEditListeners(Message message);
+
+    /**
+     * Adds a listener, which listens to reactions being added to a specific message.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener);
+
+    /**
+     * Adds a listener, which listens to reactions being added to a specific message.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionAddListener> addReactionAddListener(Message message, ReactionAddListener listener);
+
+    /**
+     * Gets a list with all registered reaction add listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners(long messageId);
+
+    /**
+     * Gets a list with all registered reaction add listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners(String messageId);
+
+    /**
+     * Gets a list with all registered reaction add listeners of a specific message.
+     *
+     * @param message The message.
+     * @return A list with all registered reaction add listeners.
+     */
+    List<ReactionAddListener> getReactionAddListeners(Message message);
+
+    /**
+     * Adds a listener, which listens to reactions being removed from a specific message.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(long messageId, ReactionRemoveListener listener);
+
+    /**
+     * Adds a listener, which listens to reactions being removed from a specific message.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(Message message, ReactionRemoveListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners(long messageId);
+
+    /**
+     * Gets a list with all registered reaction remove listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners(String messageId);
+
+    /**
+     * Gets a list with all registered reaction remove listeners of a specific message.
+     *
+     * @param message The message.
+     * @return A list with all registered reaction remove listeners.
+     */
+    List<ReactionRemoveListener> getReactionRemoveListeners(Message message);
+
+    /**
+     * Adds a listener, which listens to all reactions being removed from a specific message at once.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(long messageId,
+                                                                            ReactionRemoveAllListener listener);
+
+    /**
+     * Adds a listener, which listens to all reactions being removed from a specific message at once.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(Message message,
+                                                                            ReactionRemoveAllListener listener);
+
+    /**
+     * Gets a list with all registered reaction remove all listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction remove all listeners.
+     */
+    List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId);
+
+    /**
+     * Gets a list with all registered reaction remove all listeners of a specific message.
+     *
+     * @param messageId The id of the message.
+     * @return A list with all registered reaction remove all listeners.
+     */
+    List<ReactionRemoveAllListener> getReactionRemoveAllListeners(String messageId);
+
+    /**
+     * Gets a list with all registered reaction remove all listeners of a specific message.
+     *
+     * @param message The message.
+     * @return A list with all registered reaction remove all listeners.
+     */
+    List<ReactionRemoveAllListener> getReactionRemoveAllListeners(Message message);
+
+    /**
+     * Adds a listener that implements one or more {@code MessageAttachableListener}s to the message with the given id.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(long messageId, T listener);
+
+    /**
+     * Adds a listener that implements one or more {@code MessageAttachableListener}s to the message with the given id.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param messageId The id of the message which should be listened to.
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(String messageId, T listener);
+
+    /**
+     * Adds a listener that implements one or more {@code MessageAttachableListener}s to the given message.
+     * Adding a listener multiple times will only add it once
+     * and return the same listener managers on each invocation.
+     * The order of invocation is according to first addition.
+     *
+     * @param message The message which should be listened to.
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     * @return The managers for the added listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(Message message, T listener);
+
+    /**
+     * Removes a {@code MessageAttachableListener} from the message with the given id.
+     *
+     * @param messageId The id of the message.
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            long messageId, Class<T> listenerClass, T listener);
+
+    /**
+     * Removes a {@code MessageAttachableListener} from the message with the given id.
+     *
+     * @param messageId The id of the message.
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            String messageId, Class<T> listenerClass, T listener);
+
+    /**
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the given message.
+     *
+     * @param message The message.
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            Message message, Class<T> listenerClass, T listener);
+
+    /**
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the message with the given
+     * id.
+     *
+     * @param messageId The id of the message.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            long messageId, T listener);
+
+    /**
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the message with the given
+     * id.
+     *
+     * @param messageId The id of the message.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            String messageId, T listener);
+
+    /**
+     * Removes a listener that implements one or more {@code MessageAttachableListener}s from the given message.
+     *
+     * @param message The message.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            Message message, T listener);
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
+     * assigned listener classes they listen to for the message with the given id.
+     *
+     * @param messageId The id of the message.
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(long messageId);
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
+     * assigned listener classes they listen to for the message with the given id.
+     *
+     * @param messageId The id of the message.
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(String messageId);
+
+    /**
+     * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
+     * assigned listener classes they listen to for the given message.
+     *
+     * @param message The message.
+     * @param <T> The type of the listeners.
+     * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
+     * their assigned listener classes they listen to.
+     */
+    <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(Message message);
     
 }

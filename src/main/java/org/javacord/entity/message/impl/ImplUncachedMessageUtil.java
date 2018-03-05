@@ -3,13 +3,22 @@ package org.javacord.entity.message.impl;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.DiscordApi;
+import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.UncachedMessageUtil;
 import org.javacord.entity.message.embed.EmbedBuilder;
 import org.javacord.entity.message.embed.impl.ImplEmbedFactory;
+import org.javacord.listener.ObjectAttachableListener;
+import org.javacord.listener.message.MessageAttachableListener;
+import org.javacord.listener.message.MessageDeleteListener;
+import org.javacord.listener.message.MessageEditListener;
+import org.javacord.listener.message.reaction.ReactionAddListener;
+import org.javacord.listener.message.reaction.ReactionRemoveAllListener;
+import org.javacord.listener.message.reaction.ReactionRemoveListener;
+import org.javacord.util.ClassHelper;
+import org.javacord.util.event.ListenerManager;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
@@ -17,6 +26,7 @@ import org.javacord.util.rest.RestRequest;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +41,9 @@ import java.util.stream.StreamSupport;
  */
 public class ImplUncachedMessageUtil implements UncachedMessageUtil {
 
-    private final DiscordApi api;
+    private final ImplDiscordApi api;
 
-    public ImplUncachedMessageUtil(DiscordApi api) {
+    public ImplUncachedMessageUtil(ImplDiscordApi api) {
         this.api = api;
     }
 
@@ -332,6 +342,255 @@ public class ImplUncachedMessageUtil implements UncachedMessageUtil {
             future.completeExceptionally(e);
             return future;
         }
+    }
+
+    @Override
+    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(
+            long messageId, MessageDeleteListener listener) {
+        return api.addObjectListener(
+                Message.class, messageId, MessageDeleteListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(
+            Message message, MessageDeleteListener listener) {
+        return addMessageDeleteListener(message.getId(), listener);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners(long messageId) {
+        return api.getObjectListeners(Message.class, messageId, MessageDeleteListener.class);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners(String messageId) {
+        try {
+            return getMessageDeleteListeners(Long.valueOf(messageId));
+        } catch (NumberFormatException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners(Message message) {
+        return getMessageDeleteListeners(message.getId());
+    }
+
+    @Override
+    public ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener) {
+        return api.addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<MessageEditListener> addMessageEditListener(
+            Message message, MessageEditListener listener) {
+        return addMessageEditListener(message.getId(), listener);
+    }
+
+    @Override
+    public List<MessageEditListener> getMessageEditListeners(long messageId) {
+        return api.getObjectListeners(Message.class, messageId, MessageEditListener.class);
+    }
+
+    @Override
+    public List<MessageEditListener> getMessageEditListeners(String messageId) {
+        try {
+            return getMessageEditListeners(Long.valueOf(messageId));
+        } catch (NumberFormatException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<MessageEditListener> getMessageEditListeners(Message message) {
+        return getMessageEditListeners(message.getId());
+    }
+
+    @Override
+    public ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener) {
+        return api.addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<ReactionAddListener> addReactionAddListener(Message message, ReactionAddListener listener) {
+        return addReactionAddListener(message.getId(), listener);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners(long messageId) {
+        return api.getObjectListeners(Message.class, messageId, ReactionAddListener.class);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners(String messageId) {
+        try {
+            return getReactionAddListeners(Long.valueOf(messageId));
+        } catch (NumberFormatException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners(Message message) {
+        return getReactionAddListeners(message.getId());
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(long messageId,
+                                                                             ReactionRemoveListener listener) {
+        return api.addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(Message message,
+                                                                             ReactionRemoveListener listener) {
+        return addReactionRemoveListener(message.getId(), listener);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners(long messageId) {
+        return api.getObjectListeners(Message.class, messageId, ReactionRemoveListener.class);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners(String messageId) {
+        try {
+            return getReactionRemoveListeners(Long.valueOf(messageId));
+        } catch (NumberFormatException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners(Message message) {
+        return getReactionRemoveListeners(message.getId());
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(long messageId,
+                                                                                   ReactionRemoveAllListener listener) {
+        return api.addObjectListener(Message.class, messageId, ReactionRemoveAllListener.class, listener);
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(Message message,
+                                                                                   ReactionRemoveAllListener listener) {
+        return addReactionRemoveAllListener(message.getId(), listener);
+    }
+
+    @Override
+    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId) {
+        return api.getObjectListeners(Message.class, messageId, ReactionRemoveAllListener.class);
+    }
+
+    @Override
+    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(String messageId) {
+        try {
+            return getReactionRemoveAllListeners(Long.valueOf(messageId));
+        } catch (NumberFormatException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(Message message) {
+        return getReactionRemoveAllListeners(message.getId());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(long messageId, T listener) {
+        return ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(MessageAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .map(listenerClass -> api.addObjectListener(
+                        Message.class, messageId, listenerClass, listener))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(String messageId, T listener) {
+        try {
+            return addMessageAttachableListener(Long.valueOf(messageId), listener);
+        } catch (NumberFormatException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+    addMessageAttachableListener(Message message, T listener) {
+        return addMessageAttachableListener(message.getId(), listener);
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            long messageId, Class<T> listenerClass, T listener) {
+        api.removeObjectListener(Message.class, messageId, listenerClass, listener);
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            String messageId, Class<T> listenerClass, T listener) {
+        try {
+            removeListener(Long.valueOf(messageId), listenerClass, listener);
+        } catch (NumberFormatException ignored) { }
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            Message message, Class<T> listenerClass, T listener) {
+        removeListener(message.getId(), listenerClass, listener);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            long messageId, T listener) {
+        ClassHelper.getInterfacesAsStream(listener.getClass())
+                .filter(MessageAttachableListener.class::isAssignableFrom)
+                .filter(ObjectAttachableListener.class::isAssignableFrom)
+                .map(listenerClass -> (Class<T>) listenerClass)
+                .forEach(listenerClass -> removeListener(messageId, listenerClass, listener));
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            String messageId, T listener) {
+        try {
+            removeMessageAttachableListener(Long.valueOf(messageId), listener);
+        } catch (NumberFormatException ignored) { }
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            Message message, T listener) {
+        removeMessageAttachableListener(message.getId(), listener);
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(long messageId) {
+        return api.getObjectListeners(Message.class, messageId);
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(String messageId) {
+        try {
+            return getMessageAttachableListeners(Long.valueOf(messageId));
+        } catch (NumberFormatException ignored) {
+            return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+    getMessageAttachableListeners(Message message) {
+        return getMessageAttachableListeners(message.getId());
     }
     
 }
