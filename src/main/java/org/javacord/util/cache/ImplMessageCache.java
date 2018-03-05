@@ -92,9 +92,9 @@ public class ImplMessageCache implements MessageCache, Cleanupable {
     }
 
     /**
-     * Adds a message to the cache.
+     * Removes a message from the cache.
      *
-     * @param message The message to add.
+     * @param message The message to remove.
      */
     public void removeMessage(Message message) {
         synchronized (messages) {
