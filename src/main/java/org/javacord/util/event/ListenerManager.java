@@ -1,12 +1,5 @@
 package org.javacord.util.event;
 
-import org.javacord.DiscordApi;
-import org.javacord.ImplDiscordApi;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -15,95 +8,28 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <T> The listener class.
  */
-public class ListenerManager<T> {
-
-    /**
-     * The discord api instance.
-     */
-    private final ImplDiscordApi api;
-
-    /**
-     * The managed listener.
-     */
-    private final T listener;
-
-    /**
-     * The class of the listener to manage.
-     */
-    private final Class<T> listenerClass;
-
-    /**
-     * The class of the object, the listener was added to.
-     * <code>Null</code> if it's a global listener.
-     */
-    private final Class<?> assignedObjectClass;
-
-    /**
-     * The id of the object, the listener was added to.
-     * <code>-1</code> if it's a global listener.
-     */
-    private final long objectId;
-
-    /**
-     * The remove handlers.
-     */
-    private final List<Runnable> removeHandlers = new ArrayList<>();
-
-    /**
-     * Creates a new listener manager for a global listener.
-     *
-     * @param api The api instance.
-     * @param listener The listener to manage.
-     * @param listenerClass The class of the listener to manage.
-     */
-    public ListenerManager(DiscordApi api, T listener, Class<T> listenerClass) {
-        this(api, listener, listenerClass, null, -1);
-    }
-
-    /**
-     * Creates a new listener manager.
-     *
-     * @param api The discord api instance.
-     * @param listener The listener to manage.
-     * @param listenerClass The class of the listener to manage.
-     * @param assignedObjectClass The class of the object, the listener was added to.
-     * @param objectId The id of the object, the listener was added to.
-     */
-    public ListenerManager(
-            DiscordApi api, T listener, Class<T> listenerClass, Class<?> assignedObjectClass, long objectId) {
-        this.api = (ImplDiscordApi) api;
-        this.listener = listener;
-        this.listenerClass = listenerClass;
-        this.assignedObjectClass = assignedObjectClass;
-        this.objectId = objectId;
-    }
+public interface ListenerManager<T> {
 
     /**
      * Checks if the managed listener is a global listener.
      *
      * @return Whether the managed listener is a global listener or not.
      */
-    public boolean isGlobalListener() {
-        return assignedObjectClass == null;
-    }
+    boolean isGlobalListener();
 
     /**
      * Gets the listener class context for the managed listener.
      *
      * @return The listener class context for the managed listener.
      */
-    public Class<T> getListenerClass() {
-        return listenerClass;
-    }
+    Class<T> getListenerClass();
 
     /**
      * Gets the managed listener.
      *
      * @return The managed listener.
      */
-    public T getListener() {
-        return listener;
-    }
+    T getListener();
 
     /**
      * Gets the class of the object, the listener was added to.
@@ -111,9 +37,7 @@ public class ListenerManager<T> {
      *
      * @return The class of the object, the listener was added to.
      */
-    public Optional<Class<?>> getAssignedObjectClass() {
-        return Optional.ofNullable(assignedObjectClass);
-    }
+    Optional<Class<?>> getAssignedObjectClass();
 
     /**
      * Gets the id of the object, the listener as added to.
@@ -121,37 +45,14 @@ public class ListenerManager<T> {
      *
      * @return The id of the object, the listener was added to.
      */
-    public Optional<Long> getAssignedObjectId() {
-        if (isGlobalListener()) {
-            return Optional.empty();
-        }
-        return Optional.of(objectId);
-    }
-
-    /**
-     * Called when the listener is removed.
-     */
-    public void removed() {
-        removeHandlers.forEach(Runnable::run);
-    }
+    Optional<Long> getAssignedObjectId();
 
     /**
      * Removes the listener.
      *
      * @return The current instance in order to chain call methods.
      */
-    @SuppressWarnings("unchecked")
-    public ListenerManager<T> remove() {
-        if (isGlobalListener()) {
-            api.removeListener(
-                    (Class<GloballyAttachableListener>) listenerClass, (GloballyAttachableListener) listener);
-        } else {
-            api.removeObjectListener(
-                    assignedObjectClass, objectId, (Class<ObjectAttachableListener>) listenerClass,
-                    (ObjectAttachableListener) listener);
-        }
-        return this;
-    }
+    ListenerManager<T> remove();
 
     /**
      * Removes the listener after the given delay.
@@ -160,18 +61,13 @@ public class ListenerManager<T> {
      * @param timeUnit The time unit of the delay.
      * @return The current instance in order to chain call methods.
      */
-    public ListenerManager<T> removeAfter(long delay, TimeUnit timeUnit) {
-        api.getThreadPool().getScheduler().schedule((Runnable) this::remove, delay, timeUnit);
-        return this;
-    }
+    ListenerManager<T> removeAfter(long delay, TimeUnit timeUnit);
 
     /**
      * Adds a runnable which gets called when the listener gets removed.
      *
      * @param removeHandler The handler which gets called when the listener gets remove.
      */
-    public void addRemoveHandler(Runnable removeHandler) {
-        removeHandlers.add(removeHandler);
-    }
+    void addRemoveHandler(Runnable removeHandler);
 
 }

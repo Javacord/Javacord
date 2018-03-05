@@ -99,6 +99,7 @@ import org.javacord.util.Cleanupable;
 import org.javacord.util.concurrent.ThreadPool;
 import org.javacord.util.event.EventDispatcher;
 import org.javacord.util.event.ListenerManager;
+import org.javacord.util.event.impl.ImplListenerManager;
 import org.javacord.util.gateway.DiscordWebSocketAdapter;
 import org.javacord.util.logging.LoggerUtil;
 import org.javacord.util.ratelimit.RatelimitManager;
@@ -309,7 +310,7 @@ public class ImplDiscordApi implements DiscordApi {
      * The key is the class of the listener.
      */
     private final Map<Class<? extends GloballyAttachableListener>,
-            Map<GloballyAttachableListener, ListenerManager<? extends GloballyAttachableListener>>>
+            Map<GloballyAttachableListener, ImplListenerManager<? extends GloballyAttachableListener>>>
             listeners = Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     /**
@@ -321,7 +322,7 @@ public class ImplDiscordApi implements DiscordApi {
      * The final value is the listener manager.
      */
     private final Map<Class<?>, Map<Long, Map<Class<? extends ObjectAttachableListener>,
-            Map<ObjectAttachableListener, ListenerManager<? extends ObjectAttachableListener>>>>>
+            Map<ObjectAttachableListener, ImplListenerManager<? extends ObjectAttachableListener>>>>>
             objectListeners = Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     /**
@@ -728,13 +729,13 @@ public class ImplDiscordApi implements DiscordApi {
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> ListenerManager<T> addObjectListener(
             Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
-        Map<ObjectAttachableListener, ListenerManager<? extends ObjectAttachableListener>> listeners =
+        Map<ObjectAttachableListener, ImplListenerManager<? extends ObjectAttachableListener>> listeners =
                 objectListeners
                         .computeIfAbsent(objectClass, key -> new ConcurrentHashMap<>())
                         .computeIfAbsent(objectId, key -> new ConcurrentHashMap<>())
                         .computeIfAbsent(listenerClass, c -> Collections.synchronizedMap(new LinkedHashMap<>()));
         return (ListenerManager<T>) listeners.computeIfAbsent(
-                listener, key -> new ListenerManager<>(this, listener, listenerClass, objectClass, objectId));
+                listener, key -> new ImplListenerManager<>(this, listener, listenerClass, objectClass, objectId));
     }
 
     /**
@@ -753,22 +754,22 @@ public class ImplDiscordApi implements DiscordApi {
                 return;
             }
             Map<Long, Map<Class<? extends ObjectAttachableListener>, Map<ObjectAttachableListener,
-                    ListenerManager<? extends ObjectAttachableListener>>>> objectListener =
+                    ImplListenerManager<? extends ObjectAttachableListener>>>> objectListener =
                     objectListeners.get(objectClass);
             if (objectListener == null) {
                 return;
             }
             Map<Class<? extends ObjectAttachableListener>, Map<ObjectAttachableListener,
-                    ListenerManager<? extends ObjectAttachableListener>>> listeners = objectListener.get(objectId);
+                    ImplListenerManager<? extends ObjectAttachableListener>>> listeners = objectListener.get(objectId);
             if (listeners == null) {
                 return;
             }
-            Map<ObjectAttachableListener, ListenerManager<? extends ObjectAttachableListener>> classListeners =
+            Map<ObjectAttachableListener, ImplListenerManager<? extends ObjectAttachableListener>> classListeners =
                     listeners.get(listenerClass);
             if (classListeners == null) {
                 return;
             }
-            ListenerManager<? extends ObjectAttachableListener> listenerManager = classListeners.get(listener);
+            ImplListenerManager<? extends ObjectAttachableListener> listenerManager = classListeners.get(listener);
             if (listenerManager == null) {
                 return;
             }
@@ -843,18 +844,18 @@ public class ImplDiscordApi implements DiscordApi {
     public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
         return (ListenerManager<T>) listeners
                 .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
-                .computeIfAbsent(listener, key -> new ListenerManager<>(this, listener, listenerClass));
+                .computeIfAbsent(listener, key -> new ImplListenerManager<>(this, listener, listenerClass));
     }
 
     @Override
     public <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener) {
         synchronized (listeners) {
-            Map<GloballyAttachableListener, ListenerManager<? extends GloballyAttachableListener>> classListeners =
+            Map<GloballyAttachableListener, ImplListenerManager<? extends GloballyAttachableListener>> classListeners =
                     listeners.get(listenerClass);
             if (classListeners == null) {
                 return;
             }
-            ListenerManager<? extends GloballyAttachableListener> listenerManager = classListeners.get(listener);
+            ImplListenerManager<? extends GloballyAttachableListener> listenerManager = classListeners.get(listener);
             if (listenerManager == null) {
                 return;
             }
@@ -1105,10 +1106,9 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public MessageSet getCachedMessages() {
         synchronized (messages) {
-            return new ImplMessageSet(messages.values().stream()
-                                              .map(Reference::get)
-                                              .filter(Objects::nonNull)
-                                              .collect(Collectors.toList()));
+            return messages.values().stream()
+                    .map(Reference::get)
+                    .filter(Objects::nonNull).collect(Collectors.toCollection(ImplMessageSet::new));
         }
     }
 
