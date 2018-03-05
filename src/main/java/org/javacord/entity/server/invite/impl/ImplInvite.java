@@ -12,6 +12,9 @@ import org.javacord.entity.server.invite.Invite;
 import org.javacord.entity.server.invite.RichInvite;
 import org.javacord.entity.user.User;
 import org.javacord.util.logging.LoggerUtil;
+import org.javacord.util.rest.RestEndpoint;
+import org.javacord.util.rest.RestMethod;
+import org.javacord.util.rest.RestRequest;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -19,6 +22,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link Invite}.
@@ -218,6 +222,14 @@ public class ImplInvite implements RichInvite {
     @Override
     public ChannelType getChannelType() {
         return channelType;
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(String reason) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.INVITE)
+                .setUrlParameters(getCode())
+                .setAuditLogReason(reason)
+                .execute(result -> null);
     }
 
     @Override
