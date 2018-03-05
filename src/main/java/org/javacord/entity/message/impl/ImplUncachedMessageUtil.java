@@ -1,5 +1,6 @@
 package org.javacord.entity.message.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,6 +11,7 @@ import org.javacord.entity.message.Message;
 import org.javacord.entity.message.UncachedMessageUtil;
 import org.javacord.entity.message.embed.EmbedBuilder;
 import org.javacord.entity.message.embed.impl.ImplEmbedFactory;
+import org.javacord.entity.user.User;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.message.MessageAttachableListener;
 import org.javacord.listener.message.MessageDeleteListener;
@@ -25,6 +27,7 @@ import org.javacord.util.rest.RestRequest;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -337,6 +340,80 @@ public class ImplUncachedMessageUtil implements UncachedMessageUtil {
     public CompletableFuture<Void> unpin(String channelId, String messageId) {
         try {
             return unpin(Long.parseLong(channelId), Long.parseLong(messageId));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    @Override
+    public CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji) {
+        CompletableFuture<List<User>> future = new CompletableFuture<>();
+        api.getThreadPool().getExecutorService().submit(() -> {
+            try {
+                final String value = emoji.asUnicodeEmoji().orElseGet(() -> emoji.asCustomEmoji()
+                        .map(e -> e.getName() + ":" + e.getIdAsString()).orElse("UNKNOWN"));
+                List<User> users = new ArrayList<>();
+                boolean requestMore = true;
+                while (requestMore) {
+                    RestRequest<List<User>> request =
+                            new RestRequest<List<User>>(api, RestMethod.GET, RestEndpoint.REACTION)
+                                    .setUrlParameters(
+                                            Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), value)
+                                    .addQueryParameter("limit", "100")
+                                    .setRatelimitRetries(250);
+                    if (!users.isEmpty()) {
+                        request.addQueryParameter("after", users.get(users.size()-1).getIdAsString());
+                    }
+                    List<User> incompleteUsers = request.execute(result -> {
+                        List<User> paginatedUsers = new ArrayList<>();
+                        for (JsonNode userJson : result.getJsonBody()) {
+                            paginatedUsers.add(api.getOrCreateUser(userJson));
+                        }
+                        return Collections.unmodifiableList(paginatedUsers);
+                    }).join();
+                    users.addAll(incompleteUsers);
+                    requestMore = incompleteUsers.size() >= 100;
+                }
+                future.complete(Collections.unmodifiableList(users));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji) {
+        try {
+            return getUsersWhoReactedWithEmoji(Long.parseLong(channelId), Long.parseLong(messageId), emoji);
+        } catch (NumberFormatException e) {
+            CompletableFuture<List<User>> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    @Override
+    public CompletableFuture<Void> removeUserReactionByEmoji(long channelId, long messageId, Emoji emoji, User user) {
+        String value = emoji.asUnicodeEmoji().orElseGet(() ->
+                emoji.asCustomEmoji().map(e -> e.getName() + ":" + e.getIdAsString()).orElse("UNKNOWN"));
+        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
+                .setUrlParameters(
+                        Long.toUnsignedString(channelId),
+                        Long.toUnsignedString(messageId),
+                        value,
+                        user.isYourself() ? "@me" : user.getIdAsString())
+                .setRatelimitRetries(250)
+                .execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> removeUserReactionByEmoji(String channelId, String messageId, Emoji emoji,
+                                                             User user) {
+        try {
+            return removeUserReactionByEmoji(Long.parseLong(channelId), Long.parseLong(messageId), emoji, user);
         } catch (NumberFormatException e) {
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);

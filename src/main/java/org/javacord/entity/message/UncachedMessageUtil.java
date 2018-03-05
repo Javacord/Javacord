@@ -2,6 +2,7 @@ package org.javacord.entity.message;
 
 import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.message.embed.EmbedBuilder;
+import org.javacord.entity.user.User;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.message.MessageAttachableListener;
 import org.javacord.listener.message.MessageDeleteListener;
@@ -342,6 +343,48 @@ public interface UncachedMessageUtil {
      * @return A future to tell us if the action was successful.
      */
     CompletableFuture<Void> unpin(String channelId, String messageId);
+
+    /**
+     * Gets a list with all users who reacted with the given emoji.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji of the reaction.
+     * @return A list with all users who reacted with the given emoji
+     */
+    CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji);
+
+    /**
+     * Gets a list with all users who reacted with the given emoji.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji of the reaction.
+     * @return A list with all users who reacted with the given emoji
+     */
+    CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji);
+
+    /**
+     * Removes the reaction of the given user.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji of the reaction.
+     * @param user The user to remove.
+     * @return A future to tell us if the action was successful.
+     */
+    CompletableFuture<Void> removeUserReactionByEmoji(long channelId, long messageId, Emoji emoji, User user);
+
+    /**
+     * Removes the reaction of the given user.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji of the reaction.
+     * @param user The user to remove.
+     * @return A future to tell us if the action was successful.
+     */
+    CompletableFuture<Void> removeUserReactionByEmoji(String channelId, String messageId, Emoji emoji, User user);
 
     /**
      * Adds a listener, which listens to message deletions of a specific message.
