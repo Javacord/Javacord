@@ -11,14 +11,6 @@ import org.javacord.entity.user.User;
 import org.javacord.event.message.reaction.ReactionAddEvent;
 import org.javacord.listener.message.reaction.ReactionAddListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.emoji.Emoji;
-import org.javacord.entity.emoji.impl.ImplUnicodeEmoji;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.impl.ImplMessage;
-import org.javacord.entity.user.User;
-import org.javacord.event.message.reaction.ReactionAddEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

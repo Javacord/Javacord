@@ -8,8 +8,6 @@ import org.javacord.entity.user.User;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.emoji.Emoji;
-import org.javacord.entity.user.User;
 
 import java.util.ArrayList;
 import java.util.Collections;

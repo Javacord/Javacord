@@ -60,14 +60,6 @@ import org.javacord.util.logging.WebSocketLogger;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.activity.Activity;
-import org.javacord.entity.server.Server;
-import org.javacord.event.connection.LostConnectionEvent;
-import org.javacord.event.connection.ReconnectEvent;
-import org.javacord.event.connection.ResumeEvent;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
 import org.slf4j.Logger;
 
 import javax.net.ssl.SSLContext;

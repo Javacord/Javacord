@@ -6,11 +6,6 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
 import org.javacord.listener.server.ServerJoinListener;
 import org.javacord.listener.user.UserAttachableListener;
-import org.javacord.event.server.member.ServerMemberJoinEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.listener.server.ServerJoinListener;
 
 /**
  * This listener listens to server member joins.

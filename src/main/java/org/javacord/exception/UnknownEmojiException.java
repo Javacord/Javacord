@@ -2,8 +2,6 @@ package org.javacord.exception;
 
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestResult;
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
 
 /**
  * When the emoji that was sent, for example as reaction, is not an emoji Discord knows about.

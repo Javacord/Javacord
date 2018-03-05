@@ -17,18 +17,6 @@ import org.javacord.listener.message.CachedMessagePinListener;
 import org.javacord.listener.message.CachedMessageUnpinListener;
 import org.javacord.listener.message.MessageEditListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.embed.Embed;
-import org.javacord.entity.message.embed.impl.ImplEmbed;
-import org.javacord.entity.message.embed.impl.ImplEmbedFactory;
-import org.javacord.entity.message.impl.ImplMessage;
-import org.javacord.entity.server.Server;
-import org.javacord.event.message.CachedMessagePinEvent;
-import org.javacord.event.message.CachedMessageUnpinEvent;
-import org.javacord.event.message.MessageEditEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

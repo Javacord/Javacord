@@ -13,10 +13,6 @@ import org.javacord.entity.user.User;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.channel.ChannelCategory;
-import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannelUpdater;
-import org.javacord.entity.user.User;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;

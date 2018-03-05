@@ -2,8 +2,6 @@ package org.javacord;
 
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.impl.ImplPermissions;
-import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.impl.ImplPermissions;
 
 /**
  * A tool to create bot invites.

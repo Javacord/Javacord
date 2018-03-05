@@ -1,15 +1,15 @@
 package org.javacord.util.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.DiscordApi;
-import org.javacord.exception.DiscordException;
-import org.javacord.util.logging.LoggerUtil;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.javacord.DiscordApi;
+import org.javacord.exception.DiscordException;
+import org.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

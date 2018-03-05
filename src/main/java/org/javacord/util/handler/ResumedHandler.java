@@ -3,7 +3,6 @@ package org.javacord.util.handler;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.DiscordApi;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.util.gateway.PacketHandler;
 
 /**
  * This class handles the resumed packet.

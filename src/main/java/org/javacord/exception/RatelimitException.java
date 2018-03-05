@@ -1,7 +1,6 @@
 package org.javacord.exception;
 
 import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequest;
 
 /**
  * When we encounter a rate limit and ran out of retires.

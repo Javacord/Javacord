@@ -37,18 +37,6 @@ import org.javacord.util.event.ListenerManager;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.UpdatableFromCache;
-import org.javacord.entity.channel.GroupChannel;
-import org.javacord.entity.channel.PrivateChannel;
-import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.emoji.CustomEmoji;
-import org.javacord.entity.emoji.Emoji;
-import org.javacord.entity.emoji.impl.ImplUnicodeEmoji;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

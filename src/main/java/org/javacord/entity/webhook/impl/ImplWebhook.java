@@ -15,14 +15,6 @@ import org.javacord.util.logging.LoggerUtil;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Icon;
-import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.impl.ImplIcon;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.user.User;
-import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.webhook.WebhookUpdater;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;

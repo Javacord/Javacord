@@ -31,27 +31,6 @@ import org.javacord.listener.channel.server.text.ServerTextChannelChangeTopicLis
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelChangeBitrateListener;
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelChangeUserLimitListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.channel.Categorizable;
-import org.javacord.entity.channel.ChannelCategory;
-import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.channel.impl.ImplChannelCategory;
-import org.javacord.entity.channel.impl.ImplGroupChannel;
-import org.javacord.entity.channel.impl.ImplServerTextChannel;
-import org.javacord.entity.channel.impl.ImplServerVoiceChannel;
-import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.Role;
-import org.javacord.entity.permission.impl.ImplPermissions;
-import org.javacord.entity.user.User;
-import org.javacord.event.channel.group.GroupChannelChangeNameEvent;
-import org.javacord.event.channel.server.ServerChannelChangeNameEvent;
-import org.javacord.event.channel.server.ServerChannelChangeNsfwFlagEvent;
-import org.javacord.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
-import org.javacord.event.channel.server.ServerChannelChangePositionEvent;
-import org.javacord.event.channel.server.text.ServerTextChannelChangeTopicEvent;
-import org.javacord.event.channel.server.voice.ServerVoiceChannelChangeBitrateEvent;
-import org.javacord.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;

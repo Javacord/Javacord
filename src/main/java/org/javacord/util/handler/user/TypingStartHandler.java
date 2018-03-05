@@ -6,8 +6,6 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.event.user.UserStartTypingEvent;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

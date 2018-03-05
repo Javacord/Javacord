@@ -6,10 +6,6 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
 import org.javacord.listener.server.role.RoleAttachableListener;
 import org.javacord.listener.user.UserAttachableListener;
-import org.javacord.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to server channel overwritten permissions changes.

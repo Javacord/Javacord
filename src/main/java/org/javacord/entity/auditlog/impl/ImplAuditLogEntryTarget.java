@@ -4,9 +4,6 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.auditlog.AuditLogEntry;
 import org.javacord.entity.auditlog.AuditLogEntryTarget;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.auditlog.AuditLogEntry;
-import org.javacord.entity.auditlog.AuditLogEntryTarget;
 
 import java.util.Objects;
 

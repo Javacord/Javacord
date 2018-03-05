@@ -3,9 +3,6 @@ package org.javacord.entity.permission.impl;
 import org.javacord.entity.permission.PermissionState;
 import org.javacord.entity.permission.PermissionType;
 import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.PermissionState;
-import org.javacord.entity.permission.PermissionType;
-import org.javacord.entity.permission.Permissions;
 
 /**
  * The implementation of the permissions interface.

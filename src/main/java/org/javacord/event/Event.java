@@ -1,7 +1,6 @@
 package org.javacord.event;
 
 import org.javacord.DiscordApi;
-import org.javacord.DiscordApi;
 
 /**
  * The basic event.

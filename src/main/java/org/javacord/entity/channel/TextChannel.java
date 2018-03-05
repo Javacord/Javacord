@@ -23,7 +23,6 @@ import org.javacord.util.NonThrowingAutoCloseable;
 import org.javacord.util.cache.MessageCache;
 import org.javacord.util.event.ListenerManager;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.user.User;
 import org.slf4j.Logger;
 
 import java.util.Arrays;

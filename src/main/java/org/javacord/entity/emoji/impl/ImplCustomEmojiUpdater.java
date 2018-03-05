@@ -9,8 +9,6 @@ import org.javacord.entity.permission.Role;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.emoji.CustomEmojiUpdater;
-import org.javacord.entity.emoji.KnownCustomEmoji;
 
 import java.util.Arrays;
 import java.util.Collection;

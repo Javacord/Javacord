@@ -3,7 +3,6 @@ package org.javacord.entity.message;
 import org.javacord.Javacord;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.DiscordEntity;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;

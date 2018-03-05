@@ -15,15 +15,6 @@ import org.javacord.listener.server.emoji.CustomEmojiChangeWhitelistedRolesListe
 import org.javacord.listener.server.emoji.CustomEmojiCreateListener;
 import org.javacord.listener.server.emoji.CustomEmojiDeleteListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.emoji.KnownCustomEmoji;
-import org.javacord.entity.emoji.impl.ImplKnownCustomEmoji;
-import org.javacord.entity.permission.Role;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.event.server.emoji.CustomEmojiChangeNameEvent;
-import org.javacord.event.server.emoji.CustomEmojiChangeWhitelistedRolesEvent;
-import org.javacord.event.server.emoji.CustomEmojiCreateEvent;
-import org.javacord.event.server.emoji.CustomEmojiDeleteEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -8,10 +8,6 @@ import org.javacord.entity.Icon;
 import org.javacord.entity.emoji.CustomEmoji;
 import org.javacord.entity.impl.ImplIcon;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Icon;
-import org.javacord.entity.emoji.CustomEmoji;
-import org.javacord.entity.impl.ImplIcon;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;

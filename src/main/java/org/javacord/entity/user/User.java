@@ -41,13 +41,6 @@ import org.javacord.listener.user.channel.PrivateChannelCreateListener;
 import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
 import org.javacord.util.ClassHelper;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Icon;
-import org.javacord.entity.Mentionable;
-import org.javacord.entity.UpdatableFromCache;
-import org.javacord.listener.user.UserChangeNameListener;
-import org.javacord.listener.user.UserChangeNicknameListener;
-import org.javacord.listener.user.UserChangeStatusListener;
 
 import java.time.Instant;
 import java.util.Collection;

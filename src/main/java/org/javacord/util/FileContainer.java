@@ -5,7 +5,6 @@ import org.javacord.Javacord;
 import org.javacord.entity.Icon;
 import org.javacord.util.io.FileUtils;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.Icon;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;

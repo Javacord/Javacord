@@ -2,7 +2,6 @@ package org.javacord.entity.emoji;
 
 import org.javacord.entity.Icon;
 import org.javacord.entity.permission.Role;
-import org.javacord.entity.Icon;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

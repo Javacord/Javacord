@@ -4,8 +4,6 @@ import org.javacord.DiscordApi;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.message.Message;
 import org.javacord.util.Cleanupable;
-import org.javacord.entity.message.Message;
-import org.javacord.util.Cleanupable;
 
 import java.time.Instant;
 import java.util.ArrayList;

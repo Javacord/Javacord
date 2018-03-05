@@ -25,15 +25,6 @@ import org.javacord.util.cache.ImplMessageCache;
 import org.javacord.util.cache.MessageCache;
 import org.javacord.util.event.ListenerManager;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Icon;
-import org.javacord.entity.channel.GroupChannel;
-import org.javacord.entity.channel.GroupChannelUpdater;
-import org.javacord.entity.channel.InternalChannel;
-import org.javacord.entity.channel.InternalTextChannel;
-import org.javacord.entity.channel.InternalVoiceChannel;
-import org.javacord.entity.impl.ImplIcon;
-import org.javacord.entity.user.User;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;

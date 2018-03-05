@@ -3,7 +3,6 @@ package org.javacord.event.message.reaction;
 import org.javacord.DiscordApi;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.event.message.RequestableMessageEvent;
-import org.javacord.event.message.RequestableMessageEvent;
 
 /**
  * A reaction event.

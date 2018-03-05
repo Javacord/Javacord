@@ -8,7 +8,6 @@ import org.javacord.listener.channel.server.voice.ServerVoiceChannelChangeUserLi
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.user.User;
 
 import java.util.Collection;
 import java.util.List;

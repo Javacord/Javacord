@@ -3,7 +3,6 @@ package org.javacord.listener.server;
 import org.javacord.event.server.ServerChangeRegionEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.event.server.ServerChangeRegionEvent;
 
 /**
  * This listener listens to server region changes.

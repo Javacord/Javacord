@@ -6,12 +6,6 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.TextChannelAttachableListener;
 import org.javacord.listener.message.MessageAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.event.message.reaction.ReactionRemoveAllEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.TextChannelAttachableListener;
-import org.javacord.listener.message.MessageAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to all reaction being delete at once.

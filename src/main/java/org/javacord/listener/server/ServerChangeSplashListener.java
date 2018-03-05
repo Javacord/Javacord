@@ -3,9 +3,6 @@ package org.javacord.listener.server;
 import org.javacord.event.server.ServerChangeSplashEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.event.server.ServerChangeSplashEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
 
 /**
  * This listener listens to server splash changes.

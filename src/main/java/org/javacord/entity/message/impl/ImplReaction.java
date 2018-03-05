@@ -7,11 +7,6 @@ import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.emoji.impl.ImplUnicodeEmoji;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.Reaction;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.emoji.Emoji;
-import org.javacord.entity.emoji.impl.ImplUnicodeEmoji;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.Reaction;
 
 /**
  * The implementation of {@link Reaction}.

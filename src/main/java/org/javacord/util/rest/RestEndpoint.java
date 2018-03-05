@@ -1,7 +1,7 @@
 package org.javacord.util.rest;
 
-import org.javacord.Javacord;
 import okhttp3.HttpUrl;
+import org.javacord.Javacord;
 
 import java.util.Optional;
 

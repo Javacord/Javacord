@@ -1,16 +1,12 @@
 package org.javacord.util.ratelimit;
 
+import okhttp3.Response;
 import org.javacord.DiscordApi;
 import org.javacord.ImplDiscordApi;
 import org.javacord.exception.DiscordException;
 import org.javacord.exception.RatelimitException;
 import org.javacord.util.Cleanupable;
 import org.javacord.util.concurrent.ThreadFactory;
-import org.javacord.util.logging.LoggerUtil;
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
-import okhttp3.Response;
-import org.javacord.util.Cleanupable;
 import org.javacord.util.logging.LoggerUtil;
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestResult;

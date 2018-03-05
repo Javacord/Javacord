@@ -6,9 +6,6 @@ import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.MessageAttachment;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.message.Message;
-import org.javacord.entity.message.MessageAttachment;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;

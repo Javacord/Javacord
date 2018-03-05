@@ -6,7 +6,6 @@ import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.message.Reaction;
 import org.javacord.entity.user.User;
 import org.javacord.event.message.RequestableMessageEvent;
-import org.javacord.event.message.RequestableMessageEvent;
 
 import java.util.List;
 import java.util.Optional;

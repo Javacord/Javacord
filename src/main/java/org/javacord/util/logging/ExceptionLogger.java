@@ -1,7 +1,6 @@
 package org.javacord.util.logging;
 
 import org.javacord.entity.channel.TextChannel;
-import org.javacord.entity.channel.TextChannel;
 import org.slf4j.Logger;
 
 import java.lang.Thread.UncaughtExceptionHandler;

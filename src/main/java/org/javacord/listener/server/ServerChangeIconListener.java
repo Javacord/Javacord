@@ -3,7 +3,6 @@ package org.javacord.listener.server;
 import org.javacord.event.server.ServerChangeIconEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.event.server.ServerChangeIconEvent;
 
 /**
  * This listener listens to server icon changes.

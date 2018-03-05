@@ -3,9 +3,6 @@ package org.javacord.event.user;
 import org.javacord.DiscordApi;
 import org.javacord.entity.user.User;
 import org.javacord.entity.user.UserStatus;
-import org.javacord.DiscordApi;
-import org.javacord.entity.user.User;
-import org.javacord.entity.user.UserStatus;
 
 /**
  * A user change status event.

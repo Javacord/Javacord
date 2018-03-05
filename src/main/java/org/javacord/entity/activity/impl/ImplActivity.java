@@ -5,9 +5,6 @@ import org.javacord.entity.activity.Activity;
 import org.javacord.entity.activity.ActivityAssets;
 import org.javacord.entity.activity.ActivityParty;
 import org.javacord.entity.activity.ActivityType;
-import org.javacord.entity.activity.Activity;
-import org.javacord.entity.activity.ActivityAssets;
-import org.javacord.entity.activity.ActivityType;
 
 import java.time.Instant;
 import java.util.Objects;

@@ -13,14 +13,6 @@ import org.javacord.listener.server.role.UserRoleAddListener;
 import org.javacord.listener.server.role.UserRoleRemoveListener;
 import org.javacord.listener.user.UserChangeNicknameListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.permission.Role;
-import org.javacord.entity.permission.impl.ImplRole;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.entity.user.User;
-import org.javacord.event.server.role.UserRoleAddEvent;
-import org.javacord.event.server.role.UserRoleRemoveEvent;
-import org.javacord.listener.user.UserChangeNicknameListener;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;

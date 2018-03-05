@@ -12,9 +12,6 @@ import org.javacord.entity.user.User;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.channel.ServerChannelUpdater;
-import org.javacord.entity.user.User;
 
 import java.util.HashMap;
 import java.util.Map;

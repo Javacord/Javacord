@@ -2,8 +2,6 @@ package org.javacord.listener.connection;
 
 import org.javacord.event.connection.ResumeEvent;
 import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.event.connection.ResumeEvent;
-import org.javacord.listener.GloballyAttachableListener;
 
 /**
  * This listener listens to resumed sessions.

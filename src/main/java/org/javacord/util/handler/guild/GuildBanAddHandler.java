@@ -7,10 +7,6 @@ import org.javacord.entity.user.User;
 import org.javacord.event.server.member.ServerMemberBanEvent;
 import org.javacord.listener.server.member.ServerMemberBanListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.entity.user.User;
-import org.javacord.event.server.member.ServerMemberBanEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

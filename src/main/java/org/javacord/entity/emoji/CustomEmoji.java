@@ -3,9 +3,6 @@ package org.javacord.entity.emoji;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.Icon;
 import org.javacord.entity.UpdatableFromCache;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.Icon;
-import org.javacord.entity.UpdatableFromCache;
 
 import java.util.Optional;
 

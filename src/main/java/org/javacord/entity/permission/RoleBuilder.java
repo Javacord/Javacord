@@ -8,8 +8,6 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.server.impl.ImplServer;
 
 import java.awt.Color;
 import java.util.concurrent.CompletableFuture;

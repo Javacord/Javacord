@@ -10,14 +10,6 @@ import org.javacord.entity.message.embed.EmbedProvider;
 import org.javacord.entity.message.embed.EmbedThumbnail;
 import org.javacord.entity.message.embed.EmbedVideo;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.entity.message.embed.Embed;
-import org.javacord.entity.message.embed.EmbedAuthor;
-import org.javacord.entity.message.embed.EmbedField;
-import org.javacord.entity.message.embed.EmbedFooter;
-import org.javacord.entity.message.embed.EmbedImage;
-import org.javacord.entity.message.embed.EmbedProvider;
-import org.javacord.entity.message.embed.EmbedThumbnail;
-import org.javacord.entity.message.embed.EmbedVideo;
 import org.slf4j.Logger;
 
 import java.awt.Color;

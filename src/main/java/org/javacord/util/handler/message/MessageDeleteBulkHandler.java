@@ -8,11 +8,6 @@ import org.javacord.event.message.MessageDeleteEvent;
 import org.javacord.listener.message.MessageDeleteListener;
 import org.javacord.util.cache.ImplMessageCache;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.message.Message;
-import org.javacord.event.message.MessageDeleteEvent;
-import org.javacord.util.cache.ImplMessageCache;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

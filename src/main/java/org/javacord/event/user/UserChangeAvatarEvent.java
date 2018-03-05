@@ -5,11 +5,6 @@ import org.javacord.entity.Icon;
 import org.javacord.entity.impl.ImplIcon;
 import org.javacord.entity.user.User;
 import org.javacord.util.logging.LoggerUtil;
-import org.javacord.DiscordApi;
-import org.javacord.entity.Icon;
-import org.javacord.entity.impl.ImplIcon;
-import org.javacord.entity.user.User;
-import org.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;

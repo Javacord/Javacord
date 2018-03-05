@@ -3,7 +3,6 @@ package org.javacord.util.ratelimit;
 import org.javacord.DiscordApi;
 import org.javacord.ImplDiscordApi;
 import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestEndpoint;
 
 import java.util.Optional;
 

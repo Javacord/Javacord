@@ -7,11 +7,6 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.event.server.ServerBecomesAvailableEvent;
 import org.javacord.event.server.ServerJoinEvent;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.event.server.ServerBecomesAvailableEvent;
-import org.javacord.event.server.ServerJoinEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 /**
  * Handles the guild create packet.

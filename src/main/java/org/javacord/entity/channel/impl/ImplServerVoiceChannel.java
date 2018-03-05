@@ -27,16 +27,6 @@ import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberJoinLi
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
 import org.javacord.util.ClassHelper;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.DiscordEntity;
-import org.javacord.entity.channel.ChannelCategory;
-import org.javacord.entity.channel.InternalChannel;
-import org.javacord.entity.channel.InternalServerChannel;
-import org.javacord.entity.channel.InternalVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannelUpdater;
-import org.javacord.entity.server.Server;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.entity.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;

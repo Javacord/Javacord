@@ -3,9 +3,6 @@ package org.javacord.entity.emoji.impl;
 import org.javacord.entity.emoji.CustomEmoji;
 import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.emoji.KnownCustomEmoji;
-import org.javacord.entity.emoji.CustomEmoji;
-import org.javacord.entity.emoji.Emoji;
-import org.javacord.entity.emoji.KnownCustomEmoji;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;

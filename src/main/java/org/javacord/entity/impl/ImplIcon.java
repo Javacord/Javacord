@@ -2,7 +2,6 @@ package org.javacord.entity.impl;
 
 import org.javacord.DiscordApi;
 import org.javacord.entity.Icon;
-import org.javacord.entity.Icon;
 
 import java.net.URL;
 

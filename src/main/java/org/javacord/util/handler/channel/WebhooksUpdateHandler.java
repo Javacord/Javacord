@@ -5,8 +5,6 @@ import org.javacord.DiscordApi;
 import org.javacord.event.channel.text.WebhooksUpdateEvent;
 import org.javacord.listener.channel.text.WebhooksUpdateListener;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.event.channel.text.WebhooksUpdateEvent;
-import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;

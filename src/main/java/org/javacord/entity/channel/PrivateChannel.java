@@ -5,7 +5,6 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.user.channel.PrivateChannelAttachableListener;
 import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.user.User;
 
 import java.util.Collection;
 import java.util.List;

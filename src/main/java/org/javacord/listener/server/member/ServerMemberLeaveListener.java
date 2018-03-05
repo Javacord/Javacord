@@ -6,11 +6,6 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
 import org.javacord.listener.server.ServerLeaveListener;
 import org.javacord.listener.user.UserAttachableListener;
-import org.javacord.event.server.member.ServerMemberLeaveEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.listener.server.ServerLeaveListener;
 
 /**
  * This listener listens to server member leaves.

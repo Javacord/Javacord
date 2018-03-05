@@ -4,10 +4,6 @@ import org.javacord.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.server.ServerAttachableListener;
-import org.javacord.event.channel.server.ServerChannelDeleteEvent;
-import org.javacord.listener.GloballyAttachableListener;
-import org.javacord.listener.ObjectAttachableListener;
-import org.javacord.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to server channel deletions.

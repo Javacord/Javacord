@@ -5,7 +5,6 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.channel.server.ChannelCategoryAttachableListener;
 import org.javacord.listener.channel.server.ServerChannelChangeNsfwFlagListener;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.entity.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;

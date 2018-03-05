@@ -8,8 +8,6 @@ import org.javacord.entity.server.invite.impl.ImplInvite;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.Icon;
-import org.javacord.entity.server.Server;
 
 import java.net.MalformedURLException;
 import java.net.URL;

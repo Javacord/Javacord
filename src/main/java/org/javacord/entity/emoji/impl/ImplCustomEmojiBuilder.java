@@ -14,9 +14,6 @@ import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
-import org.javacord.entity.Icon;
-import org.javacord.entity.emoji.CustomEmojiBuilder;
-import org.javacord.entity.emoji.KnownCustomEmoji;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

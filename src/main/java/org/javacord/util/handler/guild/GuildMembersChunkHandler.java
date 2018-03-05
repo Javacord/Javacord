@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.DiscordApi;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.gateway.PacketHandler;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.util.gateway.PacketHandler;
 
 /**
  * Handles the guild members chunk packet.
