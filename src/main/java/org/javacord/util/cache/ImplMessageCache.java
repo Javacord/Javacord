@@ -4,6 +4,8 @@ import org.javacord.DiscordApi;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.message.Message;
 import org.javacord.util.Cleanupable;
+import org.javacord.util.logging.LoggerUtil;
+import org.slf4j.Logger;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -17,6 +19,11 @@ import java.util.stream.Collectors;
  * The implementation of {@link MessageCache}.
  */
 public class ImplMessageCache implements MessageCache, Cleanupable {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(ImplMessageCache.class);
 
     /**
      * A list with all messages.
@@ -55,7 +62,13 @@ public class ImplMessageCache implements MessageCache, Cleanupable {
         this.capacity = capacity;
         this.storageTimeInSeconds = storageTimeInSeconds;
 
-        cleanFuture = api.getThreadPool().getScheduler().scheduleWithFixedDelay(this::clean, 1, 1, TimeUnit.MINUTES);
+        cleanFuture = api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+            try {
+                this.clean();
+            } catch (Throwable t) {
+                logger.error("Failed to clean message cache!", t);
+            }
+        }, 1, 1, TimeUnit.MINUTES);
     }
 
     /**
@@ -99,7 +112,7 @@ public class ImplMessageCache implements MessageCache, Cleanupable {
             long foreverCachedAmount = messages.stream().filter(Message::isCachedForever).count();
             messages.removeAll(messages.stream()
                                        .filter(message -> !message.isCachedForever())
-                                       .limit(Math.min(0, messages.size() - capacity - foreverCachedAmount))
+                                       .limit(Math.max(0, messages.size() - capacity - foreverCachedAmount))
                                        .collect(Collectors.toList()));
         }
     }
