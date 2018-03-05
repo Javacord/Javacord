@@ -1080,6 +1080,11 @@ public class ImplDiscordApi implements DiscordApi {
     }
 
     @Override
+    public AccountUpdater createAccountUpdater() {
+        return new ImplAccountUpdater(this);
+    }
+
+    @Override
     public Collection<User> getCachedUsers() {
         synchronized (users) {
             return Collections.unmodifiableCollection(users.values().stream()
