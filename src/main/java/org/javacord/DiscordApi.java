@@ -18,6 +18,7 @@ import org.javacord.entity.channel.VoiceChannel;
 import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.MessageSet;
+import org.javacord.entity.message.UncachedMessageUtil;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.server.Server;
@@ -166,6 +167,13 @@ public interface DiscordApi {
      * @return The ratelimit manager for this bot.
      */
     RatelimitManager getRatelimitManager();
+
+    /**
+     * Gets a utility class to interact with uncached messages.
+     *
+     * @return A utility class to interact with uncached messages.
+     */
+    UncachedMessageUtil getUncachedMessageUtil();
 
     /**
      * Gets the websocket adapter which is used to connect to Discord.

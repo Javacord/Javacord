@@ -1,8 +1,5 @@
 package org.javacord.entity.message;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.DiscordApi;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
@@ -17,7 +14,6 @@ import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.emoji.impl.ImplUnicodeEmoji;
 import org.javacord.entity.message.embed.Embed;
 import org.javacord.entity.message.embed.EmbedBuilder;
-import org.javacord.entity.message.embed.impl.ImplEmbedFactory;
 import org.javacord.entity.permission.PermissionType;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.server.Server;
@@ -34,12 +30,8 @@ import org.javacord.listener.message.reaction.ReactionRemoveListener;
 import org.javacord.util.ClassHelper;
 import org.javacord.util.DiscordRegexPattern;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,13 +40,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * This class represents a Discord message.
@@ -73,7 +63,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId) {
-        return delete(api, channelId, messageId, null);
+        return api.getUncachedMessageUtil().delete(channelId, messageId);
     }
 
     /**
@@ -85,7 +75,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, String channelId, String messageId) {
-        return delete(api, channelId, messageId, null);
+        return api.getUncachedMessageUtil().delete(channelId, messageId, null);
     }
 
     /**
@@ -98,11 +88,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId, String reason) {
-        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
-                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
-                .setRatelimitRetries(250)
-                .setAuditLogReason(reason)
-                .execute(result -> null);
+        return api.getUncachedMessageUtil().delete(channelId, messageId, reason);
     }
 
     /**
@@ -115,13 +101,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, String channelId, String messageId, String reason) {
-        try {
-            return delete(api, Long.parseLong(channelId), Long.parseLong(messageId), reason);
-        } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
+        return api.getUncachedMessageUtil().delete(channelId, messageId, reason);
     }
 
     /**
@@ -136,41 +116,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> deleteAll(DiscordApi api, long channelId, long... messageIds) {
-        // split by younger than two weeks / older than two weeks
-        Instant twoWeeksAgo = Instant.now().minus(14, ChronoUnit.DAYS);
-        Map<Boolean, List<Long>> messageIdsByAge = Arrays.stream(messageIds).distinct().boxed()
-                .collect(Collectors.groupingBy(
-                        messageId -> DiscordEntity.getCreationTimestamp(messageId).isAfter(twoWeeksAgo)));
-
-        AtomicInteger batchCounter = new AtomicInteger();
-        return CompletableFuture.allOf(Stream.concat(
-                // for messages younger than 2 weeks
-                messageIdsByAge.getOrDefault(true, Collections.emptyList()).stream()
-                        // send batches of 100 messages
-                        .collect(Collectors.groupingBy(messageId -> batchCounter.getAndIncrement() / 100))
-                        .values().stream()
-                        .map(messageIdBatch -> {
-                            // do not use batch deletion for a single message
-                            if (messageIdBatch.size() == 1) {
-                                return Message.delete(api, channelId, messageIdBatch.get(0));
-                            }
-
-                            ObjectNode body = JsonNodeFactory.instance.objectNode();
-                            ArrayNode messages = body.putArray("messages");
-                            messageIdBatch.stream()
-                                    .map(Long::toUnsignedString)
-                                    .forEach(messages::add);
-
-                            return new RestRequest<Void>(api, RestMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
-                                    .setRatelimitRetries(0)
-                                    .setUrlParameters(Long.toUnsignedString(channelId))
-                                    .setBody(body)
-                                    .execute(result -> null);
-                        }),
-                // for messages older than 2 weeks use single message deletion
-                messageIdsByAge.getOrDefault(false, Collections.emptyList()).stream()
-                        .map(messageId -> Message.delete(api, channelId, messageId))
-        ).toArray(CompletableFuture[]::new));
+        return api.getUncachedMessageUtil().deleteAll(channelId, messageIds);
     }
 
     /**
@@ -185,16 +131,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> deleteAll(DiscordApi api, String channelId, String... messageIds) {
-        long[] messageLongIds = Arrays.stream(messageIds).filter(s -> {
-            try {
-                //noinspection ResultOfMethodCallIgnored
-                Long.parseLong(s);
-                return true;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }).mapToLong(Long::parseLong).toArray();
-        return deleteAll(api, Long.parseLong(channelId), messageLongIds);
+        return api.getUncachedMessageUtil().deleteAll(channelId, messageIds);
     }
 
     /**
@@ -208,14 +145,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> deleteAll(DiscordApi api, Message... messages) {
-        return CompletableFuture.allOf(
-                Arrays.stream(messages)
-                        .collect(Collectors.groupingBy(message -> message.getChannel().getId(),
-                                                       Collectors.mapping(Message::getId, Collectors.toList())))
-                        .entrySet().stream()
-                        .map(entry -> deleteAll(api, entry.getKey(),
-                                                entry.getValue().stream().mapToLong(Long::longValue).toArray()))
-                        .toArray(CompletableFuture[]::new));
+        return api.getUncachedMessageUtil().deleteAll(messages);
     }
 
     /**
@@ -229,7 +159,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> deleteAll(DiscordApi api, Iterable<Message> messages) {
-        return deleteAll(api, StreamSupport.stream(messages.spliterator(), false).toArray(Message[]::new));
+        return api.getUncachedMessageUtil().deleteAll(messages);
     }
 
     /**
@@ -242,7 +172,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, String content) {
-        return edit(api, channelId, messageId, content, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, null, false);
     }
 
     /**
@@ -255,7 +185,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, String content) {
-        return edit(api, channelId, messageId, content, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, null, false);
     }
 
     /**
@@ -268,7 +198,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder embed) {
-        return edit(api, channelId, messageId, null, false, embed, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embed, true);
     }
 
     /**
@@ -281,7 +211,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, EmbedBuilder embed) {
-        return edit(api, channelId, messageId, null, false, embed, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embed, true);
     }
 
     /**
@@ -296,7 +226,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> edit(
             DiscordApi api, long channelId, long messageId, String content, EmbedBuilder embed) {
-        return edit(api, channelId, messageId, content, true, embed, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embed, true);
     }
 
     /**
@@ -311,7 +241,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> edit(
             DiscordApi api, String channelId, String messageId, String content, EmbedBuilder embed) {
-        return edit(api, channelId, messageId, content, true, embed, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embed, true);
     }
 
     /**
@@ -328,25 +258,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, String content,
                                         boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
-        ObjectNode body = JsonNodeFactory.instance.objectNode();
-        if (updateContent) {
-            if (content == null) {
-                body.putNull("content");
-            } else {
-                body.put("content", content);
-            }
-        }
-        if (updateEmbed) {
-            if (embed == null) {
-                body.putNull("embed");
-            } else {
-                ((ImplEmbedFactory) embed.getFactory()).toJsonNode(body.putObject("embed"));
-            }
-        }
-        return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
-                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
-                .setBody(body)
-                .execute(result -> null);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
     }
 
     /**
@@ -363,13 +275,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, String content,
                                         boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
-        try {
-            return edit(api, Long.parseLong(channelId), Long.parseLong(messageId), content, true, embed, true);
-        } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
     }
 
     /**
@@ -381,7 +287,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Void> removeContent(DiscordApi api, long channelId, long messageId) {
-        return edit(api, channelId, messageId, null, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, false);
     }
 
     /**
@@ -393,7 +299,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Void> removeContent(DiscordApi api, String channelId, String messageId) {
-        return edit(api, channelId, messageId, null, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, false);
     }
 
     /**
@@ -405,7 +311,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Void> removeEmbed(DiscordApi api, long channelId, long messageId) {
-        return edit(api, channelId, messageId, null, false, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, null, true);
     }
 
     /**
@@ -417,7 +323,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Void> removeEmbed(DiscordApi api, String channelId, String messageId) {
-        return edit(api, channelId, messageId, null, false, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, null, true);
     }
 
     /**
@@ -429,7 +335,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Void> removeContentAndEmbed(DiscordApi api, long channelId, long messageId) {
-        return edit(api, channelId, messageId, null, true, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, true);
     }
 
     /**
@@ -441,7 +347,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Void> removeContentAndEmbed(DiscordApi api, String channelId, String messageId) {
-        return edit(api, channelId, messageId, null, true, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, true);
     }
 
     /**
@@ -454,11 +360,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, String unicodeEmoji) {
-        return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
-                .setUrlParameters(
-                        Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), unicodeEmoji, "@me")
-                .setRatelimitRetries(500)
-                .execute(result -> null);
+        return api.getUncachedMessageUtil().addReaction(channelId, messageId, unicodeEmoji);
     }
 
     /**
@@ -472,13 +374,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     static CompletableFuture<Void> addReaction(
             DiscordApi api, String channelId, String messageId, String unicodeEmoji) {
-        try {
-            return addReaction(api, Long.parseLong(channelId), Long.parseLong(messageId), unicodeEmoji);
-        } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
+        return api.getUncachedMessageUtil().addReaction(channelId, messageId, unicodeEmoji);
     }
 
     /**
@@ -491,15 +387,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, Emoji emoji) {
-        String value = emoji.asUnicodeEmoji().orElseGet(() ->
-                emoji.asCustomEmoji()
-                        .map(e -> e.getName() + ":" + e.getIdAsString())
-                        .orElse("UNKNOWN")
-        );
-        return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
-                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), value, "@me")
-                .setRatelimitRetries(500)
-                .execute(result -> null);
+        return api.getUncachedMessageUtil().addReaction(channelId, messageId, emoji);
     }
 
     /**
@@ -512,13 +400,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, String channelId, String messageId, Emoji emoji) {
-        try {
-            return addReaction(api, Long.parseLong(channelId), Long.parseLong(messageId), emoji);
-        } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
+        return api.getUncachedMessageUtil().addReaction(channelId, messageId, emoji);
     }
 
     /**
@@ -530,9 +412,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> removeAllReactions(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
-                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
-                .execute(result -> null);
+        return api.getUncachedMessageUtil().removeAllReactions(channelId, messageId);
     }
 
     /**
@@ -544,13 +424,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> removeAllReactions(DiscordApi api, String channelId, String messageId) {
-        try {
-            return removeAllReactions(api, Long.parseLong(channelId), Long.parseLong(messageId));
-        } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
+        return api.getUncachedMessageUtil().removeAllReactions(channelId, messageId);
     }
 
     /**
@@ -562,9 +436,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the pin was successful.
      */
     static CompletableFuture<Void> pin(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.PINS)
-                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
-                .execute(result -> null);
+        return api.getUncachedMessageUtil().pin(channelId, messageId);
     }
 
     /**
@@ -576,13 +448,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the pin was successful.
      */
     static CompletableFuture<Void> pin(DiscordApi api, String channelId, String messageId) {
-        try {
-            return pin(api, Long.parseLong(channelId), Long.parseLong(messageId));
-        } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
+        return api.getUncachedMessageUtil().pin(channelId, messageId);
     }
 
     /**
@@ -594,9 +460,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> unpin(DiscordApi api, long channelId, long messageId) {
-        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.PINS)
-                .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
-                .execute(result -> null);
+        return api.getUncachedMessageUtil().unpin(channelId, messageId);
     }
 
     /**
@@ -608,13 +472,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> unpin(DiscordApi api, String channelId, String messageId) {
-        try {
-            return unpin(api, Long.parseLong(channelId), Long.parseLong(messageId));
-        } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
+        return api.getUncachedMessageUtil().unpin(channelId, messageId);
     }
 
     /**

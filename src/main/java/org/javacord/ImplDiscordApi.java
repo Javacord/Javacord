@@ -18,8 +18,10 @@ import org.javacord.entity.emoji.impl.ImplCustomEmoji;
 import org.javacord.entity.emoji.impl.ImplKnownCustomEmoji;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.MessageSet;
+import org.javacord.entity.message.UncachedMessageUtil;
 import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.entity.message.impl.ImplMessageSet;
+import org.javacord.entity.message.impl.ImplUncachedMessageUtil;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilder;
 import org.javacord.entity.server.impl.ImplServerBuilder;
@@ -172,6 +174,11 @@ public class ImplDiscordApi implements DiscordApi {
      * The ratelimit manager for this bot.
      */
     private final RatelimitManager ratelimitManager = new RatelimitManager(this);
+
+    /**
+     * The utility class to interact with uncached messages.
+     */
+    private final UncachedMessageUtil uncachedMessageUtil = new ImplUncachedMessageUtil(this);
 
     /**
      * The websocket adapter used to connect to Discord.
@@ -932,6 +939,11 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public RatelimitManager getRatelimitManager() {
         return ratelimitManager;
+    }
+
+    @Override
+    public UncachedMessageUtil getUncachedMessageUtil() {
+        return uncachedMessageUtil;
     }
 
     /*
