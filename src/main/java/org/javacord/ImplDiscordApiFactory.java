@@ -100,8 +100,8 @@ public class ImplDiscordApiFactory implements DiscordApiFactory {
     }
 
     @Override
-    public CompletableFuture<ImplDiscordApiFactory> setRecommendedTotalShards() {
-        CompletableFuture<ImplDiscordApiFactory> future = new CompletableFuture<>();
+    public CompletableFuture<DiscordApiFactory> setRecommendedTotalShards() {
+        CompletableFuture<DiscordApiFactory> future = new CompletableFuture<>();
         if (token == null) {
             future.completeExceptionally(new IllegalArgumentException("You cannot request the recommended total shards without a token!"));
             return future;

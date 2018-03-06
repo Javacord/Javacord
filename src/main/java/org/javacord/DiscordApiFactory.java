@@ -57,7 +57,7 @@ public interface DiscordApiFactory {
      *
      * @return A future to check if the action was successful.
      */
-    CompletableFuture<ImplDiscordApiFactory> setRecommendedTotalShards();
+    CompletableFuture<DiscordApiFactory> setRecommendedTotalShards();
 
     /**
      * Gets the total shards.
