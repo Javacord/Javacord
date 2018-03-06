@@ -72,11 +72,6 @@ public class ImplMessageFactory implements MessageFactory {
     public ImplMessageFactory() { }
 
     @Override
-    public ImplMessageFactory getNewInstance() {
-        return new ImplMessageFactory();
-    }
-
-    @Override
     public void append(String message, MessageDecoration... decorations) {
         for (MessageDecoration decoration : decorations) {
             strBuilder.append(decoration.getPrefix());

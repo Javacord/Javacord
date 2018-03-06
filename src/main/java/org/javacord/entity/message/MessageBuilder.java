@@ -5,6 +5,7 @@ import org.javacord.entity.Mentionable;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.message.embed.EmbedBuilder;
 import org.javacord.entity.user.User;
+import org.javacord.util.FactoryBuilder;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,35 +21,9 @@ import java.util.concurrent.CompletableFuture;
 public class MessageBuilder {
 
     /**
-     * The base factory. It's only used to create new factories.
-     */
-    private static final MessageFactory baseFactory;
-
-    // Load it static, because it has a better performance to load it only once
-    static {
-        ServiceLoader<MessageFactory> factoryServiceLoader = ServiceLoader.load(MessageFactory.class);
-        Iterator<MessageFactory> factoryIterator = factoryServiceLoader.iterator();
-        if (factoryIterator.hasNext()) {
-            baseFactory = factoryIterator.next();
-            if (factoryIterator.hasNext()) {
-                throw new IllegalStateException("Found more than one MessageFactory implementation!");
-            }
-        } else {
-            throw new IllegalStateException("No MessageFactory implementation was found!");
-        }
-    }
-
-    /**
      * The message factory used by this instance.
      */
-    private final MessageFactory factory;
-
-    /**
-     * Creates a new message builder.
-     */
-    public MessageBuilder() {
-        factory = baseFactory.getNewInstance();
-    }
+    private final MessageFactory factory = FactoryBuilder.createMessageFactory();
 
     /**
      * Creates a message builder from a message.

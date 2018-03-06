@@ -1,6 +1,7 @@
 package org.javacord;
 
 import org.javacord.event.server.ServerBecomesAvailableEvent;
+import org.javacord.util.FactoryBuilder;
 import org.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -28,23 +29,7 @@ public class DiscordApiBuilder {
     /**
      * The factory used to create a {@link DiscordApi} instance.
      */
-    private DiscordApiFactory factory;
-
-    /**
-     * Creates a new discord api builder.
-     */
-    public DiscordApiBuilder() {
-        ServiceLoader<DiscordApiFactory> factoryServiceLoader = ServiceLoader.load(DiscordApiFactory.class);
-        Iterator<DiscordApiFactory> factoryIterator = factoryServiceLoader.iterator();
-        if (factoryIterator.hasNext()) {
-            factory = factoryIterator.next();
-            if (factoryIterator.hasNext()) {
-                throw new IllegalStateException("Found more than one DiscordApiFactory implementation!");
-            }
-        } else {
-            throw new IllegalStateException("No DiscordApiFactory implementation was found!");
-        }
-    }
+    private DiscordApiFactory factory = FactoryBuilder.createDiscordApiFactory();
 
     /**
      * Login to the account with the given token.

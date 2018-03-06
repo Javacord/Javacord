@@ -18,14 +18,6 @@ import java.util.concurrent.CompletableFuture;
 public interface MessageFactory {
 
     /**
-     * Gets a new instance of a message factory.
-     * This method is the same as calling the constructor of the implementation.
-     *
-     * @return A new instance of a message factory.
-     */
-    MessageFactory getNewInstance();
-
-    /**
      * Appends a sting with or without decoration to the message.
      *
      * @param message The string to append.
