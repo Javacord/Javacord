@@ -31,6 +31,40 @@ public interface Emoji extends Mentionable {
     Optional<KnownCustomEmoji> asKnownCustomEmoji();
 
     /**
+     * Checks if the emoji is equal to the given emoji.
+     * This can be used to safe some ugly optional checks.
+     *
+     * @param otherEmoji The emoji to compare with.
+     * @return Whether the emoji is equal to the given emoji.
+     */
+    default boolean equalsEmoji(Emoji otherEmoji) {
+        if (otherEmoji.isUnicodeEmoji()) {
+            return equalsEmoji(otherEmoji.asUnicodeEmoji().orElse(""));
+        }
+        if (isUnicodeEmoji()) {
+            // This is an unicode emoji and the other emoji is a custom emoji
+            return false;
+        }
+        // Both are custom emojis, so we have to compare the id
+        long thisId = asCustomEmoji().map(CustomEmoji::getId).orElseThrow(AssertionError::new);
+        long otherId = asCustomEmoji().map(CustomEmoji::getId).orElseThrow(AssertionError::new);
+        return thisId == otherId;
+    }
+
+    /**
+     * Checks if the emoji is equal to the given unicode emoji.
+     * This can be used to safe some ugly optional checks.
+     *
+     * @param otherEmoji The unicode emoji to compare with.
+     * @return Whether the emoji is equal to the given unicode emoji.
+     */
+    default boolean equalsEmoji(String otherEmoji) {
+        return asUnicodeEmoji()
+                .map(emoji -> emoji.equals(otherEmoji))
+                .orElse(false);
+    }
+
+    /**
      * Checks if the emoji is animated.
      * Always returns <code>false</code> for unicode emojis.
      *
