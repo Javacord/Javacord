@@ -6,6 +6,7 @@ import org.javacord.exception.DiscordExceptionInstantiator;
 import org.javacord.exception.ReactionBlockedException;
 import org.javacord.exception.UnknownEmojiException;
 import org.javacord.exception.UnknownMessageException;
+import org.javacord.util.exception.DiscordExceptionValidator;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -154,14 +155,17 @@ public enum RestRequestResultErrorCode {
      *
      * @param origin The origin of the exception.
      * @param message The message of the exception.
-     * @param request The request.
-     * @param restRequestResult The rest request result which caused the exception.
+     * @param request The information about the request.
+     * @param response The information about the response.
      * @return The discord exception to throw for this kind of result code.
      */
-    public Optional<? extends DiscordException> getDiscordException(
-            Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
-        return Optional.ofNullable(discordExceptionInstantiator)
-                .map(instantiator -> instantiator.createInstance(origin, message, request, restRequestResult));
+    public Optional<? extends DiscordException> getDiscordException(Exception origin, String message,
+                                                                    RestRequestInformation request,
+                                                                    RestRequestResponseInformation response) {
+        Optional<? extends DiscordException> exception = Optional.ofNullable(discordExceptionInstantiator)
+                .map(instantiator -> instantiator.createInstance(origin, message, request, response));
+        exception.ifPresent(DiscordExceptionValidator::validateException);
+        return exception;
     }
 
 }

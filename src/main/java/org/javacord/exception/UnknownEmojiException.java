@@ -1,7 +1,7 @@
 package org.javacord.exception;
 
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
+import org.javacord.util.rest.RestRequestInformation;
+import org.javacord.util.rest.RestRequestResponseInformation;
 
 /**
  * When the emoji that was sent, for example as reaction, is not an emoji Discord knows about.
@@ -13,12 +13,12 @@ public class UnknownEmojiException extends BadRequestException {
      *
      * @param origin The origin of the exception.
      * @param message The message of the exception.
-     * @param request The request.
-     * @param restRequestResult The rest request result which caused the exception.
+     * @param request The information about the request.
+     * @param response The information about the response.
      */
-    public UnknownEmojiException(
-            Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
-        super(origin, message, request, restRequestResult);
+    public UnknownEmojiException(Exception origin, String message, RestRequestInformation request,
+                                 RestRequestResponseInformation response) {
+        super(origin, message, request, response);
     }
 
 }

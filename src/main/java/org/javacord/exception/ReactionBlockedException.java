@@ -1,7 +1,7 @@
 package org.javacord.exception;
 
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
+import org.javacord.util.rest.RestRequestInformation;
+import org.javacord.util.rest.RestRequestResponseInformation;
 
 /**
  * When the user of the connected account cannot add a reaction to a message a user has written.
@@ -13,12 +13,12 @@ public class ReactionBlockedException extends MissingPermissionsException {
      *
      * @param origin The origin of the exception.
      * @param message The message of the exception.
-     * @param request The request.
-     * @param restRequestResult The rest request result which caused the exception.
+     * @param request The information about the request.
+     * @param response The information about the response.
      */
-    public ReactionBlockedException(
-            Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
-        super(origin, message, request, restRequestResult);
+    public ReactionBlockedException(Exception origin, String message, RestRequestInformation request,
+                                    RestRequestResponseInformation response) {
+        super(origin, message, request, response);
     }
 
 }

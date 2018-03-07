@@ -10,6 +10,7 @@ import org.javacord.util.concurrent.ThreadFactory;
 import org.javacord.util.logging.LoggerUtil;
 import org.javacord.util.rest.RestRequest;
 import org.javacord.util.rest.RestRequestResult;
+import org.javacord.util.rest.impl.ImplRestRequestResponseInformation;
 import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
@@ -97,7 +98,8 @@ public class RatelimitManager implements Cleanupable {
                     if (request.incrementRetryCounter()) {
                         request.getResult().completeExceptionally(
                                 new RatelimitException(request.getOrigin(),
-                                        "You have been ratelimited and ran out of retires!", request)
+                                        "You have been ratelimited and ran out of retires!",
+                                        request.asRestRequestInformation())
                         );
                         queue.remove(request);
                         bucket.setHasActiveScheduler(false);
@@ -118,7 +120,8 @@ public class RatelimitManager implements Cleanupable {
                                 if (req.incrementRetryCounter()) {
                                     req.getResult().completeExceptionally(
                                             new RatelimitException(req.getOrigin(),
-                                                    "You have been ratelimited and ran out of retires!", req)
+                                                    "You have been ratelimited and ran out of retires!",
+                                                    request.asRestRequestInformation())
                                     );
                                     return true;
                                 }
@@ -167,7 +170,10 @@ public class RatelimitManager implements Cleanupable {
                         }
                     } catch (Exception e) {
                         if (e instanceof DiscordException) {
-                            rateLimitHeadersSource = ((DiscordException) e).getRestRequestResult().orElse(null);
+                            rateLimitHeadersSource = ((DiscordException) e).getResponse()
+                                    .map(response -> ((ImplRestRequestResponseInformation) response))
+                                    .map(ImplRestRequestResponseInformation::getRestRequestResult)
+                                    .orElse(null);
                         }
                         restRequestResult.completeExceptionally(e);
                     } finally {

@@ -1,7 +1,7 @@
 package org.javacord.exception;
 
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
+import org.javacord.util.rest.RestRequestInformation;
+import org.javacord.util.rest.RestRequestResponseInformation;
 
 /**
  * When the message that was referenced, for example for adding a reaction to, is not a message Discord knows about
@@ -14,12 +14,12 @@ public class UnknownMessageException extends NotFoundException {
      *
      * @param origin The origin of the exception.
      * @param message The message of the exception.
-     * @param request The request.
-     * @param restRequestResult The rest request result which caused the exception.
+     * @param request The information about the request.
+     * @param response The information about the response.
      */
-    public UnknownMessageException(
-            Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult) {
-        super(origin, message, request, restRequestResult);
+    public UnknownMessageException(Exception origin, String message, RestRequestInformation request,
+                                   RestRequestResponseInformation response) {
+        super(origin, message, request, response);
     }
 
 }

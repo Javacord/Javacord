@@ -10,10 +10,14 @@ import okhttp3.Response;
 import org.javacord.DiscordApi;
 import org.javacord.exception.DiscordException;
 import org.javacord.util.logging.LoggerUtil;
+import org.javacord.util.rest.impl.ImplRestRequestInformation;
+import org.javacord.util.rest.impl.ImplRestRequestResponseInformation;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -35,8 +39,8 @@ public class RestRequest<T> {
     private boolean includeAuthorizationHeader = true;
     private int ratelimitRetries = 50;
     private String[] urlParameters = new String[0];
-    private List<String[]> queryParameters = new ArrayList<>();
-    private List<String[]> headers = new ArrayList<>();
+    private Map<String, String> queryParameters = new HashMap<>();
+    private Map<String, String> headers = new HashMap<>();
     private String body = null;
 
     private int retryCounter = 0;
@@ -155,7 +159,7 @@ public class RestRequest<T> {
      * @return The current instance in order to chain call methods.
      */
     public RestRequest<T> addQueryParameter(String key, String value) {
-        this.queryParameters.add(new String[]{key, value});
+        queryParameters.put(key, value);
         return this;
     }
 
@@ -167,7 +171,7 @@ public class RestRequest<T> {
      * @return The current instance in order to chain call methods.
      */
     public RestRequest<T> addHeader(String name, String value) {
-        this.headers.add(new String[]{name, value});
+        headers.put(name, value);
         return this;
     }
 
@@ -306,6 +310,20 @@ public class RestRequest<T> {
     }
 
     /**
+     * Gets the information for this rest request.
+     *
+     * @return The information for this rest request.
+     */
+    public RestRequestInformation asRestRequestInformation() {
+        try {
+            return new ImplRestRequestInformation(
+                    api, new URL(endpoint.getFullUrl(urlParameters)), queryParameters, headers, body);
+        } catch (MalformedURLException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    /**
      * Executes the request blocking.
      *
      * @return The result of the request.
@@ -314,9 +332,7 @@ public class RestRequest<T> {
     public RestRequestResult executeBlocking() throws Exception {
         Request.Builder requestBuilder = new Request.Builder();
         HttpUrl.Builder httpUrlBuilder = endpoint.getOkHttpUrl(urlParameters).newBuilder();
-        for (String[] queryParameter : queryParameters) {
-            httpUrlBuilder.addQueryParameter(queryParameter[0], queryParameter[1]);
-        }
+        queryParameters.forEach(httpUrlBuilder::addQueryParameter);
         requestBuilder.url(httpUrlBuilder.build());
 
         RequestBody requestBody;
@@ -350,9 +366,7 @@ public class RestRequest<T> {
         if (includeAuthorizationHeader) {
             requestBuilder.addHeader("authorization", api.getToken());
         }
-        for (String[] header : headers) {
-            requestBuilder.addHeader(header[0], header[1]);
-        }
+        headers.forEach(requestBuilder::addHeader);
         logger.debug("Trying to send {} request to {}{}",
                 method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
 
@@ -362,7 +376,14 @@ public class RestRequest<T> {
                     method.name(), endpoint.getFullUrl(urlParameters), response.code(),
                     result.getBody().map(b -> "").orElse(" empty"),
                     result.getStringBody().map(s -> " " + s).orElse(""));
+
             if (response.code() >= 300 || response.code() < 200) {
+
+                RestRequestInformation requestInformation = asRestRequestInformation();
+                RestRequestResponseInformation responseInformation = new ImplRestRequestResponseInformation(
+                        requestInformation, result);
+
+                // Check if the response body contained a know error code
                 if (!result.getJsonBody().isNull() && result.getJsonBody().has("code")) {
                     int code = result.getJsonBody().get("code").asInt();
                     String message = result.getJsonBody().has("message") ?
@@ -370,7 +391,8 @@ public class RestRequest<T> {
                     Optional<? extends DiscordException> discordException = RestRequestResultErrorCode.fromCode(code)
                             .flatMap(restRequestResultCode -> restRequestResultCode.getDiscordException(
                                     origin, (message == null) ? restRequestResultCode.getMeaning() : message,
-                                    this, result));
+                                    requestInformation, responseInformation));
+                    // There's an exception for this specific response code
                     if (discordException.isPresent()) {
                         throw discordException.get();
                     }
@@ -380,29 +402,26 @@ public class RestRequest<T> {
                     case 429:
                         // A 429 will be handled in the RatelimitManager class
                         return result;
-
                     default:
-                        Optional<? extends DiscordException> discordException =
-                                RestRequestHttpResponseCode.fromCode(response.code())
-                                        .flatMap(restRequestHttpResponseCode ->
-                                                         restRequestHttpResponseCode.getDiscordException(
-                                                                 origin, "Received a " + response.code()
-                                                                         + " response from Discord with"
-                                                                         + (result.getBody().isPresent()
-                                                                            ? ""
-                                                                            : " empty")
-                                                                         + " body"
-                                                                         + result.getStringBody()
-                                                                                 .map(s -> " " + s)
-                                                                                 .orElse("")
-                                                                         + "!", this, result));
+                        // There are specific exceptions for specific response codes (e.g. NotFoundException for 404)
+                        Optional<? extends DiscordException> discordException = RestRequestHttpResponseCode
+                                .fromCode(response.code()).flatMap(restRequestHttpResponseCode ->
+                                        restRequestHttpResponseCode.getDiscordException(
+                                                origin, "Received a " + response.code() + " response from Discord with"
+                                                        + (result.getBody().isPresent() ? "" : " empty")
+                                                        + " body"
+                                                        + result.getStringBody().map(s -> " " + s).orElse("")
+                                                        + "!",
+                                                requestInformation, responseInformation));
                         if (discordException.isPresent()) {
                             throw discordException.get();
                         } else {
+                            // No specific exception was defined for the response code, so throw a "normal"
                             throw new DiscordException(
                                     origin, "Received a " + response.code() + " response from Discord with"
                                             + (result.getBody().isPresent() ? "" : " empty") + " body"
-                                            + result.getStringBody().map(s -> " " + s).orElse("") + "!", this, result);
+                                            + result.getStringBody().map(s -> " " + s).orElse("") + "!",
+                                    requestInformation, responseInformation);
                         }
                 }
             }

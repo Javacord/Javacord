@@ -1,7 +1,7 @@
 package org.javacord.exception;
 
-import org.javacord.util.rest.RestRequest;
-import org.javacord.util.rest.RestRequestResult;
+import org.javacord.util.rest.RestRequestInformation;
+import org.javacord.util.rest.RestRequestResponseInformation;
 
 /**
  * Represents a function that accepts four arguments ({@code Exception}, {@code String}, {@code RestRequest<?>} and
@@ -17,10 +17,11 @@ public interface DiscordExceptionInstantiator<T extends DiscordException> {
      *
      * @param origin The origin of the exception.
      * @param message The message of the exception.
-     * @param request The request.
-     * @param restRequestResult The rest request result which caused the exception.
+     * @param request The information about the request.
+     * @param response The information about the response.
      * @return The new instance.
      */
-    T createInstance(Exception origin, String message, RestRequest<?> request, RestRequestResult restRequestResult);
+    T createInstance(Exception origin, String message, RestRequestInformation request,
+                     RestRequestResponseInformation response);
 
 }
