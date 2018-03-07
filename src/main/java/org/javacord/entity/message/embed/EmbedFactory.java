@@ -17,14 +17,6 @@ import java.time.Instant;
 public interface EmbedFactory {
 
     /**
-     * Gets a new instance of an embed factory.
-     * This method is the same as calling the constructor of the implementation.
-     *
-     * @return A new instance of an embed factory.
-     */
-    EmbedFactory getNewInstance();
-
-    /**
      * Sets the title of the embed.
      *
      * @param title The title of the embed.

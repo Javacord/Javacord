@@ -3,6 +3,8 @@ package org.javacord.entity.message.embed;
 import org.javacord.entity.Icon;
 import org.javacord.entity.message.MessageAuthor;
 import org.javacord.entity.user.User;
+import org.javacord.util.FactoryBuilder;
+import org.javacord.util.FactoryBuilderDelegate;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -18,35 +20,9 @@ import java.util.ServiceLoader;
 public class EmbedBuilder {
 
     /**
-     * The base factory. It's only used to create new factories.
-     */
-    private static final EmbedFactory baseFactory;
-
-    // Load it static, because it has a better performance to load it only once
-    static {
-        ServiceLoader<EmbedFactory> factoryServiceLoader = ServiceLoader.load(EmbedFactory.class);
-        Iterator<EmbedFactory> factoryIterator = factoryServiceLoader.iterator();
-        if (factoryIterator.hasNext()) {
-            baseFactory = factoryIterator.next();
-            if (factoryIterator.hasNext()) {
-                throw new IllegalStateException("Found more than one EmbedFactory implementation!");
-            }
-        } else {
-            throw new IllegalStateException("No EmbedFactory implementation was found!");
-        }
-    }
-
-    /**
      * The embed factory used by this instance.
      */
-    private final EmbedFactory factory;
-
-    /**
-     * Creates a new embed builder.
-     */
-    public EmbedBuilder() {
-        factory = baseFactory.getNewInstance();
-    }
+    private final EmbedFactory factory = FactoryBuilder.createEmbedFactory();
 
     /**
      * Gets the factory used by this embed builder internally.

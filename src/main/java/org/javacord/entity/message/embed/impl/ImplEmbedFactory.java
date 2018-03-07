@@ -63,11 +63,6 @@ public class ImplEmbedFactory implements EmbedFactory {
     }
 
     @Override
-    public ImplEmbedFactory getNewInstance() {
-        return new ImplEmbedFactory();
-    }
-
-    @Override
     public void setTitle(String title) {
         this.title = title;
     }
