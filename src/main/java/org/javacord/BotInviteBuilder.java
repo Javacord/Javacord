@@ -63,7 +63,7 @@ public class BotInviteBuilder {
      * @return The invite link for the bot.
      */
     public String build() {
-        return String.format(BASE_LINK, clientId, ((ImplPermissions) permissions).getAllowed());
+        return String.format(BASE_LINK, clientId, permissions.getAllowedBitmask());
     }
 
 }

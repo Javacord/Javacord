@@ -21,8 +21,8 @@ public class PermissionsBuilder {
      * @param permissions The permissions which should be copied.
      */
     public PermissionsBuilder(Permissions permissions) {
-        allowed = ((ImplPermissions) permissions).getAllowed();
-        denied = ((ImplPermissions) permissions).getDenied();
+        allowed = permissions.getAllowedBitmask();
+        denied = permissions.getDeniedBitmask();
     }
 
     /**

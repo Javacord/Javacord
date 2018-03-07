@@ -139,8 +139,8 @@ public class ImplServerTextChannelUpdater extends ImplServerChannelUpdater imple
                 permissionOverwrites.addObject()
                         .put("id", Long.toUnsignedString(entry.getKey()))
                         .put("type", "member")
-                        .put("allow", ((ImplPermissions) entry.getValue()).getAllowed())
-                        .put("deny", ((ImplPermissions) entry.getValue()).getDenied());
+                        .put("allow", entry.getValue().getAllowedBitmask())
+                        .put("deny", entry.getValue().getDeniedBitmask());
             }
         }
         if (overwrittenRolePermissions != null) {
@@ -148,8 +148,8 @@ public class ImplServerTextChannelUpdater extends ImplServerChannelUpdater imple
                 permissionOverwrites.addObject()
                         .put("id", Long.toUnsignedString(entry.getKey()))
                         .put("type", "role")
-                        .put("allow", ((ImplPermissions) entry.getValue()).getAllowed())
-                        .put("deny", ((ImplPermissions) entry.getValue()).getDenied());
+                        .put("allow", entry.getValue().getAllowedBitmask())
+                        .put("deny", entry.getValue().getDeniedBitmask());
             }
         }
         if (topic != null) {

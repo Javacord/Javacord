@@ -44,21 +44,13 @@ public class ImplPermissions implements Permissions {
         }
     }
 
-    /**
-     * Gets the integer containing all allowed permission types.
-     *
-     * @return The integer containing all allowed permission types.
-     */
-    public int getAllowed() {
+    @Override
+    public int getAllowedBitmask() {
         return allowed;
     }
 
-    /**
-     * Gets the integer containing all denied permission types.
-     *
-     * @return The integer containing all denied permission types.
-     */
-    public int getDenied() {
+    @Override
+    public int getDeniedBitmask() {
         return denied;
     }
 
@@ -98,7 +90,7 @@ public class ImplPermissions implements Permissions {
 
     @Override
     public String toString() {
-        return "Permissions (allowed: " + getAllowed() + ", denied: " + getDenied() + ")";
+        return "Permissions (allowed: " + getAllowedBitmask() + ", denied: " + getDeniedBitmask() + ")";
     }
 
 }
