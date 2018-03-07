@@ -1,19 +1,23 @@
 package org.javacord.entity.permission;
 
-import org.javacord.entity.permission.impl.ImplPermissions;
+import org.javacord.util.FactoryBuilder;
 
 /**
  * A class to create {@link Permissions permissions} objects.
  */
 public class PermissionsBuilder {
 
-    private int allowed = 0;
-    private int denied = 0;
+    /**
+     * The permissions factory used by this instance.
+     */
+    private final PermissionsFactory factory;
 
     /**
      * Creates a new permissions builder with all types set to {@link PermissionState#NONE}.
      */
-    public PermissionsBuilder() { }
+    public PermissionsBuilder() {
+        factory = FactoryBuilder.createPermissionsFactory();
+    }
 
     /**
      * Creates a new permissions builder with the states of the given permissions object.
@@ -21,8 +25,7 @@ public class PermissionsBuilder {
      * @param permissions The permissions which should be copied.
      */
     public PermissionsBuilder(Permissions permissions) {
-        allowed = permissions.getAllowedBitmask();
-        denied = permissions.getDeniedBitmask();
+        factory = FactoryBuilder.createPermissionsFactory(permissions);
     }
 
     /**
@@ -33,20 +36,7 @@ public class PermissionsBuilder {
      * @return The current instance in order to chain call methods.
      */
     public PermissionsBuilder setState(PermissionType type, PermissionState state) {
-        switch (state) {
-            case ALLOWED:
-                allowed = type.set(allowed, true);
-                denied = type.set(denied, false);
-                break;
-            case DENIED:
-                allowed = type.set(allowed, false);
-                denied = type.set(denied, true);
-                break;
-            case NONE:
-                allowed = type.set(allowed, false);
-                denied = type.set(denied, false);
-                break;
-        }
+        factory.setState(type, state);
         return this;
     }
 
@@ -57,13 +47,7 @@ public class PermissionsBuilder {
      * @return The state of the given type.
      */
     public PermissionState getState(PermissionType type) {
-        if (type.isSet(allowed)) {
-            return PermissionState.ALLOWED;
-        }
-        if (type.isSet(denied)) {
-            return PermissionState.DENIED;
-        }
-        return PermissionState.NONE;
+        return factory.getState(type);
     }
 
     /**
@@ -72,7 +56,7 @@ public class PermissionsBuilder {
      * @return The created permissions instance.
      */
     public Permissions build() {
-        return new ImplPermissions(allowed, denied);
+        return factory.build();
     }
 
 }

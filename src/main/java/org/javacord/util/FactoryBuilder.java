@@ -3,6 +3,8 @@ package org.javacord.util;
 import org.javacord.DiscordApiFactory;
 import org.javacord.entity.message.MessageFactory;
 import org.javacord.entity.message.embed.EmbedFactory;
+import org.javacord.entity.permission.Permissions;
+import org.javacord.entity.permission.PermissionsFactory;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -61,6 +63,25 @@ public class FactoryBuilder {
      */
     public static MessageFactory createMessageFactory() {
         return factoryBuilderDelegate.createMessageFactory();
+    }
+
+    /**
+     * Creates a new permissions factory.
+     *
+     * @return A new permissions factory.
+     */
+    public static PermissionsFactory createPermissionsFactory() {
+        return factoryBuilderDelegate.createPermissionsFactory();
+    }
+
+    /**
+     * Creates a new permissions factory initialized with the given permissions.
+     *
+     * @param permissions The permissions which should be copied.
+     * @return A new permissions factory initialized with the given permissions.
+     */
+    public static PermissionsFactory createPermissionsFactory(Permissions permissions) {
+        return factoryBuilderDelegate.createPermissionsFactory(permissions);
     }
 
 }
