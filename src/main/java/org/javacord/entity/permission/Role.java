@@ -3,7 +3,6 @@ package org.javacord.entity.permission;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.Mentionable;
 import org.javacord.entity.UpdatableFromCache;
-import org.javacord.entity.permission.impl.ImplRoleUpdater;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
 import org.javacord.listener.ObjectAttachableListener;
@@ -109,9 +108,7 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      *
      * @return The updater for this role.
      */
-    default RoleUpdater createUpdater() {
-        return new ImplRoleUpdater(this);
-    }
+    RoleUpdater createUpdater();
 
     /**
      * Updates the name of the role.

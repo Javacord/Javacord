@@ -6,6 +6,7 @@ import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
+import org.javacord.entity.permission.RoleUpdater;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
@@ -264,6 +265,11 @@ public class ImplRole implements Role {
     @Override
     public boolean isManaged() {
         return managed;
+    }
+
+    @Override
+    public RoleUpdater createUpdater() {
+        return new ImplRoleUpdater(this);
     }
 
     @Override
