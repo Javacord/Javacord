@@ -1,5 +1,6 @@
 package org.javacord.exception;
 
+import org.javacord.util.DelegateFactory;
 import org.javacord.util.rest.RestRequestInformation;
 import org.javacord.util.rest.RestRequestResponseInformation;
 
@@ -33,6 +34,8 @@ public class DiscordException extends Exception {
         super(message, origin);
         this.request = request;
         this.response = response;
+
+        DelegateFactory.getDiscordExceptionValidator().validateException(this);
     }
 
     /**

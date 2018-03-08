@@ -31,6 +31,8 @@ import org.javacord.entity.server.invite.InviteBuilderDelegate;
 import org.javacord.entity.server.invite.impl.ImplInviteBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 import org.javacord.entity.webhook.impl.ImplWebhookBuilderDelegate;
+import org.javacord.util.exception.DiscordExceptionValidator;
+import org.javacord.util.exception.impl.ImplDiscordExceptionValidator;
 
 /**
  * The implementation of {@link DelegateFactoryDelegate}.
@@ -100,6 +102,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public InviteBuilderDelegate createInviteBuilderDelegate(ServerChannel channel) {
         return new ImplInviteBuilderDelegate(channel);
+    }
+
+    @Override
+    public DiscordExceptionValidator createDiscordExceptionValidator() {
+        return new ImplDiscordExceptionValidator();
     }
 
 }

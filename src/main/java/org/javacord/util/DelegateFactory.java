@@ -17,6 +17,7 @@ import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.invite.InviteBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
+import org.javacord.util.exception.DiscordExceptionValidator;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -32,6 +33,11 @@ public class DelegateFactory {
      */
     private static final DelegateFactoryDelegate delegateFactoryDelegate;
 
+    /**
+     * The discord exception validator.
+     */
+    private static final DiscordExceptionValidator discordExceptionValidator;
+
     // Load it static, because it has a better performance to load it only once
     static {
         ServiceLoader<DelegateFactoryDelegate> delegateServiceLoader =
@@ -45,6 +51,7 @@ public class DelegateFactory {
         } else {
             throw new IllegalStateException("No DelegateFactoryDelegate implementation was found!");
         }
+        discordExceptionValidator = delegateFactoryDelegate.createDiscordExceptionValidator();
     }
 
     private DelegateFactory() {
@@ -175,6 +182,15 @@ public class DelegateFactory {
      */
     public static InviteBuilderDelegate createInviteBuilderDelegate(ServerChannel channel) {
         return delegateFactoryDelegate.createInviteBuilderDelegate(channel);
+    }
+
+    /**
+     * Gets the discord exception validator.
+     *
+     * @return The discord exception validator.
+     */
+    public static DiscordExceptionValidator getDiscordExceptionValidator() {
+        return discordExceptionValidator;
     }
 
 }

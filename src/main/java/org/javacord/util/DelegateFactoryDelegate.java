@@ -17,6 +17,7 @@ import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.invite.InviteBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
+import org.javacord.util.exception.DiscordExceptionValidator;
 
 /**
  * This class is internally used by the {@link DelegateFactory} to create delegate instances.
@@ -123,5 +124,12 @@ public interface DelegateFactoryDelegate {
      * @return A new invite builder delegate.
      */
     InviteBuilderDelegate createInviteBuilderDelegate(ServerChannel channel);
+
+    /**
+     * Creates a new discord exception validator.
+     *
+     * @return A new discord exception validator.
+     */
+    DiscordExceptionValidator createDiscordExceptionValidator();
 
 }
