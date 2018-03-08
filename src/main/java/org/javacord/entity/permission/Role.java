@@ -3,6 +3,7 @@ package org.javacord.entity.permission;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.Mentionable;
 import org.javacord.entity.UpdatableFromCache;
+import org.javacord.entity.permission.impl.ImplRoleUpdater;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
 import org.javacord.listener.ObjectAttachableListener;
@@ -108,73 +109,73 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      *
      * @return The updater for this role.
      */
-    default RoleUpdater getUpdater() {
-        return new RoleUpdater(this);
+    default RoleUpdater createUpdater() {
+        return new ImplRoleUpdater(this);
     }
 
     /**
      * Updates the name of the role.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateName(String name) {
-        return getUpdater().setName(name).update();
+        return createUpdater().setName(name).update();
     }
 
     /**
      * Updates the permissions of the role.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param permissions The new permissions of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updatePermissions(Permissions permissions) {
-        return getUpdater().setPermissions(permissions).update();
+        return createUpdater().setPermissions(permissions).update();
     }
 
     /**
      * Updates the color of the role.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param color The new color of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateColor(Color color) {
-        return getUpdater().setColor(color).update();
+        return createUpdater().setColor(color).update();
     }
 
     /**
      * Updates the display separately flag of the role.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param displaySeparately The new display separately flag of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateDisplaySeparatelyFlag(boolean displaySeparately) {
-        return getUpdater().setDisplaySeparatelyFlag(displaySeparately).update();
+        return createUpdater().setDisplaySeparatelyFlag(displaySeparately).update();
     }
 
     /**
      * Updates the mentionable flag of the role.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
-     * {@link RoleUpdater} from {@link #getUpdater()} which provides a better performance!
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param mentionable The new mentionable flag of the role.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateMentionableFlag(boolean mentionable) {
-        return getUpdater().setMentionableFlag(mentionable).update();
+        return createUpdater().setMentionableFlag(mentionable).update();
     }
 
     /**
