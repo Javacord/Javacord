@@ -6,6 +6,7 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.event.message.reaction.ReactionRemoveAllEvent;
+import org.javacord.event.message.reaction.impl.ImplReactionRemoveAllEvent;
 import org.javacord.listener.message.reaction.ReactionRemoveAllListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -35,7 +36,7 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
 
             message.ifPresent(msg -> ((ImplMessage) msg).removeAllReactionsFromCache());
 
-            ReactionRemoveAllEvent event = new ReactionRemoveAllEvent(api, messageId, channel);
+            ReactionRemoveAllEvent event = new ImplReactionRemoveAllEvent(api, messageId, channel);
 
             List<ReactionRemoveAllListener> listeners = new ArrayList<>();
             listeners.addAll(Message.getReactionRemoveAllListeners(api, messageId));

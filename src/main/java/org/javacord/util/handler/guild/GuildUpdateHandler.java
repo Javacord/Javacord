@@ -23,6 +23,18 @@ import org.javacord.event.server.ServerChangeRegionEvent;
 import org.javacord.event.server.ServerChangeSplashEvent;
 import org.javacord.event.server.ServerChangeSystemChannelEvent;
 import org.javacord.event.server.ServerChangeVerificationLevelEvent;
+import org.javacord.event.server.impl.ImplServerChangeAfkChannelEvent;
+import org.javacord.event.server.impl.ImplServerChangeAfkTimeoutEvent;
+import org.javacord.event.server.impl.ImplServerChangeDefaultMessageNotificationLevelEvent;
+import org.javacord.event.server.impl.ImplServerChangeExplicitContentFilterLevelEvent;
+import org.javacord.event.server.impl.ImplServerChangeIconEvent;
+import org.javacord.event.server.impl.ImplServerChangeMultiFactorAuthenticationLevelEvent;
+import org.javacord.event.server.impl.ImplServerChangeNameEvent;
+import org.javacord.event.server.impl.ImplServerChangeOwnerEvent;
+import org.javacord.event.server.impl.ImplServerChangeRegionEvent;
+import org.javacord.event.server.impl.ImplServerChangeSplashEvent;
+import org.javacord.event.server.impl.ImplServerChangeSystemChannelEvent;
+import org.javacord.event.server.impl.ImplServerChangeVerificationLevelEvent;
 import org.javacord.listener.server.ServerChangeAfkChannelListener;
 import org.javacord.listener.server.ServerChangeAfkTimeoutListener;
 import org.javacord.listener.server.ServerChangeDefaultMessageNotificationLevelListener;
@@ -72,7 +84,7 @@ public class GuildUpdateHandler extends PacketHandler {
             String oldName = server.getName();
             if (!Objects.deepEquals(oldName, newName)) {
                 server.setName(newName);
-                ServerChangeNameEvent event = new ServerChangeNameEvent(api, server, newName, oldName);
+                ServerChangeNameEvent event = new ImplServerChangeNameEvent(server, newName, oldName);
 
                 List<ServerChangeNameListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeNameListeners());
@@ -86,7 +98,7 @@ public class GuildUpdateHandler extends PacketHandler {
             String oldIconHash = server.getIconHash();
             if (!Objects.deepEquals(oldIconHash, newIconHash)) {
                 server.setIconHash(newIconHash);
-                ServerChangeIconEvent event = new ServerChangeIconEvent(api, server, newIconHash, oldIconHash);
+                ServerChangeIconEvent event = new ImplServerChangeIconEvent(server, newIconHash, oldIconHash);
 
                 List<ServerChangeIconListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeIconListeners());
@@ -100,7 +112,7 @@ public class GuildUpdateHandler extends PacketHandler {
             String oldSplashHash = server.getSplashHash();
             if (!Objects.deepEquals(oldSplashHash, newSplashHash)) {
                 server.setSplashHash(newSplashHash);
-                ServerChangeSplashEvent event = new ServerChangeSplashEvent(api, server, newSplashHash, oldSplashHash);
+                ServerChangeSplashEvent event = new ImplServerChangeSplashEvent(server, newSplashHash, oldSplashHash);
 
                 List<ServerChangeSplashListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeSplashListeners());
@@ -114,8 +126,8 @@ public class GuildUpdateHandler extends PacketHandler {
             VerificationLevel oldVerificationLevel = server.getVerificationLevel();
             if (newVerificationLevel != oldVerificationLevel) {
                 server.setVerificationLevel(newVerificationLevel);
-                ServerChangeVerificationLevelEvent event = new ServerChangeVerificationLevelEvent(
-                        api, server, newVerificationLevel, oldVerificationLevel);
+                ServerChangeVerificationLevelEvent event = new ImplServerChangeVerificationLevelEvent(
+                        server, newVerificationLevel, oldVerificationLevel);
 
                 List<ServerChangeVerificationLevelListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeVerificationLevelListeners());
@@ -129,7 +141,7 @@ public class GuildUpdateHandler extends PacketHandler {
             Region oldRegion = server.getRegion();
             if (oldRegion != newRegion) {
                 server.setRegion(newRegion);
-                ServerChangeRegionEvent event = new ServerChangeRegionEvent(api, server, newRegion, oldRegion);
+                ServerChangeRegionEvent event = new ImplServerChangeRegionEvent(server, newRegion, oldRegion);
 
                 List<ServerChangeRegionListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeRegionListeners());
@@ -146,8 +158,8 @@ public class GuildUpdateHandler extends PacketHandler {
             if (newDefaultMessageNotificationLevel != oldDefaultMessageNotificationLevel) {
                 server.setDefaultMessageNotificationLevel(newDefaultMessageNotificationLevel);
                 ServerChangeDefaultMessageNotificationLevelEvent event =
-                        new ServerChangeDefaultMessageNotificationLevelEvent(
-                                api, server, newDefaultMessageNotificationLevel, oldDefaultMessageNotificationLevel);
+                        new ImplServerChangeDefaultMessageNotificationLevelEvent(
+                                server, newDefaultMessageNotificationLevel, oldDefaultMessageNotificationLevel);
 
                 List<ServerChangeDefaultMessageNotificationLevelListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeDefaultMessageNotificationLevelListeners());
@@ -161,7 +173,7 @@ public class GuildUpdateHandler extends PacketHandler {
             User oldOwner = server.getOwner();
             if (oldOwner != newOwner) {
                 server.setOwnerId(newOwner.getId());
-                ServerChangeOwnerEvent event = new ServerChangeOwnerEvent(api, server, newOwner, oldOwner);
+                ServerChangeOwnerEvent event = new ImplServerChangeOwnerEvent(server, newOwner, oldOwner);
 
                 List<ServerChangeOwnerListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeOwnerListeners());
@@ -178,7 +190,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 if (oldSystemChannel != newSystemChannel) {
                     server.setSystemChannelId(newSystemChannel == null ? -1 : newSystemChannel.getId());
                     ServerChangeSystemChannelEvent event =
-                            new ServerChangeSystemChannelEvent(api, server, newSystemChannel, oldSystemChannel);
+                            new ImplServerChangeSystemChannelEvent(server, newSystemChannel, oldSystemChannel);
 
                     List<ServerChangeSystemChannelListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getServerChangeSystemChannelListeners());
@@ -196,7 +208,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 if (oldAfkChannel != newAfkChannel) {
                     server.setAfkChannelId(newAfkChannel == null ? -1 : newAfkChannel.getId());
                     ServerChangeAfkChannelEvent event =
-                            new ServerChangeAfkChannelEvent(api, server, newAfkChannel, oldAfkChannel);
+                            new ImplServerChangeAfkChannelEvent(server, newAfkChannel, oldAfkChannel);
 
                     List<ServerChangeAfkChannelListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getServerChangeAfkChannelListeners());
@@ -212,7 +224,7 @@ public class GuildUpdateHandler extends PacketHandler {
             if (oldAfkTimeout != newAfkTimeout) {
                 server.setAfkTimeout(newAfkTimeout);
                 ServerChangeAfkTimeoutEvent event =
-                        new ServerChangeAfkTimeoutEvent(api, server, newAfkTimeout, oldAfkTimeout);
+                        new ImplServerChangeAfkTimeoutEvent(server, newAfkTimeout, oldAfkTimeout);
 
                 List<ServerChangeAfkTimeoutListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeAfkTimeoutListeners());
@@ -227,8 +239,8 @@ public class GuildUpdateHandler extends PacketHandler {
             ExplicitContentFilterLevel oldExplicitContentFilterLevel = server.getExplicitContentFilterLevel();
             if (oldExplicitContentFilterLevel != newExplicitContentFilterLevel) {
                 server.setExplicitContentFilterLevel(newExplicitContentFilterLevel);
-                ServerChangeExplicitContentFilterLevelEvent event = new ServerChangeExplicitContentFilterLevelEvent(
-                        api, server, newExplicitContentFilterLevel, oldExplicitContentFilterLevel);
+                ServerChangeExplicitContentFilterLevelEvent event = new ImplServerChangeExplicitContentFilterLevelEvent(
+                        server, newExplicitContentFilterLevel, oldExplicitContentFilterLevel);
 
                 List<ServerChangeExplicitContentFilterLevelListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerChangeExplicitContentFilterLevelListeners());
@@ -245,7 +257,7 @@ public class GuildUpdateHandler extends PacketHandler {
             if (oldMultiFactorAuthenticationLevel != newMultiFactorAuthenticationLevel) {
                 server.setMultiFactorAuthenticationLevel(newMultiFactorAuthenticationLevel);
                 ServerChangeMultiFactorAuthenticationLevelEvent event =
-                        new ServerChangeMultiFactorAuthenticationLevelEvent(api,
+                        new ImplServerChangeMultiFactorAuthenticationLevelEvent(
                                 server, newMultiFactorAuthenticationLevel, oldMultiFactorAuthenticationLevel);
 
                 List<ServerChangeMultiFactorAuthenticationLevelListener> listeners = new ArrayList<>();

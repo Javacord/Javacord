@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
 import org.javacord.event.server.member.ServerMemberUnbanEvent;
+import org.javacord.event.server.member.impl.ImplServerMemberUnbanEvent;
 import org.javacord.listener.server.member.ServerMemberUnbanListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -32,7 +33,7 @@ public class GuildBanRemoveHandler extends PacketHandler {
                 .ifPresent(server -> {
                     User user = api.getOrCreateUser(packet.get("user"));
 
-                    ServerMemberUnbanEvent event = new ServerMemberUnbanEvent(api, server, user);
+                    ServerMemberUnbanEvent event = new ImplServerMemberUnbanEvent(server, user);
 
                     List<ServerMemberUnbanListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getServerMemberUnbanListeners());

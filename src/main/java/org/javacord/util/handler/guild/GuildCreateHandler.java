@@ -6,6 +6,8 @@ import org.javacord.entity.server.Server;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.event.server.ServerBecomesAvailableEvent;
 import org.javacord.event.server.ServerJoinEvent;
+import org.javacord.event.server.impl.ImplServerBecomesAvailableEvent;
+import org.javacord.event.server.impl.ImplServerJoinEvent;
 import org.javacord.util.gateway.PacketHandler;
 
 /**
@@ -31,7 +33,7 @@ public class GuildCreateHandler extends PacketHandler {
         if (api.getUnavailableServers().contains(id)) {
             api.removeUnavailableServerFromCache(id);
             Server server = new ImplServer(api, packet);
-            ServerBecomesAvailableEvent event = new ServerBecomesAvailableEvent(api, server);
+            ServerBecomesAvailableEvent event = new ImplServerBecomesAvailableEvent(server);
 
             api.getEventDispatcher().dispatchEvent(server,
                     api.getServerBecomesAvailableListeners(), listener -> listener.onServerBecomesAvailable(event));
@@ -39,7 +41,7 @@ public class GuildCreateHandler extends PacketHandler {
         }
 
         Server server = new ImplServer(api, packet);
-        ServerJoinEvent event = new ServerJoinEvent(api, server);
+        ServerJoinEvent event = new ImplServerJoinEvent(server);
 
         api.getEventDispatcher().dispatchEvent(server, api.getServerJoinListeners(), listener -> listener.onServerJoin(event));
     }

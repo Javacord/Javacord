@@ -13,6 +13,8 @@ import org.javacord.entity.user.User;
 import org.javacord.entity.user.impl.ImplUser;
 import org.javacord.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
 import org.javacord.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
+import org.javacord.event.channel.server.voice.impl.ImplServerVoiceChannelMemberJoinEvent;
+import org.javacord.event.channel.server.voice.impl.ImplServerVoiceChannelMemberLeaveEvent;
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
 import org.javacord.util.gateway.PacketHandler;
@@ -107,7 +109,8 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 
     private void dispatchServerVoiceChannelMemberJoinEvent(
             User user, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
-        ServerVoiceChannelMemberJoinEvent event = new ServerVoiceChannelMemberJoinEvent(user, newChannel, oldChannel);
+        ServerVoiceChannelMemberJoinEvent event = new ImplServerVoiceChannelMemberJoinEvent(
+                user, newChannel, oldChannel);
 
         List<ServerVoiceChannelMemberJoinListener> listeners = new ArrayList<>();
         listeners.addAll(user.getServerVoiceChannelMemberJoinListeners());
@@ -123,7 +126,8 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 
     private void dispatchServerVoiceChannelMemberLeaveEvent(
             User user, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
-        ServerVoiceChannelMemberLeaveEvent event = new ServerVoiceChannelMemberLeaveEvent(user, newChannel, oldChannel);
+        ServerVoiceChannelMemberLeaveEvent event = new ImplServerVoiceChannelMemberLeaveEvent(
+                user, newChannel, oldChannel);
 
         List<ServerVoiceChannelMemberLeaveListener> listeners = new ArrayList<>();
         listeners.addAll(user.getServerVoiceChannelMemberLeaveListeners());

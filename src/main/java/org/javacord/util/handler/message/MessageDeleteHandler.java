@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.message.Message;
 import org.javacord.event.message.MessageDeleteEvent;
+import org.javacord.event.message.impl.ImplMessageDeleteEvent;
 import org.javacord.listener.message.MessageDeleteListener;
 import org.javacord.util.cache.ImplMessageCache;
 import org.javacord.util.gateway.PacketHandler;
@@ -32,7 +33,7 @@ public class MessageDeleteHandler extends PacketHandler {
         long channelId = packet.get("channel_id").asLong();
 
         api.getTextChannelById(channelId).ifPresent(channel -> {
-            MessageDeleteEvent event = new MessageDeleteEvent(api, messageId, channel);
+            MessageDeleteEvent event = new ImplMessageDeleteEvent(api, messageId, channel);
 
             List<MessageDeleteListener> listeners = new ArrayList<>();
             api.getCachedMessageById(messageId)

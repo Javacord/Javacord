@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
 import org.javacord.event.server.member.ServerMemberBanEvent;
+import org.javacord.event.server.member.impl.ImplServerMemberBanEvent;
 import org.javacord.listener.server.member.ServerMemberBanListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -33,7 +34,7 @@ public class GuildBanAddHandler extends PacketHandler {
                     User user = api.getOrCreateUser(packet.get("user"));
                     server.removeMember(user);
 
-                    ServerMemberBanEvent event = new ServerMemberBanEvent(api, server, user);
+                    ServerMemberBanEvent event = new ImplServerMemberBanEvent(server, user);
 
                     List<ServerMemberBanListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getServerMemberBanListeners());

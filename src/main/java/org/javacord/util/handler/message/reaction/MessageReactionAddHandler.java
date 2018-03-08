@@ -9,6 +9,7 @@ import org.javacord.entity.message.Message;
 import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.entity.user.User;
 import org.javacord.event.message.reaction.ReactionAddEvent;
+import org.javacord.event.message.reaction.impl.ImplReactionAddEvent;
 import org.javacord.listener.message.reaction.ReactionAddListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -47,7 +48,7 @@ public class MessageReactionAddHandler extends PacketHandler {
 
             message.ifPresent(msg -> ((ImplMessage) msg).addReaction(emoji, user.isYourself()));
 
-            ReactionAddEvent event = new ReactionAddEvent(api, messageId, channel, emoji, user);
+            ReactionAddEvent event = new ImplReactionAddEvent(api, messageId, channel, emoji, user);
 
             List<ReactionAddListener> listeners = new ArrayList<>();
             listeners.addAll(Message.getReactionAddListeners(api, messageId));

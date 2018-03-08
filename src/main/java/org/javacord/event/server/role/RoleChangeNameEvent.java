@@ -1,52 +1,22 @@
 package org.javacord.event.server.role;
 
-import org.javacord.DiscordApi;
-import org.javacord.entity.permission.Role;
-
 /**
  * A role change name.
  */
-public class RoleChangeNameEvent extends RoleEvent {
-
-    /**
-     * The new name of the role.
-     */
-    private final String newName;
-
-    /**
-     * The old name of the role.
-     */
-    private final String oldName;
-
-    /**
-     * Creates a new role change name.
-     *
-     * @param api The api instance of the event.
-     * @param role The role of the event.
-     * @param newName The new name of the role.
-     * @param oldName The old name of the role.
-     */
-    public RoleChangeNameEvent(DiscordApi api, Role role, String newName, String oldName) {
-        super(api, role);
-        this.newName = newName;
-        this.oldName = oldName;
-    }
+public interface RoleChangeNameEvent extends RoleEvent {
 
     /**
      * Gets the old name of the role.
      *
      * @return The old name of the role.
      */
-    public String getOldName() {
-        return oldName;
-    }
+    String getOldName();
 
     /**
      * Gets the new name of the role.
      *
      * @return The new name of the role.
      */
-    public String getNewName() {
-        return newName;
-    }
+    String getNewName();
+
 }

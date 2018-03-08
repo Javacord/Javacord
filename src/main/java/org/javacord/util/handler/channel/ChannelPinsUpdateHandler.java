@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.server.Server;
 import org.javacord.event.message.ChannelPinsUpdateEvent;
+import org.javacord.event.message.impl.ImplChannelPinsUpdateEvent;
 import org.javacord.listener.message.ChannelPinsUpdateListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -32,7 +33,7 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
         api.getTextChannelById(packet.get("channel_id").asLong()).ifPresent(channel -> {
             Instant lastPinTimestamp = packet.hasNonNull("last_pin_timestamp") ?
                     OffsetDateTime.parse(packet.get("last_pin_timestamp").asText()).toInstant() : null;
-            ChannelPinsUpdateEvent event = new ChannelPinsUpdateEvent(channel, lastPinTimestamp);
+            ChannelPinsUpdateEvent event = new ImplChannelPinsUpdateEvent(channel, lastPinTimestamp);
 
             List<ChannelPinsUpdateListener> listeners = new ArrayList<>();
             listeners.addAll(channel.getChannelPinsUpdateListeners());

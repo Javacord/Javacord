@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.message.Message;
 import org.javacord.event.message.MessageCreateEvent;
+import org.javacord.event.message.impl.ImplMessageCreateEvent;
 import org.javacord.listener.message.MessageCreateListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -29,7 +30,7 @@ public class MessageCreateHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         api.getTextChannelById(packet.get("channel_id").asText()).ifPresent(channel -> {
             Message message = api.getOrCreateMessage(channel, packet);
-            MessageCreateEvent event = new MessageCreateEvent(api, message);
+            MessageCreateEvent event = new ImplMessageCreateEvent(message);
 
             List<MessageCreateListener> listeners = new ArrayList<>();
             listeners.addAll(channel.getMessageCreateListeners());

@@ -1,53 +1,22 @@
 package org.javacord.event.server;
 
-import org.javacord.DiscordApi;
-import org.javacord.entity.server.Server;
-
 /**
  * A server change afk timeout event.
  */
-public class ServerChangeAfkTimeoutEvent extends ServerEvent {
-
-    /**
-     * The new afk timeout of the server.
-     */
-    private final int newAfkTimeout;
-
-    /**
-     * The old afk timeout of the server.
-     */
-    private final int oldAfkTimeout;
-
-    /**
-     * Creates a new server change afk timeout event.
-     *
-     * @param api The api instance of the event.
-     * @param server The server of the event.
-     * @param newAfkTimeout The new afk timeout of the server.
-     * @param oldAfkTimeout The old afk timeout of the server.
-     */
-    public ServerChangeAfkTimeoutEvent(DiscordApi api, Server server, int newAfkTimeout, int oldAfkTimeout) {
-        super(api, server);
-        this.newAfkTimeout = newAfkTimeout;
-        this.oldAfkTimeout = oldAfkTimeout;
-    }
+public interface ServerChangeAfkTimeoutEvent extends ServerEvent {
 
     /**
      * Gets the old afk timeout of the server in seconds.
      *
      * @return The old afk timeout of the server in seconds.
      */
-    public int getOldAfkTimeoutInSeconds() {
-        return oldAfkTimeout;
-    }
+    int getOldAfkTimeoutInSeconds();
 
     /**
      * Gets the new afk timeout of the server in seconds.
      *
      * @return The new afk timeout of the server in seconds.
      */
-    public int getNewAfkTimeoutInSeconds() {
-        return newAfkTimeout;
-    }
+    int getNewAfkTimeoutInSeconds();
 
 }

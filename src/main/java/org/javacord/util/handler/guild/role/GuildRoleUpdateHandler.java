@@ -11,6 +11,12 @@ import org.javacord.event.server.role.RoleChangeMentionableEvent;
 import org.javacord.event.server.role.RoleChangeNameEvent;
 import org.javacord.event.server.role.RoleChangePermissionsEvent;
 import org.javacord.event.server.role.RoleChangePositionEvent;
+import org.javacord.event.server.role.impl.ImplRoleChangeColorEvent;
+import org.javacord.event.server.role.impl.ImplRoleChangeHoistEvent;
+import org.javacord.event.server.role.impl.ImplRoleChangeMentionableEvent;
+import org.javacord.event.server.role.impl.ImplRoleChangeNameEvent;
+import org.javacord.event.server.role.impl.ImplRoleChangePermissionsEvent;
+import org.javacord.event.server.role.impl.ImplRoleChangePositionEvent;
 import org.javacord.listener.server.role.RoleChangeColorListener;
 import org.javacord.listener.server.role.RoleChangeHoistListener;
 import org.javacord.listener.server.role.RoleChangeMentionableListener;
@@ -48,8 +54,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             if (oldColor != newColor) {
                 role.setColor(newColor);
 
-                RoleChangeColorEvent event = new RoleChangeColorEvent(
-                        api, role, role.getColor().orElse(null), oldColorObject);
+                RoleChangeColorEvent event = new ImplRoleChangeColorEvent(
+                        role, role.getColor().orElse(null), oldColorObject);
 
                 List<RoleChangeColorListener> listeners = new ArrayList<>();
                 listeners.addAll(role.getRoleChangeColorListeners());
@@ -65,7 +71,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             if (oldHoist != newHoist) {
                 role.setHoist(newHoist);
 
-                RoleChangeHoistEvent event = new RoleChangeHoistEvent(api, role, oldHoist);
+                RoleChangeHoistEvent event = new ImplRoleChangeHoistEvent(role, oldHoist);
 
                 List<RoleChangeHoistListener> listeners = new ArrayList<>();
                 listeners.addAll(role.getRoleChangeHoistListeners());
@@ -81,7 +87,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             if (oldMentionable != newMentionable) {
                 role.setMentionable(newMentionable);
 
-                RoleChangeMentionableEvent event = new RoleChangeMentionableEvent(api, role, oldMentionable);
+                RoleChangeMentionableEvent event = new ImplRoleChangeMentionableEvent(role, oldMentionable);
 
                 List<RoleChangeMentionableListener> listeners = new ArrayList<>();
                 listeners.addAll(role.getRoleChangeMentionableListeners());
@@ -97,7 +103,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             if (!oldName.equals(newName)) {
                 role.setName(newName);
 
-                RoleChangeNameEvent event = new RoleChangeNameEvent(api, role, newName, oldName);
+                RoleChangeNameEvent event = new ImplRoleChangeNameEvent(role, newName, oldName);
 
                 List<RoleChangeNameListener> listeners = new ArrayList<>();
                 listeners.addAll(role.getRoleChangeNameListeners());
@@ -114,7 +120,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 role.setPermissions(newPermissions);
 
                 RoleChangePermissionsEvent event =
-                        new RoleChangePermissionsEvent(api, role, newPermissions, oldPermissions);
+                        new ImplRoleChangePermissionsEvent(role, newPermissions, oldPermissions);
 
                 List<RoleChangePermissionsListener> listeners = new ArrayList<>();
                 listeners.addAll(role.getRoleChangePermissionsListeners());
@@ -130,7 +136,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             if (oldPosition != newPosition) {
                 role.setPosition(newPosition);
 
-                RoleChangePositionEvent event = new RoleChangePositionEvent(api, role, newPosition, oldPosition);
+                RoleChangePositionEvent event = new ImplRoleChangePositionEvent(role, newPosition, oldPosition);
 
                 List<RoleChangePositionListener> listeners = new ArrayList<>();
                 listeners.addAll(role.getRoleChangePositionListeners());

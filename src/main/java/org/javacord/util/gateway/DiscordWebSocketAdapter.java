@@ -18,6 +18,9 @@ import org.javacord.entity.server.Server;
 import org.javacord.event.connection.LostConnectionEvent;
 import org.javacord.event.connection.ReconnectEvent;
 import org.javacord.event.connection.ResumeEvent;
+import org.javacord.event.connection.impl.ImplLostConnectionEvent;
+import org.javacord.event.connection.impl.ImplReconnectEvent;
+import org.javacord.event.connection.impl.ImplResumeEvent;
 import org.javacord.listener.connection.LostConnectionListener;
 import org.javacord.listener.connection.ReconnectListener;
 import org.javacord.listener.connection.ResumeListener;
@@ -354,7 +357,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         logger.info("Websocket closed with reason '{}' and code {} by {}!",
                     closeReason, closeCodeString, closedByServer ? "server" : "client");
 
-        LostConnectionEvent lostConnectionEvent = new LostConnectionEvent(api);
+        LostConnectionEvent lostConnectionEvent = new ImplLostConnectionEvent(api);
         List<LostConnectionListener> listeners = new ArrayList<>();
         listeners.addAll(api.getLostConnectionListeners());
         api.getEventDispatcher()
@@ -412,7 +415,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     reconnectAttempt = 0;
                     logger.debug("Received RESUMED packet");
 
-                    ResumeEvent resumeEvent = new ResumeEvent(api);
+                    ResumeEvent resumeEvent = new ImplResumeEvent(api);
                     List<ResumeListener> listeners = new ArrayList<>();
                     listeners.addAll(api.getResumeListeners());
                     api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onResume(resumeEvent));
@@ -451,7 +454,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                 Thread.sleep(100);
                             } catch (InterruptedException ignored) { }
                         }
-                        ReconnectEvent reconnectEvent = new ReconnectEvent(api);
+                        ReconnectEvent reconnectEvent = new ImplReconnectEvent(api);
                         List<ReconnectListener> listeners = new ArrayList<>();
                         listeners.addAll(api.getReconnectListeners());
                         api.getEventDispatcher()

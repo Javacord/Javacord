@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
 import org.javacord.event.server.member.ServerMemberLeaveEvent;
+import org.javacord.event.server.member.impl.ImplServerMemberLeaveEvent;
 import org.javacord.listener.server.member.ServerMemberLeaveListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -34,7 +35,7 @@ public class GuildMemberRemoveHandler extends PacketHandler {
                     server.removeMember(user);
                     server.decrementMemberCount();
 
-                    ServerMemberLeaveEvent event = new ServerMemberLeaveEvent(api, server, user);
+                    ServerMemberLeaveEvent event = new ImplServerMemberLeaveEvent(server, user);
 
                     List<ServerMemberLeaveListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getServerMemberLeaveListeners());

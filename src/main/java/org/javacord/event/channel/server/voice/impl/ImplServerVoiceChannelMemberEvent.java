@@ -1,12 +1,12 @@
-package org.javacord.event.channel.server.voice;
+package org.javacord.event.channel.server.voice.impl;
 
 import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.user.User;
 
 /**
- * A server voice channel member event.
+ * The implementation of {@link ImplServerVoiceChannelEvent}.
  */
-public abstract class ServerVoiceChannelMemberEvent extends ServerVoiceChannelEvent {
+public abstract class ImplServerVoiceChannelMemberEvent extends ImplServerVoiceChannelEvent {
 
     /**
      * The user of the event.
@@ -19,7 +19,7 @@ public abstract class ServerVoiceChannelMemberEvent extends ServerVoiceChannelEv
      * @param user The user of the event.
      * @param channel The channel of the event.
      */
-    public ServerVoiceChannelMemberEvent(User user, ServerVoiceChannel channel) {
+    public ImplServerVoiceChannelMemberEvent(User user, ServerVoiceChannel channel) {
         super(channel);
         this.user = user;
     }
