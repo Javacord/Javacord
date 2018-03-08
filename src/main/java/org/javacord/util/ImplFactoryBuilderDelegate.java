@@ -9,6 +9,8 @@ import org.javacord.entity.message.impl.ImplMessageFactory;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsFactory;
 import org.javacord.entity.permission.impl.ImplPermissionsFactory;
+import org.javacord.util.exception.DiscordExceptionValidator;
+import org.javacord.util.exception.impl.ImplDiscordExceptionValidator;
 
 /**
  * The implementation of {@code FactoryBuilderDelegate}.
@@ -38,6 +40,11 @@ public class ImplFactoryBuilderDelegate implements FactoryBuilderDelegate {
     @Override
     public PermissionsFactory createPermissionsFactory(Permissions permissions) {
         return new ImplPermissionsFactory(permissions);
+    }
+
+    @Override
+    public DiscordExceptionValidator createDiscordExceptionValidator() {
+        return new ImplDiscordExceptionValidator();
     }
 
 }
