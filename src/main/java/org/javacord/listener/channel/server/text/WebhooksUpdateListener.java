@@ -1,6 +1,6 @@
-package org.javacord.listener.channel.text;
+package org.javacord.listener.channel.server.text;
 
-import org.javacord.event.channel.text.WebhooksUpdateEvent;
+import org.javacord.event.channel.server.text.WebhooksUpdateEvent;
 import org.javacord.listener.GloballyAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.channel.server.text.ServerTextChannelAttachableListener;

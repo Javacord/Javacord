@@ -15,13 +15,21 @@ import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.impl.ImplPermissions;
 import org.javacord.entity.user.User;
 import org.javacord.event.channel.group.GroupChannelChangeNameEvent;
+import org.javacord.event.channel.group.impl.ImplGroupChannelChangeNameEvent;
 import org.javacord.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.event.channel.server.ServerChannelChangeNsfwFlagEvent;
 import org.javacord.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
 import org.javacord.event.channel.server.ServerChannelChangePositionEvent;
+import org.javacord.event.channel.server.impl.ImplServerChannelChangeNameEvent;
+import org.javacord.event.channel.server.impl.ImplServerChannelChangeNsfwFlagEvent;
+import org.javacord.event.channel.server.impl.ImplServerChannelChangeOverwrittenPermissionsEvent;
+import org.javacord.event.channel.server.impl.ImplServerChannelChangePositionEvent;
 import org.javacord.event.channel.server.text.ServerTextChannelChangeTopicEvent;
+import org.javacord.event.channel.server.text.impl.ImplServerTextChannelChangeTopicEvent;
 import org.javacord.event.channel.server.voice.ServerVoiceChannelChangeBitrateEvent;
 import org.javacord.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEvent;
+import org.javacord.event.channel.server.voice.impl.ImplServerVoiceChannelChangeBitrateEvent;
+import org.javacord.event.channel.server.voice.impl.ImplServerVoiceChannelChangeUserLimitEvent;
 import org.javacord.listener.channel.group.GroupChannelChangeNameListener;
 import org.javacord.listener.channel.server.ServerChannelChangeNameListener;
 import org.javacord.listener.channel.server.ServerChannelChangeNsfwFlagListener;
@@ -95,7 +103,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 channel.asServerTextChannel().ifPresent(stc -> ((ImplServerTextChannel) stc).setName(newName));
                 channel.asServerVoiceChannel().ifPresent(svc -> ((ImplServerVoiceChannel) svc).setName(newName));
                 ServerChannelChangeNameEvent event =
-                        new ServerChannelChangeNameEvent(channel, newName, oldName);
+                        new ImplServerChannelChangeNameEvent(channel, newName, oldName);
 
                 List<ServerChannelChangeNameListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerChannelChangeNameListeners());
@@ -125,8 +133,8 @@ public class ChannelUpdateHandler extends PacketHandler {
 
                 int newPosition = channel.getPosition();
 
-                ServerChannelChangePositionEvent event = new ServerChannelChangePositionEvent(channel, newPosition,
-                        oldPosition, newRawPosition, oldRawPosition, newCategory, oldCategory);
+                ServerChannelChangePositionEvent event = new ImplServerChannelChangePositionEvent(
+                        channel, newPosition, oldPosition, newRawPosition, oldRawPosition, newCategory, oldCategory);
 
                 List<ServerChannelChangePositionListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerChannelChangePositionListeners());
@@ -241,7 +249,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             if (!Objects.deepEquals(oldName, newName)) {
                 channel.setName(newName);
                 ServerChannelChangeNameEvent event =
-                        new ServerChannelChangeNameEvent(channel, newName, oldName);
+                        new ImplServerChannelChangeNameEvent(channel, newName, oldName);
 
                 List<ServerChannelChangeNameListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerChannelChangeNameListeners());
@@ -257,7 +265,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             if (oldNsfwFlaf != newNsfwFlag) {
                 channel.setNsfwFlag(newNsfwFlag);
                 ServerChannelChangeNsfwFlagEvent event =
-                        new ServerChannelChangeNsfwFlagEvent(channel, newNsfwFlag, oldNsfwFlaf);
+                        new ImplServerChannelChangeNsfwFlagEvent(channel, newNsfwFlag, oldNsfwFlaf);
 
                 List<ServerChannelChangeNsfwFlagListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerChannelChangeNsfwFlagListeners());
@@ -285,7 +293,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 channel.setTopic(newTopic);
 
                 ServerTextChannelChangeTopicEvent event =
-                        new ServerTextChannelChangeTopicEvent(channel, newTopic, oldTopic);
+                        new ImplServerTextChannelChangeTopicEvent(channel, newTopic, oldTopic);
 
                 List<ServerTextChannelChangeTopicListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerTextChannelChangeTopicListeners());
@@ -301,7 +309,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             if (oldNsfwFlaf != newNsfwFlag) {
                 channel.setNsfwFlag(newNsfwFlag);
                 ServerChannelChangeNsfwFlagEvent event =
-                        new ServerChannelChangeNsfwFlagEvent(channel, newNsfwFlag, oldNsfwFlaf);
+                        new ImplServerChannelChangeNsfwFlagEvent(channel, newNsfwFlag, oldNsfwFlaf);
 
                 List<ServerChannelChangeNsfwFlagListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerChannelChangeNsfwFlagListeners());
@@ -327,7 +335,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             if (oldBitrate != newBitrate) {
                 channel.setBitrate(newBitrate);
                 ServerVoiceChannelChangeBitrateEvent event =
-                        new ServerVoiceChannelChangeBitrateEvent(channel, newBitrate, oldBitrate);
+                        new ImplServerVoiceChannelChangeBitrateEvent(channel, newBitrate, oldBitrate);
 
                 List<ServerVoiceChannelChangeBitrateListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerVoiceChannelChangeBitrateListeners());
@@ -343,7 +351,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             if (oldUserLimit != newUserLimit) {
                 channel.setUserLimit(newUserLimit);
                 ServerVoiceChannelChangeUserLimitEvent event =
-                        new ServerVoiceChannelChangeUserLimitEvent(channel, newUserLimit, oldUserLimit);
+                        new ImplServerVoiceChannelChangeUserLimitEvent(channel, newUserLimit, oldUserLimit);
 
                 List<ServerVoiceChannelChangeUserLimitListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getServerVoiceChannelChangeUserLimitListeners());
@@ -378,7 +386,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 channel.setName(newName);
 
                 GroupChannelChangeNameEvent event =
-                        new GroupChannelChangeNameEvent(channel, newName, oldName);
+                        new ImplGroupChannelChangeNameEvent(channel, newName, oldName);
 
                 List<GroupChannelChangeNameListener> listeners = new ArrayList<>();
                 listeners.addAll(channel.getGroupChannelChangeNameListeners());
@@ -409,7 +417,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             return;
         }
         ServerChannelChangeOverwrittenPermissionsEvent event =
-                new ServerChannelChangeOverwrittenPermissionsEvent(
+                new ImplServerChannelChangeOverwrittenPermissionsEvent(
                         channel, newPermissions, oldPermissions, entity);
 
         List<ServerChannelChangeOverwrittenPermissionsListener> listeners = new ArrayList<>();

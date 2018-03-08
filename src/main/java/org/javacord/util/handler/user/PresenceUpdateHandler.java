@@ -11,6 +11,10 @@ import org.javacord.event.user.UserChangeActivityEvent;
 import org.javacord.event.user.UserChangeAvatarEvent;
 import org.javacord.event.user.UserChangeNameEvent;
 import org.javacord.event.user.UserChangeStatusEvent;
+import org.javacord.event.user.impl.ImplUserChangeActivityEvent;
+import org.javacord.event.user.impl.ImplUserChangeAvatarEvent;
+import org.javacord.event.user.impl.ImplUserChangeNameEvent;
+import org.javacord.event.user.impl.ImplUserChangeStatusEvent;
 import org.javacord.listener.user.UserChangeActivityListener;
 import org.javacord.listener.user.UserChangeAvatarListener;
 import org.javacord.listener.user.UserChangeNameListener;
@@ -87,7 +91,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     }
 
     private void dispatchUserActivityChangeEvent(User user, Activity newActivity, Activity oldActivity) {
-        UserChangeActivityEvent event = new UserChangeActivityEvent(api, user, newActivity, oldActivity);
+        UserChangeActivityEvent event = new ImplUserChangeActivityEvent(user, newActivity, oldActivity);
 
         List<UserChangeActivityListener> listeners = new ArrayList<>();
         listeners.addAll(user.getUserChangeActivityListeners());
@@ -98,7 +102,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     }
 
     private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {
-        UserChangeStatusEvent event = new UserChangeStatusEvent(api, user, newStatus, oldStatus);
+        UserChangeStatusEvent event = new ImplUserChangeStatusEvent(user, newStatus, oldStatus);
 
         List<UserChangeStatusListener> listeners = new ArrayList<>();
         listeners.addAll(user.getUserChangeStatusListeners());
@@ -109,7 +113,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     }
 
     private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
-        UserChangeNameEvent event = new UserChangeNameEvent(api, user, newName, oldName);
+        UserChangeNameEvent event = new ImplUserChangeNameEvent(user, newName, oldName);
 
         List<UserChangeNameListener> listeners = new ArrayList<>();
         listeners.addAll(user.getUserChangeNameListeners());
@@ -120,7 +124,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     }
 
     private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
-        UserChangeAvatarEvent event = new UserChangeAvatarEvent(api, user, newAvatarHash, oldAvatarHash);
+        UserChangeAvatarEvent event = new ImplUserChangeAvatarEvent(user, newAvatarHash, oldAvatarHash);
 
         List<UserChangeAvatarListener> listeners = new ArrayList<>();
         listeners.addAll(user.getUserChangeAvatarListeners());

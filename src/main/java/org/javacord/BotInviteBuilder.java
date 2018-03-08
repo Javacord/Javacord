@@ -1,7 +1,7 @@
 package org.javacord;
 
 import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.impl.ImplPermissions;
+import org.javacord.entity.permission.PermissionsBuilder;
 
 /**
  * A tool to create bot invites.
@@ -22,7 +22,7 @@ public class BotInviteBuilder {
     /**
      * The permissions for the bot.
      */
-    private Permissions permissions = ImplPermissions.EMPTY_PERMISSIONS;
+    private Permissions permissions = new PermissionsBuilder().build();
 
     /**
      * Creates a new bot invite builder.

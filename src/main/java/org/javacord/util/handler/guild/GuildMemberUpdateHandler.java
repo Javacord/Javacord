@@ -8,7 +8,10 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
 import org.javacord.event.server.role.UserRoleAddEvent;
 import org.javacord.event.server.role.UserRoleRemoveEvent;
+import org.javacord.event.server.role.impl.ImplUserRoleAddEvent;
+import org.javacord.event.server.role.impl.ImplUserRoleRemoveEvent;
 import org.javacord.event.user.UserChangeNicknameEvent;
+import org.javacord.event.user.impl.ImplUserChangeNicknameEvent;
 import org.javacord.listener.server.role.UserRoleAddListener;
 import org.javacord.listener.server.role.UserRoleRemoveListener;
 import org.javacord.listener.user.UserChangeNicknameListener;
@@ -45,7 +48,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     server.setNickname(user, newNickname);
 
                     UserChangeNicknameEvent event =
-                            new UserChangeNicknameEvent(api, user, server, newNickname, oldNickname);
+                            new ImplUserChangeNicknameEvent(user, server, newNickname, oldNickname);
 
                     List<UserChangeNicknameListener> listeners = new ArrayList<>();
                     listeners.addAll(user.getUserChangeNicknameListeners());
@@ -80,7 +83,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                         continue;
                     }
                     ((ImplRole) role).addUserToCache(user);
-                    UserRoleAddEvent event = new UserRoleAddEvent(api, role, user);
+                    UserRoleAddEvent event = new ImplUserRoleAddEvent(role, user);
 
                     List<UserRoleAddListener> listeners = new ArrayList<>();
                     listeners.addAll(user.getUserRoleAddListeners());
@@ -100,7 +103,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                         continue;
                     }
                     ((ImplRole) role).removeUserFromCache(user);
-                    UserRoleRemoveEvent event = new UserRoleRemoveEvent(api, role, user);
+                    UserRoleRemoveEvent event = new ImplUserRoleRemoveEvent(role, user);
 
                     List<UserRoleRemoveListener> listeners = new ArrayList<>();
                     listeners.addAll(user.getUserRoleRemoveListeners());

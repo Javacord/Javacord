@@ -1,48 +1,27 @@
-
 package org.javacord.event.channel.server.voice;
 
 import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.user.User;
+import org.javacord.event.user.UserEvent;
 
 import java.util.Optional;
 
 /**
  * A server voice channel member join event.
  */
-public class ServerVoiceChannelMemberJoinEvent extends ServerVoiceChannelMemberEvent {
+public interface ServerVoiceChannelMemberJoinEvent extends ServerVoiceChannelEvent, UserEvent {
 
     /**
-     * The old channel of the event.
-     */
-    private final ServerVoiceChannel oldChannel;
-
-    /**
-     * Creates a new server voice channel member join event.
+     * Gets the old channel of the event.
      *
-     * @param user The user of the event.
-     * @param newChannel The new channel of the event.
-     * @param oldChannel The old channel of the event.
+     * @return The old channel of the event.
      */
-    public ServerVoiceChannelMemberJoinEvent(User user, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel) {
-        super(user, newChannel);
-        this.oldChannel = oldChannel;
-    }
-
-    /**
-     * Gets the channel of the event.
-     *
-     * @return The channel of the event.
-     */
-    public Optional<ServerVoiceChannel> getOldChannel() {
-        return Optional.ofNullable(oldChannel);
-    }
+    Optional<ServerVoiceChannel> getOldChannel();
 
     /**
      * Gets whether this event is part of a move.
      *
      * @return whether this event is part of a move.
      */
-    public boolean isMove() {
-        return oldChannel != null;
-    }
+    boolean isMove();
+
 }

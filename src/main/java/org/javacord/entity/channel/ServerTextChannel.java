@@ -6,7 +6,7 @@ import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.channel.server.ServerChannelChangeNsfwFlagListener;
 import org.javacord.listener.channel.server.text.ServerTextChannelAttachableListener;
 import org.javacord.listener.channel.server.text.ServerTextChannelChangeTopicListener;
-import org.javacord.listener.channel.text.WebhooksUpdateListener;
+import org.javacord.listener.channel.server.text.WebhooksUpdateListener;
 import org.javacord.util.event.ListenerManager;
 
 import java.util.Collection;

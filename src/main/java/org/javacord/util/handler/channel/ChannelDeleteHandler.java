@@ -7,11 +7,14 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
 import org.javacord.entity.user.impl.ImplUser;
 import org.javacord.event.channel.group.GroupChannelDeleteEvent;
+import org.javacord.event.channel.group.impl.ImplGroupChannelDeleteEvent;
 import org.javacord.event.channel.server.ServerChannelDeleteEvent;
+import org.javacord.event.channel.server.impl.ImplServerChannelDeleteEvent;
 import org.javacord.event.channel.user.PrivateChannelDeleteEvent;
+import org.javacord.event.channel.user.impl.ImplPrivateChannelDeleteEvent;
 import org.javacord.listener.channel.group.GroupChannelDeleteListener;
 import org.javacord.listener.channel.server.ServerChannelDeleteListener;
-import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
+import org.javacord.listener.channel.user.PrivateChannelDeleteListener;
 import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
@@ -103,7 +106,7 @@ public class ChannelDeleteHandler extends PacketHandler {
     private void handlePrivateChannel(JsonNode channel) {
         ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.get("recipients").get(0));
         recipient.getPrivateChannel().ifPresent(privateChannel -> {
-            PrivateChannelDeleteEvent event = new PrivateChannelDeleteEvent(privateChannel);
+            PrivateChannelDeleteEvent event = new ImplPrivateChannelDeleteEvent(privateChannel);
 
             List<PrivateChannelDeleteListener> listeners = new ArrayList<>();
             listeners.addAll(privateChannel.getPrivateChannelDeleteListeners());
@@ -125,7 +128,7 @@ public class ChannelDeleteHandler extends PacketHandler {
         long channelId = channel.get("id").asLong();
 
         api.getGroupChannelById(channelId).ifPresent(groupChannel -> {
-            GroupChannelDeleteEvent event = new GroupChannelDeleteEvent(groupChannel);
+            GroupChannelDeleteEvent event = new ImplGroupChannelDeleteEvent(groupChannel);
 
             List<GroupChannelDeleteListener> listeners = new ArrayList<>();
             listeners.addAll(groupChannel.getGroupChannelDeleteListeners());
@@ -145,7 +148,7 @@ public class ChannelDeleteHandler extends PacketHandler {
      * @param channel The channel of the event.
      */
     private void dispatchServerChannelDeleteEvent(ServerChannel channel) {
-        ServerChannelDeleteEvent event = new ServerChannelDeleteEvent(channel);
+        ServerChannelDeleteEvent event = new ImplServerChannelDeleteEvent(channel);
 
         List<ServerChannelDeleteListener> listeners = new ArrayList<>();
         listeners.addAll(channel.getServerChannelDeleteListeners());

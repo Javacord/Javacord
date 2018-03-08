@@ -1,6 +1,5 @@
 package org.javacord.event.connection;
 
-import org.javacord.DiscordApi;
 import org.javacord.event.Event;
 
 /**
@@ -9,15 +8,5 @@ import org.javacord.event.Event;
  * Don't panic! It's totally normal for the websocket to occasionally lose the connection. In most cases it's possible
  * to resume the session without missing any events!
  */
-public class LostConnectionEvent extends Event {
-
-    /**
-     * Creates a new lost connection event.
-     *
-     * @param api The api instance of the event.
-     */
-    public LostConnectionEvent(DiscordApi api) {
-        super(api);
-    }
-
+public interface LostConnectionEvent extends Event {
 }

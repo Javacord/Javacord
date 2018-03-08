@@ -1,55 +1,25 @@
 package org.javacord.event.server.role;
 
-import org.javacord.DiscordApi;
-import org.javacord.entity.permission.Role;
-
 import java.awt.Color;
 import java.util.Optional;
 
 /**
  * A role change color event.
  */
-public class RoleChangeColorEvent extends RoleEvent {
-
-    /**
-     * The new color value.
-     */
-    private final Color newColor;
-
-    /**
-     * The old color value.
-     */
-    private final Color oldColor;
-
-    /**
-     * Creates a new role change color event.
-     *
-     * @param api The api instance of the event.
-     * @param role The role of the event.
-     * @param newColor The new color of the role.
-     * @param oldColor The old color of the role.
-     */
-    public RoleChangeColorEvent(DiscordApi api, Role role, Color newColor, Color oldColor) {
-        super(api, role);
-        this.newColor = newColor;
-        this.oldColor = oldColor;
-    }
+public interface RoleChangeColorEvent extends RoleEvent {
 
     /**
      * Gets the old color of the role.
      *
      * @return The old color of the role.
      */
-    public Optional<Color> getOldColor() {
-        return Optional.ofNullable(oldColor);
-    }
+    Optional<Color> getOldColor();
 
     /**
      * Gets the new color of the role.
      *
      * @return The new color of the role.
      */
-    public Optional<Color> getNewColor() {
-        return Optional.ofNullable(newColor);
-    }
+    Optional<Color> getNewColor();
+
 }

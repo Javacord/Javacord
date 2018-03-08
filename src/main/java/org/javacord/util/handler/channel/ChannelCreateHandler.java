@@ -12,11 +12,14 @@ import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
 import org.javacord.entity.user.impl.ImplUser;
 import org.javacord.event.channel.group.GroupChannelCreateEvent;
+import org.javacord.event.channel.group.impl.ImplGroupChannelCreateEvent;
 import org.javacord.event.channel.server.ServerChannelCreateEvent;
+import org.javacord.event.channel.server.impl.ImplServerChannelCreateEvent;
 import org.javacord.event.channel.user.PrivateChannelCreateEvent;
+import org.javacord.event.channel.user.impl.ImplPrivateChannelCreateEvent;
 import org.javacord.listener.channel.group.GroupChannelCreateListener;
 import org.javacord.listener.channel.server.ServerChannelCreateListener;
-import org.javacord.listener.user.channel.PrivateChannelCreateListener;
+import org.javacord.listener.channel.user.PrivateChannelCreateListener;
 import org.javacord.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
@@ -67,7 +70,7 @@ public class ChannelCreateHandler extends PacketHandler {
         long serverId = channel.get("guild_id").asLong();
         api.getServerById(serverId).ifPresent(server -> {
             ChannelCategory channelCategory = ((ImplServer) server).getOrCreateChannelCategory(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEvent(channelCategory);
+            ServerChannelCreateEvent event = new ImplServerChannelCreateEvent(channelCategory);
 
             List<ServerChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerChannelCreateListeners());
@@ -86,7 +89,7 @@ public class ChannelCreateHandler extends PacketHandler {
         long serverId = channel.get("guild_id").asLong();
         api.getServerById(serverId).ifPresent(server -> {
             ServerTextChannel textChannel = ((ImplServer) server).getOrCreateServerTextChannel(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEvent(textChannel);
+            ServerChannelCreateEvent event = new ImplServerChannelCreateEvent(textChannel);
 
             List<ServerChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerChannelCreateListeners());
@@ -105,7 +108,7 @@ public class ChannelCreateHandler extends PacketHandler {
         long serverId = channel.get("guild_id").asLong();
         api.getServerById(serverId).ifPresent(server -> {
             ServerVoiceChannel voiceChannel = ((ImplServer) server).getOrCreateServerVoiceChannel(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEvent(voiceChannel);
+            ServerChannelCreateEvent event = new ImplServerChannelCreateEvent(voiceChannel);
 
             List<ServerChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerChannelCreateListeners());
@@ -126,7 +129,7 @@ public class ChannelCreateHandler extends PacketHandler {
         ImplUser recipient = (ImplUser) api.getOrCreateUser(channel.get("recipients").get(0));
         if (!recipient.getPrivateChannel().isPresent()) {
             PrivateChannel privateChannel = recipient.getOrCreateChannel(channel);
-            PrivateChannelCreateEvent event = new PrivateChannelCreateEvent(privateChannel);
+            PrivateChannelCreateEvent event = new ImplPrivateChannelCreateEvent(privateChannel);
 
             List<PrivateChannelCreateListener> listeners = new ArrayList<>();
             listeners.addAll(recipient.getPrivateChannelCreateListeners());
@@ -145,7 +148,7 @@ public class ChannelCreateHandler extends PacketHandler {
         long channelId = channel.get("id").asLong();
         if (!api.getGroupChannelById(channelId).isPresent()) {
             GroupChannel groupChannel = new ImplGroupChannel(api, channel);
-            GroupChannelCreateEvent event = new GroupChannelCreateEvent(groupChannel);
+            GroupChannelCreateEvent event = new ImplGroupChannelCreateEvent(groupChannel);
 
             List<GroupChannelCreateListener> listeners = new ArrayList<>();
             groupChannel.getMembers().stream()

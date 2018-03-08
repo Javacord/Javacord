@@ -10,6 +10,10 @@ import org.javacord.event.server.emoji.CustomEmojiChangeNameEvent;
 import org.javacord.event.server.emoji.CustomEmojiChangeWhitelistedRolesEvent;
 import org.javacord.event.server.emoji.CustomEmojiCreateEvent;
 import org.javacord.event.server.emoji.CustomEmojiDeleteEvent;
+import org.javacord.event.server.emoji.impl.ImplCustomEmojiChangeNameEvent;
+import org.javacord.event.server.emoji.impl.ImplCustomEmojiChangeWhitelistedRolesEvent;
+import org.javacord.event.server.emoji.impl.ImplCustomEmojiCreateEvent;
+import org.javacord.event.server.emoji.impl.ImplCustomEmojiDeleteEvent;
 import org.javacord.listener.server.emoji.CustomEmojiChangeNameListener;
 import org.javacord.listener.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
 import org.javacord.listener.server.emoji.CustomEmojiCreateListener;
@@ -55,7 +59,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     String oldName = emoji.getName();
                     String newName = entry.getValue().get("name").asText();
                     if (!Objects.deepEquals(oldName, newName)) {
-                        CustomEmojiChangeNameEvent event = new CustomEmojiChangeNameEvent(emoji, newName, oldName);
+                        CustomEmojiChangeNameEvent event = new ImplCustomEmojiChangeNameEvent(emoji, newName, oldName);
                         ((ImplKnownCustomEmoji) emoji).setName(newName);
 
                         List<CustomEmojiChangeNameListener> listeners = new ArrayList<>();
@@ -77,7 +81,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     }
                     if (!newWhitelist.containsAll(oldWhitelist) || !oldWhitelist.containsAll(newWhitelist)) {
                         CustomEmojiChangeWhitelistedRolesEvent event =
-                                new CustomEmojiChangeWhitelistedRolesEvent(emoji, newWhitelist, oldWhitelist);
+                                new ImplCustomEmojiChangeWhitelistedRolesEvent(emoji, newWhitelist, oldWhitelist);
                         ((ImplKnownCustomEmoji) emoji).setWhitelist(newWhitelist);
 
                         List<CustomEmojiChangeWhitelistedRolesListener> listeners = new ArrayList<>();
@@ -92,7 +96,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(server, entry.getValue());
                     server.addCustomEmoji(emoji);
 
-                    CustomEmojiCreateEvent event = new CustomEmojiCreateEvent(emoji);
+                    CustomEmojiCreateEvent event = new ImplCustomEmojiCreateEvent(emoji);
 
                     List<CustomEmojiCreateListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getCustomEmojiCreateListeners());
@@ -110,7 +114,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                         api.removeCustomEmoji(emoji);
                         server.removeCustomEmoji(emoji);
 
-                        CustomEmojiDeleteEvent event = new CustomEmojiDeleteEvent(emoji);
+                        CustomEmojiDeleteEvent event = new ImplCustomEmojiDeleteEvent(emoji);
 
                         List<CustomEmojiDeleteListener> listeners = new ArrayList<>();
                         listeners.addAll(emoji.getCustomEmojiDeleteListeners());

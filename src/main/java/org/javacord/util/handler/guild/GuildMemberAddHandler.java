@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
 import org.javacord.event.server.member.ServerMemberJoinEvent;
+import org.javacord.event.server.member.impl.ImplServerMemberJoinEvent;
 import org.javacord.listener.server.member.ServerMemberJoinListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -34,7 +35,7 @@ public class GuildMemberAddHandler extends PacketHandler {
                     server.incrementMemberCount();
                     User user = api.getOrCreateUser(packet.get("user"));
 
-                    ServerMemberJoinEvent event = new ServerMemberJoinEvent(api, server, user);
+                    ServerMemberJoinEvent event = new ImplServerMemberJoinEvent(server, user);
 
                     List<ServerMemberJoinListener> listeners = new ArrayList<>();
                     listeners.addAll(server.getServerMemberJoinListeners());

@@ -1,4 +1,4 @@
-package org.javacord.listener.user.channel;
+package org.javacord.listener.channel.user;
 
 import org.javacord.event.channel.user.PrivateChannelCreateEvent;
 import org.javacord.listener.GloballyAttachableListener;

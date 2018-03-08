@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.DiscordApi;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.event.server.role.RoleDeleteEvent;
+import org.javacord.event.server.role.impl.ImplRoleDeleteEvent;
 import org.javacord.listener.server.role.RoleDeleteListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -32,7 +33,7 @@ public class GuildRoleDeleteHandler extends PacketHandler {
             server.getRoleById(roleId).ifPresent(role -> {
                 server.removeRole(roleId);
 
-                RoleDeleteEvent event = new RoleDeleteEvent(role.getApi(), role);
+                RoleDeleteEvent event = new ImplRoleDeleteEvent(role);
 
                 List<RoleDeleteListener> listeners = new ArrayList<>();
                 listeners.addAll(role.getRoleDeleteListeners());

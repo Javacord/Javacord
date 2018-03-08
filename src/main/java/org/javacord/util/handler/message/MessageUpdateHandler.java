@@ -13,6 +13,9 @@ import org.javacord.entity.server.Server;
 import org.javacord.event.message.CachedMessagePinEvent;
 import org.javacord.event.message.CachedMessageUnpinEvent;
 import org.javacord.event.message.MessageEditEvent;
+import org.javacord.event.message.impl.ImplCachedMessagePinEvent;
+import org.javacord.event.message.impl.ImplCachedMessageUnpinEvent;
+import org.javacord.event.message.impl.ImplMessageEditEvent;
 import org.javacord.listener.message.CachedMessagePinListener;
 import org.javacord.listener.message.CachedMessageUnpinListener;
 import org.javacord.listener.message.MessageEditListener;
@@ -64,7 +67,7 @@ public class MessageUpdateHandler extends PacketHandler {
                     msg.setPinned(newPinnedFlag);
 
                     if (newPinnedFlag) {
-                        CachedMessagePinEvent event = new CachedMessagePinEvent(msg);
+                        CachedMessagePinEvent event = new ImplCachedMessagePinEvent(msg);
 
                         List<CachedMessagePinListener> listeners = new ArrayList<>();
                         listeners.addAll(msg.getCachedMessagePinListeners());
@@ -83,7 +86,7 @@ public class MessageUpdateHandler extends PacketHandler {
                                     api, listeners, listener -> listener.onCachedMessagePin(event));
                         }
                     } else {
-                        CachedMessageUnpinEvent event = new CachedMessageUnpinEvent(msg);
+                        CachedMessageUnpinEvent event = new ImplCachedMessageUnpinEvent(msg);
 
                         List<CachedMessageUnpinListener> listeners = new ArrayList<>();
                         listeners.addAll(msg.getCachedMessageUnpinListeners());
@@ -164,8 +167,8 @@ public class MessageUpdateHandler extends PacketHandler {
                 }
 
                 if (isMostLikelyAnEdit) {
-                    editEvent =
-                            new MessageEditEvent(api, messageId, channel, newContent, newEmbeds, oldContent, oldEmbeds);
+                    editEvent = new ImplMessageEditEvent(
+                            api, messageId, channel, newContent, newEmbeds, oldContent, oldEmbeds);
                 }
             }
 

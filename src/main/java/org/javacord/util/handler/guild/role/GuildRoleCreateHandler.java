@@ -5,6 +5,7 @@ import org.javacord.DiscordApi;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.event.server.role.RoleCreateEvent;
+import org.javacord.event.server.role.impl.ImplRoleCreateEvent;
 import org.javacord.listener.server.role.RoleCreateListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -30,7 +31,7 @@ public class GuildRoleCreateHandler extends PacketHandler {
         long serverId = Long.parseLong(packet.get("guild_id").asText());
         api.getServerById(serverId).ifPresent(server -> {
             Role role = ((ImplServer) server).getOrCreateRole(packet.get("role"));
-            RoleCreateEvent event = new RoleCreateEvent(role.getApi(), role);
+            RoleCreateEvent event = new ImplRoleCreateEvent(role);
 
             List<RoleCreateListener> listeners = new ArrayList<>();
             listeners.addAll(server.getRoleCreateListeners());

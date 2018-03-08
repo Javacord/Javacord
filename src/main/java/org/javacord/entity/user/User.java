@@ -20,6 +20,8 @@ import org.javacord.listener.channel.group.GroupChannelDeleteListener;
 import org.javacord.listener.channel.server.ServerChannelChangeOverwrittenPermissionsListener;
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
 import org.javacord.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
+import org.javacord.listener.channel.user.PrivateChannelCreateListener;
+import org.javacord.listener.channel.user.PrivateChannelDeleteListener;
 import org.javacord.listener.message.MessageCreateListener;
 import org.javacord.listener.message.reaction.ReactionAddListener;
 import org.javacord.listener.message.reaction.ReactionRemoveListener;
@@ -36,8 +38,6 @@ import org.javacord.listener.user.UserChangeNameListener;
 import org.javacord.listener.user.UserChangeNicknameListener;
 import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
-import org.javacord.listener.user.channel.PrivateChannelCreateListener;
-import org.javacord.listener.user.channel.PrivateChannelDeleteListener;
 import org.javacord.util.event.ListenerManager;
 
 import java.time.Instant;

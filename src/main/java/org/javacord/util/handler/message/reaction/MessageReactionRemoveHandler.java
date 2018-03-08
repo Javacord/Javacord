@@ -9,6 +9,7 @@ import org.javacord.entity.message.Message;
 import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.entity.user.User;
 import org.javacord.event.message.reaction.ReactionRemoveEvent;
+import org.javacord.event.message.reaction.impl.ImplReactionRemoveEvent;
 import org.javacord.listener.message.reaction.ReactionRemoveListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -47,7 +48,7 @@ public class MessageReactionRemoveHandler extends PacketHandler {
 
             message.ifPresent(msg -> ((ImplMessage) msg).removeReaction(emoji, user.isYourself()));
 
-            ReactionRemoveEvent event = new ReactionRemoveEvent(api, messageId, channel, emoji, user);
+            ReactionRemoveEvent event = new ImplReactionRemoveEvent(api, messageId, channel, emoji, user);
 
             List<ReactionRemoveListener> listeners = new ArrayList<>();
             listeners.addAll(Message.getReactionRemoveListeners(api, messageId));

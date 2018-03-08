@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.DiscordApi;
 import org.javacord.event.server.ServerBecomesUnavailableEvent;
 import org.javacord.event.server.ServerLeaveEvent;
+import org.javacord.event.server.impl.ImplServerBecomesUnavailableEvent;
+import org.javacord.event.server.impl.ImplServerLeaveEvent;
 import org.javacord.listener.server.ServerBecomesUnavailableListener;
 import org.javacord.listener.server.ServerLeaveListener;
 import org.javacord.util.gateway.PacketHandler;
@@ -31,7 +33,7 @@ public class GuildDeleteHandler extends PacketHandler {
         if (packet.has("unavailable") && packet.get("unavailable").asBoolean()) {
             api.addUnavailableServerToCache(serverId);
             api.getServerById(serverId).ifPresent(server -> {
-                ServerBecomesUnavailableEvent event = new ServerBecomesUnavailableEvent(api, server);
+                ServerBecomesUnavailableEvent event = new ImplServerBecomesUnavailableEvent(server);
 
                 List<ServerBecomesUnavailableListener> listeners = new ArrayList<>();
                 listeners.addAll(server.getServerBecomesUnavailableListeners());
@@ -44,7 +46,7 @@ public class GuildDeleteHandler extends PacketHandler {
             return;
         }
         api.getServerById(serverId).ifPresent(server -> {
-            ServerLeaveEvent event = new ServerLeaveEvent(api, server);
+            ServerLeaveEvent event = new ImplServerLeaveEvent(server);
 
             List<ServerLeaveListener> listeners = new ArrayList<>();
             listeners.addAll(server.getServerLeaveListeners());

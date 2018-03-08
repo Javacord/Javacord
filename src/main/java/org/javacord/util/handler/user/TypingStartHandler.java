@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.DiscordApi;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.event.user.UserStartTypingEvent;
+import org.javacord.event.user.impl.ImplUserStartTypingEvent;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.util.gateway.PacketHandler;
 
@@ -29,7 +30,7 @@ public class TypingStartHandler extends PacketHandler {
         long userId = packet.get("user_id").asLong();
         long channelId = packet.get("channel_id").asLong();
         api.getTextChannelById(channelId).ifPresent(channel -> api.getCachedUserById(userId).ifPresent(user -> {
-            UserStartTypingEvent event = new UserStartTypingEvent(api, user, channel);
+            UserStartTypingEvent event = new ImplUserStartTypingEvent(user, channel);
 
             List<UserStartTypingListener> listeners = new ArrayList<>();
             listeners.addAll(channel.getUserStartTypingListeners());
