@@ -23,7 +23,7 @@ public class ImplAccountUpdater implements AccountUpdater {
     /**
      * The discord api instance.
      */
-    private final DiscordApi api;
+    private final ImplDiscordApi api;
 
     /**
      * The username to update.
@@ -40,7 +40,7 @@ public class ImplAccountUpdater implements AccountUpdater {
      *
      * @param api The discord api instance.
      */
-    public ImplAccountUpdater(DiscordApi api) {
+    public ImplAccountUpdater(ImplDiscordApi api) {
         this.api = api;
     }
 

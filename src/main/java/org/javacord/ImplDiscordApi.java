@@ -456,10 +456,40 @@ public class ImplDiscordApi implements DiscordApi {
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        disconnect();
-        super.finalize();
+    /**
+     * Gets the used {@link OkHttpClient http client} for this api instance.
+     *
+     * @return The used http client.
+     */
+    public OkHttpClient getHttpClient() {
+        return httpClient;
+    }
+
+    /**
+     * Gets the event dispatcher which is used to dispatch events.
+     *
+     * @return The used event dispatcher.
+     */
+    public EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
+    }
+
+    /**
+     * Gets the ratelimit manager for this bot.
+     *
+     * @return The ratelimit manager for this bot.
+     */
+    public RatelimitManager getRatelimitManager() {
+        return ratelimitManager;
+    }
+
+    /**
+     * Gets the object mapper used by this api instance.
+     *
+     * @return The object mapper used by this api instance.
+     */
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     /**
@@ -920,26 +950,6 @@ public class ImplDiscordApi implements DiscordApi {
     @Override
     public ThreadPool getThreadPool() {
         return threadPool;
-    }
-
-    @Override
-    public OkHttpClient getHttpClient() {
-        return httpClient;
-    }
-
-    @Override
-    public EventDispatcher getEventDispatcher() {
-        return eventDispatcher;
-    }
-
-    @Override
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    @Override
-    public RatelimitManager getRatelimitManager() {
-        return ratelimitManager;
     }
 
     @Override
@@ -1938,5 +1948,11 @@ public class ImplDiscordApi implements DiscordApi {
                 .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
                 .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
                 .forEach(listenerClass -> removeListener(listenerClass, listener));
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        disconnect();
+        super.finalize();
     }
 }

@@ -1,7 +1,5 @@
 package org.javacord;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.OkHttpClient;
 import org.javacord.entity.ApplicationInfo;
 import org.javacord.entity.Icon;
 import org.javacord.entity.activity.Activity;
@@ -98,10 +96,8 @@ import org.javacord.listener.user.UserChangeNicknameListener;
 import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.util.concurrent.ThreadPool;
-import org.javacord.util.event.EventDispatcher;
 import org.javacord.util.event.ListenerManager;
 import org.javacord.util.gateway.DiscordWebSocketAdapter;
-import org.javacord.util.ratelimit.RatelimitManager;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -139,34 +135,6 @@ public interface DiscordApi {
      * @return The internally used thread pool.
      */
     ThreadPool getThreadPool();
-
-    /**
-     * Gets the used {@link OkHttpClient http client} for this api instance.
-     *
-     * @return The used http client.
-     */
-    OkHttpClient getHttpClient();
-
-    /**
-     * Gets the event dispatcher which is used to dispatch events.
-     *
-     * @return The used event dispatcher.
-     */
-    EventDispatcher getEventDispatcher();
-
-    /**
-     * Gets the object mapper used by this api instance.
-     *
-     * @return The object mapper used by this api instance.
-     */
-    ObjectMapper getObjectMapper();
-
-    /**
-     * Gets the ratelimit manager for this bot.
-     *
-     * @return The ratelimit manager for this bot.
-     */
-    RatelimitManager getRatelimitManager();
 
     /**
      * Gets a utility class to interact with uncached messages.

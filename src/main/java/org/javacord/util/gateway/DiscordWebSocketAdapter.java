@@ -11,7 +11,7 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
-import org.javacord.DiscordApi;
+import org.javacord.ImplDiscordApi;
 import org.javacord.Javacord;
 import org.javacord.entity.activity.Activity;
 import org.javacord.entity.server.Server;
@@ -112,7 +112,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private static final Lock gatewayReadLock = gatewayLock.readLock();
     private static final Lock gatewayWriteLock = gatewayLock.writeLock();
 
-    private final DiscordApi api;
+    private final ImplDiscordApi api;
     private final HashMap<String, PacketHandler> handlers = new HashMap<>();
     private final CompletableFuture<Boolean> ready = new CompletableFuture<>();
 
@@ -162,7 +162,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      *
      * @param api The discord api instance.
      */
-    public DiscordWebSocketAdapter(DiscordApi api) {
+    public DiscordWebSocketAdapter(ImplDiscordApi api) {
         this.api = api;
 
         registerHandlers();
@@ -220,7 +220,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * @param api The api used to make the rest call.
      * @return The gateway url as string.
      */
-    private static String getGateway(DiscordApi api) {
+    private static String getGateway(ImplDiscordApi api) {
         gatewayReadLock.lock();
         if (gateway == null) {
             gatewayReadLock.unlock();
@@ -418,7 +418,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     ResumeEvent resumeEvent = new ImplResumeEvent(api);
                     List<ResumeListener> listeners = new ArrayList<>();
                     listeners.addAll(api.getResumeListeners());
-                    api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onResume(resumeEvent));
+                    api.getEventDispatcher()
+                            .dispatchEvent(api, listeners, listener -> listener.onResume(resumeEvent));
                 }
                 if (type.equals("READY")) {
                     reconnectAttempt = 0;

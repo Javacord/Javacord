@@ -8,6 +8,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.javacord.DiscordApi;
+import org.javacord.ImplDiscordApi;
 import org.javacord.exception.DiscordException;
 import org.javacord.util.logging.LoggerUtil;
 import org.javacord.util.rest.impl.ImplRestRequestInformation;
@@ -32,7 +33,7 @@ public class RestRequest<T> {
      */
     private static final Logger logger = LoggerUtil.getLogger(RestRequest.class);
 
-    private final DiscordApi api;
+    private final ImplDiscordApi api;
     private final RestMethod method;
     private final RestEndpoint endpoint;
 
@@ -70,7 +71,7 @@ public class RestRequest<T> {
      * @param endpoint The endpoint to which the request should be sent.
      */
     public RestRequest(DiscordApi api, RestMethod method, RestEndpoint endpoint) {
-        this.api = api;
+        this.api = (ImplDiscordApi) api;
         this.method = method;
         this.endpoint = endpoint;
 
@@ -82,7 +83,7 @@ public class RestRequest<T> {
      *
      * @return The api which is used for this request.
      */
-    public DiscordApi getApi() {
+    public ImplDiscordApi getApi() {
         return api;
     }
 
