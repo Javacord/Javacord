@@ -8,6 +8,8 @@ import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannelBuilderDelegate;
+import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
+import org.javacord.entity.emoji.impl.ImplCustomEmojiBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
@@ -61,6 +63,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public ServerVoiceChannelBuilderDelegate createServerVoiceChannelBuilderDelegate(Server server) {
         return new ImplServerVoiceChannelBuilderDelegate((ImplServer) server);
+    }
+
+    @Override
+    public CustomEmojiBuilderDelegate createCustomEmojiBuilderDelegate(Server server) {
+        return new ImplCustomEmojiBuilderDelegate((ImplServer) server);
     }
 
 }

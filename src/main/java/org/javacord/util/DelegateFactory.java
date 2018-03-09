@@ -4,6 +4,7 @@ import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
+import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
@@ -117,6 +118,16 @@ public class DelegateFactory {
      */
     public static ServerVoiceChannelBuilderDelegate createServerVoiceChannelBuilderDelegate(Server server) {
         return delegateFactoryDelegate.createServerVoiceChannelBuilderDelegate(server);
+    }
+
+    /**
+     * Creates a new custom emoji builder delegate.
+     *
+     * @param server The server of the custom emoji.
+     * @return A new custom emoji builder delegate.
+     */
+    public static CustomEmojiBuilderDelegate createCustomEmojiBuilderDelegate(Server server) {
+        return delegateFactoryDelegate.createCustomEmojiBuilderDelegate(server);
     }
 
 }

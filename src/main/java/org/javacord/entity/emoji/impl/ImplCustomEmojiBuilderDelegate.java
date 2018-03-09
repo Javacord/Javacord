@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.Icon;
-import org.javacord.entity.emoji.CustomEmojiBuilder;
+import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
 import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.entity.permission.Role;
-import org.javacord.entity.server.Server;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
@@ -26,9 +25,9 @@ import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link CustomEmojiBuilder}.
+ * The implementation of {@link CustomEmojiBuilderDelegate}.
  */
-public class ImplCustomEmojiBuilder implements CustomEmojiBuilder {
+public class ImplCustomEmojiBuilderDelegate implements CustomEmojiBuilderDelegate {
 
     /**
      * The server of the emoji.
@@ -56,98 +55,85 @@ public class ImplCustomEmojiBuilder implements CustomEmojiBuilder {
     private Collection<Role> whitelist = null;
 
     /**
-     * Creates a new custom emoji builder.
+     * Creates a new custom emoji builder delegate.
      *
      * @param server The server of the channel.
      */
-    public ImplCustomEmojiBuilder(Server server) {
-        this.server = (ImplServer) server;
+    public ImplCustomEmojiBuilderDelegate(ImplServer server) {
+        this.server = server;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(Icon image) {
+    public void setImage(Icon image) {
         this.image = (image == null) ? null : new FileContainer(image);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(URL image) {
+    public void setImage(URL image) {
         this.image = (image == null) ? null : new FileContainer(image);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(File image) {
+    public void setImage(File image) {
         this.image = (image == null) ? null : new FileContainer(image);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(BufferedImage image) {
+    public void setImage(BufferedImage image) {
         this.image = (image == null) ? null : new FileContainer(image, "png");
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(BufferedImage image, String type) {
+    public void setImage(BufferedImage image, String type) {
         this.image = (image == null) ? null : new FileContainer(image, type);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(byte[] image) {
+    public void setImage(byte[] image) {
         this.image = (image == null) ? null : new FileContainer(image, "png");
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(byte[] image, String type) {
+    public void setImage(byte[] image, String type) {
         this.image = (image == null) ? null : new FileContainer(image, type);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(InputStream image) {
+    public void setImage(InputStream image) {
         this.image = (image == null) ? null : new FileContainer(image, "png");
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setImage(InputStream image, String type) {
+    public void setImage(InputStream image, String type) {
         this.image = (image == null) ? null : new FileContainer(image, type);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder addRoleToWhitelist(Role role) {
+    public void addRoleToWhitelist(Role role) {
         if (whitelist == null) {
             whitelist = new HashSet<>();
         }
         whitelist.add(role);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setWhitelist(Collection<Role> roles) {
+    public void setWhitelist(Collection<Role> roles) {
         whitelist = roles == null ? null : new HashSet<>(roles);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiBuilder setWhitelist(Role... roles) {
-        return setWhitelist(roles == null ? null : Arrays.asList(roles));
+    public void setWhitelist(Role... roles) {
+        setWhitelist(roles == null ? null : Arrays.asList(roles));
     }
 
     @Override

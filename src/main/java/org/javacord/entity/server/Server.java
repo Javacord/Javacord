@@ -593,7 +593,9 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return A custom emoji builder to create custom emojis.
      */
-    CustomEmojiBuilder createCustomEmojiBuilder();
+    default CustomEmojiBuilder createCustomEmojiBuilder() {
+        return new CustomEmojiBuilder(this);
+    }
 
     /**
      * Creates an updater for this server.

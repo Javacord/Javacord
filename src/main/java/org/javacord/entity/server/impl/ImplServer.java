@@ -22,9 +22,7 @@ import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.channel.impl.ImplChannelCategory;
 import org.javacord.entity.channel.impl.ImplServerTextChannel;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannel;
-import org.javacord.entity.emoji.CustomEmojiBuilder;
 import org.javacord.entity.emoji.KnownCustomEmoji;
-import org.javacord.entity.emoji.impl.ImplCustomEmojiBuilder;
 import org.javacord.entity.impl.ImplIcon;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.impl.ImplRole;
@@ -870,11 +868,6 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
-    }
-
-    @Override
-    public CustomEmojiBuilder createCustomEmojiBuilder() {
-        return new ImplCustomEmojiBuilder(this);
     }
 
     @Override
