@@ -2,6 +2,7 @@ package org.javacord.util;
 
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
@@ -95,6 +96,16 @@ public class DelegateFactory {
      */
     public static ChannelCategoryBuilderDelegate createChannelCategoryBuilderDelegate(Server server) {
         return delegateFactoryDelegate.createChannelCategoryBuilderDelegate(server);
+    }
+
+    /**
+     * Creates a new server text channel builder delegate.
+     *
+     * @param server The server of the server text channel.
+     * @return A new server text channel builder delegate.
+     */
+    public static ServerTextChannelBuilderDelegate createServerTextChannelBuilderDelegate(Server server) {
+        return delegateFactoryDelegate.createServerTextChannelBuilderDelegate(server);
     }
 
 }

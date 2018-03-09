@@ -3,7 +3,9 @@ package org.javacord.util;
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.ImplDiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.impl.ImplServerTextChannelBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
@@ -47,6 +49,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public ChannelCategoryBuilderDelegate createChannelCategoryBuilderDelegate(Server server) {
         return new ImplChannelCategoryBuilderDelegate((ImplServer) server);
+    }
+
+    @Override
+    public ServerTextChannelBuilderDelegate createServerTextChannelBuilderDelegate(Server server) {
+        return new ImplServerTextChannelBuilderDelegate((ImplServer) server);
     }
 
 }

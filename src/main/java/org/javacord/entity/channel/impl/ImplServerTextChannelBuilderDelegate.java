@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.channel.ChannelCategory;
 import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.ServerTextChannelBuilder;
+import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
@@ -13,9 +13,9 @@ import org.javacord.util.rest.RestRequest;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link ServerTextChannelBuilder}.
+ * The implementation of {@link ServerTextChannelBuilderDelegate}.
  */
-public class ImplServerTextChannelBuilder implements ServerTextChannelBuilder {
+public class ImplServerTextChannelBuilderDelegate implements ServerTextChannelBuilderDelegate {
 
     /**
      * The server of the channel.
@@ -38,30 +38,27 @@ public class ImplServerTextChannelBuilder implements ServerTextChannelBuilder {
     private ChannelCategory category = null;
 
     /**
-     * Creates a new server text channel builder.
+     * Creates a new server text channel builder delegate.
      *
-     * @param server The server of the channel.
+     * @param server The server of the server text channel.
      */
-    public ImplServerTextChannelBuilder(ImplServer server) {
+    public ImplServerTextChannelBuilderDelegate(ImplServer server) {
         this.server = server;
     }
 
     @Override
-    public ServerTextChannelBuilder setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ServerTextChannelBuilder setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ServerTextChannelBuilder setCategory(ChannelCategory category) {
+    public void setCategory(ChannelCategory category) {
         this.category = category;
-        return this;
     }
 
     @Override

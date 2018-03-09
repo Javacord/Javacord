@@ -1,11 +1,28 @@
 package org.javacord.entity.channel;
 
+import org.javacord.entity.server.Server;
+import org.javacord.util.DelegateFactory;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is used to create new server text channels.
  */
-public interface ServerTextChannelBuilder {
+public class ServerTextChannelBuilder {
+
+    /**
+     * The server text channel delegate used by this instance.
+     */
+    private final ServerTextChannelBuilderDelegate delegate;
+
+    /**
+     * Creates a new server text channel builder.
+     *
+     * @param server The server of the server text channel.
+     */
+    public ServerTextChannelBuilder(Server server) {
+        delegate = DelegateFactory.createServerTextChannelBuilderDelegate(server);
+    }
 
     /**
      * Sets the reason for this creation. This reason will be visible in the audit log entry(s).
@@ -13,7 +30,10 @@ public interface ServerTextChannelBuilder {
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    ServerTextChannelBuilder setAuditLogReason(String reason);
+    public ServerTextChannelBuilder setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
 
     /**
      * Sets the name of the channel.
@@ -21,7 +41,10 @@ public interface ServerTextChannelBuilder {
      * @param name The name of the channel.
      * @return The current instance in order to chain call methods.
      */
-    ServerTextChannelBuilder setName(String name);
+    public ServerTextChannelBuilder setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Sets the category of the channel.
@@ -29,13 +52,18 @@ public interface ServerTextChannelBuilder {
      * @param category The category of the channel.
      * @return The current instance in order to chain call methods.
      */
-    ServerTextChannelBuilder setCategory(ChannelCategory category);
+    public ServerTextChannelBuilder setCategory(ChannelCategory category) {
+        delegate.setCategory(category);
+        return this;
+    }
 
     /**
      * Creates the server text channel.
      *
      * @return The created text channel.
      */
-    CompletableFuture<ServerTextChannel> create();
+    public CompletableFuture<ServerTextChannel> create() {
+        return delegate.create();
+    }
 
 }
