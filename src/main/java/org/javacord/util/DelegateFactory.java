@@ -2,6 +2,7 @@ package org.javacord.util;
 
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
@@ -10,6 +11,7 @@ import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
 import org.javacord.entity.server.Server;
+import org.javacord.entity.webhook.WebhookBuilderDelegate;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -128,6 +130,16 @@ public class DelegateFactory {
      */
     public static CustomEmojiBuilderDelegate createCustomEmojiBuilderDelegate(Server server) {
         return delegateFactoryDelegate.createCustomEmojiBuilderDelegate(server);
+    }
+
+    /**
+     * Creates a new webhook builder delegate.
+     *
+     * @param channel The server text channel of the webhook.
+     * @return A new webhook builder delegate.
+     */
+    public static WebhookBuilderDelegate createWebhookBuilderDelegate(ServerTextChannel channel) {
+        return delegateFactoryDelegate.createWebhookBuilderDelegate(channel);
     }
 
 }

@@ -3,6 +3,7 @@ package org.javacord.util;
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.ImplDiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplChannelCategoryBuilderDelegate;
@@ -19,6 +20,8 @@ import org.javacord.entity.permission.PermissionsBuilderDelegate;
 import org.javacord.entity.permission.impl.ImplPermissionsBuilderDelegate;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.impl.ImplServer;
+import org.javacord.entity.webhook.WebhookBuilderDelegate;
+import org.javacord.entity.webhook.impl.ImplWebhookBuilderDelegate;
 
 /**
  * The implementation of {@link DelegateFactoryDelegate}.
@@ -68,6 +71,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public CustomEmojiBuilderDelegate createCustomEmojiBuilderDelegate(Server server) {
         return new ImplCustomEmojiBuilderDelegate((ImplServer) server);
+    }
+
+    @Override
+    public WebhookBuilderDelegate createWebhookBuilderDelegate(ServerTextChannel channel) {
+        return new ImplWebhookBuilderDelegate(channel);
     }
 
 }

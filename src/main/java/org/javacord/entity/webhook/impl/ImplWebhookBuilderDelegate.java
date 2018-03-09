@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.Icon;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.webhook.WebhookBuilder;
+import org.javacord.entity.webhook.WebhookBuilderDelegate;
 import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
@@ -19,9 +19,9 @@ import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link WebhookBuilder}.
+ * The implementation of {@link WebhookBuilderDelegate}.
  */
-public class ImplWebhookBuilder implements WebhookBuilder {
+public class ImplWebhookBuilderDelegate implements WebhookBuilderDelegate {
 
     /**
      * The channel for the webhook.
@@ -44,78 +44,67 @@ public class ImplWebhookBuilder implements WebhookBuilder {
     private FileContainer avatar = null;
 
     /**
-     * Creates a new webhook builder.
+     * Creates a new webhook builder delegate.
      *
      * @param channel The channel for the webhook.
      */
-    public ImplWebhookBuilder(ServerTextChannel channel) {
+    public ImplWebhookBuilderDelegate(ServerTextChannel channel) {
         this.channel = channel;
     }
 
     @Override
-    public ImplWebhookBuilder setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(BufferedImage avatar) {
+    public void setAvatar(BufferedImage avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(BufferedImage avatar, String fileType) {
+    public void setAvatar(BufferedImage avatar, String fileType) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(File avatar) {
+    public void setAvatar(File avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar);
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(Icon avatar) {
+    public void setAvatar(Icon avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar);
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(URL avatar) {
+    public void setAvatar(URL avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar);
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(byte[] avatar) {
+    public void setAvatar(byte[] avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(byte[] avatar, String fileType) {
+    public void setAvatar(byte[] avatar, String fileType) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(InputStream avatar) {
+    public void setAvatar(InputStream avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
-        return this;
     }
 
     @Override
-    public ImplWebhookBuilder setAvatar(InputStream avatar, String fileType) {
+    public void setAvatar(InputStream avatar, String fileType) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
-        return this;
     }
 
     @Override
