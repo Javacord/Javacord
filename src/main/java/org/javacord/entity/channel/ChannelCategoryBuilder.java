@@ -1,11 +1,28 @@
 package org.javacord.entity.channel;
 
+import org.javacord.entity.server.Server;
+import org.javacord.util.DelegateFactory;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is used to create new channel categories.
  */
-public interface ChannelCategoryBuilder {
+public class ChannelCategoryBuilder {
+
+    /**
+     * The channel category delegate used by this instance.
+     */
+    private final ChannelCategoryBuilderDelegate delegate;
+
+    /**
+     * Creates a new channel category builder.
+     *
+     * @param server The server of the channel category.
+     */
+    public ChannelCategoryBuilder(Server server) {
+        delegate = DelegateFactory.createChannelCategoryBuilderDelegate(server);
+    }
 
     /**
      * Sets the reason for this creation. This reason will be visible in the audit log entry(s).
@@ -13,7 +30,10 @@ public interface ChannelCategoryBuilder {
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    ChannelCategoryBuilder setAuditLogReason(String reason);
+    public ChannelCategoryBuilder setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
 
     /**
      * Sets the name of the channel.
@@ -21,13 +41,18 @@ public interface ChannelCategoryBuilder {
      * @param name The name of the channel.
      * @return The current instance in order to chain call methods.
      */
-    ChannelCategoryBuilder setName(String name);
+    public ChannelCategoryBuilder setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Creates the channel category.
      *
      * @return The created channel category.
      */
-    CompletableFuture<ChannelCategory> create();
+    public CompletableFuture<ChannelCategory> create() {
+        return delegate.create();
+    }
 
 }

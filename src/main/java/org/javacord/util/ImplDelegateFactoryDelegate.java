@@ -2,6 +2,8 @@ package org.javacord.util;
 
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.ImplDiscordApiBuilderDelegate;
+import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.impl.ImplChannelCategoryBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
@@ -9,6 +11,8 @@ import org.javacord.entity.message.impl.ImplMessageBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
 import org.javacord.entity.permission.impl.ImplPermissionsBuilderDelegate;
+import org.javacord.entity.server.Server;
+import org.javacord.entity.server.impl.ImplServer;
 
 /**
  * The implementation of {@link DelegateFactoryDelegate}.
@@ -38,6 +42,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public PermissionsBuilderDelegate createPermissionsBuilderDelegate(Permissions permissions) {
         return new ImplPermissionsBuilderDelegate(permissions);
+    }
+
+    @Override
+    public ChannelCategoryBuilderDelegate createChannelCategoryBuilderDelegate(Server server) {
+        return new ImplChannelCategoryBuilderDelegate((ImplServer) server);
     }
 
 }

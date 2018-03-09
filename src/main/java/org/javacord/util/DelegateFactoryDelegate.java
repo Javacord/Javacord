@@ -1,10 +1,12 @@
 package org.javacord.util;
 
 import org.javacord.DiscordApiBuilderDelegate;
+import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
+import org.javacord.entity.server.Server;
 
 /**
  * This class is internally used by the {@link DelegateFactory} to create delegate instances.
@@ -47,5 +49,13 @@ public interface DelegateFactoryDelegate {
      * @return A new permissions builder delegate initialized with the given permissions.
      */
     PermissionsBuilderDelegate createPermissionsBuilderDelegate(Permissions permissions);
+
+    /**
+     * Creates a new channel category builder delegate.
+     *
+     * @param server The server of the channel category.
+     * @return A new channel category builder delegate.
+     */
+    ChannelCategoryBuilderDelegate createChannelCategoryBuilderDelegate(Server server);
 
 }

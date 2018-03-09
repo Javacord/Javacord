@@ -2,7 +2,7 @@ package org.javacord.entity.channel.impl;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.javacord.entity.channel.ChannelCategory;
-import org.javacord.entity.channel.ChannelCategoryBuilder;
+import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
@@ -11,9 +11,9 @@ import org.javacord.util.rest.RestRequest;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link ChannelCategoryBuilder}.
+ * The implementation of {@link ChannelCategoryBuilderDelegate}.
  */
-public class ImplChannelCategoryBuilder implements ChannelCategoryBuilder {
+public class ImplChannelCategoryBuilderDelegate implements ChannelCategoryBuilderDelegate {
 
     /**
      * The server of the channel.
@@ -31,24 +31,22 @@ public class ImplChannelCategoryBuilder implements ChannelCategoryBuilder {
     private String name = null;
 
     /**
-     * Creates a new channel category builder.
+     * Creates a new channel category builder delegate.
      *
-     * @param server The server of the channel.
+     * @param server The server of the channel category.
      */
-    public ImplChannelCategoryBuilder(ImplServer server) {
+    public ImplChannelCategoryBuilderDelegate(ImplServer server) {
         this.server = server;
     }
 
     @Override
-    public ChannelCategoryBuilder setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ChannelCategoryBuilder setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
