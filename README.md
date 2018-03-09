@@ -145,18 +145,3 @@ to stay for at least 6 months before it finally gets removed, but this is not gu
 
 Javacord has its own Discord Server. You can join it ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) for support,
 status updates or just chatting with other users.
-
-## Command Framework
-
-Depending on the use-case of your bot you can use [sdcf4j](https://github.com/BtoBastian/sdcf4j) in order to create commands. It provides a clean and simple way to create commands. A ping-pong command would be as easy as this:
-```java
-public class PingCommand implements CommandExecutor {
-
-    @Command(aliases = {"!ping"}, description = "Pong!")
-    public String onCommand(String command, String[] args) {
-        return "Pong!";
-    }
-
-}
-```
-Take a look at the [sdcf4j wiki](https://github.com/BtoBastian/sdcf4j/wiki) to find out how it works.
