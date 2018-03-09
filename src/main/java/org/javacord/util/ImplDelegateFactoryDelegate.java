@@ -1,6 +1,8 @@
 package org.javacord.util;
 
+import org.javacord.DiscordApi;
 import org.javacord.DiscordApiBuilderDelegate;
+import org.javacord.ImplDiscordApi;
 import org.javacord.ImplDiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.ServerTextChannel;
@@ -19,7 +21,9 @@ import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
 import org.javacord.entity.permission.impl.ImplPermissionsBuilderDelegate;
 import org.javacord.entity.server.Server;
+import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.impl.ImplServer;
+import org.javacord.entity.server.impl.ImplServerBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 import org.javacord.entity.webhook.impl.ImplWebhookBuilderDelegate;
 
@@ -76,6 +80,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public WebhookBuilderDelegate createWebhookBuilderDelegate(ServerTextChannel channel) {
         return new ImplWebhookBuilderDelegate(channel);
+    }
+
+    @Override
+    public ServerBuilderDelegate createServerBuilderDelegate(DiscordApi api) {
+        return new ImplServerBuilderDelegate((ImplDiscordApi) api);
     }
 
 }

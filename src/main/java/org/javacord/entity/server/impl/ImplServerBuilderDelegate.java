@@ -7,7 +7,7 @@ import org.javacord.entity.Icon;
 import org.javacord.entity.Region;
 import org.javacord.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.entity.server.ExplicitContentFilterLevel;
-import org.javacord.entity.server.ServerBuilder;
+import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.VerificationLevel;
 import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
@@ -22,9 +22,9 @@ import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link ServerBuilder}.
+ * The implementation of {@link ServerBuilderDelegate}.
  */
-public class ImplServerBuilder implements ServerBuilder {
+public class ImplServerBuilderDelegate implements ServerBuilderDelegate {
 
     /**
      * The discord api instance.
@@ -67,103 +67,87 @@ public class ImplServerBuilder implements ServerBuilder {
     private FileContainer icon = null;
 
     /**
-     * Creates a new server builder.
+     * Creates a new server builder delegate.
      *
      * @param api The discord api instance.
      */
-    public ImplServerBuilder(ImplDiscordApi api) {
+    public ImplServerBuilderDelegate(ImplDiscordApi api) {
         this.api = api;
     }
 
     @Override
-    public ServerBuilder setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ServerBuilder setRegion(Region region) {
+    public void setRegion(Region region) {
         this.region = region;
-        return this;
     }
 
     @Override
-    public ServerBuilder setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
+    public void setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
         this.explicitContentFilterLevel = explicitContentFilterLevel;
-        return this;
     }
 
     @Override
-    public ServerBuilder setVerificationLevel(VerificationLevel verificationLevel) {
+    public void setVerificationLevel(VerificationLevel verificationLevel) {
         this.verificationLevel = verificationLevel;
-        return this;
     }
 
     @Override
-    public ServerBuilder setDefaultMessageNotificationLevel(
-            DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
+    public void setDefaultMessageNotificationLevel(DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
         this.defaultMessageNotificationLevel = defaultMessageNotificationLevel;
-        return this;
     }
 
     @Override
-    public ServerBuilder setAfkTimeoutInSeconds(int afkTimeout) {
+    public void setAfkTimeoutInSeconds(int afkTimeout) {
         this.afkTimeout = afkTimeout;
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(BufferedImage icon) {
+    public void setIcon(BufferedImage icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon, "png");
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(BufferedImage icon, String fileType) {
+    public void setIcon(BufferedImage icon, String fileType) {
         this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(File icon) {
+    public void setIcon(File icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon);
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(Icon icon) {
+    public void setIcon(Icon icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon);
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(URL icon) {
+    public void setIcon(URL icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon);
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(byte[] icon) {
+    public void setIcon(byte[] icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon, "png");
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(byte[] icon, String fileType) {
+    public void setIcon(byte[] icon, String fileType) {
         this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(InputStream icon) {
+    public void setIcon(InputStream icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon, "png");
-        return this;
     }
 
     @Override
-    public ServerBuilder setIcon(InputStream icon, String fileType) {
+    public void setIcon(InputStream icon, String fileType) {
         this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
-        return this;
     }
 
     @Override

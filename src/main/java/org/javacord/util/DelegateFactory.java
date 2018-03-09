@@ -1,5 +1,6 @@
 package org.javacord.util;
 
+import org.javacord.DiscordApi;
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.ServerTextChannel;
@@ -11,6 +12,7 @@ import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
 import org.javacord.entity.server.Server;
+import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 
 import java.util.Iterator;
@@ -140,6 +142,16 @@ public class DelegateFactory {
      */
     public static WebhookBuilderDelegate createWebhookBuilderDelegate(ServerTextChannel channel) {
         return delegateFactoryDelegate.createWebhookBuilderDelegate(channel);
+    }
+
+    /**
+     * Creates a new server builder delegate.
+     *
+     * @param api The discord api instance.
+     * @return A new server builder delegate.
+     */
+    public static ServerBuilderDelegate createServerBuilderDelegate(DiscordApi api) {
+        return delegateFactoryDelegate.createServerBuilderDelegate(api);
     }
 
 }
