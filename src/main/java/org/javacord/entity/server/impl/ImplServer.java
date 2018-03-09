@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.AccountType;
 import org.javacord.DiscordApi;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
@@ -337,7 +338,7 @@ public class ImplServer implements Server, Cleanupable {
             }
         }
 
-        if (isLarge() && getMembers().size() < getMemberCount()) {
+        if ((isLarge() || api.getAccountType() == AccountType.CLIENT) && getMembers().size() < getMemberCount()) {
             this.api.getWebSocketAdapter().queueRequestGuildMembers(this);
         }
 
