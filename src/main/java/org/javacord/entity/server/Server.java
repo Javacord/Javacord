@@ -1350,7 +1350,9 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return A builder to create a new server voice channel.
      */
-    ServerVoiceChannelBuilder createVoiceChannelBuilder();
+    default ServerVoiceChannelBuilder createVoiceChannelBuilder() {
+        return new ServerVoiceChannelBuilder(this);
+    }
 
     /**
      * Creates a new role builder.

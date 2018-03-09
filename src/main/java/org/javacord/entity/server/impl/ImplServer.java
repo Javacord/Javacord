@@ -19,11 +19,9 @@ import org.javacord.entity.channel.ChannelCategory;
 import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.entity.channel.impl.ImplChannelCategory;
 import org.javacord.entity.channel.impl.ImplServerTextChannel;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannel;
-import org.javacord.entity.channel.impl.ImplServerVoiceChannelBuilder;
 import org.javacord.entity.emoji.CustomEmojiBuilder;
 import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.entity.emoji.impl.ImplCustomEmojiBuilder;
@@ -1010,11 +1008,6 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Collection<KnownCustomEmoji> getCustomEmojis() {
         return Collections.unmodifiableCollection(new ArrayList<>(customEmojis));
-    }
-
-    @Override
-    public ServerVoiceChannelBuilder createVoiceChannelBuilder() {
-        return new ImplServerVoiceChannelBuilder(this);
     }
 
     @Override

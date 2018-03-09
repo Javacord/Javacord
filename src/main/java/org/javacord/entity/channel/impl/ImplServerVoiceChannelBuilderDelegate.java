@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.channel.ChannelCategory;
 import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannelBuilder;
+import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
@@ -13,9 +13,9 @@ import org.javacord.util.rest.RestRequest;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link ServerVoiceChannelBuilder}.
+ * The implementation of {@link ServerVoiceChannelBuilderDelegate}.
  */
-public class ImplServerVoiceChannelBuilder implements ServerVoiceChannelBuilder {
+public class ImplServerVoiceChannelBuilderDelegate implements ServerVoiceChannelBuilderDelegate {
 
     /**
      * The server of the channel.
@@ -48,42 +48,37 @@ public class ImplServerVoiceChannelBuilder implements ServerVoiceChannelBuilder 
     private ChannelCategory category = null;
 
     /**
-     * Creates a new server voice channel builder.
+     * Creates a new server voice channel builder delegate.
      *
-     * @param server The server of the channel.
+     * @param server The server of the server voice channel.
      */
-    public ImplServerVoiceChannelBuilder(ImplServer server) {
+    public ImplServerVoiceChannelBuilderDelegate(ImplServer server) {
         this.server = server;
     }
 
     @Override
-    public ServerVoiceChannelBuilder setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ServerVoiceChannelBuilder setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ServerVoiceChannelBuilder setCategory(ChannelCategory category) {
+    public void setCategory(ChannelCategory category) {
         this.category = category;
-        return this;
     }
 
     @Override
-    public ServerVoiceChannelBuilder setBitrate(int bitrate) {
+    public void setBitrate(int bitrate) {
         this.bitrate = bitrate;
-        return this;
     }
 
     @Override
-    public ServerVoiceChannelBuilder setUserlimit(int userlimit) {
+    public void setUserlimit(int userlimit) {
         this.userlimit = userlimit;
-        return this;
     }
 
     @Override

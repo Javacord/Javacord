@@ -4,8 +4,10 @@ import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.ImplDiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
+import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplServerTextChannelBuilderDelegate;
+import org.javacord.entity.channel.impl.ImplServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
@@ -54,6 +56,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public ServerTextChannelBuilderDelegate createServerTextChannelBuilderDelegate(Server server) {
         return new ImplServerTextChannelBuilderDelegate((ImplServer) server);
+    }
+
+    @Override
+    public ServerVoiceChannelBuilderDelegate createServerVoiceChannelBuilderDelegate(Server server) {
+        return new ImplServerVoiceChannelBuilderDelegate((ImplServer) server);
     }
 
 }
