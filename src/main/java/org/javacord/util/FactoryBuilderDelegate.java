@@ -5,6 +5,7 @@ import org.javacord.entity.message.MessageFactory;
 import org.javacord.entity.message.embed.EmbedFactory;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsFactory;
+import org.javacord.util.exception.DiscordExceptionValidator;
 
 /**
  * This class is used by Javacord internally.
@@ -47,5 +48,12 @@ public interface FactoryBuilderDelegate {
      * @return A new permissions factory initialized with the given permissions.
      */
     PermissionsFactory createPermissionsFactory(Permissions permissions);
+
+    /**
+     * Creates a new discord exception validator.
+     *
+     * @return A new discord exception validator.
+     */
+    DiscordExceptionValidator createDiscordExceptionValidator();
 
 }

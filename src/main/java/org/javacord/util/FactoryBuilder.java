@@ -5,6 +5,7 @@ import org.javacord.entity.message.MessageFactory;
 import org.javacord.entity.message.embed.EmbedFactory;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsFactory;
+import org.javacord.util.exception.DiscordExceptionValidator;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -20,6 +21,11 @@ public class FactoryBuilder {
      */
     private static final FactoryBuilderDelegate factoryBuilderDelegate;
 
+    /**
+     * The discord exception validator.
+     */
+    private static final DiscordExceptionValidator discordExceptionValidator;
+
     // Load it static, because it has a better performance to load it only once
     static {
         ServiceLoader<FactoryBuilderDelegate> delegateServiceLoader = ServiceLoader.load(FactoryBuilderDelegate.class);
@@ -32,6 +38,7 @@ public class FactoryBuilder {
         } else {
             throw new IllegalStateException("No FactoryBuilderDelegate implementation was found!");
         }
+        discordExceptionValidator = factoryBuilderDelegate.createDiscordExceptionValidator();
     }
 
     private FactoryBuilder() {
@@ -82,6 +89,15 @@ public class FactoryBuilder {
      */
     public static PermissionsFactory createPermissionsFactory(Permissions permissions) {
         return factoryBuilderDelegate.createPermissionsFactory(permissions);
+    }
+
+    /**
+     * Gets the discord exception validator.
+     *
+     * @return The discord exception validator.
+     */
+    public static DiscordExceptionValidator getDiscordExceptionValidator() {
+        return discordExceptionValidator;
     }
 
 }
