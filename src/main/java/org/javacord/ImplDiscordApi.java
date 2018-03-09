@@ -105,6 +105,7 @@ import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.util.ClassHelper;
 import org.javacord.util.Cleanupable;
+import org.javacord.util.concurrent.ImplThreadPool;
 import org.javacord.util.concurrent.ThreadPool;
 import org.javacord.util.event.EventDispatcher;
 import org.javacord.util.event.ListenerManager;
@@ -153,7 +154,7 @@ public class ImplDiscordApi implements DiscordApi {
     /**
      * The thread pool which is used internally.
      */
-    private final ThreadPool threadPool = new ThreadPool();
+    private final ImplThreadPool threadPool = new ImplThreadPool();
 
     /**
      * The http client for this instance.
