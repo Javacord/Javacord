@@ -14,7 +14,7 @@ import org.javacord.entity.message.MessageDecoration;
 import org.javacord.entity.message.MessageFactory;
 import org.javacord.entity.message.Messageable;
 import org.javacord.entity.message.embed.EmbedBuilder;
-import org.javacord.entity.message.embed.impl.ImplEmbedFactory;
+import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
 import org.javacord.entity.user.User;
 import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
@@ -237,7 +237,7 @@ public class ImplMessageFactory implements MessageFactory {
                 .put("tts", tts);
         body.putArray("mentions");
         if (embed != null) {
-            ((ImplEmbedFactory) embed.getFactory()).toJsonNode(body.putObject("embed"));
+            ((ImplEmbedBuilderDelegate) embed.getDelegate()).toJsonNode(body.putObject("embed"));
         }
         if (nonce != null) {
             body.put("nonce", nonce);
@@ -256,7 +256,8 @@ public class ImplMessageFactory implements MessageFactory {
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
                     // Add the attachments required for the embed
                     if (embed != null) {
-                        tempAttachments.addAll(((ImplEmbedFactory) embed.getFactory()).getRequiredAttachments());
+                        tempAttachments.addAll(
+                                ((ImplEmbedBuilderDelegate) embed.getDelegate()).getRequiredAttachments());
                     }
                     Collections.reverse(tempAttachments);
                     for (int i = 0; i < tempAttachments.size(); i++) {

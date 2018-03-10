@@ -14,7 +14,7 @@ import java.time.Instant;
  * This class is internally used by the {@link EmbedBuilder} to created embeds.
  * You usually don't want to interact with this object.
  */
-public interface EmbedFactory {
+public interface EmbedBuilderDelegate {
 
     /**
      * Sets the title of the embed.

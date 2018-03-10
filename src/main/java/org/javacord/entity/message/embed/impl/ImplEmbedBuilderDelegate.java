@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.Icon;
 import org.javacord.entity.message.MessageAuthor;
-import org.javacord.entity.message.embed.EmbedFactory;
+import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.user.User;
 import org.javacord.util.FileContainer;
 import org.javacord.util.io.FileUtils;
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * The implementation of {@link EmbedFactory}.
+ * The implementation of {@link EmbedBuilderDelegate}.
  */
-public class ImplEmbedFactory implements EmbedFactory {
+public class ImplEmbedBuilderDelegate implements EmbedBuilderDelegate {
 
     // General embed stuff
     private String title = null;
@@ -54,13 +54,6 @@ public class ImplEmbedFactory implements EmbedFactory {
     // Fields
     // (Array indices: 0: name (String), 1: value (String), 2: inline (boolean)
     private List<Object[]> fields = new ArrayList<>();
-
-    /**
-     * Creates a new embed builder.
-     */
-    public ImplEmbedFactory() {
-        // Default constructor
-    }
 
     @Override
     public void setTitle(String title) {
