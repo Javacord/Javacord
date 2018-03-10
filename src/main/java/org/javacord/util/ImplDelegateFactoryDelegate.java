@@ -1,7 +1,9 @@
 package org.javacord.util;
 
+import org.javacord.AccountUpdaterDelegate;
 import org.javacord.DiscordApi;
 import org.javacord.DiscordApiBuilderDelegate;
+import org.javacord.ImplAccountUpdaterDelegate;
 import org.javacord.ImplDiscordApi;
 import org.javacord.ImplDiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
@@ -102,6 +104,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public InviteBuilderDelegate createInviteBuilderDelegate(ServerChannel channel) {
         return new ImplInviteBuilderDelegate(channel);
+    }
+
+    @Override
+    public AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api) {
+        return new ImplAccountUpdaterDelegate(((ImplDiscordApi) api));
     }
 
     @Override

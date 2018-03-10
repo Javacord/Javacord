@@ -3,6 +3,7 @@ package org.javacord;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.Icon;
+import org.javacord.util.DelegateFactoryDelegate;
 import org.javacord.util.FileContainer;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
@@ -16,9 +17,9 @@ import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This class can be used to update the connected account (e.g. username or avatar).
+ * The implementation of {@link AccountUpdaterDelegate}.
  */
-public class ImplAccountUpdater implements AccountUpdater {
+public class ImplAccountUpdaterDelegate implements AccountUpdaterDelegate {
 
     /**
      * The discord api instance.
@@ -36,72 +37,62 @@ public class ImplAccountUpdater implements AccountUpdater {
     private FileContainer avatar = null;
 
     /**
-     * Creates a new account updater.
+     * Creates a new account updater delegate.
      *
      * @param api The discord api instance.
      */
-    public ImplAccountUpdater(ImplDiscordApi api) {
+    public ImplAccountUpdaterDelegate(ImplDiscordApi api) {
         this.api = api;
     }
 
     @Override
-    public AccountUpdater setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(BufferedImage avatar) {
+    public void setAvatar(BufferedImage avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(BufferedImage avatar, String fileType) {
+    public void setAvatar(BufferedImage avatar, String fileType) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(File avatar) {
+    public void setAvatar(File avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar);
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(Icon avatar) {
+    public void setAvatar(Icon avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar);
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(URL avatar) {
+    public void setAvatar(URL avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar);
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(byte[] avatar) {
+    public void setAvatar(byte[] avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(byte[] avatar, String fileType) {
+    public void setAvatar(byte[] avatar, String fileType) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(InputStream avatar) {
+    public void setAvatar(InputStream avatar) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
-        return this;
     }
 
     @Override
-    public AccountUpdater setAvatar(InputStream avatar, String fileType) {
+    public void setAvatar(InputStream avatar, String fileType) {
         this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
-        return this;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.javacord.util;
 
+import org.javacord.AccountUpdaterDelegate;
 import org.javacord.DiscordApi;
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
@@ -124,6 +125,14 @@ public interface DelegateFactoryDelegate {
      * @return A new invite builder delegate.
      */
     InviteBuilderDelegate createInviteBuilderDelegate(ServerChannel channel);
+
+    /**
+     * Creates a new account updater delegate.
+     *
+     * @param api The discord api instance.
+     * @return A new account updater delegate.
+     */
+    AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api);
 
     /**
      * Creates a new discord exception validator.

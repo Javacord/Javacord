@@ -406,7 +406,9 @@ public interface DiscordApi {
      *
      * @return An account updater for the current account.
      */
-    AccountUpdater createAccountUpdater();
+    default AccountUpdater createAccountUpdater() {
+        return new AccountUpdater(this);
+    }
 
     /**
      * Updates the username of the current account.
