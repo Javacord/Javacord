@@ -7,9 +7,13 @@ import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.GroupChannel;
 import org.javacord.entity.channel.GroupChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerChannel;
+import org.javacord.entity.channel.ServerChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
+import org.javacord.entity.channel.ServerTextChannelUpdaterDelegate;
+import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
+import org.javacord.entity.channel.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
@@ -205,6 +209,37 @@ public class DelegateFactory {
      */
     public static GroupChannelUpdaterDelegate createGroupChannelUpdaterDelegate(GroupChannel channel) {
         return delegateFactoryDelegate.createGroupChannelUpdaterDelegate(channel);
+    }
+
+    /**
+     * Creates a new server channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server channel updater delegate.
+     */
+    public static ServerChannelUpdaterDelegate createServerChannelUpdaterDelegate(ServerChannel channel) {
+        return delegateFactoryDelegate.createServerChannelUpdaterDelegate(channel);
+    }
+
+    /**
+     * Creates a new server text channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server text channel updater delegate.
+     */
+    public static ServerTextChannelUpdaterDelegate createServerTextChannelUpdaterDelegate(ServerTextChannel channel) {
+        return delegateFactoryDelegate.createServerTextChannelUpdaterDelegate(channel);
+    }
+
+    /**
+     * Creates a new server voice channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server voice channel updater delegate.
+     */
+    public static ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(
+            ServerVoiceChannel channel) {
+        return delegateFactoryDelegate.createServerVoiceChannelUpdaterDelegate(channel);
     }
 
     /**

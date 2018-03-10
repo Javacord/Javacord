@@ -10,13 +10,20 @@ import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.GroupChannel;
 import org.javacord.entity.channel.GroupChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerChannel;
+import org.javacord.entity.channel.ServerChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
+import org.javacord.entity.channel.ServerTextChannelUpdaterDelegate;
+import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
+import org.javacord.entity.channel.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.entity.channel.impl.ImplChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplGroupChannelUpdaterDelegate;
+import org.javacord.entity.channel.impl.ImplServerChannelUpdaterDelegate;
 import org.javacord.entity.channel.impl.ImplServerTextChannelBuilderDelegate;
+import org.javacord.entity.channel.impl.ImplServerTextChannelUpdaterDelegate;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannelBuilderDelegate;
+import org.javacord.entity.channel.impl.ImplServerVoiceChannelUpdaterDelegate;
 import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
 import org.javacord.entity.emoji.impl.ImplCustomEmojiBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
@@ -117,6 +124,21 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public GroupChannelUpdaterDelegate createGroupChannelUpdaterDelegate(GroupChannel channel) {
         return new ImplGroupChannelUpdaterDelegate(channel);
+    }
+
+    @Override
+    public ServerChannelUpdaterDelegate createServerChannelUpdaterDelegate(ServerChannel channel) {
+        return new ImplServerChannelUpdaterDelegate(channel);
+    }
+
+    @Override
+    public ServerTextChannelUpdaterDelegate createServerTextChannelUpdaterDelegate(ServerTextChannel channel) {
+        return new ImplServerTextChannelUpdaterDelegate(channel);
+    }
+
+    @Override
+    public ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(ServerVoiceChannel channel) {
+        return new ImplServerVoiceChannelUpdaterDelegate(channel);
     }
 
     @Override

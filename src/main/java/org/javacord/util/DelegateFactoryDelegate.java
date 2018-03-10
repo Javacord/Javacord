@@ -7,9 +7,13 @@ import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
 import org.javacord.entity.channel.GroupChannel;
 import org.javacord.entity.channel.GroupChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerChannel;
+import org.javacord.entity.channel.ServerChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
+import org.javacord.entity.channel.ServerTextChannelUpdaterDelegate;
+import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
+import org.javacord.entity.channel.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
@@ -143,6 +147,30 @@ public interface DelegateFactoryDelegate {
      * @return A new group channel updater delegate.
      */
     GroupChannelUpdaterDelegate createGroupChannelUpdaterDelegate(GroupChannel channel);
+
+    /**
+     * Creates a new server channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server channel updater delegate.
+     */
+    ServerChannelUpdaterDelegate createServerChannelUpdaterDelegate(ServerChannel channel);
+
+    /**
+     * Creates a new server text channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server text channel updater delegate.
+     */
+    ServerTextChannelUpdaterDelegate createServerTextChannelUpdaterDelegate(ServerTextChannel channel);
+
+    /**
+     * Creates a new server voice channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server voice channel updater delegate.
+     */
+    ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(ServerVoiceChannel channel);
 
     /**
      * Creates a new discord exception validator.

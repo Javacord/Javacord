@@ -9,7 +9,6 @@ import org.javacord.entity.channel.InternalChannel;
 import org.javacord.entity.channel.InternalServerChannel;
 import org.javacord.entity.channel.InternalTextChannel;
 import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.ServerTextChannelUpdater;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.impl.ImplPermissions;
@@ -226,11 +225,6 @@ public class ImplServerTextChannel
     @Override
     public String getTopic() {
         return topic;
-    }
-
-    @Override
-    public ServerTextChannelUpdater createUpdater() {
-        return new ImplServerTextChannelUpdater(this);
     }
 
     @Override

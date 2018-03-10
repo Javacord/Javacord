@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.channel.ServerChannelUpdater;
+import org.javacord.entity.channel.ServerChannelUpdaterDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
-import org.javacord.entity.permission.impl.ImplPermissions;
 import org.javacord.entity.user.User;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
@@ -18,9 +17,9 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link ServerChannelUpdater}.
+ * The implementation of {@link ServerChannelUpdaterDelegate}.
  */
-public class ImplServerChannelUpdater implements ServerChannelUpdater {
+public class ImplServerChannelUpdaterDelegate implements ServerChannelUpdaterDelegate {
 
     /**
      * The channel to update.
@@ -53,64 +52,69 @@ public class ImplServerChannelUpdater implements ServerChannelUpdater {
     protected Map<Long, Permissions> overwrittenRolePermissions = null;
 
     /**
-     * Creates a new server channel updater.
+     * Creates a new server channel updater delegate.
      *
      * @param channel The channel to update.
      */
-    public ImplServerChannelUpdater(ServerChannel channel) {
+    public ImplServerChannelUpdaterDelegate(ServerChannel channel) {
         this.channel = channel;
     }
 
     @Override
-    public ServerChannelUpdater setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ServerChannelUpdater setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ServerChannelUpdater setRawPosition(int rawPosition) {
+    public void setRawPosition(int rawPosition) {
         this.position = rawPosition;
-        return this;
     }
 
     @Override
-    public ServerChannelUpdater addPermissionOverwrite(User user, Permissions permissions) {
+    public void addPermissionOverwrite(User user, Permissions permissions) {
         populatePermissionOverwrites();
         overwrittenUserPermissions.put(user.getId(), permissions);
-        return this;
     }
 
     @Override
-    public ServerChannelUpdater addPermissionOverwrite(Role role, Permissions permissions) {
+    public void addPermissionOverwrite(Role role, Permissions permissions) {
         populatePermissionOverwrites();
         overwrittenRolePermissions.put(role.getId(), permissions);
-        return this;
     }
 
     @Override
-    public ServerChannelUpdater removePermissionOverwrite(User user) {
+    public void removePermissionOverwrite(User user) {
         populatePermissionOverwrites();
         overwrittenUserPermissions.remove(user.getId());
-        return this;
     }
 
     @Override
-    public ServerChannelUpdater removePermissionOverwrite(Role role) {
+    public void removePermissionOverwrite(Role role) {
         populatePermissionOverwrites();
         overwrittenRolePermissions.remove(role.getId());
-        return this;
     }
 
     @Override
     public CompletableFuture<Void> update() {
-        boolean patchChannel = false;
         ObjectNode body = JsonNodeFactory.instance.objectNode();
+        if (prepareUpdateBody(body)) {
+            return new RestRequest<Void>(channel.getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
+                    .setUrlParameters(channel.getIdAsString())
+                    .setBody(body)
+                    .setAuditLogReason(reason)
+                    .execute(result -> null);
+        } else {
+            return CompletableFuture.completedFuture(null);
+        }
+    }
+
+    protected boolean prepareUpdateBody(ObjectNode body) {
+        boolean patchChannel = false;
         if (name != null) {
             body.put("name", name);
             patchChannel = true;
@@ -142,15 +146,7 @@ public class ImplServerChannelUpdater implements ServerChannelUpdater {
                         .put("deny", entry.getValue().getDeniedBitmask());
             }
         }
-        if (patchChannel) {
-            return new RestRequest<Void>(channel.getApi(), RestMethod.PATCH, RestEndpoint.CHANNEL)
-                    .setUrlParameters(channel.getIdAsString())
-                    .setBody(body)
-                    .setAuditLogReason(reason)
-                    .execute(result -> null);
-        } else {
-            return CompletableFuture.completedFuture(null);
-        }
+        return patchChannel;
     }
 
     /**
