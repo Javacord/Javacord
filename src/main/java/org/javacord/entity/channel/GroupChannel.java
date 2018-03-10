@@ -61,7 +61,9 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      *
      * @return An updater for this channel.
      */
-    GroupChannelUpdater createUpdater();
+    default GroupChannelUpdater createUpdater() {
+        return new GroupChannelUpdater(this);
+    }
 
     /**
      * Updates the name of the channel.

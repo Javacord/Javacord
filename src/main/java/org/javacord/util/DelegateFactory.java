@@ -4,6 +4,8 @@ import org.javacord.AccountUpdaterDelegate;
 import org.javacord.DiscordApi;
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.GroupChannel;
+import org.javacord.entity.channel.GroupChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
@@ -193,6 +195,16 @@ public class DelegateFactory {
      */
     public static AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api) {
         return delegateFactoryDelegate.createAccountUpdaterDelegate(api);
+    }
+
+    /**
+     * Creates a new group channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new group channel updater delegate.
+     */
+    public static GroupChannelUpdaterDelegate createGroupChannelUpdaterDelegate(GroupChannel channel) {
+        return delegateFactoryDelegate.createGroupChannelUpdaterDelegate(channel);
     }
 
     /**

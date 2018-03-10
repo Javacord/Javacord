@@ -3,7 +3,7 @@ package org.javacord.entity.channel.impl;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.channel.GroupChannel;
-import org.javacord.entity.channel.GroupChannelUpdater;
+import org.javacord.entity.channel.GroupChannelUpdaterDelegate;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
@@ -11,9 +11,9 @@ import org.javacord.util.rest.RestRequest;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link GroupChannelUpdater}.
+ * The implementation of {@link GroupChannelUpdaterDelegate}.
  */
-public class ImplGroupChannelUpdater implements GroupChannelUpdater {
+public class ImplGroupChannelUpdaterDelegate implements GroupChannelUpdaterDelegate {
 
     /**
      * The channel to update.
@@ -26,18 +26,17 @@ public class ImplGroupChannelUpdater implements GroupChannelUpdater {
     protected String name = null;
 
     /**
-     * Creates a new group channel updater.
+     * Creates a new group channel updater delegate.
      *
      * @param channel The channel to update.
      */
-    public ImplGroupChannelUpdater(GroupChannel channel) {
+    public ImplGroupChannelUpdaterDelegate(GroupChannel channel) {
         this.channel = channel;
     }
 
     @Override
-    public GroupChannelUpdater setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override

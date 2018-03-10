@@ -6,7 +6,6 @@ import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.Icon;
 import org.javacord.entity.channel.GroupChannel;
-import org.javacord.entity.channel.GroupChannelUpdater;
 import org.javacord.entity.channel.InternalChannel;
 import org.javacord.entity.channel.InternalTextChannel;
 import org.javacord.entity.channel.InternalVoiceChannel;
@@ -150,11 +149,6 @@ public class ImplGroupChannel
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
-    }
-
-    @Override
-    public GroupChannelUpdater createUpdater() {
-        return new ImplGroupChannelUpdater(this);
     }
 
     @Override

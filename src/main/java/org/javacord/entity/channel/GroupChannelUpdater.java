@@ -1,11 +1,27 @@
 package org.javacord.entity.channel;
 
+import org.javacord.util.DelegateFactory;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class can be used to update group channels.
  */
-public interface GroupChannelUpdater {
+public class GroupChannelUpdater {
+
+    /**
+     * The group channel delegate used by this instance.
+     */
+    private final GroupChannelUpdaterDelegate delegate;
+
+    /**
+     * Creates a new group channel updater.
+     *
+     * @param channel The channel to update.
+     */
+    public GroupChannelUpdater(GroupChannel channel) {
+        delegate = DelegateFactory.createGroupChannelUpdaterDelegate(channel);
+    }
 
     /**
      * Queues the name to be updated.
@@ -13,13 +29,18 @@ public interface GroupChannelUpdater {
      * @param name The new name of the channel.
      * @return The current instance in order to chain call methods.
      */
-    GroupChannelUpdater setName(String name);
+    public GroupChannelUpdater setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Performs the queued updates.
      *
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> update();
+    public CompletableFuture<Void> update() {
+        return delegate.update();
+    }
 
 }

@@ -7,11 +7,14 @@ import org.javacord.ImplAccountUpdaterDelegate;
 import org.javacord.ImplDiscordApi;
 import org.javacord.ImplDiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.GroupChannel;
+import org.javacord.entity.channel.GroupChannelUpdaterDelegate;
 import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.impl.ImplGroupChannelUpdaterDelegate;
 import org.javacord.entity.channel.impl.ImplServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
@@ -109,6 +112,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api) {
         return new ImplAccountUpdaterDelegate(((ImplDiscordApi) api));
+    }
+
+    @Override
+    public GroupChannelUpdaterDelegate createGroupChannelUpdaterDelegate(GroupChannel channel) {
+        return new ImplGroupChannelUpdaterDelegate(channel);
     }
 
     @Override
