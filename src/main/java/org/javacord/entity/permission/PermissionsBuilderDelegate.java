@@ -1,6 +1,10 @@
 package org.javacord.entity.permission;
 
-public interface PermissionsFactory {
+/**
+ * This class is internally used by the {@link PermissionsBuilder} to create permissions.
+ * You usually don't want to interact with this object.
+ */
+public interface PermissionsBuilderDelegate {
 
     /**
      * Sets the new state of the given type.

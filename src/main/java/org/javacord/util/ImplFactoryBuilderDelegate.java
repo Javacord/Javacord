@@ -7,8 +7,8 @@ import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
 import org.javacord.entity.message.impl.ImplMessageBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.PermissionsFactory;
-import org.javacord.entity.permission.impl.ImplPermissionsFactory;
+import org.javacord.entity.permission.PermissionsBuilderDelegate;
+import org.javacord.entity.permission.impl.ImplPermissionsBuilderDelegate;
 
 /**
  * The implementation of {@code FactoryBuilderDelegate}.
@@ -31,13 +31,13 @@ public class ImplFactoryBuilderDelegate implements FactoryBuilderDelegate {
     }
 
     @Override
-    public PermissionsFactory createPermissionsFactory() {
-        return new ImplPermissionsFactory();
+    public PermissionsBuilderDelegate createPermissionsBuilderDelegate() {
+        return new ImplPermissionsBuilderDelegate();
     }
 
     @Override
-    public PermissionsFactory createPermissionsFactory(Permissions permissions) {
-        return new ImplPermissionsFactory(permissions);
+    public PermissionsBuilderDelegate createPermissionsBuilderDelegate(Permissions permissions) {
+        return new ImplPermissionsBuilderDelegate(permissions);
     }
 
 }

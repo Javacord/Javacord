@@ -4,7 +4,7 @@ import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.PermissionsFactory;
+import org.javacord.entity.permission.PermissionsBuilderDelegate;
 
 /**
  * This class is used by Javacord internally.
@@ -34,18 +34,18 @@ public interface FactoryBuilderDelegate {
     MessageBuilderDelegate createMessageBuilderDelegate();
 
     /**
-     * Creates a new permissions factory.
+     * Creates a new permissions builder delegate.
      *
-     * @return A new permissions factory.
+     * @return A new permissions builder delegate.
      */
-    PermissionsFactory createPermissionsFactory();
+    PermissionsBuilderDelegate createPermissionsBuilderDelegate();
 
     /**
-     * Creates a new permissions factory initialized with the given permissions.
+     * Creates a new permissions builder delegate initialized with the given permissions.
      *
      * @param permissions The permissions which should be copied.
-     * @return A new permissions factory initialized with the given permissions.
+     * @return A new permissions builder delegate initialized with the given permissions.
      */
-    PermissionsFactory createPermissionsFactory(Permissions permissions);
+    PermissionsBuilderDelegate createPermissionsBuilderDelegate(Permissions permissions);
 
 }

@@ -3,12 +3,12 @@ package org.javacord.entity.permission.impl;
 import org.javacord.entity.permission.PermissionState;
 import org.javacord.entity.permission.PermissionType;
 import org.javacord.entity.permission.Permissions;
-import org.javacord.entity.permission.PermissionsFactory;
+import org.javacord.entity.permission.PermissionsBuilderDelegate;
 
 /**
- * The implementation of {@link PermissionsFactory}.
+ * The implementation of {@link PermissionsBuilderDelegate}.
  */
-public class ImplPermissionsFactory implements PermissionsFactory {
+public class ImplPermissionsBuilderDelegate implements PermissionsBuilderDelegate {
 
     /**
      * The integer containing all allowed permission types
@@ -23,14 +23,14 @@ public class ImplPermissionsFactory implements PermissionsFactory {
     /**
      * Creates a new permissions factory.
      */
-    public ImplPermissionsFactory() { }
+    public ImplPermissionsBuilderDelegate() { }
 
     /**
      * Creates a new permissions factory with the states of the given permissions object.
      *
      * @param permissions The permissions which should be copied.
      */
-    public ImplPermissionsFactory(Permissions permissions) {
+    public ImplPermissionsBuilderDelegate(Permissions permissions) {
         allowed = permissions.getAllowedBitmask();
         denied = permissions.getDeniedBitmask();
     }
