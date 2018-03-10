@@ -13,9 +13,10 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This class can help you to create messages.
+ * This class is internally used by the {@link MessageBuilder} to create messages.
+ * You usually don't want to interact with this object.
  */
-public interface MessageFactory {
+public interface MessageBuilderDelegate {
 
     /**
      * Appends a sting with or without decoration to the message.

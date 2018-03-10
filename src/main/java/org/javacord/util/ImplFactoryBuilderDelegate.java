@@ -2,10 +2,10 @@ package org.javacord.util;
 
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.ImplDiscordApiBuilderDelegate;
-import org.javacord.entity.message.MessageFactory;
+import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
-import org.javacord.entity.message.impl.ImplMessageFactory;
+import org.javacord.entity.message.impl.ImplMessageBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsFactory;
 import org.javacord.entity.permission.impl.ImplPermissionsFactory;
@@ -26,8 +26,8 @@ public class ImplFactoryBuilderDelegate implements FactoryBuilderDelegate {
     }
 
     @Override
-    public MessageFactory createMessageFactory() {
-        return new ImplMessageFactory();
+    public MessageBuilderDelegate createMessageBuilderDelegate() {
+        return new ImplMessageBuilderDelegate();
     }
 
     @Override

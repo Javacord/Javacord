@@ -11,7 +11,7 @@ import org.javacord.entity.Mentionable;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.MessageDecoration;
-import org.javacord.entity.message.MessageFactory;
+import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.Messageable;
 import org.javacord.entity.message.embed.EmbedBuilder;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link MessageFactory}.
+ * The implementation of {@link MessageBuilderDelegate}.
  */
-public class ImplMessageFactory implements MessageFactory {
+public class ImplMessageBuilderDelegate implements MessageBuilderDelegate {
 
     /**
      * The receiver of the message.
@@ -65,11 +65,6 @@ public class ImplMessageFactory implements MessageFactory {
      * A list with all attachments which should be added to the message.
      */
     private final List<FileContainer> attachments = new ArrayList<>();
-
-    /**
-     * Creates a new message factory.
-     */
-    public ImplMessageFactory() { }
 
     @Override
     public void append(String message, MessageDecoration... decorations) {

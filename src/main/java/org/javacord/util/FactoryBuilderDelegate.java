@@ -1,7 +1,7 @@
 package org.javacord.util;
 
 import org.javacord.DiscordApiBuilderDelegate;
-import org.javacord.entity.message.MessageFactory;
+import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsFactory;
@@ -27,11 +27,11 @@ public interface FactoryBuilderDelegate {
     EmbedBuilderDelegate createEmbedBuilderDelegate();
 
     /**
-     * Creates a new message factory.
+     * Creates a new message builder delegate.
      *
-     * @return A new message factory.
+     * @return A new message builder delegate.
      */
-    MessageFactory createMessageFactory();
+    MessageBuilderDelegate createMessageBuilderDelegate();
 
     /**
      * Creates a new permissions factory.
