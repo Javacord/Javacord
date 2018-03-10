@@ -5,6 +5,7 @@ import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.ImplDiscordApi;
 import org.javacord.ImplDiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
@@ -26,6 +27,8 @@ import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.server.impl.ImplServerBuilderDelegate;
+import org.javacord.entity.server.invite.InviteBuilderDelegate;
+import org.javacord.entity.server.invite.impl.ImplInviteBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 import org.javacord.entity.webhook.impl.ImplWebhookBuilderDelegate;
 
@@ -92,6 +95,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public RoleBuilderDelegate createRoleBuilderDelegate(Server server) {
         return new ImplRoleBuilderDelegate((ImplServer) server);
+    }
+
+    @Override
+    public InviteBuilderDelegate createInviteBuilderDelegate(ServerChannel channel) {
+        return new ImplInviteBuilderDelegate(channel);
     }
 
 }

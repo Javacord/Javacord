@@ -3,6 +3,7 @@ package org.javacord.util;
 import org.javacord.DiscordApi;
 import org.javacord.DiscordApiBuilderDelegate;
 import org.javacord.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerTextChannelBuilderDelegate;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
@@ -14,6 +15,7 @@ import org.javacord.entity.permission.PermissionsBuilderDelegate;
 import org.javacord.entity.permission.RoleBuilderDelegate;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
+import org.javacord.entity.server.invite.InviteBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 
 import java.util.Iterator;
@@ -163,6 +165,16 @@ public class DelegateFactory {
      */
     public static RoleBuilderDelegate createRoleBuilderDelegate(Server server) {
         return delegateFactoryDelegate.createRoleBuilderDelegate(server);
+    }
+
+    /**
+     * Creates a new invite builder delegate.
+     *
+     * @param channel The channel for the invite.
+     * @return A new invite builder delegate.
+     */
+    public static InviteBuilderDelegate createInviteBuilderDelegate(ServerChannel channel) {
+        return delegateFactoryDelegate.createInviteBuilderDelegate(channel);
     }
 
 }
