@@ -11,6 +11,7 @@ import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
+import org.javacord.entity.permission.RoleBuilderDelegate;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
@@ -152,6 +153,16 @@ public class DelegateFactory {
      */
     public static ServerBuilderDelegate createServerBuilderDelegate(DiscordApi api) {
         return delegateFactoryDelegate.createServerBuilderDelegate(api);
+    }
+
+    /**
+     * Creates a new role builder delegate.
+     *
+     * @param server The server for which the role should be created.
+     * @return A new role builder delegate.
+     */
+    public static RoleBuilderDelegate createRoleBuilderDelegate(Server server) {
+        return delegateFactoryDelegate.createRoleBuilderDelegate(server);
     }
 
 }

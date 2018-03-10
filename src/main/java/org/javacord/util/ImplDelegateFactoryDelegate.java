@@ -19,7 +19,9 @@ import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
 import org.javacord.entity.message.impl.ImplMessageBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
+import org.javacord.entity.permission.RoleBuilderDelegate;
 import org.javacord.entity.permission.impl.ImplPermissionsBuilderDelegate;
+import org.javacord.entity.permission.impl.ImplRoleBuilderDelegate;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.impl.ImplServer;
@@ -85,6 +87,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public ServerBuilderDelegate createServerBuilderDelegate(DiscordApi api) {
         return new ImplServerBuilderDelegate((ImplDiscordApi) api);
+    }
+
+    @Override
+    public RoleBuilderDelegate createRoleBuilderDelegate(Server server) {
+        return new ImplRoleBuilderDelegate((ImplServer) server);
     }
 
 }

@@ -1,13 +1,7 @@
 package org.javacord.entity.permission;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.entity.permission.impl.ImplPermissions;
 import org.javacord.entity.server.Server;
-import org.javacord.entity.server.impl.ImplServer;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.Color;
 import java.util.concurrent.CompletableFuture;
@@ -18,39 +12,9 @@ import java.util.concurrent.CompletableFuture;
 public class RoleBuilder {
 
     /**
-     * The server of the role builder.
+     * The role delegate used by this instance.
      */
-    private final ImplServer server;
-
-    /**
-     * The reason for the creation.
-     */
-    private String reason = null;
-
-    /**
-     * The name of the role.
-     */
-    private String name = null;
-
-    /**
-     * The permissions of the role.
-     */
-    private Permissions permissions = null;
-
-    /**
-     * The color of the role.
-     */
-    private Color color = null;
-
-    /**
-     * Whether the role should be mentionable or not.
-     */
-    private boolean mentionable = false;
-
-    /**
-     * Whether the role should be pinned in the user listing or not.
-     */
-    private boolean displaySeparately = false;
+    private final RoleBuilderDelegate delegate;
 
     /**
      * Creates a new role role builder for the given server.
@@ -58,7 +22,7 @@ public class RoleBuilder {
      * @param server The server for which the role should be created.
      */
     public RoleBuilder(Server server) {
-        this.server = (ImplServer) server;
+        delegate = DelegateFactory.createRoleBuilderDelegate(server);
     }
 
     /**
@@ -68,7 +32,7 @@ public class RoleBuilder {
      * @return The current instance in order to chain call methods.
      */
     public RoleBuilder setAuditLogReason(String reason) {
-        this.reason = reason;
+        delegate.setAuditLogReason(reason);
         return this;
     }
 
@@ -80,7 +44,7 @@ public class RoleBuilder {
      * @return The current instance in order to chain call methods.
      */
     public RoleBuilder setName(String name) {
-        this.name = name;
+        delegate.setName(name);
         return this;
     }
 
@@ -92,7 +56,7 @@ public class RoleBuilder {
      * @return The current instance in order to chain call methods.
      */
     public RoleBuilder setPermissions(Permissions permissions) {
-        this.permissions = permissions;
+        delegate.setPermissions(permissions);
         return this;
     }
 
@@ -103,7 +67,7 @@ public class RoleBuilder {
      * @return The current instance in order to chain call methods.
      */
     public RoleBuilder setColor(Color color) {
-        this.color = color;
+        delegate.setColor(color);
         return this;
     }
 
@@ -115,7 +79,7 @@ public class RoleBuilder {
      * @return The current instance in order to chain call methods.
      */
     public RoleBuilder setMentionable(boolean mentionable) {
-        this.mentionable = mentionable;
+        delegate.setMentionable(mentionable);
         return this;
     }
 
@@ -126,7 +90,7 @@ public class RoleBuilder {
      * @return The current instance in order to chain call methods.
      */
     public RoleBuilder setDisplaySeparately(boolean displaySeparately) {
-        this.displaySeparately = displaySeparately;
+        delegate.setDisplaySeparately(displaySeparately);
         return this;
     }
 
@@ -136,23 +100,7 @@ public class RoleBuilder {
      * @return The created text channel.
      */
     public CompletableFuture<Role> create() {
-        ObjectNode body = JsonNodeFactory.instance.objectNode();
-        if (name != null) {
-            body.put("name", name);
-        }
-        if (permissions != null) {
-            body.put("permissions", permissions.getAllowedBitmask());
-        }
-        if (color != null) {
-            body.put("color", color.getRGB() & 0xFFFFFF);
-        }
-        body.put("mentionable", mentionable);
-        body.put("hoist", displaySeparately);
-        return new RestRequest<Role>(server.getApi(), RestMethod.POST, RestEndpoint.ROLE)
-                .setUrlParameters(server.getIdAsString())
-                .setBody(body)
-                .setAuditLogReason(reason)
-                .execute(result -> server.getOrCreateRole(result.getJsonBody()));
+        return delegate.create();
     }
 
 }
