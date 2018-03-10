@@ -3,10 +3,10 @@ package org.javacord;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This class is used by the {@link DiscordApiBuilder} internally.
- * You probably won't need it ever.
+ * This class is internally used by the {@link DiscordApiBuilder} to create discord api instances.
+ * You usually don't want to interact with this object.
  */
-public interface DiscordApiFactory {
+public interface DiscordApiBuilderDelegate {
 
     /**
      * Sets the token.
@@ -57,7 +57,7 @@ public interface DiscordApiFactory {
      *
      * @return A future to check if the action was successful.
      */
-    CompletableFuture<DiscordApiFactory> setRecommendedTotalShards();
+    CompletableFuture<Void> setRecommendedTotalShards();
 
     /**
      * Gets the total shards.

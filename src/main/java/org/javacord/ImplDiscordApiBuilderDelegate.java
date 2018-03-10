@@ -13,14 +13,14 @@ import org.slf4j.MDC.MDCCloseable;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link DiscordApiFactory}.
+ * The implementation of {@link DiscordApiBuilderDelegate}.
  */
-public class ImplDiscordApiFactory implements DiscordApiFactory {
+public class ImplDiscordApiBuilderDelegate implements DiscordApiBuilderDelegate {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(ImplDiscordApiFactory.class);
+    private static final Logger logger = LoggerUtil.getLogger(ImplDiscordApiBuilderDelegate.class);
 
     /**
      * The token which is used to login. Must be present in order to login!
@@ -100,8 +100,8 @@ public class ImplDiscordApiFactory implements DiscordApiFactory {
     }
 
     @Override
-    public CompletableFuture<DiscordApiFactory> setRecommendedTotalShards() {
-        CompletableFuture<DiscordApiFactory> future = new CompletableFuture<>();
+    public CompletableFuture<Void> setRecommendedTotalShards() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
         if (token == null) {
             future.completeExceptionally(new IllegalArgumentException("You cannot request the recommended total shards without a token!"));
             return future;
@@ -113,7 +113,7 @@ public class ImplDiscordApiFactory implements DiscordApiFactory {
                 .thenAccept(resultJson -> {
                     DiscordWebSocketAdapter.setGateway(resultJson.get("url").asText());
                     setTotalShards(resultJson.get("shards").asInt());
-                    future.complete(ImplDiscordApiFactory.this);
+                    future.complete(null);
                 })
                 .exceptionally(t -> {
                     future.completeExceptionally(t);
