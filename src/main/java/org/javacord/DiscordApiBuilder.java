@@ -1,7 +1,7 @@
 package org.javacord;
 
 import org.javacord.event.server.ServerBecomesAvailableEvent;
-import org.javacord.util.FactoryBuilder;
+import org.javacord.util.DelegateFactory;
 import org.javacord.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -27,7 +27,7 @@ public class DiscordApiBuilder {
     /**
      * The delegate used to create a {@link DiscordApi} instance.
      */
-    private DiscordApiBuilderDelegate delegate = FactoryBuilder.createDiscordApiBuilderDelegate();
+    private DiscordApiBuilderDelegate delegate = DelegateFactory.createDiscordApiBuilderDelegate();
 
     /**
      * Login to the account with the given token.

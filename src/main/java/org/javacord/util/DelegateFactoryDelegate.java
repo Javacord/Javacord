@@ -7,10 +7,10 @@ import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
 
 /**
- * This class is used by Javacord internally.
- * You probably won't need it ever.
+ * This class is internally used by the {@link DelegateFactory} to create delegate instances.
+ * You usually don't want to interact with this object.
  */
-public interface FactoryBuilderDelegate {
+public interface DelegateFactoryDelegate {
 
     /**
      * Creates a new discord api builder delegate.

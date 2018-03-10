@@ -13,28 +13,29 @@ import java.util.ServiceLoader;
  * This class is used by Javacord internally.
  * You probably won't need it ever.
  */
-public class FactoryBuilder {
+public class DelegateFactory {
 
     /**
      * The factory builder delegate. It's used to create new factories.
      */
-    private static final FactoryBuilderDelegate factoryBuilderDelegate;
+    private static final DelegateFactoryDelegate delegateFactoryDelegate;
 
     // Load it static, because it has a better performance to load it only once
     static {
-        ServiceLoader<FactoryBuilderDelegate> delegateServiceLoader = ServiceLoader.load(FactoryBuilderDelegate.class);
-        Iterator<FactoryBuilderDelegate> delegateIterator = delegateServiceLoader.iterator();
+        ServiceLoader<DelegateFactoryDelegate> delegateServiceLoader =
+                ServiceLoader.load(DelegateFactoryDelegate.class);
+        Iterator<DelegateFactoryDelegate> delegateIterator = delegateServiceLoader.iterator();
         if (delegateIterator.hasNext()) {
-            factoryBuilderDelegate = delegateIterator.next();
+            delegateFactoryDelegate = delegateIterator.next();
             if (delegateIterator.hasNext()) {
-                throw new IllegalStateException("Found more than one FactoryBuilderDelegate implementation!");
+                throw new IllegalStateException("Found more than one DelegateFactoryDelegate implementation!");
             }
         } else {
-            throw new IllegalStateException("No FactoryBuilderDelegate implementation was found!");
+            throw new IllegalStateException("No DelegateFactoryDelegate implementation was found!");
         }
     }
 
-    private FactoryBuilder() {
+    private DelegateFactory() {
         throw new UnsupportedOperationException();
     }
 
@@ -44,7 +45,7 @@ public class FactoryBuilder {
      * @return A new discord api builder delegate.
      */
     public static DiscordApiBuilderDelegate createDiscordApiBuilderDelegate() {
-        return factoryBuilderDelegate.createDiscordApiBuilderDelegate();
+        return delegateFactoryDelegate.createDiscordApiBuilderDelegate();
     }
 
     /**
@@ -53,7 +54,7 @@ public class FactoryBuilder {
      * @return A new embed builder delegate.
      */
     public static EmbedBuilderDelegate createEmbedBuilderDelegate() {
-        return factoryBuilderDelegate.createEmbedBuilderDelegate();
+        return delegateFactoryDelegate.createEmbedBuilderDelegate();
     }
 
     /**
@@ -62,7 +63,7 @@ public class FactoryBuilder {
      * @return A new message builder delegate.
      */
     public static MessageBuilderDelegate createMessageBuilderDelegate() {
-        return factoryBuilderDelegate.createMessageBuilderDelegate();
+        return delegateFactoryDelegate.createMessageBuilderDelegate();
     }
 
     /**
@@ -71,7 +72,7 @@ public class FactoryBuilder {
      * @return A new permissions builder delegate.
      */
     public static PermissionsBuilderDelegate createPermissionsBuilderDelegate() {
-        return factoryBuilderDelegate.createPermissionsBuilderDelegate();
+        return delegateFactoryDelegate.createPermissionsBuilderDelegate();
     }
 
     /**
@@ -81,7 +82,7 @@ public class FactoryBuilder {
      * @return A new permissions builder delegate initialized with the given permissions.
      */
     public static PermissionsBuilderDelegate createPermissionsBuilderDelegate(Permissions permissions) {
-        return factoryBuilderDelegate.createPermissionsBuilderDelegate(permissions);
+        return delegateFactoryDelegate.createPermissionsBuilderDelegate(permissions);
     }
 
 }

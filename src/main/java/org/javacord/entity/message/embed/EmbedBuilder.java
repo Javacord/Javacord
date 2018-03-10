@@ -3,7 +3,7 @@ package org.javacord.entity.message.embed;
 import org.javacord.entity.Icon;
 import org.javacord.entity.message.MessageAuthor;
 import org.javacord.entity.user.User;
-import org.javacord.util.FactoryBuilder;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -19,7 +19,7 @@ public class EmbedBuilder {
     /**
      * The embed delegate used by this instance.
      */
-    private final EmbedBuilderDelegate delegate = FactoryBuilder.createEmbedBuilderDelegate();
+    private final EmbedBuilderDelegate delegate = DelegateFactory.createEmbedBuilderDelegate();
 
     /**
      * Gets the delegate used by this embed builder internally.

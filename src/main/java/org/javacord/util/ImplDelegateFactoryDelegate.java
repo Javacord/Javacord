@@ -11,9 +11,9 @@ import org.javacord.entity.permission.PermissionsBuilderDelegate;
 import org.javacord.entity.permission.impl.ImplPermissionsBuilderDelegate;
 
 /**
- * The implementation of {@code FactoryBuilderDelegate}.
+ * The implementation of {@link DelegateFactoryDelegate}.
  */
-public class ImplFactoryBuilderDelegate implements FactoryBuilderDelegate {
+public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
 
     @Override
     public DiscordApiBuilderDelegate createDiscordApiBuilderDelegate() {
