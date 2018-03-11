@@ -49,8 +49,11 @@ import org.javacord.entity.server.impl.ImplServerBuilderDelegate;
 import org.javacord.entity.server.impl.ImplServerUpdaterDelegate;
 import org.javacord.entity.server.invite.InviteBuilderDelegate;
 import org.javacord.entity.server.invite.impl.ImplInviteBuilderDelegate;
+import org.javacord.entity.webhook.Webhook;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
+import org.javacord.entity.webhook.WebhookUpdaterDelegate;
 import org.javacord.entity.webhook.impl.ImplWebhookBuilderDelegate;
+import org.javacord.entity.webhook.impl.ImplWebhookUpdaterDelegate;
 import org.javacord.util.exception.DiscordExceptionValidator;
 import org.javacord.util.exception.impl.ImplDiscordExceptionValidator;
 
@@ -162,6 +165,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public ServerUpdaterDelegate createServerUpdaterDelegate(Server server) {
         return new ImplServerUpdaterDelegate(server);
+    }
+
+    @Override
+    public WebhookUpdaterDelegate createWebhookUpdaterDelegate(Webhook webhook) {
+        return new ImplWebhookUpdaterDelegate(webhook);
     }
 
     @Override

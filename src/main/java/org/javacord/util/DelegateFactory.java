@@ -28,7 +28,9 @@ import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.ServerUpdaterDelegate;
 import org.javacord.entity.server.invite.InviteBuilderDelegate;
+import org.javacord.entity.webhook.Webhook;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
+import org.javacord.entity.webhook.WebhookUpdaterDelegate;
 import org.javacord.util.exception.DiscordExceptionValidator;
 
 import java.util.Iterator;
@@ -275,6 +277,16 @@ public class DelegateFactory {
      */
     public static ServerUpdaterDelegate createServerUpdaterDelegate(Server server) {
         return delegateFactoryDelegate.createServerUpdaterDelegate(server);
+    }
+
+    /**
+     * Creates a new webhook updater delegate.
+     *
+     * @param webhook The webhook to update.
+     * @return A new webhook updater delegate.
+     */
+    public static WebhookUpdaterDelegate createWebhookUpdaterDelegate(Webhook webhook) {
+        return delegateFactoryDelegate.createWebhookUpdaterDelegate(webhook);
     }
 
     /**
