@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
-import org.javacord.entity.permission.RoleUpdater;
+import org.javacord.entity.permission.RoleUpdaterDelegate;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
 import org.javacord.util.rest.RestRequest;
@@ -13,9 +13,9 @@ import java.awt.Color;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This class can be used to update the settings of a role.
+ * The implementation of {@link RoleUpdaterDelegate}.
  */
-public class ImplRoleUpdater implements RoleUpdater {
+public class ImplRoleUpdaterDelegate implements RoleUpdaterDelegate {
 
     /**
      * The role to update.
@@ -53,48 +53,42 @@ public class ImplRoleUpdater implements RoleUpdater {
     private Boolean mentionable = null;
 
     /**
-     * Creates a new role updater.
+     * Creates a new role updater delegate.
      *
      * @param role The role to update.
      */
-    public ImplRoleUpdater(Role role) {
+    public ImplRoleUpdaterDelegate(Role role) {
         this.role = role;
     }
 
     @Override
-    public RoleUpdater setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public RoleUpdater setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public RoleUpdater setPermissions(Permissions permissions) {
+    public void setPermissions(Permissions permissions) {
         this.permissions = permissions;
-        return this;
     }
 
     @Override
-    public RoleUpdater setColor(Color color) {
+    public void setColor(Color color) {
         this.color = color;
-        return this;
     }
 
     @Override
-    public RoleUpdater setDisplaySeparatelyFlag(boolean displaySeparately) {
+    public void setDisplaySeparatelyFlag(boolean displaySeparately) {
         this.displaySeparately = displaySeparately;
-        return this;
     }
 
     @Override
-    public RoleUpdater setMentionableFlag(boolean mentionable) {
+    public void setMentionableFlag(boolean mentionable) {
         this.mentionable = mentionable;
-        return this;
     }
 
     @Override

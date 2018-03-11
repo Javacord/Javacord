@@ -108,7 +108,9 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      *
      * @return The updater for this role.
      */
-    RoleUpdater createUpdater();
+    default RoleUpdater createUpdater() {
+        return new RoleUpdater(this);
+    }
 
     /**
      * Updates the name of the role.

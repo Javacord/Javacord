@@ -21,7 +21,9 @@ import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.PermissionsBuilderDelegate;
+import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.RoleBuilderDelegate;
+import org.javacord.entity.permission.RoleUpdaterDelegate;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
 import org.javacord.entity.server.invite.InviteBuilderDelegate;
@@ -181,6 +183,14 @@ public interface DelegateFactoryDelegate {
      * @return A new custom emoji updater delegate.
      */
     CustomEmojiUpdaterDelegate createCustomEmojiUpdaterDelegate(KnownCustomEmoji emoji);
+
+    /**
+     * Creates a new role updater delegate.
+     *
+     * @param role The role to update.
+     * @return A new role updater delegate.
+     */
+    RoleUpdaterDelegate createRoleUpdaterDelegate(Role role);
 
     /**
      * Creates a new discord exception validator.
