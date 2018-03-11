@@ -25,7 +25,10 @@ import org.javacord.entity.channel.impl.ImplServerTextChannelUpdaterDelegate;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannelUpdaterDelegate;
 import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
+import org.javacord.entity.emoji.CustomEmojiUpdaterDelegate;
+import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.entity.emoji.impl.ImplCustomEmojiBuilderDelegate;
+import org.javacord.entity.emoji.impl.ImplCustomEmojiUpdaterDelegate;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
@@ -139,6 +142,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(ServerVoiceChannel channel) {
         return new ImplServerVoiceChannelUpdaterDelegate(channel);
+    }
+
+    @Override
+    public CustomEmojiUpdaterDelegate createCustomEmojiUpdaterDelegate(KnownCustomEmoji emoji) {
+        return new ImplCustomEmojiUpdaterDelegate(emoji);
     }
 
     @Override

@@ -15,6 +15,8 @@ import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.channel.ServerVoiceChannelBuilderDelegate;
 import org.javacord.entity.channel.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.entity.emoji.CustomEmojiBuilderDelegate;
+import org.javacord.entity.emoji.CustomEmojiUpdaterDelegate;
+import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.entity.message.MessageBuilderDelegate;
 import org.javacord.entity.message.embed.EmbedBuilderDelegate;
 import org.javacord.entity.permission.Permissions;
@@ -240,6 +242,16 @@ public class DelegateFactory {
     public static ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(
             ServerVoiceChannel channel) {
         return delegateFactoryDelegate.createServerVoiceChannelUpdaterDelegate(channel);
+    }
+
+    /**
+     * Creates a new custom emoji updater delegate.
+     *
+     * @param emoji The custom emoji to update.
+     * @return A new custom emoji updater delegate.
+     */
+    public static CustomEmojiUpdaterDelegate createCustomEmojiUpdaterDelegate(KnownCustomEmoji emoji) {
+        return delegateFactoryDelegate.createCustomEmojiUpdaterDelegate(emoji);
     }
 
     /**

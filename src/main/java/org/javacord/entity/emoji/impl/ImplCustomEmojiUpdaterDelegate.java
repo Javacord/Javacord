@@ -3,7 +3,7 @@ package org.javacord.entity.emoji.impl;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.entity.emoji.CustomEmojiUpdater;
+import org.javacord.entity.emoji.CustomEmojiUpdaterDelegate;
 import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.entity.permission.Role;
 import org.javacord.util.rest.RestEndpoint;
@@ -16,14 +16,14 @@ import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The implementation of {@link CustomEmojiUpdater}.
+ * The implementation of {@link CustomEmojiUpdaterDelegate}.
  */
-public class ImplCustomEmojiUpdater implements CustomEmojiUpdater {
+public class ImplCustomEmojiUpdaterDelegate implements CustomEmojiUpdaterDelegate {
 
     /**
      * The custom emoji to update.
      */
-    private final ImplKnownCustomEmoji emoji;
+    private final KnownCustomEmoji emoji;
 
     /**
      * The reason for the update.
@@ -46,63 +46,57 @@ public class ImplCustomEmojiUpdater implements CustomEmojiUpdater {
     private boolean updateWhitelist = false;
 
     /**
-     * Creates a new custom emoji updater.
+     * Creates a new custom emoji updater delegate.
      *
      * @param emoji The custom emoji to update.
      */
-    public ImplCustomEmojiUpdater(KnownCustomEmoji emoji) {
-        this.emoji = (ImplKnownCustomEmoji) emoji;
+    public ImplCustomEmojiUpdaterDelegate(KnownCustomEmoji emoji) {
+        this.emoji = emoji;
     }
 
     @Override
-    public ImplCustomEmojiUpdater setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiUpdater setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiUpdater addRoleToWhitelist(Role role) {
+    public void addRoleToWhitelist(Role role) {
         if (whitelist == null) {
             whitelist = emoji.getWhitelistedRoles().map(HashSet::new).orElseGet(HashSet::new);
         }
         updateWhitelist = true;
         whitelist.add(role);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiUpdater removeRoleFromWhitelist(Role role) {
+    public void removeRoleFromWhitelist(Role role) {
         if (whitelist == null) {
             whitelist = emoji.getWhitelistedRoles().map(HashSet::new).orElseGet(HashSet::new);
         }
         updateWhitelist = true;
         whitelist.remove(role);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiUpdater removeWhitelist() {
+    public void removeWhitelist() {
         updateWhitelist = true;
         whitelist = null;
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiUpdater setWhitelist(Collection<Role> roles) {
+    public void setWhitelist(Collection<Role> roles) {
         updateWhitelist = true;
         whitelist = roles == null ? null : new HashSet<>(roles);
-        return this;
     }
 
     @Override
-    public ImplCustomEmojiUpdater setWhitelist(Role... roles) {
-        return setWhitelist(roles == null ? null : Arrays.asList(roles));
+    public void setWhitelist(Role... roles) {
+        setWhitelist(roles == null ? null : Arrays.asList(roles));
     }
 
     @Override

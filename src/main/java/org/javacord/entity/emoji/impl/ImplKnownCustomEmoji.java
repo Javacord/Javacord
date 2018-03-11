@@ -3,7 +3,6 @@ package org.javacord.entity.emoji.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.emoji.CustomEmoji;
-import org.javacord.entity.emoji.CustomEmojiUpdater;
 import org.javacord.entity.emoji.KnownCustomEmoji;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.server.Server;
@@ -102,11 +101,6 @@ public class ImplKnownCustomEmoji extends ImplCustomEmoji implements KnownCustom
                 .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .setAuditLogReason(reason)
                 .execute(result -> null);
-    }
-
-    @Override
-    public CustomEmojiUpdater createUpdater() {
-        return new ImplCustomEmojiUpdater(this);
     }
 
     @Override
