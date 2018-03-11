@@ -10,7 +10,8 @@ import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.entity.server.ExplicitContentFilterLevel;
-import org.javacord.entity.server.ServerUpdater;
+import org.javacord.entity.server.Server;
+import org.javacord.entity.server.ServerUpdaterDelegate;
 import org.javacord.entity.server.VerificationLevel;
 import org.javacord.entity.user.User;
 import org.javacord.util.FileContainer;
@@ -32,14 +33,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * The implementation of {@link ServerUpdater}.
+ * The implementation of {@link ServerUpdaterDelegate}.
  */
-public class ImplServerUpdater implements ServerUpdater {
+public class ImplServerUpdaterDelegate implements ServerUpdaterDelegate {
 
     /**
      * The server to update.
      */
-    private final ImplServer server;
+    private final Server server;
 
     /**
      * The reason for the update.
@@ -137,265 +138,229 @@ public class ImplServerUpdater implements ServerUpdater {
     private boolean updateSystemChannel = false;
 
     /**
-     * Creates a new server updater.
+     * Creates a new server updater delegate.
      *
      * @param server The server to update.
      */
-    public ImplServerUpdater(ImplServer server) {
+    public ImplServerUpdaterDelegate(Server server) {
         this.server = server;
     }
 
     @Override
-    public ServerUpdater setAuditLogReason(String reason) {
+    public void setAuditLogReason(String reason) {
         this.reason = reason;
-        return this;
     }
 
     @Override
-    public ServerUpdater setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
-    public ServerUpdater setRegion(Region region) {
+    public void setRegion(Region region) {
         this.region = region;
-        return this;
     }
 
     @Override
-    public ServerUpdater setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
+    public void setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
         this.explicitContentFilterLevel = explicitContentFilterLevel;
-        return this;
     }
 
     @Override
-    public ServerUpdater setVerificationLevel(VerificationLevel verificationLevel) {
+    public void setVerificationLevel(VerificationLevel verificationLevel) {
         this.verificationLevel = verificationLevel;
-        return this;
     }
 
     @Override
-    public ServerUpdater setDefaultMessageNotificationLevel(
+    public void setDefaultMessageNotificationLevel(
             DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
         this.defaultMessageNotificationLevel = defaultMessageNotificationLevel;
-        return this;
     }
 
     @Override
-    public ServerUpdater setAfkChannel(ServerVoiceChannel afkChannel) {
+    public void setAfkChannel(ServerVoiceChannel afkChannel) {
         this.afkChannel = afkChannel;
         updateAfkChannel = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater removeAfkChannel() {
-        return setAfkChannel(null);
+    public void removeAfkChannel() {
+        setAfkChannel(null);
     }
 
     @Override
-    public ServerUpdater setAfkTimeoutInSeconds(int afkTimeout) {
+    public void setAfkTimeoutInSeconds(int afkTimeout) {
         this.afkTimeout = afkTimeout;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(BufferedImage icon) {
+    public void setIcon(BufferedImage icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon, "png");
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(BufferedImage icon, String fileType) {
+    public void setIcon(BufferedImage icon, String fileType) {
         this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(File icon) {
+    public void setIcon(File icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon);
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(Icon icon) {
+    public void setIcon(Icon icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon);
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(URL icon) {
+    public void setIcon(URL icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon);
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(byte[] icon) {
+    public void setIcon(byte[] icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon, "png");
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(byte[] icon, String fileType) {
+    public void setIcon(byte[] icon, String fileType) {
         this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(InputStream icon) {
+    public void setIcon(InputStream icon) {
         this.icon = (icon == null) ? null : new FileContainer(icon, "png");
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setIcon(InputStream icon, String fileType) {
+    public void setIcon(InputStream icon, String fileType) {
         this.icon = (icon == null) ? null : new FileContainer(icon, fileType);
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater removeIcon() {
+    public void removeIcon() {
         icon = null;
         updateIcon = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setOwner(User owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(BufferedImage splash) {
+    public void setSplash(BufferedImage splash) {
         this.splash = (splash == null) ? null : new FileContainer(splash, "png");
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(BufferedImage splash, String fileType) {
+    public void setSplash(BufferedImage splash, String fileType) {
         this.splash = (splash == null) ? null : new FileContainer(splash, fileType);
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(File splash) {
+    public void setSplash(File splash) {
         this.splash = (splash == null) ? null : new FileContainer(splash);
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(Icon splash) {
+    public void setSplash(Icon splash) {
         this.splash = (splash == null) ? null : new FileContainer(splash);
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(URL splash) {
+    public void setSplash(URL splash) {
         this.splash = (splash == null) ? null : new FileContainer(splash);
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(byte[] splash) {
+    public void setSplash(byte[] splash) {
         this.splash = (splash == null) ? null : new FileContainer(splash, "png");
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(byte[] splash, String fileType) {
+    public void setSplash(byte[] splash, String fileType) {
         this.splash = (splash == null) ? null : new FileContainer(splash, fileType);
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(InputStream splash) {
+    public void setSplash(InputStream splash) {
         this.splash = (splash == null) ? null : new FileContainer(splash, "png");
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSplash(InputStream splash, String fileType) {
+    public void setSplash(InputStream splash, String fileType) {
         this.splash = (splash == null) ? null : new FileContainer(splash, fileType);
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater removeSplash() {
+    public void removeSplash() {
         splash = null;
         updateSplash = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater setSystemChannel(ServerTextChannel systemChannel) {
+    public void setSystemChannel(ServerTextChannel systemChannel) {
         this.systemChannel = systemChannel;
         updateSystemChannel = true;
-        return this;
     }
 
     @Override
-    public ServerUpdater removeSystemChannel() {
-        return setSystemChannel(null);
+    public void removeSystemChannel() {
+        setSystemChannel(null);
     }
 
     @Override
-    public ServerUpdater setNickname(User user, String nickname) {
+    public void setNickname(User user, String nickname) {
         userNicknames.put(user, nickname);
-        return this;
     }
 
     @Override
-    public ServerUpdater reorderRoles(List<Role> roles) {
+    public void reorderRoles(List<Role> roles) {
         newRolesOrder = roles;
-        return this;
     }
 
     @Override
-    public ServerUpdater addRoleToUser(User user, Role role) {
+    public void addRoleToUser(User user, Role role) {
         Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.add(role);
-        return this;
     }
 
     @Override
-    public ServerUpdater addAllRolesToUser(User user, Collection<Role> roles) {
+    public void addAllRolesToUser(User user, Collection<Role> roles) {
         Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.addAll(roles);
-        return this;
     }
 
     @Override
-    public ServerUpdater removeRoleFromUser(User user, Role role) {
+    public void removeRoleFromUser(User user, Role role) {
         Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.remove(role);
-        return this;
     }
 
     @Override
-    public ServerUpdater removeAllRolesFromUser(User user, Collection<Role> roles) {
+    public void removeAllRolesFromUser(User user, Collection<Role> roles) {
         Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.removeAll(roles);
-        return this;
     }
 
     @Override
@@ -406,8 +371,8 @@ public class ImplServerUpdater implements ServerUpdater {
                 .collect(Collectors.toCollection(ArrayList::new));
         // User nicknames
         tasks.addAll(userNicknames.entrySet().stream()
-                .map(entry -> server.updateNickname(entry.getKey(), entry.getValue(), reason))
-                .collect(Collectors.toList()));
+                             .map(entry -> server.updateNickname(entry.getKey(), entry.getValue(), reason))
+                             .collect(Collectors.toList()));
         if (newRolesOrder != null) {
             tasks.add(server.reorderRoles(newRolesOrder, reason));
         }
@@ -480,7 +445,7 @@ public class ImplServerUpdater implements ServerUpdater {
                 if (icon != null) {
                     iconFuture = icon.asByteArray(server.getApi()).thenAccept(bytes -> {
                         String base64Icon = "data:image/" + icon.getFileType() + ";base64," +
-                                Base64.getEncoder().encodeToString(bytes);
+                                            Base64.getEncoder().encodeToString(bytes);
                         body.put("icon", base64Icon);
                     });
                 }
@@ -488,7 +453,7 @@ public class ImplServerUpdater implements ServerUpdater {
                 if (splash != null) {
                     splashFuture = splash.asByteArray(server.getApi()).thenAccept(bytes -> {
                         String base64Splash = "data:image/" + splash.getFileType() + ";base64," +
-                                Base64.getEncoder().encodeToString(bytes);
+                                              Base64.getEncoder().encodeToString(bytes);
                         body.put("splash", base64Splash);
                     });
                 }
@@ -507,10 +472,10 @@ public class ImplServerUpdater implements ServerUpdater {
                         .execute(result -> null)));
             } else {
                 tasks.add(new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
-                        .setUrlParameters(server.getIdAsString())
-                        .setBody(body)
-                        .setAuditLogReason(reason)
-                        .execute(result -> null));
+                                  .setUrlParameters(server.getIdAsString())
+                                  .setBody(body)
+                                  .setAuditLogReason(reason)
+                                  .execute(result -> null));
             }
         }
 

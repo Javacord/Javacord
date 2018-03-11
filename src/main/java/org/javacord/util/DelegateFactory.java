@@ -26,6 +26,7 @@ import org.javacord.entity.permission.RoleBuilderDelegate;
 import org.javacord.entity.permission.RoleUpdaterDelegate;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
+import org.javacord.entity.server.ServerUpdaterDelegate;
 import org.javacord.entity.server.invite.InviteBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 import org.javacord.util.exception.DiscordExceptionValidator;
@@ -264,6 +265,16 @@ public class DelegateFactory {
      */
     public static RoleUpdaterDelegate createRoleUpdaterDelegate(Role role) {
         return delegateFactoryDelegate.createRoleUpdaterDelegate(role);
+    }
+
+    /**
+     * Creates a new server updater delegate.
+     *
+     * @param server The server to update.
+     * @return A new server updater delegate.
+     */
+    public static ServerUpdaterDelegate createServerUpdaterDelegate(Server server) {
+        return delegateFactoryDelegate.createServerUpdaterDelegate(server);
     }
 
     /**

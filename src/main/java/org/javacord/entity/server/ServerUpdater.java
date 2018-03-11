@@ -6,6 +6,7 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.ServerVoiceChannel;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.user.User;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -18,7 +19,21 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to update the settings of a server.
  */
-public interface ServerUpdater {
+public class ServerUpdater {
+
+    /**
+     * The server delegate used by this instance.
+     */
+    private final ServerUpdaterDelegate delegate;
+
+    /**
+     * Creates a new server updater.
+     *
+     * @param server The server to update.
+     */
+    public ServerUpdater(Server server) {
+        delegate = DelegateFactory.createServerUpdaterDelegate(server);
+    }
 
     /**
      * Sets the reason for this update. This reason will be visible in the audit log entry(s).
@@ -26,7 +41,10 @@ public interface ServerUpdater {
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setAuditLogReason(String reason);
+    public ServerUpdater setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
 
     /**
      * Queues the name to be updated.
@@ -34,7 +52,10 @@ public interface ServerUpdater {
      * @param name The new name of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setName(String name);
+    public ServerUpdater setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Queues the region to be updated.
@@ -42,7 +63,10 @@ public interface ServerUpdater {
      * @param region The new region of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setRegion(Region region);
+    public ServerUpdater setRegion(Region region) {
+        delegate.setRegion(region);
+        return this;
+    }
 
     /**
      * Queues the explicit content filter level to be updated.
@@ -50,7 +74,10 @@ public interface ServerUpdater {
      * @param explicitContentFilterLevel The new explicit content filter level of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel);
+    public ServerUpdater setExplicitContentFilterLevel(ExplicitContentFilterLevel explicitContentFilterLevel) {
+        delegate.setExplicitContentFilterLevel(explicitContentFilterLevel);
+        return this;
+    }
 
     /**
      * Queues the verification level to be updated.
@@ -58,7 +85,10 @@ public interface ServerUpdater {
      * @param verificationLevel The new verification level of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setVerificationLevel(VerificationLevel verificationLevel);
+    public ServerUpdater setVerificationLevel(VerificationLevel verificationLevel) {
+        delegate.setVerificationLevel(verificationLevel);
+        return this;
+    }
 
     /**
      * Queues the default message notification level to be updated.
@@ -66,8 +96,11 @@ public interface ServerUpdater {
      * @param defaultMessageNotificationLevel The new default message notification level of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setDefaultMessageNotificationLevel(
-            DefaultMessageNotificationLevel defaultMessageNotificationLevel);
+    public ServerUpdater setDefaultMessageNotificationLevel(
+            DefaultMessageNotificationLevel defaultMessageNotificationLevel) {
+        delegate.setDefaultMessageNotificationLevel(defaultMessageNotificationLevel);
+        return this;
+    }
 
     /**
      * Queues the afk channel to be updated.
@@ -75,14 +108,20 @@ public interface ServerUpdater {
      * @param afkChannel The new afk channel of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setAfkChannel(ServerVoiceChannel afkChannel);
+    public ServerUpdater setAfkChannel(ServerVoiceChannel afkChannel) {
+        delegate.setAfkChannel(afkChannel);
+        return this;
+    }
 
     /**
      * Queues the afk channel to be removed.
      *
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater removeAfkChannel();
+    public ServerUpdater removeAfkChannel() {
+        delegate.removeAfkChannel();
+        return this;
+    }
 
     /**
      * Queues the afk timeout in seconds to be updated.
@@ -90,7 +129,10 @@ public interface ServerUpdater {
      * @param afkTimeout The new afk timeout in seconds of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setAfkTimeoutInSeconds(int afkTimeout);
+    public ServerUpdater setAfkTimeoutInSeconds(int afkTimeout) {
+        delegate.setAfkTimeoutInSeconds(afkTimeout);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -99,7 +141,10 @@ public interface ServerUpdater {
      * @param icon The new icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(BufferedImage icon);
+    public ServerUpdater setIcon(BufferedImage icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -108,7 +153,10 @@ public interface ServerUpdater {
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(BufferedImage icon, String fileType);
+    public ServerUpdater setIcon(BufferedImage icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -116,7 +164,10 @@ public interface ServerUpdater {
      * @param icon The new icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(File icon);
+    public ServerUpdater setIcon(File icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -124,7 +175,10 @@ public interface ServerUpdater {
      * @param icon The new icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(Icon icon);
+    public ServerUpdater setIcon(Icon icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -132,7 +186,10 @@ public interface ServerUpdater {
      * @param icon The new icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(URL icon);
+    public ServerUpdater setIcon(URL icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -141,7 +198,10 @@ public interface ServerUpdater {
      * @param icon The new icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(byte[] icon);
+    public ServerUpdater setIcon(byte[] icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -150,7 +210,10 @@ public interface ServerUpdater {
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(byte[] icon, String fileType);
+    public ServerUpdater setIcon(byte[] icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -159,7 +222,10 @@ public interface ServerUpdater {
      * @param icon The new icon of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(InputStream icon);
+    public ServerUpdater setIcon(InputStream icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
 
     /**
      * Queues the icon to be updated.
@@ -168,14 +234,20 @@ public interface ServerUpdater {
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setIcon(InputStream icon, String fileType);
+    public ServerUpdater setIcon(InputStream icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
 
     /**
      * Queues the icon to be removed.
      *
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater removeIcon();
+    public ServerUpdater removeIcon() {
+        delegate.removeIcon();
+        return this;
+    }
 
     /**
      * Queues the owner to be updated.
@@ -184,7 +256,10 @@ public interface ServerUpdater {
      * @param owner The new owner of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setOwner(User owner);
+    public ServerUpdater setOwner(User owner) {
+        delegate.setOwner(owner);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -193,7 +268,10 @@ public interface ServerUpdater {
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(BufferedImage splash);
+    public ServerUpdater setSplash(BufferedImage splash) {
+        delegate.setSplash(splash);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -202,7 +280,10 @@ public interface ServerUpdater {
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(BufferedImage splash, String fileType);
+    public ServerUpdater setSplash(BufferedImage splash, String fileType) {
+        delegate.setSplash(splash, fileType);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -210,7 +291,10 @@ public interface ServerUpdater {
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(File splash);
+    public ServerUpdater setSplash(File splash) {
+        delegate.setSplash(splash);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -218,7 +302,10 @@ public interface ServerUpdater {
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(Icon splash);
+    public ServerUpdater setSplash(Icon splash) {
+        delegate.setSplash(splash);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -226,7 +313,10 @@ public interface ServerUpdater {
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(URL splash);
+    public ServerUpdater setSplash(URL splash) {
+        delegate.setSplash(splash);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -235,7 +325,10 @@ public interface ServerUpdater {
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(byte[] splash);
+    public ServerUpdater setSplash(byte[] splash) {
+        delegate.setSplash(splash);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -244,7 +337,10 @@ public interface ServerUpdater {
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(byte[] splash, String fileType);
+    public ServerUpdater setSplash(byte[] splash, String fileType) {
+        delegate.setSplash(splash, fileType);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -253,7 +349,10 @@ public interface ServerUpdater {
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(InputStream splash);
+    public ServerUpdater setSplash(InputStream splash) {
+        delegate.setSplash(splash);
+        return this;
+    }
 
     /**
      * Queues the splash to be updated.
@@ -262,14 +361,20 @@ public interface ServerUpdater {
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSplash(InputStream splash, String fileType);
+    public ServerUpdater setSplash(InputStream splash, String fileType) {
+        delegate.setSplash(splash, fileType);
+        return this;
+    }
 
     /**
      * Queues the splash to be removed.
      *
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater removeSplash();
+    public ServerUpdater removeSplash() {
+        delegate.removeSplash();
+        return this;
+    }
 
     /**
      * Queues the system channel to be updated.
@@ -277,14 +382,20 @@ public interface ServerUpdater {
      * @param systemChannel The new system channel of the server.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setSystemChannel(ServerTextChannel systemChannel);
+    public ServerUpdater setSystemChannel(ServerTextChannel systemChannel) {
+        delegate.setSystemChannel(systemChannel);
+        return this;
+    }
 
     /**
      * Queues the system channel to be removed.
      *
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater removeSystemChannel();
+    public ServerUpdater removeSystemChannel() {
+        delegate.removeSystemChannel();
+        return this;
+    }
 
     /**
      * Queues a user's nickname to be updated.
@@ -293,7 +404,10 @@ public interface ServerUpdater {
      * @param nickname The new nickname of the user.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater setNickname(User user, String nickname);
+    public ServerUpdater setNickname(User user, String nickname) {
+        delegate.setNickname(user, nickname);
+        return this;
+    }
 
     /**
      * Sets the new order for the server's roles.
@@ -301,7 +415,10 @@ public interface ServerUpdater {
      * @param roles An ordered list with the new role positions.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater reorderRoles(List<Role> roles);
+    public ServerUpdater reorderRoles(List<Role> roles) {
+        delegate.reorderRoles(roles);
+        return this;
+    }
 
     /**
      * Queues a role to be assigned to the user.
@@ -310,7 +427,10 @@ public interface ServerUpdater {
      * @param role The role to be assigned.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater addRoleToUser(User user, Role role);
+    public ServerUpdater addRoleToUser(User user, Role role) {
+        delegate.addRoleToUser(user, role);
+        return this;
+    }
 
     /**
      * Queues a collection of roles to be assigned to the user.
@@ -319,7 +439,10 @@ public interface ServerUpdater {
      * @param roles The collection of roles to be assigned.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater addAllRolesToUser(User user, Collection<Role> roles);
+    public ServerUpdater addAllRolesToUser(User user, Collection<Role> roles) {
+        delegate.addAllRolesToUser(user, roles);
+        return this;
+    }
 
     /**
      * Queues a role to be removed from the user.
@@ -328,7 +451,10 @@ public interface ServerUpdater {
      * @param role The role to be removed.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater removeRoleFromUser(User user, Role role);
+    public ServerUpdater removeRoleFromUser(User user, Role role) {
+        delegate.removeRoleFromUser(user, role);
+        return this;
+    }
 
     /**
      * Queues a collection of roles to be removed from the user.
@@ -337,13 +463,18 @@ public interface ServerUpdater {
      * @param roles The collection of roles to be removed.
      * @return The current instance in order to chain call methods.
      */
-    ServerUpdater removeAllRolesFromUser(User user, Collection<Role> roles);
+    public ServerUpdater removeAllRolesFromUser(User user, Collection<Role> roles) {
+        delegate.removeAllRolesFromUser(user, roles);
+        return this;
+    }
 
     /**
      * Performs the queued updates.
      *
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> update();
+    public CompletableFuture<Void> update() {
+        return delegate.update();
+    }
 
 }

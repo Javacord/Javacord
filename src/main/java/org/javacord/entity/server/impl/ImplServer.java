@@ -31,7 +31,6 @@ import org.javacord.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.entity.server.ExplicitContentFilterLevel;
 import org.javacord.entity.server.MultiFactorAuthenticationLevel;
 import org.javacord.entity.server.Server;
-import org.javacord.entity.server.ServerUpdater;
 import org.javacord.entity.server.VerificationLevel;
 import org.javacord.entity.server.invite.RichInvite;
 import org.javacord.entity.server.invite.impl.ImplInvite;
@@ -868,11 +867,6 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
-    }
-
-    @Override
-    public ServerUpdater createUpdater() {
-        return new ImplServerUpdater(this);
     }
 
     @Override

@@ -43,8 +43,10 @@ import org.javacord.entity.permission.impl.ImplRoleBuilderDelegate;
 import org.javacord.entity.permission.impl.ImplRoleUpdaterDelegate;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.ServerBuilderDelegate;
+import org.javacord.entity.server.ServerUpdaterDelegate;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.server.impl.ImplServerBuilderDelegate;
+import org.javacord.entity.server.impl.ImplServerUpdaterDelegate;
 import org.javacord.entity.server.invite.InviteBuilderDelegate;
 import org.javacord.entity.server.invite.impl.ImplInviteBuilderDelegate;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
@@ -155,6 +157,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public RoleUpdaterDelegate createRoleUpdaterDelegate(Role role) {
         return new ImplRoleUpdaterDelegate(role);
+    }
+
+    @Override
+    public ServerUpdaterDelegate createServerUpdaterDelegate(Server server) {
+        return new ImplServerUpdaterDelegate(server);
     }
 
     @Override

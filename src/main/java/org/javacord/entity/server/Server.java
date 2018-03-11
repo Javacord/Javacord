@@ -602,7 +602,9 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return An updater for this server.
      */
-    ServerUpdater createUpdater();
+    default ServerUpdater createUpdater() {
+        return new ServerUpdater(this);
+    }
 
     /**
      * Updates the name of the server.
