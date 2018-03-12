@@ -68,7 +68,7 @@ public class JavacordLogger extends MarkerIgnoringBase {
 
     @Override
     final public boolean isDebugEnabled() {
-        return LoggerUtil.isDebug();
+        return FallbackLoggerConfiguration.isDebugEnabled();
     }
 
     @Override
