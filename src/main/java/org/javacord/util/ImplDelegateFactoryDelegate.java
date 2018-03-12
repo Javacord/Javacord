@@ -56,6 +56,8 @@ import org.javacord.entity.webhook.impl.ImplWebhookBuilderDelegate;
 import org.javacord.entity.webhook.impl.ImplWebhookUpdaterDelegate;
 import org.javacord.util.exception.DiscordExceptionValidator;
 import org.javacord.util.exception.impl.ImplDiscordExceptionValidator;
+import org.javacord.util.logging.ExceptionLoggerDelegate;
+import org.javacord.util.logging.impl.ImplExceptionLoggerDelegate;
 
 /**
  * The implementation of {@link DelegateFactoryDelegate}.
@@ -170,6 +172,11 @@ public class ImplDelegateFactoryDelegate implements DelegateFactoryDelegate {
     @Override
     public WebhookUpdaterDelegate createWebhookUpdaterDelegate(Webhook webhook) {
         return new ImplWebhookUpdaterDelegate(webhook);
+    }
+
+    @Override
+    public ExceptionLoggerDelegate createExceptionLoggerDelegate() {
+        return new ImplExceptionLoggerDelegate();
     }
 
     @Override

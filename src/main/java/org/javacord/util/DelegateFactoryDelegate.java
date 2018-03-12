@@ -32,6 +32,7 @@ import org.javacord.entity.webhook.Webhook;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 import org.javacord.entity.webhook.WebhookUpdaterDelegate;
 import org.javacord.util.exception.DiscordExceptionValidator;
+import org.javacord.util.logging.ExceptionLoggerDelegate;
 
 /**
  * This class is internally used by the {@link DelegateFactory} to create delegate instances.
@@ -210,6 +211,13 @@ public interface DelegateFactoryDelegate {
      * @return A new webhook updater delegate.
      */
     WebhookUpdaterDelegate createWebhookUpdaterDelegate(Webhook webhook);
+
+    /**
+     * Creates a new exception logger delegate.
+     *
+     * @return A new exception logger delegate.
+     */
+    ExceptionLoggerDelegate createExceptionLoggerDelegate();
 
     /**
      * Creates a new discord exception validator.

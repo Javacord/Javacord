@@ -1,7 +1,7 @@
 package org.javacord.util.logging;
 
 import org.javacord.entity.channel.TextChannel;
-import org.slf4j.Logger;
+import org.javacord.util.DelegateFactory;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -20,9 +20,9 @@ import java.util.function.Predicate;
 public class ExceptionLogger {
 
     /**
-     * The logger of this class.
+     * The exception logger delegate.
      */
-    private static final Logger logger = LoggerUtil.getLogger(ExceptionLogger.class);
+    private static final ExceptionLoggerDelegate delegate = DelegateFactory.getExceptionLoggerDelegate();
 
     private ExceptionLogger() {
         throw new UnsupportedOperationException();
@@ -85,21 +85,8 @@ public class ExceptionLogger {
                 .filter(element -> !(element.getClassName().equals(Thread.class.getName())
                                      && "getStackTrace".equals(element.getMethodName())))
                 .toArray(StackTraceElement[]::new);
-        Collection<Class<?>> ignoredThrowableTypesList = Arrays.asList(ignoredThrowableTypes);
-        return throwable -> {
-            Throwable unwrappedThrowable = unwrapThrowable(throwable);
-            if (ignoredThrowableTypesList.contains(unwrappedThrowable.getClass())
-                || ((logFilter != null) && !logFilter.test(unwrappedThrowable))) {
-
-                logger.debug("Suppressed exception {}", throwable.getMessage());
-            } else {
-                Throwable enrichedThrowable = new CompletionException(unwrappedThrowable.getMessage(),
-                                                                      unwrappedThrowable);
-                enrichedThrowable.setStackTrace(stackTrace);
-                logger.error("Caught unhandled exception!", enrichedThrowable);
-            }
-            return null;
-        };
+        Collection<Class<? extends Throwable>> ignoredThrowableTypesList = Arrays.asList(ignoredThrowableTypes);
+        return delegate.get(logFilter, ignoredThrowableTypesList, stackTrace);
     }
 
     /**
@@ -130,8 +117,7 @@ public class ExceptionLogger {
      * @return An {@link UncaughtExceptionHandler} which logs the given throwable.
      */
     public static UncaughtExceptionHandler getUncaughtExceptionHandler() {
-        return (thread, throwable) -> logger.error("Caught unhandled exception on thread '{}'!",
-                                                   thread.getName(), unwrapThrowable(throwable));
+        return delegate.getUncaughtExceptionHandler();
     }
 
     /**
@@ -144,12 +130,7 @@ public class ExceptionLogger {
      * @return The unwrapped throwable.
      */
     public static Throwable unwrapThrowable(Throwable throwable) {
-        Throwable result = throwable;
-        Throwable cause = result.getCause();
-        while ((result instanceof CompletionException) && (cause != null)) {
-            result = cause;
-            cause = result.getCause();
-        }
-        return result instanceof CompletionException ? throwable : result;
+        return ExceptionLoggerDelegate.unwrapThrowable(throwable);
     }
+
 }

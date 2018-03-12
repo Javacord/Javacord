@@ -32,6 +32,7 @@ import org.javacord.entity.webhook.Webhook;
 import org.javacord.entity.webhook.WebhookBuilderDelegate;
 import org.javacord.entity.webhook.WebhookUpdaterDelegate;
 import org.javacord.util.exception.DiscordExceptionValidator;
+import org.javacord.util.logging.ExceptionLoggerDelegate;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -46,6 +47,11 @@ public class DelegateFactory {
      * The factory builder delegate. It's used to create new factories.
      */
     private static final DelegateFactoryDelegate delegateFactoryDelegate;
+
+    /**
+     * The exception logger delegate.
+     */
+    private static final ExceptionLoggerDelegate exceptionLoggerDelegate;
 
     /**
      * The discord exception validator.
@@ -65,6 +71,7 @@ public class DelegateFactory {
         } else {
             throw new IllegalStateException("No DelegateFactoryDelegate implementation was found!");
         }
+        exceptionLoggerDelegate = delegateFactoryDelegate.createExceptionLoggerDelegate();
         discordExceptionValidator = delegateFactoryDelegate.createDiscordExceptionValidator();
     }
 
@@ -287,6 +294,15 @@ public class DelegateFactory {
      */
     public static WebhookUpdaterDelegate createWebhookUpdaterDelegate(Webhook webhook) {
         return delegateFactoryDelegate.createWebhookUpdaterDelegate(webhook);
+    }
+
+    /**
+     * Gets the exception logger delegate.
+     *
+     * @return The exception logger delegate.
+     */
+    public static ExceptionLoggerDelegate getExceptionLoggerDelegate() {
+        return exceptionLoggerDelegate;
     }
 
     /**
