@@ -1,5 +1,6 @@
 package org.javacord;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -51,6 +52,16 @@ public interface DiscordApiBuilderDelegate {
      * @return The discord api instance.
      */
     CompletableFuture<DiscordApi> login();
+
+    /**
+     * Login given shards to the account with the given token.
+     * It is invalid to call {@link #setCurrentShard(int)} with
+     * anything but {@code 0} before calling this method.
+     *
+     * @param shards The shards to connect, starting with {@code 0}!
+     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     */
+    Collection<CompletableFuture<DiscordApi>> loginShards(int... shards);
 
     /**
      * Sets the recommended total shards.

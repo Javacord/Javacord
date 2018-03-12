@@ -2,14 +2,8 @@ package org.javacord;
 
 import org.javacord.event.server.ServerBecomesAvailableEvent;
 import org.javacord.util.DelegateFactory;
-import org.javacord.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
@@ -18,11 +12,6 @@ import java.util.stream.IntStream;
  * This class is used to login to a Discord account.
  */
 public class DiscordApiBuilder {
-
-    /**
-     * The logger of this class.
-     */
-    private static final Logger logger = LoggerUtil.getLogger(DiscordApiBuilder.class);
 
     /**
      * The delegate used to create a {@link DiscordApi} instance.
@@ -70,41 +59,7 @@ public class DiscordApiBuilder {
      * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
     public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
-        Objects.requireNonNull(shards);
-        if (shards.length == 0) {
-            return Collections.emptyList();
-        }
-        if (Arrays.stream(shards).distinct().count() != shards.length) {
-            throw new IllegalArgumentException("shards cannot be started multiple times!");
-        }
-        if (Arrays.stream(shards).max().orElseThrow(AssertionError::new) >= delegate.getTotalShards()) {
-            throw new IllegalArgumentException("shard cannot be greater or equal than totalShards!");
-        }
-        if (Arrays.stream(shards).min().orElseThrow(AssertionError::new) < 0) {
-            throw new IllegalArgumentException("shard cannot be less than 0!");
-        }
-
-        if (shards.length == delegate.getTotalShards()) {
-            logger.info(
-                    "Creating {} {}", delegate.getTotalShards(), (delegate.getTotalShards() == 1) ? "shard" : "shards");
-        } else {
-            logger.info("Creating {} out of {} shards ({})", shards.length, delegate.getTotalShards(), shards);
-        }
-
-        Collection<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
-        int currentShard = delegate.getCurrentShard();
-        for (int shard : shards) {
-            if (currentShard != 0) {
-                CompletableFuture<DiscordApi> future = new CompletableFuture<>();
-                future.completeExceptionally(new IllegalArgumentException(
-                        "You cannot use loginShards or loginAllShards after setting the current shard!"));
-                result.add(future);
-                continue;
-            }
-            result.add(setCurrentShard(shard).login());
-        }
-        delegate.setCurrentShard(currentShard);
-        return result;
+        return delegate.loginShards(shards);
     }
 
     /**
