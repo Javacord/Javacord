@@ -1,7 +1,6 @@
 package org.javacord.entity.message;
 
 import org.javacord.DiscordApi;
-import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.UpdatableFromCache;
 import org.javacord.entity.channel.GroupChannel;
@@ -11,7 +10,6 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.emoji.CustomEmoji;
 import org.javacord.entity.emoji.Emoji;
-import org.javacord.entity.emoji.impl.ImplUnicodeEmoji;
 import org.javacord.entity.message.embed.Embed;
 import org.javacord.entity.message.embed.EmbedBuilder;
 import org.javacord.entity.permission.PermissionType;
@@ -1036,20 +1034,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *
      * @return The list of custom emojis in the message.
      */
-    default List<CustomEmoji> getCustomEmojis() {
-        String content = getContent();
-        List<CustomEmoji> emojis = new ArrayList<>();
-        Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
-        while (customEmoji.find()) {
-            long id = Long.parseLong(customEmoji.group("id"));
-            String name = customEmoji.group("name");
-            boolean animated = customEmoji.group(0).charAt(1) == 'a';
-            // TODO Maybe it would be better to cache the custom emoji objects inside the message object instead of creating new ones every time
-            CustomEmoji emoji = ((ImplDiscordApi) getApi()).getKnownCustomEmojiOrCreateCustomEmoji(id, name, animated);
-            emojis.add(emoji);
-        }
-        return Collections.unmodifiableList(emojis);
-    }
+    List<CustomEmoji> getCustomEmojis();
 
     /**
      * Gets the type of the message.
@@ -1207,9 +1192,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param unicodeEmojis The unicode emoji strings.
      * @return A future to tell us if the action was successful.
      */
-    default CompletableFuture<Void> addReactions(String... unicodeEmojis) {
-        return addReactions(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
-    }
+    CompletableFuture<Void> addReactions(String... unicodeEmojis);
 
     /**
      * Deletes all reactions on this message.
@@ -1252,9 +1235,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param unicodeEmoji The unicode emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> removeReactionByEmoji(User user, String unicodeEmoji) {
-        return removeReactionByEmoji(user, ImplUnicodeEmoji.fromString(unicodeEmoji));
-    }
+    CompletableFuture<Void> removeReactionByEmoji(User user, String unicodeEmoji);
 
     /**
      * Removes a user from the list of reactors of the given unicode emoji reactions.
@@ -1263,10 +1244,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param user The user to remove.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> removeReactionsByEmoji(User user, String... unicodeEmojis) {
-        return removeReactionsByEmoji(user,
-                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
-    }
+    CompletableFuture<Void> removeReactionsByEmoji(User user, String... unicodeEmojis);
 
     /**
      * Removes all reactors of a given emoji reaction.
@@ -1297,9 +1275,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param unicodeEmoji The unicode emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> removeReactionByEmoji(String unicodeEmoji) {
-        return removeReactionByEmoji(ImplUnicodeEmoji.fromString(unicodeEmoji));
-    }
+    CompletableFuture<Void> removeReactionByEmoji(String unicodeEmoji);
 
     /**
      * Removes all reactors of the given unicode emoji reactions.
@@ -1307,10 +1283,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param unicodeEmojis The unicode emojis of the reactions.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> removeReactionsByEmoji(String... unicodeEmojis) {
-        return removeReactionsByEmoji(
-                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
-    }
+    CompletableFuture<Void> removeReactionsByEmoji(String... unicodeEmojis);
 
     /**
      * Removes you from the list of reactors of a given emoji reaction.
@@ -1338,9 +1311,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param unicodeEmoji The unicode emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> removeOwnReactionByEmoji(String unicodeEmoji) {
-        return removeOwnReactionByEmoji(ImplUnicodeEmoji.fromString(unicodeEmoji));
-    }
+    CompletableFuture<Void> removeOwnReactionByEmoji(String unicodeEmoji);
 
     /**
      * Removes you from the list of reactors of the given unicode emoji reactions.
@@ -1348,10 +1319,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param unicodeEmojis The unicode emojis of the reactions.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis) {
-        return removeOwnReactionsByEmoji(
-                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
-    }
+    CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis);
 
     /**
      * Gets the server text channel of the message.
@@ -1930,19 +1898,14 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Message.class, getId(), CachedMessagePinListener.class, listener);
-    }
+    ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener);
 
     /**
      * Gets a list with all registered cached message pin listeners.
      *
      * @return A list with all registered cached message pin listeners.
      */
-    default List<CachedMessagePinListener> getCachedMessagePinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), CachedMessagePinListener.class);
-    }
+    List<CachedMessagePinListener> getCachedMessagePinListeners();
 
     /**
      * Adds a listener, which listens to this message getting unpinned while it is in the cache.
@@ -1950,20 +1913,14 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    default ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(
-            CachedMessageUnpinListener listener) {
-        return ((ImplDiscordApi) getApi())
-                .addObjectListener(Message.class, getId(), CachedMessageUnpinListener.class, listener);
-    }
+    ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(CachedMessageUnpinListener listener);
 
     /**
      * Gets a list with all registered cached message unpin listeners.
      *
      * @return A list with all registered cached message unpin listeners.
      */
-    default List<CachedMessageUnpinListener> getCachedMessageUnpinListeners() {
-        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), CachedMessageUnpinListener.class);
-    }
+    List<CachedMessageUnpinListener> getCachedMessageUnpinListeners();
 
     /**
      * Adds a listener that implements one or more {@code MessageAttachableListener}s.
