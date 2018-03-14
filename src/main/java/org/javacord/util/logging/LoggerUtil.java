@@ -5,20 +5,19 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.MDC.MDCCloseable;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class is used to get a {@link Logger} instance.
  */
 public class LoggerUtil {
 
-    private static volatile boolean initialized = false;
-    // we cannot use a boolean as lock so we need an extra lock object
-    private static final Object initLock = new Object();
-
-    private static final HashMap<String, Logger> loggers = new HashMap<>();
-    private static volatile boolean noLogger = false;
-    private static volatile boolean debug = false;
+    private static final AtomicReference<Boolean> initialized = new AtomicReference<>(false);
+    private static final AtomicBoolean noLogger = new AtomicBoolean();
+    private static final Map<String, Logger> loggers = new ConcurrentHashMap<>();
 
     /**
      * Get or create a logger with the given name.
@@ -27,20 +26,22 @@ public class LoggerUtil {
      * @return The logger with the given name.
      */
     public static Logger getLogger(String name) {
-        synchronized (initLock) {
+        initialized.updateAndGet(initialized -> {
             if (!initialized) {
-                init();
-            }
-        }
-        if (noLogger) { // we don't want the SLF4J NOPLogger implementation
-            synchronized (loggers) {
-                Logger logger = loggers.get(name);
-                if (logger == null) {
-                    logger = new JavacordLogger(name);
-                    loggers.put(name, logger);
+                try {
+                    // if there's no library this would cause a ClassNotFoundException
+                    Class.forName("org.slf4j.impl.StaticLoggerBinder");
+                } catch (ClassNotFoundException e) {
+                    noLogger.set(true);
+                    getLogger(LoggerUtil.class)
+                            .info("No SLF4J compatible logger was found. Using default javacord implementation!");
                 }
-                return logger;
             }
+            return true;
+        });
+
+        if (noLogger.get()) { // we don't want the SLF4J NOPLogger implementation
+            return loggers.computeIfAbsent(name, key -> new JavacordLogger(name));
         } else {
             return LoggerFactory.getLogger(name);
         }
@@ -73,7 +74,7 @@ public class LoggerUtil {
      * @throws IllegalArgumentException in case the {@code key} parameter is {@code null} and the method is not a no-op
      */
     public static MDCCloseable putCloseableToMdc(String key, String val) throws IllegalArgumentException {
-        return noLogger ? null : MDC.putCloseable(key, val);
+        return noLogger.get() ? null : MDC.putCloseable(key, val);
     }
 
     /**
@@ -84,41 +85,6 @@ public class LoggerUtil {
      */
     public static Logger getLogger(Class clazz) {
         return getLogger(clazz.getName());
-    }
-
-    /**
-     * Sets whether debugging should be enabled or not.
-     * This has only an effect if the default {@link JavacordLogger} is used.
-     *
-     * @param debug Whether debugging should be enabled or not.
-     */
-    public static void setDebug(boolean debug) {
-        LoggerUtil.debug = debug;
-    }
-
-    /**
-     * Checks whether debugging is enabled or not.
-     * This has only an effect if the default {@link JavacordLogger} is used.
-     *
-     * @return Whether debugging is enabled or not.
-     */
-    public static boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * Initializes the logger util.
-     */
-    private static void init() {
-        initialized = true;
-        try {
-            // if there's no library this would cause a ClassNotFoundException
-            Class.forName("org.slf4j.impl.StaticLoggerBinder");
-        } catch (ClassNotFoundException e) {
-            noLogger = true;
-            getLogger(LoggerUtil.class)
-                    .info("No SLF4J compatible logger was found. Using default javacord implementation!");
-        }
     }
 
 }

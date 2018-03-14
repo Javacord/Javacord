@@ -1,15 +1,9 @@
 package org.javacord;
 
 import org.javacord.event.server.ServerBecomesAvailableEvent;
-import org.javacord.util.FactoryBuilder;
-import org.javacord.util.logging.LoggerUtil;
-import org.slf4j.Logger;
+import org.javacord.util.DelegateFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
@@ -20,14 +14,9 @@ import java.util.stream.IntStream;
 public class DiscordApiBuilder {
 
     /**
-     * The logger of this class.
+     * The delegate used to create a {@link DiscordApi} instance.
      */
-    private static final Logger logger = LoggerUtil.getLogger(DiscordApiBuilder.class);
-
-    /**
-     * The factory used to create a {@link DiscordApi} instance.
-     */
-    private DiscordApiFactory factory = FactoryBuilder.createDiscordApiFactory();
+    private DiscordApiBuilderDelegate delegate = DelegateFactory.createDiscordApiBuilderDelegate();
 
     /**
      * Login to the account with the given token.
@@ -35,7 +24,7 @@ public class DiscordApiBuilder {
      * @return A {@link CompletableFuture} which contains the DiscordApi.
      */
     public CompletableFuture<DiscordApi> login() {
-        return factory.login();
+        return delegate.login();
     }
 
     /**
@@ -58,7 +47,7 @@ public class DiscordApiBuilder {
      * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
     public Collection<CompletableFuture<DiscordApi>> loginShards(IntPredicate shardsCondition) {
-        return loginShards(IntStream.range(0, factory.getTotalShards()).filter(shardsCondition).toArray());
+        return loginShards(IntStream.range(0, delegate.getTotalShards()).filter(shardsCondition).toArray());
     }
 
     /**
@@ -70,40 +59,7 @@ public class DiscordApiBuilder {
      * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
     public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
-        Objects.requireNonNull(shards);
-        if (shards.length == 0) {
-            return Collections.emptyList();
-        }
-        if (Arrays.stream(shards).distinct().count() != shards.length) {
-            throw new IllegalArgumentException("shards cannot be started multiple times!");
-        }
-        if (Arrays.stream(shards).max().orElseThrow(AssertionError::new) >= factory.getTotalShards()) {
-            throw new IllegalArgumentException("shard cannot be greater or equal than totalShards!");
-        }
-        if (Arrays.stream(shards).min().orElseThrow(AssertionError::new) < 0) {
-            throw new IllegalArgumentException("shard cannot be less than 0!");
-        }
-
-        if (shards.length == factory.getTotalShards()) {
-            logger.info("Creating {} {}", factory.getTotalShards(), (factory.getTotalShards() == 1) ? "shard" : "shards");
-        } else {
-            logger.info("Creating {} out of {} shards ({})", shards.length, factory.getTotalShards(), shards);
-        }
-
-        Collection<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
-        int currentShard = factory.getCurrentShard();
-        for (int shard : shards) {
-            if (currentShard != 0) {
-                CompletableFuture<DiscordApi> future = new CompletableFuture<>();
-                future.completeExceptionally(new IllegalArgumentException(
-                        "You cannot use loginShards or loginAllShards after setting the current shard!"));
-                result.add(future);
-                continue;
-            }
-            result.add(setCurrentShard(shard).login());
-        }
-        factory.setCurrentShard(currentShard);
-        return result;
+        return delegate.loginShards(shards);
     }
 
     /**
@@ -115,7 +71,7 @@ public class DiscordApiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public DiscordApiBuilder setToken(String token) {
-        factory.setToken(token);
+        delegate.setToken(token);
         return this;
     }
 
@@ -128,7 +84,7 @@ public class DiscordApiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public DiscordApiBuilder setAccountType(AccountType type) {
-        factory.setAccountType(type);
+        delegate.setAccountType(type);
         return this;
     }
 
@@ -142,7 +98,7 @@ public class DiscordApiBuilder {
      * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public DiscordApiBuilder setTotalShards(int totalShards) {
-        factory.setTotalShards(totalShards);
+        delegate.setTotalShards(totalShards);
         return this;
     }
 
@@ -156,7 +112,7 @@ public class DiscordApiBuilder {
      * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public DiscordApiBuilder setCurrentShard(int currentShard) {
-        factory.setCurrentShard(currentShard);
+        delegate.setCurrentShard(currentShard);
         return this;
     }
 
@@ -172,7 +128,7 @@ public class DiscordApiBuilder {
      * @return The current instance in order to chain call methods.
      */
     public DiscordApiBuilder setWaitForServersOnStartup(boolean waitForServersOnStartup) {
-        factory.setWaitForServersOnStartup(waitForServersOnStartup);
+        delegate.setWaitForServersOnStartup(waitForServersOnStartup);
         return this;
     }
 
@@ -181,10 +137,10 @@ public class DiscordApiBuilder {
      * Sharding allows you to split your bot into several independent instances.
      * A shard only handles a subset of a bot's servers.
      *
-     * @return A future to with the current api builder.
+     * @return A future with the current api builder.
      * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public CompletableFuture<DiscordApiBuilder> setRecommendedTotalShards() {
-        return factory.setRecommendedTotalShards().thenCompose(factory -> CompletableFuture.completedFuture(this));
+        return delegate.setRecommendedTotalShards().thenCompose(nothing -> CompletableFuture.completedFuture(this));
     }
 }

@@ -97,7 +97,6 @@ import org.javacord.listener.user.UserChangeStatusListener;
 import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.util.concurrent.ThreadPool;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.util.gateway.DiscordWebSocketAdapter;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -142,13 +141,6 @@ public interface DiscordApi {
      * @return A utility class to interact with uncached messages.
      */
     UncachedMessageUtil getUncachedMessageUtil();
-
-    /**
-     * Gets the websocket adapter which is used to connect to Discord.
-     *
-     * @return The websocket adapter.
-     */
-    DiscordWebSocketAdapter getWebSocketAdapter();
 
     /**
      * Gets the type of the current account.
@@ -397,14 +389,18 @@ public interface DiscordApi {
      *
      * @return A server builder.
      */
-    ServerBuilder createServerBuilder();
+    default ServerBuilder createServerBuilder() {
+        return new ServerBuilder(this);
+    }
 
     /**
      * Creates an account updater for the current account.
      *
      * @return An account updater for the current account.
      */
-    AccountUpdater createAccountUpdater();
+    default AccountUpdater createAccountUpdater() {
+        return new AccountUpdater(this);
+    }
 
     /**
      * Updates the username of the current account.

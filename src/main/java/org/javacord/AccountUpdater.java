@@ -1,6 +1,7 @@
 package org.javacord;
 
 import org.javacord.entity.Icon;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,9 +10,23 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This interface can be used to update the connected account (e.g. username or avatar).
+ * This class can be used to update the connected account (e.g. username or avatar).
  */
-public interface AccountUpdater {
+public class AccountUpdater {
+
+    /**
+     * The account delegate used by this instance.
+     */
+    private final AccountUpdaterDelegate delegate;
+
+    /**
+     * Creates a new account updater.
+     *
+     * @param api The discord api instance.
+     */
+    public AccountUpdater(DiscordApi api) {
+        delegate = DelegateFactory.createAccountUpdaterDelegate(api);
+    }
 
     /**
      * Queues the username of the connected account to get updated.
@@ -19,7 +34,10 @@ public interface AccountUpdater {
      * @param username The username to set.
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setUsername(String username);
+    public AccountUpdater setUsername(String username) {
+        delegate.setUsername(username);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -28,7 +46,10 @@ public interface AccountUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(BufferedImage avatar);
+    public AccountUpdater setAvatar(BufferedImage avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -37,7 +58,10 @@ public interface AccountUpdater {
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(BufferedImage avatar, String fileType);
+    public AccountUpdater setAvatar(BufferedImage avatar, String fileType) {
+        delegate.setAvatar(avatar, fileType);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -45,7 +69,10 @@ public interface AccountUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(File avatar);
+    public AccountUpdater setAvatar(File avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -53,7 +80,10 @@ public interface AccountUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(Icon avatar);
+    public AccountUpdater setAvatar(Icon avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -61,7 +91,10 @@ public interface AccountUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(URL avatar);
+    public AccountUpdater setAvatar(URL avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -70,7 +103,10 @@ public interface AccountUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(byte[] avatar);
+    public AccountUpdater setAvatar(byte[] avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -79,7 +115,10 @@ public interface AccountUpdater {
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(byte[] avatar, String fileType);
+    public AccountUpdater setAvatar(byte[] avatar, String fileType) {
+        delegate.setAvatar(avatar, fileType);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -88,7 +127,10 @@ public interface AccountUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(InputStream avatar);
+    public AccountUpdater setAvatar(InputStream avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar of the connected account to get updated.
@@ -97,13 +139,18 @@ public interface AccountUpdater {
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    AccountUpdater setAvatar(InputStream avatar, String fileType);
+    public AccountUpdater setAvatar(InputStream avatar, String fileType) {
+        delegate.setAvatar(avatar, fileType);
+        return this;
+    }
 
     /**
      * Performs the queued updates.
      *
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> update();
+    public CompletableFuture<Void> update() {
+        return delegate.update();
+    }
 
 }

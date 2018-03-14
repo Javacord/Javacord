@@ -2,6 +2,8 @@ package org.javacord.entity.emoji;
 
 import org.javacord.entity.Icon;
 import org.javacord.entity.permission.Role;
+import org.javacord.entity.server.Server;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -13,7 +15,21 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class is used to create new custom emojis.
  */
-public interface CustomEmojiBuilder {
+public class CustomEmojiBuilder {
+
+    /**
+     * The custom emoji delegate used by this instance.
+     */
+    private final CustomEmojiBuilderDelegate delegate;
+
+    /**
+     * Creates a new custom emoji builder.
+     *
+     * @param server The server of the custom emoji.
+     */
+    public CustomEmojiBuilder(Server server) {
+        delegate = DelegateFactory.createCustomEmojiBuilderDelegate(server);
+    }
 
     /**
      * Sets the reason for the creation. This reason will be visible in the audit log entry(s).
@@ -21,7 +37,10 @@ public interface CustomEmojiBuilder {
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setAuditLogReason(String reason);
+    public CustomEmojiBuilder setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
 
     /**
      * Sets the name of the emoji.
@@ -29,7 +48,10 @@ public interface CustomEmojiBuilder {
      * @param name The name of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setName(String name);
+    public CustomEmojiBuilder setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -37,7 +59,10 @@ public interface CustomEmojiBuilder {
      * @param image The image of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(Icon image);
+    public CustomEmojiBuilder setImage(Icon image) {
+        delegate.setImage(image);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -45,7 +70,10 @@ public interface CustomEmojiBuilder {
      * @param image The image of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(URL image);
+    public CustomEmojiBuilder setImage(URL image) {
+        delegate.setImage(image);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -53,7 +81,10 @@ public interface CustomEmojiBuilder {
      * @param image The image file of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(File image);
+    public CustomEmojiBuilder setImage(File image) {
+        delegate.setImage(image);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -62,7 +93,10 @@ public interface CustomEmojiBuilder {
      * @param image The image of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(BufferedImage image);
+    public CustomEmojiBuilder setImage(BufferedImage image) {
+        delegate.setImage(image);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -71,7 +105,10 @@ public interface CustomEmojiBuilder {
      * @param type The type of the image, e.g. "png", "jpg" or "gif".
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(BufferedImage image, String type);
+    public CustomEmojiBuilder setImage(BufferedImage image, String type) {
+        delegate.setImage(image, type);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -80,7 +117,10 @@ public interface CustomEmojiBuilder {
      * @param image The image of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(byte[] image);
+    public CustomEmojiBuilder setImage(byte[] image) {
+        delegate.setImage(image);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -89,7 +129,10 @@ public interface CustomEmojiBuilder {
      * @param type The type of the image, e.g. "png", "jpg" or "gif".
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(byte[] image, String type);
+    public CustomEmojiBuilder setImage(byte[] image, String type) {
+        delegate.setImage(image, type);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -98,7 +141,10 @@ public interface CustomEmojiBuilder {
      * @param image The image of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(InputStream image);
+    public CustomEmojiBuilder setImage(InputStream image) {
+        delegate.setImage(image);
+        return this;
+    }
 
     /**
      * Sets the image of the emoji.
@@ -107,7 +153,10 @@ public interface CustomEmojiBuilder {
      * @param type The type of the image, e.g. "png", "jpg" or "gif".
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setImage(InputStream image, String type);
+    public CustomEmojiBuilder setImage(InputStream image, String type) {
+        delegate.setImage(image, type);
+        return this;
+    }
 
     /**
      * Adds a role to the whitelist.
@@ -116,7 +165,10 @@ public interface CustomEmojiBuilder {
      * @param role The role to add.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder addRoleToWhitelist(Role role);
+    public CustomEmojiBuilder addRoleToWhitelist(Role role) {
+        delegate.addRoleToWhitelist(role);
+        return this;
+    }
 
     /**
      * Sets the roles which should be whitelisted.
@@ -125,7 +177,10 @@ public interface CustomEmojiBuilder {
      * @param roles The roles which should be whitelisted.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setWhitelist(Collection<Role> roles);
+    public CustomEmojiBuilder setWhitelist(Collection<Role> roles) {
+        delegate.setWhitelist(roles);
+        return this;
+    }
 
     /**
      * Sets the roles which should be whitelisted.
@@ -134,13 +189,18 @@ public interface CustomEmojiBuilder {
      * @param roles The roles which should be whitelisted.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiBuilder setWhitelist(Role... roles);
+    public CustomEmojiBuilder setWhitelist(Role... roles) {
+        delegate.setWhitelist(roles);
+        return this;
+    }
 
     /**
      * Creates the custom emoji.
      *
      * @return The created custom emoji.
      */
-    CompletableFuture<KnownCustomEmoji> create();
+    public CompletableFuture<KnownCustomEmoji> create() {
+        return delegate.create();
+    }
 
 }

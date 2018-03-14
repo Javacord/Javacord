@@ -3,16 +3,13 @@ package org.javacord.entity.message.embed;
 import org.javacord.entity.Icon;
 import org.javacord.entity.message.MessageAuthor;
 import org.javacord.entity.user.User;
-import org.javacord.util.FactoryBuilder;
-import org.javacord.util.FactoryBuilderDelegate;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 /**
  * This class is used to create embeds.
@@ -20,17 +17,17 @@ import java.util.ServiceLoader;
 public class EmbedBuilder {
 
     /**
-     * The embed factory used by this instance.
+     * The embed delegate used by this instance.
      */
-    private final EmbedFactory factory = FactoryBuilder.createEmbedFactory();
+    private final EmbedBuilderDelegate delegate = DelegateFactory.createEmbedBuilderDelegate();
 
     /**
-     * Gets the factory used by this embed builder internally.
+     * Gets the delegate used by this embed builder internally.
      *
-     * @return The factory used by this embed builder internally.
+     * @return The delegate used by this embed builder internally.
      */
-    public EmbedFactory getFactory() {
-        return factory;
+    public EmbedBuilderDelegate getDelegate() {
+        return delegate;
     }
 
     /**
@@ -40,7 +37,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setTitle(String title) {
-        factory.setTitle(title);
+        delegate.setTitle(title);
         return this;
     }
 
@@ -51,7 +48,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setDescription(String description) {
-        factory.setDescription(description);
+        delegate.setDescription(description);
         return this;
     }
 
@@ -62,7 +59,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setUrl(String url) {
-        factory.setUrl(url);
+        delegate.setUrl(url);
         return this;
     }
 
@@ -72,7 +69,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setTimestamp() {
-        factory.setTimestamp();
+        delegate.setTimestamp();
         return this;
     }
 
@@ -83,7 +80,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setTimestamp(Instant timestamp) {
-        factory.setTimestamp(timestamp);
+        delegate.setTimestamp(timestamp);
         return this;
     }
 
@@ -94,7 +91,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setColor(Color color) {
-        factory.setColor(color);
+        delegate.setColor(color);
         return this;
     }
 
@@ -105,7 +102,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text) {
-        factory.setFooter(text);
+        delegate.setFooter(text);
         return this;
     }
 
@@ -117,7 +114,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, String iconUrl) {
-        factory.setFooter(text, iconUrl);
+        delegate.setFooter(text, iconUrl);
         return this;
     }
 
@@ -129,7 +126,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, Icon icon) {
-        factory.setFooter(text, icon);
+        delegate.setFooter(text, icon);
         return this;
     }
 
@@ -141,7 +138,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, File icon) {
-        factory.setFooter(text, icon);
+        delegate.setFooter(text, icon);
         return this;
     }
 
@@ -154,7 +151,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, InputStream icon) {
-        factory.setFooter(text, icon);
+        delegate.setFooter(text, icon);
         return this;
     }
 
@@ -167,7 +164,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, InputStream icon, String fileType) {
-        factory.setFooter(text, icon, fileType);
+        delegate.setFooter(text, icon, fileType);
         return this;
     }
 
@@ -180,7 +177,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, byte[] icon) {
-        factory.setFooter(text, icon);
+        delegate.setFooter(text, icon);
         return this;
     }
 
@@ -193,7 +190,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, byte[] icon, String fileType) {
-        factory.setFooter(text, icon, fileType);
+        delegate.setFooter(text, icon, fileType);
         return this;
     }
 
@@ -206,7 +203,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, BufferedImage icon) {
-        factory.setFooter(text, icon);
+        delegate.setFooter(text, icon);
         return this;
     }
 
@@ -219,7 +216,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setFooter(String text, BufferedImage icon, String fileType) {
-        factory.setFooter(text, icon, fileType);
+        delegate.setFooter(text, icon, fileType);
         return this;
     }
 
@@ -230,7 +227,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(String url) {
-        factory.setImage(url);
+        delegate.setImage(url);
         return this;
     }
 
@@ -241,7 +238,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(Icon image) {
-        factory.setImage(image);
+        delegate.setImage(image);
         return this;
     }
 
@@ -252,7 +249,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(File image) {
-        factory.setImage(image);
+        delegate.setImage(image);
         return this;
     }
 
@@ -264,7 +261,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(InputStream image) {
-        factory.setImage(image);
+        delegate.setImage(image);
         return this;
     }
 
@@ -276,7 +273,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(InputStream image, String fileType) {
-        factory.setImage(image, fileType);
+        delegate.setImage(image, fileType);
         return this;
     }
 
@@ -288,7 +285,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(byte[] image) {
-        factory.setImage(image);
+        delegate.setImage(image);
         return this;
     }
 
@@ -300,7 +297,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(byte[] image, String fileType) {
-        factory.setImage(image, fileType);
+        delegate.setImage(image, fileType);
         return this;
     }
 
@@ -312,7 +309,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(BufferedImage image) {
-        factory.setImage(image);
+        delegate.setImage(image);
         return this;
     }
 
@@ -324,7 +321,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setImage(BufferedImage image, String fileType) {
-        factory.setImage(image, fileType);
+        delegate.setImage(image, fileType);
         return this;
     }
 
@@ -335,7 +332,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(MessageAuthor author) {
-        factory.setAuthor(author);
+        delegate.setAuthor(author);
         return this;
     }
 
@@ -346,7 +343,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(User author) {
-        factory.setAuthor(author);
+        delegate.setAuthor(author);
         return this;
     }
 
@@ -357,7 +354,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name) {
-        factory.setAuthor(name);
+        delegate.setAuthor(name);
         return this;
     }
 
@@ -370,7 +367,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, String iconUrl) {
-        factory.setAuthor(name, url, iconUrl);
+        delegate.setAuthor(name, url, iconUrl);
         return this;
     }
 
@@ -383,7 +380,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, Icon icon) {
-        factory.setAuthor(name, url, icon);
+        delegate.setAuthor(name, url, icon);
         return this;
     }
 
@@ -396,7 +393,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, File icon) {
-        factory.setAuthor(name, url, icon);
+        delegate.setAuthor(name, url, icon);
         return this;
     }
 
@@ -410,7 +407,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, InputStream icon) {
-        factory.setAuthor(name, url, icon);
+        delegate.setAuthor(name, url, icon);
         return this;
     }
 
@@ -424,7 +421,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, InputStream icon, String fileType) {
-        factory.setAuthor(name, url, icon, fileType);
+        delegate.setAuthor(name, url, icon, fileType);
         return this;
     }
 
@@ -438,7 +435,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, byte[] icon) {
-        factory.setAuthor(name, url, icon);
+        delegate.setAuthor(name, url, icon);
         return this;
     }
 
@@ -452,7 +449,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, byte[] icon, String fileType) {
-        factory.setAuthor(name, url, icon, fileType);
+        delegate.setAuthor(name, url, icon, fileType);
         return this;
     }
 
@@ -466,7 +463,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, BufferedImage icon) {
-        factory.setAuthor(name, url, icon);
+        delegate.setAuthor(name, url, icon);
         return this;
     }
 
@@ -480,7 +477,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setAuthor(String name, String url, BufferedImage icon, String fileType) {
-        factory.setAuthor(name, url, icon, fileType);
+        delegate.setAuthor(name, url, icon, fileType);
         return this;
     }
 
@@ -491,7 +488,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(String url) {
-        factory.setThumbnail(url);
+        delegate.setThumbnail(url);
         return this;
     }
 
@@ -502,7 +499,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(Icon thumbnail) {
-        factory.setThumbnail(thumbnail);
+        delegate.setThumbnail(thumbnail);
         return this;
     }
 
@@ -513,7 +510,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(File thumbnail) {
-        factory.setThumbnail(thumbnail);
+        delegate.setThumbnail(thumbnail);
         return this;
     }
 
@@ -525,7 +522,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(InputStream thumbnail) {
-        factory.setThumbnail(thumbnail);
+        delegate.setThumbnail(thumbnail);
         return this;
     }
 
@@ -537,7 +534,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(InputStream thumbnail, String fileType) {
-        factory.setThumbnail(thumbnail, fileType);
+        delegate.setThumbnail(thumbnail, fileType);
         return this;
     }
 
@@ -549,7 +546,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(byte[] thumbnail) {
-        factory.setThumbnail(thumbnail);
+        delegate.setThumbnail(thumbnail);
         return this;
     }
 
@@ -561,7 +558,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(byte[] thumbnail, String fileType) {
-        factory.setThumbnail(thumbnail, fileType);
+        delegate.setThumbnail(thumbnail, fileType);
         return this;
     }
 
@@ -573,7 +570,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(BufferedImage thumbnail) {
-        factory.setThumbnail(thumbnail);
+        delegate.setThumbnail(thumbnail);
         return this;
     }
 
@@ -585,7 +582,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(BufferedImage thumbnail, String fileType) {
-        factory.setThumbnail(thumbnail, fileType);
+        delegate.setThumbnail(thumbnail, fileType);
         return this;
     }
 
@@ -597,7 +594,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder addInlineField(String name, String value) {
-        factory.addField(name, value, true);
+        delegate.addField(name, value, true);
         return this;
     }
 
@@ -609,7 +606,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder addField(String name, String value) {
-        factory.addField(name, value, false);
+        delegate.addField(name, value, false);
         return this;
     }
 
@@ -622,7 +619,7 @@ public class EmbedBuilder {
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder addField(String name, String value, boolean inline) {
-        factory.addField(name, value, inline);
+        delegate.addField(name, value, inline);
         return this;
     }
 
@@ -632,6 +629,7 @@ public class EmbedBuilder {
      * @return Whether the embed requires attachments or not.
      */
     public boolean requiresAttachments() {
-        return factory.requiresAttachments();
+        return delegate.requiresAttachments();
     }
+
 }

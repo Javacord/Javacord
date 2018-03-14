@@ -10,7 +10,6 @@ import org.javacord.entity.impl.ImplIcon;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.user.User;
 import org.javacord.entity.webhook.Webhook;
-import org.javacord.entity.webhook.WebhookUpdater;
 import org.javacord.util.logging.LoggerUtil;
 import org.javacord.util.rest.RestEndpoint;
 import org.javacord.util.rest.RestMethod;
@@ -105,7 +104,7 @@ public class ImplWebhook implements Webhook {
     public Optional<Icon> getAvatar() {
         if (avatarId != null) {
             String url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId +
-                    (avatarId.startsWith("a_") ? ".gif" : ".png");
+                         (avatarId.startsWith("a_") ? ".gif" : ".png");
             try {
                 return Optional.of(new ImplIcon(getApi(), new URL(url)));
             } catch (MalformedURLException e) {
@@ -126,11 +125,6 @@ public class ImplWebhook implements Webhook {
                 .setUrlParameters(getIdAsString())
                 .setAuditLogReason(reason)
                 .execute(result -> null);
-    }
-
-    @Override
-    public WebhookUpdater createUpdater() {
-        return new ImplWebhookUpdater(this);
     }
 
     @Override

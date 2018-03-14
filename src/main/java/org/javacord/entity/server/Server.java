@@ -593,14 +593,18 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return A custom emoji builder to create custom emojis.
      */
-    CustomEmojiBuilder createCustomEmojiBuilder();
+    default CustomEmojiBuilder createCustomEmojiBuilder() {
+        return new CustomEmojiBuilder(this);
+    }
 
     /**
      * Creates an updater for this server.
      *
      * @return An updater for this server.
      */
-    ServerUpdater createUpdater();
+    default ServerUpdater createUpdater() {
+        return new ServerUpdater(this);
+    }
 
     /**
      * Updates the name of the server.
@@ -1332,21 +1336,27 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      *
      * @return A builder to create a new channel category.
      */
-    ChannelCategoryBuilder createChannelCategoryBuilder();
+    default ChannelCategoryBuilder createChannelCategoryBuilder() {
+        return new ChannelCategoryBuilder(this);
+    }
 
     /**
      * Creates a new server text channel builder.
      *
      * @return A builder to create a new server text channel.
      */
-    ServerTextChannelBuilder createTextChannelBuilder();
+    default ServerTextChannelBuilder createTextChannelBuilder() {
+        return new ServerTextChannelBuilder(this);
+    }
 
     /**
      * Creates a new server voice channel builder.
      *
      * @return A builder to create a new server voice channel.
      */
-    ServerVoiceChannelBuilder createVoiceChannelBuilder();
+    default ServerVoiceChannelBuilder createVoiceChannelBuilder() {
+        return new ServerVoiceChannelBuilder(this);
+    }
 
     /**
      * Creates a new role builder.

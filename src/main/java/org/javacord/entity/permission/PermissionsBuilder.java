@@ -1,6 +1,6 @@
 package org.javacord.entity.permission;
 
-import org.javacord.util.FactoryBuilder;
+import org.javacord.util.DelegateFactory;
 
 /**
  * A class to create {@link Permissions permissions} objects.
@@ -8,15 +8,15 @@ import org.javacord.util.FactoryBuilder;
 public class PermissionsBuilder {
 
     /**
-     * The permissions factory used by this instance.
+     * The permissions delegate used by this instance.
      */
-    private final PermissionsFactory factory;
+    private final PermissionsBuilderDelegate delegate;
 
     /**
      * Creates a new permissions builder with all types set to {@link PermissionState#NONE}.
      */
     public PermissionsBuilder() {
-        factory = FactoryBuilder.createPermissionsFactory();
+        delegate = DelegateFactory.createPermissionsBuilderDelegate();
     }
 
     /**
@@ -25,7 +25,7 @@ public class PermissionsBuilder {
      * @param permissions The permissions which should be copied.
      */
     public PermissionsBuilder(Permissions permissions) {
-        factory = FactoryBuilder.createPermissionsFactory(permissions);
+        delegate = DelegateFactory.createPermissionsBuilderDelegate(permissions);
     }
 
     /**
@@ -36,7 +36,7 @@ public class PermissionsBuilder {
      * @return The current instance in order to chain call methods.
      */
     public PermissionsBuilder setState(PermissionType type, PermissionState state) {
-        factory.setState(type, state);
+        delegate.setState(type, state);
         return this;
     }
 
@@ -47,7 +47,7 @@ public class PermissionsBuilder {
      * @return The state of the given type.
      */
     public PermissionState getState(PermissionType type) {
-        return factory.getState(type);
+        return delegate.getState(type);
     }
 
     /**
@@ -56,7 +56,7 @@ public class PermissionsBuilder {
      * @return The created permissions instance.
      */
     public Permissions build() {
-        return factory.build();
+        return delegate.build();
     }
 
 }

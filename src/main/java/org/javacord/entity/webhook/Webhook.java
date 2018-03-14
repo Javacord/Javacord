@@ -99,7 +99,9 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook> {
      *
      * @return The updater for this webhook.
      */
-    WebhookUpdater createUpdater();
+    default WebhookUpdater createUpdater() {
+        return new WebhookUpdater(this);
+    }
 
     /**
      * Updates the name of the webhook.

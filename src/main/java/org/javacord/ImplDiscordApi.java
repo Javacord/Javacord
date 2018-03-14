@@ -23,8 +23,6 @@ import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.entity.message.impl.ImplMessageSet;
 import org.javacord.entity.message.impl.ImplUncachedMessageUtil;
 import org.javacord.entity.server.Server;
-import org.javacord.entity.server.ServerBuilder;
-import org.javacord.entity.server.impl.ImplServerBuilder;
 import org.javacord.entity.server.invite.Invite;
 import org.javacord.entity.server.invite.impl.ImplInvite;
 import org.javacord.entity.user.User;
@@ -957,12 +955,16 @@ public class ImplDiscordApi implements DiscordApi {
         return uncachedMessageUtil;
     }
 
+    /**
+     * Gets the websocket adapter which is used to connect to Discord.
+     *
+     * @return The websocket adapter.
+     */
     /*
      * Note: You might think the return type should be Optional<WebsocketAdapter>, because it's null till we receive
      *       the gateway from Discord. However the DiscordApi instance is only passed to the user, AFTER we connect
      *       so for the end user it is in fact never null.
      */
-    @Override
     public DiscordWebSocketAdapter getWebSocketAdapter() {
         return websocketAdapter;
     }
@@ -1122,16 +1124,6 @@ public class ImplDiscordApi implements DiscordApi {
         return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
                 .setUrlParameters(code)
                 .execute(result -> new ImplInvite(this, result.getJsonBody()));
-    }
-
-    @Override
-    public ServerBuilder createServerBuilder() {
-        return new ImplServerBuilder(this);
-    }
-
-    @Override
-    public AccountUpdater createAccountUpdater() {
-        return new ImplAccountUpdater(this);
     }
 
     @Override

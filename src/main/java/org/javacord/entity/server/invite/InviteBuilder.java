@@ -1,11 +1,7 @@
 package org.javacord.entity.server.invite;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.server.invite.impl.ImplInvite;
-import org.javacord.util.rest.RestEndpoint;
-import org.javacord.util.rest.RestMethod;
-import org.javacord.util.rest.RestRequest;
+import org.javacord.util.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -15,34 +11,9 @@ import java.util.concurrent.CompletableFuture;
 public class InviteBuilder {
 
     /**
-     * The server channel for the invite.
+     * The invite delegate used by this instance.
      */
-    private final ServerChannel channel;
-
-    /**
-     * The reason for the creation.
-     */
-    private String reason = null;
-
-    /**
-     * The duration of the invite in seconds before expiry, or 0 for never.
-     */
-    private int maxAge = 86400;
-
-    /**
-     * The max number of uses or 0 for unlimited.
-     */
-    private int maxUses = 0;
-
-    /**
-     * Whether this invite only grants temporary membership or not.
-     */
-    private boolean temporary = false;
-
-    /**
-     * Whether this invite is be unique or not.
-     */
-    private boolean unique = false;
+    private final InviteBuilderDelegate delegate;
 
     /**
      * Creates a new invite builder.
@@ -50,7 +21,7 @@ public class InviteBuilder {
      * @param channel The channel for the invite.
      */
     public InviteBuilder(ServerChannel channel) {
-        this.channel = channel;
+        delegate = DelegateFactory.createInviteBuilderDelegate(channel);
     }
 
     /**
@@ -60,7 +31,7 @@ public class InviteBuilder {
      * @return The current instance in order to chain call methods.
      */
     public InviteBuilder setAuditLogReason(String reason) {
-        this.reason = reason;
+        delegate.setAuditLogReason(reason);
         return this;
     }
 
@@ -72,7 +43,7 @@ public class InviteBuilder {
      * @return The current instance in order to chain call methods.
      */
     public InviteBuilder setMaxAgeInSeconds(int maxAge) {
-        this.maxAge = maxAge;
+        delegate.setMaxAgeInSeconds(maxAge);
         return this;
     }
 
@@ -84,7 +55,8 @@ public class InviteBuilder {
      * @see #setMaxAgeInSeconds(int)
      */
     public InviteBuilder setNeverExpire() {
-        return setMaxAgeInSeconds(0);
+        delegate.setNeverExpire();
+        return this;
     }
 
     /**
@@ -95,7 +67,7 @@ public class InviteBuilder {
      * @return The current instance in order to chain call methods.
      */
     public InviteBuilder setMaxUses(int maxUses) {
-        this.maxUses = maxUses;
+        delegate.setMaxUses(maxUses);
         return this;
     }
 
@@ -107,7 +79,7 @@ public class InviteBuilder {
      * @return The current instance in order to chain call methods.
      */
     public InviteBuilder setTemporary(boolean temporary) {
-        this.temporary = temporary;
+        delegate.setTemporary(temporary);
         return this;
     }
 
@@ -119,7 +91,7 @@ public class InviteBuilder {
      * @return The current instance in order to chain call methods.
      */
     public InviteBuilder setUnique(boolean unique) {
-        this.unique = unique;
+        delegate.setUnique(unique);
         return this;
     }
 
@@ -129,15 +101,7 @@ public class InviteBuilder {
      * @return The created invite.
      */
     public CompletableFuture<Invite> create() {
-        return new RestRequest<Invite>(channel.getApi(), RestMethod.POST, RestEndpoint.CHANNEL_INVITE)
-                .setUrlParameters(channel.getIdAsString())
-                .setBody(JsonNodeFactory.instance.objectNode()
-                        .put("max_age", maxAge)
-                        .put("max_uses", maxUses)
-                        .put("temporary", temporary)
-                        .put("unique", unique))
-                .setAuditLogReason(reason)
-                .execute(result -> new ImplInvite(channel.getApi(), result.getJsonBody()));
+        return delegate.create();
     }
 
 }

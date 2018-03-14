@@ -3,13 +3,35 @@ package org.javacord.entity.channel;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.user.User;
+import org.javacord.util.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class can be used to update server channels.
  */
-public interface ServerChannelUpdater {
+public class ServerChannelUpdater {
+
+    /**
+     * The server channel delegate used by this instance.
+     */
+    private final ServerChannelUpdaterDelegate delegate;
+
+    /**
+     * Creates a new server channel updater without delegate.
+     */
+    protected ServerChannelUpdater() {
+        delegate = null;
+    }
+
+    /**
+     * Creates a new server channel updater.
+     *
+     * @param channel The channel to update.
+     */
+    public ServerChannelUpdater(ServerChannel channel) {
+        delegate = DelegateFactory.createServerChannelUpdaterDelegate(channel);
+    }
 
     /**
      * Sets the reason for this update. This reason will be visible in the audit log entry(s).
@@ -17,7 +39,10 @@ public interface ServerChannelUpdater {
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    ServerChannelUpdater setAuditLogReason(String reason);
+    public ServerChannelUpdater setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
 
     /**
      * Queues the name to be updated.
@@ -25,7 +50,10 @@ public interface ServerChannelUpdater {
      * @param name The new name of the channel.
      * @return The current instance in order to chain call methods.
      */
-    ServerChannelUpdater setName(String name);
+    public ServerChannelUpdater setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Queues the raw position to be updated.
@@ -35,7 +63,10 @@ public interface ServerChannelUpdater {
      *                    {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
      * @return The current instance in order to chain call methods.
      */
-    ServerChannelUpdater setRawPosition(int rawPosition);
+    public ServerChannelUpdater setRawPosition(int rawPosition) {
+        delegate.setRawPosition(rawPosition);
+        return this;
+    }
 
     /**
      * Adds a permission overwrite for the given user.
@@ -44,7 +75,10 @@ public interface ServerChannelUpdater {
      * @param permissions The permission overwrites.
      * @return The current instance in order to chain call methods.
      */
-    ServerChannelUpdater addPermissionOverwrite(User user, Permissions permissions);
+    public ServerChannelUpdater addPermissionOverwrite(User user, Permissions permissions) {
+        delegate.addPermissionOverwrite(user, permissions);
+        return this;
+    }
 
     /**
      * Adds a permission overwrite for the given role.
@@ -53,7 +87,10 @@ public interface ServerChannelUpdater {
      * @param permissions The permission overwrites.
      * @return The current instance in order to chain call methods.
      */
-    ServerChannelUpdater addPermissionOverwrite(Role role, Permissions permissions);
+    public ServerChannelUpdater addPermissionOverwrite(Role role, Permissions permissions) {
+        delegate.addPermissionOverwrite(role, permissions);
+        return this;
+    }
 
     /**
      * Removes a permission overwrite for the given user.
@@ -61,7 +98,10 @@ public interface ServerChannelUpdater {
      * @param user The user whose permission overwrite should be removed.
      * @return The current instance in order to chain call methods.
      */
-    ServerChannelUpdater removePermissionOverwrite(User user);
+    public ServerChannelUpdater removePermissionOverwrite(User user) {
+        delegate.removePermissionOverwrite(user);
+        return this;
+    }
 
     /**
      * Removes a permission overwrite for the given role.
@@ -69,13 +109,18 @@ public interface ServerChannelUpdater {
      * @param role The role which permission overwrite should be removed.
      * @return The current instance in order to chain call methods.
      */
-    ServerChannelUpdater removePermissionOverwrite(Role role);
+    public ServerChannelUpdater removePermissionOverwrite(Role role) {
+        delegate.removePermissionOverwrite(role);
+        return this;
+    }
 
     /**
      * Performs the queued updates.
      *
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> update();
+    public CompletableFuture<Void> update() {
+        return delegate.update();
+    }
 
 }

@@ -50,7 +50,9 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      *
      * @return An updater for this emoji.
      */
-    CustomEmojiUpdater createUpdater();
+    default CustomEmojiUpdater createUpdater(){
+        return new CustomEmojiUpdater(this);
+    }
 
     /**
      * Gets a list with all whitelisted roles.

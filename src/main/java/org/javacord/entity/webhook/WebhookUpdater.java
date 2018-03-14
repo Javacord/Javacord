@@ -2,6 +2,7 @@ package org.javacord.entity.webhook;
 
 import org.javacord.entity.Icon;
 import org.javacord.entity.channel.ServerTextChannel;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -12,14 +13,32 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to update webhooks.
  */
-public interface WebhookUpdater {
+public class WebhookUpdater {
+
+    /**
+     * The webhook delegate used by this instance.
+     */
+    private final WebhookUpdaterDelegate delegate;
+
+    /**
+     * Creates a new webhook updater.
+     *
+     * @param webhook The webhook to update.
+     */
+    public WebhookUpdater(Webhook webhook) {
+        delegate = DelegateFactory.createWebhookUpdaterDelegate(webhook);
+    }
+
     /**
      * Sets the reason for this update. This reason will be visible in the audit log entry(s).
      *
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAuditLogReason(String reason);
+    public WebhookUpdater setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
 
     /**
      * Queues the name to be updated.
@@ -27,7 +46,10 @@ public interface WebhookUpdater {
      * @param name The new name of the webhook.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setName(String name);
+    public WebhookUpdater setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Queues the channel to be updated.
@@ -35,7 +57,10 @@ public interface WebhookUpdater {
      * @param channel The new channel of the webhook.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setChannel(ServerTextChannel channel);
+    public WebhookUpdater setChannel(ServerTextChannel channel) {
+        delegate.setChannel(channel);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -44,7 +69,10 @@ public interface WebhookUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(BufferedImage avatar);
+    public WebhookUpdater setAvatar(BufferedImage avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -53,7 +81,10 @@ public interface WebhookUpdater {
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(BufferedImage avatar, String fileType);
+    public WebhookUpdater setAvatar(BufferedImage avatar, String fileType) {
+        delegate.setAvatar(avatar, fileType);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -61,7 +92,10 @@ public interface WebhookUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(File avatar);
+    public WebhookUpdater setAvatar(File avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -69,7 +103,10 @@ public interface WebhookUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(Icon avatar);
+    public WebhookUpdater setAvatar(Icon avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -77,7 +114,10 @@ public interface WebhookUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(URL avatar);
+    public WebhookUpdater setAvatar(URL avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -86,7 +126,10 @@ public interface WebhookUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(byte[] avatar);
+    public WebhookUpdater setAvatar(byte[] avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -95,7 +138,10 @@ public interface WebhookUpdater {
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(byte[] avatar, String fileType);
+    public WebhookUpdater setAvatar(byte[] avatar, String fileType) {
+        delegate.setAvatar(avatar, fileType);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -104,7 +150,10 @@ public interface WebhookUpdater {
      * @param avatar The avatar to set.
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(InputStream avatar);
+    public WebhookUpdater setAvatar(InputStream avatar) {
+        delegate.setAvatar(avatar);
+        return this;
+    }
 
     /**
      * Queues the avatar to be updated.
@@ -113,20 +162,28 @@ public interface WebhookUpdater {
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater setAvatar(InputStream avatar, String fileType);
+    public WebhookUpdater setAvatar(InputStream avatar, String fileType) {
+        delegate.setAvatar(avatar, fileType);
+        return this;
+    }
 
     /**
      * Queues the avatar to be removed.
      *
      * @return The current instance in order to chain call methods.
      */
-    WebhookUpdater removeAvatar();
+    public WebhookUpdater removeAvatar() {
+        delegate.removeAvatar();
+        return this;
+    }
 
     /**
      * Performs the queued updates.
      *
      * @return The updated webhook or the current instance if no updates were queued.
      */
-    CompletableFuture<Webhook> update();
+    public CompletableFuture<Webhook> update() {
+        return delegate.update();
+    }
 
 }

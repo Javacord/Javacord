@@ -5,14 +5,12 @@ import org.javacord.entity.Mentionable;
 import org.javacord.entity.channel.TextChannel;
 import org.javacord.entity.message.embed.EmbedBuilder;
 import org.javacord.entity.user.User;
-import org.javacord.util.FactoryBuilder;
+import org.javacord.util.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -21,9 +19,9 @@ import java.util.concurrent.CompletableFuture;
 public class MessageBuilder {
 
     /**
-     * The message factory used by this instance.
+     * The message delegate used by this instance.
      */
-    private final MessageFactory factory = FactoryBuilder.createMessageFactory();
+    private final MessageBuilderDelegate delegate = DelegateFactory.createMessageBuilderDelegate();
 
     /**
      * Creates a message builder from a message.
@@ -51,7 +49,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder append(String message, MessageDecoration... decorations) {
-        factory.append(message, decorations);
+        delegate.append(message, decorations);
         return this;
     }
 
@@ -63,7 +61,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder appendCode(String language, String code) {
-        factory.appendCode(language, code);
+        delegate.appendCode(language, code);
         return this;
     }
 
@@ -74,7 +72,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder append(Mentionable entity) {
-        factory.append(entity);
+        delegate.append(entity);
         return this;
     }
 
@@ -86,7 +84,7 @@ public class MessageBuilder {
      * @see StringBuilder#append(Object)
      */
     public MessageBuilder append(Object object) {
-        factory.append(object);
+        delegate.append(object);
         return this;
     }
 
@@ -96,7 +94,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder appendNewLine() {
-        factory.appendNewLine();
+        delegate.appendNewLine();
         return this;
     }
 
@@ -109,7 +107,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder setContent(String content) {
-        factory.setContent(content);
+        delegate.setContent(content);
         return this;
     }
 
@@ -120,7 +118,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder setEmbed(EmbedBuilder embed) {
-        factory.setEmbed(embed);
+        delegate.setEmbed(embed);
         return this;
     }
 
@@ -131,7 +129,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder setTts(boolean tts) {
-        factory.setTts(tts);
+        delegate.setTts(tts);
         return this;
     }
 
@@ -144,7 +142,7 @@ public class MessageBuilder {
      * @see #addAttachment(BufferedImage, String)
      */
     public MessageBuilder addFile(BufferedImage image, String fileName) {
-        factory.addFile(image, fileName);
+        delegate.addFile(image, fileName);
         return this;
     }
 
@@ -156,7 +154,7 @@ public class MessageBuilder {
      * @see #addAttachment(File)
      */
     public MessageBuilder addFile(File file) {
-        factory.addFile(file);
+        delegate.addFile(file);
         return this;
     }
 
@@ -168,7 +166,7 @@ public class MessageBuilder {
      * @see #addAttachment(Icon)
      */
     public MessageBuilder addFile(Icon icon) {
-        factory.addFile(icon);
+        delegate.addFile(icon);
         return this;
     }
 
@@ -180,7 +178,7 @@ public class MessageBuilder {
      * @see #addAttachment(URL)
      */
     public MessageBuilder addFile(URL url) {
-        factory.addFile(url);
+        delegate.addFile(url);
         return this;
     }
 
@@ -193,7 +191,7 @@ public class MessageBuilder {
      * @see #addAttachment(byte[], String)
      */
     public MessageBuilder addFile(byte[] bytes, String fileName) {
-        factory.addFile(bytes, fileName);
+        delegate.addFile(bytes, fileName);
         return this;
     }
 
@@ -206,7 +204,7 @@ public class MessageBuilder {
      * @see #addAttachment(InputStream, String)
      */
     public MessageBuilder addFile(InputStream stream, String fileName) {
-        factory.addFile(stream, fileName);
+        delegate.addFile(stream, fileName);
         return this;
     }
 
@@ -218,7 +216,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder addAttachment(BufferedImage image, String fileName) {
-        factory.addAttachment(image, fileName);
+        delegate.addAttachment(image, fileName);
         return this;
     }
 
@@ -229,7 +227,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder addAttachment(File file) {
-        factory.addAttachment(file);
+        delegate.addAttachment(file);
         return this;
     }
 
@@ -240,7 +238,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder addAttachment(Icon icon) {
-        factory.addAttachment(icon);
+        delegate.addAttachment(icon);
         return this;
     }
 
@@ -251,7 +249,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder addAttachment(URL url) {
-        factory.addAttachment(url);
+        delegate.addAttachment(url);
         return this;
     }
 
@@ -263,7 +261,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder addAttachment(byte[] bytes, String fileName) {
-        factory.addAttachment(bytes, fileName);
+        delegate.addAttachment(bytes, fileName);
         return this;
     }
 
@@ -275,7 +273,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder addAttachment(InputStream stream, String fileName) {
-        factory.addAttachment(stream, fileName);
+        delegate.addAttachment(stream, fileName);
         return this;
     }
 
@@ -286,7 +284,7 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder setNonce(String nonce) {
-        factory.setNonce(nonce);
+        delegate.setNonce(nonce);
         return this;
     }
 
@@ -296,7 +294,7 @@ public class MessageBuilder {
      * @return The StringBuilder which is used to build the message.
      */
     public StringBuilder getStringBuilder() {
-        return factory.getStringBuilder();
+        return delegate.getStringBuilder();
     }
 
     /**
@@ -306,7 +304,7 @@ public class MessageBuilder {
      * @return The sent message.
      */
     public CompletableFuture<Message> send(User user) {
-        return factory.send(user);
+        return delegate.send(user);
     }
 
     /**
@@ -316,7 +314,7 @@ public class MessageBuilder {
      * @return The sent message.
      */
     public CompletableFuture<Message> send(TextChannel channel) {
-        return factory.send(channel);
+        return delegate.send(channel);
     }
 
     /**
@@ -326,7 +324,7 @@ public class MessageBuilder {
      * @return The sent message.
      */
     public CompletableFuture<Message> send(Messageable messageable) {
-        return factory.send(messageable);
+        return delegate.send(messageable);
     }
 
 }

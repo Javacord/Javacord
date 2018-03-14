@@ -5,7 +5,9 @@ import org.javacord.DiscordApi;
 import org.javacord.ImplDiscordApi;
 import org.javacord.entity.DiscordEntity;
 import org.javacord.entity.channel.TextChannel;
+import org.javacord.entity.emoji.CustomEmoji;
 import org.javacord.entity.emoji.Emoji;
+import org.javacord.entity.emoji.impl.ImplUnicodeEmoji;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.MessageAttachment;
 import org.javacord.entity.message.MessageAuthor;
@@ -15,15 +17,22 @@ import org.javacord.entity.message.embed.Embed;
 import org.javacord.entity.message.embed.impl.ImplEmbed;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.user.User;
+import org.javacord.listener.message.CachedMessagePinListener;
+import org.javacord.listener.message.CachedMessageUnpinListener;
+import org.javacord.util.DiscordRegexPattern;
 import org.javacord.util.cache.ImplMessageCache;
+import org.javacord.util.event.ListenerManager;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
 
 /**
  * The implementation of {@link Message}.
@@ -260,6 +269,22 @@ public class ImplMessage implements Message {
     }
 
     @Override
+    public List<CustomEmoji> getCustomEmojis() {
+        String content = getContent();
+        List<CustomEmoji> emojis = new ArrayList<>();
+        Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
+        while (customEmoji.find()) {
+            long id = Long.parseLong(customEmoji.group("id"));
+            String name = customEmoji.group("name");
+            boolean animated = customEmoji.group(0).charAt(1) == 'a';
+            // TODO Maybe it would be better to cache the custom emoji objects inside the message object instead of creating new ones every time
+            CustomEmoji emoji = ((ImplDiscordApi) getApi()).getKnownCustomEmojiOrCreateCustomEmoji(id, name, animated);
+            emojis.add(emoji);
+        }
+        return Collections.unmodifiableList(emojis);
+    }
+
+    @Override
     public MessageType getType() {
         return type;
     }
@@ -316,6 +341,67 @@ public class ImplMessage implements Message {
     @Override
     public List<Role> getMentionedRoles() {
         return Collections.unmodifiableList(new ArrayList<>(roleMentions));
+    }
+
+    @Override
+    public CompletableFuture<Void> addReactions(String... unicodeEmojis) {
+        return addReactions(Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeReactionByEmoji(User user, String unicodeEmoji) {
+        return removeReactionByEmoji(user, ImplUnicodeEmoji.fromString(unicodeEmoji));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeReactionsByEmoji(User user, String... unicodeEmojis) {
+        return removeReactionsByEmoji(user,
+                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeReactionByEmoji(String unicodeEmoji) {
+        return removeReactionByEmoji(ImplUnicodeEmoji.fromString(unicodeEmoji));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeReactionsByEmoji(String... unicodeEmojis) {
+        return removeReactionsByEmoji(
+                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeOwnReactionByEmoji(String unicodeEmoji) {
+        return removeOwnReactionByEmoji(ImplUnicodeEmoji.fromString(unicodeEmoji));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis) {
+        return removeOwnReactionsByEmoji(
+                Arrays.stream(unicodeEmojis).map(ImplUnicodeEmoji::fromString).toArray(Emoji[]::new));
+    }
+
+    @Override
+    public ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Message.class, getId(), CachedMessagePinListener.class, listener);
+    }
+
+    @Override
+    public List<CachedMessagePinListener> getCachedMessagePinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), CachedMessagePinListener.class);
+    }
+
+    @Override
+    public ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(
+            CachedMessageUnpinListener listener) {
+        return ((ImplDiscordApi) getApi())
+                .addObjectListener(Message.class, getId(), CachedMessageUnpinListener.class, listener);
+    }
+
+    @Override
+    public List<CachedMessageUnpinListener> getCachedMessageUnpinListeners() {
+        return ((ImplDiscordApi) getApi()).getObjectListeners(Message.class, getId(), CachedMessageUnpinListener.class);
     }
 
     @Override

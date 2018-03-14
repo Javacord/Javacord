@@ -7,7 +7,7 @@ import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.embed.Embed;
 import org.javacord.entity.message.embed.impl.ImplEmbed;
-import org.javacord.entity.message.embed.impl.ImplEmbedFactory;
+import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
 import org.javacord.entity.message.impl.ImplMessage;
 import org.javacord.entity.server.Server;
 import org.javacord.event.message.CachedMessagePinEvent;
@@ -156,10 +156,10 @@ public class MessageUpdateHandler extends PacketHandler {
                         isMostLikelyAnEdit = true;
                     } else {
                         for (int i = 0; i < newEmbeds.size(); i++) {
-                            if (!((ImplEmbedFactory) newEmbeds.get(i)
-                                    .toBuilder().getFactory()).toJsonNode().toString()
-                                    .equals(((ImplEmbedFactory) oldEmbeds.get(i)
-                                            .toBuilder().getFactory()).toJsonNode().toString())) {
+                            if (!((ImplEmbedBuilderDelegate) newEmbeds.get(i)
+                                    .toBuilder().getDelegate()).toJsonNode().toString()
+                                    .equals(((ImplEmbedBuilderDelegate) oldEmbeds.get(i)
+                                            .toBuilder().getDelegate()).toJsonNode().toString())) {
                                 isMostLikelyAnEdit = true;
                             }
                         }

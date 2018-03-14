@@ -9,15 +9,12 @@ import org.javacord.entity.channel.InternalChannel;
 import org.javacord.entity.channel.InternalServerChannel;
 import org.javacord.entity.channel.InternalTextChannel;
 import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.ServerTextChannelUpdater;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.impl.ImplPermissions;
 import org.javacord.entity.server.Server;
 import org.javacord.entity.server.impl.ImplServer;
 import org.javacord.entity.user.User;
-import org.javacord.entity.webhook.WebhookBuilder;
-import org.javacord.entity.webhook.impl.ImplWebhookBuilder;
 import org.javacord.listener.ChannelAttachableListener;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.TextChannelAttachableListener;
@@ -228,16 +225,6 @@ public class ImplServerTextChannel
     @Override
     public String getTopic() {
         return topic;
-    }
-
-    @Override
-    public WebhookBuilder createWebhookBuilder() {
-        return new ImplWebhookBuilder(this);
-    }
-
-    @Override
-    public ServerTextChannelUpdater createUpdater() {
-        return new ImplServerTextChannelUpdater(this);
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.javacord.entity.channel.InternalChannel;
 import org.javacord.entity.channel.InternalServerChannel;
 import org.javacord.entity.channel.InternalVoiceChannel;
 import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannelUpdater;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.impl.ImplPermissions;
@@ -271,11 +270,6 @@ public class ImplServerVoiceChannel
     @Override
     public Collection<User> getConnectedUsers() {
         return Collections.unmodifiableCollection(connectedUsers);
-    }
-
-    @Override
-    public ServerVoiceChannelUpdater createUpdater() {
-        return new ImplServerVoiceChannelUpdater(this);
     }
 
     @Override

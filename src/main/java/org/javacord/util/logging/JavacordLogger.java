@@ -37,38 +37,50 @@ public class JavacordLogger extends MarkerIgnoringBase {
 
     @Override
     final public boolean isTraceEnabled() {
-        // always false
-        return false;
+        return FallbackLoggerConfiguration.isTraceEnabled();
     }
 
     @Override
     final public void trace(String msg) {
-        // not used
+        if (isTraceEnabled()) {
+            log("TRACE", msg, null);
+        }
     }
 
     @Override
     final public void trace(String format, Object arg) {
-        // not used
+        if (isTraceEnabled()) {
+            FormattingTuple ft = MessageFormatter.format(format, arg);
+            log("TRACE", ft.getMessage(), ft.getThrowable());
+        }
     }
 
     @Override
     public final void trace(String format, Object arg1, Object arg2) {
-        // not used
+        if (isTraceEnabled()) {
+            FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
+            log("TRACE", ft.getMessage(), ft.getThrowable());
+        }
     }
 
     @Override
     public final void trace(String format, Object... arguments) {
-        // not used
+        if (isTraceEnabled()) {
+            FormattingTuple ft = MessageFormatter.arrayFormat(format, arguments);
+            log("TRACE", ft.getMessage(), ft.getThrowable());
+        }
     }
 
     @Override
     final public void trace(String msg, Throwable t) {
-        // not used
+        if (isTraceEnabled()) {
+            log("TRACE", msg, t);
+        }
     }
 
     @Override
     final public boolean isDebugEnabled() {
-        return LoggerUtil.isDebug();
+        return FallbackLoggerConfiguration.isDebugEnabled();
     }
 
     @Override

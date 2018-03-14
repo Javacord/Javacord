@@ -22,8 +22,6 @@ import org.javacord.listener.user.UserStartTypingListener;
 import org.javacord.util.NonThrowingAutoCloseable;
 import org.javacord.util.cache.MessageCache;
 import org.javacord.util.event.ListenerManager;
-import org.javacord.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,11 +41,6 @@ import java.util.stream.StreamSupport;
  * This class represents a text channel.
  */
 public interface TextChannel extends Channel, Messageable {
-
-    /**
-     * The logger of this class.
-     */
-    Logger logger = LoggerUtil.getLogger(TextChannel.class);
 
     /**
      * Displays the "xyz is typing..." message.

@@ -10,7 +10,7 @@ import org.javacord.entity.emoji.Emoji;
 import org.javacord.entity.message.Message;
 import org.javacord.entity.message.UncachedMessageUtil;
 import org.javacord.entity.message.embed.EmbedBuilder;
-import org.javacord.entity.message.embed.impl.ImplEmbedFactory;
+import org.javacord.entity.message.embed.impl.ImplEmbedBuilderDelegate;
 import org.javacord.entity.user.User;
 import org.javacord.listener.ObjectAttachableListener;
 import org.javacord.listener.message.MessageAttachableListener;
@@ -197,7 +197,7 @@ public class ImplUncachedMessageUtil implements UncachedMessageUtil {
             if (embed == null) {
                 body.putNull("embed");
             } else {
-                ((ImplEmbedFactory) embed.getFactory()).toJsonNode(body.putObject("embed"));
+                ((ImplEmbedBuilderDelegate) embed.getDelegate()).toJsonNode(body.putObject("embed"));
             }
         }
         return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
@@ -669,5 +669,5 @@ public class ImplUncachedMessageUtil implements UncachedMessageUtil {
     getMessageAttachableListeners(Message message) {
         return getMessageAttachableListeners(message.getId());
     }
-    
+
 }

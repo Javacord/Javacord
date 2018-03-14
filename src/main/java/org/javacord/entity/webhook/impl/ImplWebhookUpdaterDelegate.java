@@ -1,0 +1,180 @@
+package org.javacord.entity.webhook.impl;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.entity.Icon;
+import org.javacord.entity.channel.ServerTextChannel;
+import org.javacord.entity.webhook.Webhook;
+import org.javacord.entity.webhook.WebhookUpdaterDelegate;
+import org.javacord.util.FileContainer;
+import org.javacord.util.rest.RestEndpoint;
+import org.javacord.util.rest.RestMethod;
+import org.javacord.util.rest.RestRequest;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Base64;
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * The implementation of {@link WebhookUpdaterDelegate}.
+ */
+public class ImplWebhookUpdaterDelegate implements WebhookUpdaterDelegate {
+
+    /**
+     * The webhook to update.
+     */
+    protected final Webhook webhook;
+
+    /**
+     * The reason for the update.
+     */
+    private String reason = null;
+
+    /**
+     * The name to update.
+     */
+    protected String name = null;
+
+    /**
+     * The channel to update.
+     */
+    protected ServerTextChannel channel = null;
+
+    /**
+     * The avatar to update.
+     */
+    private FileContainer avatar = null;
+
+    /**
+     * Whether the avatar should be updated or not.
+     */
+    protected boolean updateAvatar = false;
+
+    /**
+     * Creates a new webhook updater delegate.
+     *
+     * @param webhook The webhook to update.
+     */
+    public ImplWebhookUpdaterDelegate(Webhook webhook) {
+        this.webhook = webhook;
+    }
+
+    @Override
+    public void setAuditLogReason(String reason) {
+        this.reason = reason;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setChannel(ServerTextChannel channel) {
+        this.channel = channel;
+    }
+
+    @Override
+    public void setAvatar(BufferedImage avatar) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(BufferedImage avatar, String fileType) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(File avatar) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(Icon avatar) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(URL avatar) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar);
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(byte[] avatar) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(byte[] avatar, String fileType) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(InputStream avatar) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, "png");
+        updateAvatar = true;
+    }
+
+    @Override
+    public void setAvatar(InputStream avatar, String fileType) {
+        this.avatar = (avatar == null) ? null : new FileContainer(avatar, fileType);
+        updateAvatar = true;
+    }
+
+    @Override
+    public void removeAvatar() {
+        this.avatar = null;
+        updateAvatar = true;
+    }
+
+    @Override
+    public CompletableFuture<Webhook> update() {
+        boolean patchWebhook = false;
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        if (name != null) {
+            body.put("name", name);
+            patchWebhook = true;
+        }
+        if (channel != null) {
+            body.put("channel_id", channel.getIdAsString());
+            patchWebhook = true;
+        }
+        if (updateAvatar) {
+            if (avatar == null) {
+                body.putNull("avatar");
+            }
+            patchWebhook = true;
+        }
+        if (patchWebhook) {
+            if (avatar != null) {
+                return avatar.asByteArray(webhook.getApi()).thenAccept(bytes -> {
+                    String base64Avatar = "data:image/" + avatar.getFileType() + ";base64," +
+                                          Base64.getEncoder().encodeToString(bytes);
+                    body.put("avatar", base64Avatar);
+                }).thenCompose(aVoid -> new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
+                        .setUrlParameters(webhook.getIdAsString())
+                        .setBody(body)
+                        .setAuditLogReason(reason)
+                        .execute(result -> new ImplWebhook(webhook.getApi(), result.getJsonBody())));
+            }
+            return new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
+                    .setUrlParameters(webhook.getIdAsString())
+                    .setBody(body)
+                    .setAuditLogReason(reason)
+                    .execute(result -> new ImplWebhook(webhook.getApi(), result.getJsonBody()));
+        } else {
+            return CompletableFuture.completedFuture(webhook);
+        }
+    }
+
+}

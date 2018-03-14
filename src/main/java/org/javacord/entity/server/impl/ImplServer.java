@@ -16,21 +16,13 @@ import org.javacord.entity.auditlog.AuditLog;
 import org.javacord.entity.auditlog.impl.ImplAuditLog;
 import org.javacord.entity.channel.Categorizable;
 import org.javacord.entity.channel.ChannelCategory;
-import org.javacord.entity.channel.ChannelCategoryBuilder;
 import org.javacord.entity.channel.ServerChannel;
 import org.javacord.entity.channel.ServerTextChannel;
-import org.javacord.entity.channel.ServerTextChannelBuilder;
 import org.javacord.entity.channel.ServerVoiceChannel;
-import org.javacord.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.entity.channel.impl.ImplChannelCategory;
-import org.javacord.entity.channel.impl.ImplChannelCategoryBuilder;
 import org.javacord.entity.channel.impl.ImplServerTextChannel;
-import org.javacord.entity.channel.impl.ImplServerTextChannelBuilder;
 import org.javacord.entity.channel.impl.ImplServerVoiceChannel;
-import org.javacord.entity.channel.impl.ImplServerVoiceChannelBuilder;
-import org.javacord.entity.emoji.CustomEmojiBuilder;
 import org.javacord.entity.emoji.KnownCustomEmoji;
-import org.javacord.entity.emoji.impl.ImplCustomEmojiBuilder;
 import org.javacord.entity.impl.ImplIcon;
 import org.javacord.entity.permission.Role;
 import org.javacord.entity.permission.impl.ImplRole;
@@ -39,7 +31,6 @@ import org.javacord.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.entity.server.ExplicitContentFilterLevel;
 import org.javacord.entity.server.MultiFactorAuthenticationLevel;
 import org.javacord.entity.server.Server;
-import org.javacord.entity.server.ServerUpdater;
 import org.javacord.entity.server.VerificationLevel;
 import org.javacord.entity.server.invite.RichInvite;
 import org.javacord.entity.server.invite.impl.ImplInvite;
@@ -879,16 +870,6 @@ public class ImplServer implements Server, Cleanupable {
     }
 
     @Override
-    public CustomEmojiBuilder createCustomEmojiBuilder() {
-        return new ImplCustomEmojiBuilder(this);
-    }
-
-    @Override
-    public ServerUpdater createUpdater() {
-        return new ImplServerUpdater(this);
-    }
-
-    @Override
     public CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
         if (user.isYourself()) {
             return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
@@ -1014,21 +995,6 @@ public class ImplServer implements Server, Cleanupable {
     @Override
     public Collection<KnownCustomEmoji> getCustomEmojis() {
         return Collections.unmodifiableCollection(new ArrayList<>(customEmojis));
-    }
-
-    @Override
-    public ChannelCategoryBuilder createChannelCategoryBuilder() {
-        return new ImplChannelCategoryBuilder(this);
-    }
-
-    @Override
-    public ServerTextChannelBuilder createTextChannelBuilder() {
-        return new ImplServerTextChannelBuilder(this);
-    }
-
-    @Override
-    public ServerVoiceChannelBuilder createVoiceChannelBuilder() {
-        return new ImplServerVoiceChannelBuilder(this);
     }
 
     @Override

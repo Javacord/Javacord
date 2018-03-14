@@ -1,6 +1,7 @@
 package org.javacord.entity.emoji;
 
 import org.javacord.entity.permission.Role;
+import org.javacord.util.DelegateFactory;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -8,7 +9,21 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to update known custom emojis.
  */
-public interface CustomEmojiUpdater {
+public class CustomEmojiUpdater {
+
+    /**
+     * The custom emoji delegate used by this instance.
+     */
+    private final CustomEmojiUpdaterDelegate delegate;
+
+    /**
+     * Creates a new custom emoji updater.
+     *
+     * @param emoji The custom emoji to update.
+     */
+    public CustomEmojiUpdater(KnownCustomEmoji emoji) {
+        delegate = DelegateFactory.createCustomEmojiUpdaterDelegate(emoji);
+    }
 
     /**
      * Sets the reason for this update. This reason will be visible in the audit log entry(s).
@@ -16,7 +31,10 @@ public interface CustomEmojiUpdater {
      * @param reason The reason for this update.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiUpdater setAuditLogReason(String reason);
+    public CustomEmojiUpdater setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
 
     /**
      * Queues the name to be updated.
@@ -24,7 +42,10 @@ public interface CustomEmojiUpdater {
      * @param name The new name of the emoji.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiUpdater setName(String name);
+    public CustomEmojiUpdater setName(String name) {
+        delegate.setName(name);
+        return this;
+    }
 
     /**
      * Queues a role to be added to the whitelist.
@@ -32,7 +53,10 @@ public interface CustomEmojiUpdater {
      * @param role The role to add.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiUpdater addRoleToWhitelist(Role role);
+    public CustomEmojiUpdater addRoleToWhitelist(Role role) {
+        delegate.addRoleToWhitelist(role);
+        return this;
+    }
 
     /**
      * Queues a role to be removed from the whitelist.
@@ -41,14 +65,20 @@ public interface CustomEmojiUpdater {
      * @param role The role to remove.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiUpdater removeRoleFromWhitelist(Role role);
+    public CustomEmojiUpdater removeRoleFromWhitelist(Role role) {
+        delegate.removeRoleFromWhitelist(role);
+        return this;
+    }
 
     /**
      * Queues the whitelist to be removed.
      *
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiUpdater removeWhitelist();
+    public CustomEmojiUpdater removeWhitelist() {
+        delegate.removeWhitelist();
+        return this;
+    }
 
     /**
      * Sets the roles which should be whitelisted.
@@ -57,7 +87,10 @@ public interface CustomEmojiUpdater {
      * @param roles The roles which should be whitelisted.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiUpdater setWhitelist(Collection<Role> roles);
+    public CustomEmojiUpdater setWhitelist(Collection<Role> roles) {
+        delegate.setWhitelist(roles);
+        return this;
+    }
 
     /**
      * Sets the roles which should be whitelisted.
@@ -66,13 +99,18 @@ public interface CustomEmojiUpdater {
      * @param roles The roles which should be whitelisted.
      * @return The current instance in order to chain call methods.
      */
-    CustomEmojiUpdater setWhitelist(Role... roles);
+    public CustomEmojiUpdater setWhitelist(Role... roles) {
+        delegate.setWhitelist(roles);
+        return this;
+    }
 
     /**
      * Performs the queued updates.
      *
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> update();
+    public CompletableFuture<Void> update() {
+        return delegate.update();
+    }
 
 }

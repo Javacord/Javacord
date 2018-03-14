@@ -8,7 +8,6 @@ import org.javacord.entity.channel.ChannelCategory;
 import org.javacord.entity.channel.InternalChannel;
 import org.javacord.entity.channel.InternalServerChannel;
 import org.javacord.entity.channel.ServerChannel;
-import org.javacord.entity.channel.ServerChannelUpdater;
 import org.javacord.entity.channel.ServerTextChannel;
 import org.javacord.entity.permission.Permissions;
 import org.javacord.entity.permission.Role;
@@ -293,11 +292,6 @@ public class ImplChannelCategory implements ChannelCategory, InternalChannel, In
     @Override
     public int getRawPosition() {
         return position;
-    }
-
-    @Override
-    public ServerChannelUpdater createUpdater() {
-        return new ImplServerChannelUpdater(this);
     }
 
     @Override
