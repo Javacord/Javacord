@@ -26,6 +26,7 @@ public class LoggerUtil {
      * @return The logger with the given name.
      */
     public static Logger getLogger(String name) {
+        AtomicBoolean logWarning = new AtomicBoolean(false);
         initialized.updateAndGet(initialized -> {
             if (!initialized) {
                 try {
@@ -33,15 +34,20 @@ public class LoggerUtil {
                     Class.forName("org.slf4j.impl.StaticLoggerBinder");
                 } catch (ClassNotFoundException e) {
                     noLogger.set(true);
-                    getLogger(LoggerUtil.class)
-                            .info("No SLF4J compatible logger was found. Using default javacord implementation!");
+                    logWarning.set(true);
                 }
             }
             return true;
         });
 
         if (noLogger.get()) { // we don't want the SLF4J NOPLogger implementation
-            return loggers.computeIfAbsent(name, key -> new JavacordLogger(name));
+            return loggers.computeIfAbsent(name, key -> {
+                JavacordLogger logger = new JavacordLogger(name);
+                if (logWarning.get()) {
+                    logger.info("No SLF4J compatible logger was found. Using default javacord implementation!");
+                }
+                return logger;
+            });
         } else {
             return LoggerFactory.getLogger(name);
         }

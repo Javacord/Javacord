@@ -47,6 +47,17 @@ public class ServerTextChannelBuilder {
     }
 
     /**
+     * Sets the topic of the channel.
+     *
+     * @param topic The topic of the channel.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerTextChannelBuilder setTopic(String topic) {
+        delegate.setTopic(topic);
+        return this;
+    }
+
+    /**
      * Sets the category of the channel.
      *
      * @param category The category of the channel.

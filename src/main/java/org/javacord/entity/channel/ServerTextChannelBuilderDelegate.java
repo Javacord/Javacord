@@ -23,6 +23,13 @@ public interface ServerTextChannelBuilderDelegate {
     void setName(String name);
 
     /**
+     * Sets the topic of the channel.
+     *
+     * @param topic The topic of the channel.
+     */
+    void setTopic(String topic);
+
+    /**
      * Sets the category of the channel.
      *
      * @param category The category of the channel.

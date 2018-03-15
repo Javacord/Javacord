@@ -33,6 +33,11 @@ public class ImplServerTextChannelBuilderDelegate implements ServerTextChannelBu
     private String name = null;
 
     /**
+     * The topic of the channel.
+     */
+    private String topic = null;
+
+    /**
      * The category of the channel.
      */
     private ChannelCategory category = null;
@@ -57,6 +62,11 @@ public class ImplServerTextChannelBuilderDelegate implements ServerTextChannelBu
     }
 
     @Override
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    @Override
     public void setCategory(ChannelCategory category) {
         this.category = category;
     }
@@ -71,6 +81,9 @@ public class ImplServerTextChannelBuilderDelegate implements ServerTextChannelBu
         body.put("name", name);
         if (category != null) {
             body.put("parent_id", category.getIdAsString());
+        }
+        if (topic != null) {
+            body.put("topic", topic);
         }
         return new RestRequest<ServerTextChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(server.getIdAsString())
