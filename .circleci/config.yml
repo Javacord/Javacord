@@ -73,23 +73,43 @@ jobs:
           name: Collecting Test Results
           command: |
             mkdir ~/test-results
-            mkdir ~/test-results/javacord
-            [ -d build/test-results/test ] &&
-              [ -n "$(ls -A build/test-results/test)" ] &&
-              cp -a build/test-results/test/* ~/test-results/javacord || true
+            mkdir ~/test-results/javacord-api
+            [ -d build/javacord-api/test-results/test ] &&
+              [ -n "$(ls -A build/javacord-api/test-results/test)" ] &&
+              cp -a build/javacord-api/test-results/test/* ~/test-results/javacord-api || true
+            mkdir ~/test-results/javacord-core
+            [ -d build/javacord-core/test-results/test ] &&
+              [ -n "$(ls -A build/javacord-core/test-results/test)" ] &&
+              cp -a build/javacord-core/test-results/test/* ~/test-results/javacord-core || true
 
       - store_test_results:
           path: ~/test-results
 
       # store the artifacts
       - store_artifacts:
-          path: build/libs/
+          path: build/javacord/libs/
           destination: javacord
 
       - store_artifacts:
-          path: build/docs/javadoc/
-          destination: javacord/javadoc
+          path: build/javacord-api/libs/
+          destination: javacord-api
 
       - store_artifacts:
-          path: build/reports/tests/test/
-          destination: javacord/test-report
+          path: build/javacord-api/docs/javadoc/
+          destination: javacord-api/javadoc
+
+      - store_artifacts:
+          path: build/javacord-api/reports/tests/test/
+          destination: javacord-api/test-report
+
+      - store_artifacts:
+          path: build/javacord-core/libs/
+          destination: javacord-core
+
+      - store_artifacts:
+          path: build/javacord-core/docs/javadoc/
+          destination: javacord-core/javadoc
+
+      - store_artifacts:
+          path: build/javacord-core/reports/tests/test/
+          destination: javacord-core/test-report

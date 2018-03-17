@@ -1,20 +1,35 @@
 plugins {
-    id 'java-library'
-    id 'nebula.java-cross-compile' version '0.10.0'
+    id 'nebula.java-cross-compile' version '0.10.0' apply false
     id 'com.github.johnrengelman.shadow' version '2.0.2'
-    id 'maven-publish'
-    id 'me.tatarka.gradle.pom' version '1.0'
+    id 'me.tatarka.gradle.pom' version '1.0' apply false
 }
 
-group = 'org.javacord'
-version = '3.0.0'
-description = 'A multithreaded but easy to use Discord Java API'
+def rootBuildDir = buildDir
 
-sourceCompatibility = 1.8
+allprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'nebula.java-cross-compile'
+    apply plugin: 'maven-publish'
 
-tasks.withType(JavaCompile) {
-    options.encoding 'UTF-8'
-    options.incremental true
+    group = 'org.javacord'
+    version = '3.0.0'
+    description = 'A multithreaded but easy to use Discord Java API'
+    buildDir = rootProject.file("${rootBuildDir}/${name}")
+
+    sourceCompatibility = 1.8
+
+    tasks.withType(JavaCompile) {
+        options.encoding 'UTF-8'
+        options.incremental true
+    }
+}
+
+clean {
+    delete rootBuildDir
+}
+
+subprojects {
+    description = "A multithreaded but easy to use Discord Java API (${name - ~/^javacord-/})"
 }
 
 tasks.remove knows

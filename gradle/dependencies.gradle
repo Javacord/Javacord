@@ -1,25 +1,37 @@
-repositories {
-    mavenCentral()
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    task downloadDependencies() {
+        description 'Download all dependencies to the Gradle cache'
+        doLast {
+            configurations.findAll { it.canBeResolved }.files
+        }
+    }
 }
 
-task downloadDependencies() {
-    description 'Download all dependencies to the Gradle cache'
-    doLast {
-        configurations.findAll { it.canBeResolved }.files
+project(':javacord-core') {
+    dependencies {
+        // OkHttp for REST-calls
+        implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+        implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+
+        // the JSON-lib because Discord returns in JSON format
+        implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.3'
+
+        // the web socket
+        implementation 'com.neovisionaries:nv-websocket-client:1.31'
+
+        // logging
+        implementation 'org.slf4j:slf4j-api:1.7.22'
+
+        // the Javacord API
+        api project(path: ':javacord-api')
     }
 }
 
 dependencies {
-    // OkHttp for REST-calls
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
-
-    // the JSON-lib because Discord returns in JSON format
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.3'
-
-    // the web socket
-    implementation 'com.neovisionaries:nv-websocket-client:1.31'
-
-    // logging
-    implementation 'org.slf4j:slf4j-api:1.7.22'
+    api project(path: ':javacord-api')
+    implementation project(path: ':javacord-core')
 }

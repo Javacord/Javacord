@@ -1,10 +1,23 @@
+subprojects {
+    publishing {
+        publications {
+            javacord(MavenPublication) {
+                from components.java
+                artifact javadocJar
+                artifact sourcesJar
+            }
+        }
+    }
+}
+
 publishing {
     publications {
         javacord(MavenPublication) {
+            // add the dependencies to the POM,
+            // but do not try to publish the JAR
             from components.java
+            artifacts.clear()
             artifact shadowJar
-            artifact javadocJar
-            artifact sourcesJar
         }
     }
 }
