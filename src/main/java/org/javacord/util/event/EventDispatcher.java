@@ -113,7 +113,7 @@ public class EventDispatcher {
                                 " thread. Make sure to not block listener threads!",
                                 getThreadType(object), MAX_EXECUTION_TIME_IN_SECONDS);
                         synchronized (runningListeners) {
-                            activeListeners.remove(entry.getKey());
+                            runningListeners.remove(object);
                             iterator.remove();
                         }
                         canceledObjects.add(object);
@@ -203,9 +203,7 @@ public class EventDispatcher {
                 boolean moreTasks = queuedListenerTasks.entrySet()
                         .stream()
                         .filter(entry -> !entry.getValue().isEmpty())
-                        .filter(entry -> entry.getKey() != OBJECT_INDEPENDENT_TASK_INDICATOR)
-                        .findAny()
-                        .isPresent();
+                        .anyMatch(entry -> entry.getKey() != OBJECT_INDEPENDENT_TASK_INDICATOR);
                 synchronized (runningListeners) {
                     if (moreTasks || !runningListeners.isEmpty()) {
                         return;
