@@ -20,6 +20,8 @@ import org.javacord.core.event.message.CachedMessagePinEventImpl;
 import org.javacord.core.event.message.CachedMessageUnpinEventImpl;
 import org.javacord.core.event.message.MessageEditEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
+import org.javacord.core.util.logging.LoggerUtil;
+import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -34,6 +36,11 @@ import java.util.concurrent.TimeUnit;
 public class MessageUpdateHandler extends PacketHandler {
 
     /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(MessageUpdateHandler.class);
+
+    /**
      * A map with the last known edit timestamps.
      */
     private final ConcurrentHashMap<Long, Long> lastKnownEditTimestamps = new ConcurrentHashMap<>();
@@ -46,10 +53,14 @@ public class MessageUpdateHandler extends PacketHandler {
     public MessageUpdateHandler(DiscordApi api) {
         super(api, true, "MESSAGE_UPDATE");
         long offset = this.api.getTimeOffset() == null ? 0 : this.api.getTimeOffset();
-        api.getThreadPool().getScheduler().scheduleAtFixedRate(
-                () -> lastKnownEditTimestamps.entrySet().removeIf(
-                        entry -> System.currentTimeMillis() + offset - entry.getValue() > 5000)
-                , 1, 1, TimeUnit.MINUTES);
+        api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
+            try {
+                lastKnownEditTimestamps.entrySet().removeIf(
+                        entry -> System.currentTimeMillis() + offset - entry.getValue() > 5000);
+            } catch (Throwable t) {
+                logger.error("Failed to clean last known edit timestamps cache!", t);
+            }
+        }, 1, 1, TimeUnit.MINUTES);
     }
 
     @Override
