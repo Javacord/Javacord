@@ -1,0 +1,21 @@
+import javax.naming.ConfigurationException
+import static org.gradle.api.JavaVersion.toVersion
+
+allprojects {
+    tasks.withType(Javadoc) { javadocTask ->
+        def java9ToolChain = toVersion(toolChain.version).java9Compatible
+        // use taskGraph.whenReady to not always have a custom action which makes the task uncachable
+        gradle.taskGraph.whenReady {
+            if (it.hasTask(javadocTask)) {
+                // make sure we use at least the Java 9 standard doclet that has nice search functionality
+                if (!java9ToolChain) {
+                    if ((findProperty('allowJava8Javadoc') ?: 'false').toBoolean()) {
+                        logger.warn "JavaDoc ($javadocTask) is built with Java 8, no search box will be available!"
+                    } else {
+                        throw new ConfigurationException("JavaDoc ($javadocTask) should be built with Java 9 at least")
+                    }
+                }
+            }
+        }
+    }
+}
