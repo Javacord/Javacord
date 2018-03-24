@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.entity.webhook.WebhookUpdaterDelegate;
+import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;

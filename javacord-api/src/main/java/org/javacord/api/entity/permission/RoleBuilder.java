@@ -1,7 +1,8 @@
 package org.javacord.api.entity.permission;
 
+import org.javacord.api.entity.permission.internal.RoleBuilderDelegate;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.Color;
 import java.util.concurrent.CompletableFuture;

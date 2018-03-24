@@ -1,7 +1,8 @@
 package org.javacord.api.entity.server.invite;
 
 import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
 

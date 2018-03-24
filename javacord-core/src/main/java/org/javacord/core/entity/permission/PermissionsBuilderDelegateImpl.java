@@ -3,7 +3,7 @@ package org.javacord.core.entity.permission;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.PermissionsBuilderDelegate;
+import org.javacord.api.entity.permission.internal.PermissionsBuilderDelegate;
 
 /**
  * The implementation of {@link PermissionsBuilderDelegate}.

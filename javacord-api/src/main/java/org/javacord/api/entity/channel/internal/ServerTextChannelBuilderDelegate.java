@@ -1,4 +1,8 @@
-package org.javacord.api.entity.channel;
+package org.javacord.api.entity.channel.internal;
+
+import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 
 import java.util.concurrent.CompletableFuture;
 

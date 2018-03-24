@@ -2,8 +2,8 @@ package org.javacord.core;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.api.AccountUpdaterDelegate;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;

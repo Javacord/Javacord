@@ -1,10 +1,14 @@
-package org.javacord.api.entity.server;
+package org.javacord.api.entity.server.internal;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
+import org.javacord.api.entity.server.ExplicitContentFilterLevel;
+import org.javacord.api.entity.server.ServerUpdater;
+import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.user.User;
 
 import java.awt.image.BufferedImage;

@@ -38,3 +38,18 @@ allprojects {
         }
     }
 }
+
+project(':javacord-api') {
+    javadoc.options.group 'Public API', '*'
+    javadoc.options.group 'Internal Helpers',
+            javadoc.source
+                    .files
+                    *.toURI()
+                    *.toString()
+                    .findAll { it.contains '/internal/' }
+                    .collect {
+                        it - ~/^(?:${sourceSets.main.java.srcDirs*.toURI()*.toString().join '|'})/ - ~/\/[^\/]*.java$/
+                    }
+                    .collect { it.replace '/', '.' }
+                    .unique()
+}

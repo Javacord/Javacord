@@ -1,7 +1,8 @@
 package org.javacord.api.util.logging;
 
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.util.internal.DelegateFactory;
+import org.javacord.api.util.logging.internal.ExceptionLoggerDelegate;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.InvocationTargetException;

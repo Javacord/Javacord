@@ -1,4 +1,6 @@
-package org.javacord.api.entity.channel;
+package org.javacord.api.entity.channel.internal;
+
+import org.javacord.api.entity.channel.GroupChannelUpdater;
 
 import java.util.concurrent.CompletableFuture;
 

@@ -1,4 +1,6 @@
-package org.javacord.api.util.logging;
+package org.javacord.api.util.logging.internal;
+
+import org.javacord.api.util.logging.ExceptionLogger;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.InvocationTargetException;

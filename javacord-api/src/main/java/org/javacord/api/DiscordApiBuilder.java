@@ -1,7 +1,8 @@
 package org.javacord.api;
 
 import org.javacord.api.event.server.ServerBecomesAvailableEvent;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.internal.DiscordApiBuilderDelegate;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;

@@ -3,7 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerTextChannel;
-import org.javacord.api.entity.channel.ServerTextChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
 
 /**
  * The implementation of {@link ServerTextChannelUpdaterDelegate}.

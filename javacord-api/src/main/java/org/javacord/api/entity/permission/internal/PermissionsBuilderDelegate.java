@@ -1,4 +1,9 @@
-package org.javacord.api.entity.permission;
+package org.javacord.api.entity.permission.internal;
+
+import org.javacord.api.entity.permission.PermissionState;
+import org.javacord.api.entity.permission.PermissionType;
+import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.permission.PermissionsBuilder;
 
 /**
  * This class is internally used by the {@link PermissionsBuilder} to create permissions.

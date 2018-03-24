@@ -3,7 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.GroupChannel;
-import org.javacord.api.entity.channel.GroupChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.GroupChannelUpdaterDelegate;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;

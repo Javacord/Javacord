@@ -1,7 +1,8 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
 

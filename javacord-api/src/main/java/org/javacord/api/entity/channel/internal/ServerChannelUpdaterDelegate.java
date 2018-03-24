@@ -1,5 +1,7 @@
-package org.javacord.api.entity.channel;
+package org.javacord.api.entity.channel.internal;
 
+import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerChannelUpdater;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;

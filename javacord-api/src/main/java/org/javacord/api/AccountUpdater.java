@@ -1,7 +1,8 @@
 package org.javacord.api;
 
 import org.javacord.api.entity.Icon;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.internal.AccountUpdaterDelegate;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

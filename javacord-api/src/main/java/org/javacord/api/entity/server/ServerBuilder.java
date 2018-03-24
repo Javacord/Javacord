@@ -3,7 +3,8 @@ package org.javacord.api.entity.server;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.entity.server.internal.ServerBuilderDelegate;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

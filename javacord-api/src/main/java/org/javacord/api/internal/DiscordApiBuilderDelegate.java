@@ -1,4 +1,8 @@
-package org.javacord.api;
+package org.javacord.api.internal;
+
+import org.javacord.api.AccountType;
+import org.javacord.api.DiscordApi;
+import org.javacord.api.DiscordApiBuilder;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;

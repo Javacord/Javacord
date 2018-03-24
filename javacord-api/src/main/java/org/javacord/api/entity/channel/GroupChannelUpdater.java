@@ -1,6 +1,7 @@
 package org.javacord.api.entity.channel;
 
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.entity.channel.internal.GroupChannelUpdaterDelegate;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
 

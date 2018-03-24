@@ -1,6 +1,6 @@
 package org.javacord.core.util.logging;
 
-import org.javacord.api.util.logging.ExceptionLoggerDelegate;
+import org.javacord.api.util.logging.internal.ExceptionLoggerDelegate;
 import org.slf4j.Logger;
 
 import java.lang.Thread.UncaughtExceptionHandler;

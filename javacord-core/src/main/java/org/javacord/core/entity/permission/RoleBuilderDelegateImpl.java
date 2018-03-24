@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.permission.RoleBuilderDelegate;
+import org.javacord.api.entity.permission.internal.RoleBuilderDelegate;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;

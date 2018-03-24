@@ -2,8 +2,9 @@ package org.javacord.api.entity.message.embed;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

@@ -3,7 +3,7 @@ package org.javacord.core.entity.server.invite;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.server.invite.Invite;
-import org.javacord.api.entity.server.invite.InviteBuilderDelegate;
+import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;

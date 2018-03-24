@@ -1,6 +1,6 @@
 package org.javacord.api.exception;
 
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.util.internal.DelegateFactory;
 import org.javacord.api.util.rest.RestRequestInformation;
 import org.javacord.api.util.rest.RestRequestResponseInformation;
 

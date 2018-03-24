@@ -3,7 +3,7 @@ package org.javacord.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilderDelegate;
+import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;

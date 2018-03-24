@@ -2,7 +2,7 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.javacord.api.entity.channel.ChannelCategory;
-import org.javacord.api.entity.channel.ChannelCategoryBuilderDelegate;
+import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;

@@ -1,6 +1,7 @@
 package org.javacord.api.entity.permission;
 
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.entity.permission.internal.PermissionsBuilderDelegate;
+import org.javacord.api.util.internal.DelegateFactory;
 
 /**
  * A class to create {@link Permissions permissions} objects.

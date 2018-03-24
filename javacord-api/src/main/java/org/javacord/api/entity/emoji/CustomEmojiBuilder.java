@@ -1,9 +1,10 @@
 package org.javacord.api.entity.emoji;
 
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

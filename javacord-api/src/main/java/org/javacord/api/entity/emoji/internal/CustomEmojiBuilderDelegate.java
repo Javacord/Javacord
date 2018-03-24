@@ -1,6 +1,8 @@
-package org.javacord.api.entity.emoji;
+package org.javacord.api.entity.emoji.internal;
 
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.emoji.CustomEmojiBuilder;
+import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.Role;
 
 import java.awt.image.BufferedImage;

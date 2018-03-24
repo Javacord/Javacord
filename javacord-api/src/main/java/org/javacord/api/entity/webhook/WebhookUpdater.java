@@ -2,7 +2,8 @@ package org.javacord.api.entity.webhook;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.ServerTextChannel;
-import org.javacord.api.util.DelegateFactory;
+import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
+import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

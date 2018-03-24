@@ -1,5 +1,6 @@
-package org.javacord.api.entity.webhook;
+package org.javacord.api.internal;
 
+import org.javacord.api.AccountUpdater;
 import org.javacord.api.entity.Icon;
 
 import java.awt.image.BufferedImage;
@@ -9,27 +10,20 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This class is internally used by the {@link WebhookBuilder} to create webhooks.
+ * This class is internally used by the {@link AccountUpdater} to update the connected account.
  * You usually don't want to interact with this object.
  */
-public interface WebhookBuilderDelegate {
+public interface AccountUpdaterDelegate {
 
     /**
-     * Sets the reason for this update. This reason will be visible in the audit log entry(s).
+     * Queues the username of the connected account to get updated.
      *
-     * @param reason The reason for this update.
+     * @param username The username to set.
      */
-    void setAuditLogReason(String reason);
+    void setUsername(String username);
 
     /**
-     * Sets the name.
-     *
-     * @param name The new name of the webhook.
-     */
-    void setName(String name);
-
-    /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      * This method assumes the file type is "png"!
      *
      * @param avatar The avatar to set.
@@ -37,7 +31,7 @@ public interface WebhookBuilderDelegate {
     void setAvatar(BufferedImage avatar);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      *
      * @param avatar The avatar to set.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
@@ -45,28 +39,28 @@ public interface WebhookBuilderDelegate {
     void setAvatar(BufferedImage avatar, String fileType);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      *
      * @param avatar The avatar to set.
      */
     void setAvatar(File avatar);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      *
      * @param avatar The avatar to set.
      */
     void setAvatar(Icon avatar);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      *
      * @param avatar The avatar to set.
      */
     void setAvatar(URL avatar);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      * This method assumes the file type is "png"!
      *
      * @param avatar The avatar to set.
@@ -74,7 +68,7 @@ public interface WebhookBuilderDelegate {
     void setAvatar(byte[] avatar);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      *
      * @param avatar The avatar to set.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
@@ -82,7 +76,7 @@ public interface WebhookBuilderDelegate {
     void setAvatar(byte[] avatar, String fileType);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      * This method assumes the file type is "png"!
      *
      * @param avatar The avatar to set.
@@ -90,7 +84,7 @@ public interface WebhookBuilderDelegate {
     void setAvatar(InputStream avatar);
 
     /**
-     * Sets the avatar.
+     * Queues the avatar of the connected account to get updated.
      *
      * @param avatar The avatar to set.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
@@ -98,10 +92,10 @@ public interface WebhookBuilderDelegate {
     void setAvatar(InputStream avatar, String fileType);
 
     /**
-     * Creates the webhook.
+     * Performs the queued updates.
      *
-     * @return The created webhook.
+     * @return A future to check if the update was successful.
      */
-    CompletableFuture<Webhook> create();
+    CompletableFuture<Void> update();
 
 }

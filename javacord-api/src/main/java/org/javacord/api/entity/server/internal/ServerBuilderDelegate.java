@@ -1,7 +1,11 @@
-package org.javacord.api.entity.server;
+package org.javacord.api.entity.server.internal;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
+import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
+import org.javacord.api.entity.server.ExplicitContentFilterLevel;
+import org.javacord.api.entity.server.ServerBuilder;
+import org.javacord.api.entity.server.VerificationLevel;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

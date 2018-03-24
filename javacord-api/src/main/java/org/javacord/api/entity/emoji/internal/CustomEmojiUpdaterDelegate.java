@@ -1,5 +1,6 @@
-package org.javacord.api.entity.emoji;
+package org.javacord.api.entity.emoji.internal;
 
+import org.javacord.api.entity.emoji.CustomEmojiUpdater;
 import org.javacord.api.entity.permission.Role;
 
 import java.util.Collection;

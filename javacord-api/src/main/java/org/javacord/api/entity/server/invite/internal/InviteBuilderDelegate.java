@@ -1,4 +1,7 @@
-package org.javacord.api.entity.server.invite;
+package org.javacord.api.entity.server.invite.internal;
+
+import org.javacord.api.entity.server.invite.Invite;
+import org.javacord.api.entity.server.invite.InviteBuilder;
 
 import java.util.concurrent.CompletableFuture;
 

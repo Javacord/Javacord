@@ -1,4 +1,7 @@
-package org.javacord.api.entity.permission;
+package org.javacord.api.entity.permission.internal;
+
+import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.permission.RoleUpdater;
 
 import java.awt.Color;
 import java.util.concurrent.CompletableFuture;
