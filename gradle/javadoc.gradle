@@ -17,5 +17,18 @@ allprojects {
                 }
             }
         }
+        options {
+            locale 'en'
+            encoding 'UTF-8'
+            docTitle "Javacord $project.version (${project.name - ~/^javacord-/})"
+            windowTitle "$docTitle Documentation"
+            links 'https://docs.oracle.com/javase/8/docs/api/'
+            delegate.use()
+            version()
+            author()
+            splitIndex()
+            addBooleanOption 'html5', true
+            addStringOption '-release', targetCompatibility.majorVersion
+        }
     }
 }
