@@ -37,7 +37,7 @@ jobs:
       # download and cache dependencies and Gradle
       - run:
           name: Downloading Dependencies
-          command: ./gradlew downloadDependencies
+          command: ./gradlew --max-workers 2 downloadDependencies
 
       - save_cache:
           paths:
@@ -52,7 +52,7 @@ jobs:
       # build everything needed for publication
       - run:
           name: Building Project
-          command: ./gradlew build publishToMavenLocal
+          command: ./gradlew --max-workers 2 build publishToMavenLocal
 
       # cache gradle build caches
       - run:
