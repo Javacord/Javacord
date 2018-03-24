@@ -12,7 +12,9 @@ allprojects {
                     if ((findProperty('allowJava8Javadoc') ?: 'false').toBoolean()) {
                         logger.warn "JavaDoc ($javadocTask) is built with Java 8, no search box will be available!"
                     } else {
-                        throw new ConfigurationException("JavaDoc ($javadocTask) should be built with Java 9 at least")
+                        throw new ConfigurationException(
+                                "JavaDoc ($javadocTask) should be built with Java 9 at least (set Gradle " +
+                                        'project property allowJava8Javadoc=true to allow building with Java 8)')
                     }
                 }
             }
@@ -27,8 +29,12 @@ allprojects {
             version()
             author()
             splitIndex()
-            addBooleanOption 'html5', true
-            addStringOption '-release', targetCompatibility.majorVersion
+            if (java9ToolChain) {
+                addBooleanOption 'html5', true
+                addStringOption '-release', targetCompatibility.majorVersion
+            } else {
+                options.source sourceCompatibility.toString()
+            }
         }
     }
 }
