@@ -38,6 +38,7 @@ defaultTasks 'build'
 
 apply from: 'gradle/dependencies.gradle'
 apply from: 'gradle/jars.gradle'
+apply from: 'gradle/java9.gradle'
 apply from: 'gradle/javadoc.gradle'
 apply from: 'gradle/pom.gradle'
 apply from: 'gradle/publishing.gradle'
