@@ -319,7 +319,8 @@ public interface DiscordApi {
      *                               attempt. By default the function reconnect delay is calculated using the following
      *                               equation: <code>f(x): (x^1.5-(1/(1/(0.1*x)+1))*x^1.5)+(currentShard*6)</code>.
      *                               This would result in a delay which looks like this for a bot with 1 shard:
-     *                               <table summary="">
+     *                               <table>
+     *                                  <caption style="display: none">Reconnect Delays</caption>
      *                                  <tr>
      *                                      <th>Attempt</th>
      *                                      <th>Delay</th>
