@@ -1,0 +1,23 @@
+subprojects {
+    task javadocJar(type: Jar) {
+        group 'build'
+        description 'Assembles a jar archive containing the JavaDoc files.'
+        classifier 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        group 'build'
+        description 'Assembles a jar archive containing the Java source files.'
+        classifier 'sources'
+        from sourceSets.main.allJava
+    }
+}
+
+jar {
+    enabled false
+}
+
+shadowJar {
+    classifier 'shaded'
+}

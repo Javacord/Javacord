@@ -1,0 +1,74 @@
+if (JavaVersion.current().java9Compatible) {
+    subprojects {
+        task compileJava9(type: JavaCompile, dependsOn: sourceSets.main.runtimeClasspath) {
+            description 'Compiles main Java 9 source'
+            source sourceSets.main.java
+            source 'src/main/java9/'
+            classpath = files()
+            destinationDir = file("$buildDir/classes/java9/main")
+            sourceCompatibility = 9
+            targetCompatibility = 9
+            afterEvaluate {
+                // undo the effect of nebula.java-cross-compile plugin after it was done, thus in afterEvaluate
+                options.bootstrapClasspath = null
+                // access sourceSets.main.runtimeClasspath.asPath in afterEvaluate
+                // or publishing extension has been accessed and cannot be configured further o_O
+                options.compilerArgs << '--module-path' << sourceSets.main.runtimeClasspath.asPath
+            }
+        }
+
+        jar {
+            manifest {
+                attributes 'Multi-Release': true
+            }
+            from(compileJava9) {
+                include 'module-info.class'
+                into 'META-INF/versions/9/'
+            }
+        }
+    }
+
+    project(':javacord-api') {
+        task generateModuleInfo(type: Copy) {
+            from 'templates/module-info.java'
+            into "$buildDir/generated/module-info/"
+            def exports = project.sourceSets.main.allJava
+                    .files
+                    *.toURI()
+                    *.toString()
+                    .collect {
+                        it - ~/^(?:${sourceSets.main.java.srcDirs*.toURI()*.toString().join '|'})/ - ~/\/[^\/]*.java$/
+                    }
+                    .collect { it.replace '/', '.' }
+                    .unique()
+                    .collect {
+                        "    exports $it${ it =~ /\.internal(?:\.|$)/ ? ' to org.javacord.core' : '' };"
+                    }
+                    .join('\n')
+            inputs.property 'exports', exports
+            expand exports: exports
+        }
+        compileJava9.source generateModuleInfo
+    }
+} else {
+    // use taskGraph.whenReady to not always have a custom action which makes the task uncachable
+    gradle.taskGraph.whenReady {
+        if (it.allTasks.find { it instanceof Jar }) {
+            logger.warn 'Building on Java 8, resulting JARs will not be Jigsaw ready properly!'
+        }
+    }
+    project(':javacord-api') {
+        jar {
+            manifest {
+                attributes 'Automatic-Module-Name': 'org.javacord.api'
+            }
+        }
+    }
+    project(':javacord-core') {
+        jar {
+            manifest {
+                attributes 'Automatic-Module-Name': 'org.javacord.core'
+            }
+        }
+    }
+}
