@@ -51,7 +51,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,11 +107,6 @@ public class UserImpl implements User, Cleanupable {
      * The activity of the user.
      */
     private Activity activity = null;
-
-    /**
-     * The server voice channels the user is connected to.
-     */
-    private final Collection<ServerVoiceChannel> connectedVoiceChannels = new HashSet<>();
 
     /**
      * The status of the user.
@@ -214,24 +208,6 @@ public class UserImpl implements User, Cleanupable {
         }
     }
 
-    /**
-     * Adds the given server voice channel to the ones this user is connected to.
-     *
-     * @param channel The server voice channel this user has connected to.
-     */
-    public void addConnectedVoiceChannel(ServerVoiceChannel channel) {
-        connectedVoiceChannels.add(channel);
-    }
-
-    /**
-     * Removes the given server voice channel from the ones this user is connected to.
-     *
-     * @param channel The server voice channel this user has left.
-     */
-    public void removeConnectedVoiceChannel(ServerVoiceChannel channel) {
-        connectedVoiceChannels.remove(channel);
-    }
-
     @Override
     public String getName() {
         return name;
@@ -254,7 +230,9 @@ public class UserImpl implements User, Cleanupable {
 
     @Override
     public Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
-        return Collections.unmodifiableCollection(connectedVoiceChannels);
+        return Collections.unmodifiableCollection(api.getServerVoiceChannels().stream()
+                                                          .filter(this::isConnected)
+                                                          .collect(Collectors.toList()));
     }
 
     @Override

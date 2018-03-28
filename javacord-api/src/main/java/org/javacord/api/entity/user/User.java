@@ -113,6 +113,15 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     Collection<ServerVoiceChannel> getConnectedVoiceChannels();
 
     /**
+     * Checks whether this user is connected to the given channel.
+     *
+     * @return Whether this user is connected to the given channel or not.
+     */
+    default boolean isConnected(ServerVoiceChannel channel) {
+        return channel.isConnected(this);
+    }
+
+    /**
      * Gets the voice channel this user is connected to on the given server if any.
      *
      * @param server The server to check.

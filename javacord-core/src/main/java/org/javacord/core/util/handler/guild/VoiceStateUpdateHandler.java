@@ -14,7 +14,6 @@ import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLe
 import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
-import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberJoinEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberLeaveEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
@@ -43,28 +42,25 @@ public class VoiceStateUpdateHandler extends PacketHandler {
             return;
         }
 
-        api.getCachedUserById(packet.get("user_id").asLong())
-                .map(UserImpl.class::cast)
-                .ifPresent(user -> {
-                    if (packet.hasNonNull("guild_id")) {
-                        handleServerVoiceChannel(packet, user);
-                    } else if (packet.hasNonNull("channel_id")) {
-                        long channelId = packet.get("channel_id").asLong();
-                        api.getVoiceChannelById(channelId).ifPresent(voiceChannel -> {
-                            if (voiceChannel instanceof PrivateChannel) {
-                                handlePrivateChannel(user, ((PrivateChannelImpl) voiceChannel));
-                            } else if (voiceChannel instanceof GroupChannel) {
-                                handleGroupChannel(user, ((GroupChannelImpl) voiceChannel));
-                            }
-                        });
-                    }
-                });
+        long userId = packet.get("user_id").asLong();
+        if (packet.hasNonNull("guild_id")) {
+            handleServerVoiceChannel(packet, userId);
+        } else if (packet.hasNonNull("channel_id")) {
+            long channelId = packet.get("channel_id").asLong();
+            api.getVoiceChannelById(channelId).ifPresent(voiceChannel -> {
+                if (voiceChannel instanceof PrivateChannel) {
+                    handlePrivateChannel(userId, ((PrivateChannelImpl) voiceChannel));
+                } else if (voiceChannel instanceof GroupChannel) {
+                    handleGroupChannel(userId, ((GroupChannelImpl) voiceChannel));
+                }
+            });
+        }
     }
 
-    private void handleServerVoiceChannel(JsonNode packet, UserImpl user) {
+    private void handleServerVoiceChannel(JsonNode packet, long userId) {
         Optional<Server> optionalServer = api.getServerById(packet.get("guild_id").asLong());
         Optional<ServerVoiceChannelImpl> oldChannel = optionalServer
-                .flatMap(server -> server.getConnectedVoiceChannel(user))
+                .flatMap(server -> server.getConnectedVoiceChannel(userId))
                 .map(ServerVoiceChannelImpl.class::cast);
 
         optionalServer.ifPresent(server -> {
@@ -81,29 +77,31 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 newChannel = Optional.empty();
             }
 
+            Optional<User> optionalUser = api.getCachedUserById(userId);
+
             oldChannel.ifPresent(channel -> {
-                user.removeConnectedVoiceChannel(channel);
-                channel.removeConnectedUser(user);
-                dispatchServerVoiceChannelMemberLeaveEvent(user, newChannel.orElse(null), channel, server);
+                channel.removeConnectedUser(userId);
+                //TODO: send with only user id with RequestableUserEvent
+                optionalUser.ifPresent(user -> dispatchServerVoiceChannelMemberLeaveEvent(
+                        user, newChannel.orElse(null), channel, server));
             });
 
             newChannel.ifPresent(channel -> {
-                channel.addConnectedUser(user);
-                user.addConnectedVoiceChannel(channel);
-                dispatchServerVoiceChannelMemberJoinEvent(user, channel, oldChannel.orElse(null), server);
+                channel.addConnectedUser(userId);
+                //TODO: send with only user id with RequestableUserEvent
+                optionalUser.ifPresent(user -> dispatchServerVoiceChannelMemberJoinEvent(
+                        user, channel, oldChannel.orElse(null), server));
             });
         });
     }
 
-    private void handlePrivateChannel(UserImpl user, PrivateChannelImpl channel) {
+    private void handlePrivateChannel(long userId, PrivateChannelImpl channel) {
         //channel.addConnectedUser(user);
-        //user.addConnectedChannel(channel);
         //dispatchVoiceChannelMemberJoinEvent(user, channel);
     }
 
-    private void handleGroupChannel(UserImpl user, GroupChannelImpl channel) {
+    private void handleGroupChannel(long userId, GroupChannelImpl channel) {
         //channel.addConnectedUser(user);
-        //user.addConnectedChannel(channel);
         //dispatchVoiceChannelMemberJoinEvent(user, channel);
     }
 

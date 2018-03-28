@@ -322,10 +322,7 @@ public class ServerImpl implements Server, Cleanupable {
                 ServerVoiceChannelImpl channel =
                         (ServerVoiceChannelImpl) getVoiceChannelById(voiceStateJson.get("channel_id").asLong())
                                 .orElseThrow(AssertionError::new);
-                UserImpl user = (UserImpl) api.getCachedUserById(voiceStateJson.get("user_id").asLong())
-                        .orElseThrow(AssertionError::new);
-                channel.addConnectedUser(user);
-                user.addConnectedVoiceChannel(channel);
+                channel.addConnectedUser(voiceStateJson.get("user_id").asLong());
             }
         }
 
