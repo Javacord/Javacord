@@ -20,7 +20,6 @@ import org.javacord.api.event.connection.ResumeEvent;
 import org.javacord.api.listener.connection.LostConnectionListener;
 import org.javacord.api.listener.connection.ReconnectListener;
 import org.javacord.api.listener.connection.ResumeListener;
-import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.event.connection.LostConnectionEventImpl;
 import org.javacord.core.event.connection.ReconnectEventImpl;
@@ -148,13 +147,18 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         // for whatever reason. It's just a fail-safe.
         Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactory("Javacord - Connection Delay Semaphores Starvation Protector", true)
-        ).scheduleWithFixedDelay(() ->
-            connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
-                if ((semaphore.availablePermits() == 0) &&
+        ).scheduleWithFixedDelay(() -> {
+            try {
+                connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
+                    if ((semaphore.availablePermits() == 0) &&
                         ((System.currentTimeMillis() - lastIdentificationPerAccount.get(token)) >= 15000)) {
-                    semaphore.release();
-                }
-            }), 10, 10, TimeUnit.SECONDS);
+                        semaphore.release();
+                    }
+                });
+            } catch (Throwable t) {
+                logger.error("Failed to do the backup semaphore releasing!", t);
+            }
+        }, 10, 10, TimeUnit.SECONDS);
     }
 
     /**
@@ -206,8 +210,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                 getWebSocket().sendText(requestGuildMembersPacket.toString());
                             });
                     Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
                 } catch (Throwable t) {
-                    ExceptionLogger.getConsumer(InterruptedException.class).accept(t);
+                    logger.error("Failed to process request guild members queue!", t);
                 }
             }
         });
@@ -557,12 +562,16 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         // first heartbeat should assume last heartbeat was answered properly
         heartbeatAckReceived.set(true);
         return api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
-            if (heartbeatAckReceived.getAndSet(false)) {
-                sendHeartbeat(websocket);
-                logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
-            } else {
-                websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
-                                    WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
+            try {
+                if (heartbeatAckReceived.getAndSet(false)) {
+                    sendHeartbeat(websocket);
+                    logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
+                } else {
+                    websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
+                                        WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
+                }
+            } catch (Throwable t) {
+                logger.error("Failed to send heartbeat or close web socket!", t);
             }
         }, 0, heartbeatInterval, TimeUnit.MILLISECONDS);
     }

@@ -65,7 +65,7 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
 
         cleanFuture = api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
             try {
-                this.clean();
+                clean();
             } catch (Throwable t) {
                 logger.error("Failed to clean message cache!", t);
             }

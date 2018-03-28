@@ -81,52 +81,56 @@ public class EventDispatcher {
         this.api = api;
         queuedListenerTasks.put(OBJECT_INDEPENDENT_TASK_INDICATOR, new LinkedList<>());
         api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
-            if (!executionTimeCheckingEnabled) {
-                return;
-            }
-            List<Object> canceledObjects = new ArrayList<>();
-            synchronized (activeListeners) {
-                long currentNanoTime = System.nanoTime();
-                Iterator<Map.Entry<Future<?>, Object[]>> iterator = activeListeners.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<Future<?>, Object[]> entry = iterator.next();
-                    long difference = currentNanoTime - ((long) entry.getValue()[0]);
-                    Object object = entry.getValue()[1];
-                    if (difference > DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L &&
-                            difference < DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L + 201_000_000L) {
-                        logger.debug("Detected a {} which is now running for over {}ms ({}ms). This is" +
-                                        " an unusually long execution time for a listener task. Make" +
-                                        " sure to not do any heavy computations in listener threads!",
-                                getThreadType(object), DEBUG_WARNING_DELAY_IN_MILLIS, (int) (difference/1_000_000L));
-                    }
-                    if (difference > INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L &&
-                            difference < INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L + 201_000_000L) {
-                        logger.warn("Detected a {} which is now running for over {} seconds ({}ms)." +
-                                        " This is a very unusually long execution time for a listener task. Make" +
-                                        " sure to not do any heavy computations in listener threads!",
-                                getThreadType(object), INFO_WARNING_DELAY_IN_SECONDS, (int) (difference/1_000_000L));
-                    }
-                    if (difference > MAX_EXECUTION_TIME_IN_SECONDS * 1_000_000_000L) {
-                        entry.getKey().cancel(true);
-                        logger.error("Interrupted a {}, because it was running over {} seconds! This was most likely" +
-                                " caused by a deadlock or very heavy computation/blocking operations in the listener" +
-                                " thread. Make sure to not block listener threads!",
-                                getThreadType(object), MAX_EXECUTION_TIME_IN_SECONDS);
-                        synchronized (runningListeners) {
-                            runningListeners.remove(object);
-                            iterator.remove();
+            try {
+                if (!executionTimeCheckingEnabled) {
+                    return;
+                }
+                List<Object> canceledObjects = new ArrayList<>();
+                synchronized (activeListeners) {
+                    long currentNanoTime = System.nanoTime();
+                    Iterator<Map.Entry<Future<?>, Object[]>> iterator = activeListeners.entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<Future<?>, Object[]> entry = iterator.next();
+                        long difference = currentNanoTime - ((long) entry.getValue()[0]);
+                        Object object = entry.getValue()[1];
+                        if (difference > DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L &&
+                                difference < DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L + 201_000_000L) {
+                            logger.debug("Detected a {} which is now running for over {}ms ({}ms). This is" +
+                                            " an unusually long execution time for a listener task. Make" +
+                                            " sure to not do any heavy computations in listener threads!",
+                                    getThreadType(object), DEBUG_WARNING_DELAY_IN_MILLIS, (int) (difference/1_000_000L));
                         }
-                        canceledObjects.add(object);
+                        if (difference > INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L &&
+                                difference < INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L + 201_000_000L) {
+                            logger.warn("Detected a {} which is now running for over {} seconds ({}ms)." +
+                                            " This is a very unusually long execution time for a listener task. Make" +
+                                            " sure to not do any heavy computations in listener threads!",
+                                    getThreadType(object), INFO_WARNING_DELAY_IN_SECONDS, (int) (difference/1_000_000L));
+                        }
+                        if (difference > MAX_EXECUTION_TIME_IN_SECONDS * 1_000_000_000L) {
+                            entry.getKey().cancel(true);
+                            logger.error("Interrupted a {}, because it was running over {} seconds! This was most likely" +
+                                    " caused by a deadlock or very heavy computation/blocking operations in the listener" +
+                                    " thread. Make sure to not block listener threads!",
+                                    getThreadType(object), MAX_EXECUTION_TIME_IN_SECONDS);
+                            synchronized (runningListeners) {
+                                runningListeners.remove(object);
+                                iterator.remove();
+                            }
+                            canceledObjects.add(object);
+                        }
                     }
                 }
-            }
-            if (canceledObjects.isEmpty()) {
-                // Inform the dispatchEvent method that it maybe can queue new listeners now
-                synchronized (queuedListenerTasks) {
-                    queuedListenerTasks.notifyAll();
+                if (canceledObjects.isEmpty()) {
+                    // Inform the dispatchEvent method that it maybe can queue new listeners now
+                    synchronized (queuedListenerTasks) {
+                        queuedListenerTasks.notifyAll();
+                    }
                 }
+                canceledObjects.forEach(this::checkRunningListenersAndStartIfPossible);
+            } catch (Throwable t) {
+                logger.error("Failed to check execution times!", t);
             }
-            canceledObjects.forEach(this::checkRunningListenersAndStartIfPossible);
         }, 200, 200, TimeUnit.MILLISECONDS);
     }
 

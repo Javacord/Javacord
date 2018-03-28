@@ -22,6 +22,7 @@ import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.NonThrowingAutoCloseable;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.util.logging.ExceptionLogger;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -170,12 +171,16 @@ public interface TextChannel extends Channel, Messageable {
             long delay, TimeUnit timeUnit, Consumer<Throwable> exceptionHandler) {
         // the delegate that does the actual type indicator sending and error handling
         Runnable typeRunnable = () -> {
-            CompletableFuture<?> typeFuture = type();
-            if (exceptionHandler != null) {
-                typeFuture.exceptionally(throwable -> {
-                    exceptionHandler.accept(throwable);
-                    return null;
-                });
+            try {
+                CompletableFuture<?> typeFuture = type();
+                if (exceptionHandler != null) {
+                    typeFuture.exceptionally(throwable -> {
+                        exceptionHandler.accept(throwable);
+                        return null;
+                    });
+                }
+            } catch (Throwable t) {
+                ExceptionLogger.getConsumer().accept(t);
             }
         };
 

@@ -422,25 +422,33 @@ public class DiscordApiImpl implements DiscordApi {
 
             // After minimum JDK 9 is required this can be switched to use a Cleaner
             getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
-                for (Reference<? extends User> userRef = usersCleanupQueue.poll();
-                     userRef != null;
-                     userRef = usersCleanupQueue.poll()) {
-                    Long userId = userIdByRef.remove(userRef);
-                    if (userId != null) {
-                        users.remove(userId, userRef);
+                try {
+                    for (Reference<? extends User> userRef = usersCleanupQueue.poll();
+                         userRef != null;
+                         userRef = usersCleanupQueue.poll()) {
+                        Long userId = userIdByRef.remove(userRef);
+                        if (userId != null) {
+                            users.remove(userId, userRef);
+                        }
                     }
+                } catch (Throwable t) {
+                    logger.error("Failed to process users cleanup queue!", t);
                 }
             }, 30, 30, TimeUnit.SECONDS);
 
             // After minimum JDK 9 is required this can be switched to use a Cleaner
             getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
-                for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                     messageRef != null;
-                     messageRef = messagesCleanupQueue.poll()) {
-                    Long messageId = messageIdByRef.remove(messageRef);
-                    if (messageId != null) {
-                        messages.remove(messageId, messageRef);
+                try {
+                    for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
+                         messageRef != null;
+                         messageRef = messagesCleanupQueue.poll()) {
+                        Long messageId = messageIdByRef.remove(messageRef);
+                        if (messageId != null) {
+                            messages.remove(messageId, messageRef);
+                        }
                     }
+                } catch (Throwable t) {
+                    logger.error("Failed to process messages cleanup queue!", t);
                 }
             }, 30, 30, TimeUnit.SECONDS);
 
