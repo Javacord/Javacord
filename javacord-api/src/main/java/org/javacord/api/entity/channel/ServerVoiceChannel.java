@@ -10,11 +10,13 @@ import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLe
 import org.javacord.api.util.event.ListenerManager;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a server voice channel.
@@ -46,6 +48,19 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * @return The ids of the users that are connected to this server voice channel.
      */
     Collection<Long> getConnectedUserIds();
+
+    /**
+     * Gets the ids of the users that are connected to this server voice channel.
+     *
+     * @return The ids of the users that are connected to this server voice channel.
+     */
+    default Collection<User> getConnectedUsers() {
+        return Collections.unmodifiableCollection(getConnectedUserIds().stream()
+                .map(id -> getApi().getCachedUserById(id))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet()));
+    }
 
     /**
      * Checks whether the user with the given id is connected to this channel.
