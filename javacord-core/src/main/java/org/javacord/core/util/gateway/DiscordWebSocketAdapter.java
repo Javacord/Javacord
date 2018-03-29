@@ -151,7 +151,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             try {
                 connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
                     if ((semaphore.availablePermits() == 0) &&
-                        ((System.currentTimeMillis() - lastIdentificationPerAccount.get(token)) >= 15000)) {
+                        (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L) >= 15000)) {
                         semaphore.release();
                     }
                 });
