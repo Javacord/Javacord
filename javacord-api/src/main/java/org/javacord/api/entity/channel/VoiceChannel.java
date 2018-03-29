@@ -30,9 +30,9 @@ public interface VoiceChannel extends Channel {
         if (!canSee(user)) {
             return false;
         }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasAnyPermission(user,
+        Optional<ServerVoiceChannel> severVoiceChannel = asServerVoiceChannel();
+        return !severVoiceChannel.isPresent()
+               || severVoiceChannel.get().hasAnyPermission(user,
                                                           PermissionType.ADMINISTRATOR,
                                                           PermissionType.VOICE_CONNECT);
     }
