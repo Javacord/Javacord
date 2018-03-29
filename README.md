@@ -28,8 +28,8 @@ or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/m
 **Javacord Dependency**
 ```xml
 <dependency>
-    <groupId>de.btobastian</groupId>
-    <artifactId>Javacord</artifactId>
+    <groupId>de.btobastian.Javacord</groupId>
+    <artifactId>javacord</artifactId>
     <!-- See below what to insert here -->
     <version>COMMIT_ID</version>
 </dependency>
