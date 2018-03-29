@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The implementation of {@link DiscordApiBuilderDelegate}.
@@ -43,13 +45,18 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * The current shard starting with <code>0</code>.
      */
-    private int currentShard = 0;
+    private AtomicInteger currentShard = new AtomicInteger();
 
     /**
      * The total amount of shards.
      * If the total amount is <code>1</code>, sharding will be disabled.
      */
-    private int totalShards = 1;
+    private AtomicInteger totalShards = new AtomicInteger(1);
+
+    /**
+     * A retry attempt counter.
+     */
+    private AtomicInteger retryAttempt = new AtomicInteger();
 
     /**
      * Whether Javacord should wait for all servers to become available on startup or not.
@@ -58,14 +65,15 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public CompletableFuture<DiscordApi> login() {
-        logger.debug("Creating shard {} of {}", currentShard + 1, totalShards);
+        logger.debug("Creating shard {} of {}", currentShard.get() + 1, totalShards.get());
         CompletableFuture<DiscordApi> future = new CompletableFuture<>();
         if (token == null) {
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
-        try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard))){
-            new DiscordApiImpl(accountType, token, currentShard, totalShards, waitForServersOnStartup, future);
+        try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard.get()))){
+            new DiscordApiImpl(
+                    accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup, future);
         }
         return future;
     }
@@ -121,24 +129,24 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public void setTotalShards(int totalShards) {
-        if (currentShard >= totalShards) {
+        if (currentShard.get() >= totalShards) {
             throw new IllegalArgumentException("currentShard cannot be greater or equal than totalShards!");
         }
         if (totalShards < 1) {
             throw new IllegalArgumentException("totalShards cannot be less than 1!");
         }
-        this.totalShards = totalShards;
+        this.totalShards.set(totalShards);
     }
 
     @Override
     public void setCurrentShard(int currentShard) {
-        if (currentShard >= totalShards) {
+        if (currentShard >= totalShards.get()) {
             throw new IllegalArgumentException("currentShard cannot be greater or equal than totalShards!");
         }
         if (currentShard < 0) {
             throw new IllegalArgumentException("currentShard cannot be less than 0!");
         }
-        this.currentShard = currentShard;
+        this.currentShard.set(currentShard);
     }
 
     @Override
@@ -150,34 +158,43 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     public CompletableFuture<Void> setRecommendedTotalShards() {
         CompletableFuture<Void> future = new CompletableFuture<>();
         if (token == null) {
-            future.completeExceptionally(new IllegalArgumentException("You cannot request the recommended total shards without a token!"));
-            return future;
+            future.completeExceptionally(
+                    new IllegalArgumentException("You cannot request the recommended total shards without a token!"));
+        } else {
+            retryAttempt.set(0);
+            setRecommendedTotalShards(future);
         }
+        return future;
+    }
 
-        RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(new DiscordApiImpl(token), RestMethod.GET, RestEndpoint.GATEWAY_BOT);
+    private void setRecommendedTotalShards(CompletableFuture<Void> future) {
+        DiscordApiImpl api = new DiscordApiImpl(token);
+        RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(api, RestMethod.GET, RestEndpoint.GATEWAY_BOT);
         botGatewayRequest
                 .execute(RestRequestResult::getJsonBody)
                 .thenAccept(resultJson -> {
                     DiscordWebSocketAdapter.setGateway(resultJson.get("url").asText());
                     setTotalShards(resultJson.get("shards").asInt());
+                    retryAttempt.set(0);
                     future.complete(null);
                 })
                 .exceptionally(t -> {
-                    future.completeExceptionally(t);
+                    int retryDelay = api.getReconnectDelay(retryAttempt.incrementAndGet());
+                    logger.info("Retrying to get recommended total shards in {} seconds!", retryDelay);
+                    api.getThreadPool().getScheduler().schedule(
+                            () -> setRecommendedTotalShards(future), retryDelay, TimeUnit.SECONDS);
                     return null;
                 })
-                .whenComplete((nothing, throwable) -> botGatewayRequest.getApi().disconnect());
-
-        return future;
+                .whenComplete((nothing, throwable) -> api.disconnect());
     }
 
     @Override
     public int getTotalShards() {
-        return totalShards;
+        return totalShards.get();
     }
 
     @Override
     public int getCurrentShard() {
-        return currentShard;
+        return currentShard.get();
     }
 }
