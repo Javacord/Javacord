@@ -1638,15 +1638,25 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Gets the voice channel the user with the given id is connected to on this server if any.
+     *
+     * @param userId The id of the user to check.
+     * @return The voice channel the user is connected to.
+     */
+    default Optional<ServerVoiceChannel> getConnectedVoiceChannel(long userId) {
+        return getVoiceChannels().stream()
+                .filter(serverVoiceChannel -> serverVoiceChannel.isConnected(userId))
+                .findAny();
+    }
+
+    /**
      * Gets the voice channel the given user is connected to on this server if any.
      *
      * @param user The user to check.
      * @return The voice channel the user is connected to.
      */
     default Optional<ServerVoiceChannel> getConnectedVoiceChannel(User user) {
-        return getVoiceChannels().stream()
-                .filter(serverVoiceChannel -> serverVoiceChannel.getConnectedUsers().contains(user))
-                .findAny();
+        return getConnectedVoiceChannel(user.getId());
     }
 
     /**

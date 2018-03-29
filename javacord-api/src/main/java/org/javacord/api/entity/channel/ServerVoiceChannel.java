@@ -41,11 +41,27 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     Optional<Integer> getUserLimit();
 
     /**
-     * Gets the users that are connected to this server voice channel.
+     * Gets the ids of the users that are connected to this server voice channel.
      *
-     * @return The users that are connected to this server voice channel.
+     * @return The ids of the users that are connected to this server voice channel.
      */
-    Collection<User> getConnectedUsers();
+    Collection<Long> getConnectedUserIds();
+
+    /**
+     * Checks whether the user with the given id is connected to this channel.
+     *
+     * @return Whether the user with the given id is connected to this channel or not.
+     */
+    boolean isConnected(long userId);
+
+    /**
+     * Checks whether the given user is connected to this channel.
+     *
+     * @return Whether the given user is connected to this channel or not.
+     */
+    default boolean isConnected(User user) {
+        return isConnected(user.getId());
+    }
 
     /**
      * Creates an updater for this channel.

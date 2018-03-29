@@ -92,9 +92,9 @@ public class ServerVoiceChannelImpl
     private final ConcurrentHashMap<Long, Permissions> overwrittenRolePermissions = new ConcurrentHashMap<>();
 
     /**
-     * The connected users of this server voice channel.
+     * The ids of the connected users of this server voice channel.
      */
-    private final Collection<User> connectedUsers = new ArrayList<>();
+    private final Collection<Long> connectedUsers = new ArrayList<>();
 
     /**
      * Creates a new server voice channel object.
@@ -197,21 +197,21 @@ public class ServerVoiceChannelImpl
     }
 
     /**
-     * Adds the given user to the list of connected users.
+     * Adds the user with the given id to the list of connected users.
      *
-     * @param user The user to add.
+     * @param userId The id of the user to add.
      */
-    public void addConnectedUser(User user) {
-        connectedUsers.add(user);
+    public void addConnectedUser(long userId) {
+        connectedUsers.add(userId);
     }
 
     /**
-     * Removes the given user from the list of connected users.
+     * Removes the user with the given id from the list of connected users.
      *
-     * @param user The user to remove.
+     * @param userId The id of the user to remove.
      */
-    public void removeConnectedUser(User user) {
-        connectedUsers.remove(user);
+    public void removeConnectedUser(long userId) {
+        connectedUsers.remove(userId);
     }
 
     @Override
@@ -265,8 +265,13 @@ public class ServerVoiceChannelImpl
     }
 
     @Override
-    public Collection<User> getConnectedUsers() {
+    public Collection<Long> getConnectedUserIds() {
         return Collections.unmodifiableCollection(connectedUsers);
+    }
+
+    @Override
+    public boolean isConnected(long userId) {
+        return connectedUsers.contains(userId);
     }
 
     @Override
