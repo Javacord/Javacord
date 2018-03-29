@@ -11,6 +11,7 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.auditlog.AuditLog;
+import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -107,6 +108,7 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+import org.javacord.core.util.rest.RestRequestResult;
 import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
@@ -986,10 +988,39 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public CompletableFuture<AuditLog> getAuditLog(int limit) {
-        return new RestRequest<AuditLog>(getApi(), RestMethod.GET, RestEndpoint.AUDIT_LOG)
-                .setUrlParameters(getIdAsString())
-                .addQueryParameter("limit", String.valueOf(limit))
-                .execute(result -> new AuditLogImpl(getApi(), result.getJsonBody()));
+        CompletableFuture<AuditLog> future = new CompletableFuture<>();
+        api.getThreadPool().getExecutorService().submit(() -> {
+            try {
+                AuditLogImpl auditLog = new AuditLogImpl(api);
+                boolean requestMore = true;
+                while (requestMore) {
+                    int requestAmount = limit - auditLog.getEntries().size();
+                    requestAmount = requestAmount > 100 ? 100 : requestAmount;
+                    RestRequest<JsonNode> request =
+                            new RestRequest<JsonNode>(getApi(), RestMethod.GET, RestEndpoint.AUDIT_LOG)
+                                    .setUrlParameters(getIdAsString())
+                                    .addQueryParameter("limit", String.valueOf(requestAmount));
+                    List<AuditLogEntry> lastAuditLogEntries = auditLog.getEntries();
+
+                    if (!lastAuditLogEntries.isEmpty()) {
+                        // It's not the first request, so append a "before"
+                        request.addQueryParameter(
+                                "before", lastAuditLogEntries.get(lastAuditLogEntries.size() - 1).getIdAsString());
+                    }
+
+                    JsonNode data = request.execute(RestRequestResult::getJsonBody).join();
+                    // Add the new entries
+                    auditLog.addEntries(data);
+                    // Check if we have to made another request
+                    requestMore = auditLog.getEntries().size() < limit
+                            && data.get("audit_log_entries").size() >= requestAmount;
+                }
+                future.complete(auditLog);
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
     }
 
     @Override

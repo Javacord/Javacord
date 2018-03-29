@@ -43,15 +43,30 @@ public class AuditLogImpl implements AuditLog {
      * Creates a new audit log.
      *
      * @param api The discord api instance.
-     * @param data The data of the audit log.
      */
-    public AuditLogImpl(DiscordApi api, JsonNode data) {
+    public AuditLogImpl(DiscordApi api) {
         this.api = api;
-        for (JsonNode webhook : data.get("webhooks")) {
-            involvedWebhooks.add(new WebhookImpl(api, webhook));
+    }
+
+    /**
+     * Adds entries to the audit log.
+     *
+     * @param data The json data of the audit log.
+     */
+    public void addEntries(JsonNode data) {
+        for (JsonNode webhookJson : data.get("webhooks")) {
+            boolean alreadyAdded = involvedWebhooks.stream()
+                    .anyMatch(webhook -> webhook.getId() == webhookJson.get("id").asLong());
+            if (!alreadyAdded) {
+                involvedWebhooks.add(new WebhookImpl(api, webhookJson));
+            }
         }
-        for (JsonNode user : data.get("users")) {
-            involvedUsers.add(((DiscordApiImpl) api).getOrCreateUser(user));
+        for (JsonNode userJson : data.get("users")) {
+            boolean alreadyAdded = involvedUsers.stream()
+                    .anyMatch(user -> user.getId() == userJson.get("id").asLong());
+            if (!alreadyAdded) {
+                involvedUsers.add(((DiscordApiImpl) api).getOrCreateUser(userJson));
+            }
         }
         for (JsonNode entry : data.get("audit_log_entries")) {
             entries.add(new AuditLogEntryImpl(this, entry));
