@@ -52,7 +52,7 @@ jobs:
       # build everything needed for publication
       - run:
           name: Building Project
-          command: ./gradlew --max-workers 2 build publishToMavenLocal
+          command: ./gradlew --max-workers 2 --continue build publishToMavenLocal
 
       # cache gradle build caches
       - run:
@@ -62,54 +62,59 @@ jobs:
             [ -d ~/.gradle/caches ] &&
               [ -n "$(ls -Ad ~/.gradle/caches/build-cache-* 2>/dev/null)" ] &&
               mv ~/.gradle/caches/build-cache-* ~/gradle-build-caches || true
+          when: always
 
       - save_cache:
           paths:
             - ~/gradle-build-caches
           key: gradle-build-caches-{{ .Revision }}
+          when: always
 
       # store the test results
       - run:
-          name: Collecting Test Results
+          name: Collecting test results
           command: |
             mkdir ~/test-results
-            mkdir ~/test-results/javacord-api
-            [ -d build/javacord-api/test-results/test ] &&
-              [ -n "$(ls -A build/javacord-api/test-results/test)" ] &&
-              cp -a build/javacord-api/test-results/test/* ~/test-results/javacord-api || true
-            mkdir ~/test-results/javacord-core
-            [ -d build/javacord-core/test-results/test ] &&
-              [ -n "$(ls -A build/javacord-core/test-results/test)" ] &&
-              cp -a build/javacord-core/test-results/test/* ~/test-results/javacord-core || true
+            cd build
+            find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
+              [ -d {}/test-results/test ] &&
+              [ -n "$(ls -A {}/test-results/test)" ] &&
+              mkdir ~/test-results/{} &&
+              cp -a {}/test-results/test/* ~/test-results/{} || true
+              ' \;
+          when: always
 
       - store_test_results:
           path: ~/test-results
 
       # store the artifacts
-      - store_artifacts:
-          path: build/javacord/libs/
-          destination: javacord
+      - run:
+          name: Collecting artifacts
+          command: |
+            mkdir ~/artifacts
+            cd build
+            find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
+              [ -d {}/libs ] &&
+              [ -n "$(ls -A {}/libs)" ] &&
+              mkdir ~/artifacts/{} &&
+              cp -a {}/libs/* ~/artifacts/{} || true
+              ' \;
+            find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
+              [ -d {}/docs/javadoc ] &&
+              [ -n "$(ls -A {}/docs/javadoc)" ] &&
+              { [ ! -d ~/artifacts/{} ] && mkdir ~/artifacts/{} || true; } &&
+              mkdir ~/artifacts/{}/javadoc &&
+              cp -a {}/docs/javadoc/* ~/artifacts/{}/javadoc || true
+              ' \;
+            find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
+              [ -d {}/reports/tests/test ] &&
+              [ -n "$(ls -A {}/reports/tests/test)" ] &&
+              { [ ! -d ~/artifacts/{} ] && mkdir ~/artifacts/{} || true; } &&
+              mkdir ~/artifacts/{}/test-report &&
+              cp -a {}/reports/tests/test/* ~/artifacts/{}/test-report || true
+              ' \;
+          when: always
 
       - store_artifacts:
-          path: build/javacord-api/libs/
-          destination: javacord-api
-
-      - store_artifacts:
-          path: build/javacord-api/docs/javadoc/
-          destination: javacord-api/javadoc
-
-      - store_artifacts:
-          path: build/javacord-api/reports/tests/test/
-          destination: javacord-api/test-report
-
-      - store_artifacts:
-          path: build/javacord-core/libs/
-          destination: javacord-core
-
-      - store_artifacts:
-          path: build/javacord-core/docs/javadoc/
-          destination: javacord-core/javadoc
-
-      - store_artifacts:
-          path: build/javacord-core/reports/tests/test/
-          destination: javacord-core/test-report
+          path: ~/artifacts
+          destination: Javacord
