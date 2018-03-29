@@ -1774,6 +1774,27 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Checks if the given user can manage roles on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can manage roles or not.
+     */
+    default boolean canManageRoles(User user) {
+        return hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MANAGE_ROLES);
+    }
+
+    /**
+     * Checks if the user of the connected account can manage roles on the server.
+     *
+     * @return Whether the user of the connected account can manage roles or not.
+     */
+    default boolean canYouManageRoles() {
+        return canManageRoles(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can manage the server.
      *
      * @param user The user to check.
