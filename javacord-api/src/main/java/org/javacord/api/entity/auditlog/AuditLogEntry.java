@@ -54,4 +54,25 @@ public interface AuditLogEntry extends DiscordEntity {
      */
     List<AuditLogChange<?>> getChanges();
 
+    /**
+     * Gets the audit log before this entry.
+     *
+     * @param limit The maximum amount of audit log entries.
+     * @return The audit log.
+     */
+    default CompletableFuture<AuditLog> getAuditLogBefore(int limit) {
+        return getAuditLog().getServer().getAuditLogBefore(limit, this);
+    }
+
+    /**
+     * Gets the audit log before this entry.
+     *
+     * @param limit The maximum amount of audit log entries.
+     * @param type The action type of the audit log.
+     * @return The audit log.
+     */
+    default CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogActionType type) {
+        return getAuditLog().getServer().getAuditLogBefore(limit, this, type);
+    }
+
 }

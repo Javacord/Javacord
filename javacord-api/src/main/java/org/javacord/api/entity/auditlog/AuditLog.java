@@ -1,6 +1,7 @@
 package org.javacord.api.entity.auditlog;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
 
@@ -18,6 +19,13 @@ public interface AuditLog {
      * @return The discord api instance.
      */
     DiscordApi getApi();
+
+    /**
+     * Gets the server of the audit log.
+     *
+     * @return The server of the audit log.
+     */
+    Server getServer();
 
     /**
      * Gets a collection with all webhooks, which can be found in this audit log.

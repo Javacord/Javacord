@@ -11,6 +11,7 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.auditlog.AuditLog;
+import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
@@ -988,10 +989,25 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public CompletableFuture<AuditLog> getAuditLog(int limit) {
+        return getAuditLogBefore(limit, null, null);
+    }
+
+    @Override
+    public CompletableFuture<AuditLog> getAuditLog(int limit, AuditLogActionType type) {
+        return getAuditLogBefore(limit, null, type);
+    }
+
+    @Override
+    public CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogEntry before) {
+        return getAuditLogBefore(limit, before, null);
+    }
+
+    @Override
+    public CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogEntry before, AuditLogActionType type) {
         CompletableFuture<AuditLog> future = new CompletableFuture<>();
         api.getThreadPool().getExecutorService().submit(() -> {
             try {
-                AuditLogImpl auditLog = new AuditLogImpl(api);
+                AuditLogImpl auditLog = new AuditLogImpl(this);
                 boolean requestMore = true;
                 while (requestMore) {
                     int requestAmount = limit - auditLog.getEntries().size();
@@ -1006,6 +1022,13 @@ public class ServerImpl implements Server, Cleanupable {
                         // It's not the first request, so append a "before"
                         request.addQueryParameter(
                                 "before", lastAuditLogEntries.get(lastAuditLogEntries.size() - 1).getIdAsString());
+                    } else if (before != null) {
+                        // It's the first request and we have a non-null "before" parameter
+                        request.addQueryParameter("before", before.getIdAsString());
+                    }
+
+                    if (type != null) {
+                        request.addQueryParameter("action_type", String.valueOf(type.getValue()));
                     }
 
                     JsonNode data = request.execute(RestRequestResult::getJsonBody).join();

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.auditlog.AuditLog;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
@@ -25,6 +26,11 @@ public class AuditLogImpl implements AuditLog {
     private final DiscordApi api;
 
     /**
+     * The server of the audit log.
+     */
+    private final Server server;
+
+    /**
      * A collection with all involved webhooks.
      */
     private final Collection<Webhook> involvedWebhooks = new ArrayList<>();
@@ -42,10 +48,11 @@ public class AuditLogImpl implements AuditLog {
     /**
      * Creates a new audit log.
      *
-     * @param api The discord api instance.
+     * @param server The server of the audit log.
      */
-    public AuditLogImpl(DiscordApi api) {
-        this.api = api;
+    public AuditLogImpl(Server server) {
+        this.api = server.getApi();
+        this.server = server;
     }
 
     /**
@@ -76,6 +83,11 @@ public class AuditLogImpl implements AuditLog {
     @Override
     public DiscordApi getApi() {
         return api;
+    }
+
+    @Override
+    public Server getServer() {
+        return server;
     }
 
     @Override

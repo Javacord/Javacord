@@ -5,6 +5,8 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.auditlog.AuditLog;
+import org.javacord.api.entity.auditlog.AuditLogActionType;
+import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -1256,6 +1258,34 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The audit log.
      */
     CompletableFuture<AuditLog> getAuditLog(int limit);
+
+    /**
+     * Gets the audit log of this server.
+     *
+     * @param limit The maximum amount of audit log entries.
+     * @param type The action type of the audit log.
+     * @return The audit log.
+     */
+    CompletableFuture<AuditLog> getAuditLog(int limit, AuditLogActionType type);
+
+    /**
+     * Gets the audit log of this server.
+     *
+     * @param limit The maximum amount of audit log entries.
+     * @param before Filter the log before this entry.
+     * @return The audit log.
+     */
+    CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogEntry before);
+
+    /**
+     * Gets the audit log of this server.
+     *
+     * @param limit The maximum amount of audit log entries.
+     * @param before Filter the log before this entry.
+     * @param type The action type of the audit log.
+     * @return The audit log.
+     */
+    CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogEntry before, AuditLogActionType type);
 
     /**
      * Checks if a user has a given permission.
