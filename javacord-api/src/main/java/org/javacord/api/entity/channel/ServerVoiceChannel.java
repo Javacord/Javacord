@@ -50,9 +50,9 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     Collection<Long> getConnectedUserIds();
 
     /**
-     * Gets the ids of the users that are connected to this server voice channel.
+     * Gets the users that are connected to this server voice channel.
      *
-     * @return The ids of the users that are connected to this server voice channel.
+     * @return The users that are connected to this server voice channel.
      */
     default Collection<User> getConnectedUsers() {
         return Collections.unmodifiableCollection(getConnectedUserIds().stream()
