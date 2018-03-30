@@ -152,15 +152,15 @@ public enum RestEndpoint {
      * @return The full url of the endpoint.
      */
     public String getFullUrl(String... parameters) {
-        String url = "https://discordapp.com/api/v" + Javacord.DISCORD_API_VERSION + getEndpointUrl();
-        url = String.format(url, (Object[]) parameters);
+        StringBuilder url = new StringBuilder("https://discordapp.com/api/v" + Javacord.DISCORD_API_VERSION + getEndpointUrl());
+        url = new StringBuilder(String.format(url.toString(), (Object[]) parameters));
         int parameterAmount = getEndpointUrl().split("%s").length - (getEndpointUrl().endsWith("%s") ? 0 : 1);
         if (parameters.length > parameterAmount) {
             for (int i = parameterAmount; i < parameters.length; i++) {
-                url += "/" + parameters[i];
+                url.append("/").append(parameters[i]);
             }
         }
-        return url;
+        return url.toString();
     }
 
     /**

@@ -72,7 +72,7 @@ public class MessageImpl implements Message {
     /**
      * Gets the last edit time.
      */
-    private Instant lastEditTime = null;
+    private Instant lastEditTime;
 
     /**
      * The author of the message.
@@ -92,22 +92,22 @@ public class MessageImpl implements Message {
     /**
      * A list with all reactions.
      */
-    private List<Reaction> reactions = new ArrayList<>();
+    private final List<Reaction> reactions = new ArrayList<>();
 
     /**
      * The attachments of the message.
      */
-    private List<MessageAttachment> attachments = new ArrayList<>();
+    private final List<MessageAttachment> attachments = new ArrayList<>();
 
     /**
      * The users mentioned in this message.
      */
-    private List<User> mentions = new ArrayList<>();
+    private final List<User> mentions = new ArrayList<>();
 
     /**
      * The roles mentioned in this message.
      */
-    private List<Role> roleMentions = new ArrayList<>();
+    private final List<Role> roleMentions = new ArrayList<>();
 
     /**
      * Creates a new message object.

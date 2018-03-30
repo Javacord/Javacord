@@ -44,7 +44,7 @@ public class RestRequestResult {
     /**
      * Gets the {@link RestRequest} which belongs to this result.
      *
-     * @return The ResuRequest which belongs to this result.
+     * @return The Request which belongs to this result.
      */
     public RestRequest<?> getRequest() {
         return request;

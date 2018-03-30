@@ -22,7 +22,7 @@ public class IconImpl implements Icon {
     /**
      * The url of the icon.
      */
-    private URL url;
+    private final URL url;
 
     /**
      * Creates a new icon object.

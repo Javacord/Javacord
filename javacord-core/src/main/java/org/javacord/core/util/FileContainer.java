@@ -29,7 +29,7 @@ public class FileContainer {
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(FileContainer.class);
+    private static final Logger logger = LoggerUtil.getLogger(FileContainer.class);
 
     /**
      * The file as buffered image

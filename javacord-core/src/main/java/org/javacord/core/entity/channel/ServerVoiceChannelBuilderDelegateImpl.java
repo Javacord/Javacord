@@ -20,7 +20,7 @@ public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannel
     /**
      * The server of the channel.
      */
-    private ServerImpl server;
+    private final ServerImpl server;
 
     /**
      * The reason for the creation.

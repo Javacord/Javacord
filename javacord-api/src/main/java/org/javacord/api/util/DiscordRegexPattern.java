@@ -79,11 +79,9 @@ public class DiscordRegexPattern {
 
     /**
      * You are not meant to create instances of this class.
-     *
-     * @throws UnsupportedOperationException
      */
     private DiscordRegexPattern() {
-        throw new UnsupportedOperationException();
+        throw new IllegalAccessError();
     }
 
 }

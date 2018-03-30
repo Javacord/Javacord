@@ -18,7 +18,7 @@ public class UserChangeAvatarEventImpl extends UserEventImpl implements UserChan
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(UserChangeAvatarEvent.class);
+    private static final Logger logger = LoggerUtil.getLogger(UserChangeAvatarEvent.class);
 
     /**
      * The new avatar hash of the user.

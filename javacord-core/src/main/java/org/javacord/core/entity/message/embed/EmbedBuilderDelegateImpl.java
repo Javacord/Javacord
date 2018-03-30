@@ -53,7 +53,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     // Fields
     // (Array indices: 0: name (String), 1: value (String), 2: inline (boolean)
-    private List<Object[]> fields = new ArrayList<>();
+    private final List<Object[]> fields = new ArrayList<>();
 
     @Override
     public void setTitle(String title) {

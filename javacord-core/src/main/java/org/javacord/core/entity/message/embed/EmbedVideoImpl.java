@@ -18,9 +18,9 @@ public class EmbedVideoImpl implements EmbedVideo {
      */
     private static final Logger logger = LoggerUtil.getLogger(EmbedVideoImpl.class);
 
-    private String url;
-    private int height;
-    private int width;
+    private final String url;
+    private final int height;
+    private final int width;
 
     /**
      * Creates a new embed video.

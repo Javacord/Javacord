@@ -44,7 +44,7 @@ public class GroupChannelImpl
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(GroupChannelImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(GroupChannelImpl.class);
 
     /**
      * The discord api instance.

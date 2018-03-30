@@ -9,6 +9,6 @@ public enum RestMethod {
     POST(),
     PUT(),
     DELETE(),
-    PATCH();
+    PATCH()
 
 }

@@ -17,7 +17,7 @@ public class DiscordApiBuilder {
     /**
      * The delegate used to create a {@link DiscordApi} instance.
      */
-    private DiscordApiBuilderDelegate delegate = DelegateFactory.createDiscordApiBuilderDelegate();
+    private final DiscordApiBuilderDelegate delegate = DelegateFactory.createDiscordApiBuilderDelegate();
 
     /**
      * Login to the account with the given token.

@@ -20,7 +20,7 @@ public class ServerTextChannelBuilderDelegateImpl implements ServerTextChannelBu
     /**
      * The server of the channel.
      */
-    private ServerImpl server;
+    private final ServerImpl server;
 
     /**
      * The reason for the creation.

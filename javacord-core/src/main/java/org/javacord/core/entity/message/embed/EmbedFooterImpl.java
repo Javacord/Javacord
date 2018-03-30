@@ -19,9 +19,9 @@ public class EmbedFooterImpl implements EmbedFooter {
      */
     private static final Logger logger = LoggerUtil.getLogger(EmbedFooterImpl.class);
 
-    private String text;
-    private String iconUrl;
-    private String proxyIconUrl;
+    private final String text;
+    private final String iconUrl;
+    private final String proxyIconUrl;
 
     /**
      * Creates a new embed footer.

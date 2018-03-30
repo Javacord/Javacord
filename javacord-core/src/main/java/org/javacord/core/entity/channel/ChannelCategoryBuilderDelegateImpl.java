@@ -18,7 +18,7 @@ public class ChannelCategoryBuilderDelegateImpl implements ChannelCategoryBuilde
     /**
      * The server of the channel.
      */
-    private ServerImpl server;
+    private final ServerImpl server;
 
     /**
      * The reason for the creation.

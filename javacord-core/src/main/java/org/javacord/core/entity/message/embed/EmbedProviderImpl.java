@@ -18,8 +18,8 @@ public class EmbedProviderImpl implements EmbedProvider {
      */
     private static final Logger logger = LoggerUtil.getLogger(EmbedProviderImpl.class);
 
-    private String name;
-    private String url;
+    private final String name;
+    private final String url;
 
     /**
      * Creates a new embed provider.

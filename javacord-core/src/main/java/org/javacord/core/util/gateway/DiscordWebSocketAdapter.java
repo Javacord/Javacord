@@ -136,7 +136,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private int reconnectAttempt = 0;
 
     // A queue which contains server ids for the "request guild members" packet
-    private BlockingQueue<Long> requestGuildMembersQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Long> requestGuildMembersQueue = new LinkedBlockingQueue<>();
 
     private static final Map<String, Long> lastIdentificationPerAccount = Collections.synchronizedMap(new HashMap<>());
     private static final ConcurrentMap<String, Semaphore> connectionDelaySemaphorePerAccount =
@@ -189,7 +189,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     AtomicInteger batchCounter = new AtomicInteger();
                     requestGuildMembersQueue.stream().distinct()
                             .collect(Collectors.groupingBy(serverId -> batchCounter.getAndIncrement() / 50))
-                            .values().stream()
+                            .values()
                             .forEach(serverIdBatch -> {
                                 requestGuildMembersQueue.removeAll(serverIdBatch);
                                 ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
@@ -338,7 +338,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
-                               WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+                               WebSocketFrame clientCloseFrame, boolean closedByServer) {
         Optional<WebSocketFrame> closeFrameOptional =
                 Optional.ofNullable(closedByServer ? serverCloseFrame : clientCloseFrame);
 
@@ -359,8 +359,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     closeReason, closeCodeString, closedByServer ? "server" : "client");
 
         LostConnectionEvent lostConnectionEvent = new LostConnectionEventImpl(api);
-        List<LostConnectionListener> listeners = new ArrayList<>();
-        listeners.addAll(api.getLostConnectionListeners());
+        List<LostConnectionListener> listeners = new ArrayList<>(api.getLostConnectionListeners());
         api.getEventDispatcher()
                 .dispatchEvent(api, listeners, listener -> listener.onLostConnection(lostConnectionEvent));
 
@@ -417,8 +416,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     logger.debug("Received RESUMED packet");
 
                     ResumeEvent resumeEvent = new ResumeEventImpl(api);
-                    List<ResumeListener> listeners = new ArrayList<>();
-                    listeners.addAll(api.getResumeListeners());
+                    List<ResumeListener> listeners = new ArrayList<>(api.getResumeListeners());
                     api.getEventDispatcher()
                             .dispatchEvent(api, listeners, listener -> listener.onResume(resumeEvent));
                 }
@@ -456,8 +454,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             } catch (InterruptedException ignored) { }
                         }
                         ReconnectEvent reconnectEvent = new ReconnectEventImpl(api);
-                        List<ReconnectListener> listeners = new ArrayList<>();
-                        listeners.addAll(api.getReconnectListeners());
+                        List<ReconnectListener> listeners = new ArrayList<>(api.getReconnectListeners());
                         api.getEventDispatcher()
                                 .dispatchEvent(api, listeners, listener -> listener.onReconnect(reconnectEvent));
                         ready.complete(true);
@@ -765,7 +762,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     @Override
-    public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
+    public void onError(WebSocket websocket, WebSocketException cause) {
         switch (cause.getMessage()) {
             // TODO This is copied from v2. I'm unsure if that's something we should do. Probably not ^^
             case "Flushing frames to the server failed: Connection closed by remote host":
@@ -781,17 +778,17 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     @Override
-    public void handleCallbackError(WebSocket websocket, Throwable cause) throws Exception {
+    public void handleCallbackError(WebSocket websocket, Throwable cause) {
         logger.error("Websocket callback error!", cause);
     }
 
     @Override
-    public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
+    public void onUnexpectedError(WebSocket websocket, WebSocketException cause) {
         logger.warn("Websocket onUnexpected error!", cause);
     }
 
     @Override
-    public void onConnectError(WebSocket websocket, WebSocketException exception) throws Exception {
+    public void onConnectError(WebSocket websocket, WebSocketException exception) {
         logger.warn("Websocket onConnect error!", exception);
     }
 }

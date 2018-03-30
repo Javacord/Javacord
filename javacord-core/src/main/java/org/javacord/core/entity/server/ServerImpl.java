@@ -163,7 +163,7 @@ public class ServerImpl implements Server, Cleanupable {
     /**
      * Whether the server is considered as large or not.
      */
-    private boolean large;
+    private final boolean large;
 
     /**
      * The id of the owner.
@@ -341,7 +341,7 @@ public class ServerImpl implements Server, Cleanupable {
         }
 
         if ((isLarge() || api.getAccountType() == AccountType.CLIENT) && getMembers().size() < getMemberCount()) {
-            this.api.getWebSocketAdapter().queueRequestGuildMembers(this);
+            api.getWebSocketAdapter().queueRequestGuildMembers(this);
         }
 
         if (data.has("emojis")) {

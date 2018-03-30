@@ -756,10 +756,9 @@ public class MessageSetImpl implements MessageSet {
      */
     private static MessageSet requestAsMessages(TextChannel channel, int limit, long before, long after) {
         DiscordApiImpl api = (DiscordApiImpl) channel.getApi();
-        return new MessageSetImpl(
-                requestAsJsonNodes(channel, limit, before, after).stream()
-                        .map(jsonNode -> api.getOrCreateMessage(channel, jsonNode))
-                        .collect(Collectors.toList()));
+        return requestAsJsonNodes(channel, limit, before, after).stream()
+                .map(jsonNode -> api.getOrCreateMessage(channel, jsonNode))
+                .collect(Collectors.toCollection(MessageSetImpl::new));
     }
 
     /**

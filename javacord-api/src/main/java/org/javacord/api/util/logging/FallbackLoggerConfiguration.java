@@ -7,9 +7,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class FallbackLoggerConfiguration {
 
-    private static AtomicBoolean debug = new AtomicBoolean();
+    private static final AtomicBoolean debug = new AtomicBoolean();
 
-    private static AtomicBoolean trace = new AtomicBoolean();
+    private static final AtomicBoolean trace = new AtomicBoolean();
 
     private FallbackLoggerConfiguration() {
         throw new UnsupportedOperationException();

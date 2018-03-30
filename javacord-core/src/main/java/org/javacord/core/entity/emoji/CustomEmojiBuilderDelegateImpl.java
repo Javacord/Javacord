@@ -32,7 +32,7 @@ public class CustomEmojiBuilderDelegateImpl implements CustomEmojiBuilderDelegat
     /**
      * The server of the emoji.
      */
-    private ServerImpl server;
+    private final ServerImpl server;
 
     /**
      * The reason for the creation.

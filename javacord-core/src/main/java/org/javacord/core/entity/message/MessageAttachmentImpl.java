@@ -24,7 +24,7 @@ public class MessageAttachmentImpl implements MessageAttachment {
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(MessageAttachmentImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(MessageAttachmentImpl.class);
 
     /**
      * The id of the attachment.

@@ -35,7 +35,7 @@ public class MessageReactionAddHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         api.getTextChannelById(packet.get("channel_id").asText()).ifPresent(channel -> {
             long messageId = packet.get("message_id").asLong();
-            User user = api.getCachedUserById(packet.get("user_id").asText()).orElse(null);
+            User user = api.getCachedUserById(packet.get("user_id").asText()).orElseThrow(AssertionError::new);
             Optional<Message> message = api.getCachedMessageById(messageId);
 
             Emoji emoji;

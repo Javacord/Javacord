@@ -149,8 +149,8 @@ public class ChannelUpdateHandler extends PacketHandler {
             Collection<Long> usersWithOverwrittenPermissions = new HashSet<>();
             if (jsonChannel.has("permission_overwrites") && !jsonChannel.get("permission_overwrites").isNull()) {
                 for (JsonNode permissionOverwriteJson : jsonChannel.get("permission_overwrites")) {
-                    Permissions oldOverwrittenPermissions = null;
-                    DiscordEntity entity = null;
+                    Permissions oldOverwrittenPermissions;
+                    DiscordEntity entity;
                     ConcurrentHashMap<Long, Permissions> overwrittenPermissions = null;
                     switch (permissionOverwriteJson.get("type").asText()) {
                         case "role":
@@ -388,8 +388,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 GroupChannelChangeNameEvent event =
                         new GroupChannelChangeNameEventImpl(channel, newName, oldName);
 
-                List<GroupChannelChangeNameListener> listeners = new ArrayList<>();
-                listeners.addAll(channel.getGroupChannelChangeNameListeners());
+                List<GroupChannelChangeNameListener> listeners = new ArrayList<>(channel.getGroupChannelChangeNameListeners());
                 channel.getMembers().stream()
                         .map(User::getGroupChannelChangeNameListeners)
                         .forEach(listeners::addAll);

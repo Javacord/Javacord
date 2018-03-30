@@ -130,8 +130,7 @@ public class ChannelDeleteHandler extends PacketHandler {
         api.getGroupChannelById(channelId).ifPresent(groupChannel -> {
             GroupChannelDeleteEvent event = new GroupChannelDeleteEventImpl(groupChannel);
 
-            List<GroupChannelDeleteListener> listeners = new ArrayList<>();
-            listeners.addAll(groupChannel.getGroupChannelDeleteListeners());
+            List<GroupChannelDeleteListener> listeners = new ArrayList<>(groupChannel.getGroupChannelDeleteListeners());
             groupChannel.getMembers().stream()
                     .map(User::getGroupChannelDeleteListeners)
                     .forEach(listeners::addAll);

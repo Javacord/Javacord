@@ -18,10 +18,10 @@ public class EmbedImageImpl implements EmbedImage {
      */
     private static final Logger logger = LoggerUtil.getLogger(EmbedImageImpl.class);
 
-    private String url;
-    private String proxyUrl;
-    private int height;
-    private int width;
+    private final String url;
+    private final String proxyUrl;
+    private final int height;
+    private final int width;
 
     /**
      * Creates a new embed image.

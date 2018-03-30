@@ -93,8 +93,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     private void dispatchUserActivityChangeEvent(User user, Activity newActivity, Activity oldActivity) {
         UserChangeActivityEvent event = new UserChangeActivityEventImpl(user, newActivity, oldActivity);
 
-        List<UserChangeActivityListener> listeners = new ArrayList<>();
-        listeners.addAll(user.getUserChangeActivityListeners());
+        List<UserChangeActivityListener> listeners = new ArrayList<>(user.getUserChangeActivityListeners());
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeActivityListeners()));
         listeners.addAll(api.getUserChangeActivityListeners());
 
@@ -104,8 +103,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {
         UserChangeStatusEvent event = new UserChangeStatusEventImpl(user, newStatus, oldStatus);
 
-        List<UserChangeStatusListener> listeners = new ArrayList<>();
-        listeners.addAll(user.getUserChangeStatusListeners());
+        List<UserChangeStatusListener> listeners = new ArrayList<>(user.getUserChangeStatusListeners());
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeStatusListeners()));
         listeners.addAll(api.getUserChangeStatusListeners());
 
@@ -115,8 +113,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
         UserChangeNameEvent event = new UserChangeNameEventImpl(user, newName, oldName);
 
-        List<UserChangeNameListener> listeners = new ArrayList<>();
-        listeners.addAll(user.getUserChangeNameListeners());
+        List<UserChangeNameListener> listeners = new ArrayList<>(user.getUserChangeNameListeners());
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeNameListeners()));
         listeners.addAll(api.getUserChangeNameListeners());
 
@@ -126,8 +123,7 @@ public class PresenceUpdateHandler extends PacketHandler {
     private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
         UserChangeAvatarEvent event = new UserChangeAvatarEventImpl(user, newAvatarHash, oldAvatarHash);
 
-        List<UserChangeAvatarListener> listeners = new ArrayList<>();
-        listeners.addAll(user.getUserChangeAvatarListeners());
+        List<UserChangeAvatarListener> listeners = new ArrayList<>(user.getUserChangeAvatarListeners());
         user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeAvatarListeners()));
         listeners.addAll(api.getUserChangeAvatarListeners());
 

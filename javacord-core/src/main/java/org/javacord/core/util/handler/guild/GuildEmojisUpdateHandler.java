@@ -52,12 +52,12 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                 emojis.put(emojiJson.get("id").asLong(), emojiJson);
             }
 
-            emojis.entrySet().stream().forEach(entry -> {
-                Optional<KnownCustomEmoji> optionalEmoji = server.getCustomEmojiById(entry.getKey());
+            emojis.forEach((key, value) -> {
+                Optional<KnownCustomEmoji> optionalEmoji = server.getCustomEmojiById(key);
                 if (optionalEmoji.isPresent()) {
                     KnownCustomEmoji emoji = optionalEmoji.get();
                     String oldName = emoji.getName();
-                    String newName = entry.getValue().get("name").asText();
+                    String newName = value.get("name").asText();
                     if (!Objects.deepEquals(oldName, newName)) {
                         CustomEmojiChangeNameEvent event = new CustomEmojiChangeNameEventImpl(emoji, newName, oldName);
                         ((KnownCustomEmojiImpl) emoji).setName(newName);
@@ -72,7 +72,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     }
 
                     Collection<Role> oldWhitelist = emoji.getWhitelistedRoles().orElse(Collections.emptySet());
-                    JsonNode newWhitelistJson = entry.getValue().get("roles");
+                    JsonNode newWhitelistJson = value.get("roles");
                     Collection<Role> newWhitelist = new ArrayList<>();
                     if (newWhitelistJson != null && !newWhitelistJson.isNull()) {
                         for (JsonNode role : newWhitelistJson) {
@@ -93,7 +93,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                                 listeners, listener -> listener.onCustomEmojiChangeWhitelistedRoles(event));
                     }
                 } else {
-                    KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(server, entry.getValue());
+                    KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(server, value);
                     server.addCustomEmoji(emoji);
 
                     CustomEmojiCreateEvent event = new CustomEmojiCreateEventImpl(emoji);

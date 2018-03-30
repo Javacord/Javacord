@@ -35,8 +35,7 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
                     OffsetDateTime.parse(packet.get("last_pin_timestamp").asText()).toInstant() : null;
             ChannelPinsUpdateEvent event = new ChannelPinsUpdateEventImpl(channel, lastPinTimestamp);
 
-            List<ChannelPinsUpdateListener> listeners = new ArrayList<>();
-            listeners.addAll(channel.getChannelPinsUpdateListeners());
+            List<ChannelPinsUpdateListener> listeners = new ArrayList<>(channel.getChannelPinsUpdateListeners());
             channel.asServerTextChannel()
                     .map(ServerTextChannel::getServer)
                     .map(Server::getChannelPinsUpdateListeners)

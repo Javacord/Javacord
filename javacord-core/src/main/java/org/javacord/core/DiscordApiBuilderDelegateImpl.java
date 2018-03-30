@@ -45,18 +45,18 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * The current shard starting with <code>0</code>.
      */
-    private AtomicInteger currentShard = new AtomicInteger();
+    private final AtomicInteger currentShard = new AtomicInteger();
 
     /**
      * The total amount of shards.
      * If the total amount is <code>1</code>, sharding will be disabled.
      */
-    private AtomicInteger totalShards = new AtomicInteger(1);
+    private final AtomicInteger totalShards = new AtomicInteger(1);
 
     /**
      * A retry attempt counter.
      */
-    private AtomicInteger retryAttempt = new AtomicInteger();
+    private final AtomicInteger retryAttempt = new AtomicInteger();
 
     /**
      * Whether Javacord should wait for all servers to become available on startup or not.

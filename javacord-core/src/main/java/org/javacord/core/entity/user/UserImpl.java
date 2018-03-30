@@ -66,7 +66,7 @@ public class UserImpl implements User, Cleanupable {
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(UserImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(UserImpl.class);
 
     /**
      * The discord api instance.

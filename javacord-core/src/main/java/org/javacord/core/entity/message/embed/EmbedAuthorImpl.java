@@ -19,10 +19,10 @@ public class EmbedAuthorImpl implements EmbedAuthor {
      */
     private static final Logger logger = LoggerUtil.getLogger(EmbedAuthorImpl.class);
 
-    private String name;
-    private String url;
-    private String iconUrl;
-    private String proxyIconUrl;
+    private final String name;
+    private final String url;
+    private final String iconUrl;
+    private final String proxyIconUrl;
 
     /**
      * Creates a new embed author.

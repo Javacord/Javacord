@@ -3,6 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -28,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,7 +67,7 @@ public class ChannelCategoryImpl implements ChannelCategory, InternalChannel, In
     /**
      * Whether the category is "not safe for work" or not.
      */
-    private boolean nsfw = false;
+    private boolean nsfw;
 
     /**
      * A map with all overwritten user permissions.
@@ -172,14 +174,16 @@ public class ChannelCategoryImpl implements ChannelCategory, InternalChannel, In
     public List<ServerChannel> getChannels() {
         List<ServerChannel> channels = new ArrayList<>();
         ((ServerImpl) getServer()).getUnorderedChannels().stream()
-                .filter(channel -> channel.asServerTextChannel().isPresent())
-                .map(channel -> channel.asServerTextChannel().get())
+                .map(Channel::asServerTextChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .filter(channel -> channel.getCategory().orElse(null) == this)
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .forEach(channels::add);
         ((ServerImpl) getServer()).getUnorderedChannels().stream()
-                .filter(channel -> channel.asServerVoiceChannel().isPresent())
-                .map(channel -> channel.asServerVoiceChannel().get())
+                .map(Channel::asServerVoiceChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .filter(channel -> channel.getCategory().orElse(null) == this)
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                 .forEach(channels::add);

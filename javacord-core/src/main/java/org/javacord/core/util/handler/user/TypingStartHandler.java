@@ -32,8 +32,7 @@ public class TypingStartHandler extends PacketHandler {
         api.getTextChannelById(channelId).ifPresent(channel -> api.getCachedUserById(userId).ifPresent(user -> {
             UserStartTypingEvent event = new UserStartTypingEventImpl(user, channel);
 
-            List<UserStartTypingListener> listeners = new ArrayList<>();
-            listeners.addAll(channel.getUserStartTypingListeners());
+            List<UserStartTypingListener> listeners = new ArrayList<>(channel.getUserStartTypingListeners());
             if (channel instanceof ServerTextChannel) {
                 listeners.addAll(((ServerTextChannel) channel).getServer().getUserStartTypingListeners());
             }

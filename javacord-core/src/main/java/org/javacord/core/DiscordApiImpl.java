@@ -196,7 +196,7 @@ public class DiscordApiImpl implements DiscordApi {
     /**
      * The token used for authentication.
      */
-    private String token;
+    private final String token;
 
     /**
      * Whether the {@link #disconnect()} method has been called before or not.

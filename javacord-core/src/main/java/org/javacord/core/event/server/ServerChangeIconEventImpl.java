@@ -19,7 +19,7 @@ public class ServerChangeIconEventImpl extends ServerEventImpl implements Server
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(ServerChangeIconEvent.class);
+    private static final Logger logger = LoggerUtil.getLogger(ServerChangeIconEvent.class);
 
     /**
      * The new icon hash of the server.

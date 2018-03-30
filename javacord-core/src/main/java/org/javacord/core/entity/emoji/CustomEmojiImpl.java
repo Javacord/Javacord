@@ -22,7 +22,7 @@ public class CustomEmojiImpl implements CustomEmoji {
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(CustomEmojiImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(CustomEmojiImpl.class);
 
     /**
      * The discord api instance.
@@ -42,7 +42,7 @@ public class CustomEmojiImpl implements CustomEmoji {
     /**
      * Whether the emoji is animated or not.
      */
-    private boolean animated;
+    private final boolean animated;
 
     /**
      * Creates a new custom emoji.

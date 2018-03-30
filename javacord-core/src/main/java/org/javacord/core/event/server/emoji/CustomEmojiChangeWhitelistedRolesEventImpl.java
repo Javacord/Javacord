@@ -18,12 +18,12 @@ public class CustomEmojiChangeWhitelistedRolesEventImpl extends CustomEmojiEvent
     /**
      * The new whitelist.
      */
-    private Collection<Role> newWhitelist;
+    private final Collection<Role> newWhitelist;
 
     /**
      * The new whitelist.
      */
-    private Collection<Role> oldWhitelist;
+    private final Collection<Role> oldWhitelist;
 
     /**
      * Creates a new custom emoji change whitelisted roles event.

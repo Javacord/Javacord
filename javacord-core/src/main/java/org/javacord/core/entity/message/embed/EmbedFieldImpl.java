@@ -8,9 +8,9 @@ import org.javacord.api.entity.message.embed.EmbedField;
  */
 public class EmbedFieldImpl implements EmbedField {
 
-    private String name;
-    private String value;
-    private boolean inline;
+    private final String name;
+    private final String value;
+    private final boolean inline;
 
     /**
      * Creates a new embed field.

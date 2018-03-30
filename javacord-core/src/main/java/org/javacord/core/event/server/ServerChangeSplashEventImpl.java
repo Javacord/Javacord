@@ -19,7 +19,7 @@ public class ServerChangeSplashEventImpl extends ServerEventImpl implements Serv
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(ServerChangeSplashEvent.class);
+    private static final Logger logger = LoggerUtil.getLogger(ServerChangeSplashEvent.class);
 
     /**
      * The new splash hash of the server.

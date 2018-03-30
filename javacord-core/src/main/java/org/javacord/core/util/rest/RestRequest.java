@@ -40,8 +40,8 @@ public class RestRequest<T> {
     private boolean includeAuthorizationHeader = true;
     private int ratelimitRetries = 50;
     private String[] urlParameters = new String[0];
-    private Map<String, String> queryParameters = new HashMap<>();
-    private Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> queryParameters = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
     private String body = null;
 
     private int retryCounter = 0;

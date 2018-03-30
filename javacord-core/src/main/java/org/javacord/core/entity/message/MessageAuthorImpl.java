@@ -23,7 +23,7 @@ public class MessageAuthorImpl implements MessageAuthor {
     /**
      * The logger of this class.
      */
-    Logger logger = LoggerUtil.getLogger(MessageAuthorImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(MessageAuthorImpl.class);
 
     private final Message message;
 

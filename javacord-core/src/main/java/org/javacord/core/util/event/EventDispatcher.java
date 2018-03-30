@@ -230,17 +230,17 @@ public class EventDispatcher {
                     synchronized (activeListener) {
                         activeListener[0] = api.getThreadPool().getExecutorService().submit(() -> {
                             if (taskIndicator instanceof ServerImpl) {
-                                Object serverReadyNofitier = new Object();
+                                Object serverReadyNotifier = new Object();
                                 ((ServerImpl) taskIndicator)
                                         .addServerReadyConsumer(s -> {
-                                            synchronized (serverReadyNofitier) {
-                                                serverReadyNofitier.notifyAll();
+                                            synchronized (serverReadyNotifier) {
+                                                serverReadyNotifier.notifyAll();
                                             }
                                         });
-                                synchronized (serverReadyNofitier) {
+                                synchronized (serverReadyNotifier) {
                                     while (!((ServerImpl) taskIndicator).isReady()) {
                                         try {
-                                            serverReadyNofitier.wait(5000);
+                                            serverReadyNotifier.wait(5000);
                                         } catch (InterruptedException ignored) { }
                                     }
                                 }
