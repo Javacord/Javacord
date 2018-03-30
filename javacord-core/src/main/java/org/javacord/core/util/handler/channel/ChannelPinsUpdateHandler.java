@@ -2,7 +2,7 @@ package org.javacord.core.util.handler.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.ChannelPinsUpdateEvent;
 import org.javacord.api.listener.message.ChannelPinsUpdateListener;
@@ -36,8 +36,8 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
             ChannelPinsUpdateEvent event = new ChannelPinsUpdateEventImpl(channel, lastPinTimestamp);
 
             List<ChannelPinsUpdateListener> listeners = new ArrayList<>(channel.getChannelPinsUpdateListeners());
-            channel.asServerTextChannel()
-                    .map(ServerTextChannel::getServer)
+            channel.asServerChannel()
+                    .map(ServerChannel::getServer)
                     .map(Server::getChannelPinsUpdateListeners)
                     .ifPresent(listeners::addAll);
             listeners.addAll(api.getChannelPinsUpdateListeners());

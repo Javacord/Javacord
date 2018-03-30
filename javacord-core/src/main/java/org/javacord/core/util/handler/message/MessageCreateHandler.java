@@ -2,7 +2,7 @@ package org.javacord.core.util.handler.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
@@ -33,14 +33,14 @@ public class MessageCreateHandler extends PacketHandler {
             MessageCreateEvent event = new MessageCreateEventImpl(message);
 
             List<MessageCreateListener> listeners = new ArrayList<>(channel.getMessageCreateListeners());
-            if (channel instanceof ServerTextChannel) {
-                listeners.addAll(((ServerTextChannel) channel).getServer().getMessageCreateListeners());
+            if (channel instanceof ServerChannel) {
+                listeners.addAll(((ServerChannel) channel).getServer().getMessageCreateListeners());
             }
             message.getUserAuthor().ifPresent(user -> listeners.addAll(user.getMessageCreateListeners()));
             listeners.addAll(api.getMessageCreateListeners());
 
-            if (channel instanceof ServerTextChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerTextChannel) channel).getServer(),
+            if (channel instanceof ServerChannel) {
+                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
                         listeners, listener -> listener.onMessageCreate(event));
             } else {
                 api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onMessageCreate(event));

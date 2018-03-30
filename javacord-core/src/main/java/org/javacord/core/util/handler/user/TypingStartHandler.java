@@ -2,7 +2,7 @@ package org.javacord.core.util.handler.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.event.user.UserStartTypingEvent;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.core.event.user.UserStartTypingEventImpl;
@@ -33,14 +33,14 @@ public class TypingStartHandler extends PacketHandler {
             UserStartTypingEvent event = new UserStartTypingEventImpl(user, channel);
 
             List<UserStartTypingListener> listeners = new ArrayList<>(channel.getUserStartTypingListeners());
-            if (channel instanceof ServerTextChannel) {
-                listeners.addAll(((ServerTextChannel) channel).getServer().getUserStartTypingListeners());
+            if (channel instanceof ServerChannel) {
+                listeners.addAll(((ServerChannel) channel).getServer().getUserStartTypingListeners());
             }
             listeners.addAll(user.getUserStartTypingListeners());
             listeners.addAll(api.getUserStartTypingListeners());
 
-            if (channel instanceof ServerTextChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerTextChannel) channel).getServer(),
+            if (channel instanceof ServerChannel) {
+                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
                         listeners, listener -> listener.onUserStartTyping(event));
             } else {
                 api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserStartTyping(event));

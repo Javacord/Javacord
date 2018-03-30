@@ -2,7 +2,7 @@ package org.javacord.core.util.handler.message.reaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.event.message.reaction.ReactionRemoveAllEvent;
 import org.javacord.api.listener.message.reaction.ReactionRemoveAllListener;
@@ -41,13 +41,13 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
             List<ReactionRemoveAllListener> listeners = new ArrayList<>();
             listeners.addAll(Message.getReactionRemoveAllListeners(api, messageId));
             listeners.addAll(channel.getReactionRemoveAllListeners());
-            if (channel instanceof ServerTextChannel) {
-                listeners.addAll(((ServerTextChannel) channel).getServer().getReactionRemoveAllListeners());
+            if (channel instanceof ServerChannel) {
+                listeners.addAll(((ServerChannel) channel).getServer().getReactionRemoveAllListeners());
             }
             listeners.addAll(api.getReactionRemoveAllListeners());
 
-            if (channel instanceof ServerTextChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerTextChannel) channel).getServer(),
+            if (channel instanceof ServerChannel) {
+                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
                         listeners, listener -> listener.onReactionRemoveAll(event));
             } else {
                 api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onReactionRemoveAll(event));
