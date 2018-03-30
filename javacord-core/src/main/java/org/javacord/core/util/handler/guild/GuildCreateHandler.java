@@ -31,7 +31,6 @@ public class GuildCreateHandler extends PacketHandler {
         }
         long id = packet.get("id").asLong();
         if (api.getUnavailableServers().contains(id)) {
-            api.removeUnavailableServerFromCache(id);
             Server server = new ServerImpl(api, packet);
             ServerBecomesAvailableEvent event = new ServerBecomesAvailableEventImpl(server);
 

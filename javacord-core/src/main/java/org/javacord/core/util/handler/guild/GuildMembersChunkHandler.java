@@ -21,7 +21,7 @@ public class GuildMembersChunkHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
-        api.getServerById(packet.get("guild_id").asText())
+        api.getAllServerById(packet.get("guild_id").asLong())
             .map(server -> (ServerImpl) server)
             .ifPresent(server -> server.addMembers(packet.get("members")));
     }

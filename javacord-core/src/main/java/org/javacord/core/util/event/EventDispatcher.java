@@ -1,6 +1,7 @@
 package org.javacord.core.util.event;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.slf4j.Logger;
 
@@ -228,6 +229,22 @@ public class EventDispatcher {
                     // Call the listener
                     synchronized (activeListener) {
                         activeListener[0] = api.getThreadPool().getExecutorService().submit(() -> {
+                            if (taskIndicator instanceof ServerImpl) {
+                                Object serverReadyNofitier = new Object();
+                                ((ServerImpl) taskIndicator)
+                                        .addServerReadyConsumer(s -> {
+                                            synchronized (serverReadyNofitier) {
+                                                serverReadyNofitier.notifyAll();
+                                            }
+                                        });
+                                synchronized (serverReadyNofitier) {
+                                    while (!((ServerImpl) taskIndicator).isReady()) {
+                                        try {
+                                            serverReadyNofitier.wait(5000);
+                                        } catch (InterruptedException ignored) { }
+                                    }
+                                }
+                            }
                             synchronized (activeListeners) {
                                 synchronized (activeListener) {
                                     // Add the future to the list of active listeners

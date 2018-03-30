@@ -103,6 +103,7 @@ import org.javacord.core.entity.emoji.KnownCustomEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.entity.message.MessageSetImpl;
 import org.javacord.core.entity.message.UncachedMessageUtilImpl;
+import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
@@ -285,9 +286,14 @@ public class DiscordApiImpl implements DiscordApi {
     private final ReferenceQueue<User> usersCleanupQueue = new ReferenceQueue<>();
 
     /**
-     * A map which contains all servers.
+     * A map which contains all servers that are ready.
      */
     private final ConcurrentHashMap<Long, Server> servers = new ConcurrentHashMap<>();
+
+    /**
+     * A map which contains all servers that are not ready.
+     */
+    private final ConcurrentHashMap<Long, Server> nonReadyServers = new ConcurrentHashMap<>();
 
     /**
      * A map which contains all group channels.
@@ -531,15 +537,42 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     /**
+     * Gets a collection with all servers, including ready and not ready ones.
+     *
+     * @return A collection with all servers.
+     */
+    public Collection<Server> getAllServers() {
+        return Collections.unmodifiableList(new ArrayList<>(nonReadyServers.values()));
+    }
+
+    /**
+     * Gets a server by it's id, including ready and not ready ones.
+     *
+     * @param id The of the server.
+     * @return The server with the given id.
+     */
+    public Optional<Server> getAllServerById(long id) {
+        if (nonReadyServers.containsKey(id)) {
+            return Optional.ofNullable(nonReadyServers.get(id));
+        }
+        return Optional.ofNullable(servers.get(id));
+    }
+
+    /**
      * Adds the given server to the cache.
      *
      * @param server The server to add.
      */
-    public void addServerToCache(Server server) {
-        Server oldServer = servers.put(server.getId(), server);
-        if ((oldServer != null) && (oldServer != server)) {
-            ((Cleanupable) oldServer).cleanup();
-        }
+    public void addServerToCache(ServerImpl server) {
+        // Remove in case, there's an old instance in cache
+        removeServerFromCache(server.getId());
+
+        nonReadyServers.put(server.getId(), server);
+        server.addServerReadyConsumer(s -> {
+            nonReadyServers.remove(s.getId());
+            removeUnavailableServerFromCache(s.getId());
+            servers.put(s.getId(), s);
+        });
     }
 
     /**
@@ -549,6 +582,10 @@ public class DiscordApiImpl implements DiscordApi {
      */
     public void removeServerFromCache(long serverId) {
         servers.computeIfPresent(serverId, (key, server) -> {
+            ((Cleanupable) server).cleanup();
+            return null;
+        });
+        nonReadyServers.computeIfPresent(serverId, (key, server) -> {
             ((Cleanupable) server).cleanup();
             return null;
         });
@@ -611,7 +648,7 @@ public class DiscordApiImpl implements DiscordApi {
      *
      * @param serverId The id of the server.
      */
-    public void removeUnavailableServerFromCache(long serverId) {
+    private void removeUnavailableServerFromCache(long serverId) {
         unavailableServers.remove(serverId);
     }
 

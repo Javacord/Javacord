@@ -29,7 +29,7 @@ public class GuildRoleCreateHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         long serverId = Long.parseLong(packet.get("guild_id").asText());
-        api.getServerById(serverId).ifPresent(server -> {
+        api.getAllServerById(serverId).ifPresent(server -> {
             Role role = ((ServerImpl) server).getOrCreateRole(packet.get("role"));
             RoleCreateEvent event = new RoleCreateEventImpl(role);
 

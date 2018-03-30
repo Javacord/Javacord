@@ -39,7 +39,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
-        api.getServerById(packet.get("guild_id").asText()).map(server -> (ServerImpl) server).ifPresent(server -> {
+        api.getAllServerById(packet.get("guild_id").asLong()).map(server -> (ServerImpl) server).ifPresent(server -> {
             User user = api.getOrCreateUser(packet.get("user"));
             if (packet.has("nick")) {
                 String newNickname = packet.get("nick").asText(null);

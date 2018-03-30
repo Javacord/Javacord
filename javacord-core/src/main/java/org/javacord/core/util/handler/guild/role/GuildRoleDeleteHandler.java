@@ -28,7 +28,7 @@ public class GuildRoleDeleteHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         long serverId = packet.get("guild_id").asLong();
-        api.getServerById(serverId).map(server -> ((ServerImpl) server)).ifPresent(server -> {
+        api.getAllServerById(serverId).map(server -> ((ServerImpl) server)).ifPresent(server -> {
             long roleId = packet.get("role_id").asLong();
             server.getRoleById(roleId).ifPresent(role -> {
                 server.removeRole(roleId);

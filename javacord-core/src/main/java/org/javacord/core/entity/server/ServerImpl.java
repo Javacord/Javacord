@@ -127,6 +127,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -223,6 +224,16 @@ public class ServerImpl implements Server, Cleanupable {
      * The server's afk timeout.
      */
     private int afkTimeout = 0;
+
+    /**
+     * If the server is ready (all members are cached).
+     */
+    private volatile boolean ready = false;
+
+    /**
+     * A list with all consumers who will be informed when the server is ready.
+     */
+    private final List<Consumer<Server>> readyConsumers = new ArrayList<>();
 
     /**
      * A map with all roles of the server.
@@ -360,6 +371,32 @@ public class ServerImpl implements Server, Cleanupable {
         }
 
         api.addServerToCache(this);
+    }
+
+    /**
+     * Checks if the server is ready (all members are cached).
+     *
+     * @return Whether the server is ready or not.
+     */
+    public boolean isReady() {
+        return ready;
+    }
+
+    /**
+     * Adds a consumer which will be informed once the server is ready.
+     * If the server is already ready, it will immediately call the consumer, otherwise it will be called from the
+     * websocket reading thread.
+     *
+     * @param consumer The consumer which should be called.
+     */
+    public void addServerReadyConsumer(Consumer<Server> consumer) {
+        synchronized (readyConsumers) {
+            if (ready) {
+                consumer.accept(this);
+            } else {
+                readyConsumers.add(consumer);
+            }
+        }
     }
 
     /**
@@ -649,6 +686,14 @@ public class ServerImpl implements Server, Cleanupable {
         }
 
         joinedAtTimestamps.put(user.getId(), OffsetDateTime.parse(member.get("joined_at").asText()).toInstant());
+
+        synchronized (readyConsumers) {
+            if (!ready && members.size() == getMemberCount()) {
+                ready = true;
+                readyConsumers.forEach(consumer -> consumer.accept(this));
+                readyConsumers.clear();
+            }
+        }
     }
 
     /**
