@@ -155,33 +155,11 @@ public class ServerChannelUpdaterDelegateImpl implements ServerChannelUpdaterDel
     private void populatePermissionOverwrites() {
         if (overwrittenUserPermissions == null) {
             overwrittenUserPermissions = new HashMap<>();
-            channel.asServerTextChannel()
-                    .map(c -> (ServerTextChannelImpl) c)
-                    .map(ServerTextChannelImpl::getOverwrittenUserPermissions)
-                    .ifPresent(overwrittenUserPermissions::putAll);
-            channel.asServerVoiceChannel()
-                    .map(c -> (ServerVoiceChannelImpl) c)
-                    .map(ServerVoiceChannelImpl::getOverwrittenUserPermissions)
-                    .ifPresent(overwrittenUserPermissions::putAll);
-            channel.asChannelCategory()
-                    .map(c -> (ChannelCategoryImpl) c)
-                    .map(ChannelCategoryImpl::getOverwrittenUserPermissions)
-                    .ifPresent(overwrittenUserPermissions::putAll);
+            overwrittenUserPermissions.putAll(((ServerChannelImpl) channel).getOverwrittenUserPermissions());
         }
         if (overwrittenRolePermissions == null) {
             overwrittenRolePermissions = new HashMap<>();
-            channel.asServerTextChannel()
-                    .map(c -> (ServerTextChannelImpl) c)
-                    .map(ServerTextChannelImpl::getOverwrittenRolePermissions)
-                    .ifPresent(overwrittenRolePermissions::putAll);
-            channel.asServerVoiceChannel()
-                    .map(c -> (ServerVoiceChannelImpl) c)
-                    .map(ServerVoiceChannelImpl::getOverwrittenRolePermissions)
-                    .ifPresent(overwrittenRolePermissions::putAll);
-            channel.asChannelCategory()
-                    .map(c -> (ChannelCategoryImpl) c)
-                    .map(ChannelCategoryImpl::getOverwrittenRolePermissions)
-                    .ifPresent(overwrittenRolePermissions::putAll);
+            overwrittenRolePermissions.putAll(((ServerChannelImpl) channel).getOverwrittenRolePermissions());
         }
     }
 

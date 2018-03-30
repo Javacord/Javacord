@@ -71,47 +71,24 @@ public interface ChannelCategory extends ServerChannel {
     boolean isNsfw();
 
     /**
-     * Adds a channel to this category.
+     * Adds a categorizable to this category.
      *
-     * @param channel The channel to add.
+     * @param categorizable The categorizable to add.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> addChannel(ServerTextChannel channel) {
-        return channel.updateCategory(this);
+    default CompletableFuture<Void> addCategorizable(Categorizable categorizable) {
+        return categorizable.updateCategory(this);
     }
 
     /**
-     * Adds a channel to this category.
+     * Removes a categorizable from this category.
      *
-     * @param channel The channel to add.
+     * @param categorizable The categorizable to remove.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> addChannel(ServerVoiceChannel channel) {
-        return channel.updateCategory(this);
-    }
-
-    /**
-     * Removes a channel from this category.
-     *
-     * @param channel The channel to remove.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> removeChannel(ServerTextChannel channel) {
-        if (channel.getCategory().orElse(null) == this) {
-            return channel.removeCategory();
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /**
-     * Removes a channel from this category.
-     *
-     * @param channel The channel to remove.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> removeChannel(ServerVoiceChannel channel) {
-        if (channel.getCategory().orElse(null) == this) {
-            return channel.removeCategory();
+    default CompletableFuture<Void> removeCategorizable(Categorizable categorizable) {
+        if (categorizable.getCategory().map(this::equals).orElse(false)) {
+            return categorizable.removeCategory();
         }
         return CompletableFuture.completedFuture(null);
     }

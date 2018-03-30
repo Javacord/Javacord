@@ -1,14 +1,9 @@
 package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.ChannelAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.VoiceChannelAttachableListener;
@@ -20,7 +15,6 @@ import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberJo
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
 import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.permission.PermissionsImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.ClassHelper;
 
@@ -31,25 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * The implementation of {@link ServerVoiceChannel}.
  */
-public class ServerVoiceChannelImpl
-        implements ServerVoiceChannel, InternalChannel, InternalServerChannel, InternalVoiceChannel {
-
-    /**
-     * The discord api instance.
-     */
-    private final DiscordApiImpl api;
-
-    /**
-     * The id of the channel.
-     */
-    private final long id;
+public class ServerVoiceChannelImpl extends  ServerChannelImpl implements ServerVoiceChannel, InternalVoiceChannel {
 
     /**
      * The bitrate of the channel.
@@ -62,34 +44,9 @@ public class ServerVoiceChannelImpl
     private volatile int userLimit;
 
     /**
-     * The name of the channel.
-     */
-    private volatile String name;
-
-    /**
-     * The server of the channel.
-     */
-    private final ServerImpl server;
-
-    /**
-     * The position of the channel.
-     */
-    private volatile int position;
-
-    /**
      * The parent id of the channel.
      */
     private volatile long parentId;
-
-    /**
-     * A map with all overwritten user permissions.
-     */
-    private final ConcurrentHashMap<Long, Permissions> overwrittenUserPermissions = new ConcurrentHashMap<>();
-
-    /**
-     * A map with all overwritten role permissions.
-     */
-    private final ConcurrentHashMap<Long, Permissions> overwrittenRolePermissions = new ConcurrentHashMap<>();
 
     /**
      * The ids of the connected users of this server voice channel.
@@ -104,51 +61,10 @@ public class ServerVoiceChannelImpl
      * @param data The json data of the channel.
      */
     public ServerVoiceChannelImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
-        this.api = api;
-        this.server = server;
-        position = data.get("position").asInt();
-
-        id = Long.parseLong(data.get("id").asText());
+        super(api, server, data);
         bitrate = data.get("bitrate").asInt();
         userLimit = data.get("user_limit").asInt();
-        name = data.get("name").asText();
         parentId = Long.valueOf(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
-
-        if (data.has("permission_overwrites")) {
-            for (JsonNode permissionOverwrite : data.get("permission_overwrites")) {
-                long id = Long.parseLong(permissionOverwrite.has("id") ? permissionOverwrite.get("id").asText() : "-1");
-                int allow = permissionOverwrite.has("allow") ? permissionOverwrite.get("allow").asInt() : 0;
-                int deny = permissionOverwrite.has("deny") ? permissionOverwrite.get("deny").asInt() : 0;
-                Permissions permissions = new PermissionsImpl(allow, deny);
-                switch (permissionOverwrite.get("type").asText()) {
-                    case "role":
-                        overwrittenRolePermissions.put(id, permissions);
-                        break;
-                    case "member":
-                        overwrittenUserPermissions.put(id, permissions);
-                        break;
-                }
-            }
-        }
-        server.addChannelToCache(this);
-    }
-
-    /**
-     * Sets the name of the channel.
-     *
-     * @param name The new name of the channel.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Sets the position of the channel.
-     *
-     * @param position The new position of the channel.
-     */
-    public void setPosition(int position) {
-        this.position = position;
     }
 
     /**
@@ -179,24 +95,6 @@ public class ServerVoiceChannelImpl
     }
 
     /**
-     * Gets the overwritten role permissions.
-     *
-     * @return The overwritten role permissions.
-     */
-    public ConcurrentHashMap<Long, Permissions> getOverwrittenRolePermissions() {
-        return overwrittenRolePermissions;
-    }
-
-    /**
-     * Gets the overwritten user permissions.
-     *
-     * @return The overwritten user permissions.
-     */
-    public ConcurrentHashMap<Long, Permissions> getOverwrittenUserPermissions() {
-        return overwrittenUserPermissions;
-    }
-
-    /**
      * Adds the user with the given id to the list of connected users.
      *
      * @param userId The id of the user to add.
@@ -212,41 +110,6 @@ public class ServerVoiceChannelImpl
      */
     public void removeConnectedUser(long userId) {
         connectedUsers.remove(userId);
-    }
-
-    @Override
-    public DiscordApi getApi() {
-        return api;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Server getServer() {
-        return server;
-    }
-
-    @Override
-    public int getRawPosition() {
-        return position;
-    }
-
-    @Override
-    public Permissions getOverwrittenPermissions(User user) {
-        return overwrittenUserPermissions.getOrDefault(user.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
-    }
-
-    @Override
-    public Permissions getOverwrittenPermissions(Role role) {
-        return overwrittenRolePermissions.getOrDefault(role.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
     }
 
     @Override
