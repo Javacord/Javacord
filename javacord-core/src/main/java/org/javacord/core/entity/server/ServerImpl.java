@@ -947,6 +947,22 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
+    public CompletableFuture<Void> addRoleToUser(User user, Role role, String reason) {
+        return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.SERVER_MEMBER_ROLE)
+                .setUrlParameters(getIdAsString(), user.getIdAsString(), role.getIdAsString())
+                .setAuditLogReason(reason)
+                .execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> removeRoleFromUser(User user, Role role, String reason) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER_ROLE)
+                .setUrlParameters(getIdAsString(), user.getIdAsString(), role.getIdAsString())
+                .setAuditLogReason(reason)
+                .execute(result -> null);
+    }
+
+    @Override
     public CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason) {
         ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
         ArrayNode rolesJson = updateNode.putArray("roles");

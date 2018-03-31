@@ -4,6 +4,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.channel.server.ServerChannelChangeOverwrittenPermissionsListener;
@@ -175,6 +176,64 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      */
     default CompletableFuture<Void> updateMentionableFlag(boolean mentionable) {
         return createUpdater().setMentionableFlag(mentionable).update();
+    }
+
+    /**
+     * Adds a user to the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param user The user to add.
+     * @return A future to check if the update was successful.
+     * @see Server#addRoleToUser(User, Role)
+     */
+    default CompletableFuture<Void> addUser(User user) {
+        return addUser(user, null);
+    }
+
+    /**
+     * Adds a user to the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param user The user to add.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     * @see Server#addRoleToUser(User, Role, String)
+     */
+    default CompletableFuture<Void> addUser(User user, String reason) {
+        return getServer().addRoleToUser(user, this, reason);
+    }
+
+    /**
+     * Removes a user from the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param user The user to remove.
+     * @return A future to check if the update was successful.
+     * @see Server#removeRoleFromUser(User, Role)
+     */
+    default CompletableFuture<Void> removeUser(User user) {
+        return removeUser(user, null);
+    }
+
+    /**
+     * Removes a user from the role.
+     * <p>
+     * If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param user The user to remove.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     * @see Server#removeRoleFromUser(User, Role, String)
+     */
+    default CompletableFuture<Void> removeUser(User user, String reason) {
+        return getServer().removeRoleFromUser(user, this, reason);
     }
 
     /**
