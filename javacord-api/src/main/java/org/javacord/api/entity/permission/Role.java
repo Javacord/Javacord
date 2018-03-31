@@ -179,12 +179,12 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
     }
 
     /**
-     * Adds a user to the role.
+     * Adds the role to the given user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user to add.
+     * @param user The user the role should be added to.
      * @return A future to check if the update was successful.
      * @see Server#addRoleToUser(User, Role)
      */
@@ -193,12 +193,12 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
     }
 
     /**
-     * Adds a user to the role.
+     * Adds the role to the given user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user to add.
+     * @param user The user the role should be added to.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#addRoleToUser(User, Role, String)
@@ -208,12 +208,12 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
     }
 
     /**
-     * Removes a user from the role.
+     * Removes the role from the given user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user to remove.
+     * @param user The user the role should be removed from.
      * @return A future to check if the update was successful.
      * @see Server#removeRoleFromUser(User, Role)
      */
@@ -222,12 +222,12 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
     }
 
     /**
-     * Removes a user from the role.
+     * Removes the role from the given user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user to remove.
+     * @param user The user the role should be removed from.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#removeRoleFromUser(User, Role, String)

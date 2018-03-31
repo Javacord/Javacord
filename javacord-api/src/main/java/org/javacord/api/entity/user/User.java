@@ -276,12 +276,12 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
-     * Adds the user to the given role.
+     * Adds the given role to the user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role the user should be added to.
+     * @param role The role which should be added to the user.
      * @return A future to check if the update was successful.
      * @see Server#addRoleToUser(User, Role)
      */
@@ -290,12 +290,12 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
-     * Adds the user to the given role.
+     * Adds the given role to the user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role the user should be added to.
+     * @param role The role which should be added to the user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#addRoleToUser(User, Role, String)
@@ -305,12 +305,12 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
-     * Removes the user from the given role.
+     * Removes the given role from the user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role the user should be removed from.
+     * @param role The role which should be removed from the user.
      * @return A future to check if the update was successful.
      * @see Server#removeRoleFromUser(User, Role)
      */
@@ -319,12 +319,12 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
-     * Removes the user from the given role.
+     * Removes the given role from the user.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role the user should be removed from.
+     * @param role The role which should be removed from the user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#removeRoleFromUser(User, Role, String)

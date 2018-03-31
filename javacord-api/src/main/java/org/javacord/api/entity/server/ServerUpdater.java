@@ -424,8 +424,8 @@ public class ServerUpdater {
     /**
      * Queues a role to be assigned to the user.
      *
-     * @param user The user to whom the role should be assigned.
-     * @param role The role to be assigned.
+     * @param user The server member the role should be added to.
+     * @param role The role which should be added to the server member.
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater addRoleToUser(User user, Role role) {
@@ -436,8 +436,8 @@ public class ServerUpdater {
     /**
      * Queues a collection of roles to be assigned to the user.
      *
-     * @param user The user to whom the roles should be assigned.
-     * @param roles The collection of roles to be assigned.
+     * @param user The server member the role should be added to.
+     * @param roles The roles which should be added to the server member.
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater addAllRolesToUser(User user, Collection<Role> roles) {
@@ -448,8 +448,8 @@ public class ServerUpdater {
     /**
      * Queues a role to be removed from the user.
      *
-     * @param user The user who should lose the role.
-     * @param role The role to be removed.
+     * @param user The server member the role should be removed from.
+     * @param role The role which should be removed from the user.
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater removeRoleFromUser(User user, Role role) {
@@ -460,8 +460,8 @@ public class ServerUpdater {
     /**
      * Queues a collection of roles to be removed from the user.
      *
-     * @param user The user who should lose the roles.
-     * @param roles The collection of roles to be removed.
+     * @param user The server member the roles should be removed from.
+     * @param roles The roles which should be removed from the user.
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater removeAllRolesFromUser(User user, Collection<Role> roles) {

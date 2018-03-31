@@ -1079,13 +1079,13 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     CompletableFuture<Void> leave();
 
     /**
-     * Adds a server member to the given role.
+     * Adds the given role to the given server member.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member which should be added to the role.
-     * @param role The role the server member should be added to.
+     * @param user The server member the role should be added to.
+     * @param role The role which should be added to the server member.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> addRoleToUser(User user, Role role) {
@@ -1093,26 +1093,26 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
-     * Adds a server member to the given role.
+     * Adds the given role to the given server member.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member which should be added to the role.
-     * @param role The role the server member should be added to.
+     * @param user The server member the role should be added to.
+     * @param role The role which should be added to the server member.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Void> addRoleToUser(User user, Role role, String reason);
 
     /**
-     * Removes a server member from the given role.
+     * Removes the given role from the given server member.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member which should be removed from the role.
-     * @param role The role the server member should be removed from.
+     * @param user The server member the role should be removed from.
+     * @param role The role which should be removed from the server member.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> removeRoleFromUser(User user, Role role) {
@@ -1120,13 +1120,13 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
-     * Removes a server member from the given role.
+     * Removes the given role from the given server member.
      * <p>
      * If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member which should be removed from the role.
-     * @param role The role the server member should be removed from.
+     * @param user The server member the role should be removed from.
+     * @param role The role which should be removed from the server member.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
