@@ -54,7 +54,7 @@ public class ServerTextChannelImpl
     /**
      * The name of the channel.
      */
-    private String name;
+    private volatile String name;
 
     /**
      * The server of the channel.
@@ -64,7 +64,7 @@ public class ServerTextChannelImpl
     /**
      * The position of the channel.
      */
-    private int position;
+    private volatile int position;
 
     /**
      * The message cache of the server text channel.
@@ -74,17 +74,17 @@ public class ServerTextChannelImpl
     /**
      * Whether the channel is "not safe for work" or not.
      */
-    private boolean nsfw;
+    private volatile boolean nsfw;
 
     /**
      * The parent id of the channel.
      */
-    private long parentId;
+    private volatile long parentId;
 
     /**
      * The topic of the channel.
      */
-    private String topic;
+    private volatile String topic;
 
     /**
      * A map with all overwritten user permissions.

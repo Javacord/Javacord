@@ -15,7 +15,7 @@ public class PermissionsImpl implements Permissions {
     public static final Permissions EMPTY_PERMISSIONS = new PermissionsImpl(0, 0);
 
     private final int allowed;
-    private int denied;
+    private final int denied;
 
     /**
      * Creates a new instance of this class.
@@ -36,12 +36,14 @@ public class PermissionsImpl implements Permissions {
      */
     public PermissionsImpl(int allow) {
         this.allowed = allow;
+        int tempDenied = 0;
         for (PermissionType type : PermissionType.values()) {
             if (!type.isSet(allow)) {
                 // set everything which is not allowed to denied.
-                denied = type.set(denied, true);
+                tempDenied = type.set(tempDenied, true);
             }
         }
+        this.denied = tempDenied;
     }
 
     @Override

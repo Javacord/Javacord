@@ -39,7 +39,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl implements KnownCustom
      * A list with all whitelisted roles.
      * Might be <code>null</code>!
      */
-    private Collection<Role> whitelist;
+    private volatile Collection<Role> whitelist;
 
     /**
      * Whether this emoji must be wrapped in colons or not.

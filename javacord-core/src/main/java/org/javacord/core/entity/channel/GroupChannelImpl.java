@@ -59,12 +59,12 @@ public class GroupChannelImpl
     /**
      * The name of the channel.
      */
-    private String name;
+    private volatile String name;
 
     /**
      * The icon id of the channel.
      */
-    private String iconId;
+    private volatile String iconId;
 
     /**
      * The recipients of the group channel.

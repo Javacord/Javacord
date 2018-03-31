@@ -54,17 +54,17 @@ public class ServerVoiceChannelImpl
     /**
      * The bitrate of the channel.
      */
-    private int bitrate;
+    private volatile int bitrate;
 
     /**
      * The userLimit of the channel.
      */
-    private int userLimit;
+    private volatile int userLimit;
 
     /**
      * The name of the channel.
      */
-    private String name;
+    private volatile String name;
 
     /**
      * The server of the channel.
@@ -74,12 +74,12 @@ public class ServerVoiceChannelImpl
     /**
      * The position of the channel.
      */
-    private int position;
+    private volatile int position;
 
     /**
      * The parent id of the channel.
      */
-    private long parentId;
+    private volatile long parentId;
 
     /**
      * A map with all overwritten user permissions.

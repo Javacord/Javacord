@@ -127,6 +127,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -153,12 +154,12 @@ public class ServerImpl implements Server, Cleanupable {
     /**
      * The name of the server.
      */
-    private String name;
+    private volatile String name;
 
     /**
      * The region of the server.
      */
-    private Region region;
+    private volatile Region region;
 
     /**
      * Whether the server is considered as large or not.
@@ -168,62 +169,62 @@ public class ServerImpl implements Server, Cleanupable {
     /**
      * The id of the owner.
      */
-    private long ownerId;
+    private volatile long ownerId;
 
     /**
      * The application id of the owner.
      */
-    private long applicationId = -1;
+    private volatile long applicationId = -1;
 
     /**
      * The verification level of the server.
      */
-    private VerificationLevel verificationLevel;
+    private volatile VerificationLevel verificationLevel;
 
     /**
      * The explicit content filter level of the server.
      */
-    private ExplicitContentFilterLevel explicitContentFilterLevel;
+    private volatile ExplicitContentFilterLevel explicitContentFilterLevel;
 
     /**
      * The default message notification level of the server.
      */
-    private DefaultMessageNotificationLevel defaultMessageNotificationLevel;
+    private volatile DefaultMessageNotificationLevel defaultMessageNotificationLevel;
 
     /**
      * The multi factor authentication level of the server.
      */
-    private MultiFactorAuthenticationLevel multiFactorAuthenticationLevel;
+    private volatile MultiFactorAuthenticationLevel multiFactorAuthenticationLevel;
 
     /**
      * The amount of members in this server.
      */
-    private int memberCount;
+    private final AtomicInteger memberCount = new AtomicInteger();
 
     /**
      * The icon hash of the server. Might be <code>null</code>.
      */
-    private String iconHash;
+    private volatile String iconHash;
 
     /**
      * The splash of the server. Might be <code>null</code>.
      */
-    private String splash;
+    private volatile String splash;
 
     /**
      * The id of the server's system channel.
      */
-    private long systemChannelId = -1;
+    private volatile long systemChannelId = -1;
 
     /**
      * The id of the server's afk channel.
      */
-    private long afkChannelId = -1;
+    private volatile long afkChannelId = -1;
 
     /**
      * The server's afk timeout.
      */
-    private int afkTimeout = 0;
+    private volatile int afkTimeout = 0;
 
     /**
      * If the server is ready (all members are cached).
@@ -278,7 +279,7 @@ public class ServerImpl implements Server, Cleanupable {
         name = data.get("name").asText();
         region = Region.getRegionByKey(data.get("region").asText());
         large = data.get("large").asBoolean();
-        memberCount = data.get("member_count").asInt();
+        memberCount.set(data.get("member_count").asInt());
         ownerId = Long.parseLong(data.get("owner_id").asText());
         verificationLevel = VerificationLevel.fromId(data.get("verification_level").asInt());
         explicitContentFilterLevel = ExplicitContentFilterLevel.fromId(data.get("explicit_content_filter").asInt());
@@ -665,7 +666,7 @@ public class ServerImpl implements Server, Cleanupable {
      * Decrements the member count.
      */
     public void decrementMemberCount() {
-        memberCount--;
+        memberCount.decrementAndGet();
     }
 
     /**
@@ -700,7 +701,7 @@ public class ServerImpl implements Server, Cleanupable {
      * Increments the member count.
      */
     public void incrementMemberCount() {
-        memberCount++;
+        memberCount.incrementAndGet();
     }
 
     /**
@@ -783,7 +784,7 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public int getMemberCount() {
-        return memberCount;
+        return memberCount.get();
     }
 
     @Override

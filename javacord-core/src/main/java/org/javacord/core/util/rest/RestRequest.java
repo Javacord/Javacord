@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -37,14 +38,14 @@ public class RestRequest<T> {
     private final RestMethod method;
     private final RestEndpoint endpoint;
 
-    private boolean includeAuthorizationHeader = true;
-    private int ratelimitRetries = 50;
-    private String[] urlParameters = new String[0];
+    private volatile boolean includeAuthorizationHeader = true;
+    private volatile int ratelimitRetries = 50;
+    private volatile String[] urlParameters = new String[0];
     private final Map<String, String> queryParameters = new HashMap<>();
     private final Map<String, String> headers = new HashMap<>();
-    private String body = null;
+    private volatile String body = null;
 
-    private int retryCounter = 0;
+    private final AtomicInteger retryCounter = new AtomicInteger();
 
     private final CompletableFuture<RestRequestResult> result = new CompletableFuture<>();
 
@@ -275,7 +276,7 @@ public class RestRequest<T> {
      * @return <code>true</code> if the maximum ratelimit retries were exceeded.
      */
     public boolean incrementRetryCounter() {
-        return ++retryCounter > ratelimitRetries;
+        return retryCounter.incrementAndGet() > ratelimitRetries;
     }
 
     /**

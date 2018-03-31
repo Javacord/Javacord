@@ -57,7 +57,7 @@ public class MessageImpl implements Message {
     /**
      * The content of the message.
      */
-    private String content;
+    private volatile String content;
 
     /**
      * The type of the message.
@@ -67,12 +67,12 @@ public class MessageImpl implements Message {
     /**
      * The pinned flag of the message.
      */
-    private boolean pinned;
+    private volatile boolean pinned;
 
     /**
      * Gets the last edit time.
      */
-    private Instant lastEditTime;
+    private volatile Instant lastEditTime;
 
     /**
      * The author of the message.
@@ -82,12 +82,12 @@ public class MessageImpl implements Message {
     /**
      * If the message should be cached forever or not.
      */
-    private boolean cacheForever = false;
+    private volatile boolean cacheForever = false;
 
     /**
      * A list with all embeds.
      */
-    private List<Embed> embeds = new ArrayList<>();
+    private final List<Embed> embeds = new ArrayList<>();
 
     /**
      * A list with all reactions.
@@ -207,7 +207,8 @@ public class MessageImpl implements Message {
      * @param embeds The embeds to set.
      */
     public void setEmbeds(List<Embed> embeds) {
-        this.embeds = embeds;
+        this.embeds.clear();
+        this.embeds.addAll(embeds);
     }
 
     /**

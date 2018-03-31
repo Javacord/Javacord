@@ -8,6 +8,8 @@ import org.javacord.api.entity.message.Reaction;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * The implementation of {@link Reaction}.
  */
@@ -26,12 +28,12 @@ public class ReactionImpl implements Reaction {
     /**
      * The amount of users who used this reaction.
      */
-    private int count;
+    private final AtomicInteger count = new AtomicInteger();
 
     /**
      * Whether this reaction is used by you or not.
      */
-    private boolean containsYou;
+    private volatile boolean containsYou;
 
     /**
      * Creates a new reaction.
@@ -41,7 +43,7 @@ public class ReactionImpl implements Reaction {
      */
     public ReactionImpl(Message message, JsonNode data) {
         this.message = message;
-        this.count = data.get("count").asInt();
+        this.count.set(data.get("count").asInt());
         this.containsYou = data.get("me").asBoolean();
 
         JsonNode emojiJson = data.get("emoji");
@@ -63,7 +65,7 @@ public class ReactionImpl implements Reaction {
     public ReactionImpl(Message message, Emoji emoji, int count, boolean you) {
         this.message = message;
         this.emoji = emoji;
-        this.count = count;
+        this.count.set(count);
         this.containsYou = you;
     }
 
@@ -73,7 +75,7 @@ public class ReactionImpl implements Reaction {
      * @param you If you added the reaction.
      */
     public void incrementCount(boolean you) {
-        count++;
+        count.getAndIncrement();
         if (you) {
             containsYou = true;
         }
@@ -85,7 +87,7 @@ public class ReactionImpl implements Reaction {
      * @param you If you removed the reaction.
      */
     public void decrementCount(boolean you) {
-        count--;
+        count.decrementAndGet();
         if (you) {
             containsYou = false;
         }
@@ -108,7 +110,7 @@ public class ReactionImpl implements Reaction {
 
     @Override
     public int getCount() {
-        return count;
+        return count.get();
     }
 
     @Override

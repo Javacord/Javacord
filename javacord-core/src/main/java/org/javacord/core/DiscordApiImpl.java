@@ -186,7 +186,7 @@ public class DiscordApiImpl implements DiscordApi {
     /**
      * The websocket adapter used to connect to Discord.
      */
-    private DiscordWebSocketAdapter websocketAdapter = null;
+    private volatile DiscordWebSocketAdapter websocketAdapter = null;
 
     /**
      * The account type of the bot.
@@ -211,27 +211,27 @@ public class DiscordApiImpl implements DiscordApi {
     /**
      * The status which should be displayed for the bot.
      */
-    private UserStatus status = UserStatus.ONLINE;
+    private volatile UserStatus status = UserStatus.ONLINE;
 
     /**
      * The activity which should be displayed. May be <code>null</code>.
      */
-    private Activity activity;
+    private volatile Activity activity;
 
     /**
      * The default message cache capacity which is applied for every newly created channel.
      */
-    private int defaultMessageCacheCapacity = 50;
+    private volatile int defaultMessageCacheCapacity = 50;
 
     /**
      * The default maximum age of cached messages.
      */
-    private int defaultMessageCacheStorageTimeInSeconds = 60*60*12;
+    private volatile int defaultMessageCacheStorageTimeInSeconds = 60*60*12;
 
     /**
      * The function to calculate the reconnect delay.
      */
-    private Function<Integer, Integer> reconnectDelayProvider;
+    private volatile Function<Integer, Integer> reconnectDelayProvider;
 
     /**
      * The current shard of the bot.
@@ -251,22 +251,22 @@ public class DiscordApiImpl implements DiscordApi {
     /**
      * The user of the connected account.
      */
-    private User you;
+    private volatile User you;
 
     /**
      * The client id of the application.
      */
-    private long clientId = -1;
+    private volatile long clientId = -1;
 
     /**
      * The id of the application's owner.
      */
-    private long ownerId = -1;
+    private volatile long ownerId = -1;
 
     /**
      * The time offset between the Discord time and our local time.
      */
-    private Long timeOffset = null;
+    private volatile Long timeOffset = null;
 
     /**
      * A map which contains all users.

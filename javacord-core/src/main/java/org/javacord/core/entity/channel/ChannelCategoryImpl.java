@@ -52,7 +52,7 @@ public class ChannelCategoryImpl implements ChannelCategory, InternalChannel, In
     /**
      * The name of the channel.
      */
-    private String name;
+    private volatile String name;
 
     /**
      * The server of the channel.
@@ -62,12 +62,12 @@ public class ChannelCategoryImpl implements ChannelCategory, InternalChannel, In
     /**
      * The position of the channel.
      */
-    private int position;
+    private volatile int position;
 
     /**
      * Whether the category is "not safe for work" or not.
      */
-    private boolean nsfw;
+    private volatile boolean nsfw;
 
     /**
      * A map with all overwritten user permissions.

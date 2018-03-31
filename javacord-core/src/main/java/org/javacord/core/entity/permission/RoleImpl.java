@@ -61,37 +61,37 @@ public class RoleImpl implements Role {
     /**
      * The name of the role.
      */
-    private String name;
+    private volatile String name;
 
     /**
      * The position of the role.
      */
-    private int position;
+    private volatile int position;
 
     /**
      * The color of the role.
      */
-    private int color;
+    private volatile int color;
 
     /**
      * Whether this role is pinned in the user listing or not.
      */
-    private boolean hoist;
+    private volatile boolean hoist;
 
     /**
      * Whether this role can be mentioned or not.
      */
-    private boolean mentionable;
+    private volatile boolean mentionable;
 
     /**
      * The permissions of the role.
      */
-    private PermissionsImpl permissions;
+    private volatile PermissionsImpl permissions;
 
     /**
      * Whether this role is managed by an integration or not.
      */
-    private boolean managed;
+    private final boolean managed;
 
     /**
      * A collection with all users with this role.
@@ -161,15 +161,6 @@ public class RoleImpl implements Role {
      */
     public void setHoist(boolean hoist) {
         this.hoist = hoist;
-    }
-
-    /**
-     * Sets the managed flag of the role.
-     *
-     * @param managed The managed flag to set.
-     */
-    public void setManaged(boolean managed) {
-        this.managed = managed;
     }
 
     /**

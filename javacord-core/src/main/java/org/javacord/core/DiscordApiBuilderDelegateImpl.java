@@ -35,12 +35,12 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * The token which is used to login. Must be present in order to login!
      */
-    private String token = null;
+    private volatile String token = null;
 
     /**
      * The account type of the account with the given token.
      */
-    private AccountType accountType = AccountType.BOT;
+    private volatile AccountType accountType = AccountType.BOT;
 
     /**
      * The current shard starting with <code>0</code>.
@@ -61,7 +61,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * Whether Javacord should wait for all servers to become available on startup or not.
      */
-    private boolean waitForServersOnStartup = true;
+    private volatile boolean waitForServersOnStartup = true;
 
     @Override
     public CompletableFuture<DiscordApi> login() {

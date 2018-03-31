@@ -37,7 +37,7 @@ public class CustomEmojiImpl implements CustomEmoji {
     /**
      * The name of the emoji.
      */
-    protected String name;
+    protected volatile String name;
 
     /**
      * Whether the emoji is animated or not.

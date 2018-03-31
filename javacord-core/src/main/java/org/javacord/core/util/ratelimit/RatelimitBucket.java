@@ -13,10 +13,10 @@ public class RatelimitBucket {
     private final RestEndpoint endpoint;
     private final String majorUrlParameter;
 
-    private long rateLimitResetTimestamp = 0;
-    private int rateLimitRemaining = 1;
+    private volatile long rateLimitResetTimestamp = 0;
+    private volatile int rateLimitRemaining = 1;
 
-    private boolean hasActiveScheduler = false;
+    private volatile boolean hasActiveScheduler = false;
 
     public RatelimitBucket(DiscordApi api, RestEndpoint endpoint) {
         this(api, endpoint, null);

@@ -44,12 +44,12 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
     /**
      * The maximum amount of stored messages.
      */
-    private int capacity;
+    private volatile int capacity;
 
     /**
      * The time how long messages should be cached.
      */
-    private int storageTimeInSeconds;
+    private volatile int storageTimeInSeconds;
 
     /**
      * Creates a new message cache.

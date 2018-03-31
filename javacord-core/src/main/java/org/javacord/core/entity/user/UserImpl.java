@@ -81,22 +81,22 @@ public class UserImpl implements User, Cleanupable {
     /**
      * The name of the user.
      */
-    private String name;
+    private volatile String name;
 
     /**
      * The private channel with the given user.
      */
-    private PrivateChannel channel = null;
+    private volatile PrivateChannel channel = null;
 
     /**
      * The avatar hash of the user. Might be <code>null</code>!
      */
-    private String avatarHash = null;
+    private volatile String avatarHash = null;
 
     /**
      * The discriminator of the user.
      */
-    private String discriminator;
+    private volatile String discriminator;
 
     /**
      * Whether the user is a bot account or not.
@@ -106,12 +106,12 @@ public class UserImpl implements User, Cleanupable {
     /**
      * The activity of the user.
      */
-    private Activity activity = null;
+    private volatile Activity activity = null;
 
     /**
      * The status of the user.
      */
-    private UserStatus status = UserStatus.OFFLINE;
+    private volatile UserStatus status = UserStatus.OFFLINE;
 
     /**
      * Creates a new user.

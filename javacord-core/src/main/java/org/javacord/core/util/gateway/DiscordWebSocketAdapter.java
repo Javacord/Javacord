@@ -120,20 +120,20 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private final AtomicReference<Future<?>> heartbeatTimer = new AtomicReference<>();
     private final AtomicBoolean heartbeatAckReceived = new AtomicBoolean();
 
-    private int lastSeq = -1;
-    private String sessionId = null;
+    private volatile int lastSeq = -1;
+    private volatile String sessionId = null;
 
-    private boolean reconnect = true;
+    private volatile boolean reconnect = true;
 
     private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify =
             new AtomicMarkableReference<>(null, false);
     private final AtomicReference<WebSocketFrame> nextHeartbeatFrame = new AtomicReference<>(null);
     private final List<WebSocketListener> identifyFrameListeners = Collections.synchronizedList(new ArrayList<>());
 
-    private long lastGuildMembersChunkReceived = System.currentTimeMillis();
+    private volatile long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
     // A reconnect attempt counter
-    private int reconnectAttempt = 0;
+    private final AtomicInteger reconnectAttempt = new AtomicInteger();
 
     // A queue which contains server ids for the "request guild members" packet
     private final BlockingQueue<Long> requestGuildMembersQueue = new LinkedBlockingQueue<>();
@@ -301,8 +301,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         } catch (Throwable t) {
             logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
-                reconnectAttempt++;
-                logger.info("Retrying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
+                reconnectAttempt.incrementAndGet();
+                logger.info("Retrying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
                 // Reconnect after a (short?) delay depending on the amount of reconnect attempts
                 api.getThreadPool().getScheduler()
                         .schedule(() -> {
@@ -313,7 +313,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                 gatewayWriteLock.unlock();
                             }
                             this.connect();
-                        }, api.getReconnectDelay(reconnectAttempt), TimeUnit.SECONDS);
+                        }, api.getReconnectDelay(reconnectAttempt.get()), TimeUnit.SECONDS);
             }
         }
     }
@@ -377,11 +377,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
         // Reconnect
         if (reconnect) {
-            reconnectAttempt++;
-            logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt));
+            reconnectAttempt.incrementAndGet();
+            logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
             // Reconnect after a (short?) delay depending on the amount of reconnect attempts
             api.getThreadPool().getScheduler()
-                    .schedule(this::connect, api.getReconnectDelay(reconnectAttempt), TimeUnit.SECONDS);
+                    .schedule(this::connect, api.getReconnectDelay(reconnectAttempt.get()), TimeUnit.SECONDS);
         }
     }
 
@@ -412,7 +412,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     lastGuildMembersChunkReceived = System.currentTimeMillis();
                 }
                 if (type.equals("RESUMED")) {
-                    reconnectAttempt = 0;
+                    reconnectAttempt.set(0);
                     logger.debug("Received RESUMED packet");
 
                     ResumeEvent resumeEvent = new ResumeEventImpl(api);
@@ -421,7 +421,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             .dispatchEvent(api, listeners, listener -> listener.onResume(resumeEvent));
                 }
                 if (type.equals("READY")) {
-                    reconnectAttempt = 0;
+                    reconnectAttempt.set(0);
                     sessionId = packet.get("d").get("session_id").asText();
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("Startup Servers Wait Thread").submit(() -> {
