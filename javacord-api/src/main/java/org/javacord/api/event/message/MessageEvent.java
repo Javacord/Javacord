@@ -1,11 +1,10 @@
 package org.javacord.api.event.message;
 
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.event.Event;
+import org.javacord.api.event.channel.TextChannelEvent;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -13,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * A message event.
  */
-public interface MessageEvent extends Event {
+public interface MessageEvent extends TextChannelEvent {
 
     /**
      * Gets the id of the message.
@@ -21,13 +20,6 @@ public interface MessageEvent extends Event {
      * @return The id of the message.
      */
     long getMessageId();
-
-    /**
-     * Gets the channel in which the message was sent.
-     *
-     * @return The channel in which the message was sent.
-     */
-    TextChannel getChannel();
 
     /**
      * Gets the server of the message.
