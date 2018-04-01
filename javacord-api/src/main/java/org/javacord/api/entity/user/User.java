@@ -116,6 +116,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     /**
      * Checks whether this user is connected to the given channel.
      *
+     * @param channel The channel to check.
      * @return Whether this user is connected to the given channel or not.
      */
     default boolean isConnected(ServerVoiceChannel channel) {

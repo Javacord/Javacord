@@ -65,6 +65,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     /**
      * Checks whether the user with the given id is connected to this channel.
      *
+     * @param userId The id of the user to check.
      * @return Whether the user with the given id is connected to this channel or not.
      */
     boolean isConnected(long userId);
@@ -72,6 +73,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     /**
      * Checks whether the given user is connected to this channel.
      *
+     * @param user The user to check.
      * @return Whether the given user is connected to this channel or not.
      */
     default boolean isConnected(User user) {
