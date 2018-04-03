@@ -250,6 +250,16 @@ public interface Server extends DiscordEntity {
     Optional<User> getMemberById(long id);
 
     /**
+     * Returns if this Server is the same as the given Server, going after ID
+     *
+     * @param server The Server to Compare to
+     * @return Whether the Servers are the same.
+     */
+    default boolean equals(Server server) {
+        return (this.getId() == server.getId());
+    }
+
+    /**
      * Gets a member by its id.
      *
      * @param id The id of the member.

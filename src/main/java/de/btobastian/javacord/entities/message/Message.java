@@ -1057,6 +1057,16 @@ public interface Message extends DiscordEntity, Comparable<Message> {
     List<Role> getMentionedRoles();
 
     /**
+     * Returns if this Message is the same as the given Message, going after ID
+     *
+     * @param message The Message to Compare to
+     * @return Whether the Messages are the same.
+     */
+    default boolean equals(Message message) {
+        return (this.getId() == message.getId());
+    }
+
+    /**
      * Gets a list with all channels mentioned in this message.
      *
      * @return A list with all channels mentioned in this message.

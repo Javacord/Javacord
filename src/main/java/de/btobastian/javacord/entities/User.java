@@ -140,6 +140,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable {
     boolean hasDefaultAvatar();
 
     /**
+     * Returns if this User is the same as the given User, going after ID
+     *
+     * @param user The User to Compare to
+     * @return Whether the Users are the same.
+     */
+    default boolean equals(User user) {
+        return (this.getId() == user.getId());
+    }
+
+    /**
      * Gets all mutual servers with this user.
      *
      * @return All mutual servers with this user.
