@@ -1324,7 +1324,7 @@ public interface Message extends DiscordEntity, Comparable<Message> {
      * @return Whether or not the message was sent as a private message.
      */
     default boolean isPrivate() {
-        return getPrivateChannel().isPresent();
+        return getChannel() instanceof PrivateChannel;
     }
 
     /**
