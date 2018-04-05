@@ -12,6 +12,10 @@ subprojects {
         classifier 'sources'
         from sourceSets.main.allJava
     }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
 }
 
 jar {
@@ -20,4 +24,8 @@ jar {
 
 shadowJar {
     classifier 'shaded'
+}
+
+artifacts {
+    archives shadowJar
 }
