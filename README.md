@@ -32,6 +32,7 @@ or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/m
     <artifactId>javacord</artifactId>
     <!-- See below what to insert here -->
     <version>COMMIT_ID</version>
+    <type>pom</type>
 </dependency>
 ```
 Replace `COMMIT_ID` with the latest commit id. Once the rewrite is finished, there will be proper version numbers.
