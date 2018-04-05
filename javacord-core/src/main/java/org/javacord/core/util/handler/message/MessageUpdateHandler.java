@@ -3,7 +3,6 @@ package org.javacord.core.util.handler.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.server.Server;
@@ -198,13 +197,13 @@ public class MessageUpdateHandler extends PacketHandler {
         List<MessageEditListener> listeners = new ArrayList<>();
         listeners.addAll(Message.getMessageEditListeners(api, event.getMessageId()));
         listeners.addAll(event.getChannel().getMessageEditListeners());
-        if (event.getChannel() instanceof ServerTextChannel) {
-            listeners.addAll(((ServerTextChannel) event.getChannel()).getServer().getMessageEditListeners());
+        if (event.getChannel() instanceof ServerChannel) {
+            listeners.addAll(((ServerChannel) event.getChannel()).getServer().getMessageEditListeners());
         }
         listeners.addAll(api.getMessageEditListeners());
 
-        if (event.getChannel() instanceof ServerTextChannel) {
-            api.getEventDispatcher().dispatchEvent(((ServerTextChannel) event.getChannel()).getServer(),
+        if (event.getChannel() instanceof ServerChannel) {
+            api.getEventDispatcher().dispatchEvent(((ServerChannel) event.getChannel()).getServer(),
                     listeners, listener -> listener.onMessageEdit(event));
         } else {
             api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onMessageEdit(event));

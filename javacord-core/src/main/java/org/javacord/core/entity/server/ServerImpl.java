@@ -13,7 +13,6 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.auditlog.AuditLog;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
-import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -1112,20 +1111,12 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public List<ServerChannel> getChannels() {
-        Collection<ServerChannel> channelsUnordered = this.channels.values();
-        List<ServerChannel> channels = new ArrayList<>();
-        channelsUnordered.stream()
-                .filter(channel -> !channel.asChannelCategory().isPresent())
-                .filter(channel -> channel.asServerTextChannel().isPresent())
-                .filter(channel -> !channel.asServerTextChannel().flatMap(Categorizable::getCategory).isPresent())
+        List<ServerChannel> channels = this.channels.values().stream()
+                .filter(channel -> channel.asCategorizable()
+                        .map(categorizable -> !categorizable.getCategory().isPresent())
+                        .orElse(false))
                 .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
-                .forEachOrdered(channels::add);
-        channelsUnordered.stream()
-                .filter(channel -> !channel.asChannelCategory().isPresent())
-                .filter(channel -> channel.asServerVoiceChannel().isPresent())
-                .filter(channel -> !channel.asServerVoiceChannel().flatMap(Categorizable::getCategory).isPresent())
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
-                .forEachOrdered(channels::add);
+                .collect(Collectors.toList());
         getChannelCategories().forEach(category -> {
             channels.add(category);
             channels.addAll(category.getChannels());
