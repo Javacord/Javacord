@@ -2,11 +2,7 @@ allprojects { project ->
     apply plugin: 'me.tatarka.gradle.pom'
 
     pom {
-        if (project.name =~ ~/^javacord-/) {
-            name "Javacord (${project.name - ~/^javacord-/})"
-        } else {
-            name 'Javacord'
-        }
+        name rootProject.name.capitalize() + (project.parent ? " ($shortName)" : '')
         description project.description
         url 'https://github.com/BtoBastian/Javacord/wiki'
         issueManagement {

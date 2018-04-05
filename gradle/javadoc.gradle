@@ -1,7 +1,7 @@
 import javax.naming.ConfigurationException
 import static org.gradle.api.JavaVersion.toVersion
 
-allprojects {
+subprojects {
     tasks.withType(Javadoc) { javadocTask ->
         def java9ToolChain = toVersion(toolChain.version).java9Compatible
         // use taskGraph.whenReady to not always have a custom action which makes the task uncachable
@@ -22,7 +22,7 @@ allprojects {
         options {
             locale 'en'
             encoding 'UTF-8'
-            docTitle "Javacord $project.version (${project.name - ~/^javacord-/})"
+            docTitle "Javacord $project.version ($project.shortName)"
             windowTitle "$docTitle Documentation"
             links 'https://docs.oracle.com/javase/8/docs/api/'
             delegate.use()
