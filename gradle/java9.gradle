@@ -57,17 +57,10 @@ if (JavaVersion.current().java9Compatible) {
             logger.warn 'Building on Java 8, resulting JARs will not be Jigsaw ready properly!'
         }
     }
-    project(':javacord-api') {
+    subprojects {
         jar {
             manifest {
-                attributes 'Automatic-Module-Name': 'org.javacord.api'
-            }
-        }
-    }
-    project(':javacord-core') {
-        jar {
-            manifest {
-                attributes 'Automatic-Module-Name': 'org.javacord.core'
+                attributes 'Automatic-Module-Name': "org.javacord.$shortName"
             }
         }
     }

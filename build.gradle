@@ -29,7 +29,8 @@ clean {
 }
 
 subprojects {
-    description = "A multithreaded but easy to use Discord Java API (${name - ~/^javacord-/})"
+    ext.shortName = name - ~/^javacord-/
+    description = "A multithreaded but easy to use Discord Java API ($shortName)"
 }
 
 tasks.remove knows
