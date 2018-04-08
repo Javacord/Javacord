@@ -1361,6 +1361,15 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Returns <code>true</code> if the message was sent as a private message, returns <code>false</code> if not.
+     *
+     * @return Whether or not the message was sent as a private message.
+     */
+    default boolean isPrivate() {
+        return getChannel() instanceof PrivateChannel;
+    }
+
+    /**
      * Updates the content of the message.
      *
      * @param content The new content of the message.
