@@ -20,13 +20,13 @@ public class ServerVoiceChannelMemberJoinEventImpl extends ServerVoiceChannelMem
     /**
      * Creates a new server voice channel member join event.
      *
-     * @param user The user of the event.
+     * @param userId The id of the user of the event.
      * @param newChannel The new channel of the event.
      * @param oldChannel The old channel of the event.
      */
     public ServerVoiceChannelMemberJoinEventImpl(
-            User user, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel) {
-        super(user, newChannel);
+            Long userId, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel) {
+        super(userId, newChannel);
         this.oldChannel = oldChannel;
     }
 

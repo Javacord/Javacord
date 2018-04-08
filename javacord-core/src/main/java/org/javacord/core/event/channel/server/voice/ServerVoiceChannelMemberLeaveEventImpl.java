@@ -21,13 +21,13 @@ public class ServerVoiceChannelMemberLeaveEventImpl extends ServerVoiceChannelMe
     /**
      * Creates a new server voice channel member leave event.
      *
-     * @param user The user of the event.
+     * @param userId The id of the user of the event.
      * @param newChannel The new channel of the event.
      * @param oldChannel The old channel of the event.
      */
     public ServerVoiceChannelMemberLeaveEventImpl(
-            User user, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel) {
-        super(user, oldChannel);
+            Long userId, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel) {
+        super(userId, oldChannel);
         this.newChannel = newChannel;
     }
 
