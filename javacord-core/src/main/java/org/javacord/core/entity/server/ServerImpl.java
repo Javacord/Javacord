@@ -1006,7 +1006,7 @@ public class ServerImpl implements Server, Cleanupable {
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
                 .addQueryParameter("delete-message-days", String.valueOf(deleteMessageDays));
         if (reason != null) {
-            request.addHeader("reason", reason);
+            request.addQueryParameter("reason", reason);
         }
         return request.execute(result -> null);
     }
