@@ -1155,6 +1155,7 @@ public class DiscordApiImpl implements DiscordApi {
     public CompletableFuture<Invite> getInviteByCode(String code) {
         return new RestRequest<Invite>(this, RestMethod.GET, RestEndpoint.INVITE)
                 .setUrlParameters(code)
+                .addQueryParameter("with_counts", "true")
                 .execute(result -> new InviteImpl(this, result.getJsonBody()));
     }
 
