@@ -1,3 +1,14 @@
+def releaseVersion = !version.toString().endsWith('-SNAPSHOT')
+
+ext {
+    it.'signing.secretKeyRingFile' = project.findProperty('javacord.signing.secretKeyRingFile') ?:
+            project.findProperty('signing.secretKeyRingFile')
+    it.'signing.password' = project.findProperty('javacord.signing.password') ?:
+            project.findProperty('signing.password')
+    it.'signing.keyId' = project.findProperty('javacord.signing.keyId') ?:
+            project.findProperty('signing.keyId')
+}
+
 subprojects {
     publishing {
         publications {
@@ -19,5 +30,19 @@ publishing {
             artifacts.clear()
             artifact shadowJar
         }
+    }
+}
+
+allprojects {
+    apply plugin: 'signing'
+
+    signing {
+        required {
+            // signing is required if this is a release version and the artifacts are to be published
+            releaseVersion && tasks.withType(PublishToMavenRepository).find {
+                gradle.taskGraph.hasTask it
+            }
+        }
+        sign publishing.publications
     }
 }

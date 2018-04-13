@@ -12,7 +12,7 @@ allprojects {
     apply plugin: 'maven-publish'
 
     group = 'org.javacord'
-    version = '3.0.0'
+    version = '3.0.0-SNAPSHOT'
     description = 'A multithreaded but easy to use Discord Java API'
     buildDir = rootProject.file("${rootBuildDir}/${name}")
 
@@ -33,6 +33,7 @@ subprojects {
     description = "A multithreaded but easy to use Discord Java API ($shortName)"
 }
 
+// remove non-sense task from com.github.johnrengelman.shadow plugin
 tasks.remove knows
 
 defaultTasks 'build'

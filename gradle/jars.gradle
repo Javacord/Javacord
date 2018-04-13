@@ -18,13 +18,17 @@ subprojects {
     }
 }
 
-jar {
-    enabled false
-}
-
 shadowJar {
     classifier 'shaded'
 }
+
+// disable and remove the jar task
+jar {
+    enabled false
+}
+tasks.remove jar
+// remove the main JAR from the archives artifacts
+configurations.archives.artifacts.clear()
 
 artifacts {
     archives shadowJar
