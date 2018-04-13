@@ -5,10 +5,10 @@ package org.javacord.core.util.rest;
  */
 public enum RestMethod {
 
-    GET(),
-    POST(),
-    PUT(),
-    DELETE(),
-    PATCH()
+    GET,
+    POST,
+    PUT,
+    DELETE,
+    PATCH
 
 }
