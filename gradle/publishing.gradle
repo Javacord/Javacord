@@ -1,3 +1,5 @@
+import javax.naming.ConfigurationException
+
 def releaseVersion = !version.toString().endsWith('-SNAPSHOT')
 
 ext {
@@ -7,6 +9,46 @@ ext {
             project.findProperty('signing.password')
     it.'signing.keyId' = project.findProperty('javacord.signing.keyId') ?:
             project.findProperty('signing.keyId')
+    sonatypeUsername = project.findProperty('javacord.sonatype.username') ?:
+            project.findProperty('sonatype.username')
+    sonatypePassword = project.findProperty('javacord.sonatype.password') ?:
+            project.findProperty('sonatype.password')
+}
+
+allprojects {
+    apply plugin: 'maven-publish'
+
+    publishing {
+        repositories {
+            maven {
+                name 'sonatype'
+                if (releaseVersion) {
+                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                } else {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                }
+                credentials {
+                    username sonatypeUsername
+                    password sonatypePassword
+                }
+            }
+        }
+    }
+
+    tasks.withType(PublishToMavenRepository) {
+        doFirst {
+            if (!sonatypeUsername) {
+                throw new ConfigurationException(
+                        'Please set the Sonatype username with project property "sonatype.username" ' +
+                                'or "javacord.sonatype.username". If both are set, the latter will be effective.')
+            }
+            if (!sonatypePassword) {
+                throw new ConfigurationException(
+                        'Please set the Sonatype password with project property "sonatype.password" ' +
+                                'or "javacord.sonatype.password". If both are set, the latter will be effective.')
+            }
+        }
+    }
 }
 
 subprojects {
@@ -24,10 +66,10 @@ subprojects {
 publishing {
     publications {
         javacord(MavenPublication) {
-            // add the dependencies to the POM,
-            // but do not try to publish the JAR
+            // add the dependencies to the POM
             from components.java
-            artifacts.clear()
+            // but do not try to publish the JAR
+            artifacts.removeAll { !it.classifier && (it.extension == 'jar') }
             artifact shadowJar
         }
     }

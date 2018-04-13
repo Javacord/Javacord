@@ -9,7 +9,6 @@ def rootBuildDir = buildDir
 allprojects {
     apply plugin: 'java-library'
     apply plugin: 'nebula.java-cross-compile'
-    apply plugin: 'maven-publish'
 
     group = 'org.javacord'
     version = '3.0.0-SNAPSHOT'
