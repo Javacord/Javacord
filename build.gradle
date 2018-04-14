@@ -1,6 +1,6 @@
 plugins {
     id 'nebula.java-cross-compile' version '0.10.0' apply false
-    id 'com.github.johnrengelman.shadow' version '2.0.2'
+    id 'com.github.johnrengelman.shadow' version '2.0.2' apply false
     id 'me.tatarka.gradle.pom' version '1.0' apply false
 }
 
@@ -31,9 +31,6 @@ subprojects {
     ext.shortName = name - ~/^javacord-/
     description = "A multithreaded but easy to use Discord Java API ($shortName)"
 }
-
-// remove non-sense task from com.github.johnrengelman.shadow plugin
-tasks.remove knows
 
 defaultTasks 'build'
 
