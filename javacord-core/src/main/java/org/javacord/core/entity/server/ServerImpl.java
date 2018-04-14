@@ -354,19 +354,21 @@ public class ServerImpl implements Server, Cleanupable {
         if (data.has("presences")) {
             for (JsonNode presenceJson : data.get("presences")) {
                 long userId = Long.parseLong(presenceJson.get("user").get("id").asText());
-                api.getCachedUserById(userId).map(UserImpl.class::cast).ifPresent(user -> {
-                    if (presenceJson.has("game")) {
-                        Activity activity = null;
-                        if (!presenceJson.get("game").isNull()) {
-                            activity = new ActivityImpl(presenceJson.get("game"));
-                        }
-                        user.setActivity(activity);
+                UserImpl user = api.getCachedUserById(userId)
+                        .map(UserImpl.class::cast)
+                        // Users with presences should already be cached
+                        .orElseThrow(AssertionError::new);
+                if (presenceJson.has("game")) {
+                    Activity activity = null;
+                    if (!presenceJson.get("game").isNull()) {
+                        activity = new ActivityImpl(presenceJson.get("game"));
                     }
-                    if (presenceJson.has("status")) {
-                        UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());
-                        user.setStatus(status);
-                    }
-                });
+                    user.setActivity(activity);
+                }
+                if (presenceJson.has("status")) {
+                    UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());
+                    user.setStatus(status);
+                }
             }
         }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.ChannelAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.VoiceChannelAttachableListener;
@@ -130,6 +131,15 @@ public class ServerVoiceChannelImpl extends  ServerChannelImpl implements Server
     @Override
     public Collection<Long> getConnectedUserIds() {
         return Collections.unmodifiableCollection(connectedUsers);
+    }
+
+    @Override
+    public Collection<User> getConnectedUsers() {
+        return Collections.unmodifiableCollection(
+                connectedUsers.stream()
+                        .map(getApi()::getCachedUserById)
+                        .map(optionalUser -> optionalUser.orElseThrow(AssertionError::new))
+                        .collect(Collectors.toList()));
     }
 
     @Override

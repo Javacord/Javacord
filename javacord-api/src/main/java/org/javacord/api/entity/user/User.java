@@ -43,6 +43,7 @@ import org.javacord.api.util.event.ListenerManager;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -111,7 +112,11 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      *
      * @return The server voice channels the user is connected to.
      */
-    Collection<ServerVoiceChannel> getConnectedVoiceChannels();
+    default Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
+        return Collections.unmodifiableCollection(getApi().getServerVoiceChannels().stream()
+                                                          .filter(this::isConnected)
+                                                          .collect(Collectors.toList()));
+    }
 
     /**
      * Checks whether this user is connected to the given channel.
@@ -120,7 +125,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return Whether this user is connected to the given channel or not.
      */
     default boolean isConnected(ServerVoiceChannel channel) {
-        return channel.isConnected(this);
+        return channel.isConnected(getId());
     }
 
     /**
@@ -130,7 +135,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return The server voice channel the user is connected to.
      */
     default Optional<ServerVoiceChannel> getConnectedVoiceChannel(Server server) {
-        return server.getConnectedVoiceChannel(this);
+        return server.getConnectedVoiceChannel(getId());
     }
 
     /**

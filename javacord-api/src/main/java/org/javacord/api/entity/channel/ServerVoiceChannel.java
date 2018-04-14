@@ -54,13 +54,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      *
      * @return The users that are connected to this server voice channel.
      */
-    default Collection<User> getConnectedUsers() {
-        return Collections.unmodifiableCollection(getConnectedUserIds().stream()
-                .map(id -> getApi().getCachedUserById(id))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet()));
-    }
+    Collection<User> getConnectedUsers();
 
     /**
      * Checks whether the user with the given id is connected to this channel.

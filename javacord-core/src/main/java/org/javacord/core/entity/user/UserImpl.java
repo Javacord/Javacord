@@ -229,13 +229,6 @@ public class UserImpl implements User, Cleanupable {
     }
 
     @Override
-    public Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
-        return Collections.unmodifiableCollection(api.getServerVoiceChannels().stream()
-                                                          .filter(this::isConnected)
-                                                          .collect(Collectors.toList()));
-    }
-
-    @Override
     public UserStatus getStatus() {
         return status;
     }

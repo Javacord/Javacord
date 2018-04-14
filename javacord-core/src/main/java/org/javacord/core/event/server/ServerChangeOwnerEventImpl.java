@@ -10,9 +10,9 @@ import org.javacord.api.event.server.ServerChangeOwnerEvent;
 public class ServerChangeOwnerEventImpl extends ServerEventImpl implements ServerChangeOwnerEvent {
 
     /**
-     * The new owner of the server.
+     * The id of the new owner of the server.
      */
-    private final User newOwner;
+    private final Long newOwnerId;
 
     /**
      * The old owner of the server.
@@ -23,12 +23,12 @@ public class ServerChangeOwnerEventImpl extends ServerEventImpl implements Serve
      * Creates a new server change owner event.
      *
      * @param server The server of the event.
-     * @param newOwner The new owner of the server.
+     * @param newOwnerId The id of the new owner of the server.
      * @param oldOwner The old owner of the server.
      */
-    public ServerChangeOwnerEventImpl(Server server, User newOwner, User oldOwner) {
+    public ServerChangeOwnerEventImpl(Server server, Long newOwnerId, User oldOwner) {
         super(server);
-        this.newOwner = newOwner;
+        this.newOwnerId = newOwnerId;
         this.oldOwner = oldOwner;
     }
 
@@ -39,7 +39,8 @@ public class ServerChangeOwnerEventImpl extends ServerEventImpl implements Serve
 
     @Override
     public User getNewOwner() {
-        return newOwner;
+        // server related events should only get dispatched after all members are cached
+        return getApi().getCachedUserById(newOwnerId).orElseThrow(AssertionError::new);
     }
 
 }

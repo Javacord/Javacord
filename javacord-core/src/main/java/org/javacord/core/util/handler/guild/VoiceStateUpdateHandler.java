@@ -81,16 +81,12 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 
             oldChannel.ifPresent(channel -> {
                 channel.removeConnectedUser(userId);
-                //TODO: send with only user id with RequestableUserEvent
-                optionalUser.ifPresent(user -> dispatchServerVoiceChannelMemberLeaveEvent(
-                        user, newChannel.orElse(null), channel, server));
+                dispatchServerVoiceChannelMemberLeaveEvent(userId, newChannel.orElse(null), channel, server);
             });
 
             newChannel.ifPresent(channel -> {
                 channel.addConnectedUser(userId);
-                //TODO: send with only user id with RequestableUserEvent
-                optionalUser.ifPresent(user -> dispatchServerVoiceChannelMemberJoinEvent(
-                        user, channel, oldChannel.orElse(null), server));
+                dispatchServerVoiceChannelMemberJoinEvent(userId, channel, oldChannel.orElse(null), server);
             });
         });
     }
@@ -106,12 +102,12 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     private void dispatchServerVoiceChannelMemberJoinEvent(
-            User user, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
+            Long userId, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
         ServerVoiceChannelMemberJoinEvent event = new ServerVoiceChannelMemberJoinEventImpl(
-                user, newChannel, oldChannel);
+                userId, newChannel, oldChannel);
 
         List<ServerVoiceChannelMemberJoinListener> listeners = new ArrayList<>();
-        listeners.addAll(user.getServerVoiceChannelMemberJoinListeners());
+        listeners.addAll(api.getObjectListeners(User.class, userId, ServerVoiceChannelMemberJoinListener.class));
         listeners.addAll(newChannel.getServerVoiceChannelMemberJoinListeners());
         if (server != null) {
             listeners.addAll(server.getServerVoiceChannelMemberJoinListeners());
@@ -123,12 +119,12 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     private void dispatchServerVoiceChannelMemberLeaveEvent(
-            User user, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
+            Long userId, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
         ServerVoiceChannelMemberLeaveEvent event = new ServerVoiceChannelMemberLeaveEventImpl(
-                user, newChannel, oldChannel);
+                userId, newChannel, oldChannel);
 
         List<ServerVoiceChannelMemberLeaveListener> listeners = new ArrayList<>();
-        listeners.addAll(user.getServerVoiceChannelMemberLeaveListeners());
+        listeners.addAll(api.getObjectListeners(User.class, userId, ServerVoiceChannelMemberLeaveListener.class));
         listeners.addAll(oldChannel.getServerVoiceChannelMemberLeaveListeners());
         if (server != null) {
             listeners.addAll(server.getServerVoiceChannelMemberLeaveListeners());
