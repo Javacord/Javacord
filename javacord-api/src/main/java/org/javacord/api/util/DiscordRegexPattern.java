@@ -81,7 +81,7 @@ public class DiscordRegexPattern {
      * You are not meant to create instances of this class.
      */
     private DiscordRegexPattern() {
-        throw new IllegalAccessError();
+        throw new UnsupportedOperationException();
     }
 
 }
