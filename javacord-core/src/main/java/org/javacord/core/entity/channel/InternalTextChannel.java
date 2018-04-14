@@ -80,9 +80,12 @@ public interface InternalTextChannel extends TextChannel {
     default CompletableFuture<MessageSet> getPins() {
         return new RestRequest<MessageSet>(getApi(), RestMethod.GET, RestEndpoint.PINS)
                 .setUrlParameters(getIdAsString())
-                .execute(result -> StreamSupport.stream(result.getJsonBody().spliterator(), false)
-                        .map(pinJson -> ((DiscordApiImpl) getApi()).getOrCreateMessage(this, pinJson))
-                        .collect(Collectors.toCollection(MessageSetImpl::new)));
+                .execute(result -> {
+                    Collection<Message> pins = StreamSupport.stream(result.getJsonBody().spliterator(), false)
+                            .map(pinJson -> ((DiscordApiImpl) getApi()).getOrCreateMessage(this, pinJson))
+                            .collect(Collectors.toList());
+                    return new MessageSetImpl(pins);
+                });
     }
 
     @Override
