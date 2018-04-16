@@ -5,6 +5,10 @@ plugins {
     id 'net.researchgate.release' version '2.7.0' apply false
 }
 
+if (project.hasProperty('teamcity')) {
+    println "##teamcity[buildNumber '$version (#${project.'build.number'})']"
+}
+
 def rootBuildDir = buildDir
 
 allprojects {
