@@ -7,6 +7,7 @@ plugins {
 
 if (project.hasProperty('teamcity')) {
     println "##teamcity[buildNumber '$version (#${project.'build.number'})']"
+    println "##teamcity[setParameter name='javacord.version' value='$version']"
 }
 
 def rootBuildDir = buildDir
