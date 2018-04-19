@@ -15,6 +15,7 @@ def rootBuildDir = buildDir
 allprojects {
     apply plugin: 'java-library'
     apply plugin: 'nebula.java-cross-compile'
+    apply plugin: 'checkstyle'
 
     group = 'org.javacord'
     description = 'A multithreaded but easy to use Discord Java API'
@@ -25,6 +26,11 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.encoding 'UTF-8'
         options.incremental true
+    }
+
+    checkstyle {
+        toolVersion '8.9'
+        maxWarnings 0
     }
 }
 
