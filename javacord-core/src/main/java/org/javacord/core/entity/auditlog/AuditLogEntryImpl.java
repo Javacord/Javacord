@@ -140,19 +140,10 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         break;
                     // Misc
                     case ICON:
-                        baseUrl = "https://cdn.discordapp.com/icons/";
+                        change = iconChange("https://cdn.discordapp.com/icons/", type, oldValue, newValue);
+                        break;
                     case SPLASH:
-                        baseUrl = (baseUrl == null) ? "https://cdn.discordapp.com/splashes/" : baseUrl;
-                        try {
-                            Icon oldIcon = oldValue != null ? new IconImpl(getApi(), new URL(baseUrl + getTarget()
-                                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldValue.asText() + ".png")) : null;
-                            Icon newIcon = newValue != null ? new IconImpl(getApi(), new URL(baseUrl + getTarget()
-                                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldValue.asText() + ".png")) : null;
-                            change = new AuditLogChangeImpl<>(type, oldIcon, newIcon);
-                        } catch (MalformedURLException e) {
-                            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
-                            change = new AuditLogChangeImpl<>(AuditLogChangeType.UNKNOWN, oldValue, newValue);
-                        }
+                        change = iconChange("https://cdn.discordapp.com/splashes/", type, oldValue, newValue);
                         break;
                     case REGION:
                         Region oldRegion = Region.getRegionByKey(oldValue != null ? oldValue.asText() : "");
@@ -237,6 +228,19 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                 }
                 changes.add(change);
             }
+        }
+    }
+
+    private AuditLogChange<?> iconChange(String baseUrl, AuditLogChangeType type, JsonNode oldVal, JsonNode newVal) {
+        try {
+            Icon oldIcon = oldVal != null ? new IconImpl(getApi(), new URL(baseUrl + getTarget()
+                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldVal.asText() + ".png")) : null;
+            Icon newIcon = newVal != null ? new IconImpl(getApi(), new URL(baseUrl + getTarget()
+                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldVal.asText() + ".png")) : null;
+            return new AuditLogChangeImpl<>(type, oldIcon, newIcon);
+        } catch (MalformedURLException e) {
+            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            return new AuditLogChangeImpl<>(AuditLogChangeType.UNKNOWN, oldVal, newVal);
         }
     }
 

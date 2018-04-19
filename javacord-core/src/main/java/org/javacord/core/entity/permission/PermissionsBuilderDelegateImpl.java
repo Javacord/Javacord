@@ -37,20 +37,8 @@ public class PermissionsBuilderDelegateImpl implements PermissionsBuilderDelegat
 
     @Override
     public void setState(PermissionType type, PermissionState state) {
-        switch (state) {
-            case ALLOWED:
-                allowed = type.set(allowed, true);
-                denied = type.set(denied, false);
-                break;
-            case DENIED:
-                allowed = type.set(allowed, false);
-                denied = type.set(denied, true);
-                break;
-            case NONE:
-                allowed = type.set(allowed, false);
-                denied = type.set(denied, false);
-                break;
-        }
+        allowed = type.set(allowed, state.isAllowed());
+        denied = type.set(denied, state.isDenied());
     }
 
     @Override
