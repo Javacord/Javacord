@@ -1030,6 +1030,60 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Returns whether or not the Message has any attachment
+     *
+     * @return True, when the message has any attachment
+     */
+    default boolean hasAttachments() {
+        return getAttachments().isEmpty();
+    }
+
+    /**
+     * Returns whether or not the Message has any reactions
+     *
+     * @return True, when the message has any reactions
+     */
+    default boolean hasReactions() {
+        return getReactions().isEmpty();
+    }
+
+    /**
+     * Returns whether or not the Message has any embeds
+     *
+     * @return True, when the message has any embeds
+     */
+    default boolean hasEmbeds() {
+        return getEmbeds().isEmpty();
+    }
+
+    /**
+     * Returns whether or not the Message has any users mentioned
+     *
+     * @return True, when the message has any users mentioned
+     */
+    default boolean hasUserMentions() {
+        return getMentionedUsers().isEmpty();
+    }
+
+    /**
+     * Returns whether or not the Message has any roles mentioned
+     *
+     * @return True, when the message has any roles mentioned
+     */
+    default boolean hasRoleMentions() {
+        return getMentionedRoles().isEmpty();
+    }
+
+    /**
+     * Returns whether or not the Message has any channels mentioned
+     *
+     * @return True, when the message has any channels mentioned
+     */
+    default boolean hasChannelMentions() {
+        return getMentionedChannels().isEmpty();
+    }
+
+    /**
      * Gets a list of all custom emojis in the message.
      *
      * @return The list of custom emojis in the message.
