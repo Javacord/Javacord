@@ -22,6 +22,13 @@ public class RatelimitBucket {
         this(api, endpoint, null);
     }
 
+    /**
+     * Creates a RatelimitBucket for the given endpoint / parameter combination.
+     *
+     * @param api The api/shard to use.
+     * @param endpoint The REST endpoint the ratelimit is tracked for.
+     * @param majorUrlParameter The url parameter this bucket is specific for. May be null.
+     */
     public RatelimitBucket(DiscordApi api, RestEndpoint endpoint, String majorUrlParameter) {
         this.api = (DiscordApiImpl) api;
         if (endpoint.isGlobal()) {
