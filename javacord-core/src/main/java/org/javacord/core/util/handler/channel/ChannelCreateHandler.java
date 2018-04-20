@@ -21,6 +21,7 @@ import org.javacord.core.event.channel.group.GroupChannelCreateEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelCreateEventImpl;
 import org.javacord.core.event.channel.user.PrivateChannelCreateEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
+import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,9 @@ public class ChannelCreateHandler extends PacketHandler {
             case 4:
                 handleChannelCategory(packet);
                 break;
+            default:
+                LoggerUtil.getLogger(ChannelCreateHandler.class).warn("Unexpected packet type. Your Javacord version"
+                        + " might be out of date.");
         }
     }
 
@@ -76,7 +80,8 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(server.getServerChannelCreateListeners());
             listeners.addAll(api.getServerChannelCreateListeners());
 
-            api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(server, listeners,
+                    listener -> listener.onServerChannelCreate(event));
         });
     }
 
@@ -95,7 +100,8 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(server.getServerChannelCreateListeners());
             listeners.addAll(api.getServerChannelCreateListeners());
 
-            api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(server, listeners,
+                    listener -> listener.onServerChannelCreate(event));
         });
     }
 
@@ -114,7 +120,8 @@ public class ChannelCreateHandler extends PacketHandler {
             listeners.addAll(server.getServerChannelCreateListeners());
             listeners.addAll(api.getServerChannelCreateListeners());
 
-            api.getEventDispatcher().dispatchEvent(server, listeners, listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchEvent(server, listeners,
+                    listener -> listener.onServerChannelCreate(event));
         });
     }
 

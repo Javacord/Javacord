@@ -31,8 +31,8 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         api.getTextChannelById(packet.get("channel_id").asLong()).ifPresent(channel -> {
-            Instant lastPinTimestamp = packet.hasNonNull("last_pin_timestamp") ?
-                    OffsetDateTime.parse(packet.get("last_pin_timestamp").asText()).toInstant() : null;
+            Instant lastPinTimestamp = packet.hasNonNull("last_pin_timestamp")
+                    ? OffsetDateTime.parse(packet.get("last_pin_timestamp").asText()).toInstant() : null;
             ChannelPinsUpdateEvent event = new ChannelPinsUpdateEventImpl(channel, lastPinTimestamp);
 
             List<ChannelPinsUpdateListener> listeners = new ArrayList<>(channel.getChannelPinsUpdateListeners());

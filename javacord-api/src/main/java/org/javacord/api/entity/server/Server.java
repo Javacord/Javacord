@@ -2316,7 +2316,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
-    addServerChangeDefaultMessageNotificationLevelListener(
+            addServerChangeDefaultMessageNotificationLevelListener(
             ServerChangeDefaultMessageNotificationLevelListener listener);
 
     /**
@@ -2364,7 +2364,8 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
-    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener);
+            addServerChangeMultiFactorAuthenticationLevelListener(
+                    ServerChangeMultiFactorAuthenticationLevelListener listener);
 
     /**
      * Gets a list with all registered server change multi factor authentication level listeners.
@@ -2660,7 +2661,8 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
@@ -2925,7 +2927,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The managers for the added listener.
      */
     <T extends ServerAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addServerAttachableListener(T listener);
+            addServerAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code ServerAttachableListener}s.
@@ -2944,7 +2946,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * their assigned listener classes they listen to.
      */
     <T extends ServerAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerAttachableListeners();
+            getServerAttachableListeners();
 
     /**
      * Removes a listener from this server.

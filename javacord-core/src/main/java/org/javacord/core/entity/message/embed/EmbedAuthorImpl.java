@@ -76,7 +76,7 @@ public class EmbedAuthorImpl implements EmbedAuthor {
         try {
             return Optional.of(new URL(proxyIconUrl));
         } catch (MalformedURLException e) {
-            logger.warn("Seems like the proxy icon url of the embed author is malformed! Please contact the developer!", e);
+            logger.warn("Seems like the embed author's proxy icon url is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
     }

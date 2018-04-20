@@ -50,7 +50,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      *
      * @return An updater for this emoji.
      */
-    default CustomEmojiUpdater createUpdater(){
+    default CustomEmojiUpdater createUpdater() {
         return new CustomEmojiUpdater(this);
     }
 
@@ -186,7 +186,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * @return The managers for the added listener.
      */
     <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addCustomEmojiAttachableListener(T listener);
+            addCustomEmojiAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code CustomEmojiAttachableListener}s.
@@ -195,7 +195,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * @param <T> The type of the listener.
      */
     <T extends CustomEmojiAttachableListener & ObjectAttachableListener> void
-    removeCustomEmojiAttachableListener(T listener);
+            removeCustomEmojiAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code CustomEmojiAttachableListener}s and
@@ -206,7 +206,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * their assigned listener classes they listen to.
      */
     <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getCustomEmojiAttachableListeners();
+            getCustomEmojiAttachableListeners();
 
     /**
      * Removes a listener from this custom emoji.

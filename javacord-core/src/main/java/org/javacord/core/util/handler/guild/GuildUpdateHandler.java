@@ -184,8 +184,9 @@ public class GuildUpdateHandler extends PacketHandler {
             }
 
             if (packet.has("system_channel_id")) {
-                ServerTextChannel newSystemChannel = packet.get("system_channel_id").isNull() ?
-                        null : server.getTextChannelById(packet.get("system_channel_id").asLong()).orElse(null);
+                ServerTextChannel newSystemChannel = packet.get("system_channel_id").isNull()
+                        ? null
+                        : server.getTextChannelById(packet.get("system_channel_id").asLong()).orElse(null);
                 ServerTextChannel oldSystemChannel = server.getSystemChannel().orElse(null);
                 if (oldSystemChannel != newSystemChannel) {
                     server.setSystemChannelId(newSystemChannel == null ? -1 : newSystemChannel.getId());
@@ -202,8 +203,9 @@ public class GuildUpdateHandler extends PacketHandler {
             }
 
             if (packet.has("afk_channel_id")) {
-                ServerVoiceChannel newAfkChannel = packet.get("afk_channel_id").isNull() ?
-                        null : server.getVoiceChannelById(packet.get("afk_channel_id").asLong()).orElse(null);
+                ServerVoiceChannel newAfkChannel = packet.get("afk_channel_id").isNull()
+                        ? null
+                        : server.getVoiceChannelById(packet.get("afk_channel_id").asLong()).orElse(null);
                 ServerVoiceChannel oldAfkChannel = server.getAfkChannel().orElse(null);
                 if (oldAfkChannel != newAfkChannel) {
                     server.setAfkChannelId(newAfkChannel == null ? -1 : newAfkChannel.getId());

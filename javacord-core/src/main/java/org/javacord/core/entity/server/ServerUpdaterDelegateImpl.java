@@ -444,16 +444,16 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
                 CompletableFuture<Void> iconFuture = null;
                 if (icon != null) {
                     iconFuture = icon.asByteArray(server.getApi()).thenAccept(bytes -> {
-                        String base64Icon = "data:image/" + icon.getFileType() + ";base64," +
-                                            Base64.getEncoder().encodeToString(bytes);
+                        String base64Icon = "data:image/" + icon.getFileType() + ";base64,"
+                                + Base64.getEncoder().encodeToString(bytes);
                         body.put("icon", base64Icon);
                     });
                 }
                 CompletableFuture<Void> splashFuture = null;
                 if (splash != null) {
                     splashFuture = splash.asByteArray(server.getApi()).thenAccept(bytes -> {
-                        String base64Splash = "data:image/" + splash.getFileType() + ";base64," +
-                                              Base64.getEncoder().encodeToString(bytes);
+                        String base64Splash = "data:image/" + splash.getFileType() + ";base64,"
+                                + Base64.getEncoder().encodeToString(bytes);
                         body.put("splash", base64Splash);
                     });
                 }
@@ -465,7 +465,8 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
                 } else {
                     future = CompletableFuture.allOf(splashFuture, iconFuture);
                 }
-                tasks.add(future.thenCompose(aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
+                tasks.add(future.thenCompose(
+                        aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                         .setUrlParameters(server.getIdAsString())
                         .setBody(body)
                         .setAuditLogReason(reason)

@@ -574,7 +574,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return The manager of the listener.
      */
     ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
@@ -701,7 +702,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return The managers for the added listener.
      */
     <T extends UserAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addUserAttachableListener(T listener);
+            addUserAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code UserAttachableListener}s.

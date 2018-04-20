@@ -19,8 +19,8 @@ public interface InternalVoiceChannel extends VoiceChannel {
     @Override
     @SuppressWarnings("unchecked")
     default <T extends VoiceChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends VoiceChannelAttachableListener>>
-    addVoiceChannelAttachableListener(T listener) {
+            Collection<ListenerManager<? extends VoiceChannelAttachableListener>>
+                    addVoiceChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(VoiceChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -40,7 +40,7 @@ public interface InternalVoiceChannel extends VoiceChannel {
     @Override
     @SuppressWarnings("unchecked")
     default <T extends VoiceChannelAttachableListener & ObjectAttachableListener> void
-    removeVoiceChannelAttachableListener(T listener) {
+            removeVoiceChannelAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(VoiceChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -59,16 +59,16 @@ public interface InternalVoiceChannel extends VoiceChannel {
     @Override
     @SuppressWarnings("unchecked")
     default <T extends VoiceChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getVoiceChannelAttachableListeners() {
+            getVoiceChannelAttachableListeners() {
         Map<T, List<Class<T>>> voiceChannelListeners =
                 ((DiscordApiImpl) getApi()).getObjectListeners(VoiceChannel.class, getId());
         getChannelAttachableListeners().forEach((listener, listenerClasses) -> voiceChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         return voiceChannelListeners;
     }
 

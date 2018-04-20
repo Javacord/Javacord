@@ -182,7 +182,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The managers for the added listener.
      */
     <T extends ChannelAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addChannelAttachableListener(T listener);
+            addChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code ChannelAttachableListener}s.
@@ -201,7 +201,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * and their assigned listener classes they listen to.
      */
     <T extends ChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getChannelAttachableListeners();
+            getChannelAttachableListeners();
 
     /**
      * Removes a listener from this channel.

@@ -10,13 +10,11 @@ import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLe
 import org.javacord.api.util.event.ListenerManager;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * This class represents a server voice channel.
@@ -221,8 +219,8 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * @return The managers for the added listener.
      */
     <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ServerVoiceChannelAttachableListener>> addServerVoiceChannelAttachableListener(
-            T listener);
+            Collection<ListenerManager<? extends ServerVoiceChannelAttachableListener>>
+                    addServerVoiceChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code ServerVoiceChannelAttachableListener}s.
@@ -231,7 +229,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * @param <T> The type of the listener.
      */
     <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> void
-    removeServerVoiceChannelAttachableListener(T listener);
+            removeServerVoiceChannelAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code ServerVoiceChannelAttachableListener}s
@@ -242,7 +240,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
      * {@code ServerVoiceChannelAttachableListener}s and their assigned listener classes they listen to.
      */
     <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerVoiceChannelAttachableListeners();
+            getServerVoiceChannelAttachableListeners();
 
     /**
      * Removes a listener from this server voice channel.

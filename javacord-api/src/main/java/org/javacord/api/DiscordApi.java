@@ -1956,8 +1956,8 @@ public interface DiscordApi {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
-    addServerChangeDefaultMessageNotificationLevelListener(
-            ServerChangeDefaultMessageNotificationLevelListener listener);
+            addServerChangeDefaultMessageNotificationLevelListener(
+                    ServerChangeDefaultMessageNotificationLevelListener listener);
 
     /**
      * Gets a list with all registered server change default message notification level listeners.
@@ -1973,7 +1973,8 @@ public interface DiscordApi {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
-    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener);
+            addServerChangeMultiFactorAuthenticationLevelListener(
+                    ServerChangeMultiFactorAuthenticationLevelListener listener);
 
     /**
      * Gets a list with all registered server change multi factor authentication level listeners.
@@ -2364,7 +2365,8 @@ public interface DiscordApi {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.

@@ -125,8 +125,9 @@ public class MessageImpl implements Message {
 
         pinned = data.get("pinned").asBoolean(false);
 
-        lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull() ?
-                OffsetDateTime.parse(data.get("edited_timestamp").asText()).toInstant() : null;
+        lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull()
+                ? OffsetDateTime.parse(data.get("edited_timestamp").asText()).toInstant()
+                : null;
 
         type = MessageType.byType(data.get("type").asInt(), data.has("webhook_id"));
 
@@ -278,7 +279,7 @@ public class MessageImpl implements Message {
             long id = Long.parseLong(customEmoji.group("id"));
             String name = customEmoji.group("name");
             boolean animated = customEmoji.group(0).charAt(1) == 'a';
-            // TODO Maybe it would be better to cache the custom emoji objects inside the message object instead of creating new ones every time
+            // TODO Maybe it would be better to cache the custom emoji objects inside the message object
             CustomEmoji emoji = ((DiscordApiImpl) getApi()).getKnownCustomEmojiOrCreateCustomEmoji(id, name, animated);
             emojis.add(emoji);
         }

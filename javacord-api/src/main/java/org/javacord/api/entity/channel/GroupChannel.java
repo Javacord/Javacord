@@ -120,7 +120,8 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * @return The managers for the added listener.
      */
     <T extends GroupChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends GroupChannelAttachableListener>> addGroupChannelAttachableListener(T listener);
+            Collection<ListenerManager<? extends GroupChannelAttachableListener>>
+                    addGroupChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code GroupChannelAttachableListener}s.
@@ -140,7 +141,7 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
      * and their assigned listener classes they listen to.
      */
     <T extends GroupChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getGroupChannelAttachableListeners();
+            getGroupChannelAttachableListeners();
 
     /**
      * Removes a listener from this group channel.

@@ -61,7 +61,7 @@ public class EmbedFooterImpl implements EmbedFooter {
         try {
             return Optional.of(new URL(proxyIconUrl));
         } catch (MalformedURLException e) {
-            logger.warn("Seems like the proxy icon url of the embed footer is malformed! Please contact the developer!", e);
+            logger.warn("Seems like the embed footer's proxy icon url is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
     }

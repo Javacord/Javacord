@@ -118,8 +118,8 @@ public class WebhookBuilderDelegateImpl implements WebhookBuilderDelegate {
         }
         if (avatar != null) {
             return avatar.asByteArray(channel.getApi()).thenAccept(bytes -> {
-                String base64Avatar = "data:image/" + avatar.getFileType() + ";base64," +
-                        Base64.getEncoder().encodeToString(bytes);
+                String base64Avatar = "data:image/" + avatar.getFileType() + ";base64,"
+                        + Base64.getEncoder().encodeToString(bytes);
                 body.put("avatar", base64Avatar);
             }).thenCompose(aVoid ->
                     new RestRequest<Webhook>(channel.getApi(), RestMethod.POST, RestEndpoint.CHANNEL_WEBHOOK)

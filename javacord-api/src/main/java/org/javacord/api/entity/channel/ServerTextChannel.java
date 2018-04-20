@@ -167,8 +167,8 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @return The managers for the added listener.
      */
     <T extends ServerTextChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ServerTextChannelAttachableListener>> addServerTextChannelAttachableListener(
-            T listener);
+            Collection<ListenerManager<? extends ServerTextChannelAttachableListener>>
+                    addServerTextChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code ServerTextChannelAttachableListener}s.
@@ -177,7 +177,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * @param <T> The type of the listener.
      */
     <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> void
-    removeServerTextChannelAttachableListener(T listener);
+            removeServerTextChannelAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code ServerTextChannelAttachableListener}s
@@ -188,7 +188,7 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
      * {@code ServerTextChannelAttachableListener}s and their assigned listener classes they listen to.
      */
     <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerTextChannelAttachableListeners();
+            getServerTextChannelAttachableListeners();
 
     /**
      * Removes a listener from this server text channel.

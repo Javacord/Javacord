@@ -228,7 +228,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     @Override
     public CompletableFuture<Message> send(TextChannel channel) {
         ObjectNode body = JsonNodeFactory.instance.objectNode()
-                .put("content", toString() == null ? "" : toString() )
+                .put("content", toString() == null ? "" : toString())
                 .put("tts", tts);
         body.putArray("mentions");
         if (embed != null) {

@@ -153,7 +153,7 @@ public enum RestRequestHttpResponseCode {
         this.discordExceptionClass = discordExceptionClass;
 
         if ((discordExceptionInstantiator == null) && (discordExceptionClass != null)
-            || (discordExceptionInstantiator != null) && (discordExceptionClass == null)) {
+                || (discordExceptionInstantiator != null) && (discordExceptionClass == null)) {
 
             throw new IllegalArgumentException("discordExceptionInstantiator and discordExceptionClass do not match");
         }

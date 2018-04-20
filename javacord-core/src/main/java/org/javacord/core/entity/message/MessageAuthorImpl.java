@@ -81,8 +81,8 @@ public class MessageAuthorImpl implements MessageAuthor {
     public Icon getAvatar() {
         String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
         if (avatarId != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId +
-                    (avatarId.startsWith("a_") ? ".gif" : ".png");
+            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId
+                    + (avatarId.startsWith("a_") ? ".gif" : ".png");
         }
         try {
             return new IconImpl(getApi(), new URL(url));

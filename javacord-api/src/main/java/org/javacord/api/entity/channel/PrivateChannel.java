@@ -59,8 +59,8 @@ public interface PrivateChannel extends TextChannel, VoiceChannel {
      * @return The managers for the added listener.
      */
     <T extends PrivateChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends PrivateChannelAttachableListener>> addPrivateChannelAttachableListener(
-            T listener);
+            Collection<ListenerManager<? extends PrivateChannelAttachableListener>>
+                    addPrivateChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code PrivateChannelAttachableListener}s.
@@ -80,7 +80,7 @@ public interface PrivateChannel extends TextChannel, VoiceChannel {
      * and their assigned listener classes they listen to.
      */
     <T extends PrivateChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getPrivateChannelAttachableListeners();
+            getPrivateChannelAttachableListeners();
 
     /**
      * Removes a listener from this private channel.

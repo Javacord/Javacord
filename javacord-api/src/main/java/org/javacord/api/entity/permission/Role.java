@@ -376,7 +376,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      * @return The manager of the listener.
      */
     ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
@@ -384,7 +385,7 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      * @return A list with all registered server channel change overwritten permissions listeners.
      */
     java.util.List<ServerChannelChangeOverwrittenPermissionsListener>
-    getServerChannelChangeOverwrittenPermissionsListeners();
+            getServerChannelChangeOverwrittenPermissionsListeners();
 
     /**
      * Adds a listener, which listens to this role being deleted.
@@ -442,7 +443,7 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      * @return The managers for the added listener.
      */
     <T extends RoleAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addRoleAttachableListener(T listener);
+            addRoleAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code RoleAttachableListener}s.

@@ -87,8 +87,8 @@ public class AuditLogEntryImpl implements AuditLogEntry {
         this.userId = data.get("user_id").asLong();
         this.reason = data.has("reason") ? data.get("reason").asText() : null;
         this.actionType = AuditLogActionType.fromValue(data.get("action_type").asInt());
-        this.target = data.has("target_id") && !data.get("target_id").isNull() ?
-                new AuditLogEntryTargetImpl(data.get("target_id").asLong(), this) : null;
+        this.target = data.has("target_id") && !data.get("target_id").isNull()
+                ? new AuditLogEntryTargetImpl(data.get("target_id").asLong(), this) : null;
         if (data.has("changes")) {
             for (JsonNode changeJson : data.get("changes")) {
                 AuditLogChangeType type = AuditLogChangeType.fromName(changeJson.get("key").asText());
@@ -203,18 +203,18 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         change = new AuditLogChangeImpl<>(type, oldPermissions, newPermissions);
                         break;
                     case AVATAR:
-                        baseUrl = "https://cdn.discordapp.com/avatars/" +
-                                getTarget().map(DiscordEntity::getIdAsString).orElse("0") + "/";
-                        String oldUrl = oldValue != null ? (baseUrl + oldValue.asText() +
-                                (oldValue.asText().startsWith("a_") ? ".gif" : ".png")) : null;
-                        String newUrl = newValue != null ? (baseUrl + newValue.asText() +
-                                (newValue.asText().startsWith("a_") ? ".gif" : ".png")) : null;
+                        baseUrl = "https://cdn.discordapp.com/avatars/"
+                                + getTarget().map(DiscordEntity::getIdAsString).orElse("0") + "/";
+                        String oldUrl = oldValue != null ? (baseUrl + oldValue.asText()
+                                + (oldValue.asText().startsWith("a_") ? ".gif" : ".png")) : null;
+                        String newUrl = newValue != null ? (baseUrl + newValue.asText()
+                                + (newValue.asText().startsWith("a_") ? ".gif" : ".png")) : null;
                         try {
                             Icon oldIcon = oldValue != null ? new IconImpl(getApi(), new URL(oldUrl)) : null;
                             Icon newIcon = newValue != null ? new IconImpl(getApi(), new URL(newUrl)) : null;
                             change = new AuditLogChangeImpl<>(type, oldIcon, newIcon);
                         } catch (MalformedURLException e) {
-                            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+                            logger.warn("Seems like the icon's url is malformed! Please contact the developer!", e);
                             change = new AuditLogChangeImpl<>(AuditLogChangeType.UNKNOWN, oldValue, newValue);
                         }
                         break;
@@ -239,7 +239,7 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                     .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldVal.asText() + ".png")) : null;
             return new AuditLogChangeImpl<>(type, oldIcon, newIcon);
         } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
+            logger.warn("Seems like the icon's url is malformed! Please contact the developer!", e);
             return new AuditLogChangeImpl<>(AuditLogChangeType.UNKNOWN, oldVal, newVal);
         }
     }

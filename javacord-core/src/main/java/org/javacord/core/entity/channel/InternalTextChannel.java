@@ -322,8 +322,8 @@ public interface InternalTextChannel extends TextChannel {
     @Override
     @SuppressWarnings("unchecked")
     default <T extends TextChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends TextChannelAttachableListener>>
-    addTextChannelAttachableListener(T listener) {
+            Collection<ListenerManager<? extends TextChannelAttachableListener>>
+                    addTextChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(TextChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -343,7 +343,7 @@ public interface InternalTextChannel extends TextChannel {
     @Override
     @SuppressWarnings("unchecked")
     default <T extends TextChannelAttachableListener & ObjectAttachableListener> void
-    removeTextChannelAttachableListener(T listener) {
+            removeTextChannelAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(TextChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -362,16 +362,16 @@ public interface InternalTextChannel extends TextChannel {
     @Override
     @SuppressWarnings("unchecked")
     default <T extends TextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getTextChannelAttachableListeners() {
+            getTextChannelAttachableListeners() {
         Map<T, List<Class<T>>> textChannelListeners =
                 ((DiscordApiImpl) getApi()).getObjectListeners(TextChannel.class, getId());
         getChannelAttachableListeners().forEach((listener, listenerClasses) -> textChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         return textChannelListeners;
     }
 

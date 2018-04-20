@@ -174,8 +174,8 @@ public class ServerBuilderDelegateImpl implements ServerBuilderDelegate {
         }
         if (icon != null) {
             return icon.asByteArray(api).thenAccept(bytes -> {
-                String base64Icon = "data:image/" + icon.getFileType() + ";base64," +
-                        Base64.getEncoder().encodeToString(bytes);
+                String base64Icon = "data:image/" + icon.getFileType() + ";base64,"
+                        + Base64.getEncoder().encodeToString(bytes);
                 body.put("icon", base64Icon);
             }).thenCompose(aVoid -> new RestRequest<Long>(api, RestMethod.POST, RestEndpoint.SERVER)
                     .setBody(body)

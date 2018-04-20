@@ -35,7 +35,7 @@ public class EmbedImpl implements Embed {
     private final String type;
     private final String description;
     private final String url;
-    private final Instant timestamp ;
+    private final Instant timestamp;
     private final Color color;
     private final EmbedFooter footer;
     private final EmbedImage image;

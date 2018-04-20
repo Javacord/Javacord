@@ -6,6 +6,7 @@ import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.gateway.PacketHandler;
+import org.javacord.core.util.logging.LoggerUtil;
 
 /**
  * This class handles the ready packet.
@@ -47,6 +48,10 @@ public class ReadyHandler extends PacketHandler {
                     case 3:
                         new GroupChannelImpl(api, channelJson);
                         break;
+                    default:
+                        LoggerUtil.getLogger(ReadyHandler.class).warn("Unknown channel type. Your Javacord version"
+                                + " may be outdated.");
+
                 }
 
             }

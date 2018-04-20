@@ -25,6 +25,7 @@ import org.javacord.core.entity.permission.PermissionsImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.util.ClassHelper;
+import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
@@ -109,6 +110,9 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
                     case "member":
                         overwrittenUserPermissions.put(id, permissions);
                         break;
+                    default:
+                        LoggerUtil.getLogger(ServerChannelImpl.class).warn("Unknown type for permission_overwrites. "
+                                + "Your Javacord version might be outdated.");
                 }
             }
         }
@@ -203,14 +207,15 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
 
     @Override
     public ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
                 ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
     @Override
     public List<ServerChannelChangeOverwrittenPermissionsListener>
-    getServerChannelChangeOverwrittenPermissionsListeners() {
+            getServerChannelChangeOverwrittenPermissionsListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(
                 ServerChannel.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
     }
@@ -218,8 +223,8 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ServerChannelAttachableListener>>
-    addServerChannelAttachableListener(T listener) {
+            Collection<ListenerManager<? extends ServerChannelAttachableListener>>
+                    addServerChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -239,7 +244,7 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerChannelAttachableListener & ObjectAttachableListener> void
-    removeServerChannelAttachableListener(T listener) {
+            removeServerChannelAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -258,16 +263,16 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerChannelAttachableListeners() {
+            getServerChannelAttachableListeners() {
         Map<T, List<Class<T>>> serverChannelListeners =
                 ((DiscordApiImpl) getApi()).getObjectListeners(ServerChannel.class, getId());
         getChannelAttachableListeners().forEach((listener, listenerClasses) -> serverChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         return serverChannelListeners;
     }
 

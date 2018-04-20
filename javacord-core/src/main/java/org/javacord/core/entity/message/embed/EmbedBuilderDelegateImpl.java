@@ -426,10 +426,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public boolean requiresAttachments() {
-        return footerIconContainer != null ||
-                imageContainer != null ||
-                authorIconContainer != null ||
-                thumbnailContainer != null;
+        return footerIconContainer != null
+                || imageContainer != null
+                || authorIconContainer != null
+                || thumbnailContainer != null;
     }
 
     /**

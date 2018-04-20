@@ -779,7 +779,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The managers for the added listener.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(DiscordApi api, long messageId, T listener) {
+            addMessageAttachableListener(DiscordApi api, long messageId, T listener) {
         return api.getUncachedMessageUtil().addMessageAttachableListener(messageId, listener);
     }
 
@@ -796,7 +796,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The managers for the added listener.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(DiscordApi api, String messageId, T listener) {
+            addMessageAttachableListener(DiscordApi api, String messageId, T listener) {
         return api.getUncachedMessageUtil().addMessageAttachableListener(messageId, listener);
     }
 
@@ -813,7 +813,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The managers for the added listener.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(DiscordApi api, Message message, T listener) {
+            addMessageAttachableListener(DiscordApi api, Message message, T listener) {
         return api.getUncachedMessageUtil().addMessageAttachableListener(message, listener);
     }
 
@@ -911,7 +911,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *     their assigned listener classes they listen to.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(DiscordApi api, long messageId) {
+            getMessageAttachableListeners(DiscordApi api, long messageId) {
         return api.getUncachedMessageUtil().getMessageAttachableListeners(messageId);
     }
 
@@ -926,7 +926,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *     their assigned listener classes they listen to.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(DiscordApi api, String messageId) {
+            getMessageAttachableListeners(DiscordApi api, String messageId) {
         return api.getUncachedMessageUtil().getMessageAttachableListeners(messageId);
     }
 
@@ -941,7 +941,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *     their assigned listener classes they listen to.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(DiscordApi api, Message message) {
+            getMessageAttachableListeners(DiscordApi api, Message message) {
         return api.getUncachedMessageUtil().getMessageAttachableListeners(message);
     }
 
@@ -1433,7 +1433,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> delete() {
-       return delete(null);
+        return delete(null);
     }
 
     /**
@@ -1942,7 +1942,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The managers for the added listener.
      */
     default <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(T listener) {
+            addMessageAttachableListener(T listener) {
         return addMessageAttachableListener(getApi(), getId(), listener);
     }
 
@@ -1966,7 +1966,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *     their assigned listener classes they listen to.
      */
     default <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners() {
+            getMessageAttachableListeners() {
         return getMessageAttachableListeners(getApi(), getId());
     }
 

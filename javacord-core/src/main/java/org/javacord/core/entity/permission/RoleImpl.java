@@ -335,7 +335,8 @@ public class RoleImpl implements Role {
 
     @Override
     public ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
                 Role.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
@@ -382,7 +383,7 @@ public class RoleImpl implements Role {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends RoleAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addRoleAttachableListener(T listener) {
+            addRoleAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(RoleAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -405,7 +406,7 @@ public class RoleImpl implements Role {
 
     @Override
     public <T extends RoleAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getRoleAttachableListeners() {
+            getRoleAttachableListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId());
     }
 

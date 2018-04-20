@@ -1327,7 +1327,8 @@ public interface TextChannel extends Channel, Messageable {
      */
     @SuppressWarnings("unchecked")
     <T extends TextChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends TextChannelAttachableListener>> addTextChannelAttachableListener(T listener);
+            Collection<ListenerManager<? extends TextChannelAttachableListener>>
+                    addTextChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code TextChannelAttachableListener}s.
@@ -1336,8 +1337,8 @@ public interface TextChannel extends Channel, Messageable {
      * @param <T> The type of the listener.
      */
     @SuppressWarnings("unchecked")
-    <T extends TextChannelAttachableListener & ObjectAttachableListener> void removeTextChannelAttachableListener(
-            T listener);
+    <T extends TextChannelAttachableListener & ObjectAttachableListener> void
+            removeTextChannelAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code TextChannelAttachableListener}s and
@@ -1349,7 +1350,7 @@ public interface TextChannel extends Channel, Messageable {
      */
     @SuppressWarnings("unchecked")
     <T extends TextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getTextChannelAttachableListeners();
+            getTextChannelAttachableListeners();
 
     /**
      * Removes a listener from this text channel.

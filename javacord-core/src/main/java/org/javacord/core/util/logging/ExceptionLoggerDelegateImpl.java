@@ -26,8 +26,7 @@ public class ExceptionLoggerDelegateImpl implements ExceptionLoggerDelegate {
         return throwable -> {
             Throwable unwrappedThrowable = ExceptionLoggerDelegate.unwrapThrowable(throwable);
             if (ignoredThrowableTypes.contains(unwrappedThrowable.getClass())
-                || ((logFilter != null) && !logFilter.test(unwrappedThrowable))) {
-
+                    || ((logFilter != null) && !logFilter.test(unwrappedThrowable))) {
                 logger.debug("Suppressed exception {}", throwable.getMessage());
             } else {
                 Throwable enrichedThrowable = new CompletionException(unwrappedThrowable.getMessage(),

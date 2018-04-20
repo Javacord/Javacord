@@ -202,8 +202,8 @@ public class ServerVoiceChannelImpl extends  ServerChannelImpl implements Server
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ServerVoiceChannelAttachableListener>> addServerVoiceChannelAttachableListener(
-            T listener) {
+            Collection<ListenerManager<? extends ServerVoiceChannelAttachableListener>>
+                    addServerVoiceChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerVoiceChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -229,7 +229,7 @@ public class ServerVoiceChannelImpl extends  ServerChannelImpl implements Server
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> void
-    removeServerVoiceChannelAttachableListener(T listener) {
+            removeServerVoiceChannelAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerVoiceChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -254,30 +254,30 @@ public class ServerVoiceChannelImpl extends  ServerChannelImpl implements Server
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerVoiceChannelAttachableListeners() {
+            getServerVoiceChannelAttachableListeners() {
         Map<T, List<Class<T>>> serverVoiceChannelListeners =
                 ((DiscordApiImpl) getApi()).getObjectListeners(ServerVoiceChannel.class, getId());
         getVoiceChannelAttachableListeners().forEach((listener, listenerClasses) -> serverVoiceChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         getServerChannelAttachableListeners().forEach((listener, listenerClasses) -> serverVoiceChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         getChannelAttachableListeners().forEach((listener, listenerClasses) -> serverVoiceChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         return serverVoiceChannelListeners;
     }
 

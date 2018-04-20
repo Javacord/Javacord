@@ -377,8 +377,8 @@ public interface MessageAuthor extends DiscordEntity {
     }
 
     /**
-     * Checks if the author is allowed to add <b>new</b> reactions to messages in the channel where the message was sent.
-     * Always returns {@code false} if the author is not a user.
+     * Checks if the author is allowed to add <b>new</b> reactions to messages in the channel where the message was
+     * sent. Always returns {@code false} if the author is not a user.
      *
      * @return Whether the author is allowed to add <b>new</b> reactions to messages in the channel or not.
      */
@@ -391,9 +391,9 @@ public interface MessageAuthor extends DiscordEntity {
     }
 
     /**
-     * Checks if the author can manage messages (delete or pin them or remove reactions of others) in the channel where the message was sent.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * Checks if the author can manage messages (delete or pin them or remove reactions of others) in the channel
+     * where the message was sent. In private chats (private channel or group channel) this always returns {@code true}
+     * if the user is part of the chat.
      * Always returns {@code false} if the author is not a user.
      *
      * @return Whether the author can manage messages in the channel or not.
