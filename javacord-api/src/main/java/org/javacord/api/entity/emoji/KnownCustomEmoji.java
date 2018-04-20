@@ -77,8 +77,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
 
     /**
      * Updates the name of the emoji.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the emoji.
@@ -91,8 +91,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     /**
      * Updates the whitelist of the emoji.
      * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param roles The new whitelist.
@@ -105,8 +105,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     /**
      * Updates the whitelist of the emoji.
      * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param roles The new whitelist.
@@ -118,8 +118,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
 
     /**
      * Removes the whitelist of the emoji.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.

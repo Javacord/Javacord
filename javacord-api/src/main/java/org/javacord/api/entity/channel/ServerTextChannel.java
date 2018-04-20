@@ -60,8 +60,8 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
 
     /**
      * Updates the topic of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param topic The new topic of the channel.
@@ -73,8 +73,8 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
 
     /**
      * Updates the nsfw flag of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param nsfw The new nsfw flag of the channel.
@@ -86,8 +86,8 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
 
     /**
      * {@inheritDoc}
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param category The new category of the channel.
@@ -99,8 +99,8 @@ public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionab
 
     /**
      * {@inheritDoc}
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.

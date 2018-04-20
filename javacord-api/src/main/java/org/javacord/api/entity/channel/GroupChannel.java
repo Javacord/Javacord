@@ -67,8 +67,8 @@ public interface GroupChannel extends TextChannel, VoiceChannel {
 
     /**
      * Updates the name of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link GroupChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the channel.

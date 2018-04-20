@@ -14,57 +14,57 @@ import java.util.stream.Collectors;
 public enum VoiceGatewayOpcode {
 
     /**
-     * begin a voice websocket connection
+     * begin a voice websocket connection.
      */
     IDENTIFY(0),
 
     /**
-     * select the voice protocol
+     * select the voice protocol.
      */
     SELECT_PROTOCOL(1),
 
     /**
-     * complete the websocket handshake
+     * complete the websocket handshake.
      */
     READY(2),
 
     /**
-     * keep the websocket connection alive
+     * keep the websocket connection alive.
      */
     HEARTBEAT(3),
 
     /**
-     * describe the session
+     * describe the session.
      */
     SESSION_DESCRIPTION(4),
 
     /**
-     * indicate which users are speaking
+     * indicate which users are speaking.
      */
     SPEAKING(5),
 
     /**
-     * sent immediately following a received client heartbeat
+     * sent immediately following a received client heartbeat.
      */
     HEARTBEAT_ACK(6),
 
     /**
-     * resume a connection
+     * resume a connection.
      */
     RESUME(7),
 
     /**
-     * the continuous interval in milliseconds after which the client should send a heartbeat
+     * the continuous interval in milliseconds after which the client should send a heartbeat.
      */
     HELLO(8),
 
     /**
-     * acknowledge Resume
+     * acknowledge Resume.
      */
     RESUMED(9),
 
     /**
-     * a client has disconnected from the voice channel
+     * a client has disconnected from the voice channel.
      */
     CLIENT_DISCONNECT(13);
 
@@ -74,7 +74,7 @@ public enum VoiceGatewayOpcode {
     private static final Map<Integer, VoiceGatewayOpcode> instanceByCode;
 
     /**
-     * The actual numeric code
+     * The actual numeric code.
      */
     private final int code;
 

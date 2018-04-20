@@ -14,7 +14,7 @@ public enum RestEndpoint {
     GATEWAY_BOT("/gateway/bot"),
     MESSAGE("/channels/%s/messages", 0),
     /**
-     * This is the same endpoint as {@link RestEndpoint#MESSAGE}, but it has an different ratelimit bucket!
+     * This is the same endpoint as {@link RestEndpoint#MESSAGE}, but it has an different ratelimit bucket.
      */
     MESSAGE_DELETE("/channels/%s/messages", 0),
     MESSAGES_BULK_DELETE("/channels/%s/messages/bulk-delete", 0),

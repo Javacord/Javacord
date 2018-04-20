@@ -283,8 +283,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Adds the given role to the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be added to the user.
@@ -297,8 +297,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Adds the given role to the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be added to the user.
@@ -312,8 +312,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Removes the given role from the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be removed from the user.
@@ -326,8 +326,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Removes the given role from the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be removed from the user.

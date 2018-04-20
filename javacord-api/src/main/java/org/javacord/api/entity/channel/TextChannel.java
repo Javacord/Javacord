@@ -63,13 +63,13 @@ public interface TextChannel extends Channel, Messageable {
      * the {@code AutoCloseable}. This can be used in a try-with-resources block like
      * <code>try (NonThrowingAutoCloseable typingIndicator = textChannel.typeContinuously())
      * { /* do lengthy stuff &#42;/ } sendReply();</code>.
-     * <p>
-     * The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
+     *
+     * <p>The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
      * {@link #typeContinuouslyAfter(long, TimeUnit)}. This can be useful if the task you do can be finished in very
      * short time which could cause the typing indicator and the response message being sent at the same time and the
      * typing indicator could be shown for 10 seconds even if the message was sent already.
-     * <p>
-     * Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
+     *
+     * <p>Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
      * {@link #typeContinuously(Consumer)} or {@link #typeContinuouslyAfter(long, TimeUnit, Consumer)}.
      *
      * @return An auto-closable to stop sending the typing indicator.
@@ -90,14 +90,14 @@ public interface TextChannel extends Channel, Messageable {
      * <code>try (NonThrowingAutoCloseable typingIndicator =
      * textChannel.typeContinuouslyAfter(500, TimeUnit.MILLISECONDS)) { /* do lengthy stuff &#42;/ }
      * sendReply();</code>.
-     * <p>
-     * The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very short
-     * time which could cause the typing indicator and the response message being sent at the same time and the typing
-     * indicator could be shown for 10 seconds even if the message was sent already. With the delay this is
+     *
+     * <p>The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very
+     * short time which could cause the typing indicator and the response message being sent at the same time and the
+     * typing indicator could be shown for 10 seconds even if the message was sent already. With the delay this is
      * compensated, because if the returned {@code AutoCloseable} is closed before the delay is over, no typing
      * indicator will be sent at all.
-     * <p>
-     * Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
+     *
+     * <p>Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
      * {@link #typeContinuously(Consumer)} or {@link #typeContinuouslyAfter(long, TimeUnit, Consumer)}.
      *
      * @param delay The delay to wait until the first typing indicator is sent.
@@ -120,13 +120,13 @@ public interface TextChannel extends Channel, Messageable {
      * <code>try (NonThrowingAutoCloseable typingIndicator =
      * textChannel.typeContinuously(ExceptionLogger.getConsumer(RatelimitException.class)))
      * { /* do lengthy stuff &#42;/ } sendReply();</code>.
-     * <p>
-     * The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
+     *
+     * <p>The typing indicator will immediately be shown. To delay the display of the first typing indicator, use
      * {@link #typeContinuouslyAfter(long, TimeUnit)}. This can be useful if the task you do can be finished in very
      * short time which could cause the typing indicator and the response message being sent at the same time and the
      * typing indicator could be shown for 10 seconds even if the message was sent already.
-     * <p>
-     * Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler} or
+     *
+     * <p>Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler} or
      * ignored if it is {@code null}.
      *
      * @param exceptionHandler The handler that exceptions are given to.
@@ -148,14 +148,14 @@ public interface TextChannel extends Channel, Messageable {
      * <code>try (NonThrowingAutoCloseable typingIndicator = textChannel.typeContinuouslyAfter(500,
      * TimeUnit.MILLISECONDS, ExceptionLogger.getConsumer(RatelimitException.class)))
      * { /* do lengthy stuff &#42;/ } sendReply();</code>.
-     * <p>
-     * The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very short
-     * time which could cause the typing indicator and the response message being sent at the same time and the typing
-     * indicator could be shown for 10 seconds even if the message was sent already. With the delay this is
+     *
+     * <p>The typing indicator will be shown delayed. This can be useful if the task you do can be finished in very
+     * short time which could cause the typing indicator and the response message being sent at the same time and the
+     * typing indicator could be shown for 10 seconds even if the message was sent already. With the delay this is
      * compensated, because if the returned {@code AutoCloseable} is closed before the delay is over, no typing
      * indicator will be sent at all.
-     * <p>
-     * Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler} or
+     *
+     * <p>Any occurring exceptions including ratelimit exceptions are given to the provided {@code exceptionHandler} or
      * ignored if it is {@code null}.
      *
      * @param exceptionHandler The handler that exceptions are given to.
@@ -385,8 +385,8 @@ public interface TextChannel extends Channel, Messageable {
 
     /**
      * Gets a stream of messages in this channel sorted from newest to oldest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @return The stream.
@@ -429,8 +429,8 @@ public interface TextChannel extends Channel, Messageable {
 
     /**
      * Gets a stream of messages in this channel before a given message in any channel sorted from newest to oldest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param before Get messages before the message with this id.
@@ -480,8 +480,8 @@ public interface TextChannel extends Channel, Messageable {
 
     /**
      * Gets a stream of messages in this channel before a given message in any channel sorted from newest to oldest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param before Get messages before this message.
@@ -527,8 +527,8 @@ public interface TextChannel extends Channel, Messageable {
 
     /**
      * Gets a stream of messages in this channel after a given message in any channel sorted from oldest to newest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param after Get messages after the message with this id.
@@ -578,8 +578,8 @@ public interface TextChannel extends Channel, Messageable {
 
     /**
      * Gets a stream of messages in this channel after a given message in any channel sorted from oldest to newest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param after Get messages after this message.
@@ -643,8 +643,8 @@ public interface TextChannel extends Channel, Messageable {
      * After that you will always get an older message and a newer message alternating as long as on both sides
      * messages are available. If only on one side further messages are available, only those are delivered further on.
      * It's not guaranteed to be perfectly balanced.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param around Get messages around the message with this id.
@@ -712,8 +712,8 @@ public interface TextChannel extends Channel, Messageable {
      * After that you will always get an older message and a newer message alternating as long as on both sides
      * messages are available. If only on one side further messages are available, only those are delivered further on.
      * It's not guaranteed to be perfectly balanced.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param around Get messages around this message.
@@ -764,8 +764,8 @@ public interface TextChannel extends Channel, Messageable {
     /**
      * Gets all messages in this channel between the first given message in any channel and the second given message in
      * any channel, excluding the boundaries, sorted from first given message to the second given message.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param from The id of the start boundary messages.
@@ -823,8 +823,8 @@ public interface TextChannel extends Channel, Messageable {
     /**
      * Gets all messages in this channel between the first given message in any channel and the second given message in
      * any channel, excluding the boundaries, sorted from first given message to the second given message.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param from The start boundary messages.
@@ -1073,7 +1073,8 @@ public interface TextChannel extends Channel, Messageable {
     /**
      * Checks if the user of the connected account is allowed to add <b>new</b> reactions to messages in this channel.
      *
-     * @return Whether the user of the connected account is allowed to add <b>new</b> reactions to messages in this channel or not.
+     * @return Whether the user of the connected account is allowed to add <b>new</b> reactions to messages in this
+     *     channel or not.
      */
     default boolean canYouAddNewReactions() {
         return canAddNewReactions(getApi().getYourself());
@@ -1099,7 +1100,8 @@ public interface TextChannel extends Channel, Messageable {
     }
 
     /**
-     * Checks if the user of the connected account can manage messages (delete or pin them or remove reactions of others) in this channel.
+     * Checks if the user of the connected account can manage messages (delete or pin them or remove reactions of
+     * others) in this channel.
      * In private chats (private channel or group channel) this always returns {@code true} if the user is
      * part of the chat.
      *
@@ -1343,7 +1345,7 @@ public interface TextChannel extends Channel, Messageable {
      *
      * @param <T> The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code TextChannelAttachableListener}s and
-     * their assigned listener classes they listen to.
+     *     their assigned listener classes they listen to.
      */
     @SuppressWarnings("unchecked")
     <T extends TextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>

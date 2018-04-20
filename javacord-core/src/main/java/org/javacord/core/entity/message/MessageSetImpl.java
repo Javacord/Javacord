@@ -106,8 +106,8 @@ public class MessageSetImpl implements MessageSet {
 
     /**
      * Gets a stream of messages in the given channel sorted from newest to oldest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param channel The channel of the messages.
@@ -165,8 +165,8 @@ public class MessageSetImpl implements MessageSet {
     /**
      * Gets a stream of messages in the given channel before a given message in any channel sorted from newest to
      * oldest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param channel The channel of the messages.
@@ -224,8 +224,8 @@ public class MessageSetImpl implements MessageSet {
 
     /**
      * Gets a stream of messages in the given channel after a given message in any channel sorted from oldest to newest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param channel The channel of the messages.
@@ -366,8 +366,8 @@ public class MessageSetImpl implements MessageSet {
      * After that you will always get an older message and a newer message alternating as long as on both sides
      * messages are available. If only on one side further messages are available, only those are delivered further on.
      * It's not guaranteed to be perfectly balanced.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param channel The channel of the messages.
@@ -542,8 +542,8 @@ public class MessageSetImpl implements MessageSet {
     /**
      * Gets all messages in the given channel between the first given message in any channel and the second given
      * message in any channel, excluding the boundaries, sorted from first given message to the second given message.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param channel The channel of the messages.
@@ -692,8 +692,8 @@ public class MessageSetImpl implements MessageSet {
 
     /**
      * Gets a stream of messages in the given channel sorted from newest to oldest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param channel The channel of the messages.

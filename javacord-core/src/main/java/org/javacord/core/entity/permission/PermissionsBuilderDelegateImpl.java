@@ -11,7 +11,7 @@ import org.javacord.api.entity.permission.internal.PermissionsBuilderDelegate;
 public class PermissionsBuilderDelegateImpl implements PermissionsBuilderDelegate {
 
     /**
-     * The integer containing all allowed permission types
+     * The integer containing all allowed permission types.
      */
     private int allowed = 0;
 

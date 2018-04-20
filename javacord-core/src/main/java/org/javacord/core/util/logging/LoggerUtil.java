@@ -59,15 +59,13 @@ public class LoggerUtil {
      * {@code key} parameter cannot be {@code null}. The {@code val} parameter
      * can be {@code null} only if the underlying implementation supports it.
      *
-     * <p>
-     * This method delegates all work to the MDC of the underlying logging system
+     * <p>This method delegates all work to the MDC of the underlying logging system
      * and is a no-op if there is no proper logging binding present, also regarding {@code null} key.
-     * <p>
-     * This method returns a {@code Closeable} object which can remove {@code key} when
+     *
+     * <p>This method returns a {@code Closeable} object which can remove {@code key} when
      * {@code close} is called.
      *
-     * <p>
-     * Useful with Java 7 for example :
+     * <p>Useful with Java 7 for example :
      * {@code
      *     try (MDCCloseable closeable = LoggerUtil.putCloseableToMdc(key, value)) {
      *         ....

@@ -908,7 +908,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @param <T> The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
-     * their assigned listener classes they listen to.
+     *     their assigned listener classes they listen to.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getMessageAttachableListeners(DiscordApi api, long messageId) {
@@ -923,7 +923,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @param <T> The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
-     * their assigned listener classes they listen to.
+     *     their assigned listener classes they listen to.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getMessageAttachableListeners(DiscordApi api, String messageId) {
@@ -938,7 +938,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param message The message.
      * @param <T> The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
-     * their assigned listener classes they listen to.
+     *     their assigned listener classes they listen to.
      */
     static <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getMessageAttachableListeners(DiscordApi api, Message message) {
@@ -1504,8 +1504,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
 
     /**
      * Gets a stream of messages before this message sorted from newest to oldest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @return The stream.
@@ -1556,8 +1556,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
 
     /**
      * Gets a stream of messages after this message sorted from oldest to newest.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @return The stream.
@@ -1625,8 +1625,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * After that you will always get an older message and a newer message alternating as long as on both sides
      * messages are available. If only on one side further messages are available, only those are delivered further on.
      * It's not guaranteed to be perfectly balanced.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @return The stream.
@@ -1682,8 +1682,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Gets a stream of all messages between this message and the given message, excluding the boundaries, sorted from
      * this message to the given message.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param other The id of the other boundary messages.
@@ -1740,8 +1740,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Gets a stream of all messages between this message and the given message, excluding the boundaries, sorted from
      * this message to the given message.
-     * <p>
-     * The messages are retrieved in batches synchronously from Discord,
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
      * so consider not using this method from a listener directly.
      *
      * @param other The other boundary messages.
@@ -1963,7 +1963,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *
      * @param <T> The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code MessageAttachableListener}s and
-     * their assigned listener classes they listen to.
+     *     their assigned listener classes they listen to.
      */
     default <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
     getMessageAttachableListeners() {

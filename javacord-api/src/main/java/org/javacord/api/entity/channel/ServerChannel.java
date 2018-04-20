@@ -90,8 +90,8 @@ public interface ServerChannel extends Channel {
 
     /**
      * Updates the name of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the channel.
@@ -103,13 +103,13 @@ public interface ServerChannel extends Channel {
 
     /**
      * Updates the raw position of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param rawPosition The new position of the channel.
-     * If you want to update the position based on other channels, make sure to use
-     * {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
+     *     If you want to update the position based on other channels, make sure to use
+     *     {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRawPosition(int rawPosition) {

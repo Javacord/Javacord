@@ -14,62 +14,62 @@ import java.util.stream.Collectors;
 public enum GatewayOpcode {
 
     /**
-     * dispatches an event
+     * Dispatches an event.
      */
     DISPATCH(0),
 
     /**
-     * used for ping checking
+     * Used for ping checking.
      */
     HEARTBEAT(1),
 
     /**
-     * used for client handshake
+     * Used for client handshake.
      */
     IDENTIFY(2),
 
     /**
-     * used to update the client status
+     * Used to update the client status.
      */
     STATUS_UPDATE(3),
 
     /**
-     * used to join/move/leave voice channels
+     * Used to join/move/leave voice channels.
      */
     VOICE_STATE_UPDATE(4),
 
     /**
-     * used for voice ping checking
+     * Used for voice ping checking.
      */
     VOICE_SERVER_PING(5),
 
     /**
-     * used to resume a closed connection
+     * Used to resume a closed connection.
      */
     RESUME(6),
 
     /**
-     * used to tell clients to reconnect to the gateway
+     * Used to tell clients to reconnect to the gateway.
      */
     RECONNECT(7),
 
     /**
-     * used to request guild members
+     * Used to request guild members.
      */
     REQUEST_GUILD_MEMBERS(8),
 
     /**
-     * used to notify client they have an invalid session id
+     * Used to notify client they have an invalid session id.
      */
     INVALID_SESSION(9),
 
     /**
-     * sent immediately after connecting, contains heartbeat and server debug information
+     * Sent immediately after connecting, contains heartbeat and server debug information.
      */
     HELLO(10),
 
     /**
-     * sent immediately following a client heartbeat that was received
+     * Sent immediately following a client heartbeat that was received.
      */
     HEARTBEAT_ACK(11);
 
@@ -79,7 +79,7 @@ public enum GatewayOpcode {
     private static final Map<Integer, GatewayOpcode> instanceByCode;
 
     /**
-     * The actual numeric code
+     * The actual numeric code.
      */
     private final int code;
 

@@ -85,8 +85,8 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
 
     /**
      * Updates the bitrate of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param bitrate The new bitrate of the channel.
@@ -98,8 +98,8 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
 
     /**
      * Updates the user limit of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param userLimit The new user limit of the channel.
@@ -111,8 +111,8 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
 
     /**
      * Removes the user limit of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
@@ -123,8 +123,8 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
 
     /**
      * {@inheritDoc}
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param category The new category of the channel.
@@ -136,8 +136,8 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
 
     /**
      * {@inheritDoc}
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.

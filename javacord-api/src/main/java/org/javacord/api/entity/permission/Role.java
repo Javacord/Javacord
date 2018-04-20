@@ -115,8 +115,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Updates the name of the role.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the role.
@@ -128,8 +128,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Updates the permissions of the role.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param permissions The new permissions of the role.
@@ -141,8 +141,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Updates the color of the role.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param color The new color of the role.
@@ -154,8 +154,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Updates the display separately flag of the role.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param displaySeparately The new display separately flag of the role.
@@ -167,8 +167,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Updates the mentionable flag of the role.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param mentionable The new mentionable flag of the role.
@@ -180,8 +180,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Adds the role to the given user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param user The user the role should be added to.
@@ -194,8 +194,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Adds the role to the given user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param user The user the role should be added to.
@@ -209,8 +209,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Removes the role from the given user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param user The user the role should be removed from.
@@ -223,8 +223,8 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
 
     /**
      * Removes the role from the given user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param user The user the role should be removed from.
