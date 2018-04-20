@@ -39,6 +39,16 @@ public interface Reaction {
     }
 
     /**
+     * Gets a list with all users who used this reaction.
+     *
+     * @return A list with all users who used this reaction.
+     */
+    default CompletableFuture<List<User>> getUsers() {
+        return Reaction.getUsers(
+                getMessage().getApi(), getMessage().getChannel().getId(), getMessage().getId(), getEmoji());
+    }
+
+    /**
      * Removes a user from the list of reactors.
      *
      * @param api The discord api instance.
@@ -68,6 +78,17 @@ public interface Reaction {
     }
 
     /**
+     * Removes a user from the list of reactors.
+     *
+     * @param user The user to remove.
+     * @return A future to tell us if the action was successful.
+     */
+    default CompletableFuture<Void> removeUser(User user) {
+        return Reaction.removeUser(
+                getMessage().getApi(), getMessage().getChannel().getId(), getMessage().getId(), getEmoji(), user);
+    }
+
+    /**
      * Gets the message, the reaction belongs to.
      *
      * @return The message, the reaction belongs to.
@@ -94,27 +115,6 @@ public interface Reaction {
      * @return Whether this reaction is used by you or not.
      */
     boolean containsYou();
-
-    /**
-     * Gets a list with all users who used this reaction.
-     *
-     * @return A list with all users who used this reaction.
-     */
-    default CompletableFuture<List<User>> getUsers() {
-        return Reaction.getUsers(
-                getMessage().getApi(), getMessage().getChannel().getId(), getMessage().getId(), getEmoji());
-    }
-
-    /**
-     * Removes a user from the list of reactors.
-     *
-     * @param user The user to remove.
-     * @return A future to tell us if the action was successful.
-     */
-    default CompletableFuture<Void> removeUser(User user) {
-        return Reaction.removeUser(
-                getMessage().getApi(), getMessage().getChannel().getId(), getMessage().getId(), getEmoji(), user);
-    }
 
     /**
      * Removes the user of the connected account from the list of reactors.

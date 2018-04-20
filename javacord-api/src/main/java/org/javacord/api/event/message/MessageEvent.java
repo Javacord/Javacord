@@ -117,15 +117,6 @@ public interface MessageEvent extends TextChannelEvent {
     CompletableFuture<Void> removeReactionByEmojiFromMessage(User user, Emoji emoji);
 
     /**
-     * Removes a user from the list of reactors of the given emoji reactions from the message.
-     *
-     * @param user The user to remove.
-     * @param emojis The emojis of the reactions.
-     * @return A future to tell us if the deletion was successful.
-     */
-    CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, Emoji... emojis);
-
-    /**
      * Removes a user from the list of reactors of a given unicode emoji reaction from the message.
      *
      * @param user The user to remove.
@@ -133,6 +124,31 @@ public interface MessageEvent extends TextChannelEvent {
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> removeReactionByEmojiFromMessage(User user, String unicodeEmoji);
+
+    /**
+     * Removes all reactors of a given emoji reaction from the message.
+     *
+     * @param emoji The emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    CompletableFuture<Void> removeReactionByEmojiFromMessage(Emoji emoji);
+
+    /**
+     * Removes all reactors of a given unicode emoji reaction from the message.
+     *
+     * @param unicodeEmoji The unicode emoji of the reaction.
+     * @return A future to tell us if the deletion was successful.
+     */
+    CompletableFuture<Void> removeReactionByEmojiFromMessage(String unicodeEmoji);
+
+    /**
+     * Removes a user from the list of reactors of the given emoji reactions from the message.
+     *
+     * @param user The user to remove.
+     * @param emojis The emojis of the reactions.
+     * @return A future to tell us if the deletion was successful.
+     */
+    CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, Emoji... emojis);
 
     /**
      * Removes a user from the list of reactors of the given unicode emoji reactions from the message.
@@ -144,28 +160,12 @@ public interface MessageEvent extends TextChannelEvent {
     CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, String... unicodeEmojis);
 
     /**
-     * Removes all reactors of a given emoji reaction from the message.
-     *
-     * @param emoji The emoji of the reaction.
-     * @return A future to tell us if the deletion was successful.
-     */
-    CompletableFuture<Void> removeReactionByEmojiFromMessage(Emoji emoji);
-
-    /**
      * Removes all reactors of the given emoji reactions from the message.
      *
      * @param emojis The emojis of the reactions.
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> removeReactionsByEmojiFromMessage(Emoji... emojis);
-
-    /**
-     * Removes all reactors of a given unicode emoji reaction from the message.
-     *
-     * @param unicodeEmoji The unicode emoji of the reaction.
-     * @return A future to tell us if the deletion was successful.
-     */
-    CompletableFuture<Void> removeReactionByEmojiFromMessage(String unicodeEmoji);
 
     /**
      * Removes all reactors of the given unicode emoji reactions from the message.
@@ -184,20 +184,20 @@ public interface MessageEvent extends TextChannelEvent {
     CompletableFuture<Void> removeOwnReactionByEmojiFromMessage(Emoji emoji);
 
     /**
-     * Removes you from the list of reactors of the given emoji reactions from the message.
-     *
-     * @param emojis The emojis of the reactions.
-     * @return A future to tell us if the deletion was successful.
-     */
-    CompletableFuture<Void> removeOwnReactionsByEmojiFromMessage(Emoji... emojis);
-
-    /**
      * Removes you from the list of reactors of a given unicode emoji reaction from the message.
      *
      * @param unicodeEmoji The unicode emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> removeOwnReactionByEmojiFromMessage(String unicodeEmoji);
+
+    /**
+     * Removes you from the list of reactors of the given emoji reactions from the message.
+     *
+     * @param emojis The emojis of the reactions.
+     * @return A future to tell us if the deletion was successful.
+     */
+    CompletableFuture<Void> removeOwnReactionsByEmojiFromMessage(Emoji... emojis);
 
     /**
      * Removes you from the list of reactors of the given unicode emoji reactions from the message.

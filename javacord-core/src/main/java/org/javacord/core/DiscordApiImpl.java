@@ -792,24 +792,6 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     /**
-     * Sets the current activity, along with type and streaming Url.
-     *
-     * @param name The name of the activity.
-     * @param type The activity's type.
-     * @param streamingUrl The Url used for streaming.
-     */
-    private void updateActivity(String name, ActivityType type, String streamingUrl) {
-        if (name == null) {
-            activity = null;
-        } else if (streamingUrl == null) {
-            activity = new ActivityImpl(type, name, null);
-        } else {
-            activity = new ActivityImpl(type, name, streamingUrl);
-        }
-        websocketAdapter.updateStatus();
-    }
-
-    /**
      * Adds an object listener.
      * Adding a listener multiple times to the same object will only add it once
      * and return the same listener manager on each invocation.
@@ -937,35 +919,6 @@ public class DiscordApiImpl implements DiscordApi {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
-        return (ListenerManager<T>) listeners
-                .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
-                .computeIfAbsent(listener, key -> new ListenerManagerImpl<>(this, listener, listenerClass));
-    }
-
-    @Override
-    public <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener) {
-        synchronized (listeners) {
-            Map<GloballyAttachableListener, ListenerManagerImpl<? extends GloballyAttachableListener>> classListeners =
-                    listeners.get(listenerClass);
-            if (classListeners == null) {
-                return;
-            }
-            ListenerManagerImpl<? extends GloballyAttachableListener> listenerManager = classListeners.get(listener);
-            if (listenerManager == null) {
-                return;
-            }
-            classListeners.remove(listener);
-            listenerManager.removed();
-            // Clean it up
-            if (classListeners.isEmpty()) {
-                listeners.remove(listenerClass);
-            }
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public <T extends GloballyAttachableListener> Map<T, List<Class<T>>> getListeners() {
         return Collections.unmodifiableMap(listeners.entrySet().stream()
                 .flatMap(entry -> entry
@@ -1078,6 +1031,26 @@ public class DiscordApiImpl implements DiscordApi {
     public UserStatus getStatus() {
         return status;
     }
+
+
+    /**
+     * Sets the current activity, along with type and streaming Url.
+     *
+     * @param name The name of the activity.
+     * @param type The activity's type.
+     * @param streamingUrl The Url used for streaming.
+     */
+    private void updateActivity(String name, ActivityType type, String streamingUrl) {
+        if (name == null) {
+            activity = null;
+        } else if (streamingUrl == null) {
+            activity = new ActivityImpl(type, name, null);
+        } else {
+            activity = new ActivityImpl(type, name, streamingUrl);
+        }
+        websocketAdapter.updateStatus();
+    }
+
 
     @Override
     public void updateActivity(String name) {
@@ -1990,6 +1963,35 @@ public class DiscordApiImpl implements DiscordApi {
                 .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
                 .map(listenerClass -> addListener(listenerClass, listener))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
+        return (ListenerManager<T>) listeners
+                .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
+                .computeIfAbsent(listener, key -> new ListenerManagerImpl<>(this, listener, listenerClass));
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener) {
+        synchronized (listeners) {
+            Map<GloballyAttachableListener, ListenerManagerImpl<? extends GloballyAttachableListener>> classListeners =
+                    listeners.get(listenerClass);
+            if (classListeners == null) {
+                return;
+            }
+            ListenerManagerImpl<? extends GloballyAttachableListener> listenerManager = classListeners.get(listener);
+            if (listenerManager == null) {
+                return;
+            }
+            classListeners.remove(listener);
+            listenerManager.removed();
+            // Clean it up
+            if (classListeners.isEmpty()) {
+                listeners.remove(listenerClass);
+            }
+        }
     }
 
     @Override

@@ -356,14 +356,14 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public CompletableFuture<Void> removeReactionsByEmoji(User user, String... unicodeEmojis) {
-        return removeReactionsByEmoji(user,
-                Arrays.stream(unicodeEmojis).map(UnicodeEmojiImpl::fromString).toArray(Emoji[]::new));
+    public CompletableFuture<Void> removeReactionByEmoji(String unicodeEmoji) {
+        return removeReactionByEmoji(UnicodeEmojiImpl.fromString(unicodeEmoji));
     }
 
     @Override
-    public CompletableFuture<Void> removeReactionByEmoji(String unicodeEmoji) {
-        return removeReactionByEmoji(UnicodeEmojiImpl.fromString(unicodeEmoji));
+    public CompletableFuture<Void> removeReactionsByEmoji(User user, String... unicodeEmojis) {
+        return removeReactionsByEmoji(user,
+                Arrays.stream(unicodeEmojis).map(UnicodeEmojiImpl::fromString).toArray(Emoji[]::new));
     }
 
     @Override

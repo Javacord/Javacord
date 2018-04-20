@@ -54,6 +54,17 @@ public class LoggerUtil {
     }
 
     /**
+     * Gets or creates a logger for the given name.
+     *
+     * @param clazz The class of the logger.
+     * @return A logger for the given class.
+     */
+    public static Logger getLogger(Class clazz) {
+        return getLogger(clazz.getName());
+    }
+
+
+    /**
      * Put a diagnostic context value (the {@code val} parameter) as identified with the
      * {@code key} parameter into the current thread's diagnostic context map. The
      * {@code key} parameter cannot be {@code null}. The {@code val} parameter
@@ -80,15 +91,4 @@ public class LoggerUtil {
     public static MDCCloseable putCloseableToMdc(String key, String val) throws IllegalArgumentException {
         return noLogger.get() ? null : MDC.putCloseable(key, val);
     }
-
-    /**
-     * Gets or creates a logger for the given name.
-     *
-     * @param clazz The class of the logger.
-     * @return A logger for the given class.
-     */
-    public static Logger getLogger(Class clazz) {
-        return getLogger(clazz.getName());
-    }
-
 }

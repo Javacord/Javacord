@@ -51,13 +51,10 @@ public interface MessageSet extends NavigableSet<Message> {
     MessageSet subSet(Message fromElement, boolean fromInclusive, Message toElement, boolean toInclusive);
 
     @Override
-    MessageSet headSet(Message toElement, boolean inclusive);
-
-    @Override
-    MessageSet tailSet(Message fromElement, boolean inclusive);
-
-    @Override
     MessageSet subSet(Message fromElement, Message toElement);
+
+    @Override
+    MessageSet headSet(Message toElement, boolean inclusive);
 
     @Override
     MessageSet headSet(Message toElement);
@@ -65,4 +62,6 @@ public interface MessageSet extends NavigableSet<Message> {
     @Override
     MessageSet tailSet(Message fromElement);
 
+    @Override
+    MessageSet tailSet(Message fromElement, boolean inclusive);
 }

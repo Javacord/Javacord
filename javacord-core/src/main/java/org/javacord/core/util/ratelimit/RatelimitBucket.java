@@ -32,25 +32,6 @@ public class RatelimitBucket {
     }
 
     /**
-     * Checks if a bucket created with the given parameters would equal this bucket.
-     *
-     * @param endpoint The endpoint.
-     * @param majorUrlParameter The major url parameter.
-     * @return Whether a bucket created with the given parameters would equal this bucket or not.
-     */
-    public boolean equals(RestEndpoint endpoint, String majorUrlParameter) {
-        if (endpoint.isGlobal()) {
-            endpoint = null;
-        }
-        boolean endpointSame = this.endpoint == endpoint;
-        boolean majorUrlParameterBothNull = this.majorUrlParameter == null && majorUrlParameter == null;
-        boolean majorUrlParameterEqual =
-                this.majorUrlParameter != null && this.majorUrlParameter.equals(majorUrlParameter);
-
-        return endpointSame && (majorUrlParameterBothNull || majorUrlParameterEqual);
-    }
-
-    /**
      * Gets the rest endpoint of the bucket.
      *
      * @return The endpoint of the bucket. If it's a global limit, the endpoint will be not be present.
@@ -117,6 +98,26 @@ public class RatelimitBucket {
         long timestamp = System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset());
         return (int) (rateLimitResetTimestamp - timestamp);
     }
+
+    /**
+     * Checks if a bucket created with the given parameters would equal this bucket.
+     *
+     * @param endpoint The endpoint.
+     * @param majorUrlParameter The major url parameter.
+     * @return Whether a bucket created with the given parameters would equal this bucket or not.
+     */
+    public boolean equals(RestEndpoint endpoint, String majorUrlParameter) {
+        if (endpoint.isGlobal()) {
+            endpoint = null;
+        }
+        boolean endpointSame = this.endpoint == endpoint;
+        boolean majorUrlParameterBothNull = this.majorUrlParameter == null && majorUrlParameter == null;
+        boolean majorUrlParameterEqual =
+                this.majorUrlParameter != null && this.majorUrlParameter.equals(majorUrlParameter);
+
+        return endpointSame && (majorUrlParameterBothNull || majorUrlParameterEqual);
+    }
+
 
     @Override
     public boolean equals(Object obj) {

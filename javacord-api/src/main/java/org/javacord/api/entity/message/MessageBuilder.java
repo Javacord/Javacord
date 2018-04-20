@@ -43,18 +43,6 @@ public class MessageBuilder {
     }
 
     /**
-     * Appends a sting with or without decoration to the message.
-     *
-     * @param message The string to append.
-     * @param decorations The decorations of the string.
-     * @return The current instance in order to chain call methods.
-     */
-    public MessageBuilder append(String message, MessageDecoration... decorations) {
-        delegate.append(message, decorations);
-        return this;
-    }
-
-    /**
      * Appends code to the message.
      *
      * @param language The language, e.g. "java".
@@ -63,6 +51,18 @@ public class MessageBuilder {
      */
     public MessageBuilder appendCode(String language, String code) {
         delegate.appendCode(language, code);
+        return this;
+    }
+
+    /**
+     * Appends a sting with or without decoration to the message.
+     *
+     * @param message The string to append.
+     * @param decorations The decorations of the string.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder append(String message, MessageDecoration... decorations) {
+        delegate.append(message, decorations);
         return this;
     }
 

@@ -67,17 +67,6 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     private final List<FileContainer> attachments = new ArrayList<>();
 
     @Override
-    public void append(String message, MessageDecoration... decorations) {
-        for (MessageDecoration decoration : decorations) {
-            strBuilder.append(decoration.getPrefix());
-        }
-        strBuilder.append(message);
-        for (int i = decorations.length - 1; i >= 0; i--) {
-            strBuilder.append(decorations[i].getSuffix());
-        }
-    }
-
-    @Override
     public void appendCode(String language, String code) {
         strBuilder
                 .append("\n")
@@ -86,6 +75,17 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 .append("\n")
                 .append(code)
                 .append(MessageDecoration.CODE_LONG.getSuffix());
+    }
+
+    @Override
+    public void append(String message, MessageDecoration... decorations) {
+        for (MessageDecoration decoration : decorations) {
+            strBuilder.append(decoration.getPrefix());
+        }
+        strBuilder.append(message);
+        for (int i = decorations.length - 1; i >= 0; i--) {
+            strBuilder.append(decorations[i].getSuffix());
+        }
     }
 
     @Override

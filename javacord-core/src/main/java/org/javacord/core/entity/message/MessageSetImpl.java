@@ -79,6 +79,75 @@ public class MessageSetImpl implements MessageSet {
     }
 
     /**
+     * Gets up to a given amount of messages in the given channel.
+     *
+     * @param channel The channel of the messages.
+     * @param limit The limit of messages to get.
+     * @param before Get messages before the message with this id.
+     * @param after Get messages after the message with this id.
+     *
+     * @return The messages.
+     * @see #getMessagesAsStream(TextChannel, long, long)
+     */
+    private static CompletableFuture<MessageSet> getMessages(TextChannel channel, int limit, long before, long after) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                // get the initial batch with the first <= 100 messages
+                int initialBatchSize = ((limit % 100) == 0) ? 100 : limit % 100;
+                MessageSet initialMessages = requestAsMessages(channel, initialBatchSize, before, after);
+
+                // limit <= 100 => initial request got all messages
+                // initialMessages is empty => READ_MESSAGE_HISTORY permission is denied or no more messages available
+                if ((limit <= 100) || initialMessages.isEmpty()) {
+                    future.complete(initialMessages);
+                    return;
+                }
+
+                // calculate the amount and direction of remaining message to get
+                // this will be a multiple of 100 and at least 100
+                int remainingMessages = limit - initialBatchSize;
+                int steps = remainingMessages / 100;
+                // "before" is set or both are not set
+                boolean older = (before != -1) || (after == -1);
+                boolean newer = after != -1;
+
+                // get remaining messages
+                List<MessageSet> messageSets = new ArrayList<>();
+                MessageSet lastMessages = initialMessages;
+                messageSets.add(lastMessages);
+                for (int step = 0; step < steps; ++step) {
+                    lastMessages = requestAsMessages(channel,
+                            100,
+                            lastMessages.getOldestMessage()
+                                    .filter(message -> older)
+                                    .map(DiscordEntity::getId)
+                                    .orElse(-1L),
+                            lastMessages.getNewestMessage()
+                                    .filter(message -> newer)
+                                    .map(DiscordEntity::getId)
+                                    .orElse(-1L));
+
+                    // no more messages available
+                    if (lastMessages.isEmpty()) {
+                        break;
+                    }
+
+                    messageSets.add(lastMessages);
+                }
+
+                // combine the message sets
+                future.complete(new MessageSetImpl(messageSets.stream()
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList())));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
      * Gets messages in the given channel from the newer end until one that meets the given condition is found.
      * If no message matches the condition, an empty set is returned.
      *
@@ -89,6 +158,36 @@ public class MessageSetImpl implements MessageSet {
      */
     public static CompletableFuture<MessageSet> getMessagesUntil(TextChannel channel, Predicate<Message> condition) {
         return getMessagesUntil(channel, condition, -1, -1);
+    }
+
+    /**
+     * Gets messages in the given channel until one that meets the given condition is found.
+     * If no message matches the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The abort condition for when to stop retrieving messages.
+     * @param before Get messages before the message with this id.
+     * @param after Get messages after the message with this id.
+     *
+     * @return The messages.
+     */
+    private static CompletableFuture<MessageSet> getMessagesUntil(
+            TextChannel channel, Predicate<Message> condition, long before, long after) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesAsStream(channel, before, after).peek(messages::add).filter(condition).findFirst();
+
+                future.complete(new MessageSetImpl(untilMessage
+                        .map(message -> messages)
+                        .orElse(Collections.emptyList())));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
     }
 
     /**
@@ -105,6 +204,38 @@ public class MessageSetImpl implements MessageSet {
     }
 
     /**
+     * Gets messages in the given channel while they meet the given condition.
+     * If the first message does not match the condition, an empty set is returned.
+     *
+     * @param channel The channel of the messages.
+     * @param condition The condition that has to be met.
+     * @param before Get messages before the message with this id.
+     * @param after Get messages after the message with this id.
+     *
+     * @return The messages.
+     */
+    private static CompletableFuture<MessageSet> getMessagesWhile(
+            TextChannel channel, Predicate<Message> condition, long before, long after) {
+        CompletableFuture<MessageSet> future = new CompletableFuture<>();
+        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            try {
+                List<Message> messages = new ArrayList<>();
+                Optional<Message> untilMessage =
+                        getMessagesAsStream(channel, before, after)
+                                .peek(messages::add)
+                                .filter(condition.negate())
+                                .findFirst();
+                untilMessage.ifPresent(messages::remove);
+
+                future.complete(new MessageSetImpl(messages));
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
      * Gets a stream of messages in the given channel sorted from newest to oldest.
      *
      * <p>The messages are retrieved in batches synchronously from Discord,
@@ -116,6 +247,61 @@ public class MessageSetImpl implements MessageSet {
      */
     public static Stream<Message> getMessagesAsStream(TextChannel channel) {
         return getMessagesAsStream(channel, -1, -1);
+    }
+
+    /**
+     * Gets a stream of messages in the given channel sorted from newest to oldest.
+     *
+     * <p>The messages are retrieved in batches synchronously from Discord,
+     * so consider not using this method from a listener directly.
+     *
+     * @param channel The channel of the messages.
+     * @param before Get messages before the message with this id.
+     * @param after Get messages after the message with this id.
+     *
+     * @return The stream.
+     * @see #getMessages(TextChannel, int, long, long)
+     */
+    private static Stream<Message> getMessagesAsStream(TextChannel channel, long before, long after) {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Message>() {
+            private final DiscordApiImpl api = ((DiscordApiImpl) channel.getApi());
+            // before was set or both were not set
+            private final boolean older = (before != -1) || (after == -1);
+            private final boolean newer = after != -1;
+            private long referenceMessageId = older ? before : after;
+            private final List<JsonNode> messageJsons = Collections.synchronizedList(new ArrayList<>());
+
+            private void ensureMessagesAvailable() {
+                if (messageJsons.isEmpty()) {
+                    synchronized (messageJsons) {
+                        if (messageJsons.isEmpty()) {
+                            messageJsons.addAll(requestAsSortedJsonNodes(
+                                    channel,
+                                    100,
+                                    older ? referenceMessageId : -1,
+                                    newer ? referenceMessageId : -1,
+                                    older
+                            ));
+                            if (!messageJsons.isEmpty()) {
+                                referenceMessageId = messageJsons.get(messageJsons.size() - 1).get("id").asLong();
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public boolean hasNext() {
+                ensureMessagesAvailable();
+                return !messageJsons.isEmpty();
+            }
+
+            @Override
+            public Message next() {
+                ensureMessagesAvailable();
+                return api.getOrCreateMessage(channel, messageJsons.remove(0));
+            }
+        }, Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.NONNULL | Spliterator.CONCURRENT), false);
     }
 
     /**
@@ -560,192 +746,6 @@ public class MessageSetImpl implements MessageSet {
     }
 
     /**
-     * Gets messages in the given channel until one that meets the given condition is found.
-     * If no message matches the condition, an empty set is returned.
-     *
-     * @param channel The channel of the messages.
-     * @param condition The abort condition for when to stop retrieving messages.
-     * @param before Get messages before the message with this id.
-     * @param after Get messages after the message with this id.
-     *
-     * @return The messages.
-     */
-    private static CompletableFuture<MessageSet> getMessagesUntil(
-            TextChannel channel, Predicate<Message> condition, long before, long after) {
-        CompletableFuture<MessageSet> future = new CompletableFuture<>();
-        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
-            try {
-                List<Message> messages = new ArrayList<>();
-                Optional<Message> untilMessage =
-                        getMessagesAsStream(channel, before, after).peek(messages::add).filter(condition).findFirst();
-
-                future.complete(new MessageSetImpl(untilMessage
-                                                           .map(message -> messages)
-                                                           .orElse(Collections.emptyList())));
-            } catch (Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Gets messages in the given channel while they meet the given condition.
-     * If the first message does not match the condition, an empty set is returned.
-     *
-     * @param channel The channel of the messages.
-     * @param condition The condition that has to be met.
-     * @param before Get messages before the message with this id.
-     * @param after Get messages after the message with this id.
-     *
-     * @return The messages.
-     */
-    private static CompletableFuture<MessageSet> getMessagesWhile(
-            TextChannel channel, Predicate<Message> condition, long before, long after) {
-        CompletableFuture<MessageSet> future = new CompletableFuture<>();
-        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
-            try {
-                List<Message> messages = new ArrayList<>();
-                Optional<Message> untilMessage =
-                        getMessagesAsStream(channel, before, after)
-                                .peek(messages::add)
-                                .filter(condition.negate())
-                                .findFirst();
-                untilMessage.ifPresent(messages::remove);
-
-                future.complete(new MessageSetImpl(messages));
-            } catch (Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Gets up to a given amount of messages in the given channel.
-     *
-     * @param channel The channel of the messages.
-     * @param limit The limit of messages to get.
-     * @param before Get messages before the message with this id.
-     * @param after Get messages after the message with this id.
-     *
-     * @return The messages.
-     * @see #getMessagesAsStream(TextChannel, long, long)
-     */
-    private static CompletableFuture<MessageSet> getMessages(TextChannel channel, int limit, long before, long after) {
-        CompletableFuture<MessageSet> future = new CompletableFuture<>();
-        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
-            try {
-                // get the initial batch with the first <= 100 messages
-                int initialBatchSize = ((limit % 100) == 0) ? 100 : limit % 100;
-                MessageSet initialMessages = requestAsMessages(channel, initialBatchSize, before, after);
-
-                // limit <= 100 => initial request got all messages
-                // initialMessages is empty => READ_MESSAGE_HISTORY permission is denied or no more messages available
-                if ((limit <= 100) || initialMessages.isEmpty()) {
-                    future.complete(initialMessages);
-                    return;
-                }
-
-                // calculate the amount and direction of remaining message to get
-                // this will be a multiple of 100 and at least 100
-                int remainingMessages = limit - initialBatchSize;
-                int steps = remainingMessages / 100;
-                // "before" is set or both are not set
-                boolean older = (before != -1) || (after == -1);
-                boolean newer = after != -1;
-
-                // get remaining messages
-                List<MessageSet> messageSets = new ArrayList<>();
-                MessageSet lastMessages = initialMessages;
-                messageSets.add(lastMessages);
-                for (int step = 0; step < steps; ++step) {
-                    lastMessages = requestAsMessages(channel,
-                                                     100,
-                                                     lastMessages.getOldestMessage()
-                                                             .filter(message -> older)
-                                                             .map(DiscordEntity::getId)
-                                                             .orElse(-1L),
-                                                     lastMessages.getNewestMessage()
-                                                             .filter(message -> newer)
-                                                             .map(DiscordEntity::getId)
-                                                             .orElse(-1L));
-
-                    // no more messages available
-                    if (lastMessages.isEmpty()) {
-                        break;
-                    }
-
-                    messageSets.add(lastMessages);
-                }
-
-                // combine the message sets
-                future.complete(new MessageSetImpl(messageSets.stream()
-                                                           .flatMap(Collection::stream)
-                                                           .collect(Collectors.toList())));
-            } catch (Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Gets a stream of messages in the given channel sorted from newest to oldest.
-     *
-     * <p>The messages are retrieved in batches synchronously from Discord,
-     * so consider not using this method from a listener directly.
-     *
-     * @param channel The channel of the messages.
-     * @param before Get messages before the message with this id.
-     * @param after Get messages after the message with this id.
-     *
-     * @return The stream.
-     * @see #getMessages(TextChannel, int, long, long)
-     */
-    private static Stream<Message> getMessagesAsStream(TextChannel channel, long before, long after) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Message>() {
-            private final DiscordApiImpl api = ((DiscordApiImpl) channel.getApi());
-            // before was set or both were not set
-            private final boolean older = (before != -1) || (after == -1);
-            private final boolean newer = after != -1;
-            private long referenceMessageId = older ? before : after;
-            private final List<JsonNode> messageJsons = Collections.synchronizedList(new ArrayList<>());
-
-            private void ensureMessagesAvailable() {
-                if (messageJsons.isEmpty()) {
-                    synchronized (messageJsons) {
-                        if (messageJsons.isEmpty()) {
-                            messageJsons.addAll(requestAsSortedJsonNodes(
-                                    channel,
-                                    100,
-                                    older ? referenceMessageId : -1,
-                                    newer ? referenceMessageId : -1,
-                                    older
-                            ));
-                            if (!messageJsons.isEmpty()) {
-                                referenceMessageId = messageJsons.get(messageJsons.size() - 1).get("id").asLong();
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public boolean hasNext() {
-                ensureMessagesAvailable();
-                return !messageJsons.isEmpty();
-            }
-
-            @Override
-            public Message next() {
-                ensureMessagesAvailable();
-                return api.getOrCreateMessage(channel, messageJsons.remove(0));
-            }
-        }, Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.NONNULL | Spliterator.CONCURRENT), false);
-    }
-
-    /**
      * Requests the messages from Discord.
      *
      * @param channel The channel of which to get messages from.
@@ -922,23 +922,13 @@ public class MessageSetImpl implements MessageSet {
     }
 
     @Override
-    public MessageSet headSet(Message toElement, boolean inclusive) {
-        return new MessageSetImpl(messages.headSet(toElement, inclusive));
-    }
-
-    @Override
-    public MessageSet tailSet(Message fromElement, boolean inclusive) {
-        return new MessageSetImpl(messages.tailSet(fromElement, inclusive));
-    }
-
-    @Override
-    public Comparator<? super Message> comparator() {
-        return messages.comparator();
-    }
-
-    @Override
     public MessageSet subSet(Message fromElement, Message toElement) {
         return new MessageSetImpl(messages.subSet(fromElement, toElement));
+    }
+
+    @Override
+    public MessageSet headSet(Message toElement, boolean inclusive) {
+        return new MessageSetImpl(messages.headSet(toElement, inclusive));
     }
 
     @Override
@@ -947,8 +937,18 @@ public class MessageSetImpl implements MessageSet {
     }
 
     @Override
+    public MessageSet tailSet(Message fromElement, boolean inclusive) {
+        return new MessageSetImpl(messages.tailSet(fromElement, inclusive));
+    }
+
+    @Override
     public MessageSet tailSet(Message fromElement) {
         return new MessageSetImpl(messages.tailSet(fromElement));
+    }
+
+    @Override
+    public Comparator<? super Message> comparator() {
+        return messages.comparator();
     }
 
     @Override
