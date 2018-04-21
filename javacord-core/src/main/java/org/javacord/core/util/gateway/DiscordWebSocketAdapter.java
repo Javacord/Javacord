@@ -65,12 +65,7 @@ import org.slf4j.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -200,6 +195,7 @@ public class DiscordWebSocketAdapter extends WebSocketListener {
                                 logger.debug("Sending request guild members packet {}",
                                              requestGuildMembersPacket.toString());
                                 getWebSocket().send(requestGuildMembersPacket.toString());
+                                lastFrameWasIdentify.set(false);
                             });
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored) {
@@ -579,7 +575,15 @@ public class DiscordWebSocketAdapter extends WebSocketListener {
     private void sendHeartbeat(WebSocket websocket) {
         ObjectNode heartbeatPacket = JsonNodeFactory.instance.objectNode();
         heartbeatPacket.put("op", GatewayOpcode.HEARTBEAT.getCode());
-        heartbeatPacket.put("d", lastSeq);
+        if(lastSeq != -1) {
+            heartbeatPacket.put("d", lastSeq);
+        } else {
+            heartbeatPacket.putNull("d");
+        }
+
+        if(logger.isTraceEnabled()){
+            logger.trace("Heartbeat packet: '{}'", heartbeatPacket.toString());
+        }
         websocket.send(heartbeatPacket.toString());
     }
 
@@ -596,6 +600,9 @@ public class DiscordWebSocketAdapter extends WebSocketListener {
                 .put("session_id", sessionId)
                 .put("seq", lastSeq);
         logger.debug("Sending resume packet");
+        if(logger.isTraceEnabled()){
+            logger.trace("Resume packet: '{}'", resumePacket.toString());
+        }
         websocket.send(resumePacket.toString());
         this.lastFrameWasIdentify.set(false);
     }
@@ -622,7 +629,10 @@ public class DiscordWebSocketAdapter extends WebSocketListener {
         if (api.getTotalShards() > 1) {
             data.putArray("shard").add(api.getCurrentShard()).add(api.getTotalShards());
         }
-        websocket.send(data.toString());
+        if(logger.isTraceEnabled()){
+            logger.trace("Identify packet: '{}'", data.toString());
+        }
+        websocket.send(identifyPacket.toString());
         lastIdentificationPerAccount.put(token, System.currentTimeMillis());
         connectionDelaySemaphorePerAccount.get(token).release();
         this.lastFrameWasIdentify.set(true);
