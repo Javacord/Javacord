@@ -123,6 +123,7 @@ import org.slf4j.Logger;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.net.Proxy;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -354,7 +355,7 @@ public class DiscordApiImpl implements DiscordApi {
      * @param token The token used to connect without any account type specific prefix.
      */
     public DiscordApiImpl(String token) {
-        this(AccountType.BOT, token, 0, 1, false, null);
+        this(AccountType.BOT, token, 0, 1, null, false, null);
     }
 
     /**
@@ -364,6 +365,7 @@ public class DiscordApiImpl implements DiscordApi {
      * @param token The token used to connect without any account type specific prefix.
      * @param currentShard The current shard the bot should connect to.
      * @param totalShards  The total amount of shards.
+     * @param proxy The proxy to use for the OkHttpClient.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
      * @param ready The future which will be completed when the connection to Discord was successful.
@@ -373,6 +375,7 @@ public class DiscordApiImpl implements DiscordApi {
             String token,
             int currentShard,
             int totalShards,
+            Proxy proxy,
             boolean waitForServersOnStartup,
             CompletableFuture<DiscordApi> ready
     ) {
@@ -390,6 +393,7 @@ public class DiscordApiImpl implements DiscordApi {
                         .addHeader("User-Agent", Javacord.USER_AGENT)
                         .build()))
                 .addInterceptor(new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY))
+                .proxy(proxy)
                 .build();
         this.eventDispatcher = new EventDispatcher(this);
 

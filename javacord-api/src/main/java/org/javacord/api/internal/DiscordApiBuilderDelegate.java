@@ -4,6 +4,7 @@ import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
+import java.net.Proxy;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,6 +27,14 @@ public interface DiscordApiBuilderDelegate {
      * @param accountType The account type to set.
      */
     void setAccountType(AccountType accountType);
+
+    /**
+     * Sets the proxy to use.
+     *
+     * @param proxy The proxy to use.
+     * @see DiscordApiBuilder#setProxy(Proxy)
+     */
+    void setProxy(Proxy proxy);
 
     /**
      * Sets the total shards.
