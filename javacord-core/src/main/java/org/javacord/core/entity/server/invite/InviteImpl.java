@@ -115,12 +115,12 @@ public class InviteImpl implements RichInvite {
     private final boolean revoked;
 
     /**
-     * The approximate count of members, if available
+     * The approximate count of members, if available.
      */
     private final Integer approximateMemberCount;
 
     /**
-     * The approximate count of present members, if available
+     * The approximate count of present members, if available.
      */
     private final Integer approximatePresenceCount;
 
