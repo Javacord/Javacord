@@ -1,3 +1,70 @@
+import io.codearte.gradle.nexus.BaseStagingTask
+import io.codearte.gradle.nexus.NexusStagingPlugin
+
+import javax.naming.ConfigurationException
+
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0'
+    }
+}
+
+def releaseVersion = !version.toString().endsWith('-SNAPSHOT')
+
+ext {
+    it.'signing.secretKeyRingFile' = project.findProperty('javacord.signing.secretKeyRingFile') ?:
+            project.findProperty('signing.secretKeyRingFile')
+    it.'signing.password' = project.findProperty('javacord.signing.password') ?:
+            project.findProperty('signing.password')
+    it.'signing.keyId' = project.findProperty('javacord.signing.keyId') ?:
+            project.findProperty('signing.keyId')
+    sonatypeUsername = project.findProperty('javacord.sonatype.username') ?:
+            project.findProperty('sonatype.username')
+    sonatypePassword = project.findProperty('javacord.sonatype.password') ?:
+            project.findProperty('sonatype.password')
+    sonatypeStagingProfileId = project.findProperty('javacord.sonatype.stagingProfileId') ?:
+            project.findProperty('sonatype.stagingProfileId')
+}
+
+allprojects {
+    apply plugin: 'maven-publish'
+
+    publishing {
+        repositories {
+            maven {
+                name 'sonatype'
+                if (releaseVersion) {
+                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                } else {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                }
+                credentials {
+                    username sonatypeUsername
+                    password sonatypePassword
+                }
+            }
+        }
+    }
+
+    tasks.withType(PublishToMavenRepository) {
+        doFirst {
+            if (!sonatypeUsername) {
+                throw new ConfigurationException(
+                        'Please set the Sonatype username with project property "sonatype.username" ' +
+                                'or "javacord.sonatype.username". If both are set, the latter will be effective.')
+            }
+            if (!sonatypePassword) {
+                throw new ConfigurationException(
+                        'Please set the Sonatype password with project property "sonatype.password" ' +
+                                'or "javacord.sonatype.password". If both are set, the latter will be effective.')
+            }
+        }
+    }
+}
+
 subprojects {
     publishing {
         publications {
@@ -13,11 +80,69 @@ subprojects {
 publishing {
     publications {
         javacord(MavenPublication) {
-            // add the dependencies to the POM,
-            // but do not try to publish the JAR
+            // add the dependencies to the POM
             from components.java
-            artifacts.clear()
+            // but do not try to publish the JAR
+            artifacts.removeAll { !it.classifier && (it.extension == 'jar') }
             artifact shadowJar
         }
     }
 }
+
+allprojects {
+    apply plugin: 'signing'
+
+    signing {
+        required {
+            // signing is required if this is a release version and the artifacts are to be published
+            releaseVersion && tasks.withType(PublishToMavenRepository).find {
+                gradle.taskGraph.hasTask it
+            }
+        }
+        sign publishing.publications
+    }
+}
+
+apply plugin: NexusStagingPlugin
+// remove superfluous tasks from NexusStagingPlugin
+tasks.removeAll([promoteRepository, closeAndPromoteRepository, getStagingProfile])
+
+nexusStaging {
+    stagingProfileId sonatypeStagingProfileId
+    username sonatypeUsername
+    password sonatypePassword
+}
+
+// make sure the staging tasks are run after any publishing tasks if both are to be run
+tasks.withType(BaseStagingTask) {
+    mustRunAfter allprojects.tasks*.withType(PublishToMavenRepository)
+
+    doFirst {
+        if (!sonatypeStagingProfileId) {
+            throw new ConfigurationException(
+                    'Please set the Sonatype staging profile id with project property "sonatype.stagingProfileId" ' +
+                            'or "javacord.sonatype.stagingProfileId". If both are set, the latter will be effective.')
+        }
+        if (!sonatypeUsername) {
+            throw new ConfigurationException(
+                    'Please set the Sonatype username with project property "sonatype.username" ' +
+                            'or "javacord.sonatype.username". If both are set, the latter will be effective.')
+        }
+        if (!sonatypePassword) {
+            throw new ConfigurationException(
+                    'Please set the Sonatype password with project property "sonatype.password" ' +
+                            'or "javacord.sonatype.password". If both are set, the latter will be effective.')
+        }
+    }
+}
+
+apply plugin: 'net.researchgate.release'
+
+task buildAll(dependsOn: allprojects.tasks.build)
+
+release {
+    tagTemplate = 'v$version'
+    buildTasks = ['buildAll']
+}
+
+afterReleaseBuild.dependsOn allprojects.tasks*.withType(PublishToMavenRepository), closeRepository

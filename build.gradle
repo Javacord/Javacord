@@ -1,7 +1,13 @@
 plugins {
     id 'nebula.java-cross-compile' version '0.10.0' apply false
-    id 'com.github.johnrengelman.shadow' version '2.0.2'
+    id 'com.github.johnrengelman.shadow' version '2.0.2' apply false
     id 'me.tatarka.gradle.pom' version '1.0' apply false
+    id 'net.researchgate.release' version '2.7.0' apply false
+}
+
+if (project.hasProperty('teamcity')) {
+    println "##teamcity[buildNumber '$version (#${project.'build.number'})']"
+    println "##teamcity[setParameter name='javacord.version' value='$version']"
 }
 
 def rootBuildDir = buildDir
@@ -9,10 +15,8 @@ def rootBuildDir = buildDir
 allprojects {
     apply plugin: 'java-library'
     apply plugin: 'nebula.java-cross-compile'
-    apply plugin: 'maven-publish'
 
     group = 'org.javacord'
-    version = '3.0.0'
     description = 'A multithreaded but easy to use Discord Java API'
     buildDir = rootProject.file("${rootBuildDir}/${name}")
 
@@ -32,8 +36,6 @@ subprojects {
     ext.shortName = name - ~/^javacord-/
     description = "A multithreaded but easy to use Discord Java API ($shortName)"
 }
-
-tasks.remove knows
 
 defaultTasks 'build'
 

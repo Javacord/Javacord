@@ -18,9 +18,12 @@ subprojects {
     }
 }
 
-jar {
-    enabled false
-}
+// remove the main JAR from the archives artifacts
+configurations.archives.artifacts.clear()
+
+apply plugin: 'com.github.johnrengelman.shadow'
+// remove non-sense task from com.github.johnrengelman.shadow plugin
+tasks.remove knows
 
 shadowJar {
     classifier 'shaded'
@@ -29,3 +32,9 @@ shadowJar {
 artifacts {
     archives shadowJar
 }
+
+// disable and remove the jar task
+jar {
+    enabled false
+}
+tasks.remove jar
