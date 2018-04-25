@@ -6,7 +6,6 @@ module org.javacord.core {
     requires transitive org.javacord.api;
     requires transitive okhttp;
     requires transitive com.fasterxml.jackson.databind;
-    requires transitive nv.websocket.client;
     requires transitive slf4j.api;
 
     requires transitive java.desktop;

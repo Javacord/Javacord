@@ -22,7 +22,7 @@ public enum WebSocketCloseCode {
      * 1000 indicates a normal closure, meaning that the purpose for
      * which the connection was established has been fulfilled.</i>
      */
-    NORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.NORMAL, Usage.BOTH),
+    NORMAL(1000, Usage.BOTH),
 
     /**
      * 1001;
@@ -30,7 +30,7 @@ public enum WebSocketCloseCode {
      * 1001 indicates that an endpoint is "going away", such as a server
      * going down or a browser having navigated away from a page.</i>
      */
-    AWAY(com.neovisionaries.ws.client.WebSocketCloseCode.AWAY, Usage.BOTH),
+    AWAY(1001, Usage.BOTH),
 
     /**
      * 1002;
@@ -38,7 +38,7 @@ public enum WebSocketCloseCode {
      * 1002 indicates that an endpoint is terminating the connection due
      * to a protocol error.</i>
      */
-    UNCONFORMED(com.neovisionaries.ws.client.WebSocketCloseCode.UNCONFORMED, Usage.BOTH),
+    UNCONFORMED(1002, Usage.BOTH),
 
     /**
      * 1003;
@@ -48,7 +48,7 @@ public enum WebSocketCloseCode {
      * (e&#46;g&#46;, an endpoint that understands only text data MAY
      * send this if it receives a binary message).</i>
      */
-    UNACCEPTABLE(com.neovisionaries.ws.client.WebSocketCloseCode.UNACCEPTABLE, Usage.BOTH),
+    UNACCEPTABLE(1003, Usage.BOTH),
 
     /**
      * 1005;
@@ -58,7 +58,7 @@ public enum WebSocketCloseCode {
      * applications expecting a status code to indicate that no status
      * code was actually present.</i>
      */
-    NONE(com.neovisionaries.ws.client.WebSocketCloseCode.NONE, Usage.BOTH),
+    NONE(1005, Usage.BOTH),
 
     /**
      * 1006;
@@ -69,7 +69,7 @@ public enum WebSocketCloseCode {
      * connection was closed abnormally, e&#46;g&#46;, without sending or
      * receiving a Close control frame.</i>
      */
-    ABNORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.ABNORMAL, Usage.BOTH),
+    ABNORMAL(1006, Usage.BOTH),
 
     /**
      * 1007;
@@ -80,7 +80,7 @@ public enum WebSocketCloseCode {
      * [<a href="http://tools.ietf.org/html/rfc3629">RFC3629</a>] data
      * within a text message).</i>
      */
-    INCONSISTENT(com.neovisionaries.ws.client.WebSocketCloseCode.INCONSISTENT, Usage.BOTH),
+    INCONSISTENT(1007, Usage.BOTH),
 
     /**
      * 1008;
@@ -91,7 +91,7 @@ public enum WebSocketCloseCode {
      * is no other more suitable status code (e&#46;g&#46;, 1003 or 1009)
      * or if there is a need to hide specific details about the policy.</i>
      */
-    VIOLATED(com.neovisionaries.ws.client.WebSocketCloseCode.VIOLATED, Usage.BOTH),
+    VIOLATED(1008, Usage.BOTH),
 
     /**
      * 1009;
@@ -100,7 +100,7 @@ public enum WebSocketCloseCode {
      * because it has received a message that is too big for it to
      * process.</i>
      */
-    OVERSIZE(com.neovisionaries.ws.client.WebSocketCloseCode.OVERSIZE, Usage.BOTH),
+    OVERSIZE(1009, Usage.BOTH),
 
     /**
      * 1010;
@@ -114,7 +114,7 @@ public enum WebSocketCloseCode {
      * code is not used by the server, because it can fail the
      * WebSocket handshake instead.</i>
      */
-    UNEXTENDED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXTENDED, Usage.BOTH),
+    UNEXTENDED(1010, Usage.BOTH),
 
     /**
      * 1011;
@@ -123,7 +123,7 @@ public enum WebSocketCloseCode {
      * it encountered an unexpected condition that prevented it from
      * fulfilling the request.</i>
      */
-    UNEXPECTED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXPECTED, Usage.BOTH),
+    UNEXPECTED(1011, Usage.BOTH),
 
     /**
      * 1015;
@@ -134,7 +134,7 @@ public enum WebSocketCloseCode {
      * connection was closed due to a failure to perform a TLS handshake
      * (e&#46;g&#46;, the server certificate can't be verified).</i>
      */
-    INSECURE(com.neovisionaries.ws.client.WebSocketCloseCode.INSECURE, Usage.BOTH),
+    INSECURE(1015, Usage.BOTH),
 
     /**
      * We're not sure what went wrong. Try reconnecting?

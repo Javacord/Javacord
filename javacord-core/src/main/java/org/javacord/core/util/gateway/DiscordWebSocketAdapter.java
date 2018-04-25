@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
-import com.neovisionaries.ws.client.WebSocketListener;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.server.Server;
@@ -58,23 +57,15 @@ import org.javacord.core.util.handler.user.PresencesReplaceHandler;
 import org.javacord.core.util.handler.user.TypingStartHandler;
 import org.javacord.core.util.handler.user.UserUpdateHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.javacord.core.util.logging.WebSocketLogger;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 import org.slf4j.Logger;
 
-import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,7 +78,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -99,7 +89,7 @@ import java.util.zip.Inflater;
 /**
  * The main websocket adapter.
  */
-public class DiscordWebSocketAdapter extends WebSocketAdapter {
+public class DiscordWebSocketAdapter extends WebSocketListener {
 
     /**
      * The logger of this class.
@@ -125,10 +115,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private volatile boolean reconnect = true;
 
-    private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify =
-            new AtomicMarkableReference<>(null, false);
-    private final AtomicReference<WebSocketFrame> nextHeartbeatFrame = new AtomicReference<>(null);
-    private final List<WebSocketListener> identifyFrameListeners = Collections.synchronizedList(new ArrayList<>());
+    private final AtomicBoolean lastFrameWasIdentify = new AtomicBoolean();
 
     private volatile long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
@@ -207,7 +194,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                 }
                                 logger.debug("Sending request guild members packet {}",
                                              requestGuildMembersPacket.toString());
-                                getWebSocket().sendText(requestGuildMembersPacket.toString());
+                                getWebSocket().send(requestGuildMembersPacket.toString());
+                                lastFrameWasIdentify.set(false);
                             });
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored) {
@@ -269,7 +257,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      */
     public void disconnect() {
         reconnect = false;
-        websocket.get().sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
+        //TODO: Add a reason to this close
+        websocket.get().close(WebSocketCloseReason.DISCONNECT.getNumericCloseCode(), "");
         // cancel heartbeat timer if within one minute no disconnect event was dispatched
         api.getThreadPool().getDaemonScheduler().schedule(() -> heartbeatTimer.updateAndGet(future -> {
             if (future != null) {
@@ -283,21 +272,14 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * Connects the websocket.
      */
     private void connect() {
-        WebSocketFactory factory = new WebSocketFactory();
         try {
-            factory.setSSLContext(SSLContext.getDefault());
-        } catch (NoSuchAlgorithmException e) {
-            logger.warn("An error occurred while setting ssl context", e);
-        }
-        try {
-            WebSocket websocket = factory.createSocket(
-                    getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION);
-            this.websocket.set(websocket);
-            websocket.addHeader("Accept-Encoding", "gzip");
-            websocket.addListener(this);
-            websocket.addListener(new WebSocketLogger());
+            Request webSocketRequest = new Request.Builder()
+                    .url(getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION)
+                    .addHeader("Accept-Encoding", "gzip")
+                    .build();
             waitForIdentifyRateLimit();
-            websocket.connect();
+            WebSocket webSocket = api.getHttpClient().newWebSocket(webSocketRequest, this);
+            this.websocket.set(webSocket);
         } catch (Throwable t) {
             logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
@@ -337,58 +319,25 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     @Override
-    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
-                               WebSocketFrame clientCloseFrame, boolean closedByServer) {
-        Optional<WebSocketFrame> closeFrameOptional =
-                Optional.ofNullable(closedByServer ? serverCloseFrame : clientCloseFrame);
-
-        String closeReason = closeFrameOptional
-                .map(WebSocketFrame::getCloseReason)
-                .orElse("unknown");
-
-        String closeCodeString = closeFrameOptional
-                .map(closeFrame -> {
-                    int code = closeFrame.getCloseCode();
-                    return WebSocketCloseCode.fromCode(code)
-                            .map(closeCode -> closeCode + " (" + code + ")")
-                            .orElseGet(() -> String.valueOf(code));
-                })
-                .orElse("'unknown'");
-
-        logger.info("Websocket closed with reason '{}' and code {} by {}!",
-                    closeReason, closeCodeString, closedByServer ? "server" : "client");
-
-        LostConnectionEvent lostConnectionEvent = new LostConnectionEventImpl(api);
-        List<LostConnectionListener> listeners = new ArrayList<>(api.getLostConnectionListeners());
-        api.getEventDispatcher()
-                .dispatchEvent(api, listeners, listener -> listener.onLostConnection(lostConnectionEvent));
-
-        heartbeatTimer.updateAndGet(future -> {
-            if (future != null) {
-                future.cancel(false);
-            }
-            return null;
-        });
-
-        if (!ready.isDone()) {
-            ready.complete(false);
-            return;
-        }
-
-        // Reconnect
-        if (reconnect) {
-            reconnectAttempt.incrementAndGet();
-            logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
-            // Reconnect after a (short?) delay depending on the amount of reconnect attempts
-            api.getThreadPool().getScheduler()
-                    .schedule(this::connect, api.getReconnectDelay(reconnectAttempt.get()), TimeUnit.SECONDS);
+    public void onOpen(WebSocket webSocket, Response response) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("onOpen: response='{}'", response.toString());
         }
     }
 
     @Override
-    public void onTextMessage(WebSocket websocket, String text) throws Exception {
+    public void onMessage(WebSocket websocket, String text) {
+        if(logger.isTraceEnabled()) {
+            logger.trace("onMessage: text='{}'", text);
+        }
         ObjectMapper mapper = api.getObjectMapper();
-        JsonNode packet = mapper.readTree(text);
+        JsonNode packet;
+        try {
+            packet = mapper.readTree(text);
+        } catch (IOException e) {
+            logger.error("Unable to read json tree!", e);
+            return;
+        }
 
         int op = packet.get("op").asInt();
         Optional<GatewayOpcode> opcode = GatewayOpcode.fromCode(op);
@@ -466,12 +415,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 sendHeartbeat(websocket);
                 break;
             case RECONNECT:
-                websocket.sendClose(WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
+                websocket.close(WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
                                     WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
                 break;
             case INVALID_SESSION:
                 long fakeLastIdentificationTime = System.currentTimeMillis();
-                if (lastSentFrameWasIdentify.isMarked()) {
+                if (lastFrameWasIdentify.get()) {
                     logger.info("Hit identifying rate limit. Retrying in 5 seconds...");
                 } else {
                     // Invalid session :(
@@ -515,10 +464,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     @Override
-    public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception {
+    public void onMessage(WebSocket websocket, ByteString binary) {
+        if(logger.isTraceEnabled()) {
+            logger.trace("onMessage: binary='{}'", binary);
+        }
         Inflater decompressor = new Inflater();
-        decompressor.setInput(binary);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(binary.length);
+        decompressor.setInput(binary.toByteArray());
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(binary.size());
         byte[] buf = new byte[1024];
         while (!decompressor.finished()) {
             int count;
@@ -537,9 +489,56 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         try {
             String message = new String(decompressedData, "UTF-8");
             logger.trace("onTextMessage: text='{}'", message);
-            onTextMessage(websocket, message);
+            onMessage(websocket, message);
         } catch (UnsupportedEncodingException e) {
             logger.warn("An error occurred while decompressing data", e);
+        }
+    }
+
+    @Override
+    public void onClosing(WebSocket webSocket, int code, String reason){
+        if(logger.isTraceEnabled()) {
+            logger.trace("onClosing: code='{}' reason='{}'", code, reason);
+        }
+    }
+
+    @Override
+    public void onClosed(WebSocket websocket, int code, String reason) {
+        if(logger.isTraceEnabled()) {
+            logger.trace("onClosed: code='{}' reason='{}'", code, reason);
+        }
+
+        String closeCodeString = WebSocketCloseCode.fromCode(code)
+                .map(closeCode -> closeCode + " (" + code + ")")
+                .orElseGet(() -> String.valueOf(code));
+
+        logger.info("Websocket closed with reason '{}' and code {}!",
+                reason, closeCodeString);
+
+        LostConnectionEvent lostConnectionEvent = new LostConnectionEventImpl(api);
+        List<LostConnectionListener> listeners = new ArrayList<>(api.getLostConnectionListeners());
+        api.getEventDispatcher()
+                .dispatchEvent(api, listeners, listener -> listener.onLostConnection(lostConnectionEvent));
+
+        heartbeatTimer.updateAndGet(future -> {
+            if (future != null) {
+                future.cancel(false);
+            }
+            return null;
+        });
+
+        if (!ready.isDone()) {
+            ready.complete(false);
+            return;
+        }
+
+        // Reconnect
+        if (reconnect) {
+            reconnectAttempt.incrementAndGet();
+            logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
+            // Reconnect after a (short?) delay depending on the amount of reconnect attempts
+            api.getThreadPool().getScheduler()
+                    .schedule(this::connect, api.getReconnectDelay(reconnectAttempt.get()), TimeUnit.SECONDS);
         }
     }
 
@@ -559,7 +558,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     sendHeartbeat(websocket);
                     logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
                 } else {
-                    websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
+                    websocket.close(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
                                         WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
                 }
             } catch (Throwable t) {
@@ -576,10 +575,16 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private void sendHeartbeat(WebSocket websocket) {
         ObjectNode heartbeatPacket = JsonNodeFactory.instance.objectNode();
         heartbeatPacket.put("op", GatewayOpcode.HEARTBEAT.getCode());
-        heartbeatPacket.put("d", lastSeq);
-        WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
-        nextHeartbeatFrame.set(heartbeatFrame);
-        websocket.sendFrame(heartbeatFrame);
+        if(lastSeq != -1) {
+            heartbeatPacket.put("d", lastSeq);
+        } else {
+            heartbeatPacket.putNull("d");
+        }
+
+        if(logger.isTraceEnabled()){
+            logger.trace("Heartbeat packet: '{}'", heartbeatPacket.toString());
+        }
+        websocket.send(heartbeatPacket.toString());
     }
 
     /**
@@ -595,7 +600,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("session_id", sessionId)
                 .put("seq", lastSeq);
         logger.debug("Sending resume packet");
-        websocket.sendText(resumePacket.toString());
+        if(logger.isTraceEnabled()){
+            logger.trace("Resume packet: '{}'", resumePacket.toString());
+        }
+        websocket.send(resumePacket.toString());
+        this.lastFrameWasIdentify.set(false);
     }
 
     /**
@@ -620,36 +629,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         if (api.getTotalShards() > 1) {
             data.putArray("shard").add(api.getCurrentShard()).add(api.getTotalShards());
         }
-        // remove eventually still registered listeners
-        synchronized (identifyFrameListeners) {
-            websocket.removeListeners(identifyFrameListeners);
-            identifyFrameListeners.clear();
+        if(logger.isTraceEnabled()){
+            logger.trace("Identify packet: '{}'", data.toString());
         }
-        WebSocketFrame identifyFrame = WebSocketFrame.createTextFrame(identifyPacket.toString());
-        lastSentFrameWasIdentify.set(identifyFrame, false);
-        WebSocketAdapter identifyFrameListener = new WebSocketAdapter() {
-            @Override
-            public void onFrameSent(WebSocket websocket, WebSocketFrame frame) {
-                if (lastSentFrameWasIdentify.isMarked()) {
-                    // sending non-heartbeat frame after identify was sent => unset mark
-                    if (!nextHeartbeatFrame.compareAndSet(frame, null)) {
-                        lastSentFrameWasIdentify.set(null, false);
-                        websocket.removeListener(this);
-                        identifyFrameListeners.remove(this);
-                    }
-                } else {
-                    // identify frame is actually sent => set the mark
-                    if (lastSentFrameWasIdentify.compareAndSet(frame, null, false, true)) {
-                        lastIdentificationPerAccount.put(token, System.currentTimeMillis());
-                        connectionDelaySemaphorePerAccount.get(token).release();
-                    }
-                }
-            }
-        };
-        identifyFrameListeners.add(identifyFrameListener);
-        websocket.addListener(identifyFrameListener);
-        logger.debug("Sending identify packet");
-        websocket.sendFrame(identifyFrame);
+        websocket.send(identifyPacket.toString());
+        lastIdentificationPerAccount.put(token, System.currentTimeMillis());
+        connectionDelaySemaphorePerAccount.get(token).release();
+        this.lastFrameWasIdentify.set(true);
     }
 
     /**
@@ -748,7 +734,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         activityJson.put("type", activity.map(g -> g.getType().getId()).orElse(0));
         activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
         logger.debug("Updating status (content: {})", updateStatus.toString());
-        websocket.get().sendText(updateStatus.toString());
+        websocket.get().send(updateStatus.toString());
+        this.lastFrameWasIdentify.set(false);
     }
 
     /**
@@ -762,33 +749,10 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     @Override
-    public void onError(WebSocket websocket, WebSocketException cause) {
-        switch (cause.getMessage()) {
-            // TODO This is copied from v2. I'm unsure if that's something we should do. Probably not ^^
-            case "Flushing frames to the server failed: Connection closed by remote host":
-            case "Flushing frames to the server failed: Socket is closed":
-            case "Flushing frames to the server failed: Connection has been shutdown: javax.net.ssl.SSLException:" +
-                    " java.net.SocketException: Connection reset":
-            case "An I/O error occurred while a frame was being read from the web socket: Connection reset":
-                break;
-            default:
-                logger.warn("Websocket error!", cause);
-                break;
+    public void onFailure(WebSocket websocket, Throwable throwable, Response response) {
+        if(logger.isTraceEnabled()) {
+            logger.trace("onFailure: t='{}' response='{}'", throwable, response);
         }
-    }
-
-    @Override
-    public void handleCallbackError(WebSocket websocket, Throwable cause) {
-        logger.error("Websocket callback error!", cause);
-    }
-
-    @Override
-    public void onUnexpectedError(WebSocket websocket, WebSocketException cause) {
-        logger.warn("Websocket onUnexpected error!", cause);
-    }
-
-    @Override
-    public void onConnectError(WebSocket websocket, WebSocketException exception) {
-        logger.warn("Websocket onConnect error!", exception);
+        logger.warn("Websocket failure!", throwable);
     }
 }

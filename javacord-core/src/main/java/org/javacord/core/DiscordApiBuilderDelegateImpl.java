@@ -13,6 +13,7 @@ import org.javacord.core.util.rest.RestRequestResult;
 import org.slf4j.Logger;
 import org.slf4j.MDC.MDCCloseable;
 
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +42,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      * The account type of the account with the given token.
      */
     private volatile AccountType accountType = AccountType.BOT;
+
+    /**
+     * The proxy to use for all WebSocket and REST calls.
+     */
+    private volatile Proxy proxy = null;
 
     /**
      * The current shard starting with <code>0</code>.
@@ -73,7 +79,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard.get()))){
             new DiscordApiImpl(
-                    accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup, future);
+                    accountType, token, currentShard.get(), totalShards.get(), proxy, waitForServersOnStartup, future);
         }
         return future;
     }
@@ -125,6 +131,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public void setAccountType(AccountType type) {
         this.accountType = type;
+    }
+
+    @Override
+    public void setProxy(Proxy proxy) {
+        this.proxy = proxy;
     }
 
     @Override

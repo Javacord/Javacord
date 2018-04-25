@@ -4,6 +4,7 @@ import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 
+import java.net.Proxy;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntPredicate;
@@ -86,6 +87,19 @@ public class DiscordApiBuilder {
      */
     public DiscordApiBuilder setAccountType(AccountType type) {
         delegate.setAccountType(type);
+        return this;
+    }
+
+    /**
+     * Sets the proxy to use.
+     * All WebSocket and REST calls will abide by this proxy.
+     * Setting this to null will disable using a proxy.
+     *
+     * @param proxy The proxy to use.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setProxy(Proxy proxy){
+        delegate.setProxy(proxy);
         return this;
     }
 
