@@ -14,7 +14,6 @@ jobs:
       - restore_cache:
           keys:
             - gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-            - gradle-wrapper
 
       - restore_cache:
           keys:
