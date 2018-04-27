@@ -423,6 +423,18 @@ public class ServerUpdater {
     }
 
     /**
+     * Queues a user's deafened state to be updated.
+     *
+     * @param user The user whose deafened state should be updated.
+     * @param deafened The new deafened state of the user.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setDeafened(User user, boolean deafened) {
+        delegate.setDeafened(user, deafened);
+        return this;
+    }
+
+    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.

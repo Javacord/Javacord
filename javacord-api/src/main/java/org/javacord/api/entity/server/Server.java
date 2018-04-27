@@ -1323,6 +1323,48 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Deafens the given user on the server.
+     *
+     * @param user The user to deafen.
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafenUser(User user) {
+        return createUpdater().setDeafened(user, true).update();
+    }
+
+    /**
+     * Deafens the given user on the server.
+     *
+     * @param user The user to deafen.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafenUser(User user, String reason) {
+        return createUpdater().setDeafened(user, true).setAuditLogReason(reason).update();
+    }
+
+    /**
+     * Undeafens the given user on the server.
+     *
+     * @param user The user to undeafen.
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafenUser(User user) {
+        return createUpdater().setDeafened(user, false).update();
+    }
+
+    /**
+     * Undeafens the given user on the server.
+     *
+     * @param user The user to undeafen.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafenUser(User user, String reason) {
+        return createUpdater().setDeafened(user, false).setAuditLogReason(reason).update();
+    }
+
+    /**
      * Kicks the given user from the server.
      *
      * @param user The user to kick.

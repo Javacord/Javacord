@@ -335,6 +335,48 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
+     * Deafens this user on the given server.
+     *
+     * @param server The server to deafen this user on.
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafen(Server server) {
+        return server.deafenUser(this);
+    }
+
+    /**
+     * Deafens this user on the given server.
+     *
+     * @param server The server to deafen this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafen(Server server, String reason) {
+        return server.deafenUser(this, reason);
+    }
+
+    /**
+     * Undeafens this user on the given server.
+     *
+     * @param server The server to undeafen this user on.
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafen(Server server) {
+        return server.undeafenUser(this);
+    }
+
+    /**
+     * Undeafens this user on the given server.
+     *
+     * @param server The server to undeafen this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafen(Server server, String reason) {
+        return server.undeafenUser(this, reason);
+    }
+
+    /**
      * Gets the deafened state of the user in the given server.
      *
      * @param server The server to check.

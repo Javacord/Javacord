@@ -271,6 +271,14 @@ public interface ServerUpdaterDelegate {
     void setMuted(User user, boolean muted);
 
     /**
+     * Queues a user's deafened state to be updated.
+     *
+     * @param user The user whose deafened state should be updated.
+     * @param deafened The new deafened state of the user.
+     */
+    void setDeafened(User user, boolean deafened);
+
+    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.
