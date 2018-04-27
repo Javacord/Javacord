@@ -270,6 +270,31 @@ public class MessageImpl implements Message {
     }
 
     @Override
+    public boolean hasAttachments() {
+        return !attachments.isEmpty();
+    }
+
+    @Override
+    public boolean hasReactions() {
+        return !reactions.isEmpty();
+    }
+
+    @Override
+    public boolean hasEmbeds() {
+        return !embeds.isEmpty();
+    }
+
+    @Override
+    public boolean hasUserMentions() {
+        return !mentions.isEmpty();
+    }
+
+    @Override
+    public boolean hasRoleMentions() {
+        return !roleMentions.isEmpty();
+    }
+
+    @Override
     public List<CustomEmoji> getCustomEmojis() {
         String content = getContent();
         List<CustomEmoji> emojis = new ArrayList<>();
