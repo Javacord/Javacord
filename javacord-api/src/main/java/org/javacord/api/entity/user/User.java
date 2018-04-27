@@ -283,6 +283,48 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
+     * Mutes this user on the given server.
+     *
+     * @param server The server to umute this user on.
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> mute(Server server) {
+        return server.muteUser(this);
+    }
+
+    /**
+     * Mutes this user on the given server.
+     *
+     * @param server The server to umute this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> mute(Server server, String reason) {
+        return server.muteUser(this, reason);
+    }
+
+    /**
+     * Unmutes this user on the given server.
+     *
+     * @param server The server to unumute this user on.
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmute(Server server) {
+        return server.unmuteUser(this);
+    }
+
+    /**
+     * Unmutes this user on the given server.
+     *
+     * @param server The server to unumute this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmute(Server server, String reason) {
+        return server.unmuteUser(this, reason);
+    }
+
+    /**
      * Gets the muted state of the user in the given server.
      *
      * @param server The server to check.

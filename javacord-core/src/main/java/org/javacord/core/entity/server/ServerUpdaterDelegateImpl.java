@@ -60,6 +60,11 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     private final Map<User, String> userNicknames = new HashMap<>();
 
     /**
+     * A map with all user muted states to update.
+     */
+    private final Map<User, Boolean> userMuted = new HashMap<>();
+
+    /**
      * A list with the new order of the roles.
      */
     private List<Role> newRolesOrder = null;
@@ -337,6 +342,11 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
+    public void setMuted(User user, boolean muted) {
+        userMuted.put(user, muted);
+    }
+
+    @Override
     public void reorderRoles(List<Role> roles) {
         newRolesOrder = roles;
     }
@@ -376,6 +386,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
         // A set with all members that get updates
         HashSet<User> members = new HashSet<>(userRoles.keySet());
         members.addAll(userNicknames.keySet());
+        members.addAll(userMuted.keySet());
 
         // A list with all tasks
         List<CompletableFuture<?>> tasks = new ArrayList<>();
@@ -406,6 +417,11 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
                     updateNode.put("nick", (nickname == null) ? "" : nickname);
                     patchMember = true;
                 }
+            }
+
+            if (userMuted.containsKey(member)) {
+                updateNode.put("mute", userMuted.get(member));
+                patchMember = true;
             }
 
             if (patchMember) {

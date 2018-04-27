@@ -263,6 +263,14 @@ public interface ServerUpdaterDelegate {
     void setNickname(User user, String nickname);
 
     /**
+     * Queues a user's muted state to be updated.
+     *
+     * @param user The user whose muted state should be updated.
+     * @param muted The new muted state of the user.
+     */
+    void setMuted(User user, boolean muted);
+
+    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.

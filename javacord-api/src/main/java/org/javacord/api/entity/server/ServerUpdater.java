@@ -411,6 +411,18 @@ public class ServerUpdater {
     }
 
     /**
+     * Queues a user's muted state to be updated.
+     *
+     * @param user The user whose muted state should be updated.
+     * @param muted The new muted state of the user.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setMuted(User user, boolean muted) {
+        delegate.setMuted(user, muted);
+        return this;
+    }
+
+    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.

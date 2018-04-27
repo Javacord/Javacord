@@ -1281,6 +1281,48 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     CompletableFuture<Void> reorderRoles(List<Role> roles, String reason);
 
     /**
+     * Mutes the given user on the server.
+     *
+     * @param user The user to mute.
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> muteUser(User user) {
+        return createUpdater().setMuted(user, true).update();
+    }
+
+    /**
+     * Mutes the given user on the server.
+     *
+     * @param user The user to mute.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> muteUser(User user, String reason) {
+        return createUpdater().setMuted(user, true).setAuditLogReason(reason).update();
+    }
+
+    /**
+     * Unmutes the given user on the server.
+     *
+     * @param user The user to unmute.
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmuteUser(User user) {
+        return createUpdater().setMuted(user, false).update();
+    }
+
+    /**
+     * Unmutes the given user on the server.
+     *
+     * @param user The user to unmute.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmuteUser(User user, String reason) {
+        return createUpdater().setMuted(user, false).setAuditLogReason(reason).update();
+    }
+
+    /**
      * Kicks the given user from the server.
      *
      * @param user The user to kick.
