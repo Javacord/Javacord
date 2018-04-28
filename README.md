@@ -4,10 +4,11 @@ A multithreaded but simple to use library to create a Discord bot in Java.
 ## IMPORTANT
 
 This library currently gets rewritten!
-It's not recommended to start developing a new bot with Javacord 2.x.x.
-You can either take a look at one of the other libraries ([JDA](https://github.com/DV8FromTheWorld/JDA) and [Discord4J](https://github.com/austinv11/Discord4J)) or test Javacord 3 which is currently in development, but already useable.
-Feel free to join the Javacord Discord server ([Invite link](https://discord.gg/0qJ2jjyneLEgG7y3)) if you are interested in Javacord 3!
+It's not recommended to start developing a new bot with Javacord 2.x.x as Javacord 3 will be released within the next few days. Please visit the [v_3 branch](https://github.com/BtoBastian/Javacord/tree/v_3) for information about the new version.
 
+<details>
+  <summary>View outdated README</summary>
+  
 ##  Maven
 ```xml
 <repository>
@@ -141,3 +142,5 @@ public class PingCommand implements CommandExecutor {
 }
 ```
 Take a look at the [sdcf4j wiki](https://github.com/BtoBastian/sdcf4j/wiki) to find out how it works.
+
+</details>
