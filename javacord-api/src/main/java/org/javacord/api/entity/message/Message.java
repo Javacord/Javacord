@@ -1307,6 +1307,41 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Returns whether or not the Message has any attachment
+     *
+     * @return True, when the message has any attachment
+     */
+    boolean hasAttachments();
+
+    /**
+     * Returns whether or not the Message has any reactions
+     *
+     * @return True, when the message has any reactions
+     */
+    boolean hasReactions();
+
+    /**
+     * Returns whether or not the Message has any embeds
+     *
+     * @return True, when the message has any embeds
+     */
+    boolean hasEmbeds();
+
+    /**
+     * Returns whether or not the Message has any users mentioned
+     *
+     * @return True, when the message has any users mentioned
+     */
+    boolean hasUserMentions();
+
+    /**
+     * Returns whether or not the Message has any roles mentioned
+     *
+     * @return True, when the message has any roles mentioned
+     */
+    boolean hasRoleMentions();
+
+    /**
      * Gets a list of all custom emojis in the message.
      *
      * @return The list of custom emojis in the message.
