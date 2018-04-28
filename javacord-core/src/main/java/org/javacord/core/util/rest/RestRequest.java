@@ -388,8 +388,9 @@ public class RestRequest<T> {
                 // Check if the response body contained a know error code
                 if (!result.getJsonBody().isNull() && result.getJsonBody().has("code")) {
                     int code = result.getJsonBody().get("code").asInt();
-                    String message = result.getJsonBody().has("message") ?
-                            result.getJsonBody().get("message").asText() : null;
+                    String message = result.getJsonBody().has("message")
+                            ? result.getJsonBody().get("message").asText()
+                            : null;
                     Optional<? extends DiscordException> discordException = RestRequestResultErrorCode.fromCode(code)
                             .flatMap(restRequestResultCode -> restRequestResultCode.getDiscordException(
                                     origin, (message == null) ? restRequestResultCode.getMeaning() : message,

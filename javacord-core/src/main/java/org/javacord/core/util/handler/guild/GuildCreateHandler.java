@@ -42,7 +42,8 @@ public class GuildCreateHandler extends PacketHandler {
         Server server = new ServerImpl(api, packet);
         ServerJoinEvent event = new ServerJoinEventImpl(server);
 
-        api.getEventDispatcher().dispatchEvent(server, api.getServerJoinListeners(), listener -> listener.onServerJoin(event));
+        api.getEventDispatcher().dispatchEvent(server, api.getServerJoinListeners(),
+                listener -> listener.onServerJoin(event));
     }
 
 }

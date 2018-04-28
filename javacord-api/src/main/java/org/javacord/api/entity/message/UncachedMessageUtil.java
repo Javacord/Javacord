@@ -610,7 +610,7 @@ public interface UncachedMessageUtil {
      * @return The managers for the added listener.
      */
     <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(long messageId, T listener);
+            addMessageAttachableListener(long messageId, T listener);
 
     /**
      * Adds a listener that implements one or more {@code MessageAttachableListener}s to the message with the given id.
@@ -624,7 +624,7 @@ public interface UncachedMessageUtil {
      * @return The managers for the added listener.
      */
     <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(String messageId, T listener);
+            addMessageAttachableListener(String messageId, T listener);
 
     /**
      * Adds a listener that implements one or more {@code MessageAttachableListener}s to the given message.
@@ -638,7 +638,7 @@ public interface UncachedMessageUtil {
      * @return The managers for the added listener.
      */
     <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(Message message, T listener);
+            addMessageAttachableListener(Message message, T listener);
 
     /**
      * Removes a {@code MessageAttachableListener} from the message with the given id.
@@ -715,7 +715,7 @@ public interface UncachedMessageUtil {
      * their assigned listener classes they listen to.
      */
     <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(long messageId);
+            getMessageAttachableListeners(long messageId);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
@@ -727,7 +727,7 @@ public interface UncachedMessageUtil {
      * their assigned listener classes they listen to.
      */
     <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(String messageId);
+            getMessageAttachableListeners(String messageId);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code MessageAttachableListener}s and their
@@ -739,6 +739,6 @@ public interface UncachedMessageUtil {
      * their assigned listener classes they listen to.
      */
     <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(Message message);
+            getMessageAttachableListeners(Message message);
 
 }

@@ -71,7 +71,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
-        try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard.get()))){
+        try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard.get()))) {
             new DiscordApiImpl(
                     accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup, future);
         }

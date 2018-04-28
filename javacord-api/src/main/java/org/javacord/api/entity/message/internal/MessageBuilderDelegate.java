@@ -23,20 +23,20 @@ import java.util.concurrent.CompletableFuture;
 public interface MessageBuilderDelegate {
 
     /**
-     * Appends a sting with or without decoration to the message.
-     *
-     * @param message The string to append.
-     * @param decorations The decorations of the string.
-     */
-    void append(String message, MessageDecoration... decorations);
-
-    /**
      * Appends code to the message.
      *
      * @param language The language, e.g. "java".
      * @param code The code.
      */
     void appendCode(String language, String code);
+
+    /**
+     * Appends a sting with or without decoration to the message.
+     *
+     * @param message The string to append.
+     * @param decorations The decorations of the string.
+     */
+    void append(String message, MessageDecoration... decorations);
 
     /**
      * Appends a mentionable entity (usually a user or channel) to the message.

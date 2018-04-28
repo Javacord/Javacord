@@ -23,6 +23,16 @@ public interface DiscordEntity {
     }
 
     /**
+     * Gets the creation date of the Discord entity, calculated from the id.
+     *
+     * @return The creation date of the Discord entity.
+     * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
+     */
+    default Instant getCreationTimestamp() {
+        return getCreationTimestamp(getId());
+    }
+
+    /**
      * Gets the discord api instance.
      *
      * @return The discord api instance.
@@ -46,14 +56,5 @@ public interface DiscordEntity {
         return Long.toUnsignedString(getId());
     }
 
-    /**
-     * Gets the creation date of the Discord entity, calculated from the id.
-     *
-     * @return The creation date of the Discord entity.
-     * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
-     */
-    default Instant getCreationTimestamp() {
-        return getCreationTimestamp(getId());
-    }
 
 }

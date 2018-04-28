@@ -99,8 +99,8 @@ public class PrivateChannelImpl
     @Override
     @SuppressWarnings("unchecked")
     public <T extends PrivateChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends PrivateChannelAttachableListener>> addPrivateChannelAttachableListener(
-            T listener) {
+            Collection<ListenerManager<? extends PrivateChannelAttachableListener>>
+                    addPrivateChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(PrivateChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -126,7 +126,7 @@ public class PrivateChannelImpl
     @Override
     @SuppressWarnings("unchecked")
     public <T extends PrivateChannelAttachableListener & ObjectAttachableListener> void
-    removePrivateChannelAttachableListener(T listener) {
+            removePrivateChannelAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(PrivateChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -151,30 +151,30 @@ public class PrivateChannelImpl
     @Override
     @SuppressWarnings("unchecked")
     public <T extends PrivateChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getPrivateChannelAttachableListeners() {
+            getPrivateChannelAttachableListeners() {
         Map<T, List<Class<T>>> privateChannelListeners =
                 ((DiscordApiImpl) getApi()).getObjectListeners(PrivateChannel.class, getId());
         getTextChannelAttachableListeners().forEach((listener, listenerClasses) -> privateChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         getVoiceChannelAttachableListeners().forEach((listener, listenerClasses) -> privateChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         getChannelAttachableListeners().forEach((listener, listenerClasses) -> privateChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         return privateChannelListeners;
     }
 

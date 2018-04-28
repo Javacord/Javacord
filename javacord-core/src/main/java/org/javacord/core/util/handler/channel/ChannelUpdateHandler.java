@@ -40,6 +40,7 @@ import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicE
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeBitrateEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
+import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -86,6 +87,9 @@ public class ChannelUpdateHandler extends PacketHandler {
                 handleServerChannel(packet);
                 handleChannelCategory(packet);
                 break;
+            default:
+                LoggerUtil.getLogger(ChannelUpdateHandler.class).warn("Unexpected packet type. Your Javacord version"
+                        + " might be out of date.");
         }
     }
 
@@ -114,9 +118,9 @@ public class ChannelUpdateHandler extends PacketHandler {
             }
 
             ChannelCategory oldCategory = channel.asCategorizable().flatMap(Categorizable::getCategory).orElse(null);
-            ChannelCategory newCategory = jsonChannel.hasNonNull("parent_id") ?
-                    channel.getServer().getChannelCategoryById(jsonChannel.get("parent_id").asLong(-1)).orElse(null) :
-                    null;
+            ChannelCategory newCategory = jsonChannel.hasNonNull("parent_id")
+                    ? channel.getServer().getChannelCategoryById(jsonChannel.get("parent_id").asLong(-1)).orElse(null)
+                    : null;
             int oldRawPosition = channel.getRawPosition();
             int newRawPosition = jsonChannel.get("position").asInt();
             if (oldRawPosition != newRawPosition || !Objects.deepEquals(oldCategory, newCategory)) {
@@ -158,15 +162,15 @@ public class ChannelUpdateHandler extends PacketHandler {
                             rolesWithOverwrittenPermissions.add(entity.getId());
                             break;
                         case "member":
-                            entity = api.getCachedUserById(permissionOverwriteJson.get("id").asText()).orElseThrow(() ->
-                                    new IllegalStateException("Received channel update event with unknown user!"));
+                            entity = api.getCachedUserById(permissionOverwriteJson.get("id").asText()).orElseThrow(()
+                                    -> new IllegalStateException("Received channel update event with unknown user!"));
                             oldOverwrittenPermissions = channel.getOverwrittenPermissions((User) entity);
                             overwrittenPermissions = channel.getOverwrittenUserPermissions();
                             usersWithOverwrittenPermissions.add(entity.getId());
                             break;
                         default:
-                            throw new IllegalStateException(
-                                    "Permission overwrite object with unknown type: " + permissionOverwriteJson.toString());
+                            throw new IllegalStateException("Permission overwrite object with unknown type: "
+                                    + permissionOverwriteJson.toString());
                     }
                     int allow = permissionOverwriteJson.get("allow").asInt(0);
                     int deny = permissionOverwriteJson.get("deny").asInt(0);
@@ -349,7 +353,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 GroupChannelChangeNameEvent event =
                         new GroupChannelChangeNameEventImpl(channel, newName, oldName);
 
-                List<GroupChannelChangeNameListener> listeners = new ArrayList<>(channel.getGroupChannelChangeNameListeners());
+                List<GroupChannelChangeNameListener> listeners
+                        = new ArrayList<>(channel.getGroupChannelChangeNameListeners());
                 channel.getMembers().stream()
                         .map(User::getGroupChannelChangeNameListeners)
                         .forEach(listeners::addAll);

@@ -29,8 +29,10 @@ public class WebSocketLogger implements WebSocketListener {
     }
 
     @Override
-    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
-        logger.trace("onDisconnected: closedByServer='{}' serverCloseFrame='{}' clientCloseFrame='{}'", closedByServer, serverCloseFrame, clientCloseFrame);
+    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
+                               boolean closedByServer) {
+        logger.trace("onDisconnected: closedByServer='{}' serverCloseFrame='{}' clientCloseFrame='{}'",
+                closedByServer, serverCloseFrame, clientCloseFrame);
     }
 
     @Override

@@ -426,21 +426,12 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public boolean requiresAttachments() {
-        return footerIconContainer != null ||
-                imageContainer != null ||
-                authorIconContainer != null ||
-                thumbnailContainer != null;
+        return footerIconContainer != null
+                || imageContainer != null
+                || authorIconContainer != null
+                || thumbnailContainer != null;
     }
 
-    /**
-     * Gets the embed as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @return The embed as a ObjectNode.
-     */
-    public ObjectNode toJsonNode() {
-        ObjectNode object = JsonNodeFactory.instance.objectNode();
-        return toJsonNode(object);
-    }
 
     /**
      * Gets the required attachments for this embed.
@@ -462,6 +453,16 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
             requiredAttachments.add(thumbnailContainer);
         }
         return requiredAttachments;
+    }
+
+    /**
+     * Gets the embed as a {@link ObjectNode}. This is what is sent to Discord.
+     *
+     * @return The embed as a ObjectNode.
+     */
+    public ObjectNode toJsonNode() {
+        ObjectNode object = JsonNodeFactory.instance.objectNode();
+        return toJsonNode(object);
     }
 
     /**

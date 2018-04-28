@@ -8,17 +8,32 @@ public enum PermissionState {
     /**
      * The given {@link PermissionType type} is not set.
      */
-    NONE,
+    NONE(false, false),
 
     /**
      * The given {@link PermissionType type} is allowed.
      */
-    ALLOWED,
+    ALLOWED(true, false),
 
     /**
      * The given {@link PermissionType type} is denied.
      * This is only for overwritten permissions!
      */
-    DENIED
+    DENIED(false, true);
 
+    private boolean allowed;
+    private boolean denied;
+
+    private PermissionState(boolean allowed, boolean denied) {
+        this.allowed = allowed;
+        this.denied = denied;
+    }
+
+    public boolean isAllowed() {
+        return allowed;
+    }
+
+    public boolean isDenied() {
+        return denied;
+    }
 }

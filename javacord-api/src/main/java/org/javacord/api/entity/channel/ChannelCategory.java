@@ -120,8 +120,8 @@ public interface ChannelCategory extends ServerChannel {
      * @return The managers for the added listener.
      */
     <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ChannelCategoryAttachableListener>> addChannelCategoryAttachableListener(
-            T listener);
+            Collection<ListenerManager<? extends ChannelCategoryAttachableListener>>
+                    addChannelCategoryAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code ChannelCategoryAttachableListener}s.
@@ -130,7 +130,7 @@ public interface ChannelCategory extends ServerChannel {
      * @param <T> The type of the listener.
      */
     <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void
-    removeChannelCategoryAttachableListener(T listener);
+            removeChannelCategoryAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code ChannelCategoryAttachableListener}s
@@ -141,7 +141,7 @@ public interface ChannelCategory extends ServerChannel {
      * {@code ChannelCategoryAttachableListener}s and their assigned listener classes they listen to.
      */
     <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getChannelCategoryAttachableListeners();
+            getChannelCategoryAttachableListeners();
 
     /**
      * Removes a listener from this server text channel.

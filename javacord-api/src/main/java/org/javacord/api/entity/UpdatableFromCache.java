@@ -15,8 +15,8 @@ public interface UpdatableFromCache<T extends DiscordEntity> extends Updatable<T
      * updates from Discord applied. Due to that, references to instances should usually not be held for an extended
      * period of time. If they are, this method can be used to retrieve the current instance from the cache, that gets
      * updates from Discord, in case this one was invalidated.
-     * <p>
-     * This method returns the currently cached entity, or an empty {@code Optional} if the entity is not in the cache
+     *
+     * <p>This method returns the currently cached entity, or an empty {@code Optional} if the entity is not cached
      * any longer, for example because it was deleted or the message was thrown out of the cache.
      *
      * @return The current cached instance.

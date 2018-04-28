@@ -316,6 +316,8 @@ public class ServerImpl implements Server, Cleanupable {
                     case 4:
                         getOrCreateChannelCategory(channel);
                         break;
+                    default:
+                        logger.warn("Unknown channel type. Your Javacord version might be outdated.");
                 }
             }
         }
@@ -1360,7 +1362,8 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
-    public ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(ServerChangeSplashListener listener) {
+    public ListenerManager<ServerChangeSplashListener>
+            addServerChangeSplashListener(ServerChangeSplashListener listener) {
         return ((DiscordApiImpl) getApi())
                 .addObjectListener(Server.class, getId(), ServerChangeSplashListener.class, listener);
     }
@@ -1397,15 +1400,15 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
-    addServerChangeDefaultMessageNotificationLevelListener(
-            ServerChangeDefaultMessageNotificationLevelListener listener) {
+            addServerChangeDefaultMessageNotificationLevelListener(
+                    ServerChangeDefaultMessageNotificationLevelListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
                 Server.class, getId(), ServerChangeDefaultMessageNotificationLevelListener.class, listener);
     }
 
     @Override
     public List<ServerChangeDefaultMessageNotificationLevelListener>
-    getServerChangeDefaultMessageNotificationLevelListeners() {
+            getServerChangeDefaultMessageNotificationLevelListeners() {
         return ((DiscordApiImpl) getApi())
                 .getObjectListeners(Server.class, getId(), ServerChangeDefaultMessageNotificationLevelListener.class);
     }
@@ -1424,7 +1427,7 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public ListenerManager<ServerChangeExplicitContentFilterLevelListener>
-    addServerChangeExplicitContentFilterLevelListener(ServerChangeExplicitContentFilterLevelListener listener) {
+            addServerChangeExplicitContentFilterLevelListener(ServerChangeExplicitContentFilterLevelListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
                 Server.class, getId(), ServerChangeExplicitContentFilterLevelListener.class, listener);
     }
@@ -1437,14 +1440,15 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
-    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener) {
+            addServerChangeMultiFactorAuthenticationLevelListener(
+                    ServerChangeMultiFactorAuthenticationLevelListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
                 Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class, listener);
     }
 
     @Override
     public List<ServerChangeMultiFactorAuthenticationLevelListener>
-    getServerChangeMultiFactorAuthenticationLevelListeners() {
+            getServerChangeMultiFactorAuthenticationLevelListeners() {
         return ((DiscordApiImpl) getApi())
                 .getObjectListeners(Server.class, getId(), ServerChangeMultiFactorAuthenticationLevelListener.class);
     }
@@ -1578,7 +1582,8 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
-    public ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
+    public ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(
+            UserChangeActivityListener listener) {
         return ((DiscordApiImpl) getApi())
                 .addObjectListener(Server.class, getId(), UserChangeActivityListener.class, listener);
     }
@@ -1672,14 +1677,15 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
                 Server.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
     @Override
     public List<ServerChannelChangeOverwrittenPermissionsListener>
-    getServerChannelChangeOverwrittenPermissionsListeners() {
+            getServerChannelChangeOverwrittenPermissionsListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(
                 Server.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
     }
@@ -1862,7 +1868,8 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
-    public ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(CachedMessageUnpinListener listener) {
+    public ListenerManager<CachedMessageUnpinListener>
+            addCachedMessageUnpinListener(CachedMessageUnpinListener listener) {
         return ((DiscordApiImpl) getApi())
                 .addObjectListener(Server.class, getId(), CachedMessageUnpinListener.class, listener);
     }
@@ -1875,7 +1882,7 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addServerAttachableListener(T listener) {
+            addServerAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -1899,7 +1906,7 @@ public class ServerImpl implements Server, Cleanupable {
 
     @Override
     public <T extends ServerAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerAttachableListeners() {
+            getServerAttachableListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId());
     }
 

@@ -50,7 +50,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      *
      * @return An updater for this emoji.
      */
-    default CustomEmojiUpdater createUpdater(){
+    default CustomEmojiUpdater createUpdater() {
         return new CustomEmojiUpdater(this);
     }
 
@@ -77,8 +77,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
 
     /**
      * Updates the name of the emoji.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the emoji.
@@ -91,8 +91,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     /**
      * Updates the whitelist of the emoji.
      * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param roles The new whitelist.
@@ -105,8 +105,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     /**
      * Updates the whitelist of the emoji.
      * To be active, the whitelist must at least contain one role, otherwise everyone can use the emoji!
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param roles The new whitelist.
@@ -118,8 +118,8 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
 
     /**
      * Removes the whitelist of the emoji.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link CustomEmojiUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @return A future to check if the update was successful.
@@ -186,7 +186,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * @return The managers for the added listener.
      */
     <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addCustomEmojiAttachableListener(T listener);
+            addCustomEmojiAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code CustomEmojiAttachableListener}s.
@@ -195,7 +195,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * @param <T> The type of the listener.
      */
     <T extends CustomEmojiAttachableListener & ObjectAttachableListener> void
-    removeCustomEmojiAttachableListener(T listener);
+            removeCustomEmojiAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code CustomEmojiAttachableListener}s and
@@ -206,7 +206,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * their assigned listener classes they listen to.
      */
     <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getCustomEmojiAttachableListeners();
+            getCustomEmojiAttachableListeners();
 
     /**
      * Removes a listener from this custom emoji.

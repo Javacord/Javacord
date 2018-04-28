@@ -129,15 +129,30 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
     }
 
     @Override
-    public CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, Emoji... emojis) {
-        return CompletableFuture.allOf(Arrays.stream(emojis)
-                                               .map(emoji -> removeReactionByEmojiFromMessage(user, emoji))
-                                               .toArray(CompletableFuture[]::new));
+    public CompletableFuture<Void> removeReactionByEmojiFromMessage(User user, String unicodeEmoji) {
+        return removeReactionByEmojiFromMessage(user, UnicodeEmojiImpl.fromString(unicodeEmoji));
     }
 
     @Override
-    public CompletableFuture<Void> removeReactionByEmojiFromMessage(User user, String unicodeEmoji) {
-        return removeReactionByEmojiFromMessage(user, UnicodeEmojiImpl.fromString(unicodeEmoji));
+    public CompletableFuture<Void> removeReactionByEmojiFromMessage(Emoji emoji) {
+        return Reaction.getUsers(getApi(), getChannel().getId(), getMessageId(), emoji)
+                .thenCompose(users -> CompletableFuture.allOf(
+                        users.stream()
+                                .map(user -> Reaction.removeUser(getApi(), getChannel().getId(),
+                                        getMessageId(), emoji, user))
+                                .toArray(CompletableFuture[]::new)));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeReactionByEmojiFromMessage(String unicodeEmoji) {
+        return removeReactionByEmojiFromMessage(UnicodeEmojiImpl.fromString(unicodeEmoji));
+    }
+
+    @Override
+    public CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, Emoji... emojis) {
+        return CompletableFuture.allOf(Arrays.stream(emojis)
+                .map(emoji -> removeReactionByEmojiFromMessage(user, emoji))
+                .toArray(CompletableFuture[]::new));
     }
 
     @Override
@@ -149,26 +164,11 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
     }
 
     @Override
-    public CompletableFuture<Void> removeReactionByEmojiFromMessage(Emoji emoji) {
-        return Reaction.getUsers(getApi(), getChannel().getId(), getMessageId(), emoji)
-                .thenCompose(users -> CompletableFuture.allOf(
-                        users.stream()
-                                .map(user -> Reaction.removeUser(getApi(), getChannel().getId(),
-                                                                 getMessageId(), emoji, user))
-                                .toArray(CompletableFuture[]::new)));
-    }
-
-    @Override
     public CompletableFuture<Void> removeReactionsByEmojiFromMessage(Emoji... emojis) {
         return CompletableFuture.allOf(
                 Arrays.stream(emojis)
                         .map(this::removeReactionByEmojiFromMessage)
                         .toArray(CompletableFuture[]::new));
-    }
-
-    @Override
-    public CompletableFuture<Void> removeReactionByEmojiFromMessage(String unicodeEmoji) {
-        return removeReactionByEmojiFromMessage(UnicodeEmojiImpl.fromString(unicodeEmoji));
     }
 
     @Override
@@ -184,13 +184,13 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
     }
 
     @Override
-    public CompletableFuture<Void> removeOwnReactionsByEmojiFromMessage(Emoji... emojis) {
-        return removeReactionsByEmojiFromMessage(getApi().getYourself(), emojis);
+    public CompletableFuture<Void> removeOwnReactionByEmojiFromMessage(String unicodeEmoji) {
+        return removeOwnReactionByEmojiFromMessage(UnicodeEmojiImpl.fromString(unicodeEmoji));
     }
 
     @Override
-    public CompletableFuture<Void> removeOwnReactionByEmojiFromMessage(String unicodeEmoji) {
-        return removeOwnReactionByEmojiFromMessage(UnicodeEmojiImpl.fromString(unicodeEmoji));
+    public CompletableFuture<Void> removeOwnReactionsByEmojiFromMessage(Emoji... emojis) {
+        return removeReactionsByEmojiFromMessage(getApi().getYourself(), emojis);
     }
 
     @Override

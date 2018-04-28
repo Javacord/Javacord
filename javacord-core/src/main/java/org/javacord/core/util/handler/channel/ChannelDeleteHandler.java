@@ -16,6 +16,7 @@ import org.javacord.core.event.channel.group.GroupChannelDeleteEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelDeleteEventImpl;
 import org.javacord.core.event.channel.user.PrivateChannelDeleteEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
+import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,9 @@ public class ChannelDeleteHandler extends PacketHandler {
             case 4:
                 handleCategory(packet);
                 break;
+            default:
+                LoggerUtil.getLogger(ChannelDeleteHandler.class).warn("Unexpected packet type. Your Javacord version"
+                        + " might be out of date.");
         }
     }
 
@@ -64,10 +68,12 @@ public class ChannelDeleteHandler extends PacketHandler {
     private void handleCategory(JsonNode channelJson) {
         long serverId = channelJson.get("guild_id").asLong();
         long channelId = channelJson.get("id").asLong();
-        api.getAllServerById(serverId).ifPresent(server -> server.getChannelCategoryById(channelId).ifPresent(channel -> {
-            dispatchServerChannelDeleteEvent(channel);
-            ((ServerImpl) server).removeChannelFromCache(channel.getId());
-        }));
+        api.getAllServerById(serverId).ifPresent(server -> server.getChannelCategoryById(channelId)
+                .ifPresent(channel -> {
+                            dispatchServerChannelDeleteEvent(channel);
+                            ((ServerImpl) server).removeChannelFromCache(channel.getId());
+                        }
+                ));
     }
 
     /**

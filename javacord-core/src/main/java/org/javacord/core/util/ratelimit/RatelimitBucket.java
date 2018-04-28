@@ -22,6 +22,13 @@ public class RatelimitBucket {
         this(api, endpoint, null);
     }
 
+    /**
+     * Creates a RatelimitBucket for the given endpoint / parameter combination.
+     *
+     * @param api The api/shard to use.
+     * @param endpoint The REST endpoint the ratelimit is tracked for.
+     * @param majorUrlParameter The url parameter this bucket is specific for. May be null.
+     */
     public RatelimitBucket(DiscordApi api, RestEndpoint endpoint, String majorUrlParameter) {
         this.api = (DiscordApiImpl) api;
         if (endpoint.isGlobal()) {
@@ -29,25 +36,6 @@ public class RatelimitBucket {
         }
         this.endpoint = endpoint;
         this.majorUrlParameter = majorUrlParameter;
-    }
-
-    /**
-     * Checks if a bucket created with the given parameters would equal this bucket.
-     *
-     * @param endpoint The endpoint.
-     * @param majorUrlParameter The major url parameter.
-     * @return Whether a bucket created with the given parameters would equal this bucket or not.
-     */
-    public boolean equals(RestEndpoint endpoint, String majorUrlParameter) {
-        if (endpoint.isGlobal()) {
-            endpoint = null;
-        }
-        boolean endpointSame = this.endpoint == endpoint;
-        boolean majorUrlParameterBothNull = this.majorUrlParameter == null && majorUrlParameter == null;
-        boolean majorUrlParameterEqual =
-                this.majorUrlParameter != null && this.majorUrlParameter.equals(majorUrlParameter);
-
-        return endpointSame && (majorUrlParameterBothNull || majorUrlParameterEqual);
     }
 
     /**
@@ -117,6 +105,26 @@ public class RatelimitBucket {
         long timestamp = System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset());
         return (int) (rateLimitResetTimestamp - timestamp);
     }
+
+    /**
+     * Checks if a bucket created with the given parameters would equal this bucket.
+     *
+     * @param endpoint The endpoint.
+     * @param majorUrlParameter The major url parameter.
+     * @return Whether a bucket created with the given parameters would equal this bucket or not.
+     */
+    public boolean equals(RestEndpoint endpoint, String majorUrlParameter) {
+        if (endpoint.isGlobal()) {
+            endpoint = null;
+        }
+        boolean endpointSame = this.endpoint == endpoint;
+        boolean majorUrlParameterBothNull = this.majorUrlParameter == null && majorUrlParameter == null;
+        boolean majorUrlParameterEqual =
+                this.majorUrlParameter != null && this.majorUrlParameter.equals(majorUrlParameter);
+
+        return endpointSame && (majorUrlParameterBothNull || majorUrlParameterEqual);
+    }
+
 
     @Override
     public boolean equals(Object obj) {

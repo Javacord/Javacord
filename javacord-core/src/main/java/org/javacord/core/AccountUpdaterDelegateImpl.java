@@ -109,8 +109,8 @@ public class AccountUpdaterDelegateImpl implements AccountUpdaterDelegate {
         if (patchAccount) {
             if (avatar != null) {
                 return avatar.asByteArray(api).thenAccept(bytes -> {
-                    String base64Avatar = "data:image/" + avatar.getFileType() + ";base64," +
-                                          Base64.getEncoder().encodeToString(bytes);
+                    String base64Avatar = "data:image/" + avatar.getFileType() + ";base64,"
+                            + Base64.getEncoder().encodeToString(bytes);
                     body.put("avatar", base64Avatar);
                 }).thenCompose(aVoid -> new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
                         .setRatelimitRetries(0)

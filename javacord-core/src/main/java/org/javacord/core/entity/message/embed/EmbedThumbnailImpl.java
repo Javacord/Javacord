@@ -56,7 +56,7 @@ public class EmbedThumbnailImpl implements EmbedThumbnail {
         try {
             return new URL(proxyUrl);
         } catch (MalformedURLException e) {
-            logger.warn("Seems like the proxy url of the embed thumbnail is malformed! Please contact the developer!", e);
+            logger.warn("Seems like the embed thumbnail's proxy url is malformed! Please contact the developer!", e);
             return null;
         }
     }

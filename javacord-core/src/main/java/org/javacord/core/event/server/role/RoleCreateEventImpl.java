@@ -9,7 +9,7 @@ import org.javacord.api.event.server.role.RoleCreateEvent;
 public class RoleCreateEventImpl extends RoleEventImpl implements RoleCreateEvent {
 
     /**
-     * Creates a new role create event
+     * Creates a new role create event.
      *
      * @param role The role of the event.
      */

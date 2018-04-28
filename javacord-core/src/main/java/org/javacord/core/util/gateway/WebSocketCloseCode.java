@@ -17,33 +17,33 @@ import java.util.stream.Collectors;
 public enum WebSocketCloseCode {
 
     /**
-     * 1000;
-     * <i>
-     * 1000 indicates a normal closure, meaning that the purpose for
+     * 1000.
+     * 
+     * <i>* 1000 indicates a normal closure, meaning that the purpose for
      * which the connection was established has been fulfilled.</i>
      */
     NORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.NORMAL, Usage.BOTH),
 
     /**
-     * 1001;
-     * <i>
-     * 1001 indicates that an endpoint is "going away", such as a server
+     * 1001.
+     * 
+     * <i>1001 indicates that an endpoint is "going away", such as a server
      * going down or a browser having navigated away from a page.</i>
      */
     AWAY(com.neovisionaries.ws.client.WebSocketCloseCode.AWAY, Usage.BOTH),
 
     /**
-     * 1002;
-     * <i>
-     * 1002 indicates that an endpoint is terminating the connection due
+     * 1002.
+     * 
+     * <i>1002 indicates that an endpoint is terminating the connection due
      * to a protocol error.</i>
      */
     UNCONFORMED(com.neovisionaries.ws.client.WebSocketCloseCode.UNCONFORMED, Usage.BOTH),
 
     /**
-     * 1003;
-     * <i>
-     * 1003 indicates that an endpoint is terminating the connection
+     * 1003.
+     * 
+     * <i>1003 indicates that an endpoint is terminating the connection
      * because it has received a type of data it cannot accept
      * (e&#46;g&#46;, an endpoint that understands only text data MAY
      * send this if it receives a binary message).</i>
@@ -51,9 +51,9 @@ public enum WebSocketCloseCode {
     UNACCEPTABLE(com.neovisionaries.ws.client.WebSocketCloseCode.UNACCEPTABLE, Usage.BOTH),
 
     /**
-     * 1005;
-     * <i>
-     * 1005 is a reserved value and MUST NOT be set as a status code in a
+     * 1005.
+     * 
+     * <i>1005 is a reserved value and MUST NOT be set as a status code in a
      * Close control frame by an endpoint&#46;  It is designated for use in
      * applications expecting a status code to indicate that no status
      * code was actually present.</i>
@@ -61,9 +61,9 @@ public enum WebSocketCloseCode {
     NONE(com.neovisionaries.ws.client.WebSocketCloseCode.NONE, Usage.BOTH),
 
     /**
-     * 1006;
-     * <i>
-     * 1006 is a reserved value and MUST NOT be set as a status code in a
+     * 1006.
+     * 
+     * <i>1006 is a reserved value and MUST NOT be set as a status code in a
      * Close control frame by an endpoint&#46;  It is designated for use in
      * applications expecting a status code to indicate that the
      * connection was closed abnormally, e&#46;g&#46;, without sending or
@@ -72,9 +72,9 @@ public enum WebSocketCloseCode {
     ABNORMAL(com.neovisionaries.ws.client.WebSocketCloseCode.ABNORMAL, Usage.BOTH),
 
     /**
-     * 1007;
-     * <i>
-     * 1007 indicates that an endpoint is terminating the connection
+     * 1007.
+     * 
+     * <i>1007 indicates that an endpoint is terminating the connection
      * because it has received data within a message that was not
      * consistent with the type of the message (e&#46;g&#46;, non-UTF-8
      * [<a href="http://tools.ietf.org/html/rfc3629">RFC3629</a>] data
@@ -83,9 +83,9 @@ public enum WebSocketCloseCode {
     INCONSISTENT(com.neovisionaries.ws.client.WebSocketCloseCode.INCONSISTENT, Usage.BOTH),
 
     /**
-     * 1008;
-     * <i>
-     * 1008 indicates that an endpoint is terminating the connection
+     * 1008.
+     * 
+     * <i>1008 indicates that an endpoint is terminating the connection
      * because it has received a message that violates its policy&#46;
      * This is a generic status code that can be returned when there
      * is no other more suitable status code (e&#46;g&#46;, 1003 or 1009)
@@ -94,18 +94,18 @@ public enum WebSocketCloseCode {
     VIOLATED(com.neovisionaries.ws.client.WebSocketCloseCode.VIOLATED, Usage.BOTH),
 
     /**
-     * 1009;
-     * <i>
-     * 1009 indicates that an endpoint is terminating the connection
+     * 1009.
+     * 
+     * <i>1009 indicates that an endpoint is terminating the connection
      * because it has received a message that is too big for it to
      * process.</i>
      */
     OVERSIZE(com.neovisionaries.ws.client.WebSocketCloseCode.OVERSIZE, Usage.BOTH),
 
     /**
-     * 1010;
-     * <i>
-     * 1010 indicates that an endpoint (client) is terminating the
+     * 1010.
+     * 
+     * <i>1010 indicates that an endpoint (client) is terminating the
      * connection because it has expected the server to negotiate
      * one or more extension, but the server didn't return them in
      * the response message of the WebSocket handshake&#46;  The
@@ -117,18 +117,18 @@ public enum WebSocketCloseCode {
     UNEXTENDED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXTENDED, Usage.BOTH),
 
     /**
-     * 1011;
-     * <i>
-     * 1011 indicates that a server is terminating the connection because
+     * 1011.
+     * 
+     * <i>1011 indicates that a server is terminating the connection because
      * it encountered an unexpected condition that prevented it from
      * fulfilling the request.</i>
      */
     UNEXPECTED(com.neovisionaries.ws.client.WebSocketCloseCode.UNEXPECTED, Usage.BOTH),
 
     /**
-     * 1015;
-     * <i>
-     * 1015 is a reserved value and MUST NOT be set as a status code in a
+     * 1015.
+     * 
+     * <i>1015 is a reserved value and MUST NOT be set as a status code in a
      * Close control frame by an endpoint&#46;  It is designated for use in
      * applications expecting a status code to indicate that the
      * connection was closed due to a failure to perform a TLS handshake
@@ -257,12 +257,12 @@ public enum WebSocketCloseCode {
     private static final Map<Integer, WebSocketCloseCode> voiceInstanceByCode;
 
     /**
-     * The actual numeric close code
+     * The actual numeric close code.
      */
     private final int code;
 
     /**
-     * The actual numeric close code
+     * The actual numeric close code.
      */
     private final Usage usage;
 

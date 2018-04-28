@@ -364,7 +364,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
                                     .addQueryParameter("limit", "100")
                                     .setRatelimitRetries(250);
                     if (!users.isEmpty()) {
-                        request.addQueryParameter("after", users.get(users.size()-1).getIdAsString());
+                        request.addQueryParameter("after", users.get(users.size() - 1).getIdAsString());
                     }
                     List<User> incompleteUsers = request.execute(result -> {
                         List<User> paginatedUsers = new ArrayList<>();
@@ -577,7 +577,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(long messageId, T listener) {
+            addMessageAttachableListener(long messageId, T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(MessageAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -589,7 +589,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
 
     @Override
     public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(String messageId, T listener) {
+            addMessageAttachableListener(String messageId, T listener) {
         try {
             return addMessageAttachableListener(Long.valueOf(messageId), listener);
         } catch (NumberFormatException ignored) {
@@ -599,7 +599,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
 
     @Override
     public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addMessageAttachableListener(Message message, T listener) {
+            addMessageAttachableListener(Message message, T listener) {
         return addMessageAttachableListener(message.getId(), listener);
     }
 
@@ -650,13 +650,13 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
 
     @Override
     public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(long messageId) {
+            getMessageAttachableListeners(long messageId) {
         return api.getObjectListeners(Message.class, messageId);
     }
 
     @Override
     public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(String messageId) {
+            getMessageAttachableListeners(String messageId) {
         try {
             return getMessageAttachableListeners(Long.valueOf(messageId));
         } catch (NumberFormatException ignored) {
@@ -666,7 +666,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
 
     @Override
     public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getMessageAttachableListeners(Message message) {
+            getMessageAttachableListeners(Message message) {
         return getMessageAttachableListeners(message.getId());
     }
 

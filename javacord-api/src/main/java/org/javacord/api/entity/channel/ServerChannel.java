@@ -90,8 +90,8 @@ public interface ServerChannel extends Channel {
 
     /**
      * Updates the name of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param name The new name of the channel.
@@ -103,13 +103,13 @@ public interface ServerChannel extends Channel {
 
     /**
      * Updates the raw position of the channel.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param rawPosition The new position of the channel.
-     * If you want to update the position based on other channels, make sure to use
-     * {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
+     *     If you want to update the position based on other channels, make sure to use
+     *     {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRawPosition(int rawPosition) {
@@ -218,7 +218,9 @@ public interface ServerChannel extends Channel {
      * @see #getEffectiveAllowedPermissions(User)
      */
     default boolean hasAnyPermission(User user, PermissionType... type) {
-        return getEffectiveAllowedPermissions(user).stream().anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
+        return getEffectiveAllowedPermissions(user).stream().anyMatch(
+                allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals)
+        );
     }
 
     /**
@@ -336,7 +338,8 @@ public interface ServerChannel extends Channel {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
@@ -356,8 +359,8 @@ public interface ServerChannel extends Channel {
      * @return The managers for the added listener.
      */
     <T extends ServerChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ServerChannelAttachableListener>> addServerChannelAttachableListener(
-            T listener);
+            Collection<ListenerManager<? extends ServerChannelAttachableListener>>
+                    addServerChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code ServerChannelAttachableListener}s.
@@ -377,7 +380,7 @@ public interface ServerChannel extends Channel {
      * and their assigned listener classes they listen to.
      */
     <T extends ServerChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerChannelAttachableListeners();
+            getServerChannelAttachableListeners();
 
     /**
      * Removes a listener from this server channel.

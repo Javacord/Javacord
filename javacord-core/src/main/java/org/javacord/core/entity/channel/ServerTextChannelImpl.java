@@ -153,8 +153,8 @@ public class ServerTextChannelImpl extends ServerChannelImpl
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerTextChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ServerTextChannelAttachableListener>> addServerTextChannelAttachableListener(
-            T listener) {
+            Collection<ListenerManager<? extends ServerTextChannelAttachableListener>>
+                    addServerTextChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerTextChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -180,7 +180,7 @@ public class ServerTextChannelImpl extends ServerChannelImpl
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> void
-    removeServerTextChannelAttachableListener(T listener) {
+            removeServerTextChannelAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ServerTextChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -205,30 +205,30 @@ public class ServerTextChannelImpl extends ServerChannelImpl
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ServerTextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getServerTextChannelAttachableListeners() {
+            getServerTextChannelAttachableListeners() {
         Map<T, List<Class<T>>> serverTextChannelListeners =
                 ((DiscordApiImpl) getApi()).getObjectListeners(ServerTextChannel.class, getId());
         getTextChannelAttachableListeners().forEach((listener, listenerClasses) -> serverTextChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         getServerChannelAttachableListeners().forEach((listener, listenerClasses) -> serverTextChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         getChannelAttachableListeners().forEach((listener, listenerClasses) -> serverTextChannelListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         return serverTextChannelListeners;
     }
 

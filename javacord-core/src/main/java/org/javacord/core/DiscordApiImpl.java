@@ -226,7 +226,7 @@ public class DiscordApiImpl implements DiscordApi {
     /**
      * The default maximum age of cached messages.
      */
-    private volatile int defaultMessageCacheStorageTimeInSeconds = 60*60*12;
+    private volatile int defaultMessageCacheStorageTimeInSeconds = 60 * 60 * 12;
 
     /**
      * The function to calculate the reconnect delay.
@@ -320,7 +320,8 @@ public class DiscordApiImpl implements DiscordApi {
      * message or used to point to it for usage in the messages cleanup,
      * as at cleanup time the weak ref is already emptied.
      */
-    private final Map<Reference<? extends Message>, Long> messageIdByRef = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<Reference<? extends Message>, Long> messageIdByRef
+            = Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * The queue that is notified if a message became weakly-reachable.
@@ -382,14 +383,16 @@ public class DiscordApiImpl implements DiscordApi {
         this.totalShards = totalShards;
         this.waitForServersOnStartup = waitForServersOnStartup;
         this.reconnectDelayProvider = x ->
-                (int) Math.round(Math.pow(x, 1.5)-(1/(1/(0.1*x)+1))*Math.pow(x,1.5))+(currentShard*6);
+                (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5)) + (currentShard * 6);
 
         this.httpClient = new OkHttpClient.Builder()
                 .addInterceptor(chain -> chain.proceed(chain.request()
                         .newBuilder()
                         .addHeader("User-Agent", Javacord.USER_AGENT)
                         .build()))
-                .addInterceptor(new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY))
+                .addInterceptor(
+                        new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY)
+                )
                 .build();
         this.eventDispatcher = new EventDispatcher(this);
 
@@ -402,7 +405,7 @@ public class DiscordApiImpl implements DiscordApi {
                             if (accountType == AccountType.BOT) {
                                 getApplicationInfo().whenComplete((applicationInfo, exception) -> {
                                     if (exception != null) {
-                                       logger.error("Could not access self application info on startup!", exception);
+                                        logger.error("Could not access self application info on startup!", exception);
                                     } else {
                                         clientId = applicationInfo.getClientId();
                                         ownerId = applicationInfo.getOwnerId();
@@ -430,8 +433,8 @@ public class DiscordApiImpl implements DiscordApi {
             getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
                 try {
                     for (Reference<? extends User> userRef = usersCleanupQueue.poll();
-                         userRef != null;
-                         userRef = usersCleanupQueue.poll()) {
+                            userRef != null;
+                            userRef = usersCleanupQueue.poll()) {
                         Long userId = userIdByRef.remove(userRef);
                         if (userId != null) {
                             users.remove(userId, userRef);
@@ -446,8 +449,8 @@ public class DiscordApiImpl implements DiscordApi {
             getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
                 try {
                     for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                         messageRef != null;
-                         messageRef = messagesCleanupQueue.poll()) {
+                            messageRef != null;
+                            messageRef = messagesCleanupQueue.poll()) {
                         Long messageId = messageIdByRef.remove(messageRef);
                         if (messageId != null) {
                             messages.remove(messageId, messageRef);
@@ -461,13 +464,15 @@ public class DiscordApiImpl implements DiscordApi {
             // Add shutdown hook
             ready.thenAccept(api -> {
                 WeakReference<DiscordApi> discordApiReference = new WeakReference<>(api);
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get()).ifPresent(DiscordApi::disconnect),
-                                                                String.format("Javacord - Shutdown Disconnector (%s)", api)));
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get())
+                        .ifPresent(DiscordApi::disconnect),
+                        String.format("Javacord - Shutdown Disconnector (%s)", api)));
             });
         } else {
             WeakReference<DiscordApi> discordApiReference = new WeakReference<>(this);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get()).ifPresent(DiscordApi::disconnect),
-                                                            String.format("Javacord - Shutdown Disconnector (%s)", this)));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get())
+                    .ifPresent(DiscordApi::disconnect),
+                    String.format("Javacord - Shutdown Disconnector (%s)", this)));
         }
     }
 
@@ -657,7 +662,7 @@ public class DiscordApiImpl implements DiscordApi {
      *
      * @param yourself The user of the connected account.
      */
-    public void setYourself(User yourself){
+    public void setYourself(User yourself) {
         you = yourself;
     }
 
@@ -787,24 +792,6 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     /**
-     * Sets the current activity, along with type and streaming Url.
-     *
-     * @param name The name of the activity.
-     * @param type The activity's type.
-     * @param streamingUrl The Url used for streaming.
-     */
-    private void updateActivity(String name, ActivityType type, String streamingUrl){
-        if (name == null) {
-            activity = null;
-        } else if (streamingUrl == null) {
-            activity = new ActivityImpl(type, name, null);
-        } else {
-            activity = new ActivityImpl(type, name, streamingUrl);
-        }
-        websocketAdapter.updateStatus();
-    }
-
-    /**
      * Adds an object listener.
      * Adding a listener multiple times to the same object will only add it once
      * and return the same listener manager on each invocation.
@@ -887,7 +874,7 @@ public class DiscordApiImpl implements DiscordApi {
      * @param objectId The id of the object.
      * @param <T> The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and
-     * their assigned listener classes they listen to.
+     *     their assigned listener classes they listen to.
      */
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> Map<T, List<Class<T>>> getObjectListeners(
@@ -928,35 +915,6 @@ public class DiscordApiImpl implements DiscordApi {
                 .map(Map::keySet)
                 .map(ArrayList::new)
                 .orElseGet(ArrayList::new));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
-        return (ListenerManager<T>) listeners
-                .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
-                .computeIfAbsent(listener, key -> new ListenerManagerImpl<>(this, listener, listenerClass));
-    }
-
-    @Override
-    public <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener) {
-        synchronized (listeners) {
-            Map<GloballyAttachableListener, ListenerManagerImpl<? extends GloballyAttachableListener>> classListeners =
-                    listeners.get(listenerClass);
-            if (classListeners == null) {
-                return;
-            }
-            ListenerManagerImpl<? extends GloballyAttachableListener> listenerManager = classListeners.get(listener);
-            if (listenerManager == null) {
-                return;
-            }
-            classListeners.remove(listener);
-            listenerManager.removed();
-            // Clean it up
-            if (classListeners.isEmpty()) {
-                listeners.remove(listenerClass);
-            }
-        }
     }
 
     @Override
@@ -1074,6 +1032,26 @@ public class DiscordApiImpl implements DiscordApi {
         return status;
     }
 
+
+    /**
+     * Sets the current activity, along with type and streaming Url.
+     *
+     * @param name The name of the activity.
+     * @param type The activity's type.
+     * @param streamingUrl The Url used for streaming.
+     */
+    private void updateActivity(String name, ActivityType type, String streamingUrl) {
+        if (name == null) {
+            activity = null;
+        } else if (streamingUrl == null) {
+            activity = new ActivityImpl(type, name, null);
+        } else {
+            activity = new ActivityImpl(type, name, streamingUrl);
+        }
+        websocketAdapter.updateStatus();
+    }
+
+
     @Override
     public void updateActivity(String name) {
         updateActivity(name, ActivityType.PLAYING, null);
@@ -1095,7 +1073,7 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     @Override
-    public User getYourself(){
+    public User getYourself() {
         return you;
     }
 
@@ -1493,7 +1471,8 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(ServerChangeSplashListener listener) {
+    public ListenerManager<ServerChangeSplashListener> addServerChangeSplashListener(
+            ServerChangeSplashListener listener) {
         return addListener(ServerChangeSplashListener.class, listener);
     }
 
@@ -1526,26 +1505,27 @@ public class DiscordApiImpl implements DiscordApi {
 
     @Override
     public ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
-    addServerChangeDefaultMessageNotificationLevelListener(
-            ServerChangeDefaultMessageNotificationLevelListener listener) {
+            addServerChangeDefaultMessageNotificationLevelListener(
+                    ServerChangeDefaultMessageNotificationLevelListener listener) {
         return addListener(ServerChangeDefaultMessageNotificationLevelListener.class, listener);
     }
 
     @Override
     public List<ServerChangeDefaultMessageNotificationLevelListener>
-    getServerChangeDefaultMessageNotificationLevelListeners() {
+            getServerChangeDefaultMessageNotificationLevelListeners() {
         return getListeners(ServerChangeDefaultMessageNotificationLevelListener.class);
     }
 
     @Override
     public ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
-    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener) {
+            addServerChangeMultiFactorAuthenticationLevelListener(
+                    ServerChangeMultiFactorAuthenticationLevelListener listener) {
         return addListener(ServerChangeMultiFactorAuthenticationLevelListener.class, listener);
     }
 
     @Override
     public List<ServerChangeMultiFactorAuthenticationLevelListener>
-    getServerChangeMultiFactorAuthenticationLevelListeners() {
+            getServerChangeMultiFactorAuthenticationLevelListeners() {
         return getListeners(ServerChangeMultiFactorAuthenticationLevelListener.class);
     }
 
@@ -1561,7 +1541,8 @@ public class DiscordApiImpl implements DiscordApi {
 
     @Override
     public ListenerManager<ServerChangeExplicitContentFilterLevelListener>
-    addServerChangeExplicitContentFilterLevelListener(ServerChangeExplicitContentFilterLevelListener listener) {
+            addServerChangeExplicitContentFilterLevelListener(
+                    ServerChangeExplicitContentFilterLevelListener listener) {
         return addListener(ServerChangeExplicitContentFilterLevelListener.class, listener);
     }
 
@@ -1679,7 +1660,8 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
+    public ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(
+            UserChangeActivityListener listener) {
         return addListener(UserChangeActivityListener.class, listener);
     }
 
@@ -1807,13 +1789,14 @@ public class DiscordApiImpl implements DiscordApi {
 
     @Override
     public ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener) {
         return addListener(ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
 
     @Override
     public List<ServerChannelChangeOverwrittenPermissionsListener>
-    getServerChannelChangeOverwrittenPermissionsListeners() {
+            getServerChannelChangeOverwrittenPermissionsListeners() {
         return getListeners(ServerChannelChangeOverwrittenPermissionsListener.class);
     }
 
@@ -1960,7 +1943,8 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(CachedMessageUnpinListener listener) {
+    public ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(
+            CachedMessageUnpinListener listener) {
         return addListener(CachedMessageUnpinListener.class, listener);
     }
 
@@ -1971,13 +1955,43 @@ public class DiscordApiImpl implements DiscordApi {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(GloballyAttachableListener listener) {
+    public Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(
+            GloballyAttachableListener listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(GloballyAttachableListener.class::isAssignableFrom)
                 .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
                 .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
                 .map(listenerClass -> addListener(listenerClass, listener))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
+        return (ListenerManager<T>) listeners
+                .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
+                .computeIfAbsent(listener, key -> new ListenerManagerImpl<>(this, listener, listenerClass));
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener) {
+        synchronized (listeners) {
+            Map<GloballyAttachableListener, ListenerManagerImpl<? extends GloballyAttachableListener>> classListeners =
+                    listeners.get(listenerClass);
+            if (classListeners == null) {
+                return;
+            }
+            ListenerManagerImpl<? extends GloballyAttachableListener> listenerManager = classListeners.get(listener);
+            if (listenerManager == null) {
+                return;
+            }
+            classListeners.remove(listener);
+            listenerManager.removed();
+            // Clean it up
+            if (classListeners.isEmpty()) {
+                listeners.remove(listenerClass);
+            }
+        }
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.javacord.core.event.server.ServerEventImpl;
 public abstract class RoleEventImpl extends ServerEventImpl implements RoleEvent {
 
     /**
-     * The role of the event
+     * The role of the event.
      */
     private final Role role;
 

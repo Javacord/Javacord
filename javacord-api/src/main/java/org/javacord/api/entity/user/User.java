@@ -283,8 +283,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Adds the given role to the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be added to the user.
@@ -297,8 +297,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Adds the given role to the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be added to the user.
@@ -312,8 +312,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Removes the given role from the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be removed from the user.
@@ -326,8 +326,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Removes the given role from the user.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param role The role which should be removed from the user.
@@ -574,7 +574,8 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return The manager of the listener.
      */
     ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.
@@ -701,7 +702,7 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return The managers for the added listener.
      */
     <T extends UserAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addUserAttachableListener(T listener);
+            addUserAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code UserAttachableListener}s.

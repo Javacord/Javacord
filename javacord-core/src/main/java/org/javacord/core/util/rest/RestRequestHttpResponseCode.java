@@ -22,50 +22,50 @@ import java.util.stream.Collectors;
 public enum RestRequestHttpResponseCode {
 
     /**
-     * The request completed successfully
+     * The request completed successfully.
      */
     OK(200, "The request completed successfully"),
 
     /**
-     * The entity was created successfully
+     * The entity was created successfully.
      */
     CREATED(201, "The entity was created successfully"),
 
     /**
-     * The request completed successfully but returned no content
+     * The request completed successfully but returned no content.
      */
     NO_CONTENT(204, "The request completed successfully but returned no content"),
 
     /**
-     * The entity was not modified (no action was taken)
+     * The entity was not modified (no action was taken).
      */
     NOT_MODIFIED(304, "The entity was not modified (no action was taken)"),
 
     /**
-     * The request was improperly formatted, or the server couldn't understand it
+     * The request was improperly formatted, or the server couldn't understand it.
      */
     BAD_REQUEST(400, "The request was improperly formatted, or the server couldn't understand it",
                 BadRequestException::new, BadRequestException.class),
 
     /**
-     * The Authorization header was missing or invalid
+     * The Authorization header was missing or invalid.
      */
     UNAUTHORIZED(401, "The Authorization header was missing or invalid"),
 
     /**
-     * The Authorization token you passed did not have permission to the resource
+     * The Authorization token you passed did not have permission to the resource.
      */
     FORBIDDEN(403, "The Authorization token you passed did not have permission to the resource",
               MissingPermissionsException::new, MissingPermissionsException.class),
 
     /**
-     * The resource at the location specified doesn't exist
+     * The resource at the location specified doesn't exist.
      */
     NOT_FOUND(404, "The resource at the location specified doesn't exist",
               NotFoundException::new, NotFoundException.class),
 
     /**
-     * The HTTP method used is not valid for the location specified
+     * The HTTP method used is not valid for the location specified.
      */
     METHOD_NOT_ALLOWED(405, "The HTTP method used is not valid for the location specified"),
 
@@ -77,7 +77,7 @@ public enum RestRequestHttpResponseCode {
     TOO_MANY_REQUESTS(429, "You've made too many requests"),
 
     /**
-     * There was not a gateway available to process your request. Wait a bit and retry
+     * There was not a gateway available to process your request. Wait a bit and retry.
      */
     GATEWAY_UNAVAILABLE(502, "There was not a gateway available to process your request. Wait a bit and retry");
 
@@ -153,7 +153,7 @@ public enum RestRequestHttpResponseCode {
         this.discordExceptionClass = discordExceptionClass;
 
         if ((discordExceptionInstantiator == null) && (discordExceptionClass != null)
-            || (discordExceptionInstantiator != null) && (discordExceptionClass == null)) {
+                || (discordExceptionInstantiator != null) && (discordExceptionClass == null)) {
 
             throw new IllegalArgumentException("discordExceptionInstantiator and discordExceptionClass do not match");
         }

@@ -405,8 +405,8 @@ public interface DiscordApi {
 
     /**
      * Updates the username of the current account.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param username The new username.
@@ -419,8 +419,8 @@ public interface DiscordApi {
     /**
      * Updates the avatar of the current account.
      * This method assumes the file type is "png"!
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -432,8 +432,8 @@ public interface DiscordApi {
 
     /**
      * Updates the avatar of the current account.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -446,8 +446,8 @@ public interface DiscordApi {
 
     /**
      * Updates the avatar of the current account.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -459,8 +459,8 @@ public interface DiscordApi {
 
     /**
      * Updates the avatar of the current account.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -472,8 +472,8 @@ public interface DiscordApi {
 
     /**
      * Updates the avatar of the current account.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -486,8 +486,8 @@ public interface DiscordApi {
     /**
      * Updates the avatar of the current account.
      * This method assumes the file type is "png"!
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -499,8 +499,8 @@ public interface DiscordApi {
 
     /**
      * Updates the avatar of the current account.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -514,8 +514,8 @@ public interface DiscordApi {
     /**
      * Updates the avatar of the current account.
      * This method assumes the file type is "png"!
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -527,8 +527,8 @@ public interface DiscordApi {
 
     /**
      * Updates the avatar of the current account.
-     * <p>
-     * If you want to update several settings at once, it's recommended to use the
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
      * {@link AccountUpdater} from {@link #createAccountUpdater()} ()} which provides a better performance!
      *
      * @param avatar The new avatar.
@@ -1956,8 +1956,8 @@ public interface DiscordApi {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChangeDefaultMessageNotificationLevelListener>
-    addServerChangeDefaultMessageNotificationLevelListener(
-            ServerChangeDefaultMessageNotificationLevelListener listener);
+            addServerChangeDefaultMessageNotificationLevelListener(
+                    ServerChangeDefaultMessageNotificationLevelListener listener);
 
     /**
      * Gets a list with all registered server change default message notification level listeners.
@@ -1973,7 +1973,8 @@ public interface DiscordApi {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChangeMultiFactorAuthenticationLevelListener>
-    addServerChangeMultiFactorAuthenticationLevelListener(ServerChangeMultiFactorAuthenticationLevelListener listener);
+            addServerChangeMultiFactorAuthenticationLevelListener(
+                    ServerChangeMultiFactorAuthenticationLevelListener listener);
 
     /**
      * Gets a list with all registered server change multi factor authentication level listeners.
@@ -2364,7 +2365,8 @@ public interface DiscordApi {
      * @return The manager of the listener.
      */
     ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener);
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener);
 
     /**
      * Gets a list with all registered server channel change overwritten permissions listeners.

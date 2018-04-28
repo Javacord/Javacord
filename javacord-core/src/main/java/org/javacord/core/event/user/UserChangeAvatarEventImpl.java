@@ -70,11 +70,11 @@ public class UserChangeAvatarEventImpl extends UserEventImpl implements UserChan
      * @return The icon with the given hash.
      */
     private Icon getAvatar(String avatarHash) {
-        String url = "https://cdn.discordapp.com/embed/avatars/" +
-                     Integer.parseInt(getUser().getDiscriminator()) % 5 + ".png";
+        String url = "https://cdn.discordapp.com/embed/avatars/"
+                + Integer.parseInt(getUser().getDiscriminator()) % 5 + ".png";
         if (avatarHash != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getUser().getIdAsString() + "/" + avatarHash +
-                  (avatarHash.startsWith("a_") ? ".gif" : ".png");
+            url = "https://cdn.discordapp.com/avatars/" + getUser().getIdAsString() + "/" + avatarHash
+                    + (avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
         try {
             return new IconImpl(getApi(), new URL(url));

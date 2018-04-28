@@ -38,19 +38,19 @@ public class JavacordLogger extends MarkerIgnoringBase {
     }
 
     @Override
-    final public boolean isTraceEnabled() {
+    public final boolean isTraceEnabled() {
         return FallbackLoggerConfiguration.isTraceEnabled();
     }
 
     @Override
-    final public void trace(String msg) {
+    public final void trace(String msg) {
         if (isTraceEnabled()) {
             log("TRACE", msg, null);
         }
     }
 
     @Override
-    final public void trace(String format, Object arg) {
+    public final void trace(String format, Object arg) {
         if (isTraceEnabled()) {
             FormattingTuple ft = MessageFormatter.format(format, arg);
             log("TRACE", ft.getMessage(), ft.getThrowable());
@@ -74,26 +74,26 @@ public class JavacordLogger extends MarkerIgnoringBase {
     }
 
     @Override
-    final public void trace(String msg, Throwable t) {
+    public final void trace(String msg, Throwable t) {
         if (isTraceEnabled()) {
             log("TRACE", msg, t);
         }
     }
 
     @Override
-    final public boolean isDebugEnabled() {
+    public final boolean isDebugEnabled() {
         return FallbackLoggerConfiguration.isDebugEnabled();
     }
 
     @Override
-    final public void debug(String msg) {
+    public final void debug(String msg) {
         if (isDebugEnabled()) {
             log("DEBUG", msg, null);
         }
     }
 
     @Override
-    final public void debug(String format, Object arg1) {
+    public final void debug(String format, Object arg1) {
         if (isDebugEnabled()) {
             FormattingTuple ft = MessageFormatter.format(format, arg1);
             log("DEBUG", ft.getMessage(), ft.getThrowable());
@@ -101,7 +101,7 @@ public class JavacordLogger extends MarkerIgnoringBase {
     }
 
     @Override
-    final public void debug(String format, Object arg1, Object arg2) {
+    public final void debug(String format, Object arg1, Object arg2) {
         if (isDebugEnabled()) {
             FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
             log("DEBUG", ft.getMessage(), ft.getThrowable());
@@ -117,31 +117,31 @@ public class JavacordLogger extends MarkerIgnoringBase {
     }
 
     @Override
-    final public void debug(String msg, Throwable t) {
+    public final void debug(String msg, Throwable t) {
         if (isDebugEnabled()) {
             log("DEBUG", msg, t);
         }
     }
 
     @Override
-    final public boolean isInfoEnabled() {
+    public final boolean isInfoEnabled() {
         // always true
         return true;
     }
 
     @Override
-    final public void info(String msg) {
+    public final void info(String msg) {
         log("INFO", msg, null);
     }
 
     @Override
-    final public void info(String format, Object arg1) {
+    public final void info(String format, Object arg1) {
         FormattingTuple ft = MessageFormatter.format(format, arg1);
         log("INFO", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
-    final public void info(String format, Object arg1, Object arg2) {
+    public final void info(String format, Object arg1, Object arg2) {
         FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
         log("INFO", ft.getMessage(), ft.getThrowable());
     }
@@ -153,30 +153,30 @@ public class JavacordLogger extends MarkerIgnoringBase {
     }
 
     @Override
-    final public void info(String msg, Throwable t) {
+    public final void info(String msg, Throwable t) {
         LogRecord record = new LogRecord(Level.INFO, msg);
         log("INFO", msg, t);
     }
 
     @Override
-    final public boolean isWarnEnabled() {
+    public final boolean isWarnEnabled() {
         // always true
         return true;
     }
 
     @Override
-    final public void warn(String msg) {
+    public final void warn(String msg) {
         log("WARNING", msg, null);
     }
 
     @Override
-    final public void warn(String format, Object arg1) {
+    public final void warn(String format, Object arg1) {
         FormattingTuple ft = MessageFormatter.format(format, arg1);
         log("WARNING", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
-    final public void warn(String format, Object arg1, Object arg2) {
+    public final void warn(String format, Object arg1, Object arg2) {
         FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
         log("WARNING", ft.getMessage(), ft.getThrowable());
     }
@@ -188,29 +188,29 @@ public class JavacordLogger extends MarkerIgnoringBase {
     }
 
     @Override
-    final public void warn(String msg, Throwable t) {
+    public final void warn(String msg, Throwable t) {
         log("WARNING", msg, t);
     }
 
     @Override
-    final public boolean isErrorEnabled() {
+    public final boolean isErrorEnabled() {
         // always true
         return true;
     }
 
     @Override
-    final public void error(String msg) {
+    public final void error(String msg) {
         log("ERROR", msg, null);
     }
 
     @Override
-    final public void error(String format, Object arg1) {
+    public final void error(String format, Object arg1) {
         FormattingTuple ft = MessageFormatter.format(format, arg1);
         log("ERROR", ft.getMessage(), ft.getThrowable());
     }
 
     @Override
-    final public void error(String format, Object arg1, Object arg2) {
+    public final void error(String format, Object arg1, Object arg2) {
         FormattingTuple ft = MessageFormatter.format(format, arg1, arg2);
         log("ERROR", ft.getMessage(), ft.getThrowable());
     }
@@ -222,7 +222,7 @@ public class JavacordLogger extends MarkerIgnoringBase {
     }
 
     @Override
-    final public void error(String msg, Throwable t) {
+    public final void error(String msg, Throwable t) {
         log("ERROR", msg, t);
     }
 

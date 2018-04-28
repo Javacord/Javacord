@@ -103,8 +103,8 @@ public class WebhookImpl implements Webhook {
     @Override
     public Optional<Icon> getAvatar() {
         if (avatarId != null) {
-            String url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId +
-                         (avatarId.startsWith("a_") ? ".gif" : ".png");
+            String url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId
+                    + (avatarId.startsWith("a_") ? ".gif" : ".png");
             try {
                 return Optional.of(new IconImpl(getApi(), new URL(url)));
             } catch (MalformedURLException e) {

@@ -125,23 +125,27 @@ public class InviteImpl implements RichInvite {
         this.code = data.get("code").asText();
         this.serverId = Long.parseLong(data.get("guild").get("id").asText());
         this.serverName = data.get("guild").get("name").asText();
-        this.serverIcon = data.get("guild").has("icon") && !data.get("guild").get("icon").isNull() ?
-                data.get("guild").get("icon").asText() : null;
-        this.serverSplash = data.get("guild").has("splash") && !data.get("guild").get("splash").isNull() ?
-                data.get("guild").get("splash").asText() : null;
+        this.serverIcon = data.get("guild").has("icon") && !data.get("guild").get("icon").isNull()
+                ? data.get("guild").get("icon").asText()
+                : null;
+        this.serverSplash = data.get("guild").has("splash") && !data.get("guild").get("splash").isNull()
+                ? data.get("guild").get("splash").asText()
+                : null;
         this.channelId = Long.parseLong(data.get("channel").get("id").asText());
         this.channelName = data.get("channel").get("name").asText();
         this.channelType = ChannelType.fromId(data.get("channel").get("type").asInt());
 
         // Rich data (may not be present)
-        this.inviter = data.has("inviter") ?
-                ((DiscordApiImpl) api).getOrCreateUser(data.get("inviter")) : null;
+        this.inviter = data.has("inviter")
+                ? ((DiscordApiImpl) api).getOrCreateUser(data.get("inviter"))
+                : null;
         this.uses = data.has("uses") ? data.get("uses").asInt() : -1;
         this.maxUses = data.has("max_uses") ? data.get("max_uses").asInt() : -1;
         this.maxAge = data.has("max_age") ? data.get("max_age").asInt() : -1;
         this.temporary = data.has("temporary") && data.get("temporary").asBoolean();
-        this.creationTimestamp = data.has("created_at") ?
-                OffsetDateTime.parse(data.get("created_at").asText()).toInstant() : null;
+        this.creationTimestamp = data.has("created_at")
+                ? OffsetDateTime.parse(data.get("created_at").asText()).toInstant()
+                : null;
         this.revoked = data.has("revoked") && data.get("revoked").asBoolean();
     }
 

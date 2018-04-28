@@ -1,6 +1,5 @@
 package org.javacord.api.listener.user;
 
-
 import org.javacord.api.event.user.UserStartTypingEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;

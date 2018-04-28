@@ -158,10 +158,11 @@ public class WebhookUpdaterDelegateImpl implements WebhookUpdaterDelegate {
         if (patchWebhook) {
             if (avatar != null) {
                 return avatar.asByteArray(webhook.getApi()).thenAccept(bytes -> {
-                    String base64Avatar = "data:image/" + avatar.getFileType() + ";base64," +
-                                          Base64.getEncoder().encodeToString(bytes);
+                    String base64Avatar = "data:image/" + avatar.getFileType() + ";base64,"
+                            + Base64.getEncoder().encodeToString(bytes);
                     body.put("avatar", base64Avatar);
-                }).thenCompose(aVoid -> new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
+                }).thenCompose(aVoid ->
+                        new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                         .setUrlParameters(webhook.getIdAsString())
                         .setBody(body)
                         .setAuditLogReason(reason)

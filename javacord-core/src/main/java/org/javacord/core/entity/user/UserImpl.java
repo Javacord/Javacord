@@ -7,7 +7,6 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.PrivateChannel;
-import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.listener.ObjectAttachableListener;
@@ -50,7 +49,6 @@ import org.slf4j.Logger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -237,8 +235,8 @@ public class UserImpl implements User, Cleanupable {
     public Icon getAvatar() {
         String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
         if (avatarHash != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarHash +
-                    (avatarHash.startsWith("a_") ? ".gif" : ".png");
+            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarHash
+                    + (avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
         try {
             return new IconImpl(getApi(), new URL(url));
@@ -418,7 +416,8 @@ public class UserImpl implements User, Cleanupable {
     }
 
     @Override
-    public ListenerManager<UserChangeActivityListener> addUserChangeActivityListener(UserChangeActivityListener listener) {
+    public ListenerManager<UserChangeActivityListener>
+            addUserChangeActivityListener(UserChangeActivityListener listener) {
         return ((DiscordApiImpl) getApi())
                 .addObjectListener(User.class, getId(), UserChangeActivityListener.class, listener);
     }
@@ -441,7 +440,8 @@ public class UserImpl implements User, Cleanupable {
 
     @Override
     public ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-    addServerChannelChangeOverwrittenPermissionsListener(ServerChannelChangeOverwrittenPermissionsListener listener) {
+            addServerChannelChangeOverwrittenPermissionsListener(
+                    ServerChannelChangeOverwrittenPermissionsListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
                 User.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
     }
@@ -537,7 +537,7 @@ public class UserImpl implements User, Cleanupable {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends UserAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addUserAttachableListener(T listener) {
+            addUserAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(UserAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -560,7 +560,7 @@ public class UserImpl implements User, Cleanupable {
 
     @Override
     public <T extends UserAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getUserAttachableListeners() {
+            getUserAttachableListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(User.class, getId());
     }
 

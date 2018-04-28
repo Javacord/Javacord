@@ -2,7 +2,6 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -22,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -87,8 +85,8 @@ public class ChannelCategoryImpl extends ServerChannelImpl implements ChannelCat
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends ChannelCategoryAttachableListener>> addChannelCategoryAttachableListener(
-            T listener) {
+            Collection<ListenerManager<? extends ChannelCategoryAttachableListener>>
+            addChannelCategoryAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ChannelCategoryAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -110,7 +108,8 @@ public class ChannelCategoryImpl extends ServerChannelImpl implements ChannelCat
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void removeChannelCategoryAttachableListener(T listener) {
+    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
+            void removeChannelCategoryAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ChannelCategoryAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -124,30 +123,31 @@ public class ChannelCategoryImpl extends ServerChannelImpl implements ChannelCat
                                 (ServerChannelAttachableListener & ObjectAttachableListener) listener);
                     } else {
                         ((DiscordApiImpl) getApi()).removeObjectListener(ChannelCategory.class, getId(),
-                                                                         listenerClass, listener);
+                                listenerClass, listener);
                     }
                 });
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>> getChannelCategoryAttachableListeners() {
+    public <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
+            Map<T, List<Class<T>>> getChannelCategoryAttachableListeners() {
         Map<T, List<Class<T>>> channelCategoryListeners =
                 ((DiscordApiImpl) getApi()).getObjectListeners(ChannelCategory.class, getId());
         getServerChannelAttachableListeners().forEach((listener, listenerClasses) -> channelCategoryListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         getChannelAttachableListeners().forEach((listener, listenerClasses) -> channelCategoryListeners
                 .merge((T) listener,
-                       (List<Class<T>>) (Object) listenerClasses,
-                       (listenerClasses1, listenerClasses2) -> {
-                           listenerClasses1.addAll(listenerClasses2);
-                           return listenerClasses1;
-                       }));
+                        (List<Class<T>>) (Object) listenerClasses,
+                        (listenerClasses1, listenerClasses2) -> {
+                            listenerClasses1.addAll(listenerClasses2);
+                            return listenerClasses1;
+                        }));
         return channelCategoryListeners;
     }
 

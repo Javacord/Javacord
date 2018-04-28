@@ -228,7 +228,8 @@ public interface Messageable {
      * @param fileName The name of the file.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, InputStream stream, String fileName) {
+    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, InputStream stream,
+                                                   String fileName) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)

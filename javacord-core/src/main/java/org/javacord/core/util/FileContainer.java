@@ -32,7 +32,7 @@ public class FileContainer {
     private static final Logger logger = LoggerUtil.getLogger(FileContainer.class);
 
     /**
-     * The file as buffered image
+     * The file as buffered image.
      */
     private final BufferedImage fileAsBufferedImage;
 
@@ -203,11 +203,11 @@ public class FileContainer {
                 future.complete(fileAsByteArray);
                 return future;
             }
-            if (fileAsBufferedImage != null ||
-                    fileAsFile != null ||
-                    fileAsIcon != null ||
-                    fileAsUrl != null ||
-                    fileAsInputStream != null) {
+            if (fileAsBufferedImage != null
+                    || fileAsFile != null
+                    || fileAsIcon != null
+                    || fileAsUrl != null
+                    || fileAsInputStream != null) {
                 asInputStream(api).thenApply(stream -> {
                     try (
                             InputStream in = new BufferedInputStream(stream);

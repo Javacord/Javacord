@@ -87,7 +87,8 @@ public interface VoiceChannel extends Channel {
      * @return The managers for the added listener.
      */
     <T extends VoiceChannelAttachableListener & ObjectAttachableListener>
-    Collection<ListenerManager<? extends VoiceChannelAttachableListener>> addVoiceChannelAttachableListener(T listener);
+            Collection<ListenerManager<? extends VoiceChannelAttachableListener>>
+                    addVoiceChannelAttachableListener(T listener);
 
     /**
      * Removes a listener that implements one or more {@code VoiceChannelAttachableListener}s.
@@ -95,8 +96,8 @@ public interface VoiceChannel extends Channel {
      * @param listener The listener to remove.
      * @param <T> The type of the listener.
      */
-    <T extends VoiceChannelAttachableListener & ObjectAttachableListener> void removeVoiceChannelAttachableListener(
-            T listener);
+    <T extends VoiceChannelAttachableListener & ObjectAttachableListener> void
+            removeVoiceChannelAttachableListener(T listener);
 
     /**
      * Gets a map with all registered listeners that implement one or more {@code VoiceChannelAttachableListener}s and
@@ -107,7 +108,7 @@ public interface VoiceChannel extends Channel {
      * and their assigned listener classes they listen to.
      */
     <T extends VoiceChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getVoiceChannelAttachableListeners();
+            getVoiceChannelAttachableListeners();
 
     /**
      * Removes a listener from this voice channel.

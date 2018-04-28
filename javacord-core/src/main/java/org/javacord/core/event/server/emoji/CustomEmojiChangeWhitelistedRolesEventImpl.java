@@ -41,16 +41,16 @@ public class CustomEmojiChangeWhitelistedRolesEventImpl extends CustomEmojiEvent
 
     @Override
     public Optional<Collection<Role>> getOldWhitelistedRoles() {
-        return oldWhitelist == null || oldWhitelist.isEmpty() ?
-                Optional.empty() :
-                Optional.of(Collections.unmodifiableCollection(new HashSet<>(oldWhitelist)));
+        return oldWhitelist == null || oldWhitelist.isEmpty()
+                ? Optional.empty()
+                : Optional.of(Collections.unmodifiableCollection(new HashSet<>(oldWhitelist)));
     }
 
     @Override
     public Optional<Collection<Role>> getNewWhitelistedRoles() {
-        return newWhitelist == null || newWhitelist.isEmpty() ?
-                Optional.empty() :
-                Optional.of(Collections.unmodifiableCollection(new HashSet<>(newWhitelist)));
+        return newWhitelist == null || newWhitelist.isEmpty()
+                ? Optional.empty()
+                : Optional.of(Collections.unmodifiableCollection(new HashSet<>(newWhitelist)));
     }
 
 }

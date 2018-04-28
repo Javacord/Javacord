@@ -150,8 +150,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         ).scheduleWithFixedDelay(() -> {
             try {
                 connectionDelaySemaphorePerAccount.forEach((token, semaphore) -> {
-                    if ((semaphore.availablePermits() == 0) &&
-                        (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L) >= 15000)) {
+                    if ((semaphore.availablePermits() == 0)
+                            && (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L)
+                            >= 15000)) {
                         semaphore.release();
                     }
                 });
@@ -302,7 +303,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
                 reconnectAttempt.incrementAndGet();
-                logger.info("Retrying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
+                logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
                 // Reconnect after a (short?) delay depending on the amount of reconnect attempts
                 api.getThreadPool().getScheduler()
                         .schedule(() -> {
@@ -327,8 +328,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         String token = api.getToken();
         connectionDelaySemaphorePerAccount.computeIfAbsent(token, key -> new Semaphore(1)).acquireUninterruptibly();
         for (long delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L));
-             delay > 0;
-             delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L))) {
+                delay > 0;
+                delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L))) {
             logger.debug("Delaying connecting by {}ms", delay);
             try {
                 Thread.sleep(delay);
@@ -733,7 +734,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     }
 
     /**
-     * Sends the update status packet
+     * Sends the update status packet.
      */
     public void updateStatus() {
         Optional<Activity> activity = api.getActivity();
@@ -767,8 +768,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             // TODO This is copied from v2. I'm unsure if that's something we should do. Probably not ^^
             case "Flushing frames to the server failed: Connection closed by remote host":
             case "Flushing frames to the server failed: Socket is closed":
-            case "Flushing frames to the server failed: Connection has been shutdown: javax.net.ssl.SSLException:" +
-                    " java.net.SocketException: Connection reset":
+            case "Flushing frames to the server failed: Connection has been shutdown: javax.net.ssl.SSLException:"
+                    + " java.net.SocketException: Connection reset":
             case "An I/O error occurred while a frame was being read from the web socket: Connection reset":
                 break;
             default:

@@ -134,7 +134,8 @@ public class RatelimitManager implements Cleanupable {
                         try {
                             int sleepTime = bucket.getTimeTillSpaceGetsAvailable();
                             if (sleepTime > 0) {
-                                logger.debug("Delaying requests to {} for {}ms to prevent hitting ratelimits", bucket, sleepTime);
+                                logger.debug("Delaying requests to {} for {}ms to prevent hitting ratelimits",
+                                        bucket, sleepTime);
                                 Thread.sleep(sleepTime);
                             }
                         } catch (InterruptedException e) {
@@ -185,7 +186,9 @@ public class RatelimitManager implements Cleanupable {
                                         .getEndpoint()
                                         .getHardcodedRatelimit()
                                         .map(ratelimit -> System.currentTimeMillis() + api.getTimeOffset() + ratelimit)
-                                        .orElseGet(() -> Long.parseLong(response.header("X-RateLimit-Reset", "0")) * 1000);
+                                        .orElseGet(
+                                                () -> Long.parseLong(response.header("X-RateLimit-Reset", "0")) * 1000
+                                        );
                                 String global = response.header("X-RateLimit-Global");
 
                                 if (global != null && global.equals("true")) {

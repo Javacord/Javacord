@@ -16,7 +16,7 @@ public interface InternalChannel extends Channel {
     @Override
     @SuppressWarnings("unchecked")
     default <T extends ChannelAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-    addChannelAttachableListener(T listener) {
+            addChannelAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
                 .filter(ChannelAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
@@ -40,7 +40,7 @@ public interface InternalChannel extends Channel {
 
     @Override
     default <T extends ChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-    getChannelAttachableListeners() {
+            getChannelAttachableListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Channel.class, getId());
     }
 
