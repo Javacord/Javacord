@@ -15,7 +15,7 @@ in less than one week, depending on their size.
 
 ## Download
 The recommended way to "download" Javacord is to use a build manager like Maven.
-If you are not familiar with Maven, you can take a look at the [Setup Guide](https://github.com/BtoBastian/Javacord/wiki#setup) 
+If you are not familiar with Maven, you can take a look at the [Setup Guide](#ide-setup) 
 or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/).
 
 **Repository**
@@ -49,12 +49,11 @@ In this example the version would be `5255914`:
 </dependency>
 ```
 
-## IDE Setup (for beginners)
+## IDE Setup
 
 If you never used maven before you should take a look at the setup tutorial:
-* [IntelliJ Maven Setup](https://github.com/BtoBastian/Javacord3-Docs/wiki/How-to-setup-(IntelliJ-and-Maven))
-* Eclipse Maven Setup - coming soon
-
+* [IntelliJ Maven Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
+* [Eclipse Maven Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))
 ## Support
 
 * [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3) (recommended)
@@ -62,7 +61,7 @@ If you never used maven before you should take a look at the setup tutorial:
 
 ## Wiki
 
-For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord3-Docs/wiki)
+For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord/wiki)
 
 The wiki for Javacord 3 is a work in progress and not complete!
 
@@ -123,7 +122,7 @@ An example bot can be found here: [Example Bot](https://github.com/BtoBastian/Ja
 
 ## How to create a bot user and get its token 
 
-Click here: [Creating a Bot Account](https://github.com/BtoBastian/Javacord3-Docs/wiki/Creating-a-Bot-Account)
+Click here: [Creating a Bot Account](https://github.com/BtoBastian/Javacord/wiki/Creating-a-Bot-Account)
 
 ## Version numbers
 
