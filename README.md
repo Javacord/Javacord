@@ -2,11 +2,6 @@
 # Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg?&style=flat-square" alt="Latest version"></a> <a href="https://ci.javacord.org/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg?style=flat-square" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg?style=flat-square" alt="Javacord Wiki"></a> <a href="https://discord.gg/0qJ2jjyneLEgG7y3"><img src="https://img.shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square" alt="Discord Server"></a>
 A multithreaded but easy to use library to create a Discord bot in Java.
 
-## IMPORTANT
-This README is for the rewrite of Javacord (aka. Javacord 3) and not complete yet (e.g. the wiki is still for version 2.x).
-If you have any trouble with Javacord 3, it's highly recommended to join the Javacord Discord server ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3))
-and ask for help there.
-
 ## Feature Coverage
 
 Javacord covers every action a Discord bot is able to perform (e.g. sending messages, banning users, editing servers, etc.)
@@ -17,6 +12,8 @@ in less than one week, depending on their size.
 The recommended way to "download" Javacord is to use a build manager like Maven.
 If you are not familiar with Maven, you can take a look at the [Setup Guide](#ide-setup) 
 or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/).
+
+Javacord 3 will soon be available on Maven Central.
 
 **Repository**
 ```xml
