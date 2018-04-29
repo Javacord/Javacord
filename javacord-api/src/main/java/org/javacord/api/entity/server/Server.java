@@ -1721,9 +1721,9 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The visible channels of this server.
      */
     default List<ServerChannel> getVisibleChannels(User user) {
-        List<ServerChannel> channels = getChannels();
-        channels.removeIf(channel -> !channel.canSee(user));
-        return Collections.unmodifiableList(channels);
+        return Collections.unmodifiableList(getChannels().stream()
+                .filter(channel -> channel.canSee(user))
+                .collect(Collectors.toList()));
     }
 
     /**
