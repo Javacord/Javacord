@@ -15,14 +15,29 @@ public interface TextChannelEvent extends ChannelEvent {
     @Override
     TextChannel getChannel();
 
+    /**
+     * Gets the channel of the event as a server text channel.
+     *
+     * @return The channel of the event as a server text channel.
+     */
     default Optional<ServerTextChannel> getServerTextChannel() {
         return getChannel().asServerTextChannel();
     }
 
+    /**
+     * Gets the channel of the event as a private channel.
+     *
+     * @return The channel of the event as a private channel.
+     */
     default Optional<PrivateChannel> getPrivateChannel() {
         return getChannel().asPrivateChannel();
     }
 
+    /**
+     * Gets the channel of the event as a group channel.
+     *
+     * @return The channel of the event as a group channel.
+     */
     default Optional<GroupChannel> getGroupChannel() {
         return getChannel().asGroupChannel();
     }

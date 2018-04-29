@@ -961,15 +961,15 @@ public class DiscordApiImpl implements DiscordApi {
         return uncachedMessageUtil;
     }
 
-    /**
-     * Gets the websocket adapter which is used to connect to Discord.
-     *
-     * @return The websocket adapter.
-     */
     /*
      * Note: You might think the return type should be Optional<WebsocketAdapter>, because it's null till we receive
      *       the gateway from Discord. However the DiscordApi instance is only passed to the user, AFTER we connect
      *       so for the end user it is in fact never null.
+     */
+    /**
+     * Gets the websocket adapter which is used to connect to Discord.
+     *
+     * @return The websocket adapter.
      */
     public DiscordWebSocketAdapter getWebSocketAdapter() {
         return websocketAdapter;

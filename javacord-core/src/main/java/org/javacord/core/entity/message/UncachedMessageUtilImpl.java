@@ -46,6 +46,11 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
 
     private final DiscordApiImpl api;
 
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param api The discord api instance.
+     */
     public UncachedMessageUtilImpl(DiscordApiImpl api) {
         this.api = api;
     }

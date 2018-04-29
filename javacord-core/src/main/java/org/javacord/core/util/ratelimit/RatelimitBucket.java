@@ -18,6 +18,12 @@ public class RatelimitBucket {
 
     private volatile boolean hasActiveScheduler = false;
 
+    /**
+     * Creates a RatelimitBucket for the given endpoint / parameter combination.
+     *
+     * @param api The api/shard to use.
+     * @param endpoint The REST endpoint the ratelimit is tracked for.
+     */
     public RatelimitBucket(DiscordApi api, RestEndpoint endpoint) {
         this(api, endpoint, null);
     }

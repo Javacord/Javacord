@@ -115,6 +115,7 @@ public class MessageAuthorImpl implements MessageAuthor {
         return Objects.hash(getId());
     }
 
+    @Override
     public String toString() {
         return String.format("MessageAuthor (id: %s, name: %s)", getIdAsString(), getName());
     }

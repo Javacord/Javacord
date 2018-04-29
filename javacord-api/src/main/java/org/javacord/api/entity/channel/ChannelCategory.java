@@ -25,6 +25,11 @@ public interface ChannelCategory extends ServerChannel {
         return ChannelType.CHANNEL_CATEGORY;
     }
 
+    /**
+     * Gets a list with all channels which this category contains.
+     *
+     * @return A list with all channels which this category contains.
+     */
     List<ServerChannel> getChannels();
 
     /**
