@@ -16,6 +16,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.user.User;
+import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -68,6 +69,11 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
      * A map with all user deafened states to update.
      */
     private final Map<User, Boolean> userDeafened = new HashMap<>();
+
+    /**
+     * A map with all channels to move users to.
+     */
+    private final Map<User, ServerVoiceChannel> userMoveTargets = new HashMap<>();
 
     /**
      * A list with the new order of the roles.
@@ -357,6 +363,11 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
+    public void setVoiceChannel(User user, ServerVoiceChannel channel) {
+        userMoveTargets.put(user, channel);
+    }
+
+    @Override
     public void reorderRoles(List<Role> roles) {
         newRolesOrder = roles;
     }
@@ -398,6 +409,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
         members.addAll(userNicknames.keySet());
         members.addAll(userMuted.keySet());
         members.addAll(userDeafened.keySet());
+        members.addAll(userMoveTargets.keySet());
 
         // A list with all tasks
         List<CompletableFuture<?>> tasks = new ArrayList<>();
@@ -438,6 +450,17 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
             if (userDeafened.containsKey(member)) {
                 updateNode.put("deaf", userDeafened.get(member));
                 patchMember = true;
+            }
+
+            if (userMoveTargets.containsKey(member)) {
+                ServerVoiceChannel channel = userMoveTargets.get(member);
+                if (member.isYourself()) {
+                    ((DiscordApiImpl) server.getApi()).getWebSocketAdapter()
+                            .sendVoiceStateUpdate(server, channel, null, null);
+                } else {
+                    updateNode.put("channel_id", channel.getId());
+                    patchMember = true;
+                }
             }
 
             if (patchMember) {

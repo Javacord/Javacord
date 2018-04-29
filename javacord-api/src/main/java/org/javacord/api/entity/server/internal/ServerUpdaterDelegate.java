@@ -279,6 +279,14 @@ public interface ServerUpdaterDelegate {
     void setDeafened(User user, boolean deafened);
 
     /**
+     * Queues a moving a user to a different voice channel.
+     *
+     * @param user The user who should be moved.
+     * @param channel The new voice channel of the user.
+     */
+    void setVoiceChannel(User user, ServerVoiceChannel channel);
+
+    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.

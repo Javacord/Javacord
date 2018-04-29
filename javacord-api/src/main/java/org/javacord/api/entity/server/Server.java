@@ -1281,6 +1281,17 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     CompletableFuture<Void> reorderRoles(List<Role> roles, String reason);
 
     /**
+     * Moves the given user to the given channel on the server.
+     *
+     * @param user The user to move.
+     * @param channel The channel to move the user to.
+     * @return A future to check if the move was successful.
+     */
+    default CompletableFuture<Void> moveUser(User user, ServerVoiceChannel channel) {
+        return createUpdater().setVoiceChannel(user, channel).update();
+    }
+
+    /**
      * Mutes yourself locally for the server.
      *
      * <p>This cannot be undone by other users. If you want to mute yourself server-sidely, so that others can unmute

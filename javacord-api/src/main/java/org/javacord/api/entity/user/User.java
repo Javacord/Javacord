@@ -263,6 +263,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
+     * Moves this user to the given channel.
+     *
+     * @param channel The channel to move the user to.
+     * @return A future to check if the move was successful.
+     */
+    default CompletableFuture<Void> move(ServerVoiceChannel channel) {
+        return channel.getServer().moveUser(this, channel);
+    }
+
+    /**
      * Gets the self-muted state of the user in the given server.
      *
      * @param server The server to check.
