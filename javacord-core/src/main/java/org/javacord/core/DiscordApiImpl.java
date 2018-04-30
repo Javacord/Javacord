@@ -90,6 +90,7 @@ import org.javacord.api.listener.server.role.UserRoleAddListener;
 import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDeafenedListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
@@ -1887,6 +1888,17 @@ public class DiscordApiImpl implements DiscordApi {
     @Override
     public List<UserChangeMutedListener> getUserChangeMutedListeners() {
         return getListeners(UserChangeMutedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeDeafenedListener> addUserChangeDeafenedListener(
+            UserChangeDeafenedListener listener) {
+        return addListener(UserChangeDeafenedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeDeafenedListener> getUserChangeDeafenedListeners() {
+        return getListeners(UserChangeDeafenedListener.class);
     }
 
     @Override

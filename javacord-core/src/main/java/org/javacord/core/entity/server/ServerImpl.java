@@ -86,6 +86,7 @@ import org.javacord.api.listener.server.role.UserRoleAddListener;
 import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDeafenedListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
@@ -275,6 +276,11 @@ public class ServerImpl implements Server, Cleanupable {
      * A set with all members that are muted.
      */
     private final Set<Long> muted = new ConcurrentSkipListSet<>();
+
+    /**
+     * A set with all members that are deafened.
+     */
+    private final Set<Long> deafened = new ConcurrentSkipListSet<>();
 
     /**
      * A map with all joinedAt instants. The key is the user id.
@@ -686,6 +692,7 @@ public class ServerImpl implements Server, Cleanupable {
         selfMuted.remove(userId);
         selfDeafened.remove(userId);
         muted.remove(userId);
+        deafened.remove(userId);
         getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(user));
         joinedAtTimestamps.remove(userId);
     }
@@ -710,6 +717,9 @@ public class ServerImpl implements Server, Cleanupable {
         }
         if (member.hasNonNull("mute")) {
             setMuted(user.getId(), member.get("mute").asBoolean());
+        }
+        if (member.hasNonNull("deaf")) {
+            setDeafened(user.getId(), member.get("deaf").asBoolean());
         }
 
         for (JsonNode roleIds : member.get("roles")) {
@@ -788,6 +798,20 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     /**
+     * Sets the deafened state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param deafened Whether the user with the given id is deafened or not.
+     */
+    public void setDeafened(long userId, boolean deafened) {
+        if (deafened) {
+            this.deafened.add(userId);
+        } else {
+            this.deafened.remove(userId);
+        }
+    }
+
+    /**
      * Adds members to the server.
      *
      * @param members An array of guild member objects.
@@ -854,6 +878,11 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public boolean isMuted(long userId) {
         return muted.contains(userId);
+    }
+
+    @Override
+    public boolean isDeafened(long userId) {
+        return deafened.contains(userId);
     }
 
     @Override
@@ -1843,6 +1872,18 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public List<UserChangeMutedListener> getUserChangeMutedListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeMutedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeDeafenedListener> addUserChangeDeafenedListener(
+            UserChangeDeafenedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeDeafenedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeDeafenedListener> getUserChangeDeafenedListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeDeafenedListener.class);
     }
 
     @Override

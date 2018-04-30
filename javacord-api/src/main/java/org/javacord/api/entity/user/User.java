@@ -35,6 +35,7 @@ import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserAttachableListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDeafenedListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
@@ -254,6 +255,16 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      */
     default boolean isMuted(Server server) {
         return server.isMuted(getId());
+    }
+
+    /**
+     * Gets the deafened state of the user in the given server.
+     *
+     * @param server The server to check.
+     * @return Whether the user is deafened in the given server.
+     */
+    default boolean isDeafened(Server server) {
+        return server.isDeafened(getId());
     }
 
     /**
@@ -678,6 +689,21 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return A list with all registered user change muted listeners.
      */
     List<UserChangeMutedListener> getUserChangeMutedListeners();
+
+    /**
+     * Adds a listener, which listens to deafened changes of this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeDeafenedListener> addUserChangeDeafenedListener(UserChangeDeafenedListener listener);
+
+    /**
+     * Gets a list with all registered user change deafened listeners.
+     *
+     * @return A list with all registered user change deafened listeners.
+     */
+    List<UserChangeDeafenedListener> getUserChangeDeafenedListeners();
 
     /**
      * Adds a listener, which listens to this user being added to roles.

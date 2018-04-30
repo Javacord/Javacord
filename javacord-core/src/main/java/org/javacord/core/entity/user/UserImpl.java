@@ -30,6 +30,7 @@ import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserAttachableListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDeafenedListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
@@ -530,6 +531,18 @@ public class UserImpl implements User, Cleanupable {
     @Override
     public List<UserChangeMutedListener> getUserChangeMutedListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(User.class, getId(), UserChangeMutedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeDeafenedListener> addUserChangeDeafenedListener(
+            UserChangeDeafenedListener listener) {
+        return ((DiscordApiImpl) getApi())
+                .addObjectListener(User.class, getId(), UserChangeDeafenedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeDeafenedListener> getUserChangeDeafenedListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(User.class, getId(), UserChangeDeafenedListener.class);
     }
 
     @Override

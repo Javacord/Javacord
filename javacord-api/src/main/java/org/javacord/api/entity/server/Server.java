@@ -82,6 +82,7 @@ import org.javacord.api.listener.server.role.UserRoleAddListener;
 import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDeafenedListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
@@ -186,6 +187,24 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      */
     default boolean isMuted(User user) {
         return isMuted(user.getId());
+    }
+
+    /**
+     * Gets the deafened state of the user with the given id.
+     *
+     * @param userId The id of the user to check.
+     * @return Whether the user with the given id is deafened.
+     */
+    boolean isDeafened(long userId);
+
+    /**
+     * Gets the deafened state of the given user.
+     *
+     * @param user The user to check.
+     * @return Whether the given user is deafened.
+     */
+    default boolean isDeafened(User user) {
+        return isDeafened(user.getId());
     }
 
     /**
@@ -2821,6 +2840,21 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return A list with all registered user change muted listeners.
      */
     List<UserChangeMutedListener> getUserChangeMutedListeners();
+
+    /**
+     * Adds a listener, which listens to user deafened changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeDeafenedListener> addUserChangeDeafenedListener(UserChangeDeafenedListener listener);
+
+    /**
+     * Gets a list with all registered user change deafened listeners.
+     *
+     * @return A list with all registered user change deafened listeners.
+     */
+    List<UserChangeDeafenedListener> getUserChangeDeafenedListeners();
 
     /**
      * Adds a listener, which listens to server text channel topic changes in this server.
