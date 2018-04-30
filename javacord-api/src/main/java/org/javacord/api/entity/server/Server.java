@@ -1365,6 +1365,30 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Deafens yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to deafen yourself server-sidely, so that others can
+     * undeafen you, use {@link #deafenYourself()}, {@link #deafenUser(User)} or {@link #deafenUser(User, String)}.
+     *
+     * @see #deafenYourself()
+     * @see #deafenUser(User)
+     * @see #deafenUser(User, String)
+     */
+    void selfDeafen();
+
+    /**
+     * Undeafens yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to undeafen yourself server-sidely, so that others can
+     * deafen you, use {@link #undeafenYourself()}, {@link #undeafenUser(User)} or {@link #undeafenUser(User, String)}.
+     *
+     * @see #undeafenYourself()
+     * @see #undeafenUser(User)
+     * @see #undeafenUser(User, String)
+     */
+    void selfUndeafen();
+
+    /**
      * Deafens yourself on the server.
      *
      * @return A future to check if the deafen was successful.
