@@ -190,6 +190,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Gets your muted state.
+     *
+     * @return Whether you are muted.
+     */
+    default boolean areYouMuted() {
+        return isMuted(getApi().getYourself());
+    }
+
+    /**
      * Gets the muted state of the user with the given id.
      *
      * @param userId The id of the user to check.
