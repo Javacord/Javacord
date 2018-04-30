@@ -1281,6 +1281,24 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     CompletableFuture<Void> reorderRoles(List<Role> roles, String reason);
 
     /**
+     * Mutes yourself on the server.
+     *
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> muteYourself() {
+        return muteUser(getApi().getYourself());
+    }
+
+    /**
+     * Unmutes yourself on the server.
+     *
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmuteYourself() {
+        return unmuteUser(getApi().getYourself());
+    }
+
+    /**
      * Mutes the given user on the server.
      *
      * @param user The user to mute.
