@@ -1365,6 +1365,24 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Deafens yourself on the server.
+     *
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafenYourself() {
+        return deafenUser(getApi().getYourself());
+    }
+
+    /**
+     * Undeafens yourself on the server.
+     *
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafenYourself() {
+        return undeafenUser(getApi().getYourself());
+    }
+
+    /**
      * Deafens the given user on the server.
      *
      * @param user The user to deafen.
