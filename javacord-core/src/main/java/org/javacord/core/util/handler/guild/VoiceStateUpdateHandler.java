@@ -9,13 +9,17 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
+import org.javacord.api.event.user.UserChangeSelfMutedEvent;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
+import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
+import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberJoinEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberLeaveEventImpl;
+import org.javacord.core.event.user.UserChangeSelfMutedEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
@@ -58,36 +62,38 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     private void handleServerVoiceChannel(JsonNode packet, long userId) {
-        Optional<Server> optionalServer = api.getAllServerById(packet.get("guild_id").asLong());
-        Optional<ServerVoiceChannelImpl> oldChannel = optionalServer
-                .flatMap(server -> server.getConnectedVoiceChannel(userId))
-                .map(ServerVoiceChannelImpl.class::cast);
+        api.getAllServerById(packet.get("guild_id").asLong()).map(ServerImpl.class::cast).ifPresent(server -> {
+            Optional<ServerVoiceChannelImpl> oldChannel = server
+                    .getConnectedVoiceChannel(userId)
+                    .map(ServerVoiceChannelImpl.class::cast);
 
-        optionalServer.ifPresent(server -> {
             Optional<ServerVoiceChannelImpl> newChannel;
             if (packet.hasNonNull("channel_id")) {
                 newChannel = server
                         .getVoiceChannelById(packet.get("channel_id").asLong())
                         .map(ServerVoiceChannelImpl.class::cast);
-
-                if (newChannel.equals(oldChannel)) {
-                    return;
-                }
             } else {
                 newChannel = Optional.empty();
             }
 
-            Optional<User> optionalUser = api.getCachedUserById(userId);
+            if (!newChannel.equals(oldChannel)) {
+                oldChannel.ifPresent(channel -> {
+                    channel.removeConnectedUser(userId);
+                    dispatchServerVoiceChannelMemberLeaveEvent(userId, newChannel.orElse(null), channel, server);
+                });
 
-            oldChannel.ifPresent(channel -> {
-                channel.removeConnectedUser(userId);
-                dispatchServerVoiceChannelMemberLeaveEvent(userId, newChannel.orElse(null), channel, server);
-            });
+                newChannel.ifPresent(channel -> {
+                    channel.addConnectedUser(userId);
+                    dispatchServerVoiceChannelMemberJoinEvent(userId, channel, oldChannel.orElse(null), server);
+                });
+            }
 
-            newChannel.ifPresent(channel -> {
-                channel.addConnectedUser(userId);
-                dispatchServerVoiceChannelMemberJoinEvent(userId, channel, oldChannel.orElse(null), server);
-            });
+            boolean newSelfMuted = packet.get("self_mute").asBoolean();
+            boolean oldSelfMuted = server.isSelfMuted(userId);
+            if (newSelfMuted != oldSelfMuted) {
+                server.setSelfMuted(userId, newSelfMuted);
+                dispatchUserChangeSelfMutedEvent(userId, server, newSelfMuted, oldSelfMuted);
+            }
         });
     }
 
@@ -133,6 +139,20 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 
         api.getEventDispatcher().dispatchEvent(server,
                 listeners, listener -> listener.onServerVoiceChannelMemberLeave(event));
+    }
+
+    private void dispatchUserChangeSelfMutedEvent(
+            Long userId, Server server, boolean newSelfMuted, boolean oldSelfMuted) {
+        UserChangeSelfMutedEvent event =
+                new UserChangeSelfMutedEventImpl(userId, server, newSelfMuted, oldSelfMuted);
+
+        List<UserChangeSelfMutedListener> listeners = new ArrayList<>();
+        listeners.addAll(api.getObjectListeners(User.class, userId, UserChangeSelfMutedListener.class));
+        listeners.addAll(server.getUserChangeSelfMutedListeners());
+        listeners.addAll(api.getUserChangeSelfMutedListeners());
+
+        api.getEventDispatcher().dispatchEvent(server,
+                listeners, listener -> listener.onUserChangeSelfMuted(event));
     }
 
 }

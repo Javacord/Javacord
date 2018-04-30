@@ -93,6 +93,7 @@ import org.javacord.api.listener.user.UserChangeAvatarListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.concurrent.ThreadPool;
@@ -1852,6 +1853,17 @@ public class DiscordApiImpl implements DiscordApi {
     @Override
     public List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
         return getListeners(UserChangeNicknameListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeSelfMutedListener> addUserChangeSelfMutedListener(
+            UserChangeSelfMutedListener listener) {
+        return addListener(UserChangeSelfMutedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners() {
+        return getListeners(UserChangeSelfMutedListener.class);
     }
 
     @Override

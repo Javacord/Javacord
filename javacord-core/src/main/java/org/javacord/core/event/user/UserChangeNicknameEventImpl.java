@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * The implementation of {@link UserChangeNicknameEvent}.
  */
-public class UserChangeNicknameEventImpl extends UserEventImpl implements UserChangeNicknameEvent {
+public class UserChangeNicknameEventImpl extends ServerUserEventImpl implements UserChangeNicknameEvent {
 
     /**
      * The new nickname of the user.
@@ -22,11 +22,6 @@ public class UserChangeNicknameEventImpl extends UserEventImpl implements UserCh
     private final String oldNickname;
 
     /**
-     * The server in which the user changed its nickname.
-     */
-    private final Server server;
-
-    /**
      * Creates a new user change nickname event.
      *
      * @param user The user of the event.
@@ -35,15 +30,9 @@ public class UserChangeNicknameEventImpl extends UserEventImpl implements UserCh
      * @param oldNickname The old nickname of the user.
      */
     public UserChangeNicknameEventImpl(User user, Server server, String newNickname, String oldNickname) {
-        super(user);
-        this.server = server;
+        super(user, server);
         this.newNickname = newNickname;
         this.oldNickname = oldNickname;
-    }
-
-    @Override
-    public Server getServer() {
-        return server;
     }
 
     @Override

@@ -85,6 +85,7 @@ import org.javacord.api.listener.user.UserChangeAvatarListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
@@ -130,6 +131,24 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return The nickname of the user.
      */
     Optional<String> getNickname(User user);
+
+    /**
+     * Gets the self-muted state of the user with the given id.
+     *
+     * @param userId The id of the user to check.
+     * @return Whether the user with the given id is self-muted.
+     */
+    boolean isSelfMuted(long userId);
+
+    /**
+     * Gets the self-muted state of the given user.
+     *
+     * @param user The user to check.
+     * @return Whether the given user is self-muted.
+     */
+    default boolean isSelfMuted(User user) {
+        return isSelfMuted(user.getId());
+    }
 
     /**
      * Gets the display name of the user on this server.
@@ -2718,6 +2737,21 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return A list with all registered user change nickname listeners.
      */
     List<UserChangeNicknameListener> getUserChangeNicknameListeners();
+
+    /**
+     * Adds a listener, which listens to user self-muted changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeSelfMutedListener> addUserChangeSelfMutedListener(UserChangeSelfMutedListener listener);
+
+    /**
+     * Gets a list with all registered user change self-muted listeners.
+     *
+     * @return A list with all registered user change self-muted listeners.
+     */
+    List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners();
 
     /**
      * Adds a listener, which listens to server text channel topic changes in this server.

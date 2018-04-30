@@ -89,6 +89,7 @@ import org.javacord.api.listener.user.UserChangeAvatarListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
@@ -125,8 +126,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -255,6 +258,11 @@ public class ServerImpl implements Server, Cleanupable {
      * A map with all nicknames. The key is the user id.
      */
     private final ConcurrentHashMap<Long, String> nicknames = new ConcurrentHashMap<>();
+
+    /**
+     * A set with all members that are self-muted.
+     */
+    private final Set<Long> selfMuted = new ConcurrentSkipListSet<>();
 
     /**
      * A map with all joinedAt instants. The key is the user id.
@@ -660,10 +668,12 @@ public class ServerImpl implements Server, Cleanupable {
      * @param user The user to remove.
      */
     public void removeMember(User user) {
-        members.remove(user.getId());
-        nicknames.remove(user.getId());
+        long userId = user.getId();
+        members.remove(userId);
+        nicknames.remove(userId);
+        selfMuted.remove(userId);
         getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(user));
-        joinedAtTimestamps.remove(user.getId());
+        joinedAtTimestamps.remove(userId);
     }
 
     /**
@@ -719,6 +729,20 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     /**
+     * Sets the self-muted state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param muted Whether the user with the given id is self-muted or not.
+     */
+    public void setSelfMuted(long userId, boolean muted) {
+        if (muted) {
+            selfMuted.add(userId);
+        } else {
+            selfMuted.remove(userId);
+        }
+    }
+
+    /**
      * Adds members to the server.
      *
      * @param members An array of guild member objects.
@@ -770,6 +794,11 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public Optional<String> getNickname(User user) {
         return Optional.ofNullable(nicknames.get(user.getId()));
+    }
+
+    @Override
+    public boolean isSelfMuted(long userId) {
+        return selfMuted.contains(userId);
     }
 
     @Override
@@ -1723,6 +1752,18 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeNicknameListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeSelfMutedListener> addUserChangeSelfMutedListener(
+            UserChangeSelfMutedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeSelfMutedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeSelfMutedListener.class);
     }
 
     @Override
