@@ -217,6 +217,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Gets your deafened state.
+     *
+     * @return Whether you are deafened.
+     */
+    default boolean areYouDeafened() {
+        return isDeafened(getApi().getYourself());
+    }
+
+    /**
      * Gets the deafened state of the user with the given id.
      *
      * @param userId The id of the user to check.
