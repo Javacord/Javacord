@@ -87,6 +87,7 @@ import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
+import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
 import org.javacord.api.listener.user.UserChangeSelfDeafenedListener;
@@ -269,6 +270,11 @@ public class ServerImpl implements Server, Cleanupable {
      * A set with all members that are self-deafened.
      */
     private final Set<Long> selfDeafened = new ConcurrentSkipListSet<>();
+
+    /**
+     * A set with all members that are muted.
+     */
+    private final Set<Long> muted = new ConcurrentSkipListSet<>();
 
     /**
      * A map with all joinedAt instants. The key is the user id.
@@ -679,6 +685,7 @@ public class ServerImpl implements Server, Cleanupable {
         nicknames.remove(userId);
         selfMuted.remove(userId);
         selfDeafened.remove(userId);
+        muted.remove(userId);
         getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(user));
         joinedAtTimestamps.remove(userId);
     }
@@ -700,6 +707,9 @@ public class ServerImpl implements Server, Cleanupable {
         members.put(user.getId(), user);
         if (member.hasNonNull("nick")) {
             nicknames.put(user.getId(), member.get("nick").asText());
+        }
+        if (member.hasNonNull("mute")) {
+            setMuted(user.getId(), member.get("mute").asBoolean());
         }
 
         for (JsonNode roleIds : member.get("roles")) {
@@ -760,6 +770,20 @@ public class ServerImpl implements Server, Cleanupable {
             selfDeafened.add(userId);
         } else {
             selfDeafened.remove(userId);
+        }
+    }
+
+    /**
+     * Sets the muted state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param muted Whether the user with the given id is muted or not.
+     */
+    public void setMuted(long userId, boolean muted) {
+        if (muted) {
+            this.muted.add(userId);
+        } else {
+            this.muted.remove(userId);
         }
     }
 
@@ -825,6 +849,11 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public boolean isSelfDeafened(long userId) {
         return selfDeafened.contains(userId);
+    }
+
+    @Override
+    public boolean isMuted(long userId) {
+        return muted.contains(userId);
     }
 
     @Override
@@ -1803,6 +1832,17 @@ public class ServerImpl implements Server, Cleanupable {
     public List<UserChangeSelfDeafenedListener> getUserChangeSelfDeafenedListeners() {
         return ((DiscordApiImpl) getApi())
                 .getObjectListeners(Server.class, getId(), UserChangeSelfDeafenedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeMutedListener> addUserChangeMutedListener(UserChangeMutedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeMutedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeMutedListener> getUserChangeMutedListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeMutedListener.class);
     }
 
     @Override
