@@ -2199,6 +2199,27 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Checks if the given user can deafen members on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can deafen members or not.
+     */
+    default boolean canDeafenMembers(User user) {
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.VOICE_DEAFEN_MEMBERS);
+    }
+
+    /**
+     * Checks if the user of the connected account can deafen members on the server.
+     *
+     * @return Whether the user of the connected account can deafen members or not.
+     */
+    default boolean canYouDeafenMembers() {
+        return canDeafenMembers(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can manage emojis on the server.
      *
      * @param user The user to check.

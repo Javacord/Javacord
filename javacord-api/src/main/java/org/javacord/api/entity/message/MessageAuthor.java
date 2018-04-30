@@ -152,6 +152,19 @@ public interface MessageAuthor extends DiscordEntity {
     }
 
     /**
+     * Checks if the author can deafen members on the server where the message was sent.
+     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
+     *
+     * @return Whether the author can deafen members on the server or not.
+     */
+    default boolean canDeafenMembersOnServer() {
+        return getMessage()
+                .getServer()
+                .flatMap(server -> asUser().map(server::canDeafenMembers))
+                .orElse(false);
+    }
+
+    /**
      * Checks if the author can manage emojis on the server where the message was sent.
      * Always returns {@code false} if the author is not a user or the message was not sent on a server.
      *
