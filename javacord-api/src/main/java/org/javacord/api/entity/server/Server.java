@@ -2220,6 +2220,27 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     }
 
     /**
+     * Checks if the given user can move members on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can move members or not.
+     */
+    default boolean canMoveMembers(User user) {
+        return hasAnyPermission(user,
+                                PermissionType.ADMINISTRATOR,
+                                PermissionType.VOICE_MOVE_MEMBERS);
+    }
+
+    /**
+     * Checks if the user of the connected account can move members on the server.
+     *
+     * @return Whether the user of the connected account can move members or not.
+     */
+    default boolean canYouMoveMembers() {
+        return canMoveMembers(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can manage emojis on the server.
      *
      * @param user The user to check.
