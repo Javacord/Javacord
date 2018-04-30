@@ -723,7 +723,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the name of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -736,7 +736,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the region of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -749,7 +749,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the explicit content filter level of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -763,7 +763,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the verification level of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -776,7 +776,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the default message notification level of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -790,7 +790,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the afk channel of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -803,7 +803,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Removes the afk channel of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -815,7 +815,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the afk timeout of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -829,7 +829,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     /**
      * Updates the icon of the server.
      * This method assumes the file type is "png"!
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -842,7 +842,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the icon of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -856,7 +856,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the icon of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -869,7 +869,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the icon of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -882,7 +882,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the icon of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -896,7 +896,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     /**
      * Updates the icon of the server.
      * This method assumes the file type is "png"!
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -909,7 +909,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the icon of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -924,7 +924,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     /**
      * Updates the icon of the server.
      * This method assumes the file type is "png"!
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -937,7 +937,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Updates the icon of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -951,7 +951,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
 
     /**
      * Removes the icon of the server.
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -964,7 +964,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     /**
      * Updates the owner of the server.
      * You must be the owner of this server in order to transfer it!
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
@@ -978,7 +978,7 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     /**
      * Updates the splash of the server.
      * This method assumes the file type is "png"!
-     * 
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
