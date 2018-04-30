@@ -1317,6 +1317,16 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     CompletableFuture<Void> reorderRoles(List<Role> roles, String reason);
 
     /**
+     * Moves yourself to the given channel on the server.
+     *
+     * @param channel The channel to move the user to.
+     * @return A future to check if the move was successful.
+     */
+    default CompletableFuture<Void> moveYourself(ServerVoiceChannel channel) {
+        return moveUser(getApi().getYourself(), channel);
+    }
+
+    /**
      * Moves the given user to the given channel on the server.
      *
      * @param user The user to move.
