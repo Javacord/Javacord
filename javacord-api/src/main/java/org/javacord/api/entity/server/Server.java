@@ -136,6 +136,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     Optional<String> getNickname(User user);
 
     /**
+     * Gets your self-muted state.
+     *
+     * @return Whether you are self-muted.
+     */
+    default boolean areYouSelfMuted() {
+        return isSelfMuted(getApi().getYourself());
+    }
+
+    /**
      * Gets the self-muted state of the user with the given id.
      *
      * @param userId The id of the user to check.
