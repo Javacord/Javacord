@@ -85,6 +85,7 @@ import org.javacord.api.listener.user.UserChangeAvatarListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfDeafenedListener;
 import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
@@ -148,6 +149,24 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      */
     default boolean isSelfMuted(User user) {
         return isSelfMuted(user.getId());
+    }
+
+    /**
+     * Gets the self-deafened state of the user with the given id.
+     *
+     * @param userId The id of the user to check.
+     * @return Whether the user with the given id is self-deafened.
+     */
+    boolean isSelfDeafened(long userId);
+
+    /**
+     * Gets the self-deafened state of the given user.
+     *
+     * @param user The user to check.
+     * @return Whether the given user is self-deafened.
+     */
+    default boolean isSelfDeafened(User user) {
+        return isSelfDeafened(user.getId());
     }
 
     /**
@@ -2752,6 +2771,22 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return A list with all registered user change self-muted listeners.
      */
     List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners();
+
+    /**
+     * Adds a listener, which listens to user self-deafened changes in this server.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeSelfDeafenedListener> addUserChangeSelfDeafenedListener(
+            UserChangeSelfDeafenedListener listener);
+
+    /**
+     * Gets a list with all registered user change self-deafened listeners.
+     *
+     * @return A list with all registered user change self-deafened listeners.
+     */
+    List<UserChangeSelfDeafenedListener> getUserChangeSelfDeafenedListeners();
 
     /**
      * Adds a listener, which listens to server text channel topic changes in this server.

@@ -89,6 +89,7 @@ import org.javacord.api.listener.user.UserChangeAvatarListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfDeafenedListener;
 import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
@@ -263,6 +264,11 @@ public class ServerImpl implements Server, Cleanupable {
      * A set with all members that are self-muted.
      */
     private final Set<Long> selfMuted = new ConcurrentSkipListSet<>();
+
+    /**
+     * A set with all members that are self-deafened.
+     */
+    private final Set<Long> selfDeafened = new ConcurrentSkipListSet<>();
 
     /**
      * A map with all joinedAt instants. The key is the user id.
@@ -672,6 +678,7 @@ public class ServerImpl implements Server, Cleanupable {
         members.remove(userId);
         nicknames.remove(userId);
         selfMuted.remove(userId);
+        selfDeafened.remove(userId);
         getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(user));
         joinedAtTimestamps.remove(userId);
     }
@@ -743,6 +750,20 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     /**
+     * Sets the self-deafened state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param deafened Whether the user with the given id is self-deafened or not.
+     */
+    public void setSelfDeafened(long userId, boolean deafened) {
+        if (deafened) {
+            selfDeafened.add(userId);
+        } else {
+            selfDeafened.remove(userId);
+        }
+    }
+
+    /**
      * Adds members to the server.
      *
      * @param members An array of guild member objects.
@@ -799,6 +820,11 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public boolean isSelfMuted(long userId) {
         return selfMuted.contains(userId);
+    }
+
+    @Override
+    public boolean isSelfDeafened(long userId) {
+        return selfDeafened.contains(userId);
     }
 
     @Override
@@ -1764,6 +1790,19 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeSelfMutedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeSelfDeafenedListener> addUserChangeSelfDeafenedListener(
+            UserChangeSelfDeafenedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeSelfDeafenedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeSelfDeafenedListener> getUserChangeSelfDeafenedListeners() {
+        return ((DiscordApiImpl) getApi())
+                .getObjectListeners(Server.class, getId(), UserChangeSelfDeafenedListener.class);
     }
 
     @Override

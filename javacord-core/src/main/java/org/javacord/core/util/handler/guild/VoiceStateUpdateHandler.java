@@ -9,9 +9,11 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
+import org.javacord.api.event.user.UserChangeSelfDeafenedEvent;
 import org.javacord.api.event.user.UserChangeSelfMutedEvent;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
+import org.javacord.api.listener.user.UserChangeSelfDeafenedListener;
 import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
@@ -19,6 +21,7 @@ import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberJoinEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberLeaveEventImpl;
+import org.javacord.core.event.user.UserChangeSelfDeafenedEventImpl;
 import org.javacord.core.event.user.UserChangeSelfMutedEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
@@ -94,6 +97,13 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 server.setSelfMuted(userId, newSelfMuted);
                 dispatchUserChangeSelfMutedEvent(userId, server, newSelfMuted, oldSelfMuted);
             }
+
+            boolean newSelfDeafened = packet.get("self_deaf").asBoolean();
+            boolean oldSelfDeafened = server.isSelfDeafened(userId);
+            if (newSelfDeafened != oldSelfDeafened) {
+                server.setSelfDeafened(userId, newSelfDeafened);
+                dispatchUserChangeSelfDeafenedEvent(userId, server, newSelfDeafened, oldSelfDeafened);
+            }
         });
     }
 
@@ -153,6 +163,20 @@ public class VoiceStateUpdateHandler extends PacketHandler {
 
         api.getEventDispatcher().dispatchEvent(server,
                 listeners, listener -> listener.onUserChangeSelfMuted(event));
+    }
+
+    private void dispatchUserChangeSelfDeafenedEvent(
+            Long userId, Server server, boolean newSelfDeafened, boolean oldSelfDeafened) {
+        UserChangeSelfDeafenedEvent event =
+                new UserChangeSelfDeafenedEventImpl(userId, server, newSelfDeafened, oldSelfDeafened);
+
+        List<UserChangeSelfDeafenedListener> listeners = new ArrayList<>();
+        listeners.addAll(api.getObjectListeners(User.class, userId, UserChangeSelfDeafenedListener.class));
+        listeners.addAll(server.getUserChangeSelfDeafenedListeners());
+        listeners.addAll(api.getUserChangeSelfDeafenedListeners());
+
+        api.getEventDispatcher().dispatchEvent(server,
+                listeners, listener -> listener.onUserChangeSelfDeafened(event));
     }
 
 }

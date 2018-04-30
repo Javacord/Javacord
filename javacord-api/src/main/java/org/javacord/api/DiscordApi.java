@@ -94,6 +94,7 @@ import org.javacord.api.listener.user.UserChangeAvatarListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfDeafenedListener;
 import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
@@ -2458,6 +2459,22 @@ public interface DiscordApi {
      * @return A list with all registered user change self-muted listeners.
      */
     List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners();
+
+    /**
+     * Adds a listener, which listens to user self-deafened changes.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeSelfDeafenedListener> addUserChangeSelfDeafenedListener(
+            UserChangeSelfDeafenedListener listener);
+
+    /**
+     * Gets a list with all registered user change self-deafened listeners.
+     *
+     * @return A list with all registered user change self-deafened listeners.
+     */
+    List<UserChangeSelfDeafenedListener> getUserChangeSelfDeafenedListeners();
 
     /**
      * Adds a listener, which listens to connection losses.
