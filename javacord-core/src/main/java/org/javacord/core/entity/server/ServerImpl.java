@@ -1075,6 +1075,18 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
+    public void selfMute() {
+        api.getWebSocketAdapter().sendVoiceStateUpdate(
+                this, getConnectedVoiceChannel(api.getYourself()).orElse(null), true, null);
+    }
+
+    @Override
+    public void selfUnmute() {
+        api.getWebSocketAdapter().sendVoiceStateUpdate(
+                this, getConnectedVoiceChannel(api.getYourself()).orElse(null), false, null);
+    }
+
+    @Override
     public CompletableFuture<Void> kickUser(User user, String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())

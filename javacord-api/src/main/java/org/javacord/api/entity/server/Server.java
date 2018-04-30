@@ -1281,6 +1281,30 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     CompletableFuture<Void> reorderRoles(List<Role> roles, String reason);
 
     /**
+     * Mutes yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to mute yourself server-sidely, so that others can unmute
+     * you, use {@link #muteYourself()}, {@link #muteUser(User)} or {@link #muteUser(User, String)}.
+     *
+     * @see #muteYourself()
+     * @see #muteUser(User)
+     * @see #muteUser(User, String)
+     */
+    void selfMute();
+
+    /**
+     * Unmutes yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to unmute yourself server-sidely, so that others can
+     * mute you, use {@link #unmuteYourself()}, {@link #unmuteUser(User)} or {@link #unmuteUser(User, String)}.
+     *
+     * @see #unmuteYourself()
+     * @see #unmuteUser(User)
+     * @see #unmuteUser(User, String)
+     */
+    void selfUnmute();
+
+    /**
      * Mutes yourself on the server.
      *
      * @return A future to check if the mute was successful.
