@@ -346,7 +346,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
-    public void addAllRolesToUser(User user, Collection<Role> roles) {
+    public void addRolesToUser(User user, Collection<Role> roles) {
         Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.addAll(roles);
     }
@@ -358,9 +358,15 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
-    public void removeAllRolesFromUser(User user, Collection<Role> roles) {
+    public void removeRolesFromUser(User user, Collection<Role> roles) {
         Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
         userRoles.removeAll(roles);
+    }
+
+    @Override
+    public void removeAllRolesFromUser(User user) {
+        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRolesOf(u)));
+        userRoles.clear();
     }
 
     @Override

@@ -440,8 +440,8 @@ public class ServerUpdater {
      * @param roles The roles which should be added to the server member.
      * @return The current instance in order to chain call methods.
      */
-    public ServerUpdater addAllRolesToUser(User user, Collection<Role> roles) {
-        delegate.addAllRolesToUser(user, roles);
+    public ServerUpdater addRolesToUser(User user, Collection<Role> roles) {
+        delegate.addRolesToUser(user, roles);
         return this;
     }
 
@@ -464,8 +464,19 @@ public class ServerUpdater {
      * @param roles The roles which should be removed from the user.
      * @return The current instance in order to chain call methods.
      */
-    public ServerUpdater removeAllRolesFromUser(User user, Collection<Role> roles) {
-        delegate.removeAllRolesFromUser(user, roles);
+    public ServerUpdater removeRolesFromUser(User user, Collection<Role> roles) {
+        delegate.removeRolesFromUser(user, roles);
+        return this;
+    }
+
+    /**
+     * Queues all roles to be removed from the user.
+     *
+     * @param user The server member the roles should be removed from.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeAllRolesFromUser(User user) {
+        delegate.removeAllRolesFromUser(user);
         return this;
     }
 
