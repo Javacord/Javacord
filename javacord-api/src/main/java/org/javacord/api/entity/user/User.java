@@ -199,6 +199,9 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     /**
      * Changes the nickname of the user in the given server.
      *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
      * @param server The server.
      * @param nickname The new nickname of the user.
      * @return A future to check if the update was successful.
@@ -209,6 +212,9 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Changes the nickname of the user in the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param server The server.
      * @param nickname The new nickname of the user.
@@ -222,6 +228,9 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     /**
      * Removes the nickname of the user in the given server.
      *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
      * @param server The server.
      * @return A future to check if the update was successful.
      */
@@ -231,6 +240,9 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
 
     /**
      * Removes the nickname of the user in the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param server The server.
      * @param reason The audit log reason for this update.

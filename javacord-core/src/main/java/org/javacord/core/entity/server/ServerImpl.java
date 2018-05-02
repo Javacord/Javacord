@@ -3,7 +3,6 @@ package org.javacord.core.entity.server;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
@@ -1029,23 +1028,6 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
-    public CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
-        if (user.isYourself()) {
-            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
-                    .setUrlParameters(getIdAsString())
-                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .setAuditLogReason(reason)
-                    .execute(result -> null);
-        } else {
-            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                    .setUrlParameters(getIdAsString(), user.getIdAsString())
-                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .setAuditLogReason(reason)
-                    .execute(result -> null);
-        }
-    }
-
-    @Override
     public CompletableFuture<Void> delete() {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER)
                 .setUrlParameters(getIdAsString())
@@ -1071,20 +1053,6 @@ public class ServerImpl implements Server, Cleanupable {
     public CompletableFuture<Void> removeRoleFromUser(User user, Role role, String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER_ROLE)
                 .setUrlParameters(getIdAsString(), user.getIdAsString(), role.getIdAsString())
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
-
-    @Override
-    public CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason) {
-        ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
-        ArrayNode rolesJson = updateNode.putArray("roles");
-        for (Role role : roles) {
-            rolesJson.add(role.getIdAsString());
-        }
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setBody(updateNode)
                 .setAuditLogReason(reason)
                 .execute(result -> null);
     }

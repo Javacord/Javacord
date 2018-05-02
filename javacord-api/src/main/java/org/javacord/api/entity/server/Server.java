@@ -1102,43 +1102,57 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     /**
      * Changes the nickname of the given user.
      *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
      * @param user The user.
      * @param nickname The new nickname of the user.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNickname(User user, String nickname) {
-        return updateNickname(user, nickname, null);
+        return createUpdater().setNickname(user, nickname).update();
     }
 
     /**
      * Changes the nickname of the given user.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param user The user.
      * @param nickname The new nickname of the user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> updateNickname(User user, String nickname, String reason);
+    default CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
+        return createUpdater().setNickname(user, nickname).setAuditLogReason(reason).update();
+    }
 
     /**
      * Removes the nickname of the given user.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param user The user.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> resetNickname(User user) {
-        return updateNickname(user, null);
+        return createUpdater().setNickname(user, null).update();
     }
 
     /**
      * Removes the nickname of the given user.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param user The user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> resetNickname(User user, String reason) {
-        return updateNickname(user, null, reason);
+        return createUpdater().setNickname(user, null).setAuditLogReason(reason).update();
     }
 
     /**
@@ -1213,24 +1227,39 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * Updates the roles of a server member.
      * This will replace the roles of the server member with a provided collection.
      *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
      * @param user The user to update the roles of.
      * @param roles The collection of roles to replace the user's roles.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles) {
-        return updateRoles(user, roles, null);
+        return createUpdater()
+                .removeAllRolesFromUser(user)
+                .addRolesToUser(user, roles)
+                .update();
     }
 
     /**
      * Updates the roles of a server member.
      * This will replace the roles of the server member with a provided collection.
      *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
      * @param user The user to update the roles of.
      * @param roles The collection of roles to replace the user's roles.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason);
+    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason) {
+        return createUpdater()
+                .removeAllRolesFromUser(user)
+                .addRolesToUser(user, roles)
+                .setAuditLogReason(reason)
+                .update();
+    }
 
     /**
      * Reorders the roles of the server.

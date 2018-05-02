@@ -1,7 +1,9 @@
 package org.javacord.core.entity.server;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -27,10 +29,10 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link ServerUpdaterDelegate}.
@@ -371,19 +373,54 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
 
     @Override
     public CompletableFuture<Void> update() {
-        // A list with all tasks, initialized with all role updates
-        ArrayList<CompletableFuture<?>> tasks = userRoles.entrySet().stream()
-                .map(entry -> server.updateRoles(entry.getKey(), entry.getValue(), reason))
-                .collect(Collectors.toCollection(ArrayList::new));
-        // User nicknames
-        tasks.addAll(userNicknames.entrySet().stream()
-                             .map(entry -> server.updateNickname(entry.getKey(), entry.getValue(), reason))
-                             .collect(Collectors.toList()));
+        // A set with all members that get updates
+        HashSet<User> members = new HashSet<>(userRoles.keySet());
+        members.addAll(userNicknames.keySet());
+
+        // A list with all tasks
+        List<CompletableFuture<?>> tasks = new ArrayList<>();
+
+        members.forEach(member -> {
+            boolean patchMember = false;
+            ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
+
+            Collection<Role> roles = userRoles.get(member);
+            if (roles != null) {
+                ArrayNode rolesJson = updateNode.putArray("roles");
+                roles.stream()
+                        .map(DiscordEntity::getIdAsString)
+                        .forEach(rolesJson::add);
+                patchMember = true;
+            }
+
+            if (userNicknames.containsKey(member)) {
+                String nickname = userNicknames.get(member);
+                if (member.isYourself()) {
+                    tasks.add(
+                            new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
+                                    .setUrlParameters(server.getIdAsString())
+                                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
+                                    .setAuditLogReason(reason)
+                                    .execute(result -> null));
+                } else {
+                    updateNode.put("nick", (nickname == null) ? "" : nickname);
+                    patchMember = true;
+                }
+            }
+
+            if (patchMember) {
+                tasks.add(
+                        new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
+                                .setUrlParameters(server.getIdAsString(), member.getIdAsString())
+                                .setBody(updateNode)
+                                .setAuditLogReason(reason)
+                                .execute(result -> null));
+            }
+        });
+
         if (newRolesOrder != null) {
             tasks.add(server.reorderRoles(newRolesOrder, reason));
         }
-
-        // TODO nickname update and role update use the same endpoint -> There's potential for saving some REST calls
 
         // Server settings
         boolean patchServer = false;
