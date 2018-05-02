@@ -140,6 +140,9 @@ task buildAll(dependsOn: allprojects.tasks.build)
 release {
     tagTemplate = 'v$version'
     buildTasks = ['buildAll']
+    git {
+        signTag = true
+    }
 }
 
 afterReleaseBuild.dependsOn allprojects.tasks*.withType(PublishToMavenRepository), closeRepository
