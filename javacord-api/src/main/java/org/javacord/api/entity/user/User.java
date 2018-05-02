@@ -230,6 +230,17 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
+     * Removes the nickname of the user in the given server.
+     *
+     * @param server The server.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> resetNickname(Server server, String reason) {
+        return server.resetNickname(this, reason);
+    }
+
+    /**
      * Gets the nickname of the user in the given server.
      *
      * @param server The server to check.
