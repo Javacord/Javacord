@@ -82,7 +82,6 @@ publishing {
             from components.java
             // but do not try to publish the JAR
             artifacts.removeAll { !it.classifier && (it.extension == 'jar') }
-            artifact shadowJar
         }
     }
 }
