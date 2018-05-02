@@ -10,8 +10,8 @@ allprojects { project ->
             url 'https://github.com/BtoBastian/Javacord/issues'
         }
         ciManagement {
-            system 'CircleCI'
-            url 'https://circleci.com/gh/BtoBastian/Javacord'
+            system 'TeamCity'
+            url 'https://ci.javacord.org/project.html?projectId=Javacord&guest=1'
         }
         inceptionYear '2015'
         developers {
