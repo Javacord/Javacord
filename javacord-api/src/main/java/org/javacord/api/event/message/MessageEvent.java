@@ -1,6 +1,7 @@
 package org.javacord.api.event.message;
 
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -27,6 +28,13 @@ public interface MessageEvent extends TextChannelEvent {
      * @return The server of the message.
      */
     Optional<Server> getServer();
+
+    /**
+     * Gets the author of the Message that fired the Event.
+     *
+     * @return The Author of the Message
+     */
+    MessageAuthor getMessageAuthor();
 
     /**
      * Deletes the message involved in the event.

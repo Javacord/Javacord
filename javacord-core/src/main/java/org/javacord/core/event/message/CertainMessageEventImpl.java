@@ -1,6 +1,7 @@
 package org.javacord.core.event.message;
 
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.event.message.CertainMessageEvent;
 
 /**
@@ -28,4 +29,8 @@ public abstract class CertainMessageEventImpl extends MessageEventImpl implement
         return message;
     }
 
+    @Override
+    public MessageAuthor getMessageAuthor() {
+        return message.getAuthor();
+    }
 }
