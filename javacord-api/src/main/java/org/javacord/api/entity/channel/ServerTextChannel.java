@@ -20,6 +20,10 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a server text channel.
  */
 public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionable, Categorizable {
+    @Override
+    default String getMentionTag() {
+        return "<#" + getIdAsString() + ">";
+    }
 
     @Override
     default ChannelType getType() {
