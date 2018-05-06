@@ -41,7 +41,9 @@ import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
 
+import java.awt.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -337,6 +339,37 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      */
     default CompletableFuture<Void> removeRole(Role role, String reason) {
         return role.getServer().removeRoleFromUser(this, role, reason);
+    }
+
+    /**
+     * Gets the highest Role of the User in a server.
+     *
+     * @param server The Server on which the highest role should be found.
+     * @return An Optional that may contain the highest role of the user in the given server.
+     */
+    default Optional<Role> getHighestRole(Server server) {
+        List<Role> collect = new ArrayList<>(server.getRolesOf(this));
+
+        return Optional.ofNullable(collect.get(collect.size()-1));
+    }
+
+    /**
+     * Gets the displayed Color of the User in a server.
+     *
+     * @param server The server on which the displayed Color should be found.
+     * @return The colour of the user in the given server.
+     */
+    default Color getColor(Server server) {
+        List<Color> collect = server
+                .getRolesOf(this)
+                .stream()
+                .map(Role::getColor)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .peek(System.out::println)
+                .collect(Collectors.toList());
+        
+        return (collect.size() > 0 ? collect.get(collect.size()-1) : Color.WHITE);
     }
 
     /**

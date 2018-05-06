@@ -88,11 +88,13 @@ import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -438,6 +440,37 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
                 getMembers().stream()
                         .filter(user -> user.getDisplayName(this).equalsIgnoreCase(displayName))
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets the highest Role of a given User.
+     *
+     * @param user The user whose Role is to be found
+     * @return An Optional that may contain the highest Role of the given User in this guild.
+     */
+    default Optional<Role> getHighestRole(User user) {
+        List<Role> collect = new ArrayList<>(this.getRolesOf(user));
+
+        return Optional.ofNullable(collect.get(collect.size()-1));
+    }
+
+    /**
+     * Gets the displayed Color of an User.
+     *
+     * @param user The user whose Color is to be found
+     * @return The colour of the User in this guild.
+     */
+    default Color getColor(User user) {
+        List<Color> collect = this
+                .getRolesOf(user)
+                .stream()
+                .map(Role::getColor)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .peek(System.out::println)
+                .collect(Collectors.toList());
+
+        return (collect.size() > 0 ? collect.get(collect.size()-1) : Color.WHITE);
     }
 
     /**
