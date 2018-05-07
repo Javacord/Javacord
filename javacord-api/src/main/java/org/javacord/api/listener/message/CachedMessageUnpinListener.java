@@ -11,7 +11,8 @@ import org.javacord.api.listener.server.ServerAttachableListener;
  */
 @FunctionalInterface
 public interface CachedMessageUnpinListener extends ServerAttachableListener, TextChannelAttachableListener,
-        GloballyAttachableListener, ObjectAttachableListener {
+                                                    MessageAttachableListener, GloballyAttachableListener,
+                                                    ObjectAttachableListener {
 
     /**
      * This method is called every time a cached message gets unpinned.
