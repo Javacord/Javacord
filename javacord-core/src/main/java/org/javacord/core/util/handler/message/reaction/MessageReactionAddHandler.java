@@ -7,6 +7,7 @@ import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
+import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
@@ -51,7 +52,7 @@ public class MessageReactionAddHandler extends PacketHandler {
             ReactionAddEvent event = new ReactionAddEventImpl(api, messageId, channel, emoji, user);
 
             List<ReactionAddListener> listeners = new ArrayList<>();
-            listeners.addAll(Message.getReactionAddListeners(api, messageId));
+            listeners.addAll(MessageAttachableListenerManager.getReactionAddListeners(api, messageId));
             listeners.addAll(channel.getReactionAddListeners());
             if (channel instanceof ServerChannel) {
                 listeners.addAll(((ServerChannel) channel).getServer().getReactionAddListeners());

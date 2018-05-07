@@ -3,8 +3,8 @@ package org.javacord.core.util.handler.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.message.Message;
 import org.javacord.api.event.message.MessageDeleteEvent;
+import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.listener.message.MessageDeleteListener;
 import org.javacord.core.event.message.MessageDeleteEventImpl;
 import org.javacord.core.util.cache.MessageCacheImpl;
@@ -39,7 +39,7 @@ public class MessageDeleteHandler extends PacketHandler {
             api.getCachedMessageById(messageId)
                     .ifPresent(((MessageCacheImpl) channel.getMessageCache())::removeMessage);
             api.removeMessageFromCache(messageId);
-            listeners.addAll(Message.getMessageDeleteListeners(api, messageId));
+            listeners.addAll(MessageAttachableListenerManager.getMessageDeleteListeners(api, messageId));
             listeners.addAll(channel.getMessageDeleteListeners());
             if (channel instanceof ServerChannel) {
                 listeners.addAll(((ServerChannel) channel).getServer().getMessageDeleteListeners());

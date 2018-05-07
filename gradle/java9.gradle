@@ -21,7 +21,8 @@ buildscript {
 
 if (JavaVersion.current().java9Compatible) {
     subprojects {
-        task compileJava9(type: JavaCompile, dependsOn: sourceSets.main.runtimeClasspath) {
+        task compileJava9(type: JavaCompile, dependsOn: [sourceSets.main.compileClasspath,
+                                                         sourceSets.main.runtimeClasspath]) {
             description 'Compiles main Java 9 source'
             source sourceSets.main.java
             source 'src/main/java9/'
@@ -33,7 +34,7 @@ if (JavaVersion.current().java9Compatible) {
                 // access SourceDirectorySet#asPath in afterEvaluate
                 // or projects get evaluated before all configuration is done
                 options.compilerArgs << '--module-path'
-                options.compilerArgs << sourceSets.main.runtimeClasspath.asPath
+                options.compilerArgs << (sourceSets.main.compileClasspath + sourceSets.main.runtimeClasspath).asPath
             }
         }
 
@@ -49,6 +50,11 @@ if (JavaVersion.current().java9Compatible) {
     }
 
     project(':javacord-api') {
+        compileJava9 {
+            options.compilerArgs << '--add-modules' << 'java.annotation'
+            options.compilerArgs << '--add-reads' << 'org.javacord.api=java.annotation'
+        }
+
         task generateModuleInfo {
             ext.outputDirectory = "$buildDir/generated/module-info"
 

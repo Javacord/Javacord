@@ -15,8 +15,16 @@ import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.message.CachedMessagePinListener;
 import org.javacord.api.listener.message.CachedMessageUnpinListener;
+import org.javacord.api.listener.message.MessageAttachableListener;
+import org.javacord.api.listener.message.MessageAttachableListenerManager;
+import org.javacord.api.listener.message.MessageDeleteListener;
+import org.javacord.api.listener.message.MessageEditListener;
+import org.javacord.api.listener.message.reaction.ReactionAddListener;
+import org.javacord.api.listener.message.reaction.ReactionRemoveAllListener;
+import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.DiscordApiImpl;
@@ -28,8 +36,10 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -417,6 +427,81 @@ public class MessageImpl implements Message {
     public CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis) {
         return removeOwnReactionsByEmoji(
                 Arrays.stream(unicodeEmojis).map(UnicodeEmojiImpl::fromString).toArray(Emoji[]::new));
+    }
+
+    @Override
+    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener) {
+        return MessageAttachableListenerManager.addMessageDeleteListener(getApi(), getId(), listener);
+    }
+
+    @Override
+    public List<MessageDeleteListener> getMessageDeleteListeners() {
+        return MessageAttachableListenerManager.getMessageDeleteListeners(getApi(), getId());
+    }
+
+    @Override
+    public ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener) {
+        return MessageAttachableListenerManager.addMessageEditListener(getApi(), getId(), listener);
+    }
+
+    @Override
+    public List<MessageEditListener> getMessageEditListeners() {
+        return MessageAttachableListenerManager.getMessageEditListeners(getApi(), getId());
+    }
+
+    @Override
+    public ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener) {
+        return MessageAttachableListenerManager.addReactionAddListener(getApi(), getId(), listener);
+    }
+
+    @Override
+    public List<ReactionAddListener> getReactionAddListeners() {
+        return MessageAttachableListenerManager.getReactionAddListeners(getApi(), getId());
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener) {
+        return MessageAttachableListenerManager.addReactionRemoveListener(getApi(), getId(), listener);
+    }
+
+    @Override
+    public List<ReactionRemoveListener> getReactionRemoveListeners() {
+        return MessageAttachableListenerManager.getReactionRemoveListeners(getApi(), getId());
+    }
+
+    @Override
+    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(
+            ReactionRemoveAllListener listener) {
+        return MessageAttachableListenerManager.addReactionRemoveAllListener(getApi(), getId(), listener);
+    }
+
+    @Override
+    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners() {
+        return MessageAttachableListenerManager.getReactionRemoveAllListeners(getApi(), getId());
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+            addMessageAttachableListener(T listener) {
+        return MessageAttachableListenerManager.addMessageAttachableListener(getApi(), getId(), listener);
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
+            Class<T> listenerClass, T listener) {
+        MessageAttachableListenerManager.removeListener(getApi(), getId(), listenerClass, listener);
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
+            T listener) {
+        MessageAttachableListenerManager.removeMessageAttachableListener(getApi(), getId(), listener);
+    }
+
+    @Override
+    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+            getMessageAttachableListeners() {
+        return MessageAttachableListenerManager.getMessageAttachableListeners(getApi(), getId());
     }
 
     @Override

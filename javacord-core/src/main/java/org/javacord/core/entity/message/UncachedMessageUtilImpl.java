@@ -433,12 +433,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(
-            Message message, MessageDeleteListener listener) {
-        return addMessageDeleteListener(message.getId(), listener);
-    }
-
-    @Override
     public List<MessageDeleteListener> getMessageDeleteListeners(long messageId) {
         return api.getObjectListeners(Message.class, messageId, MessageDeleteListener.class);
     }
@@ -453,19 +447,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public List<MessageDeleteListener> getMessageDeleteListeners(Message message) {
-        return getMessageDeleteListeners(message.getId());
-    }
-
-    @Override
     public ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener) {
         return api.addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
-    }
-
-    @Override
-    public ListenerManager<MessageEditListener> addMessageEditListener(
-            Message message, MessageEditListener listener) {
-        return addMessageEditListener(message.getId(), listener);
     }
 
     @Override
@@ -483,18 +466,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public List<MessageEditListener> getMessageEditListeners(Message message) {
-        return getMessageEditListeners(message.getId());
-    }
-
-    @Override
     public ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener) {
         return api.addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
-    }
-
-    @Override
-    public ListenerManager<ReactionAddListener> addReactionAddListener(Message message, ReactionAddListener listener) {
-        return addReactionAddListener(message.getId(), listener);
     }
 
     @Override
@@ -512,20 +485,9 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public List<ReactionAddListener> getReactionAddListeners(Message message) {
-        return getReactionAddListeners(message.getId());
-    }
-
-    @Override
     public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(long messageId,
                                                                              ReactionRemoveListener listener) {
         return api.addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
-    }
-
-    @Override
-    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(Message message,
-                                                                             ReactionRemoveListener listener) {
-        return addReactionRemoveListener(message.getId(), listener);
     }
 
     @Override
@@ -543,20 +505,9 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public List<ReactionRemoveListener> getReactionRemoveListeners(Message message) {
-        return getReactionRemoveListeners(message.getId());
-    }
-
-    @Override
     public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(long messageId,
                                                                                    ReactionRemoveAllListener listener) {
         return api.addObjectListener(Message.class, messageId, ReactionRemoveAllListener.class, listener);
-    }
-
-    @Override
-    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(Message message,
-                                                                                   ReactionRemoveAllListener listener) {
-        return addReactionRemoveAllListener(message.getId(), listener);
     }
 
     @Override
@@ -571,11 +522,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
         } catch (NumberFormatException ignored) {
             return Collections.emptyList();
         }
-    }
-
-    @Override
-    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(Message message) {
-        return getReactionRemoveAllListeners(message.getId());
     }
 
     @Override
@@ -602,12 +548,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-            addMessageAttachableListener(Message message, T listener) {
-        return addMessageAttachableListener(message.getId(), listener);
-    }
-
-    @Override
     public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
             long messageId, Class<T> listenerClass, T listener) {
         api.removeObjectListener(Message.class, messageId, listenerClass, listener);
@@ -619,12 +559,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
         try {
             removeListener(Long.valueOf(messageId), listenerClass, listener);
         } catch (NumberFormatException ignored) { }
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
-            Message message, Class<T> listenerClass, T listener) {
-        removeListener(message.getId(), listenerClass, listener);
     }
 
     @Override
@@ -647,12 +581,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
-            Message message, T listener) {
-        removeMessageAttachableListener(message.getId(), listener);
-    }
-
-    @Override
     public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
             getMessageAttachableListeners(long messageId) {
         return api.getObjectListeners(Message.class, messageId);
@@ -666,12 +594,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
         } catch (NumberFormatException ignored) {
             return Collections.emptyMap();
         }
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getMessageAttachableListeners(Message message) {
-        return getMessageAttachableListeners(message.getId());
     }
 
 }

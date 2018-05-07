@@ -5,6 +5,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.event.message.reaction.ReactionRemoveAllEvent;
+import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.listener.message.reaction.ReactionRemoveAllListener;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.event.message.reaction.ReactionRemoveAllEventImpl;
@@ -39,7 +40,7 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
             ReactionRemoveAllEvent event = new ReactionRemoveAllEventImpl(api, messageId, channel);
 
             List<ReactionRemoveAllListener> listeners = new ArrayList<>();
-            listeners.addAll(Message.getReactionRemoveAllListeners(api, messageId));
+            listeners.addAll(MessageAttachableListenerManager.getReactionRemoveAllListeners(api, messageId));
             listeners.addAll(channel.getReactionRemoveAllListeners());
             if (channel instanceof ServerChannel) {
                 listeners.addAll(((ServerChannel) channel).getServer().getReactionRemoveAllListeners());
