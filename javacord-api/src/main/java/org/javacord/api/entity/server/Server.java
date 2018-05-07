@@ -62,10 +62,10 @@ import org.javacord.api.listener.server.ServerChangeSplashListener;
 import org.javacord.api.listener.server.ServerChangeSystemChannelListener;
 import org.javacord.api.listener.server.ServerChangeVerificationLevelListener;
 import org.javacord.api.listener.server.ServerLeaveListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiChangeNameListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiCreateListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiDeleteListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeNameListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeWhitelistedRolesListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiCreateListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiDeleteListener;
 import org.javacord.api.listener.server.member.ServerMemberBanListener;
 import org.javacord.api.listener.server.member.ServerMemberJoinListener;
 import org.javacord.api.listener.server.member.ServerMemberLeaveListener;
@@ -2476,14 +2476,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<CustomEmojiCreateListener> addCustomEmojiCreateListener(CustomEmojiCreateListener listener);
+    ListenerManager<KnownCustomEmojiCreateListener> addKnownCustomEmojiCreateListener(
+            KnownCustomEmojiCreateListener listener);
 
     /**
      * Gets a list with all registered custom emoji create listeners.
      *
      * @return A list with all registered custom emoji create listeners.
      */
-    List<CustomEmojiCreateListener> getCustomEmojiCreateListeners();
+    List<KnownCustomEmojiCreateListener> getKnownCustomEmojiCreateListeners();
 
     /**
      * Adds a listener, which listens to custom emoji name changes in this server.
@@ -2491,15 +2492,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
-            CustomEmojiChangeNameListener listener);
+    ListenerManager<KnownCustomEmojiChangeNameListener> addKnownCustomEmojiChangeNameListener(
+            KnownCustomEmojiChangeNameListener listener);
 
     /**
      * Gets a list with all registered custom emoji change name listeners.
      *
      * @return A list with all registered custom emoji change name listeners.
      */
-    List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners();
+    List<KnownCustomEmojiChangeNameListener> getKnownCustomEmojiChangeNameListeners();
 
     /**
      * Adds a listener, which listens to custom emoji whitelisted roles changes in this server.
@@ -2507,15 +2508,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
-            CustomEmojiChangeWhitelistedRolesListener listener);
+    ListenerManager<KnownCustomEmojiChangeWhitelistedRolesListener> addKnownCustomEmojiChangeWhitelistedRolesListener(
+            KnownCustomEmojiChangeWhitelistedRolesListener listener);
 
     /**
      * Gets a list with all registered custom emoji change whitelisted roles listeners.
      *
      * @return A list with all registered custom emoji change whitelisted roles listeners.
      */
-    List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners();
+    List<KnownCustomEmojiChangeWhitelistedRolesListener> getKnownCustomEmojiChangeWhitelistedRolesListeners();
 
     /**
      * Adds a listener, which listens to custom emoji deletions in this server.
@@ -2523,14 +2524,15 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @param listener The listener to add.
      * @return The manager of the listener.
      */
-    ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(CustomEmojiDeleteListener listener);
+    ListenerManager<KnownCustomEmojiDeleteListener> addKnownCustomEmojiDeleteListener(
+            KnownCustomEmojiDeleteListener listener);
 
     /**
      * Gets a list with all registered custom emoji delete listeners.
      *
      * @return A list with all registered custom emoji delete listeners.
      */
-    List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners();
+    List<KnownCustomEmojiDeleteListener> getKnownCustomEmojiDeleteListeners();
 
     /**
      * Adds a listener, which listens to activity changes of users in this server.

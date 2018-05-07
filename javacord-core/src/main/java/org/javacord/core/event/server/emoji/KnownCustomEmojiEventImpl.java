@@ -1,13 +1,13 @@
 package org.javacord.core.event.server.emoji;
 
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
-import org.javacord.api.event.server.emoji.CustomEmojiEvent;
+import org.javacord.api.event.server.emoji.KnownCustomEmojiEvent;
 import org.javacord.core.event.server.ServerEventImpl;
 
 /**
- * The implementation of {@link CustomEmojiEvent}.
+ * The implementation of {@link KnownCustomEmojiEvent}.
  */
-public abstract class CustomEmojiEventImpl extends ServerEventImpl implements CustomEmojiEvent {
+public abstract class KnownCustomEmojiEventImpl extends ServerEventImpl implements KnownCustomEmojiEvent {
 
     /**
      * The custom emoji of the event.
@@ -19,7 +19,7 @@ public abstract class CustomEmojiEventImpl extends ServerEventImpl implements Cu
      *
      * @param emoji The custom emoji of the event.
      */
-    public CustomEmojiEventImpl(KnownCustomEmoji emoji) {
+    public KnownCustomEmojiEventImpl(KnownCustomEmoji emoji) {
         super(emoji.getServer());
         this.emoji = emoji;
     }

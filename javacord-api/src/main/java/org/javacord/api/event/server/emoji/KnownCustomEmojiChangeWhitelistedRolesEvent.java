@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * A custom emoji change whitelisted roles event.
  */
-public interface CustomEmojiChangeWhitelistedRolesEvent extends CustomEmojiEvent {
+public interface KnownCustomEmojiChangeWhitelistedRolesEvent extends KnownCustomEmojiEvent {
 
     /**
      * Gets a list with the old whitelisted roles.

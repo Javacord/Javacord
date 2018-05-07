@@ -5,10 +5,10 @@ import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiAttachableListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiChangeNameListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiDeleteListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiAttachableListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeNameListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeWhitelistedRolesListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiDeleteListener;
 import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.ClassHelper;
@@ -120,51 +120,51 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl implements KnownCustom
     }
 
     @Override
-    public ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
-            CustomEmojiChangeNameListener listener) {
+    public ListenerManager<KnownCustomEmojiChangeNameListener> addKnownCustomEmojiChangeNameListener(
+            KnownCustomEmojiChangeNameListener listener) {
         return ((DiscordApiImpl) getApi())
-                .addObjectListener(KnownCustomEmoji.class, getId(), CustomEmojiChangeNameListener.class,
+                .addObjectListener(KnownCustomEmoji.class, getId(), KnownCustomEmojiChangeNameListener.class,
                         listener);
     }
 
     @Override
-    public List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
+    public List<KnownCustomEmojiChangeNameListener> getKnownCustomEmojiChangeNameListeners() {
         return ((DiscordApiImpl) getApi())
-                .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiChangeNameListener.class);
+                .getObjectListeners(KnownCustomEmoji.class, getId(), KnownCustomEmojiChangeNameListener.class);
     }
 
     @Override
-    public ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
-            CustomEmojiChangeWhitelistedRolesListener listener) {
+    public ListenerManager<KnownCustomEmojiChangeWhitelistedRolesListener>
+            addKnownCustomEmojiChangeWhitelistedRolesListener(KnownCustomEmojiChangeWhitelistedRolesListener listener) {
         return ((DiscordApiImpl) getApi()).addObjectListener(
-                KnownCustomEmoji.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class, listener);
+                KnownCustomEmoji.class, getId(), KnownCustomEmojiChangeWhitelistedRolesListener.class, listener);
     }
 
     @Override
-    public List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners() {
-        return ((DiscordApiImpl) getApi())
-                .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiChangeWhitelistedRolesListener.class);
+    public List<KnownCustomEmojiChangeWhitelistedRolesListener> getKnownCustomEmojiChangeWhitelistedRolesListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(
+                KnownCustomEmoji.class, getId(), KnownCustomEmojiChangeWhitelistedRolesListener.class);
     }
 
     @Override
-    public ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(
-            CustomEmojiDeleteListener listener) {
+    public ListenerManager<KnownCustomEmojiDeleteListener> addKnownCustomEmojiDeleteListener(
+            KnownCustomEmojiDeleteListener listener) {
         return ((DiscordApiImpl) getApi())
-                .addObjectListener(KnownCustomEmoji.class, getId(), CustomEmojiDeleteListener.class, listener);
+                .addObjectListener(KnownCustomEmoji.class, getId(), KnownCustomEmojiDeleteListener.class, listener);
     }
 
     @Override
-    public List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners() {
+    public List<KnownCustomEmojiDeleteListener> getKnownCustomEmojiDeleteListeners() {
         return ((DiscordApiImpl) getApi())
-                .getObjectListeners(KnownCustomEmoji.class, getId(), CustomEmojiDeleteListener.class);
+                .getObjectListeners(KnownCustomEmoji.class, getId(), KnownCustomEmojiDeleteListener.class);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-            addCustomEmojiAttachableListener(T listener) {
+    public <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
+            addKnownCustomEmojiAttachableListener(T listener) {
         return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(CustomEmojiAttachableListener.class::isAssignableFrom)
+                .filter(KnownCustomEmojiAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
                 .map(listenerClass -> ((DiscordApiImpl) getApi()).addObjectListener(KnownCustomEmoji.class, getId(),
@@ -174,10 +174,10 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl implements KnownCustom
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> void
-            removeCustomEmojiAttachableListener(T listener) {
+    public <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> void
+            removeKnownCustomEmojiAttachableListener(T listener) {
         ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(CustomEmojiAttachableListener.class::isAssignableFrom)
+                .filter(KnownCustomEmojiAttachableListener.class::isAssignableFrom)
                 .filter(ObjectAttachableListener.class::isAssignableFrom)
                 .map(listenerClass -> (Class<T>) listenerClass)
                 .forEach(listenerClass -> ((DiscordApiImpl) getApi()).removeObjectListener(KnownCustomEmoji.class,
@@ -185,13 +185,13 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl implements KnownCustom
     }
 
     @Override
-    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getCustomEmojiAttachableListeners() {
+    public <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
+            getKnownCustomEmojiAttachableListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(KnownCustomEmoji.class, getId());
     }
 
     @Override
-    public <T extends CustomEmojiAttachableListener & ObjectAttachableListener> void removeListener(
+    public <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> void removeListener(
             Class<T> listenerClass, T listener) {
         ((DiscordApiImpl) getApi()).removeObjectListener(KnownCustomEmoji.class, getId(), listenerClass, listener);
     }
