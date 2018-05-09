@@ -1,3 +1,4 @@
+@SuppressWarnings("requires-transitive-automatic")
 module org.javacord.core {
     requires logging.interceptor;
 
