@@ -91,6 +91,8 @@ publishing {
     }
 }
 
+apply from: 'gradle/pom.gradle'
+
 allprojects {
     apply plugin: 'signing'
 

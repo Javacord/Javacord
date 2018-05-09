@@ -11,9 +11,10 @@ if (JavaVersion.current().java9Compatible) {
             afterEvaluate {
                 // undo the effect of nebula.java-cross-compile plugin after it was done, thus in afterEvaluate
                 options.bootstrapClasspath = null
-                // access sourceSets.main.runtimeClasspath.asPath in afterEvaluate
-                // or publishing extension has been accessed and cannot be configured further o_O
-                options.compilerArgs << '--module-path' << sourceSets.main.runtimeClasspath.asPath
+                // access SourceDirectorySet#asPath in afterEvaluate
+                // or projects get evaluated before all configuration is done
+                options.compilerArgs << '--module-path'
+                options.compilerArgs << sourceSets.main.runtimeClasspath.asPath
             }
         }
 
