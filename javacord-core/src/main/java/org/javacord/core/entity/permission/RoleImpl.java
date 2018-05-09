@@ -7,22 +7,9 @@ import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.channel.server.ServerChannelChangeOverwrittenPermissionsListener;
-import org.javacord.api.listener.server.role.RoleAttachableListener;
-import org.javacord.api.listener.server.role.RoleChangeColorListener;
-import org.javacord.api.listener.server.role.RoleChangeHoistListener;
-import org.javacord.api.listener.server.role.RoleChangeMentionableListener;
-import org.javacord.api.listener.server.role.RoleChangeNameListener;
-import org.javacord.api.listener.server.role.RoleChangePermissionsListener;
-import org.javacord.api.listener.server.role.RoleChangePositionListener;
-import org.javacord.api.listener.server.role.RoleDeleteListener;
-import org.javacord.api.listener.server.role.UserRoleAddListener;
-import org.javacord.api.listener.server.role.UserRoleRemoveListener;
-import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.util.ClassHelper;
+import org.javacord.core.listener.server.role.InternalRoleAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
@@ -32,17 +19,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link Role}.
  */
-public class RoleImpl implements Role {
+public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
 
     private static final Comparator<Role> ROLE_COMPARATOR = Comparator
             .comparingInt(Role::getPosition)
@@ -282,158 +266,6 @@ public class RoleImpl implements Role {
             throw new IllegalArgumentException("Only roles from the same server can be compared for order");
         }
         return ROLE_COMPARATOR.compare(this, role);
-    }
-
-    @Override
-    public ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                Role.class, getId(), RoleChangeColorListener.class, listener);
-    }
-
-    @Override
-    public List<RoleChangeColorListener> getRoleChangeColorListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), RoleChangeColorListener.class);
-    }
-
-    @Override
-    public ListenerManager<RoleChangeHoistListener> addRoleChangeHoistListener(RoleChangeHoistListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                Role.class, getId(), RoleChangeHoistListener.class, listener);
-    }
-
-    @Override
-    public List<RoleChangeHoistListener> getRoleChangeHoistListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), RoleChangeHoistListener.class);
-    }
-
-    @Override
-    public ListenerManager<RoleChangeMentionableListener> addRoleChangeMentionableListener(
-            RoleChangeMentionableListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                Role.class, getId(), RoleChangeMentionableListener.class, listener);
-    }
-
-    @Override
-    public List<RoleChangeMentionableListener> getRoleChangeMentionableListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), RoleChangeMentionableListener.class);
-    }
-
-    @Override
-    public ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                Role.class, getId(), RoleChangeNameListener.class, listener);
-    }
-
-    @Override
-    public List<RoleChangeNameListener> getRoleChangeNameListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), RoleChangeNameListener.class);
-    }
-
-    @Override
-    public ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
-            RoleChangePermissionsListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                Role.class, getId(), RoleChangePermissionsListener.class, listener);
-    }
-
-    @Override
-    public List<RoleChangePermissionsListener> getRoleChangePermissionsListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), RoleChangePermissionsListener.class);
-    }
-
-    @Override
-    public ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(
-            RoleChangePositionListener listener) {
-        return ((DiscordApiImpl) getApi())
-                .addObjectListener(Role.class, getId(), RoleChangePositionListener.class, listener);
-    }
-
-    @Override
-    public java.util.List<RoleChangePositionListener> getRoleChangePositionListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), RoleChangePositionListener.class);
-    }
-
-    @Override
-    public ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-            addServerChannelChangeOverwrittenPermissionsListener(
-                    ServerChannelChangeOverwrittenPermissionsListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                Role.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class, listener);
-    }
-
-    @Override
-    public java.util.List<ServerChannelChangeOverwrittenPermissionsListener>
-            getServerChannelChangeOverwrittenPermissionsListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(
-                Role.class, getId(), ServerChannelChangeOverwrittenPermissionsListener.class);
-    }
-
-    @Override
-    public ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener) {
-        return ((DiscordApiImpl) getApi())
-                .addObjectListener(Role.class, getId(), RoleDeleteListener.class, listener);
-    }
-
-    @Override
-    public java.util.List<RoleDeleteListener> getRoleDeleteListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), RoleDeleteListener.class);
-    }
-
-    @Override
-    public ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(Role.class, getId(), UserRoleAddListener.class, listener);
-    }
-
-    @Override
-    public java.util.List<UserRoleAddListener> getUserRoleAddListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), UserRoleAddListener.class);
-    }
-
-    @Override
-    public ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener) {
-        return ((DiscordApiImpl) getApi())
-                .addObjectListener(Role.class, getId(), UserRoleRemoveListener.class, listener);
-    }
-
-    @Override
-    public java.util.List<UserRoleRemoveListener> getUserRoleRemoveListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId(), UserRoleRemoveListener.class);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends RoleAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-            addRoleAttachableListener(T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(RoleAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> ((DiscordApiImpl) getApi()).addObjectListener(Role.class, getId(),
-                                                                                    listenerClass, listener))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends RoleAttachableListener & ObjectAttachableListener> void removeRoleAttachableListener(T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(RoleAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> ((DiscordApiImpl) getApi()).removeObjectListener(Role.class, getId(),
-                                                                                           listenerClass, listener));
-    }
-
-    @Override
-    public <T extends RoleAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getRoleAttachableListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Role.class, getId());
-    }
-
-    @Override
-    public <T extends RoleAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-        ((DiscordApiImpl) getApi()).removeObjectListener(Role.class, getId(), listenerClass, listener);
     }
 
     @Override

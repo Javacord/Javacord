@@ -4,23 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.UncachedMessageUtil;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.message.MessageAttachableListener;
-import org.javacord.api.listener.message.MessageDeleteListener;
-import org.javacord.api.listener.message.MessageEditListener;
-import org.javacord.api.listener.message.reaction.ReactionAddListener;
-import org.javacord.api.listener.message.reaction.ReactionRemoveAllListener;
-import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
-import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
-import org.javacord.core.util.ClassHelper;
+import org.javacord.core.listener.message.InternalUncachedMessageAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
@@ -29,7 +22,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +34,7 @@ import java.util.stream.StreamSupport;
 /**
  * This class provides methods to interact with messages without having an instance of it.
  */
-public class UncachedMessageUtilImpl implements UncachedMessageUtil {
+public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUncachedMessageAttachableListenerManager {
 
     private final DiscordApiImpl api;
 
@@ -426,174 +418,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
     }
 
     @Override
-    public ListenerManager<MessageDeleteListener> addMessageDeleteListener(
-            long messageId, MessageDeleteListener listener) {
-        return api.addObjectListener(
-                Message.class, messageId, MessageDeleteListener.class, listener);
-    }
-
-    @Override
-    public List<MessageDeleteListener> getMessageDeleteListeners(long messageId) {
-        return api.getObjectListeners(Message.class, messageId, MessageDeleteListener.class);
-    }
-
-    @Override
-    public List<MessageDeleteListener> getMessageDeleteListeners(String messageId) {
-        try {
-            return getMessageDeleteListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
-    public ListenerManager<MessageEditListener> addMessageEditListener(long messageId, MessageEditListener listener) {
-        return api.addObjectListener(Message.class, messageId, MessageEditListener.class, listener);
-    }
-
-    @Override
-    public List<MessageEditListener> getMessageEditListeners(long messageId) {
-        return api.getObjectListeners(Message.class, messageId, MessageEditListener.class);
-    }
-
-    @Override
-    public List<MessageEditListener> getMessageEditListeners(String messageId) {
-        try {
-            return getMessageEditListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
-    public ListenerManager<ReactionAddListener> addReactionAddListener(long messageId, ReactionAddListener listener) {
-        return api.addObjectListener(Message.class, messageId, ReactionAddListener.class, listener);
-    }
-
-    @Override
-    public List<ReactionAddListener> getReactionAddListeners(long messageId) {
-        return api.getObjectListeners(Message.class, messageId, ReactionAddListener.class);
-    }
-
-    @Override
-    public List<ReactionAddListener> getReactionAddListeners(String messageId) {
-        try {
-            return getReactionAddListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
-    public ListenerManager<ReactionRemoveListener> addReactionRemoveListener(long messageId,
-                                                                             ReactionRemoveListener listener) {
-        return api.addObjectListener(Message.class, messageId, ReactionRemoveListener.class, listener);
-    }
-
-    @Override
-    public List<ReactionRemoveListener> getReactionRemoveListeners(long messageId) {
-        return api.getObjectListeners(Message.class, messageId, ReactionRemoveListener.class);
-    }
-
-    @Override
-    public List<ReactionRemoveListener> getReactionRemoveListeners(String messageId) {
-        try {
-            return getReactionRemoveListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
-    public ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(long messageId,
-                                                                                   ReactionRemoveAllListener listener) {
-        return api.addObjectListener(Message.class, messageId, ReactionRemoveAllListener.class, listener);
-    }
-
-    @Override
-    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(long messageId) {
-        return api.getObjectListeners(Message.class, messageId, ReactionRemoveAllListener.class);
-    }
-
-    @Override
-    public List<ReactionRemoveAllListener> getReactionRemoveAllListeners(String messageId) {
-        try {
-            return getReactionRemoveAllListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-            addMessageAttachableListener(long messageId, T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(MessageAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .map(listenerClass -> api.addObjectListener(
-                        Message.class, messageId, listenerClass, listener))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-            addMessageAttachableListener(String messageId, T listener) {
-        try {
-            return addMessageAttachableListener(Long.valueOf(messageId), listener);
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
-            long messageId, Class<T> listenerClass, T listener) {
-        api.removeObjectListener(Message.class, messageId, listenerClass, listener);
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeListener(
-            String messageId, Class<T> listenerClass, T listener) {
-        try {
-            removeListener(Long.valueOf(messageId), listenerClass, listener);
-        } catch (NumberFormatException ignored) { }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
-            long messageId, T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(MessageAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> removeListener(messageId, listenerClass, listener));
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> void removeMessageAttachableListener(
-            String messageId, T listener) {
-        try {
-            removeMessageAttachableListener(Long.valueOf(messageId), listener);
-        } catch (NumberFormatException ignored) { }
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getMessageAttachableListeners(long messageId) {
-        return api.getObjectListeners(Message.class, messageId);
-    }
-
-    @Override
-    public <T extends MessageAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getMessageAttachableListeners(String messageId) {
-        try {
-            return getMessageAttachableListeners(Long.valueOf(messageId));
-        } catch (NumberFormatException ignored) {
-            return Collections.emptyMap();
-        }
+    public DiscordApi getApi() {
+        return api;
     }
 
 }

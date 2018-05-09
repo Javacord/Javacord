@@ -30,6 +30,8 @@ if (JavaVersion.current().java9Compatible) {
             destinationDir = file("$buildDir/classes/java9/main")
             sourceCompatibility = 9
             targetCompatibility = 9
+            options.compilerArgs << '--add-modules' << 'java.annotation'
+            options.compilerArgs << '--add-reads' << "org.javacord.$shortName=java.annotation"
             afterEvaluate {
                 // access SourceDirectorySet#asPath in afterEvaluate
                 // or projects get evaluated before all configuration is done
@@ -50,11 +52,6 @@ if (JavaVersion.current().java9Compatible) {
     }
 
     project(':javacord-api') {
-        compileJava9 {
-            options.compilerArgs << '--add-modules' << 'java.annotation'
-            options.compilerArgs << '--add-reads' << 'org.javacord.api=java.annotation'
-        }
-
         task generateModuleInfo {
             ext.outputDirectory = "$buildDir/generated/module-info"
 

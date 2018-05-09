@@ -7,18 +7,10 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ChannelAttachableListener;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.TextChannelAttachableListener;
-import org.javacord.api.listener.VoiceChannelAttachableListener;
-import org.javacord.api.listener.channel.group.GroupChannelAttachableListener;
-import org.javacord.api.listener.channel.group.GroupChannelChangeNameListener;
-import org.javacord.api.listener.channel.group.GroupChannelDeleteListener;
 import org.javacord.api.util.cache.MessageCache;
-import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
-import org.javacord.core.util.ClassHelper;
+import org.javacord.core.listener.channel.group.InternalGroupChannelAttachableListenerManager;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -29,17 +21,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * The implementation of {@link GroupChannel}.
  */
-public class GroupChannelImpl
-        implements GroupChannel, Cleanupable, InternalChannel, InternalTextChannel, InternalVoiceChannel {
+public class GroupChannelImpl implements GroupChannel, Cleanupable, InternalTextChannel,
+                                         InternalGroupChannelAttachableListenerManager {
 
     /**
      * The logger of this class.
@@ -146,120 +135,6 @@ public class GroupChannelImpl
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
-    }
-
-    @Override
-    public ListenerManager<GroupChannelChangeNameListener> addGroupChannelChangeNameListener(
-            GroupChannelChangeNameListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                GroupChannel.class, getId(), GroupChannelChangeNameListener.class, listener);
-    }
-
-    @Override
-    public List<GroupChannelChangeNameListener> getGroupChannelChangeNameListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(
-                GroupChannel.class, getId(), GroupChannelChangeNameListener.class);
-    }
-
-    @Override
-    public ListenerManager<GroupChannelDeleteListener> addGroupChannelDeleteListener(
-            GroupChannelDeleteListener listener) {
-        return ((DiscordApiImpl) getApi()).addObjectListener(
-                GroupChannel.class, getId(), GroupChannelDeleteListener.class, listener);
-    }
-
-    @Override
-    public List<GroupChannelDeleteListener> getGroupChannelDeleteListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(
-                GroupChannel.class, getId(), GroupChannelDeleteListener.class);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends GroupChannelAttachableListener & ObjectAttachableListener>
-            Collection<ListenerManager<? extends GroupChannelAttachableListener>> addGroupChannelAttachableListener(
-            T listener) {
-        return ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(GroupChannelAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .flatMap(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addTextChannelAttachableListener(
-                                (TextChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        return addVoiceChannelAttachableListener(
-                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener).stream();
-                    } else {
-                        return Stream.of(((DiscordApiImpl) getApi()).addObjectListener(GroupChannel.class, getId(),
-                                                                                       listenerClass, listener));
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends GroupChannelAttachableListener & ObjectAttachableListener> void
-            removeGroupChannelAttachableListener(T listener) {
-        ClassHelper.getInterfacesAsStream(listener.getClass())
-                .filter(GroupChannelAttachableListener.class::isAssignableFrom)
-                .filter(ObjectAttachableListener.class::isAssignableFrom)
-                .map(listenerClass -> (Class<T>) listenerClass)
-                .forEach(listenerClass -> {
-                    if (ChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeChannelAttachableListener(
-                                (ChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else if (TextChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeTextChannelAttachableListener(
-                                (TextChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else if (VoiceChannelAttachableListener.class.isAssignableFrom(listenerClass)) {
-                        removeVoiceChannelAttachableListener(
-                                (VoiceChannelAttachableListener & ObjectAttachableListener) listener);
-                    } else {
-                        ((DiscordApiImpl) getApi()).removeObjectListener(GroupChannel.class, getId(),
-                                                                         listenerClass, listener);
-                    }
-                });
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends GroupChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getGroupChannelAttachableListeners() {
-        Map<T, List<Class<T>>> groupChannelListeners =
-                ((DiscordApiImpl) getApi()).getObjectListeners(GroupChannel.class, getId());
-        getTextChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
-                .merge((T) listener,
-                        (List<Class<T>>) (Object) listenerClasses,
-                        (listenerClasses1, listenerClasses2) -> {
-                            listenerClasses1.addAll(listenerClasses2);
-                            return listenerClasses1;
-                        }));
-        getVoiceChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
-                .merge((T) listener,
-                        (List<Class<T>>) (Object) listenerClasses,
-                        (listenerClasses1, listenerClasses2) -> {
-                            listenerClasses1.addAll(listenerClasses2);
-                            return listenerClasses1;
-                        }));
-        getChannelAttachableListeners().forEach((listener, listenerClasses) -> groupChannelListeners
-                .merge((T) listener,
-                        (List<Class<T>>) (Object) listenerClasses,
-                        (listenerClasses1, listenerClasses2) -> {
-                            listenerClasses1.addAll(listenerClasses2);
-                            return listenerClasses1;
-                        }));
-        return groupChannelListeners;
-    }
-
-    @Override
-    public <T extends GroupChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener) {
-        ((DiscordApiImpl) getApi()).removeObjectListener(GroupChannel.class, getId(), listenerClass, listener);
     }
 
     @Override

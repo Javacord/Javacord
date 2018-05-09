@@ -3,19 +3,9 @@ package org.javacord.api.entity.message;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.message.MessageAttachableListener;
-import org.javacord.api.listener.message.MessageDeleteListener;
-import org.javacord.api.listener.message.MessageEditListener;
 import org.javacord.api.listener.message.UncachedMessageAttachableListenerManager;
-import org.javacord.api.listener.message.reaction.ReactionAddListener;
-import org.javacord.api.listener.message.reaction.ReactionRemoveAllListener;
-import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
-import org.javacord.api.util.event.ListenerManager;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
