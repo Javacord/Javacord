@@ -53,3 +53,12 @@ project(':javacord-api') {
                     .collect { it.replace '/', '.' }
                     .unique()
 }
+
+project(':javacord-core') {
+    javadoc {
+        dependsOn project(':javacord-api').javadoc
+        def apiJavadocs = project(':javacord-api').javadoc.destinationDir.toURI() as String
+        def releasedApiJavadocs = "http://www.javadoc.io/doc/org.javacord/javacord-api/$version"
+        options.linksOffline releaseVersion ? releasedApiJavadocs : apiJavadocs, apiJavadocs
+    }
+}

@@ -12,8 +12,6 @@ buildscript {
     }
 }
 
-def releaseVersion = !version.toString().endsWith('-SNAPSHOT')
-
 ext {
     it.'signing.secretKeyRingFile' = project.findProperty('javacord.signing.secretKeyRingFile') ?:
             project.findProperty('signing.secretKeyRingFile')

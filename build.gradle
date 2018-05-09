@@ -12,6 +12,10 @@ if (project.hasProperty('teamcity')) {
 
 def rootBuildDir = buildDir
 
+ext {
+    releaseVersion = !version.toString().endsWith('-SNAPSHOT')
+}
+
 allprojects {
     apply plugin: 'java-library'
     apply plugin: 'nebula.java-cross-compile'
