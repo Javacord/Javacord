@@ -4,7 +4,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ChannelAttachableListenerManager;
+import org.javacord.api.listener.channel.ChannelAttachableListenerManager;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;

@@ -11,7 +11,7 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.MessageSetImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
-import org.javacord.core.listener.InternalTextChannelAttachableListenerManager;
+import org.javacord.core.listener.channel.InternalTextChannelAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
