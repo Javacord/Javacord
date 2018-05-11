@@ -10,11 +10,6 @@ import org.javacord.api.event.user.UserChangeAvatarEvent;
 import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeStatusEvent;
-import org.javacord.api.listener.user.UserChangeActivityListener;
-import org.javacord.api.listener.user.UserChangeAvatarListener;
-import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
-import org.javacord.api.listener.user.UserChangeNameListener;
-import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.user.UserChangeActivityEventImpl;
@@ -24,8 +19,7 @@ import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -98,52 +92,52 @@ public class PresenceUpdateHandler extends PacketHandler {
     private void dispatchUserActivityChangeEvent(User user, Activity newActivity, Activity oldActivity) {
         UserChangeActivityEvent event = new UserChangeActivityEventImpl(user, newActivity, oldActivity);
 
-        List<UserChangeActivityListener> listeners = new ArrayList<>(user.getUserChangeActivityListeners());
-        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeActivityListeners()));
-        listeners.addAll(api.getUserChangeActivityListeners());
-
-        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeActivity(event));
+        api.getEventDispatcher().dispatchToUserChangeActivityListeners(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                listener -> listener.onUserChangeActivity(event));
     }
 
     private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {
         UserChangeStatusEvent event = new UserChangeStatusEventImpl(user, newStatus, oldStatus);
 
-        List<UserChangeStatusListener> listeners = new ArrayList<>(user.getUserChangeStatusListeners());
-        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeStatusListeners()));
-        listeners.addAll(api.getUserChangeStatusListeners());
-
-        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeStatus(event));
+        api.getEventDispatcher().dispatchToUserChangeStatusListeners(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                listener -> listener.onUserChangeStatus(event));
     }
 
     private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
         UserChangeNameEvent event = new UserChangeNameEventImpl(user, newName, oldName);
 
-        List<UserChangeNameListener> listeners = new ArrayList<>(user.getUserChangeNameListeners());
-        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeNameListeners()));
-        listeners.addAll(api.getUserChangeNameListeners());
-
-        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeName(event));
+        api.getEventDispatcher().dispatchToUserChangeNameListeners(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                listener -> listener.onUserChangeName(event));
     }
 
     private void dispatchUserChangeDiscriminatorEvent(User user, String newDiscriminator, String oldDiscriminator) {
         UserChangeDiscriminatorEvent event =
                 new UserChangeDiscriminatorEventImpl(user, newDiscriminator, oldDiscriminator);
 
-        List<UserChangeDiscriminatorListener> listeners = new ArrayList<>(user.getUserChangeDiscriminatorListeners());
-        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeDiscriminatorListeners()));
-        listeners.addAll(api.getUserChangeDiscriminatorListeners());
-
-        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeDiscriminator(event));
+        api.getEventDispatcher().dispatchToUserChangeDiscriminatorListeners(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                listener -> listener.onUserChangeDiscriminator(event));
     }
 
     private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
         UserChangeAvatarEvent event = new UserChangeAvatarEventImpl(user, newAvatarHash, oldAvatarHash);
 
-        List<UserChangeAvatarListener> listeners = new ArrayList<>(user.getUserChangeAvatarListeners());
-        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeAvatarListeners()));
-        listeners.addAll(api.getUserChangeAvatarListeners());
-
-        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeAvatar(event));
+        api.getEventDispatcher().dispatchToUserChangeAvatarListeners(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                listener -> listener.onUserChangeAvatar(event));
     }
 
 }

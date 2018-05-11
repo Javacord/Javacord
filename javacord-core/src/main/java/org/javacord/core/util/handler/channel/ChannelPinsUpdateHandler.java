@@ -5,14 +5,12 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.ChannelPinsUpdateEvent;
-import org.javacord.api.listener.message.ChannelPinsUpdateListener;
 import org.javacord.core.event.message.ChannelPinsUpdateEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles the channel pins update packet.
@@ -35,21 +33,13 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
                     ? OffsetDateTime.parse(packet.get("last_pin_timestamp").asText()).toInstant() : null;
             ChannelPinsUpdateEvent event = new ChannelPinsUpdateEventImpl(channel, lastPinTimestamp);
 
-            List<ChannelPinsUpdateListener> listeners = new ArrayList<>(channel.getChannelPinsUpdateListeners());
-            channel.asServerChannel()
-                    .map(ServerChannel::getServer)
-                    .map(Server::getChannelPinsUpdateListeners)
-                    .ifPresent(listeners::addAll);
-            listeners.addAll(api.getChannelPinsUpdateListeners());
-
-            if (channel instanceof ServerChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
-                        listeners, listener -> listener.onChannelPinsUpdate(event));
-            } else {
-                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onChannelPinsUpdate(event));
-            }
+            Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+            api.getEventDispatcher().dispatchToChannelPinsUpdateListeners(
+                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.orElse(null),
+                    channel,
+                    listener -> listener.onChannelPinsUpdate(event));
         });
     }
-
 
 }

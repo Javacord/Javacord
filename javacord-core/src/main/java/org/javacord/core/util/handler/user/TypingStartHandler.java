@@ -3,13 +3,12 @@ package org.javacord.core.util.handler.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.user.UserStartTypingEvent;
-import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.core.event.user.UserStartTypingEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles the typing start packet.
@@ -32,19 +31,13 @@ public class TypingStartHandler extends PacketHandler {
         api.getTextChannelById(channelId).ifPresent(channel -> api.getCachedUserById(userId).ifPresent(user -> {
             UserStartTypingEvent event = new UserStartTypingEventImpl(user, channel);
 
-            List<UserStartTypingListener> listeners = new ArrayList<>(channel.getUserStartTypingListeners());
-            if (channel instanceof ServerChannel) {
-                listeners.addAll(((ServerChannel) channel).getServer().getUserStartTypingListeners());
-            }
-            listeners.addAll(user.getUserStartTypingListeners());
-            listeners.addAll(api.getUserStartTypingListeners());
-
-            if (channel instanceof ServerChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
-                        listeners, listener -> listener.onUserStartTyping(event));
-            } else {
-                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserStartTyping(event));
-            }
+            Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+            api.getEventDispatcher().dispatchToUserStartTypingListeners(
+                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.orElse(null),
+                    channel,
+                    user,
+                    listener -> listener.onUserStartTyping(event));
         }));
     }
 

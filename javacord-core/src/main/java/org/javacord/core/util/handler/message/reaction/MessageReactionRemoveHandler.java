@@ -5,17 +5,14 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
-import org.javacord.api.listener.message.MessageAttachableListenerManager;
-import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.event.message.reaction.ReactionRemoveEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,21 +48,14 @@ public class MessageReactionRemoveHandler extends PacketHandler {
 
             ReactionRemoveEvent event = new ReactionRemoveEventImpl(api, messageId, channel, emoji, user);
 
-            List<ReactionRemoveListener> listeners = new ArrayList<>();
-            listeners.addAll(MessageAttachableListenerManager.getReactionRemoveListeners(api, messageId));
-            listeners.addAll(channel.getReactionRemoveListeners());
-            if (channel instanceof ServerChannel) {
-                listeners.addAll(((ServerChannel) channel).getServer().getReactionRemoveListeners());
-            }
-            listeners.addAll(user.getReactionRemoveListeners());
-            listeners.addAll(api.getReactionRemoveListeners());
-
-            if (channel instanceof ServerChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
-                        listeners, listener -> listener.onReactionRemove(event));
-            } else {
-                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onReactionRemove(event));
-            }
+            Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+            api.getEventDispatcher().dispatchToReactionRemoveListeners(
+                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    messageId,
+                    optionalServer.orElse(null),
+                    channel,
+                    user,
+                    listener -> listener.onReactionRemove(event));
         });
     }
 

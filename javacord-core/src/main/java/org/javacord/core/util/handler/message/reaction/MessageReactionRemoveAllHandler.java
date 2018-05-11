@@ -4,15 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.reaction.ReactionRemoveAllEvent;
-import org.javacord.api.listener.message.MessageAttachableListenerManager;
-import org.javacord.api.listener.message.reaction.ReactionRemoveAllListener;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.event.message.reaction.ReactionRemoveAllEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,20 +36,13 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
 
             ReactionRemoveAllEvent event = new ReactionRemoveAllEventImpl(api, messageId, channel);
 
-            List<ReactionRemoveAllListener> listeners = new ArrayList<>();
-            listeners.addAll(MessageAttachableListenerManager.getReactionRemoveAllListeners(api, messageId));
-            listeners.addAll(channel.getReactionRemoveAllListeners());
-            if (channel instanceof ServerChannel) {
-                listeners.addAll(((ServerChannel) channel).getServer().getReactionRemoveAllListeners());
-            }
-            listeners.addAll(api.getReactionRemoveAllListeners());
-
-            if (channel instanceof ServerChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
-                        listeners, listener -> listener.onReactionRemoveAll(event));
-            } else {
-                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onReactionRemoveAll(event));
-            }
+            Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+            api.getEventDispatcher().dispatchToReactionRemoveAllListeners(
+                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    messageId,
+                    optionalServer.orElse(null),
+                    channel,
+                    listener -> listener.onReactionRemoveAll(event));
         });
     }
 
