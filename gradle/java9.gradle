@@ -1,3 +1,24 @@
+import com.github.javaparser.JavaParser
+import com.github.javaparser.ParserConfiguration.LanguageLevel
+import com.github.javaparser.ast.CompilationUnit
+import com.github.javaparser.ast.PackageDeclaration
+import com.github.javaparser.printer.PrettyPrinter
+import com.github.javaparser.printer.PrettyPrinterConfiguration
+import com.github.javaparser.symbolsolver.JavaSymbolSolver
+import com.github.javaparser.symbolsolver.model.resolution.TypeSolver
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.javaparser:javaparser-symbol-solver-core:3.6.8'
+    }
+}
+
 if (JavaVersion.current().java9Compatible) {
     subprojects {
         task compileJava9(type: JavaCompile, dependsOn: sourceSets.main.runtimeClasspath) {
@@ -28,24 +49,59 @@ if (JavaVersion.current().java9Compatible) {
     }
 
     project(':javacord-api') {
-        task generateModuleInfo(type: Copy) {
-            from 'templates/module-info.java'
-            into "$buildDir/generated/module-info/"
-            def exports = project.sourceSets.main.allJava
-                    .files
-                    *.toURI()
-                    *.toString()
-                    .collect {
-                        it - ~/^(?:${sourceSets.main.java.srcDirs*.toURI()*.toString().join '|'})/ - ~/\/[^\/]*.java$/
+        task generateModuleInfo {
+            ext.outputDirectory = "$buildDir/generated/module-info"
+
+            inputs.files sourceSets.main.allJava withPropertyName 'javaFiles'
+            outputs.dir outputDirectory withPropertyName 'outputDirectory'
+
+            doLast {
+                delete outputDirectory
+
+                def typeSolver = new CombinedTypeSolver(sourceSets.main.allJava.srcDirs
+                        .findAll { it.directory }
+                        .collect { new JavaParserTypeSolver(it) }
+                        as TypeSolver[])
+                typeSolver.add new ReflectionTypeSolver()
+                def staticJavaparserConfiguration = JavaParser.staticConfiguration
+                staticJavaparserConfiguration.symbolResolver = new JavaSymbolSolver(typeSolver)
+                staticJavaparserConfiguration.languageLevel = LanguageLevel.JAVA_9
+
+                def moduleInfoFile = new CompilationUnit()
+                        .setStorage(file("$outputDirectory/module-info.java").toPath())
+
+                def module = moduleInfoFile
+                        .setModule('org.javacord.api')
+                        .addSingleMemberAnnotation(SuppressWarnings, '"module"')
+                        .addDirective('requires transitive java.desktop;')
+                        .addDirective('uses org.javacord.api.util.internal.DelegateFactoryDelegate;')
+
+                sourceSets.main.allJava.matching {
+                    include 'org/javacord/api/**'
+                    exclude 'org/javacord/api/**/internal/**'
+                }.collectMany {
+                    JavaParser.parse(it).findAll PackageDeclaration
+                }.unique().each {
+                    module.addDirective "exports $it.nameAsString;"
+                }
+
+                sourceSets.main.allJava.matching {
+                    include 'org/javacord/api/**/internal/**'
+                }.collectMany {
+                    JavaParser.parse(it).findAll PackageDeclaration
+                }.unique().each {
+                    module.addDirective "exports $it.nameAsString to org.javacord.core;"
+                }
+
+                moduleInfoFile.storage.ifPresent {
+                    it.save {
+                        new PrettyPrinter(new PrettyPrinterConfiguration()
+                                .setOrderImports(true)
+                                .setEndOfLineCharacter('\n')
+                        ).print it
                     }
-                    .collect { it.replace '/', '.' }
-                    .unique()
-                    .collect {
-                        "    exports $it${ it =~ /\.internal(?:\.|$)/ ? ' to org.javacord.core' : '' };"
-                    }
-                    .join('\n')
-            inputs.property 'exports', exports
-            expand exports: exports
+                }
+            }
         }
         rootProject.generate.dependsOn generateModuleInfo
         compileJava9.source generateModuleInfo
