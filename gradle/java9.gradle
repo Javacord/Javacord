@@ -47,6 +47,7 @@ if (JavaVersion.current().java9Compatible) {
             inputs.property 'exports', exports
             expand exports: exports
         }
+        rootProject.generate.dependsOn generateModuleInfo
         compileJava9.source generateModuleInfo
     }
 } else {

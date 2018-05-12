@@ -89,6 +89,8 @@ subprojects {
 
 defaultTasks 'build'
 
+task 'generate'
+
 apply from: 'gradle/dependencies.gradle'
 apply from: 'gradle/jars.gradle'
 apply from: 'gradle/java9.gradle'
