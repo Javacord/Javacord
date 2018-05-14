@@ -1,0 +1,33 @@
+subprojects {
+    apply plugin: 'jacoco'
+    apply plugin: 'groovy'
+
+    dependencies {
+        testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
+
+        testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0'
+    }
+
+    // we don't need aggregation from multiple runs and it prevents caching of the task
+    tasks.withType(Test) {
+        jacoco.append false
+    }
+
+    test.finalizedBy jacocoTestReport
+}
+
+if (project.hasProperty('teamcity')) {
+    afterEvaluate {
+        def dataPaths = subprojects.tasks*.withType(Test).flatten()
+                .extensions*.findByType(JacocoTaskExtension)
+                .destinationFile.absolutePath
+        def rootProjectDirUri = rootProject.projectDir.toURI()
+        def classpaths = subprojects.sourceSets*.findAll { !it.name.toLowerCase().contains('test') }.flatten()
+                .java.outputDir.collect { it.toURI() }
+                .collect { rootProjectDirUri.relativize it }
+                .collect { "+:$it**" }
+        println "##teamcity[jacocoReport " +
+                "dataPath='${dataPaths.join ' '}' " +
+                "classpath='${classpaths.join ' '}']"
+    }
+}
