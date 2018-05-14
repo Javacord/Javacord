@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration name="Javacord Core Test" status="INFO" strict="true">
+    <Appenders>
+        <Console name="Console Appender">
+            <PatternLayout>
+                <Pattern><![CDATA[%d <%p> <%t> <%x> <%X> <%c> %m%n]]></Pattern>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="DEBUG">
+            <AppenderRef ref="Console Appender"/>
+        </Root>
+    </Loggers>
+</Configuration>

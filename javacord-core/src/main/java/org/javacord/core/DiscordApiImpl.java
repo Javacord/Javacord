@@ -552,7 +552,9 @@ public class DiscordApiImpl implements DiscordApi {
      * @return A collection with all servers.
      */
     public Collection<Server> getAllServers() {
-        return Collections.unmodifiableList(new ArrayList<>(nonReadyServers.values()));
+        ArrayList<Server> allServers = new ArrayList<>(nonReadyServers.values());
+        allServers.addAll(servers.values());
+        return Collections.unmodifiableList(allServers);
     }
 
     /**
