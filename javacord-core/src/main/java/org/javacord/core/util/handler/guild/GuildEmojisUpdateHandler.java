@@ -46,7 +46,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         long id = packet.get("guild_id").asLong();
-        api.getAllServerById(id).map(server -> (ServerImpl) server).ifPresent(server -> {
+        api.getPossiblyUnreadyServerById(id).map(server -> (ServerImpl) server).ifPresent(server -> {
             HashMap<Long, JsonNode> emojis = new HashMap<>();
             for (JsonNode emojiJson : packet.get("emojis")) {
                 emojis.put(emojiJson.get("id").asLong(), emojiJson);

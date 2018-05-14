@@ -563,7 +563,7 @@ public class DiscordApiImpl implements DiscordApi {
      * @param id The of the server.
      * @return The server with the given id.
      */
-    public Optional<Server> getAllServerById(long id) {
+    public Optional<Server> getPossiblyUnreadyServerById(long id) {
         if (nonReadyServers.containsKey(id)) {
             return Optional.ofNullable(nonReadyServers.get(id));
         }

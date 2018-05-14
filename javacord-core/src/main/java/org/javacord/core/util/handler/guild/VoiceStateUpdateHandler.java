@@ -71,60 +71,62 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     private void handleServerVoiceChannel(JsonNode packet, long userId) {
-        api.getAllServerById(packet.get("guild_id").asLong()).map(ServerImpl.class::cast).ifPresent(server -> {
-            Optional<ServerVoiceChannelImpl> oldChannel = server
-                    .getConnectedVoiceChannel(userId)
-                    .map(ServerVoiceChannelImpl.class::cast);
+        api.getPossiblyUnreadyServerById(packet.get("guild_id").asLong())
+                .map(ServerImpl.class::cast).ifPresent(server -> {
+                    Optional<ServerVoiceChannelImpl> oldChannel = server
+                            .getConnectedVoiceChannel(userId)
+                            .map(ServerVoiceChannelImpl.class::cast);
 
-            Optional<ServerVoiceChannelImpl> newChannel;
-            if (packet.hasNonNull("channel_id")) {
-                newChannel = server
-                        .getVoiceChannelById(packet.get("channel_id").asLong())
-                        .map(ServerVoiceChannelImpl.class::cast);
-            } else {
-                newChannel = Optional.empty();
-            }
+                    Optional<ServerVoiceChannelImpl> newChannel;
+                    if (packet.hasNonNull("channel_id")) {
+                        newChannel = server
+                                .getVoiceChannelById(packet.get("channel_id").asLong())
+                                .map(ServerVoiceChannelImpl.class::cast);
+                    } else {
+                        newChannel = Optional.empty();
+                    }
 
-            if (!newChannel.equals(oldChannel)) {
-                oldChannel.ifPresent(channel -> {
-                    channel.removeConnectedUser(userId);
-                    dispatchServerVoiceChannelMemberLeaveEvent(userId, newChannel.orElse(null), channel, server);
+                    if (!newChannel.equals(oldChannel)) {
+                        oldChannel.ifPresent(channel -> {
+                            channel.removeConnectedUser(userId);
+                            dispatchServerVoiceChannelMemberLeaveEvent(
+                                    userId, newChannel.orElse(null), channel, server);
+                        });
+
+                        newChannel.ifPresent(channel -> {
+                            channel.addConnectedUser(userId);
+                            dispatchServerVoiceChannelMemberJoinEvent(userId, channel, oldChannel.orElse(null), server);
+                        });
+                    }
+
+                    boolean newSelfMuted = packet.get("self_mute").asBoolean();
+                    boolean oldSelfMuted = server.isSelfMuted(userId);
+                    if (newSelfMuted != oldSelfMuted) {
+                        server.setSelfMuted(userId, newSelfMuted);
+                        dispatchUserChangeSelfMutedEvent(userId, server, newSelfMuted, oldSelfMuted);
+                    }
+
+                    boolean newSelfDeafened = packet.get("self_deaf").asBoolean();
+                    boolean oldSelfDeafened = server.isSelfDeafened(userId);
+                    if (newSelfDeafened != oldSelfDeafened) {
+                        server.setSelfDeafened(userId, newSelfDeafened);
+                        dispatchUserChangeSelfDeafenedEvent(userId, server, newSelfDeafened, oldSelfDeafened);
+                    }
+
+                    boolean newMuted = packet.get("mute").asBoolean();
+                    boolean oldMuted = server.isMuted(userId);
+                    if (newMuted != oldMuted) {
+                        server.setMuted(userId, newMuted);
+                        dispatchUserChangeMutedEvent(userId, server, newMuted, oldMuted);
+                    }
+
+                    boolean newDeafened = packet.get("deaf").asBoolean();
+                    boolean oldDeafened = server.isDeafened(userId);
+                    if (newDeafened != oldDeafened) {
+                        server.setDeafened(userId, newDeafened);
+                        dispatchUserChangeDeafenedEvent(userId, server, newDeafened, oldDeafened);
+                    }
                 });
-
-                newChannel.ifPresent(channel -> {
-                    channel.addConnectedUser(userId);
-                    dispatchServerVoiceChannelMemberJoinEvent(userId, channel, oldChannel.orElse(null), server);
-                });
-            }
-
-            boolean newSelfMuted = packet.get("self_mute").asBoolean();
-            boolean oldSelfMuted = server.isSelfMuted(userId);
-            if (newSelfMuted != oldSelfMuted) {
-                server.setSelfMuted(userId, newSelfMuted);
-                dispatchUserChangeSelfMutedEvent(userId, server, newSelfMuted, oldSelfMuted);
-            }
-
-            boolean newSelfDeafened = packet.get("self_deaf").asBoolean();
-            boolean oldSelfDeafened = server.isSelfDeafened(userId);
-            if (newSelfDeafened != oldSelfDeafened) {
-                server.setSelfDeafened(userId, newSelfDeafened);
-                dispatchUserChangeSelfDeafenedEvent(userId, server, newSelfDeafened, oldSelfDeafened);
-            }
-
-            boolean newMuted = packet.get("mute").asBoolean();
-            boolean oldMuted = server.isMuted(userId);
-            if (newMuted != oldMuted) {
-                server.setMuted(userId, newMuted);
-                dispatchUserChangeMutedEvent(userId, server, newMuted, oldMuted);
-            }
-
-            boolean newDeafened = packet.get("deaf").asBoolean();
-            boolean oldDeafened = server.isDeafened(userId);
-            if (newDeafened != oldDeafened) {
-                server.setDeafened(userId, newDeafened);
-                dispatchUserChangeDeafenedEvent(userId, server, newDeafened, oldDeafened);
-            }
-        });
     }
 
     private void handlePrivateChannel(long userId, PrivateChannelImpl channel) {
