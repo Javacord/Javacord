@@ -30,6 +30,7 @@ import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserAttachableListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
@@ -170,6 +171,15 @@ public class UserImpl implements User, Cleanupable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the discriminator of the user.
+     *
+     * @param discriminator The discriminator to set.
+     */
+    public void setDiscriminator(String discriminator) {
+        this.discriminator = discriminator;
     }
 
     /**
@@ -495,6 +505,19 @@ public class UserImpl implements User, Cleanupable {
     @Override
     public List<UserChangeNameListener> getUserChangeNameListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(User.class, getId(), UserChangeNameListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeDiscriminatorListener> addUserChangeDiscriminatorListener(
+            UserChangeDiscriminatorListener listener) {
+        return ((DiscordApiImpl) getApi())
+                .addObjectListener(User.class, getId(), UserChangeDiscriminatorListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeDiscriminatorListener> getUserChangeDiscriminatorListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(
+                User.class, getId(), UserChangeDiscriminatorListener.class);
     }
 
     @Override

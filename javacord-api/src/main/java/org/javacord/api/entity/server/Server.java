@@ -82,6 +82,7 @@ import org.javacord.api.listener.server.role.UserRoleAddListener;
 import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
@@ -2776,6 +2777,22 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
      * @return A list with all registered user change name listeners.
      */
     List<UserChangeNameListener> getUserChangeNameListeners();
+
+    /**
+     * Adds a listener, which listens to members of this server changing their discriminator.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeDiscriminatorListener> addUserChangeDiscriminatorListener(
+            UserChangeDiscriminatorListener listener);
+
+    /**
+     * Gets a list with all registered user change discriminator listeners.
+     *
+     * @return A list with all registered user change discriminator listeners.
+     */
+    List<UserChangeDiscriminatorListener> getUserChangeDiscriminatorListeners();
 
     /**
      * Adds a listener, which listens to members of this server changing their avatar.

@@ -86,6 +86,7 @@ import org.javacord.api.listener.server.role.UserRoleAddListener;
 import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
@@ -680,7 +681,7 @@ public class ServerImpl implements Server, Cleanupable {
     public void addMember(JsonNode member) {
         User user = api.getOrCreateUser(member.get("user"));
         members.put(user.getId(), user);
-        if (member.has("nick") && !member.get("nick").isNull()) {
+        if (member.hasNonNull("nick")) {
             nicknames.put(user.getId(), member.get("nick").asText());
         }
 
@@ -714,11 +715,7 @@ public class ServerImpl implements Server, Cleanupable {
      * @param nickname The nickname to set.
      */
     public void setNickname(User user, String nickname) {
-        if (nickname == null) {
-            nicknames.remove(user.getId());
-        } else {
-            nicknames.put(user.getId(), nickname);
-        }
+        nicknames.compute(user.getId(), (key, value) -> nickname);
     }
 
     /**
@@ -1767,6 +1764,19 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public List<UserChangeNameListener> getUserChangeNameListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeNameListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeDiscriminatorListener> addUserChangeDiscriminatorListener(
+            UserChangeDiscriminatorListener listener) {
+        return ((DiscordApiImpl) getApi())
+                .addObjectListener(Server.class, getId(), UserChangeDiscriminatorListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeDiscriminatorListener> getUserChangeDiscriminatorListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(
+                Server.class, getId(), UserChangeDiscriminatorListener.class);
     }
 
     @Override
