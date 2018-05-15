@@ -263,6 +263,11 @@ public interface DiscordApi {
     void updateActivity(String name, String streamingUrl);
 
     /**
+     * Unsets the activity of this bot.
+     */
+    void unsetActivity();
+
+    /**
      * Gets the activity which should be displayed.
      * This might not be the activity which is really displayed in the client, but it's the activity which Javacord
      * is trying to set for your bot, so it might change in the client a few seconds afterwards.

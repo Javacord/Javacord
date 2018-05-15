@@ -1068,6 +1068,11 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     @Override
+    public void unsetActivity() {
+        updateActivity(null);
+    }
+
+    @Override
     public Optional<Activity> getActivity() {
         return Optional.ofNullable(activity);
     }
