@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
+import org.javacord.core.util.logging.PrivacyProtectionLogger;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
@@ -120,6 +121,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public void setToken(String token) {
         this.token = token;
+        PrivacyProtectionLogger.addPrivateData(token);
     }
 
     @Override
