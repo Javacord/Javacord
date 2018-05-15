@@ -71,14 +71,6 @@ public class PresenceUpdateHandler extends PacketHandler {
                     dispatchUserChangeNameEvent(user, newName, oldName);
                 }
             }
-            if (packet.get("user").has("username")) {
-                String newName = packet.get("user").get("username").asText();
-                String oldName = user.getName();
-                if (!oldName.equals(newName)) {
-                    user.setName(newName);
-                    dispatchUserChangeNameEvent(user, newName, oldName);
-                }
-            }
             if (packet.get("user").has("avatar")) {
                 String newAvatarHash = packet.get("user").get("avatar").asText(null);
                 String oldAvatarHash = user.getAvatarHash();
