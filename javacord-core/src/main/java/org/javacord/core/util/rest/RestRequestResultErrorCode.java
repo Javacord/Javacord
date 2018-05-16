@@ -29,13 +29,13 @@ public enum RestRequestResultErrorCode {
     UNKNOWN_INTEGRATION(10005, "Unknown integration"),
     UNKNOWN_INVITE(10006, "Unknown invite"),
     UNKNOWN_MEMBER(10007, "Unknown member"),
-    UNKNOWN_MESSAGE(10008, "Unknown message", UnknownMessageException::new),
+    UNKNOWN_MESSAGE(10008, "Unknown message", UnknownMessageException::new, RestRequestHttpResponseCode.NOT_FOUND),
     UNKNOWN_OVERWRITE(10009, "Unknown overwrite"),
     UNKNOWN_PROVIDER(10010, "Unknown provider"),
     UNKNOWN_ROLE(10011, "Unknown role"),
     UNKNOWN_TOKEN(10012, "Unknown token"),
     UNKNOWN_USER(10013, "Unknown user"),
-    UNKNOWN_EMOJI(10014, "Unknown Emoji", UnknownEmojiException::new),
+    UNKNOWN_EMOJI(10014, "Unknown Emoji", UnknownEmojiException::new, RestRequestHttpResponseCode.BAD_REQUEST),
     BOTS_CANNOT_USE_THIS_ENDPOINT(20001, "Bots cannot use this endpoint"),
     ONLY_BOTS_CAN_USE_THIS_ENDPOINT(20002, "Only bots can use this endpoint"),
     MAXIMUM_NUMBER_OF_GUILDS_REACHED(30001, "Maximum number of guilds reached (100)"),
@@ -51,7 +51,8 @@ public enum RestRequestResultErrorCode {
     WIDGET_DISABLED(50004, "Widget Disabled"),
     CANNOT_EDIT_A_MESSAGE_AUTHORED_BY_ANOTHER_USER(50005, "Cannot edit a message authored by another user"),
     CANNOT_SEND_AN_EMPTY_MESSAGE(50006, "Cannot send an empty message"),
-    CANNOT_SEND_MESSAGES_TO_THIS_USER(50007, "Cannot send messages to this user", CannotMessageUserException::new),
+    CANNOT_SEND_MESSAGES_TO_THIS_USER(50007, "Cannot send messages to this user", CannotMessageUserException::new,
+                                      RestRequestHttpResponseCode.FORBIDDEN),
     CANNOT_SEND_MESSAGES_IN_A_VOICE_CHANNEL(50008, "Cannot send messages in a voice channel"),
     CHANNEL_VERIFICATION_LEVEL_IS_TOO_HIGH(50009, "Channel verification level is too high"),
     OAUTH2_APPLICATION_DOES_NOT_HAVE_A_BOT(50010, "OAuth2 application does not have a bot"),
@@ -71,7 +72,7 @@ public enum RestRequestResultErrorCode {
     AN_INVITE_WAS_ACCEPTED_TO_A_GUILD_THE_APPLICATIONS_BOT_IS_NOT_IN(
             50036, "An invite was accepted to a guild the application's bot is not in"),
     INVALID_API_VERSION(50041, "Invalid API version"),
-    REACTION_BLOCKED(90001, "Reaction blocked", ReactionBlockedException::new);
+    REACTION_BLOCKED(90001, "Reaction blocked", ReactionBlockedException::new, RestRequestHttpResponseCode.FORBIDDEN);
 
     /**
      * A map for retrieving the enum instances by code.
@@ -93,6 +94,11 @@ public enum RestRequestResultErrorCode {
      */
     private final DiscordExceptionInstantiator<?> discordExceptionInstantiator;
 
+    /**
+     * The response code for which the given instantiator should be used.
+     */
+    private final RestRequestHttpResponseCode responseCode;
+
     static {
         instanceByCode = Collections.unmodifiableMap(
                 Arrays.stream(values())
@@ -106,7 +112,7 @@ public enum RestRequestResultErrorCode {
      * @param meaning The textual meaning.
      */
     RestRequestResultErrorCode(int code, String meaning) {
-        this(code, meaning, null);
+        this(code, meaning, null, null);
     }
 
     /**
@@ -116,21 +122,26 @@ public enum RestRequestResultErrorCode {
      * @param meaning The textual meaning.
      * @param discordExceptionInstantiator The discord exception instantiator that produces
      *                                     instances to throw for this kind of result code.
+     * @param responseCode The response code for which the given instantiator should be used.
      */
-    RestRequestResultErrorCode(int code, String meaning, DiscordExceptionInstantiator<?> discordExceptionInstantiator) {
+    RestRequestResultErrorCode(int code, String meaning, DiscordExceptionInstantiator<?> discordExceptionInstantiator,
+                               RestRequestHttpResponseCode responseCode) {
         this.code = code;
         this.meaning = meaning;
         this.discordExceptionInstantiator = discordExceptionInstantiator;
+        this.responseCode = responseCode;
     }
 
     /**
      * Gets the rest request result error code by actual numeric result code.
      *
      * @param code The actual numeric close code.
+     * @param responseCode The response code.
      * @return The web socket close code with the actual numeric result code.
      */
-    public static Optional<RestRequestResultErrorCode> fromCode(int code) {
-        return Optional.ofNullable(instanceByCode.get(code));
+    public static Optional<RestRequestResultErrorCode> fromCode(int code, RestRequestHttpResponseCode responseCode) {
+        return Optional.ofNullable(instanceByCode.get(code))
+                .filter(errorCode -> errorCode.responseCode == responseCode);
     }
 
     /**
@@ -164,7 +175,11 @@ public enum RestRequestResultErrorCode {
                                                                     RestRequestInformation request,
                                                                     RestRequestResponseInformation response) {
         return Optional.ofNullable(discordExceptionInstantiator)
-                .map(instantiator -> instantiator.createInstance(origin, message, request, response));
+                .map(instantiator -> instantiator.createInstance(origin, message, request, response))
+                .filter(exception -> RestRequestHttpResponseCode.fromDiscordExceptionClass(exception.getClass())
+                        .map(RestRequestHttpResponseCode::getCode)
+                        .map(code -> code == response.getCode())
+                        .orElse(true));
     }
 
 }

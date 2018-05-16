@@ -384,6 +384,8 @@ public class RestRequest<T> {
                 RestRequestInformation requestInformation = asRestRequestInformation();
                 RestRequestResponseInformation responseInformation = new RestRequestResponseInformationImpl(
                         requestInformation, result);
+                Optional<RestRequestHttpResponseCode> responseCode = RestRequestHttpResponseCode
+                        .fromCode(response.code());
 
                 // Check if the response body contained a know error code
                 if (!result.getJsonBody().isNull() && result.getJsonBody().has("code")) {
@@ -391,10 +393,11 @@ public class RestRequest<T> {
                     String message = result.getJsonBody().has("message")
                             ? result.getJsonBody().get("message").asText()
                             : null;
-                    Optional<? extends DiscordException> discordException = RestRequestResultErrorCode.fromCode(code)
-                            .flatMap(restRequestResultCode -> restRequestResultCode.getDiscordException(
-                                    origin, (message == null) ? restRequestResultCode.getMeaning() : message,
-                                    requestInformation, responseInformation));
+                    Optional<? extends DiscordException> discordException =
+                            RestRequestResultErrorCode.fromCode(code, responseCode.orElse(null))
+                                    .flatMap(restRequestResultCode -> restRequestResultCode.getDiscordException(
+                                            origin, (message == null) ? restRequestResultCode.getMeaning() : message,
+                                            requestInformation, responseInformation));
                     // There's an exception for this specific response code
                     if (discordException.isPresent()) {
                         throw discordException.get();
@@ -407,15 +410,16 @@ public class RestRequest<T> {
                         return result;
                     default:
                         // There are specific exceptions for specific response codes (e.g. NotFoundException for 404)
-                        Optional<? extends DiscordException> discordException = RestRequestHttpResponseCode
-                                .fromCode(response.code()).flatMap(restRequestHttpResponseCode ->
-                                        restRequestHttpResponseCode.getDiscordException(
-                                                origin, "Received a " + response.code() + " response from Discord with"
-                                                        + (result.getBody().isPresent() ? "" : " empty")
-                                                        + " body"
-                                                        + result.getStringBody().map(s -> " " + s).orElse("")
-                                                        + "!",
-                                                requestInformation, responseInformation));
+                        Optional<? extends DiscordException> discordException = responseCode
+                                .flatMap(restRequestHttpResponseCode ->
+                                                 restRequestHttpResponseCode.getDiscordException(
+                                                         origin,
+                                                         "Received a " + response.code() + " response from Discord with"
+                                                         + (result.getBody().isPresent() ? "" : " empty")
+                                                         + " body"
+                                                         + result.getStringBody().map(s -> " " + s).orElse("")
+                                                         + "!",
+                                                         requestInformation, responseInformation));
                         if (discordException.isPresent()) {
                             throw discordException.get();
                         } else {
