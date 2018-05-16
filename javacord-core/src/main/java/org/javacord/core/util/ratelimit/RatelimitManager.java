@@ -169,14 +169,14 @@ public class RatelimitManager implements Cleanupable {
                         } else {
                             restRequestResult.complete(result);
                         }
-                    } catch (Exception e) {
-                        if (e instanceof DiscordException) {
-                            rateLimitHeadersSource = ((DiscordException) e).getResponse()
+                    } catch (Throwable t) {
+                        if (t instanceof DiscordException) {
+                            rateLimitHeadersSource = ((DiscordException) t).getResponse()
                                     .map(response -> ((RestRequestResponseInformationImpl) response))
                                     .map(RestRequestResponseInformationImpl::getRestRequestResult)
                                     .orElse(null);
                         }
-                        restRequestResult.completeExceptionally(e);
+                        restRequestResult.completeExceptionally(t);
                     } finally {
                         try {
                             if (rateLimitHeadersSource != null) {
@@ -198,11 +198,11 @@ public class RatelimitManager implements Cleanupable {
                                 bucket.setRateLimitRemaining(Integer.parseInt(remaining));
                                 bucket.setRateLimitResetTimestamp(reset);
                             }
-                        } catch (Exception e) {
+                        } catch (Throwable t) {
                             if (restRequestResult.isDone()) {
-                                throw e;
+                                throw t;
                             }
-                            restRequestResult.completeExceptionally(e);
+                            restRequestResult.completeExceptionally(t);
                         }
                     }
                     if (remove) {
