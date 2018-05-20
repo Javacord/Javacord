@@ -4,12 +4,33 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents an entity which can receive messages.
  */
 public interface Messageable {
+    /**
+     * Sends a message.
+     * @param items The contents of the message. Can be a {@link String}, an {@link EmbedBuilder} or a {@link File}
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(Object... items) {
+        MessageBuilder messageBuilder = new MessageBuilder();
+
+        Arrays.asList(items).forEach(item -> {
+            if (item instanceof EmbedBuilder) {
+                messageBuilder.setEmbed((EmbedBuilder) item);
+            } else if (item instanceof String) {
+                messageBuilder.append(item);
+            } else if (item instanceof File) {
+                messageBuilder.addAttachment((File) item);
+            }
+        });
+
+        return messageBuilder.send(this);
+    }
 
     /**
      * Sends a message.
