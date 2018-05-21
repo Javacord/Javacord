@@ -59,7 +59,7 @@ public class ChannelCategoryImpl extends ServerChannelImpl implements ChannelCat
     public List<ServerChannel> getChannels() {
         return Collections.unmodifiableList(
                 ((ServerImpl) getServer()).getUnorderedChannels().stream()
-                        .filter(channel -> channel.asCategorizable().map(this::equals).orElse(false))
+                        .filter(channel -> channel.asCategorizable().isPresent())
                         .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
                         .collect(Collectors.toList()));
     }
