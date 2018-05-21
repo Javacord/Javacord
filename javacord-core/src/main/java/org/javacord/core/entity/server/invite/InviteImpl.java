@@ -115,6 +115,16 @@ public class InviteImpl implements RichInvite {
     private final boolean revoked;
 
     /**
+     * The approximate count of members, if available.
+     */
+    private final Integer approximateMemberCount;
+
+    /**
+     * The approximate count of present members, if available.
+     */
+    private final Integer approximatePresenceCount;
+
+    /**
      * Creates a new invite.
      *
      * @param api The discord api instance.
@@ -134,6 +144,14 @@ public class InviteImpl implements RichInvite {
         this.channelId = Long.parseLong(data.get("channel").get("id").asText());
         this.channelName = data.get("channel").get("name").asText();
         this.channelType = ChannelType.fromId(data.get("channel").get("type").asInt());
+
+        // May not be present / only present if requested
+        this.approximateMemberCount = (data.has("approximate_member_count"))
+                ? data.get("approximate_member_count").asInt()
+                : null;
+        this.approximatePresenceCount = (data.has("approximate_presence_count"))
+                ? data.get("approximate_presence_count").asInt()
+                : null;
 
         // Rich data (may not be present)
         this.inviter = data.has("inviter")
@@ -269,5 +287,15 @@ public class InviteImpl implements RichInvite {
     @Override
     public boolean isRevoked() {
         return revoked;
+    }
+
+    @Override
+    public Optional<Integer> getApproximateMemberCount() {
+        return Optional.ofNullable(approximateMemberCount);
+    }
+
+    @Override
+    public Optional<Integer> getApproximatePresenceCount() {
+        return Optional.ofNullable(approximatePresenceCount);
     }
 }

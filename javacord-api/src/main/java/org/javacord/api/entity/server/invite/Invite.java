@@ -117,4 +117,18 @@ public interface Invite {
      */
     CompletableFuture<Void> delete(String reason);
 
+    /**
+     * Gets the approximate number of members for the target server.
+     *
+     * @return The count of members, if available.
+     */
+    Optional<Integer> getApproximateMemberCount();
+
+    /**
+     * Gets the approximate number of online members for the target server.
+     *
+     * @return The count of present members, if available.
+     */
+    Optional<Integer> getApproximatePresenceCount();
+
 }

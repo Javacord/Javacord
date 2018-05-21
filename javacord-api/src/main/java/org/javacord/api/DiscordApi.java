@@ -392,6 +392,14 @@ public interface DiscordApi {
     CompletableFuture<Invite> getInviteByCode(String code);
 
     /**
+     * Gets an invite by its code while requesting additional information.
+     *
+     * @param code The code of the invite.
+     * @return The invite with the given code.
+     */
+    CompletableFuture<Invite> getInviteWithMemberCountsByCode(String code);
+
+    /**
      * Creates a server builder which can be used to create servers.
      *
      * @return A server builder.
