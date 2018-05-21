@@ -158,14 +158,14 @@ public class ChannelUpdateHandler extends PacketHandler {
                             entity = api.getRoleById(permissionOverwriteJson.get("id").asText()).orElseThrow(() ->
                                     new IllegalStateException("Received channel update event with unknown role!"));
                             oldOverwrittenPermissions = channel.getOverwrittenPermissions((Role) entity);
-                            overwrittenPermissions = channel.getOverwrittenRolePermissions();
+                            overwrittenPermissions = channel.getInternalOverwrittenRolePermissions();
                             rolesWithOverwrittenPermissions.add(entity.getId());
                             break;
                         case "member":
                             entity = api.getCachedUserById(permissionOverwriteJson.get("id").asText()).orElseThrow(()
                                     -> new IllegalStateException("Received channel update event with unknown user!"));
                             oldOverwrittenPermissions = channel.getOverwrittenPermissions((User) entity);
-                            overwrittenPermissions = channel.getOverwrittenUserPermissions();
+                            overwrittenPermissions = channel.getInternalOverwrittenUserPermissions();
                             usersWithOverwrittenPermissions.add(entity.getId());
                             break;
                         default:
@@ -184,8 +184,8 @@ public class ChannelUpdateHandler extends PacketHandler {
             }
             ConcurrentHashMap<Long, Permissions> overwrittenRolePermissions = null;
             ConcurrentHashMap<Long, Permissions> overwrittenUserPermissions = null;
-            overwrittenRolePermissions = channel.getOverwrittenRolePermissions();
-            overwrittenUserPermissions = channel.getOverwrittenUserPermissions();
+            overwrittenRolePermissions = channel.getInternalOverwrittenRolePermissions();
+            overwrittenUserPermissions = channel.getInternalOverwrittenUserPermissions();
 
             Iterator<Map.Entry<Long, Permissions>> userIt = overwrittenUserPermissions.entrySet().iterator();
             while (userIt.hasNext()) {

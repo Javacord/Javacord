@@ -143,7 +143,7 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
      *
      * @return The overwritten role permissions.
      */
-    public ConcurrentHashMap<Long, Permissions> getOverwrittenRolePermissions() {
+    public ConcurrentHashMap<Long, Permissions> getInternalOverwrittenRolePermissions() {
         return overwrittenRolePermissions;
     }
 
@@ -152,7 +152,7 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
      *
      * @return The overwritten user permissions.
      */
-    public ConcurrentHashMap<Long, Permissions> getOverwrittenUserPermissions() {
+    public ConcurrentHashMap<Long, Permissions> getInternalOverwrittenUserPermissions() {
         return overwrittenUserPermissions;
     }
 
@@ -318,6 +318,28 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
     @Override
     public Permissions getOverwrittenPermissions(Role role) {
         return overwrittenRolePermissions.getOrDefault(role.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
+    }
+
+    @Override
+    public Map<User, Permissions> getOverwrittenUserPermissions() {
+        Server server = getServer();
+        return Collections.unmodifiableMap(
+                overwrittenUserPermissions.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                entry -> server.getMemberById(entry.getKey()).orElseThrow(AssertionError::new),
+                                Map.Entry::getValue))
+        );
+    }
+
+    @Override
+    public Map<Role, Permissions> getOverwrittenRolePermissions() {
+        Server server = getServer();
+        return Collections.unmodifiableMap(
+                overwrittenRolePermissions.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                entry -> server.getRoleById(entry.getKey()).orElseThrow(AssertionError::new),
+                                Map.Entry::getValue))
+        );
     }
 
     @Override
