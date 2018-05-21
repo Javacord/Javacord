@@ -70,10 +70,10 @@ import org.javacord.api.listener.server.ServerChangeSystemChannelListener;
 import org.javacord.api.listener.server.ServerChangeVerificationLevelListener;
 import org.javacord.api.listener.server.ServerJoinListener;
 import org.javacord.api.listener.server.ServerLeaveListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiChangeNameListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiChangeWhitelistedRolesListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiCreateListener;
-import org.javacord.api.listener.server.emoji.CustomEmojiDeleteListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeNameListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeWhitelistedRolesListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiCreateListener;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiDeleteListener;
 import org.javacord.api.listener.server.member.ServerMemberBanListener;
 import org.javacord.api.listener.server.member.ServerMemberJoinListener;
 import org.javacord.api.listener.server.member.ServerMemberLeaveListener;
@@ -1624,45 +1624,47 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     @Override
-    public ListenerManager<CustomEmojiCreateListener> addCustomEmojiCreateListener(CustomEmojiCreateListener listener) {
-        return addListener(CustomEmojiCreateListener.class, listener);
+    public ListenerManager<KnownCustomEmojiCreateListener> addKnownCustomEmojiCreateListener(
+            KnownCustomEmojiCreateListener listener) {
+        return addListener(KnownCustomEmojiCreateListener.class, listener);
     }
 
     @Override
-    public List<CustomEmojiCreateListener> getCustomEmojiCreateListeners() {
-        return getListeners(CustomEmojiCreateListener.class);
+    public List<KnownCustomEmojiCreateListener> getKnownCustomEmojiCreateListeners() {
+        return getListeners(KnownCustomEmojiCreateListener.class);
     }
 
     @Override
-    public ListenerManager<CustomEmojiChangeNameListener> addCustomEmojiChangeNameListener(
-            CustomEmojiChangeNameListener listener) {
-        return addListener(CustomEmojiChangeNameListener.class, listener);
+    public ListenerManager<KnownCustomEmojiChangeNameListener> addKnownCustomEmojiChangeNameListener(
+            KnownCustomEmojiChangeNameListener listener) {
+        return addListener(KnownCustomEmojiChangeNameListener.class, listener);
     }
 
     @Override
-    public List<CustomEmojiChangeNameListener> getCustomEmojiChangeNameListeners() {
-        return getListeners(CustomEmojiChangeNameListener.class);
+    public List<KnownCustomEmojiChangeNameListener> getKnownCustomEmojiChangeNameListeners() {
+        return getListeners(KnownCustomEmojiChangeNameListener.class);
     }
 
     @Override
-    public ListenerManager<CustomEmojiChangeWhitelistedRolesListener> addCustomEmojiChangeWhitelistedRolesListener(
-            CustomEmojiChangeWhitelistedRolesListener listener) {
-        return addListener(CustomEmojiChangeWhitelistedRolesListener.class, listener);
+    public ListenerManager<KnownCustomEmojiChangeWhitelistedRolesListener>
+            addKnownCustomEmojiChangeWhitelistedRolesListener(KnownCustomEmojiChangeWhitelistedRolesListener listener) {
+        return addListener(KnownCustomEmojiChangeWhitelistedRolesListener.class, listener);
     }
 
     @Override
-    public List<CustomEmojiChangeWhitelistedRolesListener> getCustomEmojiChangeWhitelistedRolesListeners() {
-        return getListeners(CustomEmojiChangeWhitelistedRolesListener.class);
+    public List<KnownCustomEmojiChangeWhitelistedRolesListener> getKnownCustomEmojiChangeWhitelistedRolesListeners() {
+        return getListeners(KnownCustomEmojiChangeWhitelistedRolesListener.class);
     }
 
     @Override
-    public ListenerManager<CustomEmojiDeleteListener> addCustomEmojiDeleteListener(CustomEmojiDeleteListener listener) {
-        return addListener(CustomEmojiDeleteListener.class, listener);
+    public ListenerManager<KnownCustomEmojiDeleteListener> addKnownCustomEmojiDeleteListener(
+            KnownCustomEmojiDeleteListener listener) {
+        return addListener(KnownCustomEmojiDeleteListener.class, listener);
     }
 
     @Override
-    public List<CustomEmojiDeleteListener> getCustomEmojiDeleteListeners() {
-        return getListeners(CustomEmojiDeleteListener.class);
+    public List<KnownCustomEmojiDeleteListener> getKnownCustomEmojiDeleteListeners() {
+        return getListeners(KnownCustomEmojiDeleteListener.class);
     }
 
     @Override

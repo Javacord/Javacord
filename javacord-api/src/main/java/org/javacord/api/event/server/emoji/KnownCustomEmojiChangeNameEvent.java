@@ -3,7 +3,7 @@ package org.javacord.api.event.server.emoji;
 /**
  * A custom emoji change name event.
  */
-public interface CustomEmojiChangeNameEvent extends CustomEmojiEvent {
+public interface KnownCustomEmojiChangeNameEvent extends KnownCustomEmojiEvent {
 
     /**
      * Gets the old name of the custom emoji.

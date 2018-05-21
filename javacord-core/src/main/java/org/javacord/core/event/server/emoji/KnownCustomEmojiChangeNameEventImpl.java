@@ -1,12 +1,13 @@
 package org.javacord.core.event.server.emoji;
 
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
-import org.javacord.api.event.server.emoji.CustomEmojiChangeNameEvent;
+import org.javacord.api.event.server.emoji.KnownCustomEmojiChangeNameEvent;
 
 /**
- * The implementation of {@link CustomEmojiChangeNameEvent}.
+ * The implementation of {@link KnownCustomEmojiChangeNameEvent}.
  */
-public class CustomEmojiChangeNameEventImpl extends CustomEmojiEventImpl implements CustomEmojiChangeNameEvent {
+public class KnownCustomEmojiChangeNameEventImpl extends KnownCustomEmojiEventImpl
+        implements KnownCustomEmojiChangeNameEvent {
 
     /**
      * The new name of the custom emoji.
@@ -25,7 +26,7 @@ public class CustomEmojiChangeNameEventImpl extends CustomEmojiEventImpl impleme
      * @param newName The new name of the custom emoji.
      * @param oldName The old name of the custom emoji.
      */
-    public CustomEmojiChangeNameEventImpl(KnownCustomEmoji emoji, String newName, String oldName) {
+    public KnownCustomEmojiChangeNameEventImpl(KnownCustomEmoji emoji, String newName, String oldName) {
         super(emoji);
         this.newName = newName;
         this.oldName = oldName;

@@ -6,7 +6,7 @@ import org.javacord.api.event.server.ServerEvent;
 /**
  * A custom emoji event.
  */
-public interface CustomEmojiEvent extends ServerEvent {
+public interface KnownCustomEmojiEvent extends ServerEvent {
 
     /**
      * Gets the custom emoji of the event.
