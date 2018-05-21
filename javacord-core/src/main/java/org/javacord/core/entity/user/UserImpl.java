@@ -231,19 +231,37 @@ public class UserImpl implements User, Cleanupable {
         return status;
     }
 
-    @Override
-    public Icon getAvatar() {
-        String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
-        if (avatarHash != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarHash
-                    + (avatarHash.startsWith("a_") ? ".gif" : ".png");
+    /**
+     * Gets the avatar for the given details.
+     *
+     * @param api The discord api instance.
+     * @param avatarHash The avatar hash or {@code null} for default avatar.
+     * @param discriminator The discriminator if default avatar is wanted.
+     * @param userId The user id.
+     * @return The avatar for the given details.
+     */
+    public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId) {
+        StringBuilder url = new StringBuilder("https://cdn.discordapp.com/");
+        if (avatarHash == null) {
+            url.append("embed/avatars/")
+                    .append(Integer.parseInt(discriminator) % 5)
+                    .append(".png");
+        } else {
+            url.append("avatars/")
+                    .append(userId).append('/').append(avatarHash)
+                    .append(avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
         try {
-            return new IconImpl(getApi(), new URL(url));
+            return new IconImpl(api, new URL(url.toString()));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
             return null;
         }
+    }
+
+    @Override
+    public Icon getAvatar() {
+        return getAvatar(api, avatarHash, discriminator, id);
     }
 
     @Override

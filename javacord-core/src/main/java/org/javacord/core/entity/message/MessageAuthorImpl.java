@@ -6,12 +6,8 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
-import org.javacord.core.entity.IconImpl;
-import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
+import org.javacord.core.entity.user.UserImpl;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,11 +15,6 @@ import java.util.Optional;
  * The implementation of {@link MessageAuthor}.
  */
 public class MessageAuthorImpl implements MessageAuthor {
-
-    /**
-     * The logger of this class.
-     */
-    private static final Logger logger = LoggerUtil.getLogger(MessageAuthorImpl.class);
 
     private final Message message;
 
@@ -79,17 +70,7 @@ public class MessageAuthorImpl implements MessageAuthor {
 
     @Override
     public Icon getAvatar() {
-        String url = "https://cdn.discordapp.com/embed/avatars/" + Integer.parseInt(discriminator) % 5 + ".png";
-        if (avatarId != null) {
-            url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId
-                    + (avatarId.startsWith("a_") ? ".gif" : ".png");
-        }
-        try {
-            return new IconImpl(getApi(), new URL(url));
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the avatar is malformed! Please contact the developer!", e);
-            return null;
-        }
+        return UserImpl.getAvatar(message.getApi(), avatarId, discriminator, id);
     }
 
     @Override
