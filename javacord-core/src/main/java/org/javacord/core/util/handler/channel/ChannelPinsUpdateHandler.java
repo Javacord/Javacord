@@ -42,7 +42,12 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
                     .ifPresent(listeners::addAll);
             listeners.addAll(api.getChannelPinsUpdateListeners());
 
-            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onChannelPinsUpdate(event));
+            if (channel instanceof ServerChannel) {
+                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
+                        listeners, listener -> listener.onChannelPinsUpdate(event));
+            } else {
+                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onChannelPinsUpdate(event));
+            }
         });
     }
 
