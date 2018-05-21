@@ -7,16 +7,19 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.event.user.UserChangeActivityEvent;
 import org.javacord.api.event.user.UserChangeAvatarEvent;
+import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeStatusEvent;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.user.UserChangeActivityEventImpl;
 import org.javacord.core.event.user.UserChangeAvatarEventImpl;
+import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
 import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
@@ -41,6 +44,8 @@ public class PresenceUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
+        // ignore the guild_id and send to all mutual servers instead or we must track the properties per server
+        // or all packets after the first do not detect a change and will not send around an event for the server
         long userId = packet.get("user").get("id").asLong();
         api.getCachedUserById(userId).map(UserImpl.class::cast).ifPresent(user -> {
             if (packet.has("game")) {
@@ -69,6 +74,14 @@ public class PresenceUpdateHandler extends PacketHandler {
                 if (!oldName.equals(newName)) {
                     user.setName(newName);
                     dispatchUserChangeNameEvent(user, newName, oldName);
+                }
+            }
+            if (packet.get("user").has("discriminator")) {
+                String newDiscriminator = packet.get("user").get("discriminator").asText();
+                String oldDiscriminator = user.getDiscriminator();
+                if (!oldDiscriminator.equals(newDiscriminator)) {
+                    user.setDiscriminator(newDiscriminator);
+                    dispatchUserChangeDiscriminatorEvent(user, newDiscriminator, oldDiscriminator);
                 }
             }
             if (packet.get("user").has("avatar")) {
@@ -110,6 +123,17 @@ public class PresenceUpdateHandler extends PacketHandler {
         listeners.addAll(api.getUserChangeNameListeners());
 
         api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeName(event));
+    }
+
+    private void dispatchUserChangeDiscriminatorEvent(User user, String newDiscriminator, String oldDiscriminator) {
+        UserChangeDiscriminatorEvent event =
+                new UserChangeDiscriminatorEventImpl(user, newDiscriminator, oldDiscriminator);
+
+        List<UserChangeDiscriminatorListener> listeners = new ArrayList<>(user.getUserChangeDiscriminatorListeners());
+        user.getMutualServers().forEach(server -> listeners.addAll(server.getUserChangeDiscriminatorListeners()));
+        listeners.addAll(api.getUserChangeDiscriminatorListeners());
+
+        api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onUserChangeDiscriminator(event));
     }
 
     private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
