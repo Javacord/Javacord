@@ -2,6 +2,7 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -59,8 +60,14 @@ public class ChannelCategoryImpl extends ServerChannelImpl implements ChannelCat
     public List<ServerChannel> getChannels() {
         return Collections.unmodifiableList(
                 ((ServerImpl) getServer()).getUnorderedChannels().stream()
-                        .filter(channel -> channel.asCategorizable().map(this::equals).orElse(false))
-                        .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                        .filter(channel -> channel.asCategorizable()
+                                .flatMap(Categorizable::getCategory)
+                                .map(this::equals)
+                                .orElse(false))
+                        .sorted(Comparator
+                                        .<ServerChannel>comparingInt(channel -> channel.getType().getId())
+                                        .thenComparingInt(ServerChannel::getRawPosition)
+                                        .thenComparingLong(ServerChannel::getId))
                         .collect(Collectors.toList()));
     }
 

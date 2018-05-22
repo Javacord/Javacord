@@ -1116,7 +1116,10 @@ public class ServerImpl implements Server, Cleanupable {
                 .filter(channel -> channel.asCategorizable()
                         .map(categorizable -> !categorizable.getCategory().isPresent())
                         .orElse(false))
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .sorted(Comparator
+                                .<ServerChannel>comparingInt(channel -> channel.getType().getId())
+                                .thenComparingInt(ServerChannel::getRawPosition)
+                                .thenComparingLong(ServerChannel::getId))
                 .collect(Collectors.toList());
         getChannelCategories().forEach(category -> {
             channels.add(category);
@@ -1129,7 +1132,7 @@ public class ServerImpl implements Server, Cleanupable {
     public List<ChannelCategory> getChannelCategories() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ChannelCategory)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition).thenComparingLong(ServerChannel::getId))
                 .map(channel -> (ChannelCategory) channel)
                 .collect(Collectors.toList()));
     }
@@ -1138,7 +1141,7 @@ public class ServerImpl implements Server, Cleanupable {
     public List<ServerTextChannel> getTextChannels() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerTextChannel)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition).thenComparingLong(ServerChannel::getId))
                 .map(channel -> (ServerTextChannel) channel)
                 .collect(Collectors.toList()));
     }
@@ -1147,7 +1150,7 @@ public class ServerImpl implements Server, Cleanupable {
     public List<ServerVoiceChannel> getVoiceChannels() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerVoiceChannel)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition))
+                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition).thenComparingLong(ServerChannel::getId))
                 .map(channel -> (ServerVoiceChannel) channel)
                 .collect(Collectors.toList()));
     }
