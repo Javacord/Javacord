@@ -61,7 +61,7 @@ public class DelegateFactory {
     // Load it static, because it has a better performance to load it only once
     static {
         ServiceLoader<DelegateFactoryDelegate> delegateServiceLoader =
-                ServiceLoader.load(DelegateFactoryDelegate.class);
+                ServiceLoader.load(DelegateFactoryDelegate.class, DelegateFactory.class.getClassLoader());
         Iterator<DelegateFactoryDelegate> delegateIterator = delegateServiceLoader.iterator();
         if (delegateIterator.hasNext()) {
             delegateFactoryDelegate = delegateIterator.next();
