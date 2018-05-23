@@ -2,10 +2,12 @@ package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
+import org.javacord.api.entity.channel.internal.ChannelBase;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.ChannelAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
+import org.javacord.api.util.Specializable;
 import org.javacord.api.util.event.ListenerManager;
 
 import java.util.Collection;
@@ -18,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The class represents a channel.
  */
-public interface Channel extends DiscordEntity, UpdatableFromCache {
+public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelBase, Specializable<ChannelBase> {
 
     /**
      * Gets the type of the channel.
@@ -33,10 +35,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as group channel.
      */
     default Optional<GroupChannel> asGroupChannel() {
-        if (this instanceof GroupChannel) {
-            return Optional.of((GroupChannel) this);
-        }
-        return Optional.empty();
+        return as(GroupChannel.class);
     }
 
     /**
@@ -45,10 +44,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as private channel.
      */
     default Optional<PrivateChannel> asPrivateChannel() {
-        if (this instanceof PrivateChannel) {
-            return Optional.of((PrivateChannel) this);
-        }
-        return Optional.empty();
+        return as(PrivateChannel.class);
     }
 
     /**
@@ -57,10 +53,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as server channel.
      */
     default Optional<ServerChannel> asServerChannel() {
-        if (this instanceof ServerChannel) {
-            return Optional.of((ServerChannel) this);
-        }
-        return Optional.empty();
+        return as(ServerChannel.class);
     }
 
     /**
@@ -69,10 +62,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as channel category.
      */
     default Optional<ChannelCategory> asChannelCategory() {
-        if (this instanceof ChannelCategory) {
-            return Optional.of((ChannelCategory) this);
-        }
-        return Optional.empty();
+        return as(ChannelCategory.class);
     }
 
     /**
@@ -81,10 +71,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as categorizable.
      */
     default Optional<Categorizable> asCategorizable() {
-        if (this instanceof Categorizable) {
-            return Optional.of((Categorizable) this);
-        }
-        return Optional.empty();
+        return as(Categorizable.class);
     }
 
     /**
@@ -93,10 +80,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as server text channel.
      */
     default Optional<ServerTextChannel> asServerTextChannel() {
-        if (this instanceof ServerTextChannel) {
-            return Optional.of((ServerTextChannel) this);
-        }
-        return Optional.empty();
+        return as(ServerTextChannel.class);
     }
 
     /**
@@ -105,10 +89,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as server voice channel.
      */
     default Optional<ServerVoiceChannel> asServerVoiceChannel() {
-        if (this instanceof ServerVoiceChannel) {
-            return Optional.of((ServerVoiceChannel) this);
-        }
-        return Optional.empty();
+        return as(ServerVoiceChannel.class);
     }
 
     /**
@@ -117,10 +98,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as text channel.
      */
     default Optional<TextChannel> asTextChannel() {
-        if (this instanceof TextChannel) {
-            return Optional.of((TextChannel) this);
-        }
-        return Optional.empty();
+        return as(TextChannel.class);
     }
 
     /**
@@ -129,10 +107,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache {
      * @return The channel as voice channel.
      */
     default Optional<VoiceChannel> asVoiceChannel() {
-        if (this instanceof VoiceChannel) {
-            return Optional.of((VoiceChannel) this);
-        }
-        return Optional.empty();
+        return as(VoiceChannel.class);
     }
 
 
