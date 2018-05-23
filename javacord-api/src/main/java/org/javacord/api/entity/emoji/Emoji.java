@@ -1,14 +1,14 @@
 package org.javacord.api.entity.emoji;
 
 import org.javacord.api.entity.Mentionable;
-import org.javacord.api.util.Specializable;
+import org.javacord.api.util.Specifiable;
 
 import java.util.Optional;
 
 /**
  * This class represents an emoji which can be a custom emoji (known or unknown) or a unicode emoji.
  */
-public interface Emoji extends Mentionable, Specializable<Emoji> {
+public interface Emoji extends Mentionable, Specifiable<Emoji> {
 
     /**
      * Gets the emoji as unicode emoji.

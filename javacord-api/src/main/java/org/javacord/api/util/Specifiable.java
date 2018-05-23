@@ -7,7 +7,7 @@ import java.util.Optional;
  * This interface is used to provide a more stream lined way to interact with the instance as sub types.
  * @param <S> Base instance type.
  */
-public interface Specializable<S> {
+public interface Specifiable<S> {
 
     /**
      * Get an {@link Optional} instance of an instance as specified type.
@@ -35,7 +35,7 @@ public interface Specializable<S> {
      * @param <T> Specified type.
      * @return Returns an {@link Optional} of the specified type if the instance is castable, if not it returns an empty
      *         {@link Optional}.
-     * @see Specializable#tryToSpecify(Class, Object)
+     * @see Specifiable#tryToSpecify(Class, Object)
      */
     default <T extends S> Optional<T> as(Class<T> type) {
         Objects.requireNonNull(type, "type must not be null");

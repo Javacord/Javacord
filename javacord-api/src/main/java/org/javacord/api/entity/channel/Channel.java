@@ -7,7 +7,7 @@ import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.ChannelAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.util.Specializable;
+import org.javacord.api.util.Specifiable;
 import org.javacord.api.util.event.ListenerManager;
 
 import java.util.Collection;
@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The class represents a channel.
  */
-public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelBase, Specializable<ChannelBase> {
+public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelBase, Specifiable<ChannelBase> {
 
     /**
      * Gets the type of the channel.
