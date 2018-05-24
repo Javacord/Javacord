@@ -1,9 +1,9 @@
 package org.javacord.core.util.event;
 
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -99,25 +99,25 @@ public class EventDispatcher {
                             logger.debug("Detected a {} which is now running for over {}ms ({}ms). This is"
                                             + " an unusually long execution time for a listener task. Make"
                                             + " sure to not do any heavy computations in listener threads!",
-                                    getThreadType(object),
-                                    DEBUG_WARNING_DELAY_IN_MILLIS,
-                                    (int) (difference / 1_000_000L));
+                                    () -> getThreadType(object),
+                                    () -> DEBUG_WARNING_DELAY_IN_MILLIS,
+                                    () -> (int) (difference / 1_000_000L));
                         }
                         if (difference > INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L
                                 && difference < INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L + 201_000_000L) {
                             logger.warn("Detected a {} which is now running for over {} seconds ({}ms)."
                                             + " This is a very unusually long execution time for a listener task. Make"
                                             + " sure to not do any heavy computations in listener threads!",
-                                    getThreadType(object),
-                                    INFO_WARNING_DELAY_IN_SECONDS,
-                                    (int) (difference / 1_000_000L));
+                                    () -> getThreadType(object),
+                                    () -> INFO_WARNING_DELAY_IN_SECONDS,
+                                    () -> (int) (difference / 1_000_000L));
                         }
                         if (difference > MAX_EXECUTION_TIME_IN_SECONDS * 1_000_000_000L) {
                             entry.getKey().cancel(true);
                             logger.error("Interrupted a {}, because it was running over {} seconds! This was most "
                                     + "likely caused by a deadlock or very heavy computation/blocking operations in "
                                     + "the listener thread. Make sure to not block listener threads!",
-                                    getThreadType(object), MAX_EXECUTION_TIME_IN_SECONDS);
+                                    () -> getThreadType(object), () -> MAX_EXECUTION_TIME_IN_SECONDS);
                             synchronized (runningListeners) {
                                 runningListeners.remove(object);
                                 iterator.remove();
@@ -259,7 +259,7 @@ public class EventDispatcher {
                             try {
                                 finalQueue.poll().run();
                             } catch (Throwable t) {
-                                logger.error("Unhandled exception in {}!", getThreadType(taskIndicator), t);
+                                logger.error("Unhandled exception in {}!", () -> getThreadType(taskIndicator), () -> t);
                             }
                             synchronized (activeListeners) {
                                 synchronized (runningListeners) {

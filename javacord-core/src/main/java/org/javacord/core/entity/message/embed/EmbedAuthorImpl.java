@@ -1,9 +1,9 @@
 package org.javacord.core.entity.message.embed;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.entity.message.embed.EmbedAuthor;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;

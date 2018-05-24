@@ -1,7 +1,7 @@
 package org.javacord.core.util.logging;
 
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.util.logging.internal.ExceptionLoggerDelegate;
-import org.slf4j.Logger;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Collection;
@@ -40,9 +40,10 @@ public class ExceptionLoggerDelegateImpl implements ExceptionLoggerDelegate {
 
     @Override
     public UncaughtExceptionHandler getUncaughtExceptionHandler() {
-        return (thread, throwable) -> logger.error("Caught unhandled exception on thread '{}'!",
-                                                   thread.getName(),
-                                                   ExceptionLoggerDelegate.unwrapThrowable(throwable));
+        return (thread, throwable) -> logger.error(
+                "Caught unhandled exception on thread '{}'!",
+                thread::getName,
+                () -> ExceptionLoggerDelegate.unwrapThrowable(throwable));
     }
 
 }

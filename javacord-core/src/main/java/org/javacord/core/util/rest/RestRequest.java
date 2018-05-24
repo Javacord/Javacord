@@ -7,13 +7,13 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.exception.DiscordException;
 import org.javacord.api.util.rest.RestRequestInformation;
 import org.javacord.api.util.rest.RestRequestResponseInformation;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -370,14 +370,14 @@ public class RestRequest<T> {
         }
         headers.forEach(requestBuilder::addHeader);
         logger.debug("Trying to send {} request to {}{}",
-                method.name(), endpoint.getFullUrl(urlParameters), body != null ? " with body " + body : "");
+                method::name, () -> endpoint.getFullUrl(urlParameters), () -> body != null ? " with body " + body : "");
 
         try (Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute()) {
             RestRequestResult result = new RestRequestResult(this, response);
             logger.debug("Sent {} request to {} and received status code {} with{} body{}",
-                    method.name(), endpoint.getFullUrl(urlParameters), response.code(),
-                    result.getBody().map(b -> "").orElse(" empty"),
-                    result.getStringBody().map(s -> " " + s).orElse(""));
+                    method::name, () -> endpoint.getFullUrl(urlParameters), response::code,
+                    () -> result.getBody().map(b -> "").orElse(" empty"),
+                    () -> result.getStringBody().map(s -> " " + s).orElse(""));
 
             if (response.code() >= 300 || response.code() < 200) {
 

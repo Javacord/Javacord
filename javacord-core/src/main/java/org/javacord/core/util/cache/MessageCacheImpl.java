@@ -1,12 +1,12 @@
 package org.javacord.core.util.cache;
 
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.time.Instant;
 import java.util.ArrayList;

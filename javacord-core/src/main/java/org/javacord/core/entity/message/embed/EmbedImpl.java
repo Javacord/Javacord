@@ -1,6 +1,7 @@
 package org.javacord.core.entity.message.embed;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedAuthor;
 import org.javacord.api.entity.message.embed.EmbedField;
@@ -10,7 +11,6 @@ import org.javacord.api.entity.message.embed.EmbedProvider;
 import org.javacord.api.entity.message.embed.EmbedThumbnail;
 import org.javacord.api.entity.message.embed.EmbedVideo;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.awt.Color;
 import java.net.MalformedURLException;

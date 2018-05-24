@@ -1,6 +1,7 @@
 package org.javacord.core.entity.server.invite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.ChannelType;
@@ -15,7 +16,6 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;

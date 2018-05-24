@@ -54,18 +54,21 @@ dependencies { compile 'org.javacord:javacord:3.0.0-SNAPSHOT' }
 
 ### Optional Logger Dependency
 
-Any SLF4J-compatible logging framework can be used to provide a more sophisticated logging experience
+Any Log4j 2 API or SLF4j compatible logging framework can be used to provide a more sophisticated logging experience
 with being able to configure log format, log targets (console, file, database, Discord direct message, ...),
 log levels per class, and much more.
 
-For example Log4j in Gradle
+For example Log4j Core in Gradle
 ```groovy
-dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0' }
+dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
 ```
 
-or Logback in Gradle
+or Logback via SLF4J in Gradle
 ```groovy
-dependencies { runtimeOnly 'ch.qos.logback:logback-classic:1.2.3' }
+dependencies {
+    runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j:2.11.0'
+    runtimeOnly 'ch.qos.logback:logback-classic:1.2.3'
+}
 ```
 
 ## IDE Setup

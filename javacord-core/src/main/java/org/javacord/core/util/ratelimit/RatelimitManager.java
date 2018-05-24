@@ -1,6 +1,7 @@
 package org.javacord.core.util.ratelimit;
 
 import okhttp3.Response;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.exception.DiscordException;
 import org.javacord.api.exception.RatelimitException;
@@ -11,7 +12,6 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestRequest;
 import org.javacord.core.util.rest.RestRequestResponseInformationImpl;
 import org.javacord.core.util.rest.RestRequestResult;
-import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -233,7 +233,7 @@ public class RatelimitManager implements Cleanupable {
             long discordTimestamp = OffsetDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
                     .toInstant().toEpochMilli();
             api.setTimeOffset((discordTimestamp - currentTime));
-            logger.debug("Calculated an offset of " + api.getTimeOffset() + " to the Discord time.");
+            logger.debug("Calculated an offset of {} to the Discord time.", api::getTimeOffset);
         }
     }
 

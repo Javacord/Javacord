@@ -1,6 +1,7 @@
 package org.javacord.core.entity.auditlog;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
@@ -19,7 +20,6 @@ import org.javacord.api.entity.user.User;
 import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.permission.PermissionsImpl;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.awt.Color;
 import java.net.MalformedURLException;
