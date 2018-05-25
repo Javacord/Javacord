@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.entity.message.embed.EditableEmbedField;
+import org.javacord.api.entity.message.embed.EmbedField;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.util.FileContainer;
@@ -19,6 +21,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * The implementation of {@link EmbedBuilderDelegate}.
@@ -52,8 +56,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     private FileContainer thumbnailContainer = null;
 
     // Fields
-    // (Array indices: 0: name (String), 1: value (String), 2: inline (boolean)
-    private final List<Object[]> fields = new ArrayList<>();
+    private final List<EmbedFieldImpl> fields = new ArrayList<>();
 
     @Override
     public void setTitle(String title) {
@@ -421,7 +424,20 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void addField(String name, String value, boolean inline) {
-        fields.add(new Object[]{name, value, inline});
+        fields.add(new EmbedFieldImpl(name, value, inline));
+    }
+
+    @Override
+    public void updateFields(Predicate<EmbedField> predicate, Consumer<EditableEmbedField> updater) {
+        fields.stream()
+                .filter(predicate)
+                .map(EditableEmbedFieldImpl::new)
+                .forEach(updater.andThen(field -> ((EditableEmbedFieldImpl) field).clearDelegate()));
+    }
+
+    @Override
+    public void removeFields(Predicate<EmbedField> predicate) {
+        fields.removeIf(predicate);
     }
 
     @Override
@@ -527,17 +543,11 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
         }
         if (fields.size() > 0) {
             ArrayNode jsonFields = object.putArray("fields");
-            for (Object[] field : fields) {
+            for (EmbedField field : fields) {
                 ObjectNode jsonField = jsonFields.addObject();
-                if (field[0] != null && !field[0].equals("")) {
-                    jsonField.put("name", (String) field[0]);
-                }
-                if (field[1] != null && !field[1].equals("")) {
-                    jsonField.put("value", (String) field[1]);
-                }
-                if (field[2] != null) {
-                    jsonField.put("inline", (boolean) field[2]);
-                }
+                jsonField.put("name", field.getName());
+                jsonField.put("value", field.getValue());
+                jsonField.put("inline", field.isInline());
             }
         }
         return object;

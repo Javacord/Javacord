@@ -2,7 +2,9 @@ package org.javacord.api.entity.message.embed.internal;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.entity.message.embed.EditableEmbedField;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedField;
 import org.javacord.api.entity.user.User;
 
 import java.awt.Color;
@@ -10,6 +12,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * This class is internally used by the {@link EmbedBuilder} to created embeds.
@@ -396,6 +400,23 @@ public interface EmbedBuilderDelegate {
      * @param inline Whether the field should be inline or not.
      */
     void addField(String name, String value, boolean inline);
+
+    /**
+     * Updates all fields of the embed that satisfy the given predicate using the given updater.
+     *
+     * @param predicate The predicate that fields have to satisfy to get updated.
+     * @param updater The updater for the fields; the {@code EditableEmbedField} is only valid during the run of the
+     *                updater; any try to save it in a variable and reuse it later after this method call will fail
+     *                with exceptions.
+     */
+    void updateFields(Predicate<EmbedField> predicate, Consumer<EditableEmbedField> updater);
+
+    /**
+     * Removes all fields of the embed that satisfy the given predicate.
+     *
+     * @param predicate The predicate that fields have to satisfy to get removed.
+     */
+    void removeFields(Predicate<EmbedField> predicate);
 
     /**
      * Checks if this embed requires any attachments.
