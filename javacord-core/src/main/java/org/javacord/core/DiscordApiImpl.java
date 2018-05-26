@@ -3,6 +3,7 @@ package org.javacord.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.javacord.api.AccountType;
@@ -387,6 +388,11 @@ public class DiscordApiImpl implements DiscordApi {
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5)) + (currentShard * 6);
 
         this.httpClient = new OkHttpClient.Builder()
+                // disallow HTTP 2.0 as OkHttps implementation has a bug that prevents normal closing of the JVM
+                // as there is a hanging non-deamon thread; the bug can be found at
+                // https://github.com/square/okhttp/issues/4029
+                // After it was fixed and the dependency increased, the following line can be removed
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .addInterceptor(chain -> chain.proceed(chain.request()
                         .newBuilder()
                         .addHeader("User-Agent", Javacord.USER_AGENT)
