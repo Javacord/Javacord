@@ -1114,6 +1114,8 @@ public class DiscordApiImpl implements DiscordApi {
                     // shutdown thread pool if within one minute no disconnect event was dispatched
                     threadPool.getDaemonScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
                 }
+                httpClient.dispatcher().executorService().shutdown();
+                httpClient.connectionPool().evictAll();
                 ratelimitManager.cleanup();
             }
             disconnectCalled = true;
