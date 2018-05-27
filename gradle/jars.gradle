@@ -1,4 +1,6 @@
 subprojects {
+    apply plugin: 'osgi'
+
     task javadocJar(type: Jar) {
         group 'build'
         description 'Assembles a jar archive containing the JavaDoc files.'
@@ -15,6 +17,25 @@ subprojects {
 
     artifacts {
         archives javadocJar, sourcesJar
+    }
+}
+
+project(':javacord-api') {
+    jar {
+        manifest {
+            instruction 'Export-Package', '!org.javacord.*.internal.*', "*;version=$version;-noimport:=true"
+        }
+    }
+}
+
+project(':javacord-core') {
+    jar {
+        manifest {
+            instruction 'Fragment-Host', "org.javacord.api;bundle-version=\"[$version,$version]\""
+            instruction 'Import-Package', '!org.javacord.api.*', '*'
+            instruction 'Import-Package', 'org.slf4j.impl;resolution:=optional', '*'
+            instruction 'Export-Package', ''
+        }
     }
 }
 
