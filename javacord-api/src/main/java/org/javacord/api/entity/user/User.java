@@ -408,10 +408,10 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * @param server The server.
      * @return A sorted list (by position) with all roles of the user in the given server.
-     * @see Server#getRolesOf(User)
+     * @see Server#getRoles(User)
      */
     default List<Role> getRoles(Server server) {
-        return server.getRolesOf(this);
+        return server.getRoles(this);
     }
 
     /**

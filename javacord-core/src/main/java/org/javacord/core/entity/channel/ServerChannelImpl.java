@@ -358,7 +358,7 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
                 builder.setState(type, PermissionState.ALLOWED);
             }
         }
-        List<Role> rolesOfUser = new ArrayList<>(server.getRolesOf(user));
+        List<Role> rolesOfUser = new ArrayList<>(server.getRoles(user));
         rolesOfUser.remove(everyoneRole);
         List<Permissions> permissionOverwrites = rolesOfUser.stream()
                 .map(this::getOverwrittenPermissions)

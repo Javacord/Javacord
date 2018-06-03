@@ -557,6 +557,19 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     List<Role> getRoles();
 
     /**
+     * Gets a sorted list (by position) with all roles of the user in the server.
+     *
+     * @param user The user.
+     * @return A sorted list (by position) with all roles of the user in the server.
+     */
+    default List<Role> getRoles(User user) {
+        return Collections.unmodifiableList(
+                getRoles().stream()
+                        .filter(role -> role.getUsers().contains(user))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
      * Gets a role by its id.
      *
      * @param id The id of the role.
@@ -616,19 +629,6 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a sorted list (by position) with all roles of the user in the server.
-     *
-     * @param user The user.
-     * @return A sorted list (by position) with all roles of the user in the server.
-     */
-    default List<Role> getRolesOf(User user) {
-        return Collections.unmodifiableList(
-                getRoles().stream()
-                        .filter(role -> role.getUsers().contains(user))
-                        .collect(Collectors.toList()));
-    }
-
-    /**
      * Gets the displayed color of a user based on his roles on this server.
      *
      * @param user The user.
@@ -647,9 +647,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return The permissions of the user.
      */
-    default Permissions getPermissionsOf(User user) {
+    default Permissions getPermissions(User user) {
         PermissionsBuilder builder = new PermissionsBuilder();
-        getAllowedPermissionsOf(user).forEach(type -> builder.setState(type, PermissionState.ALLOWED));
+        getAllowedPermissions(user).forEach(type -> builder.setState(type, PermissionState.ALLOWED));
         return builder.build();
     }
 
@@ -662,12 +662,12 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return The allowed permissions of the given user.
      */
-    default Collection<PermissionType> getAllowedPermissionsOf(User user) {
+    default Collection<PermissionType> getAllowedPermissions(User user) {
         Collection<PermissionType> allowed = new HashSet<>();
         if (getOwner() == user) {
             allowed.addAll(Arrays.asList(PermissionType.values()));
         } else {
-            getRolesOf(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
+            getRoles(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
         }
         return Collections.unmodifiableCollection(allowed);
     }
@@ -678,12 +678,12 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return The unset permissions of the given user.
      */
-    default Collection<PermissionType> getUnsetPermissionsOf(User user) {
+    default Collection<PermissionType> getUnsetPermissions(User user) {
         if (getOwner() == user) {
             return Collections.emptySet();
         }
         Collection<PermissionType> unset = new HashSet<>();
-        getRolesOf(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
+        getRoles(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
         return Collections.unmodifiableCollection(unset);
     }
 
@@ -693,10 +693,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user to check.
      * @param type The permission type(s) to check.
      * @return Whether the user has all given permissions or not.
-     * @see #getAllowedPermissionsOf(User)
+     * @see #getAllowedPermissions(User)
      */
     default boolean hasPermissions(User user, PermissionType... type) {
-        return getAllowedPermissionsOf(user).containsAll(Arrays.asList(type));
+        return getAllowedPermissions(user).containsAll(Arrays.asList(type));
     }
 
     /**
@@ -705,10 +705,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user to check.
      * @param type The permission type(s) to check.
      * @return Whether the user has any of the given permissions or not.
-     * @see #getAllowedPermissionsOf(User)
+     * @see #getAllowedPermissions(User)
      */
     default boolean hasAnyPermission(User user, PermissionType... type) {
-        return getAllowedPermissionsOf(user).stream()
+        return getAllowedPermissions(user).stream()
                 .anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
     }
 
@@ -1693,7 +1693,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return Whether the user has the permission or not.
      */
     default boolean hasPermission(User user, PermissionType permission) {
-        return getAllowedPermissionsOf(user).contains(permission);
+        return getAllowedPermissions(user).contains(permission);
     }
 
     /**
@@ -2073,8 +2073,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return The highest role of the given user.
      */
-    default Optional<Role> getHighestRoleOf(User user) {
-        List<Role> roles = getRolesOf(user);
+    default Optional<Role> getHighestRole(User user) {
+        List<Role> roles = getRoles(user);
         if (roles.isEmpty()) {
             return Optional.empty();
         }
@@ -2345,8 +2345,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
         if (canKickUsers(user)) {
             return false;
         }
-        Optional<Role> ownRole = getHighestRoleOf(user);
-        Optional<Role> otherRole = getHighestRoleOf(userToKick);
+        Optional<Role> ownRole = getHighestRole(user);
+        Optional<Role> otherRole = getHighestRole(userToKick);
         return ownRole.isPresent() && (!otherRole.isPresent() || ownRole.get().isHigherThan(otherRole.get()));
     }
 
@@ -2394,8 +2394,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
         if (canBanUsers(user)) {
             return false;
         }
-        Optional<Role> ownRole = getHighestRoleOf(user);
-        Optional<Role> otherRole = getHighestRoleOf(userToBan);
+        Optional<Role> ownRole = getHighestRole(user);
+        Optional<Role> otherRole = getHighestRole(userToBan);
         return ownRole.isPresent() && (!otherRole.isPresent() || ownRole.get().isHigherThan(otherRole.get()));
     }
 
