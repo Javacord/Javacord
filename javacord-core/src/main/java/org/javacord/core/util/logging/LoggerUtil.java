@@ -46,10 +46,10 @@ public class LoggerUtil {
                 if (logWarning.get()) {
                     logger.info("No SLF4J compatible logger was found. Using default javacord implementation!");
                 }
-                return logger;
+                return new PrivacyProtectionLogger(logger);
             });
         } else {
-            return LoggerFactory.getLogger(name);
+            return new PrivacyProtectionLogger(LoggerFactory.getLogger(name));
         }
     }
 
