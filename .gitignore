@@ -9,6 +9,7 @@
 
 # IntelliJ IDEA project files
 /.idea/
+/*/out/
 *.iml
 *.ipr
 *.iws
