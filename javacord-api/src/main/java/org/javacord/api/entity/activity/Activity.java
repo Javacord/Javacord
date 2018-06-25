@@ -1,12 +1,14 @@
 package org.javacord.api.entity.activity;
 
+import org.javacord.api.entity.Nameable;
+
 import java.time.Instant;
 import java.util.Optional;
 
 /**
  * This class represents a activity as it is displayed in Discord.
  */
-public interface Activity {
+public interface Activity extends Nameable {
 
     /**
      * Gets the type of the activity.
