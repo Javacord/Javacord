@@ -2,6 +2,7 @@ package org.javacord.api.entity.server;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.auditlog.AuditLog;
@@ -113,7 +114,7 @@ import java.util.stream.Collectors;
 /**
  * The class represents a Discord server, sometimes also called guild.
  */
-public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
+public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Server> {
 
     /**
      * Gets the name of the server.
