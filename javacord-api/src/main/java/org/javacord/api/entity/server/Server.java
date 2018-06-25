@@ -1,6 +1,10 @@
 package org.javacord.api.entity.server;
 
-import org.javacord.api.entity.*;
+import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Nameable;
+import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.Region;
+import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.auditlog.AuditLog;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;

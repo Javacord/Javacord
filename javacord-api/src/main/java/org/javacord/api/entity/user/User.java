@@ -2,7 +2,11 @@ package org.javacord.api.entity.user;
 
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.*;
+import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.Nameable;
+import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
