@@ -1,5 +1,7 @@
 import io.codearte.gradle.nexus.BaseStagingTask
 import io.codearte.gradle.nexus.NexusStagingPlugin
+import wooga.gradle.github.publish.GithubPublishPlugin
+import wooga.gradle.github.publish.tasks.GithubPublish
 
 import javax.naming.ConfigurationException
 
@@ -9,6 +11,7 @@ buildscript {
     }
     dependencies {
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0'
+        classpath 'gradle.plugin.net.wooga.gradle:atlas-github:1.0.1'
     }
 }
 
@@ -25,6 +28,8 @@ ext {
             project.findProperty('sonatype.password')
     sonatypeStagingProfileId = project.findProperty('javacord.sonatype.stagingProfileId') ?:
             project.findProperty('sonatype.stagingProfileId')
+    it.'github.token' = project.findProperty('javacord.github.token') ?:
+            project.findProperty('github.token')
 }
 
 allprojects {
@@ -82,10 +87,11 @@ publishing {
             from components.java
             // but do not try to publish the JAR
             artifacts.removeAll { !it.classifier && (it.extension == 'jar') }
-            artifact shadowJar
         }
     }
 }
+
+apply from: 'gradle/pom.gradle'
 
 allprojects {
     apply plugin: 'signing'
@@ -141,6 +147,24 @@ task buildAll(dependsOn: allprojects.tasks.build)
 release {
     tagTemplate = 'v$version'
     buildTasks = ['buildAll']
+    git {
+        signTag = true
+    }
 }
 
 afterReleaseBuild.dependsOn allprojects.tasks*.withType(PublishToMavenRepository), closeRepository
+
+apply plugin: GithubPublishPlugin
+
+githubPublish {
+    enabled releaseVersion
+    repositoryName 'BtoBastian/Javacord'
+    def tagNameSupplier = { rootProject.plugins.findPlugin('net.researchgate.release').tagName() }
+    tagName tagNameSupplier
+    releaseName tagNameSupplier
+    body rootProject.file('.github/release_body_template.md').text
+    draft true
+    from allprojects.configurations.archives.artifacts.files
+}
+
+afterReleaseBuild.dependsOn tasks.withType(GithubPublish)

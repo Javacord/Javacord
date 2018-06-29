@@ -1,6 +1,6 @@
 plugins {
     id 'nebula.java-cross-compile' version '0.10.0' apply false
-    id 'com.github.johnrengelman.shadow' version '2.0.2' apply false
+    id 'com.github.johnrengelman.shadow' version '2.0.4' apply false
     id 'me.tatarka.gradle.pom' version '1.0' apply false
     id 'net.researchgate.release' version '2.7.0' apply false
 }
@@ -53,5 +53,4 @@ apply from: 'gradle/dependencies.gradle'
 apply from: 'gradle/jars.gradle'
 apply from: 'gradle/java9.gradle'
 apply from: 'gradle/javadoc.gradle'
-apply from: 'gradle/pom.gradle'
 apply from: 'gradle/publishing.gradle'
