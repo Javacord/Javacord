@@ -158,7 +158,7 @@ apply plugin: GithubPublishPlugin
 
 githubPublish {
     enabled releaseVersion
-    repositoryName 'BtoBastian/Javacord'
+    repositoryName 'Javacord/Javacord'
     def tagNameSupplier = { rootProject.plugins.findPlugin('net.researchgate.release').tagName() }
     tagName tagNameSupplier
     releaseName tagNameSupplier

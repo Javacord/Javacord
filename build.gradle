@@ -22,7 +22,7 @@ allprojects {
     apply plugin: 'checkstyle'
 
     group = 'org.javacord'
-    description = 'A multithreaded but easy to use Discord Java API'
+    description = 'An easy to use multithreaded library for creating Discord bots in Java'
     buildDir = rootProject.file("${rootBuildDir}/${name}")
 
     sourceCompatibility = 1.8
@@ -44,7 +44,7 @@ clean {
 
 subprojects {
     ext.shortName = name - ~/^javacord-/
-    description = "A multithreaded but easy to use Discord Java API ($shortName)"
+    description = "An easy to use multithreaded library for creating Discord bots in Java ($shortName)"
 }
 
 defaultTasks 'build'

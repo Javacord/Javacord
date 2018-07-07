@@ -13,7 +13,7 @@ public class Javacord {
     /**
      * The github url of javacord.
      */
-    public static final String GITHUB_URL = "https://github.com/BtoBastian/Javacord";
+    public static final String GITHUB_URL = "https://github.com/Javacord/Javacord";
 
     /**
      * The user agent used for requests.
