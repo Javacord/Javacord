@@ -41,7 +41,7 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the current time as timestamp of the embed.
      */
-    void setTimestamp();
+    void setTimestampToNow();
 
     /**
      * Sets the timestamp of the embed.

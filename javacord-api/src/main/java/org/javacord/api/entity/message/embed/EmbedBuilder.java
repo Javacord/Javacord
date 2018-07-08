@@ -69,8 +69,8 @@ public class EmbedBuilder {
      *
      * @return The current instance in order to chain call methods.
      */
-    public EmbedBuilder setTimestamp() {
-        delegate.setTimestamp();
+    public EmbedBuilder setTimestampToNow() {
+        delegate.setTimestampToNow();
         return this;
     }
 
