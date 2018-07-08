@@ -71,7 +71,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setTimestamp() {
+    public void setTimestampToNow() {
         this.timestamp = Instant.now();
     }
 
