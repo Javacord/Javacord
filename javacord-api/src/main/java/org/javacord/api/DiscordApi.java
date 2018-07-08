@@ -259,10 +259,10 @@ public interface DiscordApi {
     /**
      * Updates the activity of this bot with any type.
      *
-     * @param name The name of the activity.
      * @param type The type of the activity.
+     * @param name The name of the activity.
      */
-    void updateActivity(String name, ActivityType type);
+    void updateActivity(ActivityType type, String name);
 
     /**
      * Updates the activity of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.

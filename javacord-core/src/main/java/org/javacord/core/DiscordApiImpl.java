@@ -1046,11 +1046,11 @@ public class DiscordApiImpl implements DiscordApi {
     /**
      * Sets the current activity, along with type and streaming Url.
      *
-     * @param name The name of the activity.
      * @param type The activity's type.
+     * @param name The name of the activity.
      * @param streamingUrl The Url used for streaming.
      */
-    private void updateActivity(String name, ActivityType type, String streamingUrl) {
+    private void updateActivity(ActivityType type, String name, String streamingUrl) {
         if (name == null) {
             activity = null;
         } else if (streamingUrl == null) {
@@ -1064,17 +1064,17 @@ public class DiscordApiImpl implements DiscordApi {
 
     @Override
     public void updateActivity(String name) {
-        updateActivity(name, ActivityType.PLAYING, null);
+        updateActivity(ActivityType.PLAYING, name, null);
     }
 
     @Override
-    public void updateActivity(String name, ActivityType type) {
-        updateActivity(name, type, null);
+    public void updateActivity(ActivityType type, String name) {
+        updateActivity(type, name, null);
     }
 
     @Override
     public void updateActivity(String name, String streamingUrl) {
-        updateActivity(name, ActivityType.STREAMING, streamingUrl);
+        updateActivity(ActivityType.STREAMING, name, streamingUrl);
     }
 
     @Override
