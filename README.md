@@ -1,5 +1,5 @@
 ![](http://bastian-oppermann.de/javacord3_banner.png)
-# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg?&style=flat-square" alt="Latest version"></a> <a href="https://ci.javacord.org/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg?style=flat-square" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg?style=flat-square" alt="Javacord Wiki"></a> <a href="https://discord.gg/0qJ2jjyneLEgG7y3"><img src="https://img.shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square" alt="Discord Server"></a>
+# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg?&style=flat-square" alt="Latest version"></a> <a href="https://ci.javacord.org/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg?style=flat-square" alt="Latest JavaDocs"></a> <a href="https://github.com/Javacord/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg?style=flat-square" alt="Javacord Wiki"></a> <a href="https://discord.gg/0qJ2jjyneLEgG7y3"><img src="https://img.shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square" alt="Discord Server"></a>
 A multithreaded but easy to use library to create a Discord bot in Java.
 
 ## Feature Coverage
@@ -25,7 +25,7 @@ Javacord 3 will soon be available on Maven Central.
 **Javacord Dependency**
 ```xml
 <dependency>
-    <groupId>de.btobastian.Javacord</groupId>
+    <groupId>com.github.Javacord.Javacord</groupId>
     <artifactId>javacord</artifactId>
     <!-- See below what to insert here -->
     <version>COMMIT_ID</version>
@@ -49,8 +49,8 @@ In this example the version would be `5255914`:
 ## IDE Setup
 
 If you never used maven before you should take a look at the setup tutorial:
-* [IntelliJ Maven Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
-* [Eclipse Maven Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))
+* [IntelliJ Maven Setup](https://github.com/Javacord/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
+* [Eclipse Maven Setup](https://github.com/Javacord/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))
 ## Support
 
 * [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3) (recommended)
@@ -58,7 +58,7 @@ If you never used maven before you should take a look at the setup tutorial:
 
 ## Wiki
 
-For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord/wiki)
+For detailed information take a look at the wiki: [Wiki](https://github.com/Javacord/Javacord/wiki)
 
 The wiki for Javacord 3 is a work in progress and not complete!
 
@@ -115,11 +115,11 @@ public class MyFirstBot {
 }
 ```
 
-An example bot can be found here: [Example Bot](https://github.com/BtoBastian/JavacordExampleBot)
+An example bot can be found here: [Example Bot](https://github.com/Javacord/JavacordExampleBot)
 
 ## How to create a bot user and get its token 
 
-Click here: [Creating a Bot Account](https://github.com/BtoBastian/Javacord/wiki/Creating-a-Bot-Account)
+Click here: [Creating a Bot Account](https://github.com/Javacord/Javacord/wiki/Creating-a-Bot-Account)
 
 ## Version numbers
 
