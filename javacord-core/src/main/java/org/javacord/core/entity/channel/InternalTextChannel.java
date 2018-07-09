@@ -61,7 +61,6 @@ public interface InternalTextChannel extends TextChannel {
                 .forEach(messages::add);
 
         return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
-                .setRatelimitRetries(0)
                 .setUrlParameters(getIdAsString())
                 .setBody(body)
                 .execute(result -> null);

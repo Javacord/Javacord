@@ -113,7 +113,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil {
                                     .forEach(messages::add);
 
                             return new RestRequest<Void>(api, RestMethod.POST, RestEndpoint.MESSAGES_BULK_DELETE)
-                                    .setRatelimitRetries(0)
                                     .setUrlParameters(Long.toUnsignedString(channelId))
                                     .setBody(body)
                                     .execute(result -> null);
