@@ -60,7 +60,8 @@ public class EventDispatcher {
     /**
      * This map which holds a queue for every object (usually a server) with tasks to call the waiting listeners.
      */
-    private final ConcurrentHashMap<Object, ConcurrentLinkedQueue<Runnable>> queuedListenerTasks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Object, ConcurrentLinkedQueue<Runnable>> queuedListenerTasks
+            = new ConcurrentHashMap<>();
 
     /**
      * A list with all objects which currently have a running listener.
@@ -178,7 +179,8 @@ public class EventDispatcher {
                     }
                 }
                 synchronized (queuedListenerTasks) {
-                    Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(object, o -> new ConcurrentLinkedQueue<>());
+                    Queue<Runnable> queue = queuedListenerTasks
+                            .computeIfAbsent(object, o -> new ConcurrentLinkedQueue<>());
                     listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
                 }
                 checkRunningListenersAndStartIfPossible(object);
