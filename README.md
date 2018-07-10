@@ -63,7 +63,7 @@ For detailed information take a look at the wiki: [Wiki](https://github.com/BtoB
 The wiki for Javacord 3 is a work in progress and not complete!
 
 ## JavaDocs
-The latest JavaDocs can be found here: [JavaDocs](https://ci.javacord.org/javadoc/)
+The latest JavaDocs can be found here: [JavaDocs](https://jitpack.io/com/github/Javacord/javacord/javacord-api/v_3-SNAPSHOT/javadoc/)
 
 ## Logging in
 
