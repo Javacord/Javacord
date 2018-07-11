@@ -66,7 +66,7 @@ public class DiscordApiBuilder {
     /**
      * Sets the token which is required for the login process.
      * A tutorial on how to get the token can be found in the
-     * <a href="https://github.com/BtoBastian/Javacord/wiki">Javacord wiki</a>.
+     * <a href="https://github.com/Javacord/Javacord/wiki">Javacord wiki</a>.
      *
      * @param token The token to set.
      * @return The current instance in order to chain call methods.

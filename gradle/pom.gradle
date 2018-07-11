@@ -8,7 +8,7 @@ allprojects { project ->
                     url = 'https://www.javacord.org'
                     issueManagement {
                         system = 'GitHub'
-                        url = 'https://github.com/BtoBastian/Javacord/issues'
+                        url = 'https://github.com/Javacord/Javacord/issues'
                     }
                     ciManagement {
                         system = 'TeamCity'
@@ -41,12 +41,12 @@ allprojects { project ->
                         }
                     }
                     scm {
-                        connection = 'scm:git:https://github.com/BtoBastian/Javacord.git'
-                        developerConnection = 'scm:git:git@github.com:BtoBastian/Javacord.git'
-                        url = 'https://github.com/BtoBastian/Javacord'
+                        connection = 'scm:git:https://github.com/Javacord/Javacord.git'
+                        developerConnection = 'scm:git:git@github.com:Javacord/Javacord.git'
+                        url = 'https://github.com/Javacord/Javacord'
                     }
                     distributionManagement {
-                        downloadUrl = 'https://github.com/BtoBastian/Javacord/releases'
+                        downloadUrl = 'https://github.com/Javacord/Javacord/releases'
                     }
                 }
             }

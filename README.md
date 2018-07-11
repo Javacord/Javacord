@@ -1,69 +1,92 @@
 ![](http://bastian-oppermann.de/javacord3_banner.png)
-# Javacord <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-brightgreen.svg?&style=flat-square" alt="Latest version"></a> <a href="https://ci.javacord.org/javadoc/"><img src="https://img.shields.io/badge/JavaDoc-latest-yellow.svg?style=flat-square" alt="Latest JavaDocs"></a> <a href="https://github.com/BtoBastian/Javacord/wiki"><img src="https://img.shields.io/badge/Wiki-Home-red.svg?style=flat-square" alt="Javacord Wiki"></a> <a href="https://discord.gg/0qJ2jjyneLEgG7y3"><img src="https://img.shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square" alt="Discord Server"></a>
-A multithreaded but easy to use library to create a Discord bot in Java.
+# Javacord <a href="#"><img src="https://shields.javacord.org/badge/Version-3.0.0-brightgreen.svg?&style=flat-square" alt="Latest version"></a> <a href="https://ci.javacord.org/javadoc/"><img src="https://shields.javacord.org/badge/JavaDoc-latest-yellow.svg?style=flat-square" alt="Latest JavaDocs"></a> <a href="https://github.com/Javacord/Javacord/wiki"><img src="https://shields.javacord.org/badge/Wiki-Home-red.svg?style=flat-square" alt="Javacord Wiki"></a> <a href="https://discord.gg/0qJ2jjyneLEgG7y3"><img src="https://shields.javacord.org/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square" alt="Discord Server"></a>
+An easy to use multithreaded library for creating Discord bots in Java.
 
 ## Feature Coverage
 
-Javacord covers every action a Discord bot is able to perform (e.g. sending messages, banning users, editing servers, etc.)
-**besides** sending voice, which will be added in a later release. New features introduced by Discord are usually added
-in less than one week, depending on their size.
+Javacord supports every action a Discord bot is able to perform.  
+Some of these features include, but are not limited to:
 
-## Download
-The recommended way to "download" Javacord is to use a build manager like Maven.
-If you are not familiar with Maven, you can take a look at the [Setup Guide](#ide-setup) 
-or directly download it from [Jenkins](http://ci.ketrwu.de/job/Javacord/branch/master/lastSuccessfulBuild/).
+- sending messages
+- attaching files
+- event listening
+- user management
+- server administration
+- *... **and many others***
 
-Javacord 3 will soon be available on Maven Central.
+**Sending voice will be added in an upcoming release**.  
+New features introduced by Discord are typically added in less than one week, depending on scale.
 
-**Repository**
-```xml
-<repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-</repository>
+## Download / Installation
+
+The recommended way to get Javacord is to use a build manager like Gradle or Maven.  
+If you are not familiar with build managers, you can follow this [Setup Guide](#ide-setup) 
+or download it directly from
+[TeamCity](https://ci.javacord.org/viewType.html?buildTypeId=Javacord_PublishSnapshots&branch_Javacord=v_3&tab=buildTypeStatusDiv&state=successful).
+Just click on the latest build and there go to the "Artifacts" tab to download the files.
+
+### Javacord Dependency
+
+#### Gradle
+```groovy
+repositories { maven { url "https://oss.sonatype.org/content/repositories/snapshots/" } }
+dependencies { compile 'org.javacord:javacord:3.0.0-SNAPSHOT' }
 ```
-**Javacord Dependency**
-```xml
-<dependency>
-    <groupId>de.btobastian.Javacord</groupId>
-    <artifactId>javacord</artifactId>
-    <!-- See below what to insert here -->
-    <version>COMMIT_ID</version>
-    <type>pom</type>
-</dependency>
-```
-Replace `COMMIT_ID` with the latest commit id. Once the rewrite is finished, there will be proper version numbers.
-In this example the version would be `5255914`:
-![](https://i.imgur.com/FSAYqVq.png)
 
-**Optional Logger Dependency**
+#### Maven
 ```xml
-<!-- Any SLF4J compatible logging framework. logback-classic is recommended -->
-<dependency>
-  <groupId>ch.qos.logback</groupId>
-  <artifactId>logback-classic</artifactId>
-  <version>1.2.3</version>
-</dependency>
+<repositories>
+    <repository>
+        <id>Sonatype Snapshots</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>org.javacord</groupId>
+        <artifactId>javacord</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+        <type>pom</type>
+    </dependency>
+</dependencies>
+```
+
+### Optional Logger Dependency
+
+Any SLF4J compatible logging framework can be used to provide a more sophisticated logging experience
+with being able to configure log format, log targets (console, file, database, Discord direct message, ...),
+log levels per class and much more.
+
+For example Log4j in Gradle
+```groovy
+dependencies { runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0' }
+```
+
+or Logback in Gradle
+```groovy
+dependencies { runtime 'ch.qos.logback:logback-classic:1.2.3' }
 ```
 
 ## IDE Setup
 
-If you never used maven before you should take a look at the setup tutorial:
-* [IntelliJ Maven Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))
-* [Eclipse Maven Setup](https://github.com/BtoBastian/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))
+If you never used Maven before you should take a look at the setup tutorial:
+* **[IntelliJ & Maven Setup](https://github.com/Javacord/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))**
+* **[Eclipse & Maven Setup](https://github.com/Javacord/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))**
+
 ## Support
 
-* [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3) (recommended)
-* [DiscordAPI #java_javacord channel](https://discord.gg/0SBTUU1wZTVXVKEo)
+Javacord's Discord community is an excellent resource if you have questions about the library.  
+* **[The Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3)**
 
 ## Wiki
 
-For detailed information take a look at the wiki: [Wiki](https://github.com/BtoBastian/Javacord/wiki)
-
+For additional information, take a look at the [Javacord wiki](https://github.com/Javacord/Javacord/wiki).  
 The wiki for Javacord 3 is a work in progress and not complete!
 
-## JavaDocs
-The latest JavaDocs can be found here: [JavaDocs](https://ci.javacord.org/javadoc/)
+## JavaDoc
+
+The JavaDoc for the latest snapshot build can be found on [TeamCity](https://ci.javacord.org/javadoc/).  
 
 ## Logging in
 
@@ -72,31 +95,7 @@ Logging in is very simple
 public class MyFirstBot {
 
     public static void main(String[] args) {
-        String token = args[0];
-
-        new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
-            
-            // Add a listener which answers with "Pong!" if someone writes "!ping"
-            api.addMessageCreateListener(event -> {
-                if (event.getMessage().getContent().equalsIgnoreCase("!ping")) {
-                    event.getChannel().sendMessage("Pong!");
-                }
-            });
-            
-            // Print the invite url of your bot
-            System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
-            
-        }).exceptionally(ExceptionLogger.get());
-    }
-
-}
-```
-
-You can also login blocking which throws an exception if the login failed:
-```java
-public class MyFirstBot {
-
-    public static void main(String[] args) {
+        // Read the token from the first program parameter when invoking the bot
         String token = args[0];
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
@@ -115,11 +114,37 @@ public class MyFirstBot {
 }
 ```
 
-An example bot can be found here: [Example Bot](https://github.com/BtoBastian/JavacordExampleBot)
+You can also login non-blocking asynchronously
+```java
+public class MyFirstBot {
+
+    public static void main(String[] args) {
+        // Read the token from the first program parameter when invoking the bot
+        String token = args[0];
+
+        new DiscordApiBuilder() .setToken(token) .login() .thenAccept(api -> {
+                    // Add a listener which answers with "Pong!" if someone writes "!ping"
+                    api.addMessageCreateListener(event -> {
+                        if (event.getMessage().getContent().equalsIgnoreCase("!ping")) {
+                            event.getChannel().sendMessage("Pong!");
+                        }
+                    });
+
+                    // Print the invite url of your bot
+                    System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
+                })
+                // Log any exceptions that happened
+                .exceptionally(ExceptionLogger.get());
+    }
+
+}
+```
+
+Check out the [JavacordExampleBot](https://github.com/Javacord/JavacordExampleBot) to learn more.
 
 ## How to create a bot user and get its token 
 
-Click here: [Creating a Bot Account](https://github.com/BtoBastian/Javacord/wiki/Creating-a-Bot-Account)
+* **[Creating a Bot User Account](https://github.com/Javacord/Javacord/wiki/Creating-a-Bot-Account)**
 
 ## Version numbers
 
@@ -132,13 +157,12 @@ The version number has the a 3-digit format: `major.minor.trivial`
  
 ## Deprecation policy
 
-A method/class which was marked as deprecated can be removed with the next minor release (but it will usually stay for
-several minor releases). A minor release might remove a class/method without having it deprecated, but we will do our
-best to deprecate it before removing it. We are unable to guarantee this though, because we might have to remove/replace
-something due to changes made by Discord which we are unable to control. Usually you can expect a deprecated method/class
-to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
+A method or class which was marked as deprecated can be removed with the next minor release (but it will usually stay for
+several minor releases). A minor release might remove a class or method without having it deprecated, but we will do our
+best to deprecate it before removing it. We are unable to guarantee this though, because we might have to remove / replace
+something due to changes made by Discord which we are unable to control. Usually you can expect a deprecated method or
+class to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
 
 ## Discord Server
 
-Javacord has its own Discord Server. You can join it ([Invite](https://discord.gg/0qJ2jjyneLEgG7y3)) for support,
-status updates or just chatting with other users.
+Join the [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3) for support, status updates, or just chatting with other users.
