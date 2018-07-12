@@ -168,3 +168,5 @@ githubPublish {
 }
 
 afterReleaseBuild.dependsOn tasks.withType(GithubPublish)
+
+preTagCommit.dependsOn updateReadme
