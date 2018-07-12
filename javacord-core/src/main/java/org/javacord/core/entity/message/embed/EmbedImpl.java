@@ -43,10 +43,10 @@ public class EmbedImpl implements Embed {
     private final EmbedVideo video;
     private final EmbedProvider provider;
     private final EmbedAuthor author;
-    private final List<EmbedField> fields = new ArrayList<>();
+    private final List<EmbedField> fields;
 
     /**
-     * Creates a new embed.
+     * Creates a new embed from Discord.
      *
      * @param data The json data of the embed.
      */
@@ -63,11 +63,56 @@ public class EmbedImpl implements Embed {
         video = data.has("video") ? new EmbedVideoImpl(data.get("video")) : null;
         provider = data.has("provider") ? new EmbedProviderImpl(data.get("provider")) : null;
         author = data.has("author") ? new EmbedAuthorImpl(data.get("author")) : null;
+
+        fields = new ArrayList<>();
         if (data.has("fields")) {
             for (JsonNode jsonField : data.get("fields")) {
                 this.fields.add(new EmbedFieldImpl(jsonField));
             }
         }
+    }
+
+    /**
+     * Creates a new embed from the {@link org.javacord.api.entity.message.embed.EmbedBuilder}.
+     *
+     * @param title The title of the embed.
+     * @param description The description of the embed.
+     * @param url The url of the embed.
+     * @param timestamp The timestamp of the embed.
+     * @param color The color of the embed.
+     * @param footer The footer of the embed.
+     * @param image The image of the embed.
+     * @param thumbnail The thumbnail of the embed.
+     * @param video The video of the embed.
+     * @param provider The provider of the embed.
+     * @param author The author of the embed.
+     * @param fields The fields of the embed.
+     */
+    public EmbedImpl(String title,
+                     String description,
+                     String url,
+                     Instant timestamp,
+                     Color color,
+                     EmbedFooterImpl footer,
+                     EmbedImageImpl image,
+                     EmbedThumbnailImpl thumbnail,
+                     EmbedVideoImpl video,
+                     EmbedProvider provider,
+                     EmbedAuthorImpl author,
+                     List<EmbedField> fields) {
+        this.title = title;
+        this.type = "";
+        this.description = description;
+        this.url = url;
+        this.timestamp = timestamp;
+        this.color = color;
+        this.footer = footer;
+        this.image = image;
+        this.thumbnail = thumbnail;
+        this.video = video;
+        this.provider = provider;
+        this.author = author;
+        this.fields = fields;
     }
 
     @Override
