@@ -54,8 +54,8 @@ artifacts {
     archives shadowJar
 }
 
-// disable and remove the jar task
+// disable the jar task but do not remove it,
+// this is not nicely compatible with composite builds
 jar {
     enabled false
 }
-tasks.remove jar
