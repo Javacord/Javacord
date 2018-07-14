@@ -1250,6 +1250,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * <li><b>User mentions</b>:
      * <code>@nickname</code> if the user has a nickname, <code>@name</code> if the user has no nickname, unchanged if
      * the user is not in the cache.
+     * <li><b>Role mentions</b>:
+     * <code>@name</code> if the role exists in the server, otherwise <code>#deleted-role</code>
      * <li><b>Channel mentions</b>:
      * <code>#name</code> if the text channel exists in the server, otherwise <code>#deleted-channel</code>
      * <li><b>Custom emoji</b>:
