@@ -123,6 +123,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -896,6 +897,26 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public Collection<User> getMembers() {
         return Collections.unmodifiableList(new ArrayList<>(members.values()));
+    }
+
+    @Override
+    public Collection<User> getBotMembers() {
+        return Collections.unmodifiableList(members.entrySet()
+                .stream()
+                .map(Entry::getValue)
+                .filter(User::isBot)
+                .collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    public Collection<User> getHumanMembers() {
+        return Collections.unmodifiableList(members.entrySet()
+                .stream()
+                .map(Entry::getValue)
+                .filter(user -> !user.isBot())
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
