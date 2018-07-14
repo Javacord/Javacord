@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageActivity;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageType;
@@ -83,6 +84,11 @@ public class MessageImpl implements Message {
      * The author of the message.
      */
     private final MessageAuthor author;
+
+    /**
+     * The activity of the message.
+     */
+    private final MessageActivityImpl activity;
 
     /**
      * If the message should be cached forever or not.
@@ -179,6 +185,11 @@ public class MessageImpl implements Message {
             });
         }
 
+        if (data.has("activity") && !data.get("activity").isNull()) {
+            activity = new MessageActivityImpl(this, data.get("activity"));
+        } else {
+            activity = null;
+        }
     }
 
     /**
@@ -309,6 +320,11 @@ public class MessageImpl implements Message {
     @Override
     public TextChannel getChannel() {
         return channel;
+    }
+
+    @Override
+    public Optional<MessageActivity> getActivity() {
+        return Optional.ofNullable(activity);
     }
 
     @Override

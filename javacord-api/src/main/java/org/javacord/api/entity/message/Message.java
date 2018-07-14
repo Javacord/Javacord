@@ -1341,6 +1341,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     TextChannel getChannel();
 
     /**
+     * Gets the activity of the message.
+     *
+     * @return The activity of the message.
+     */
+    Optional<MessageActivity> getActivity();
+
+    /**
      * Checks if the message is pinned.
      *
      * @return Whether the message is pinned or not.
