@@ -1193,6 +1193,36 @@ public class DiscordApiImpl implements DiscordApi {
     }
 
     @Override
+    public Collection<User> getCachedBotUsers() {
+        synchronized (users) {
+            return Collections.unmodifiableList(users
+                    .entrySet()
+                    .stream()
+                    .map(Entry::getValue)
+                    .map(Reference::get)
+                    .filter(Objects::nonNull)
+                    .filter(User::isBot)
+                    .collect(Collectors.toList())
+            );
+        }
+    }
+
+    @Override
+    public Collection<User> getCachedHumanUsers() {
+        synchronized (users) {
+            return Collections.unmodifiableList(users
+                    .entrySet()
+                    .stream()
+                    .map(Entry::getValue)
+                    .map(Reference::get)
+                    .filter(Objects::nonNull)
+                    .filter(user -> !user.isBot())
+                    .collect(Collectors.toList())
+            );
+        }
+    }
+
+    @Override
     public MessageSet getCachedMessages() {
         synchronized (messages) {
             return messages.values().stream()

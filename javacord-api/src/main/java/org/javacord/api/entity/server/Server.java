@@ -284,6 +284,20 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
     Collection<User> getMembers();
 
     /**
+     * Gets a collection with all members that are bots accounts.
+     *
+     * @return A collection of all bot-account members.
+     */
+    Collection<User> getBotMembers();
+
+    /**
+     * Gets a collection  with all members that are normal accounts.
+     *
+     * @return A collection of all normal-account members.
+     */
+    Collection<User> getHumanMembers();
+
+    /**
      * Gets a member by its id.
      *
      * @param id The id of the member.

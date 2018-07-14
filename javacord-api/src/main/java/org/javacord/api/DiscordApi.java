@@ -561,6 +561,20 @@ public interface DiscordApi {
     Collection<User> getCachedUsers();
 
     /**
+     * Gets a collection with all users that are bots accounts.
+     *
+     * @return A collection of all cached bot-account users.
+     */
+    Collection<User> getCachedBotUsers();
+
+    /**
+     * Gets a collection  with all users that are normal accounts.
+     *
+     * @return A collection of all cached normal-account users.
+     */
+    Collection<User> getCachedHumanUsers();
+
+    /**
      * Gets a cached user by its id.
      *
      * @param id The id of the user.
