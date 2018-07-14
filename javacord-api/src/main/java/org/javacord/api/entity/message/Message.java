@@ -51,6 +51,17 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             Pattern.compile("\\\\(?<char>[^a-zA-Z0-9\\p{javaWhitespace}\\xa0\\u2007\\u202E\\u202F])");
 
     /**
+     * Returns a {@code MessageBuilder} according to this {@code Message}.
+     *
+     * @see MessageBuilder#fromMessage(Message)
+     *
+     * @return The {@code MessageBuilder}.
+     */
+    default MessageBuilder toMessageBuilder() {
+        return MessageBuilder.fromMessage(this);
+    }
+
+    /**
      * Deletes the message.
      *
      * @param api The discord api instance.
