@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageApplication;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageType;
@@ -110,6 +111,11 @@ public class MessageImpl implements Message {
     private final List<Role> roleMentions = new ArrayList<>();
 
     /**
+     * The application of the message.
+     */
+    private final MessageApplication application;
+
+    /**
      * Creates a new message object.
      *
      * @param api The discord api instance.
@@ -136,6 +142,12 @@ public class MessageImpl implements Message {
 
         MessageCacheImpl cache = (MessageCacheImpl) channel.getMessageCache();
         cache.addMessage(this);
+
+        if (data.has("application") && !data.get("application").isNull()) {
+            application = new MessageApplicationImpl(this, data.get("application"));
+        } else {
+            application = null;
+        }
 
         if (data.has("embeds")) {
             for (JsonNode embedJson : data.get("embeds")) {
@@ -172,7 +184,6 @@ public class MessageImpl implements Message {
                 }
             });
         }
-
     }
 
     /**
@@ -294,6 +305,11 @@ public class MessageImpl implements Message {
     @Override
     public TextChannel getChannel() {
         return channel;
+    }
+
+    @Override
+    public Optional<MessageApplication> getApplication() {
+        return Optional.ofNullable(application);
     }
 
     @Override

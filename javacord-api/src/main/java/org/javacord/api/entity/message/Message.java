@@ -1393,6 +1393,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     List<Role> getMentionedRoles();
 
     /**
+     * Gets the application of the message.
+     *
+     * @return The application of the message.
+     */
+    Optional<MessageApplication> getApplication();
+
+    /**
      * Gets a list with all channels mentioned in this message.
      *
      * @return A list with all channels mentioned in this message.
