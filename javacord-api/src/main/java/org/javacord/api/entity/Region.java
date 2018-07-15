@@ -12,6 +12,7 @@ public enum Region {
     EU_CENTRAL("eu-central", "EU Central", false),
     FRANKFURT("frankfurt", "Frankfurt", false),
     HONG_KONG("hongkong", "Hong Kong", false),
+    JAPAN("japan", "Japan", false),
     LONDON("london", "London", false),
     RUSSIA("russia", "Russia", false),
     SINGAPORE("singapore", "Singapore", false),
