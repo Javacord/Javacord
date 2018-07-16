@@ -1,5 +1,4 @@
 plugins {
-    id 'nebula.java-cross-compile' version '0.10.0' apply false
     id 'com.github.johnrengelman.shadow' version '2.0.4' apply false
     id 'me.tatarka.gradle.pom' version '1.0' apply false
     id 'net.researchgate.release' version '2.7.0' apply false
@@ -18,7 +17,6 @@ ext {
 
 allprojects {
     apply plugin: 'java-library'
-    apply plugin: 'nebula.java-cross-compile'
     apply plugin: 'checkstyle'
 
     group = 'org.javacord'
@@ -30,6 +28,11 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.encoding 'UTF-8'
         options.incremental true
+        if (JavaVersion.current().java9Compatible) {
+            afterEvaluate {
+                options.compilerArgs << '--release' << platform.targetCompatibility.majorVersion
+            }
+        }
     }
 
     checkstyle {
