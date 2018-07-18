@@ -44,17 +44,6 @@ public class ServerChannelBuilder {
     }
 
     /**
-     * Sets the category of the channel.
-     *
-     * @param category The category of the channel.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerChannelBuilder setCategory(ChannelCategory category) {
-        delegate.setCategory(category);
-        return this;
-    }
-
-    /**
      * Adds a permission overwrite for the given entity.
      *
      * @param permissionable The entity whose permissions should be overwritten.

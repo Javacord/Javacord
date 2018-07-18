@@ -1,7 +1,6 @@
 package org.javacord.api.entity.channel.internal;
 
 import org.javacord.api.entity.Permissionable;
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannelBuilder;
 import org.javacord.api.entity.permission.Permissions;
 
@@ -24,13 +23,6 @@ public interface ServerChannelBuilderDelegate {
      * @param name The name of the channel.
      */
     void setName(String name);
-
-    /**
-     * Sets the category of the channel.
-     *
-     * @param category The category of the channel.
-     */
-    void setCategory(ChannelCategory category);
 
     /**
      * Adds a permission overwrite for the given entity.

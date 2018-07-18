@@ -3,7 +3,6 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.Permissionable;
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.internal.ServerChannelBuilderDelegate;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
@@ -34,11 +33,6 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
     private String name = null;
 
     /**
-     * The category of the channel.
-     */
-    private ChannelCategory category = null;
-
-    /**
      * The overwritten user permissions.
      */
     private final Map<Long, Permissions> overwrittenUserPermissions = new HashMap<>();
@@ -60,11 +54,6 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
     @Override
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public void setCategory(ChannelCategory category) {
-        this.category = category;
     }
 
     @Override
@@ -90,9 +79,6 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
             throw new IllegalStateException("Name is no optional parameter!");
         }
         body.put("name", name);
-        if (category != null) {
-            body.put("parent_id", category.getIdAsString());
-        }
         ArrayNode permissionOverwrites = null;
         if (overwrittenUserPermissions.size() + overwrittenRolePermissions.size() > 0) {
             permissionOverwrites = body.putArray("permission_overwrites");

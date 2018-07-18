@@ -1,5 +1,6 @@
 package org.javacord.api.entity.channel.internal;
 
+import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 
@@ -17,6 +18,13 @@ public interface ServerTextChannelBuilderDelegate extends ServerChannelBuilderDe
      * @param topic The topic of the channel.
      */
     void setTopic(String topic);
+
+    /**
+     * Sets the category of the channel.
+     *
+     * @param category The category of the channel.
+     */
+    void setCategory(ChannelCategory category);
 
     /**
      * Creates the server text channel.

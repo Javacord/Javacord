@@ -1,5 +1,6 @@
 package org.javacord.api.entity.channel.internal;
 
+import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 
@@ -24,6 +25,13 @@ public interface ServerVoiceChannelBuilderDelegate extends ServerChannelBuilderD
      * @param userlimit The user limit of the channel.
      */
     void setUserlimit(int userlimit);
+
+    /**
+     * Sets the category of the channel.
+     *
+     * @param category The category of the channel.
+     */
+    void setCategory(ChannelCategory category);
 
     /**
      * Creates the server voice channel.

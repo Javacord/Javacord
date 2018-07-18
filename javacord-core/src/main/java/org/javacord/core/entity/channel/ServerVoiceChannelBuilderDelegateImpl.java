@@ -2,6 +2,7 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.core.entity.server.ServerImpl;
@@ -28,6 +29,11 @@ public class ServerVoiceChannelBuilderDelegateImpl extends ServerChannelBuilderD
     private Integer userlimit = null;
 
     /**
+     * The category of the channel.
+     */
+    private ChannelCategory category = null;
+
+    /**
      * Creates a new server voice channel builder delegate.
      *
      * @param server The server of the server voice channel.
@@ -47,6 +53,11 @@ public class ServerVoiceChannelBuilderDelegateImpl extends ServerChannelBuilderD
     }
 
     @Override
+    public void setCategory(ChannelCategory category) {
+        this.category = category;
+    }
+
+    @Override
     public CompletableFuture<ServerVoiceChannel> create() {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("type", 2);
@@ -58,12 +69,14 @@ public class ServerVoiceChannelBuilderDelegateImpl extends ServerChannelBuilderD
         if (userlimit != null) {
             body.put("user_limit", (int) userlimit);
         }
+        if (category != null) {
+            body.put("parent_id", category.getIdAsString());
+        }
         return new RestRequest<ServerVoiceChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(server.getIdAsString())
                 .setBody(body)
                 .setAuditLogReason(reason)
                 .execute(result -> server.getOrCreateServerVoiceChannel(result.getJsonBody()));
     }
-
 
 }
