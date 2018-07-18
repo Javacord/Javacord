@@ -1,7 +1,7 @@
 package org.javacord.api.entity.channel;
 
-import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Nameable;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
@@ -134,8 +134,9 @@ public interface ServerChannel extends Channel, Nameable {
      *
      * @return The overwritten permissions.
      */
-    default Map<DiscordEntity, Permissions> getOverwrittenPermissions() {
-        Map<DiscordEntity, Permissions> result = new HashMap<>(getOverwrittenRolePermissions());
+    default Map<Permissionable, Permissions> getOverwrittenPermissions() {
+        Map<Permissionable, Permissions> result = new HashMap<>();
+        result.putAll(getOverwrittenRolePermissions());
         result.putAll(getOverwrittenUserPermissions());
         return Collections.unmodifiableMap(result);
     }

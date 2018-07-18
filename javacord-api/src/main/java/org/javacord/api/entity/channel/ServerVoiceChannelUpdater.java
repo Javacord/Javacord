@@ -1,9 +1,8 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
@@ -99,26 +98,14 @@ public class ServerVoiceChannelUpdater extends ServerChannelUpdater {
     }
 
     @Override
-    public ServerVoiceChannelUpdater addPermissionOverwrite(User user, Permissions permissions) {
-        delegate.addPermissionOverwrite(user, permissions);
+    public ServerVoiceChannelUpdater addPermissionOverwrite(Permissionable permissionable, Permissions permissions) {
+        delegate.addPermissionOverwrite(permissionable, permissions);
         return this;
     }
 
     @Override
-    public ServerVoiceChannelUpdater addPermissionOverwrite(Role role, Permissions permissions) {
-        delegate.addPermissionOverwrite(role, permissions);
-        return this;
-    }
-
-    @Override
-    public ServerVoiceChannelUpdater removePermissionOverwrite(User user) {
-        delegate.removePermissionOverwrite(user);
-        return this;
-    }
-
-    @Override
-    public ServerVoiceChannelUpdater removePermissionOverwrite(Role role) {
-        delegate.removePermissionOverwrite(role);
+    public ServerVoiceChannelUpdater removePermissionOverwrite(Permissionable permissionable) {
+        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 

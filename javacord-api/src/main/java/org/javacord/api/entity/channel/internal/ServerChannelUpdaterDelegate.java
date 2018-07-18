@@ -1,10 +1,9 @@
 package org.javacord.api.entity.channel.internal;
 
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerChannelUpdater;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.user.User;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,34 +37,19 @@ public interface ServerChannelUpdaterDelegate {
     void setRawPosition(int rawPosition);
 
     /**
-     * Adds a permission overwrite for the given user.
+     * Adds a permission overwrite for the given entity.
      *
-     * @param user The user whose permissions should be overwritten.
+     * @param permissionable The entity whose permissions should be overwritten.
      * @param permissions The permission overwrites.
      */
-    void addPermissionOverwrite(User user, Permissions permissions);
+    void addPermissionOverwrite(Permissionable permissionable, Permissions permissions);
 
     /**
-     * Adds a permission overwrite for the given role.
+     * Removes a permission overwrite for the given entity.
      *
-     * @param role The role which permissions should be overwritten.
-     * @param permissions The permission overwrites.
+     * @param permissionable The entity whose permission overwrite should be removed.
      */
-    void addPermissionOverwrite(Role role, Permissions permissions);
-
-    /**
-     * Removes a permission overwrite for the given user.
-     *
-     * @param user The user whose permission overwrite should be removed.
-     */
-    void removePermissionOverwrite(User user);
-
-    /**
-     * Removes a permission overwrite for the given role.
-     *
-     * @param role The role which permission overwrite should be removed.
-     */
-    void removePermissionOverwrite(Role role);
+    void removePermissionOverwrite(Permissionable permissionable);
 
     /**
      * Performs the queued updates.
