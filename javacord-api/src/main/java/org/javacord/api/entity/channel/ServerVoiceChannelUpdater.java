@@ -1,5 +1,6 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.api.entity.permission.Permissions;
@@ -98,13 +99,15 @@ public class ServerVoiceChannelUpdater extends ServerChannelUpdater {
     }
 
     @Override
-    public ServerVoiceChannelUpdater addPermissionOverwrite(Permissionable permissionable, Permissions permissions) {
+    public <T extends Permissionable & DiscordEntity> ServerVoiceChannelUpdater addPermissionOverwrite(
+            T permissionable, Permissions permissions) {
         delegate.addPermissionOverwrite(permissionable, permissions);
         return this;
     }
 
     @Override
-    public ServerVoiceChannelUpdater removePermissionOverwrite(Permissionable permissionable) {
+    public <T extends Permissionable & DiscordEntity> ServerVoiceChannelUpdater removePermissionOverwrite(
+            T permissionable) {
         delegate.removePermissionOverwrite(permissionable);
         return this;
     }

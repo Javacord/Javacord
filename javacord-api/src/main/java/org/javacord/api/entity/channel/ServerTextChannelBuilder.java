@@ -1,5 +1,6 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.permission.Permissions;
@@ -62,13 +63,15 @@ public class ServerTextChannelBuilder extends ServerChannelBuilder {
     }
 
     @Override
-    public ServerTextChannelBuilder addPermissionOverwrite(Permissionable permissionable, Permissions permissions) {
+    public <T extends Permissionable & DiscordEntity> ServerTextChannelBuilder addPermissionOverwrite(
+            T permissionable, Permissions permissions) {
         delegate.addPermissionOverwrite(permissionable, permissions);
         return this;
     }
 
     @Override
-    public ServerTextChannelBuilder removePermissionOverwrite(Permissionable permissionable) {
+    public <T extends Permissionable & DiscordEntity> ServerTextChannelBuilder removePermissionOverwrite(
+            T permissionable) {
         delegate.removePermissionOverwrite(permissionable);
         return this;
     }

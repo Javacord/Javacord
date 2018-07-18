@@ -1,5 +1,6 @@
 package org.javacord.api.entity.channel.internal;
 
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerChannelUpdater;
@@ -39,17 +40,19 @@ public interface ServerChannelUpdaterDelegate {
     /**
      * Adds a permission overwrite for the given entity.
      *
+     * @param <T> The type of entity to hold the permission, usually <code>User</code> or <code>Role</code>
      * @param permissionable The entity whose permissions should be overwritten.
      * @param permissions The permission overwrites.
      */
-    void addPermissionOverwrite(Permissionable permissionable, Permissions permissions);
+    <T extends Permissionable & DiscordEntity> void addPermissionOverwrite(T permissionable, Permissions permissions);
 
     /**
      * Removes a permission overwrite for the given entity.
      *
+     * @param <T> The type of entity to hold the permission, usually <code>User</code> or <code>Role</code>
      * @param permissionable The entity whose permission overwrite should be removed.
      */
-    void removePermissionOverwrite(Permissionable permissionable);
+    <T extends Permissionable & DiscordEntity> void removePermissionOverwrite(T permissionable);
 
     /**
      * Performs the queued updates.

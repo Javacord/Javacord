@@ -2,6 +2,7 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerChannelBuilderDelegate;
 import org.javacord.api.entity.permission.Permissions;
@@ -57,7 +58,8 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
     }
 
     @Override
-    public void addPermissionOverwrite(Permissionable permissionable, Permissions permissions) {
+    public <T extends Permissionable & DiscordEntity> void addPermissionOverwrite(T permissionable,
+                                                                                  Permissions permissions) {
         if (permissionable instanceof Role) {
             overwrittenRolePermissions.put(permissionable.getId(), permissions);
         } else if (permissionable instanceof User) {
@@ -66,7 +68,7 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
     }
 
     @Override
-    public void removePermissionOverwrite(Permissionable permissionable) {
+    public <T extends Permissionable & DiscordEntity> void removePermissionOverwrite(T permissionable) {
         if (permissionable instanceof Role) {
             overwrittenRolePermissions.remove(permissionable.getId());
         } else if (permissionable instanceof User) {
