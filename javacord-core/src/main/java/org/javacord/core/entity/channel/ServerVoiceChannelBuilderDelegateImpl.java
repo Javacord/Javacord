@@ -2,7 +2,6 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.core.entity.server.ServerImpl;
@@ -15,22 +14,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link ServerVoiceChannelBuilderDelegate}.
  */
-public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannelBuilderDelegate {
-
-    /**
-     * The server of the channel.
-     */
-    private final ServerImpl server;
-
-    /**
-     * The reason for the creation.
-     */
-    private String reason = null;
-
-    /**
-     * The name of the channel.
-     */
-    private String name = null;
+public class ServerVoiceChannelBuilderDelegateImpl extends ServerChannelBuilderDelegateImpl
+        implements ServerVoiceChannelBuilderDelegate {
 
     /**
      * The bitrate of the channel.
@@ -43,32 +28,12 @@ public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannel
     private Integer userlimit = null;
 
     /**
-     * The category of the channel.
-     */
-    private ChannelCategory category = null;
-
-    /**
      * Creates a new server voice channel builder delegate.
      *
      * @param server The server of the server voice channel.
      */
     public ServerVoiceChannelBuilderDelegateImpl(ServerImpl server) {
-        this.server = server;
-    }
-
-    @Override
-    public void setAuditLogReason(String reason) {
-        this.reason = reason;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setCategory(ChannelCategory category) {
-        this.category = category;
+        super(server);
     }
 
     @Override
@@ -85,13 +50,8 @@ public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannel
     public CompletableFuture<ServerVoiceChannel> create() {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("type", 2);
-        if (name == null) {
-            throw new IllegalStateException("Name is no optional parameter!");
-        }
-        body.put("name", name);
-        if (category != null) {
-            body.put("parent_id", category.getIdAsString());
-        }
+        super.prepareBody(body);
+
         if (bitrate != null) {
             body.put("bitrate", (int) bitrate);
         }
