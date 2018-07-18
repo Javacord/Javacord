@@ -1,9 +1,11 @@
 package org.javacord.api.entity.auditlog;
 
+import org.javacord.api.entity.Nameable;
+
 /**
  * This class represents an audit log change type (sometimes also called key).
  */
-public enum AuditLogChangeType {
+public enum AuditLogChangeType implements Nameable {
 
     NAME("name"),
     ICON("icon_hash"),

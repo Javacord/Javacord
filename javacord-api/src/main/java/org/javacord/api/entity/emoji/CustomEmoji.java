@@ -2,6 +2,7 @@ package org.javacord.api.entity.emoji;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.UpdatableFromCache;
 
 import java.util.Optional;
@@ -11,7 +12,7 @@ import java.util.Optional;
  * If it's an unknown custom emoji, the object won't be unique and won't receive any updates!
  * Only {@link KnownCustomEmoji} receive updates!
  */
-public interface CustomEmoji extends DiscordEntity, Emoji, UpdatableFromCache<KnownCustomEmoji> {
+public interface CustomEmoji extends DiscordEntity, Nameable,  Emoji, UpdatableFromCache<KnownCustomEmoji> {
 
     /**
      * Gets the name of the emoji.

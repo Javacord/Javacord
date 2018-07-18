@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
  * Represents the information of an application (aka. bot).
  * This class won't get updated after being fetched!
  */
-public interface ApplicationInfo {
+public interface ApplicationInfo extends Nameable {
 
     /**
      * Gets the client id of the application.

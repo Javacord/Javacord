@@ -1,9 +1,11 @@
 package org.javacord.api.entity.message.embed;
 
+import org.javacord.api.entity.Nameable;
+
 /**
  * This interface represents an embed field.
  */
-public interface EmbedField {
+public interface EmbedField extends Nameable {
 
     /**
      * Gets the name of the field.

@@ -4,6 +4,7 @@ import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents either a user or a webhook.
  */
-public interface MessageAuthor extends DiscordEntity {
+public interface MessageAuthor extends DiscordEntity, Nameable {
 
     /**
      * Gets the message.

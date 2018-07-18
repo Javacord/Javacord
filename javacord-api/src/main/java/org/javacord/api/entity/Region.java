@@ -3,7 +3,7 @@ package org.javacord.api.entity;
 /**
  * This enum represents a valid region for a server.
  */
-public enum Region {
+public enum Region implements Nameable {
 
     // "Normal" regions
     AMSTERDAM("amsterdam", "Amsterdam", false),
