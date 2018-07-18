@@ -1,6 +1,8 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
+import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -62,6 +64,18 @@ public class ServerVoiceChannelBuilder extends ServerChannelBuilder {
      */
     public ServerVoiceChannelBuilder setUserlimit(int userlimit) {
         delegate.setUserlimit(userlimit);
+        return this;
+    }
+
+    @Override
+    public ServerVoiceChannelBuilder addPermissionOverwrite(Permissionable permissionable, Permissions permissions) {
+        delegate.addPermissionOverwrite(permissionable, permissions);
+        return this;
+    }
+
+    @Override
+    public ServerVoiceChannelBuilder removePermissionOverwrite(Permissionable permissionable) {
+        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 

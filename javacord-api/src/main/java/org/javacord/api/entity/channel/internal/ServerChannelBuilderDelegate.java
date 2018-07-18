@@ -1,7 +1,9 @@
 package org.javacord.api.entity.channel.internal;
 
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannelBuilder;
+import org.javacord.api.entity.permission.Permissions;
 
 /**
  * This class is internally used by the {@link ServerChannelBuilder} to create server channels.
@@ -30,4 +32,18 @@ public interface ServerChannelBuilderDelegate {
      */
     void setCategory(ChannelCategory category);
 
+    /**
+     * Adds a permission overwrite for the given entity.
+     *
+     * @param permissionable The entity whose permissions should be overwritten.
+     * @param permissions The permission overwrites.
+     */
+    void addPermissionOverwrite(Permissionable permissionable, Permissions permissions);
+
+    /**
+     * Removes a permission overwrite for the given entity.
+     *
+     * @param permissionable The entity whose permission overwrite should be removed.
+     */
+    void removePermissionOverwrite(Permissionable permissionable);
 }

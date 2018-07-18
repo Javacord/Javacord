@@ -1,6 +1,8 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
+import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -51,6 +53,18 @@ public class ServerTextChannelBuilder extends ServerChannelBuilder {
     @Override
     public ServerTextChannelBuilder setCategory(ChannelCategory category) {
         delegate.setCategory(category);
+        return this;
+    }
+
+    @Override
+    public ServerTextChannelBuilder addPermissionOverwrite(Permissionable permissionable, Permissions permissions) {
+        delegate.addPermissionOverwrite(permissionable, permissions);
+        return this;
+    }
+
+    @Override
+    public ServerTextChannelBuilder removePermissionOverwrite(Permissionable permissionable) {
+        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 

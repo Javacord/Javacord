@@ -1,9 +1,17 @@
 package org.javacord.core.entity.channel;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.internal.ServerChannelBuilderDelegate;
+import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.user.User;
 import org.javacord.core.entity.server.ServerImpl;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The implementation of {@link ServerChannelBuilderDelegate}.
@@ -30,6 +38,16 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
      */
     private ChannelCategory category = null;
 
+    /**
+     * The overwritten user permissions.
+     */
+    private final Map<Long, Permissions> overwrittenUserPermissions = new HashMap<>();
+
+    /**
+     * The overwritten role permissions.
+     */
+    private final Map<Long, Permissions> overwrittenRolePermissions = new HashMap<>();
+
     protected ServerChannelBuilderDelegateImpl(ServerImpl server) {
         this.server = server;
     }
@@ -49,6 +67,24 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
         this.category = category;
     }
 
+    @Override
+    public void addPermissionOverwrite(Permissionable permissionable, Permissions permissions) {
+        if (permissionable instanceof Role) {
+            overwrittenRolePermissions.put(permissionable.getId(), permissions);
+        } else if (permissionable instanceof User) {
+            overwrittenUserPermissions.put(permissionable.getId(), permissions);
+        }
+    }
+
+    @Override
+    public void removePermissionOverwrite(Permissionable permissionable) {
+        if (permissionable instanceof Role) {
+            overwrittenRolePermissions.remove(permissionable.getId());
+        } else if (permissionable instanceof User) {
+            overwrittenUserPermissions.remove(permissionable.getId());
+        }
+    }
+
     protected void prepareBody(ObjectNode body) {
         if (name == null) {
             throw new IllegalStateException("Name is no optional parameter!");
@@ -56,6 +92,24 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
         body.put("name", name);
         if (category != null) {
             body.put("parent_id", category.getIdAsString());
+        }
+        ArrayNode permissionOverwrites = null;
+        if (overwrittenUserPermissions.size() + overwrittenRolePermissions.size() > 0) {
+            permissionOverwrites = body.putArray("permission_overwrites");
+        }
+        for (Map.Entry<Long, Permissions> entry : overwrittenUserPermissions.entrySet()) {
+            permissionOverwrites.addObject()
+                    .put("id", Long.toUnsignedString(entry.getKey()))
+                    .put("type", "member")
+                    .put("allow", entry.getValue().getAllowedBitmask())
+                    .put("deny", entry.getValue().getDeniedBitmask());
+        }
+        for (Map.Entry<Long, Permissions> entry : overwrittenRolePermissions.entrySet()) {
+            permissionOverwrites.addObject()
+                    .put("id", Long.toUnsignedString(entry.getKey()))
+                    .put("type", "role")
+                    .put("allow", entry.getValue().getAllowedBitmask())
+                    .put("deny", entry.getValue().getDeniedBitmask());
         }
     }
 }
