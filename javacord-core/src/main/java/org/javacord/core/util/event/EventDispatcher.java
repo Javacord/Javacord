@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -59,7 +60,8 @@ public class EventDispatcher {
     /**
      * This map which holds a queue for every object (usually a server) with tasks to call the waiting listeners.
      */
-    private final ConcurrentHashMap<Object, Queue<Runnable>> queuedListenerTasks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Object, ConcurrentLinkedQueue<Runnable>> queuedListenerTasks
+            = new ConcurrentHashMap<>();
 
     /**
      * A list with all objects which currently have a running listener.
@@ -80,7 +82,7 @@ public class EventDispatcher {
      */
     public EventDispatcher(DiscordApi api) {
         this.api = api;
-        queuedListenerTasks.put(OBJECT_INDEPENDENT_TASK_INDICATOR, new LinkedList<>());
+        queuedListenerTasks.put(OBJECT_INDEPENDENT_TASK_INDICATOR, new ConcurrentLinkedQueue<>());
         api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
             try {
                 if (!executionTimeCheckingEnabled) {
@@ -177,14 +179,15 @@ public class EventDispatcher {
                     }
                 }
                 synchronized (queuedListenerTasks) {
-                    Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(object, o -> new LinkedList<>());
+                    Queue<Runnable> queue = queuedListenerTasks
+                            .computeIfAbsent(object, o -> new ConcurrentLinkedQueue<>());
                     listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
                 }
                 checkRunningListenersAndStartIfPossible(object);
             } else { // Object independent listeners
                 synchronized (queuedListenerTasks) {
                     Queue<Runnable> queue = queuedListenerTasks
-                            .computeIfAbsent(OBJECT_INDEPENDENT_TASK_INDICATOR, o -> new LinkedList<>());
+                            .computeIfAbsent(OBJECT_INDEPENDENT_TASK_INDICATOR, o -> new ConcurrentLinkedQueue<>());
                     listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
                 }
                 checkRunningListenersAndStartIfPossible(null);
