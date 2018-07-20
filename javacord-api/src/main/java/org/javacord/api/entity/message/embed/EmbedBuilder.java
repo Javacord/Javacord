@@ -11,6 +11,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * This class is used to create embeds.
@@ -621,6 +623,54 @@ public class EmbedBuilder {
      */
     public EmbedBuilder addField(String name, String value, boolean inline) {
         delegate.addField(name, value, inline);
+        return this;
+    }
+
+    /**
+     * Updates all fields of the embed that satisfy the given predicate using the given updater.
+     *
+     * @param predicate The predicate that fields have to satisfy to get updated.
+     * @param updater The updater for the fields; the {@code EditableEmbedField} is only valid during the run of the
+     *                updater; any try to save it in a variable and reuse it later after this method call will fail
+     *                with exceptions.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder updateFields(Predicate<EmbedField> predicate, Consumer<EditableEmbedField> updater) {
+        delegate.updateFields(predicate, updater);
+        return this;
+    }
+
+    /**
+     * Updates all fields of the embed using the given updater.
+     *
+     * @param updater The updater for the fields; the {@code EditableEmbedField} is only valid during the run of the
+     *                updater; any try to save it in a variable and reuse it later after this method call will fail
+     *                with exceptions.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder updateAllFields(Consumer<EditableEmbedField> updater) {
+        delegate.updateFields(field -> true, updater);
+        return this;
+    }
+
+    /**
+     * Removes all fields of the embed that satisfy the given predicate.
+     *
+     * @param predicate The predicate that fields have to satisfy to get removed.
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder removeFields(Predicate<EmbedField> predicate) {
+        delegate.removeFields(predicate);
+        return this;
+    }
+
+    /**
+     * Removes all fields of the embed.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public EmbedBuilder removeAllFields() {
+        delegate.removeFields(field -> true);
         return this;
     }
 
