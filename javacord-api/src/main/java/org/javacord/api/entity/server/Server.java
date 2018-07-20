@@ -2394,24 +2394,33 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Checks if the given user can ban the other user.
-     * This methods also considers the position of the user roles.
+     * This method also considers the position of the user roles and the owner.
      *
      * @param user The user which "want" to ban the other user.
      * @param userToBan The user which should be banned.
      * @return Whether the given user can ban the other user or not.
      */
     default boolean canBanUser(User user, User userToBan) {
-        if (canBanUsers(user)) {
+        // owner can always ban, regardless of role for example
+        if (isOwner(user)) {
+            return true;
+        }
+        // user cannot ban at all
+        if (!canBanUsers(user)) {
             return false;
         }
-        Optional<Role> ownRole = getHighestRole(user);
+        // only returns empty optional if user is not member of server
+        // but then canBanUsers should already have kicked in
+        Role ownRole = getHighestRole(user).orElseThrow(AssertionError::new);
         Optional<Role> otherRole = getHighestRole(userToBan);
-        return ownRole.isPresent() && (!otherRole.isPresent() || ownRole.get().isHigherThan(otherRole.get()));
+        // otherRole empty => userToBan is not on the server => ban is allowed
+        boolean userToBanOnServer = otherRole.isPresent();
+        return !userToBanOnServer || ownRole.isHigherThan(otherRole.get());
     }
 
     /**
      * Checks if the user of the connected account can ban the user.
-     * This methods also considers the position of the user roles.
+     * This method also considers the position of the user roles and the owner.
      *
      * @param userToBan The user which should be banned.
      * @return Whether the user of the connected account can ban the user or not.
