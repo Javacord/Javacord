@@ -2357,7 +2357,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
         Optional<Role> otherRole = getHighestRole(userToKick);
         // otherRole empty => userToKick is not on the server => kick is allowed as Discord allows it
         boolean userToKickOnServer = otherRole.isPresent();
-        return !userToKickOnServer || ownRole.isHigherThan(otherRole.get());
+        return !userToKickOnServer || (ownRole.compareTo(otherRole.get()) > 0);
     }
 
     /**
@@ -2415,7 +2415,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
         Optional<Role> otherRole = getHighestRole(userToBan);
         // otherRole empty => userToBan is not on the server => ban is allowed
         boolean userToBanOnServer = otherRole.isPresent();
-        return !userToBanOnServer || ownRole.isHigherThan(otherRole.get());
+        return !userToBanOnServer || (ownRole.compareTo(otherRole.get()) > 0);
     }
 
     /**

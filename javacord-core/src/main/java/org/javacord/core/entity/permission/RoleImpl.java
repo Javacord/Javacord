@@ -30,6 +30,7 @@ import org.javacord.core.util.rest.RestRequest;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,10 @@ import java.util.stream.Collectors;
  * The implementation of {@link Role}.
  */
 public class RoleImpl implements Role {
+
+    private static final Comparator<Role> ROLE_COMPARATOR = Comparator
+            .comparingInt(Role::getPosition)
+            .thenComparing(Comparator.comparing(Role::getId).reversed());
 
     /**
      * The discord api instance.
@@ -262,6 +267,21 @@ public class RoleImpl implements Role {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.ROLE)
                 .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .execute(result -> null);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p/><b><i>Implementation note:</i></b> Only roles from the same server can be compared
+     *
+     * @throws IllegalArgumentException If the roles are on different servers.
+     */
+    @Override
+    public int compareTo(Role role) {
+        if (!role.getServer().equals(getServer())) {
+            throw new IllegalArgumentException("Only roles from the same server can be compared for order");
+        }
+        return ROLE_COMPARATOR.compare(this, role);
     }
 
     @Override
