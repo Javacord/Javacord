@@ -325,7 +325,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * This method waits for the identification rate limit to be over, then returns.
      */
     private void waitForIdentifyRateLimit() {
-        String token = api.getToken();
+        String token = api.getPrefixedToken();
         connectionDelaySemaphorePerAccount.computeIfAbsent(token, key -> new Semaphore(1)).acquireUninterruptibly();
         for (long delay = 5100 - (System.currentTimeMillis() - lastIdentificationPerAccount.getOrDefault(token, 0L));
                 delay > 0;
@@ -482,7 +482,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                 1 + zeroToFourSeconds / 100 % 10);
                     fakeLastIdentificationTime -= 4000 - zeroToFourSeconds;
                 }
-                lastIdentificationPerAccount.put(api.getToken(), fakeLastIdentificationTime);
+                lastIdentificationPerAccount.put(api.getPrefixedToken(), fakeLastIdentificationTime);
                 waitForIdentifyRateLimit();
                 sendIdentify(websocket);
                 break;
@@ -501,7 +501,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 if (sessionId == null) {
                     sendIdentify(websocket);
                 } else {
-                    connectionDelaySemaphorePerAccount.get(api.getToken()).release();
+                    connectionDelaySemaphorePerAccount.get(api.getPrefixedToken()).release();
                     sendResume(websocket);
                 }
                 break;
@@ -592,7 +592,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         ObjectNode resumePacket = JsonNodeFactory.instance.objectNode()
                 .put("op", GatewayOpcode.RESUME.getCode());
         resumePacket.putObject("d")
-                .put("token", api.getToken())
+                .put("token", api.getPrefixedToken())
                 .put("session_id", sessionId)
                 .put("seq", lastSeq);
         logger.debug("Sending resume packet");
@@ -608,7 +608,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         ObjectNode identifyPacket = JsonNodeFactory.instance.objectNode()
                 .put("op", GatewayOpcode.IDENTIFY.getCode());
         ObjectNode data = identifyPacket.putObject("d");
-        String token = api.getToken();
+        String token = api.getPrefixedToken();
         data.put("token", token)
                 .put("compress", true)
                 .put("large_threshold", 250)

@@ -379,7 +379,7 @@ public class DiscordApiImpl implements DiscordApi {
             CompletableFuture<DiscordApi> ready
     ) {
         this.accountType = accountType;
-        this.token = accountType.getTokenPrefix() + token;
+        this.token = token;
         this.currentShard = currentShard;
         this.totalShards = totalShards;
         this.waitForServersOnStartup = waitForServersOnStartup;
@@ -945,6 +945,11 @@ public class DiscordApiImpl implements DiscordApi {
                 .map(Map::keySet)
                 .map(ArrayList::new)
                 .orElseGet(ArrayList::new));
+    }
+
+    @Override
+    public String getPrefixedToken() {
+        return accountType.getTokenPrefix() + token;
     }
 
     @Override

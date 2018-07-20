@@ -122,12 +122,19 @@ public interface DiscordApi {
 
     /**
      * Gets the used token.
-     * The returned token already includes the {@link AccountType#getTokenPrefix()}, so you can use it directly in the
-     * authentication header for custom REST calls.
      *
      * @return The used token.
      */
     String getToken();
+
+    /**
+     * Gets the used token with the {@link AccountType#getTokenPrefix()}, that
+     * way it is usable directly in the authentication header for custom
+     * REST calls.
+     *
+     * @return The prefixed, used token.
+     */
+    String getPrefixedToken();
 
     /**
      * Gets the thread pool which is internally used.

@@ -366,7 +366,7 @@ public class RestRequest<T> {
                 throw new IllegalArgumentException("Unsupported http method!");
         }
         if (includeAuthorizationHeader) {
-            requestBuilder.addHeader("authorization", api.getToken());
+            requestBuilder.addHeader("authorization", api.getPrefixedToken());
         }
         headers.forEach(requestBuilder::addHeader);
         logger.debug("Trying to send {} request to {}{}",
