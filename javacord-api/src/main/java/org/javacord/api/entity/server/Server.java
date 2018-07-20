@@ -2335,24 +2335,34 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Checks if the given user can kick the other user.
-     * This methods also considers the position of the user roles.
+     * This method also considers the position of the user roles and the owner.
+     * If the to-be-kicked user is not part of this server, still {@code true} is returned as Discord allows this.
      *
      * @param user The user which "want" to kick the other user.
      * @param userToKick The user which should be kicked.
      * @return Whether the given user can kick the other user or not.
      */
     default boolean canKickUser(User user, User userToKick) {
-        if (canKickUsers(user)) {
+        // owner can always kick, regardless of role for example
+        if (isOwner(user)) {
+            return true;
+        }
+        // user cannot kick at all
+        if (!canKickUsers(user)) {
             return false;
         }
-        Optional<Role> ownRole = getHighestRole(user);
+        // only returns empty optional if user is not member of server
+        // but then canKickUsers should already have kicked in
+        Role ownRole = getHighestRole(user).orElseThrow(AssertionError::new);
         Optional<Role> otherRole = getHighestRole(userToKick);
-        return ownRole.isPresent() && (!otherRole.isPresent() || ownRole.get().isHigherThan(otherRole.get()));
+        // otherRole empty => userToKick is not on the server => kick is allowed as Discord allows it
+        boolean userToKickOnServer = otherRole.isPresent();
+        return !userToKickOnServer || ownRole.isHigherThan(otherRole.get());
     }
 
     /**
      * Checks if the user of the connected account can kick the user.
-     * This methods also considers the position of the user roles.
+     * This method also considers the position of the user roles and the owner.
      *
      * @param userToKick The user which should be kicked.
      * @return Whether the user of the connected account can kick the user or not.
