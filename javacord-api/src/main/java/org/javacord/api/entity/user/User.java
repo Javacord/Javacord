@@ -35,9 +35,13 @@ import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserAttachableListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDeafenedListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
+import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfDeafenedListener;
+import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
@@ -195,6 +199,9 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     /**
      * Changes the nickname of the user in the given server.
      *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
      * @param server The server.
      * @param nickname The new nickname of the user.
      * @return A future to check if the update was successful.
@@ -204,13 +211,45 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
     }
 
     /**
+     * Changes the nickname of the user in the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server The server.
+     * @param nickname The new nickname of the user.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateNickname(Server server, String nickname, String reason) {
+        return server.updateNickname(this, nickname, reason);
+    }
+
+    /**
      * Removes the nickname of the user in the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
      * @param server The server.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> resetNickname(Server server) {
         return server.resetNickname(this);
+    }
+
+    /**
+     * Removes the nickname of the user in the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server The server.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> resetNickname(Server server, String reason) {
+        return server.resetNickname(this, reason);
     }
 
     /**
@@ -221,6 +260,140 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      */
     default Optional<String> getNickname(Server server) {
         return server.getNickname(this);
+    }
+
+    /**
+     * Moves this user to the given channel.
+     *
+     * @param channel The channel to move the user to.
+     * @return A future to check if the move was successful.
+     */
+    default CompletableFuture<Void> move(ServerVoiceChannel channel) {
+        return channel.getServer().moveUser(this, channel);
+    }
+
+    /**
+     * Gets the self-muted state of the user in the given server.
+     *
+     * @param server The server to check.
+     * @return Whether the user is self-muted in the given server.
+     */
+    default boolean isSelfMuted(Server server) {
+        return server.isSelfMuted(getId());
+    }
+
+    /**
+     * Gets the self-deafened state of the user in the given server.
+     *
+     * @param server The server to check.
+     * @return Whether the user is self-deafened in the given server.
+     */
+    default boolean isSelfDeafened(Server server) {
+        return server.isSelfDeafened(getId());
+    }
+
+    /**
+     * Mutes this user on the given server.
+     *
+     * @param server The server to umute this user on.
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> mute(Server server) {
+        return server.muteUser(this);
+    }
+
+    /**
+     * Mutes this user on the given server.
+     *
+     * @param server The server to umute this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> mute(Server server, String reason) {
+        return server.muteUser(this, reason);
+    }
+
+    /**
+     * Unmutes this user on the given server.
+     *
+     * @param server The server to unumute this user on.
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmute(Server server) {
+        return server.unmuteUser(this);
+    }
+
+    /**
+     * Unmutes this user on the given server.
+     *
+     * @param server The server to unumute this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmute(Server server, String reason) {
+        return server.unmuteUser(this, reason);
+    }
+
+    /**
+     * Gets the muted state of the user in the given server.
+     *
+     * @param server The server to check.
+     * @return Whether the user is muted in the given server.
+     */
+    default boolean isMuted(Server server) {
+        return server.isMuted(getId());
+    }
+
+    /**
+     * Deafens this user on the given server.
+     *
+     * @param server The server to deafen this user on.
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafen(Server server) {
+        return server.deafenUser(this);
+    }
+
+    /**
+     * Deafens this user on the given server.
+     *
+     * @param server The server to deafen this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafen(Server server, String reason) {
+        return server.deafenUser(this, reason);
+    }
+
+    /**
+     * Undeafens this user on the given server.
+     *
+     * @param server The server to undeafen this user on.
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafen(Server server) {
+        return server.undeafenUser(this);
+    }
+
+    /**
+     * Undeafens this user on the given server.
+     *
+     * @param server The server to undeafen this user on.
+     * @param reason The audit log reason for this action.
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafen(Server server, String reason) {
+        return server.undeafenUser(this, reason);
+    }
+
+    /**
+     * Gets the deafened state of the user in the given server.
+     *
+     * @param server The server to check.
+     * @return Whether the user is deafened in the given server.
+     */
+    default boolean isDeafened(Server server) {
+        return server.isDeafened(getId());
     }
 
     /**
@@ -599,6 +772,67 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      * @return A list with all registered user change nickname listeners.
      */
     List<UserChangeNicknameListener> getUserChangeNicknameListeners();
+
+    /**
+     * Adds a listener, which listens to self-muted changes of this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeSelfMutedListener> addUserChangeSelfMutedListener(UserChangeSelfMutedListener listener);
+
+    /**
+     * Gets a list with all registered user change self-muted listeners.
+     *
+     * @return A list with all registered user change self-muted listeners.
+     */
+    List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners();
+
+    /**
+     * Adds a listener, which listens to self-deafened changes of this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeSelfDeafenedListener> addUserChangeSelfDeafenedListener(
+            UserChangeSelfDeafenedListener listener);
+
+    /**
+     * Gets a list with all registered user change self-deafened listeners.
+     *
+     * @return A list with all registered user change self-deafened listeners.
+     */
+    List<UserChangeSelfDeafenedListener> getUserChangeSelfDeafenedListeners();
+
+    /**
+     * Adds a listener, which listens to muted changes of this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeMutedListener> addUserChangeMutedListener(UserChangeMutedListener listener);
+
+    /**
+     * Gets a list with all registered user change muted listeners.
+     *
+     * @return A list with all registered user change muted listeners.
+     */
+    List<UserChangeMutedListener> getUserChangeMutedListeners();
+
+    /**
+     * Adds a listener, which listens to deafened changes of this user.
+     *
+     * @param listener The listener to add.
+     * @return The manager of the listener.
+     */
+    ListenerManager<UserChangeDeafenedListener> addUserChangeDeafenedListener(UserChangeDeafenedListener listener);
+
+    /**
+     * Gets a list with all registered user change deafened listeners.
+     *
+     * @return A list with all registered user change deafened listeners.
+     */
+    List<UserChangeDeafenedListener> getUserChangeDeafenedListeners();
 
     /**
      * Adds a listener, which listens to this user being added to roles.

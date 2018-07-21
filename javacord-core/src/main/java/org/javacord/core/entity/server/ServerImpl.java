@@ -3,7 +3,6 @@ package org.javacord.core.entity.server;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
@@ -86,9 +85,13 @@ import org.javacord.api.listener.server.role.UserRoleAddListener;
 import org.javacord.api.listener.server.role.UserRoleRemoveListener;
 import org.javacord.api.listener.user.UserChangeActivityListener;
 import org.javacord.api.listener.user.UserChangeAvatarListener;
+import org.javacord.api.listener.user.UserChangeDeafenedListener;
 import org.javacord.api.listener.user.UserChangeDiscriminatorListener;
+import org.javacord.api.listener.user.UserChangeMutedListener;
 import org.javacord.api.listener.user.UserChangeNameListener;
 import org.javacord.api.listener.user.UserChangeNicknameListener;
+import org.javacord.api.listener.user.UserChangeSelfDeafenedListener;
+import org.javacord.api.listener.user.UserChangeSelfMutedListener;
 import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
@@ -125,8 +128,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -255,6 +260,26 @@ public class ServerImpl implements Server, Cleanupable {
      * A map with all nicknames. The key is the user id.
      */
     private final ConcurrentHashMap<Long, String> nicknames = new ConcurrentHashMap<>();
+
+    /**
+     * A set with all members that are self-muted.
+     */
+    private final Set<Long> selfMuted = new ConcurrentSkipListSet<>();
+
+    /**
+     * A set with all members that are self-deafened.
+     */
+    private final Set<Long> selfDeafened = new ConcurrentSkipListSet<>();
+
+    /**
+     * A set with all members that are muted.
+     */
+    private final Set<Long> muted = new ConcurrentSkipListSet<>();
+
+    /**
+     * A set with all members that are deafened.
+     */
+    private final Set<Long> deafened = new ConcurrentSkipListSet<>();
 
     /**
      * A map with all joinedAt instants. The key is the user id.
@@ -660,10 +685,15 @@ public class ServerImpl implements Server, Cleanupable {
      * @param user The user to remove.
      */
     public void removeMember(User user) {
-        members.remove(user.getId());
-        nicknames.remove(user.getId());
+        long userId = user.getId();
+        members.remove(userId);
+        nicknames.remove(userId);
+        selfMuted.remove(userId);
+        selfDeafened.remove(userId);
+        muted.remove(userId);
+        deafened.remove(userId);
         getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(user));
-        joinedAtTimestamps.remove(user.getId());
+        joinedAtTimestamps.remove(userId);
     }
 
     /**
@@ -683,6 +713,12 @@ public class ServerImpl implements Server, Cleanupable {
         members.put(user.getId(), user);
         if (member.hasNonNull("nick")) {
             nicknames.put(user.getId(), member.get("nick").asText());
+        }
+        if (member.hasNonNull("mute")) {
+            setMuted(user.getId(), member.get("mute").asBoolean());
+        }
+        if (member.hasNonNull("deaf")) {
+            setDeafened(user.getId(), member.get("deaf").asBoolean());
         }
 
         for (JsonNode roleIds : member.get("roles")) {
@@ -716,6 +752,62 @@ public class ServerImpl implements Server, Cleanupable {
      */
     public void setNickname(User user, String nickname) {
         nicknames.compute(user.getId(), (key, value) -> nickname);
+    }
+
+    /**
+     * Sets the self-muted state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param muted Whether the user with the given id is self-muted or not.
+     */
+    public void setSelfMuted(long userId, boolean muted) {
+        if (muted) {
+            selfMuted.add(userId);
+        } else {
+            selfMuted.remove(userId);
+        }
+    }
+
+    /**
+     * Sets the self-deafened state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param deafened Whether the user with the given id is self-deafened or not.
+     */
+    public void setSelfDeafened(long userId, boolean deafened) {
+        if (deafened) {
+            selfDeafened.add(userId);
+        } else {
+            selfDeafened.remove(userId);
+        }
+    }
+
+    /**
+     * Sets the muted state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param muted Whether the user with the given id is muted or not.
+     */
+    public void setMuted(long userId, boolean muted) {
+        if (muted) {
+            this.muted.add(userId);
+        } else {
+            this.muted.remove(userId);
+        }
+    }
+
+    /**
+     * Sets the deafened state of the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @param deafened Whether the user with the given id is deafened or not.
+     */
+    public void setDeafened(long userId, boolean deafened) {
+        if (deafened) {
+            this.deafened.add(userId);
+        } else {
+            this.deafened.remove(userId);
+        }
     }
 
     /**
@@ -770,6 +862,26 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public Optional<String> getNickname(User user) {
         return Optional.ofNullable(nicknames.get(user.getId()));
+    }
+
+    @Override
+    public boolean isSelfMuted(long userId) {
+        return selfMuted.contains(userId);
+    }
+
+    @Override
+    public boolean isSelfDeafened(long userId) {
+        return selfDeafened.contains(userId);
+    }
+
+    @Override
+    public boolean isMuted(long userId) {
+        return muted.contains(userId);
+    }
+
+    @Override
+    public boolean isDeafened(long userId) {
+        return deafened.contains(userId);
     }
 
     @Override
@@ -916,23 +1028,6 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
-    public CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
-        if (user.isYourself()) {
-            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
-                    .setUrlParameters(getIdAsString())
-                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .setAuditLogReason(reason)
-                    .execute(result -> null);
-        } else {
-            return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                    .setUrlParameters(getIdAsString(), user.getIdAsString())
-                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                    .setAuditLogReason(reason)
-                    .execute(result -> null);
-        }
-    }
-
-    @Override
     public CompletableFuture<Void> delete() {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER)
                 .setUrlParameters(getIdAsString())
@@ -963,20 +1058,6 @@ public class ServerImpl implements Server, Cleanupable {
     }
 
     @Override
-    public CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason) {
-        ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
-        ArrayNode rolesJson = updateNode.putArray("roles");
-        for (Role role : roles) {
-            rolesJson.add(role.getIdAsString());
-        }
-        return new RestRequest<Void>(getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                .setUrlParameters(getIdAsString(), user.getIdAsString())
-                .setBody(updateNode)
-                .setAuditLogReason(reason)
-                .execute(result -> null);
-    }
-
-    @Override
     public CompletableFuture<Void> reorderRoles(List<Role> roles, String reason) {
         roles = new ArrayList<>(roles); // Copy the list to safely modify it
         ArrayNode body = JsonNodeFactory.instance.arrayNode();
@@ -991,6 +1072,30 @@ public class ServerImpl implements Server, Cleanupable {
                 .setBody(body)
                 .setAuditLogReason(reason)
                 .execute(result -> null);
+    }
+
+    @Override
+    public void selfMute() {
+        api.getWebSocketAdapter().sendVoiceStateUpdate(
+                this, getConnectedVoiceChannel(api.getYourself()).orElse(null), true, null);
+    }
+
+    @Override
+    public void selfUnmute() {
+        api.getWebSocketAdapter().sendVoiceStateUpdate(
+                this, getConnectedVoiceChannel(api.getYourself()).orElse(null), false, null);
+    }
+
+    @Override
+    public void selfDeafen() {
+        api.getWebSocketAdapter().sendVoiceStateUpdate(
+                this, getConnectedVoiceChannel(api.getYourself()).orElse(null), null, true);
+    }
+
+    @Override
+    public void selfUndeafen() {
+        api.getWebSocketAdapter().sendVoiceStateUpdate(
+                this, getConnectedVoiceChannel(api.getYourself()).orElse(null), null, false);
     }
 
     @Override
@@ -1723,6 +1828,54 @@ public class ServerImpl implements Server, Cleanupable {
     @Override
     public List<UserChangeNicknameListener> getUserChangeNicknameListeners() {
         return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeNicknameListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeSelfMutedListener> addUserChangeSelfMutedListener(
+            UserChangeSelfMutedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeSelfMutedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeSelfMutedListener> getUserChangeSelfMutedListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeSelfMutedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeSelfDeafenedListener> addUserChangeSelfDeafenedListener(
+            UserChangeSelfDeafenedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeSelfDeafenedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeSelfDeafenedListener> getUserChangeSelfDeafenedListeners() {
+        return ((DiscordApiImpl) getApi())
+                .getObjectListeners(Server.class, getId(), UserChangeSelfDeafenedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeMutedListener> addUserChangeMutedListener(UserChangeMutedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeMutedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeMutedListener> getUserChangeMutedListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeMutedListener.class);
+    }
+
+    @Override
+    public ListenerManager<UserChangeDeafenedListener> addUserChangeDeafenedListener(
+            UserChangeDeafenedListener listener) {
+        return ((DiscordApiImpl) getApi()).addObjectListener(
+                Server.class, getId(), UserChangeDeafenedListener.class, listener);
+    }
+
+    @Override
+    public List<UserChangeDeafenedListener> getUserChangeDeafenedListeners() {
+        return ((DiscordApiImpl) getApi()).getObjectListeners(Server.class, getId(), UserChangeDeafenedListener.class);
     }
 
     @Override

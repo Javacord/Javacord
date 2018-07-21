@@ -13,7 +13,9 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.activity.Activity;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.connection.LostConnectionEvent;
 import org.javacord.api.event.connection.ReconnectEvent;
 import org.javacord.api.event.connection.ResumeEvent;
@@ -651,6 +653,34 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         websocket.addListener(identifyFrameListener);
         logger.debug("Sending identify packet");
         websocket.sendFrame(identifyFrame);
+    }
+
+    /**
+     * Sends the voice state update packet.
+     *
+     * @param server The server to send the voice state update for. Can be {@code null} if {@code channel} is given.
+     * @param channel The channel to connect to or {@code null} to disconnect from voice.
+     * @param selfMuted Whether to self-mute on the given server. If {@code null}, current state remains unchanged.
+     * @param selfDeafened Whether to self-deafen on the given server. If {@code null}, current state remains unchanged.
+     */
+    public void sendVoiceStateUpdate(
+            Server server, ServerVoiceChannel channel, Boolean selfMuted, Boolean selfDeafened) {
+        ObjectNode updateVoiceStatePacket = JsonNodeFactory.instance.objectNode()
+                .put("op", GatewayOpcode.VOICE_STATE_UPDATE.getCode());
+        if (server == null) {
+            if (channel == null) {
+                throw new IllegalArgumentException("Either server or channel must be given");
+            }
+            server = channel.getServer();
+        }
+        User yourself = api.getYourself();
+        updateVoiceStatePacket.putObject("d")
+                .put("guild_id", server.getIdAsString())
+                .put("channel_id", (channel == null) ? null : channel.getIdAsString())
+                .put("self_mute", (selfMuted == null) ? server.isSelfMuted(yourself) : selfMuted)
+                .put("self_deaf", (selfDeafened == null) ? server.isSelfDeafened(yourself) : selfDeafened);
+        logger.debug("Sending VOICE_STATE_UPDATE packet for channel {} on server {}", channel, server);
+        websocket.get().sendText(updateVoiceStatePacket.toString());
     }
 
     /**

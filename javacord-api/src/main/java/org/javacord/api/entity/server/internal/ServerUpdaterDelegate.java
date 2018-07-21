@@ -263,6 +263,30 @@ public interface ServerUpdaterDelegate {
     void setNickname(User user, String nickname);
 
     /**
+     * Queues a user's muted state to be updated.
+     *
+     * @param user The user whose muted state should be updated.
+     * @param muted The new muted state of the user.
+     */
+    void setMuted(User user, boolean muted);
+
+    /**
+     * Queues a user's deafened state to be updated.
+     *
+     * @param user The user whose deafened state should be updated.
+     * @param deafened The new deafened state of the user.
+     */
+    void setDeafened(User user, boolean deafened);
+
+    /**
+     * Queues a moving a user to a different voice channel.
+     *
+     * @param user The user who should be moved.
+     * @param channel The new voice channel of the user.
+     */
+    void setVoiceChannel(User user, ServerVoiceChannel channel);
+
+    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.
@@ -283,7 +307,7 @@ public interface ServerUpdaterDelegate {
      * @param user The user to whom the roles should be assigned.
      * @param roles The collection of roles to be assigned.
      */
-    void addAllRolesToUser(User user, Collection<Role> roles);
+    void addRolesToUser(User user, Collection<Role> roles);
 
     /**
      * Queues a role to be removed from the user.
@@ -299,7 +323,14 @@ public interface ServerUpdaterDelegate {
      * @param user The user who should lose the roles.
      * @param roles The collection of roles to be removed.
      */
-    void removeAllRolesFromUser(User user, Collection<Role> roles);
+    void removeRolesFromUser(User user, Collection<Role> roles);
+
+    /**
+     * Queues all roles to be removed from the user.
+     *
+     * @param user The user who should lose the roles.
+     */
+    void removeAllRolesFromUser(User user);
 
     /**
      * Performs the queued updates.

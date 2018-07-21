@@ -411,6 +411,42 @@ public class ServerUpdater {
     }
 
     /**
+     * Queues a user's muted state to be updated.
+     *
+     * @param user The user whose muted state should be updated.
+     * @param muted The new muted state of the user.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setMuted(User user, boolean muted) {
+        delegate.setMuted(user, muted);
+        return this;
+    }
+
+    /**
+     * Queues a user's deafened state to be updated.
+     *
+     * @param user The user whose deafened state should be updated.
+     * @param deafened The new deafened state of the user.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setDeafened(User user, boolean deafened) {
+        delegate.setDeafened(user, deafened);
+        return this;
+    }
+
+    /**
+     * Queues a moving a user to a different voice channel.
+     *
+     * @param user The user who should be moved.
+     * @param channel The new voice channel of the user.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setVoiceChannel(User user, ServerVoiceChannel channel) {
+        delegate.setVoiceChannel(user, channel);
+        return this;
+    }
+
+    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.
@@ -440,8 +476,8 @@ public class ServerUpdater {
      * @param roles The roles which should be added to the server member.
      * @return The current instance in order to chain call methods.
      */
-    public ServerUpdater addAllRolesToUser(User user, Collection<Role> roles) {
-        delegate.addAllRolesToUser(user, roles);
+    public ServerUpdater addRolesToUser(User user, Collection<Role> roles) {
+        delegate.addRolesToUser(user, roles);
         return this;
     }
 
@@ -464,8 +500,19 @@ public class ServerUpdater {
      * @param roles The roles which should be removed from the user.
      * @return The current instance in order to chain call methods.
      */
-    public ServerUpdater removeAllRolesFromUser(User user, Collection<Role> roles) {
-        delegate.removeAllRolesFromUser(user, roles);
+    public ServerUpdater removeRolesFromUser(User user, Collection<Role> roles) {
+        delegate.removeRolesFromUser(user, roles);
+        return this;
+    }
+
+    /**
+     * Queues all roles to be removed from the user.
+     *
+     * @param user The server member the roles should be removed from.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeAllRolesFromUser(User user) {
+        delegate.removeAllRolesFromUser(user);
         return this;
     }
 
