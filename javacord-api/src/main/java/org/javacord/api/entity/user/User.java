@@ -46,6 +46,7 @@ import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
 
+import java.awt.Color;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -415,6 +416,17 @@ public interface User extends DiscordEntity, Messageable, Mentionable, Updatable
      */
     default List<Role> getRoles(Server server) {
         return server.getRolesOf(this);
+    }
+
+    /**
+     * Gets the displayed color of the user based on his roles in the given server.
+     *
+     * @param server The server.
+     * @return The color.
+     * @see Server#getRoleColor(User)
+     */
+    default Optional<Color> getRoleColor(Server server) {
+        return server.getRoleColor(this);
     }
 
     /**

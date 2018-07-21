@@ -93,6 +93,7 @@ import org.javacord.api.listener.user.UserChangeStatusListener;
 import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.event.ListenerManager;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -101,6 +102,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -630,6 +632,19 @@ public interface Server extends DiscordEntity, UpdatableFromCache<Server> {
                 getRoles().stream()
                         .filter(role -> role.getUsers().contains(user))
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets the displayed color of a user based on his roles on this server.
+     *
+     * @param user The user.
+     * @return The color.
+     */
+    default Optional<Color> getRoleColor(User user) {
+        return user.getRoles(this).stream()
+                   .filter(role -> role.getColor().isPresent())
+                   .max(Comparator.comparingInt(Role::getPosition))
+                   .flatMap(Role::getColor);
     }
 
     /**
