@@ -1348,6 +1348,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     boolean isPinned();
 
     /**
+     * Checks if the message mentions everyone.
+     *
+     * @return Whether the message mentions everyone or not.
+     */
+    boolean mentionsEveryone();
+
+    /**
      * Gets a list with all embeds of the message.
      *
      * @return A list with all embeds of the message.

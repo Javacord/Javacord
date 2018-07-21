@@ -120,8 +120,10 @@ public class MessageUpdateHandler extends PacketHandler {
 
             MessageEditEvent editEvent = null;
             if (packet.has("edited_timestamp") && !packet.get("edited_timestamp").isNull()) {
-                message.ifPresent(msg ->
-                        msg.setLastEditTime(OffsetDateTime.parse(packet.get("edited_timestamp").asText()).toInstant()));
+                message.ifPresent(msg -> {
+                    msg.setLastEditTime(OffsetDateTime.parse(packet.get("edited_timestamp").asText()).toInstant());
+                    msg.setMentionsEveryone(packet.get("mention_everyone").asBoolean());
+                });
 
                 long editTimestamp =
                         OffsetDateTime.parse(packet.get("edited_timestamp").asText()).toInstant().toEpochMilli();
