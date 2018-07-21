@@ -10,6 +10,10 @@ jobs:
     steps:
       - checkout
 
+      - run:
+          name: Collecting dependency definitions for cache key
+          command: find -type f -name '*.gradle' -exec cat {} >>~/dependencies.gradle \;
+
       # restore saved caches
       - restore_cache:
           keys:
@@ -17,7 +21,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - gradle-cache-{{ checksum "gradle/dependencies.gradle" }}
+            - gradle-cache-{{ checksum "~/dependencies.gradle" }}
             - gradle-cache
 
       - restore_cache:
@@ -46,12 +50,12 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle/caches/
-          key: gradle-cache-{{ checksum "gradle/dependencies.gradle" }}
+          key: gradle-cache-{{ checksum "~/dependencies.gradle" }}
 
       # build everything needed for publication
       - run:
           name: Building Project
-          command: ./gradlew --max-workers 2 --continue build
+          command: ./gradlew --max-workers 2 --continue clean build
 
       # cache gradle build caches
       - run:
@@ -74,12 +78,11 @@ jobs:
           name: Collecting test results
           command: |
             mkdir ~/test-results
-            cd build
             find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
-              [ -d {}/test-results/test ] &&
-              [ -n "$(ls -A {}/test-results/test)" ] &&
+              [ -d {}/build/test-results/test ] &&
+              [ -n "$(ls -A {}/build/test-results/test)" ] &&
               mkdir ~/test-results/{} &&
-              cp -a {}/test-results/test/* ~/test-results/{} || true
+              cp -a {}/build/test-results/test/* ~/test-results/{} || true
               ' \;
           when: always
 
@@ -91,26 +94,18 @@ jobs:
           name: Collecting artifacts
           command: |
             mkdir ~/artifacts
-            cd build
             find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
-              [ -d {}/libs ] &&
-              [ -n "$(ls -A {}/libs)" ] &&
+              [ -d {}/build/libs ] &&
+              [ -n "$(ls -A {}/build/libs)" ] &&
               mkdir ~/artifacts/{} &&
-              cp -a {}/libs/* ~/artifacts/{} || true
+              cp -a {}/build/libs/* ~/artifacts/{} || true
               ' \;
             find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
-              [ -d {}/docs/javadoc ] &&
-              [ -n "$(ls -A {}/docs/javadoc)" ] &&
-              { [ ! -d ~/artifacts/{} ] && mkdir ~/artifacts/{} || true; } &&
-              mkdir ~/artifacts/{}/javadoc &&
-              cp -a {}/docs/javadoc/* ~/artifacts/{}/javadoc || true
-              ' \;
-            find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
-              [ -d {}/reports/tests/test ] &&
-              [ -n "$(ls -A {}/reports/tests/test)" ] &&
+              [ -d {}/build/reports/tests/test ] &&
+              [ -n "$(ls -A {}/build/reports/tests/test)" ] &&
               { [ ! -d ~/artifacts/{} ] && mkdir ~/artifacts/{} || true; } &&
               mkdir ~/artifacts/{}/test-report &&
-              cp -a {}/reports/tests/test/* ~/artifacts/{}/test-report || true
+              cp -a {}/build/reports/tests/test/* ~/artifacts/{}/test-report || true
               ' \;
           when: always
 
