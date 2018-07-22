@@ -9,8 +9,6 @@ if (JavaVersion.current().java9Compatible) {
             sourceCompatibility = 9
             targetCompatibility = 9
             afterEvaluate {
-                // undo the effect of nebula.java-cross-compile plugin after it was done, thus in afterEvaluate
-                options.bootstrapClasspath = null
                 // access SourceDirectorySet#asPath in afterEvaluate
                 // or projects get evaluated before all configuration is done
                 options.compilerArgs << '--module-path'

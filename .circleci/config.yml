@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:9-jdk-browsers
+      - image: circleci/openjdk:10-jdk
 
     working_directory: ~/javacord
 
