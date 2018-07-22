@@ -70,6 +70,11 @@ public class MessageImpl implements Message {
     private volatile boolean pinned;
 
     /**
+     * If the message mentions everyone or not.
+     */
+    private volatile boolean mentionsEveryone;
+
+    /**
      * Gets the last edit time.
      */
     private volatile Instant lastEditTime;
@@ -124,6 +129,7 @@ public class MessageImpl implements Message {
         content = data.get("content").asText();
 
         pinned = data.get("pinned").asBoolean(false);
+        mentionsEveryone = data.get("mention_everyone").asBoolean(false);
 
         lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull()
                 ? OffsetDateTime.parse(data.get("edited_timestamp").asText()).toInstant()
@@ -191,6 +197,15 @@ public class MessageImpl implements Message {
      */
     public void setPinned(boolean pinned) {
         this.pinned = pinned;
+    }
+
+    /**
+     * Sets the mentions everyone flag.
+     *
+     * @param mentionsEveryone The mentions everyone flag to set.
+     */
+    public void setMentionsEveryone(boolean mentionsEveryone) {
+        this.mentionsEveryone = mentionsEveryone;
     }
 
     /**
@@ -299,6 +314,11 @@ public class MessageImpl implements Message {
     @Override
     public boolean isPinned() {
         return pinned;
+    }
+
+    @Override
+    public boolean mentionsEveryone() {
+        return mentionsEveryone;
     }
 
     @Override
