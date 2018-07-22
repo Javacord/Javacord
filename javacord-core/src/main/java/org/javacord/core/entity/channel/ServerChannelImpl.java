@@ -3,6 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
@@ -311,13 +312,14 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalChanne
     }
 
     @Override
-    public Permissions getOverwrittenPermissions(User user) {
-        return overwrittenUserPermissions.getOrDefault(user.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
-    }
-
-    @Override
-    public Permissions getOverwrittenPermissions(Role role) {
-        return overwrittenRolePermissions.getOrDefault(role.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
+    public <T extends Permissionable & DiscordEntity> Permissions getOverwrittenPermissions(T permissionable) {
+        Map<Long, Permissions> permissionsMap = Collections.emptyMap();
+        if (permissionable instanceof User) {
+            permissionsMap = overwrittenUserPermissions;
+        } else if (permissionable instanceof Role) {
+            permissionsMap = overwrittenRolePermissions;
+        }
+        return permissionsMap.getOrDefault(permissionable.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
     }
 
     @Override
