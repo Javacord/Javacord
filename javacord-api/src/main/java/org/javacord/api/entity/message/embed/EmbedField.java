@@ -1,16 +1,11 @@
 package org.javacord.api.entity.message.embed;
 
+import org.javacord.api.entity.Nameable;
+
 /**
  * This interface represents an embed field.
  */
-public interface EmbedField {
-
-    /**
-     * Gets the name of the field.
-     *
-     * @return The name of the field.
-     */
-    String getName();
+public interface EmbedField extends Nameable {
 
     /**
      * Gets the value of the field.

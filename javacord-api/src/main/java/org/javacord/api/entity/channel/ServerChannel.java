@@ -1,6 +1,7 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
@@ -31,14 +32,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server channel.
  */
-public interface ServerChannel extends Channel {
-
-    /**
-     * Gets the name of the channel.
-     *
-     * @return The name of the channel.
-     */
-    String getName();
+public interface ServerChannel extends Channel, Nameable {
 
     /**
      * Gets the server of the channel.

@@ -1,19 +1,14 @@
 package org.javacord.api.entity.message.embed;
 
+import org.javacord.api.entity.Nameable;
+
 import java.net.URL;
 import java.util.Optional;
 
 /**
  * This interface represents an embed author.
  */
-public interface EmbedAuthor {
-
-    /**
-     * Gets the name of the author.
-     *
-     * @return The name of the author.
-     */
-    String getName();
+public interface EmbedAuthor extends Nameable {
 
     /**
      * Gets the url of the author.

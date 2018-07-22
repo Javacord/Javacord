@@ -2,6 +2,7 @@ package org.javacord.api.entity.permission;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerUpdater;
@@ -30,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a Discord role, e.g. "moderator".
  */
-public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Role> {
+public interface Role extends DiscordEntity, Mentionable, Nameable, UpdatableFromCache<Role> {
 
     /**
      * Gets the server of the role.
@@ -38,13 +39,6 @@ public interface Role extends DiscordEntity, Mentionable, UpdatableFromCache<Rol
      * @return The server of the role.
      */
     Server getServer();
-
-    /**
-     * Gets the name of the role.
-     *
-     * @return The name of the role.
-     */
-    String getName();
 
     /**
      * Gets the position of the role.
