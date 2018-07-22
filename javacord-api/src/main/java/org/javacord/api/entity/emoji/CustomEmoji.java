@@ -15,13 +15,6 @@ import java.util.Optional;
 public interface CustomEmoji extends DiscordEntity, Nameable,  Emoji, UpdatableFromCache<KnownCustomEmoji> {
 
     /**
-     * Gets the name of the emoji.
-     *
-     * @return The name of the emoji.
-     */
-    String getName();
-
-    /**
      * Gets the image of the emoji.
      *
      * @return The image of the emoji.

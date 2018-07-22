@@ -8,13 +8,6 @@ import org.javacord.api.entity.Nameable;
 public interface EmbedField extends Nameable {
 
     /**
-     * Gets the name of the field.
-     *
-     * @return The name of the field.
-     */
-    String getName();
-
-    /**
      * Gets the value of the field.
      *
      * @return The value of the field.

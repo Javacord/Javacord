@@ -10,13 +10,6 @@ import java.net.URL;
 public interface EmbedProvider extends Nameable {
 
     /**
-     * Gets the name of the provider.
-     *
-     * @return The name of the provider.
-     */
-    String getName();
-
-    /**
      * Gets the url of the provider.
      *
      * @return The url of the provider.

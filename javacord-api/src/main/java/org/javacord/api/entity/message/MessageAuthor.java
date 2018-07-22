@@ -26,13 +26,6 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     Message getMessage();
 
     /**
-     * Gets the name of the author.
-     *
-     * @return The name of the author.
-     */
-    String getName();
-
-    /**
      * Gets the display name of the author.
      *
      * @return The display name of the author.

@@ -35,13 +35,6 @@ import java.util.concurrent.CompletableFuture;
 public interface ServerChannel extends Channel, Nameable {
 
     /**
-     * Gets the name of the channel.
-     *
-     * @return The name of the channel.
-     */
-    String getName();
-
-    /**
      * Gets the server of the channel.
      *
      * @return The server of the channel.

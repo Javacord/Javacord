@@ -11,13 +11,6 @@ import java.util.Optional;
 public interface EmbedAuthor extends Nameable {
 
     /**
-     * Gets the name of the author.
-     *
-     * @return The name of the author.
-     */
-    String getName();
-
-    /**
      * Gets the url of the author.
      *
      * @return The url of the author.

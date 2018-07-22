@@ -41,13 +41,6 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, UpdatableFro
     Server getServer();
 
     /**
-     * Gets the name of the role.
-     *
-     * @return The name of the role.
-     */
-    String getName();
-
-    /**
      * Gets the position of the role.
      *
      * @return The position of the role.

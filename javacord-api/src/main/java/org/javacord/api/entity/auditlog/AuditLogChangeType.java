@@ -73,6 +73,7 @@ public enum AuditLogChangeType implements Nameable {
      *
      * @return The name of the type.
      */
+    @Override
     public String getName() {
         return name;
     }

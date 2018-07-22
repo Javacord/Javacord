@@ -18,13 +18,6 @@ public interface Activity extends Nameable {
     ActivityType getType();
 
     /**
-     * Gets the name of the activity.
-     *
-     * @return The name of the activity.
-     */
-    String getName();
-
-    /**
      * Gets the streaming url of the activity.
      *
      * @return The streaming url of the activity.

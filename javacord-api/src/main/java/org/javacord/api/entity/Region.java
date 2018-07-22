@@ -72,6 +72,7 @@ public enum Region implements Nameable {
      *
      * @return The name of the region.
      */
+    @Override
     public String getName() {
         return name;
     }

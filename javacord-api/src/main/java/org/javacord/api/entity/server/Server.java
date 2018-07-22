@@ -117,13 +117,6 @@ import java.util.stream.Collectors;
 public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Server> {
 
     /**
-     * Gets the name of the server.
-     *
-     * @return The name of the server.
-     */
-    String getName();
-
-    /**
      * Gets the region of the server.
      *
      * @return The region of the server.

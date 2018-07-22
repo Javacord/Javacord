@@ -77,13 +77,6 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     }
 
     /**
-     * Gets the name of the user.
-     *
-     * @return The name of the user.
-     */
-    String getName();
-
-    /**
      * Gets the discriminator of the user.
      *
      * @return The discriminator of the user.

@@ -18,13 +18,6 @@ public interface ApplicationInfo extends Nameable {
     long getClientId();
 
     /**
-     * Gets the name of the application.
-     *
-     * @return The name of the application.
-     */
-    String getName();
-
-    /**
      * Gets the description of the application.
      *
      * @return The description of the application.
