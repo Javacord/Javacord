@@ -1,9 +1,9 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
@@ -70,48 +70,28 @@ public class ServerChannelUpdater {
     }
 
     /**
-     * Adds a permission overwrite for the given user.
+     * Adds a permission overwrite for the given entity.
      *
-     * @param user The user whose permissions should be overwritten.
+     * @param <T> The type of entity to hold the permission, usually <code>User</code> or <code>Role</code>
+     * @param permissionable The entity whose permissions should be overwritten.
      * @param permissions The permission overwrites.
      * @return The current instance in order to chain call methods.
      */
-    public ServerChannelUpdater addPermissionOverwrite(User user, Permissions permissions) {
-        delegate.addPermissionOverwrite(user, permissions);
+    public <T extends Permissionable & DiscordEntity> ServerChannelUpdater addPermissionOverwrite(
+            T permissionable, Permissions permissions) {
+        delegate.addPermissionOverwrite(permissionable, permissions);
         return this;
     }
 
     /**
-     * Adds a permission overwrite for the given role.
+     * Removes a permission overwrite for the given entity.
      *
-     * @param role The role which permissions should be overwritten.
-     * @param permissions The permission overwrites.
+     * @param <T> The type of entity to hold the permission, usually <code>User</code> or <code>Role</code>
+     * @param permissionable The entity which permission overwrite should be removed.
      * @return The current instance in order to chain call methods.
      */
-    public ServerChannelUpdater addPermissionOverwrite(Role role, Permissions permissions) {
-        delegate.addPermissionOverwrite(role, permissions);
-        return this;
-    }
-
-    /**
-     * Removes a permission overwrite for the given user.
-     *
-     * @param user The user whose permission overwrite should be removed.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerChannelUpdater removePermissionOverwrite(User user) {
-        delegate.removePermissionOverwrite(user);
-        return this;
-    }
-
-    /**
-     * Removes a permission overwrite for the given role.
-     *
-     * @param role The role which permission overwrite should be removed.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerChannelUpdater removePermissionOverwrite(Role role) {
-        delegate.removePermissionOverwrite(role);
+    public <T extends Permissionable & DiscordEntity> ServerChannelUpdater removePermissionOverwrite(T permissionable) {
+        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 

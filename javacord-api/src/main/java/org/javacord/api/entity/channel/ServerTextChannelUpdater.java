@@ -1,9 +1,9 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
@@ -89,26 +89,16 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
     }
 
     @Override
-    public ServerTextChannelUpdater addPermissionOverwrite(User user, Permissions permissions) {
-        delegate.addPermissionOverwrite(user, permissions);
+    public <T extends Permissionable & DiscordEntity> ServerTextChannelUpdater addPermissionOverwrite(
+            T permissionable, Permissions permissions) {
+        delegate.addPermissionOverwrite(permissionable, permissions);
         return this;
     }
 
     @Override
-    public ServerTextChannelUpdater addPermissionOverwrite(Role role, Permissions permissions) {
-        delegate.addPermissionOverwrite(role, permissions);
-        return this;
-    }
-
-    @Override
-    public ServerTextChannelUpdater removePermissionOverwrite(User user) {
-        delegate.removePermissionOverwrite(user);
-        return this;
-    }
-
-    @Override
-    public ServerTextChannelUpdater removePermissionOverwrite(Role role) {
-        delegate.removePermissionOverwrite(role);
+    public <T extends Permissionable & DiscordEntity> ServerTextChannelUpdater removePermissionOverwrite(
+            T permissionable) {
+        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 

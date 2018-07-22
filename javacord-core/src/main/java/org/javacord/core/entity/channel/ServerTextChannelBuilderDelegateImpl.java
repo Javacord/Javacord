@@ -15,22 +15,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link ServerTextChannelBuilderDelegate}.
  */
-public class ServerTextChannelBuilderDelegateImpl implements ServerTextChannelBuilderDelegate {
-
-    /**
-     * The server of the channel.
-     */
-    private final ServerImpl server;
-
-    /**
-     * The reason for the creation.
-     */
-    private String reason = null;
-
-    /**
-     * The name of the channel.
-     */
-    private String name = null;
+public class ServerTextChannelBuilderDelegateImpl extends ServerChannelBuilderDelegateImpl
+        implements ServerTextChannelBuilderDelegate {
 
     /**
      * The topic of the channel.
@@ -48,17 +34,7 @@ public class ServerTextChannelBuilderDelegateImpl implements ServerTextChannelBu
      * @param server The server of the server text channel.
      */
     public ServerTextChannelBuilderDelegateImpl(ServerImpl server) {
-        this.server = server;
-    }
-
-    @Override
-    public void setAuditLogReason(String reason) {
-        this.reason = reason;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
+        super(server);
     }
 
     @Override
@@ -75,15 +51,12 @@ public class ServerTextChannelBuilderDelegateImpl implements ServerTextChannelBu
     public CompletableFuture<ServerTextChannel> create() {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("type", 0);
-        if (name == null) {
-            throw new IllegalStateException("Name is no optional parameter!");
-        }
-        body.put("name", name);
-        if (category != null) {
-            body.put("parent_id", category.getIdAsString());
-        }
+        super.prepareBody(body);
         if (topic != null) {
             body.put("topic", topic);
+        }
+        if (category != null) {
+            body.put("parent_id", category.getIdAsString());
         }
         return new RestRequest<ServerTextChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(server.getIdAsString())

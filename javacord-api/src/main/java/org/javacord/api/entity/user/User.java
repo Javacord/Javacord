@@ -6,6 +6,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.Nameable;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.GroupChannel;
@@ -60,7 +61,8 @@ import java.util.stream.Collectors;
 /**
  * This class represents a user.
  */
-public interface User extends DiscordEntity, Messageable, Nameable, Mentionable, UpdatableFromCache<User> {
+public interface User extends DiscordEntity, Messageable, Nameable, Mentionable, Permissionable,
+        UpdatableFromCache<User> {
 
     @Override
     default String getMentionTag() {

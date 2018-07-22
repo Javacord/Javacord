@@ -3,6 +3,8 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.permission.Permissions;
@@ -76,27 +78,24 @@ public class ServerChannelUpdaterDelegateImpl implements ServerChannelUpdaterDel
     }
 
     @Override
-    public void addPermissionOverwrite(User user, Permissions permissions) {
+    public <T extends Permissionable & DiscordEntity> void addPermissionOverwrite(T permissionable,
+                                                                                  Permissions permissions) {
         populatePermissionOverwrites();
-        overwrittenUserPermissions.put(user.getId(), permissions);
+        if (permissionable instanceof Role) {
+            overwrittenRolePermissions.put(permissionable.getId(), permissions);
+        } else if (permissionable instanceof User) {
+            overwrittenUserPermissions.put(permissionable.getId(), permissions);
+        }
     }
 
     @Override
-    public void addPermissionOverwrite(Role role, Permissions permissions) {
+    public <T extends Permissionable & DiscordEntity> void removePermissionOverwrite(T permissionable) {
         populatePermissionOverwrites();
-        overwrittenRolePermissions.put(role.getId(), permissions);
-    }
-
-    @Override
-    public void removePermissionOverwrite(User user) {
-        populatePermissionOverwrites();
-        overwrittenUserPermissions.remove(user.getId());
-    }
-
-    @Override
-    public void removePermissionOverwrite(Role role) {
-        populatePermissionOverwrites();
-        overwrittenRolePermissions.remove(role.getId());
+        if (permissionable instanceof Role) {
+            overwrittenRolePermissions.remove(permissionable.getId());
+        } else if (permissionable instanceof User) {
+            overwrittenUserPermissions.remove(permissionable.getId());
+        }
     }
 
     @Override

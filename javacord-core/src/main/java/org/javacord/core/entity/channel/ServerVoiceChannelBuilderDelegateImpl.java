@@ -15,22 +15,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link ServerVoiceChannelBuilderDelegate}.
  */
-public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannelBuilderDelegate {
-
-    /**
-     * The server of the channel.
-     */
-    private final ServerImpl server;
-
-    /**
-     * The reason for the creation.
-     */
-    private String reason = null;
-
-    /**
-     * The name of the channel.
-     */
-    private String name = null;
+public class ServerVoiceChannelBuilderDelegateImpl extends ServerChannelBuilderDelegateImpl
+        implements ServerVoiceChannelBuilderDelegate {
 
     /**
      * The bitrate of the channel.
@@ -53,22 +39,7 @@ public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannel
      * @param server The server of the server voice channel.
      */
     public ServerVoiceChannelBuilderDelegateImpl(ServerImpl server) {
-        this.server = server;
-    }
-
-    @Override
-    public void setAuditLogReason(String reason) {
-        this.reason = reason;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setCategory(ChannelCategory category) {
-        this.category = category;
+        super(server);
     }
 
     @Override
@@ -82,21 +53,24 @@ public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannel
     }
 
     @Override
+    public void setCategory(ChannelCategory category) {
+        this.category = category;
+    }
+
+    @Override
     public CompletableFuture<ServerVoiceChannel> create() {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("type", 2);
-        if (name == null) {
-            throw new IllegalStateException("Name is no optional parameter!");
-        }
-        body.put("name", name);
-        if (category != null) {
-            body.put("parent_id", category.getIdAsString());
-        }
+        super.prepareBody(body);
+
         if (bitrate != null) {
             body.put("bitrate", (int) bitrate);
         }
         if (userlimit != null) {
             body.put("user_limit", (int) userlimit);
+        }
+        if (category != null) {
+            body.put("parent_id", category.getIdAsString());
         }
         return new RestRequest<ServerVoiceChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(server.getIdAsString())
@@ -104,6 +78,5 @@ public class ServerVoiceChannelBuilderDelegateImpl implements ServerVoiceChannel
                 .setAuditLogReason(reason)
                 .execute(result -> server.getOrCreateServerVoiceChannel(result.getJsonBody()));
     }
-
 
 }

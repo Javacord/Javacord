@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class is used to create new channel categories.
  */
-public class ChannelCategoryBuilder {
+public class ChannelCategoryBuilder extends ServerChannelBuilder {
 
     /**
      * The channel category delegate used by this instance.
@@ -25,23 +25,13 @@ public class ChannelCategoryBuilder {
         delegate = DelegateFactory.createChannelCategoryBuilderDelegate(server);
     }
 
-    /**
-     * Sets the reason for this creation. This reason will be visible in the audit log entry(s).
-     *
-     * @param reason The reason for this update.
-     * @return The current instance in order to chain call methods.
-     */
+    @Override
     public ChannelCategoryBuilder setAuditLogReason(String reason) {
         delegate.setAuditLogReason(reason);
         return this;
     }
 
-    /**
-     * Sets the name of the channel.
-     *
-     * @param name The name of the channel.
-     * @return The current instance in order to chain call methods.
-     */
+    @Override
     public ChannelCategoryBuilder setName(String name) {
         delegate.setName(name);
         return this;
