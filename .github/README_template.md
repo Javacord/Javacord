@@ -30,7 +30,7 @@ Just click on the latest build and go to the "Artifacts" tab to download the fil
 #### Gradle
 ```groovy
 repositories { maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } }
-dependencies { compile 'org.javacord:javacord:3.0.0-SNAPSHOT' }
+dependencies { compile 'org.javacord:javacord:$version' }
 ```
 
 #### Maven
@@ -46,7 +46,7 @@ dependencies { compile 'org.javacord:javacord:3.0.0-SNAPSHOT' }
     <dependency>
         <groupId>org.javacord</groupId>
         <artifactId>javacord</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>$version</version>
         <type>pom</type>
     </dependency>
 </dependencies>
