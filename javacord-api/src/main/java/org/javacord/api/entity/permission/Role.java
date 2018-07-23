@@ -32,7 +32,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a Discord role, e.g. "moderator".
  */
-public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionable, UpdatableFromCache<Role> {
+public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionable, Comparable<Role>,
+                              UpdatableFromCache<Role> {
 
     /**
      * Gets the server of the role.
@@ -259,17 +260,6 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     @Override
     default String getMentionTag() {
         return "<@&" + getIdAsString() + ">";
-    }
-
-    /**
-     * Checks if the this role is higher than the given role.
-     * Always returns <code>true</code> if the roles are on different servers.
-     *
-     * @param role The role to check.
-     * @return Whether the this role is higher than the given role or not.
-     */
-    default boolean isHigherThan(Role role) {
-        return role.getServer() != getServer() || role.getPosition() <= getPosition();
     }
 
     /**
