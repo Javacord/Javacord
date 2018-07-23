@@ -11,6 +11,7 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -64,7 +65,6 @@ import org.javacord.core.util.logging.WebSocketLogger;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-import org.slf4j.Logger;
 
 import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
@@ -209,7 +209,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                             .forEach(guildIds::add);
                                 }
                                 logger.debug("Sending request guild members packet {}",
-                                             requestGuildMembersPacket.toString());
+                                             requestGuildMembersPacket);
                                 getWebSocket().sendText(requestGuildMembersPacket.toString());
                             });
                     Thread.sleep(1000);
@@ -396,7 +396,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         int op = packet.get("op").asInt();
         Optional<GatewayOpcode> opcode = GatewayOpcode.fromCode(op);
         if (!opcode.isPresent()) {
-            logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
+            logger.debug("Received unknown packet (op: {}, content: {})", op, packet);
             return;
         }
 
@@ -408,7 +408,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 if (handler != null) {
                     handler.handlePacket(packet.get("d"));
                 } else {
-                    logger.debug("Received unknown packet of type {} (packet: {})", type, packet.toString());
+                    logger.debug("Received unknown packet of type {} (packet: {})", type, packet);
                 }
 
                 if (type.equals("GUILD_MEMBERS_CHUNK")) {
@@ -480,8 +480,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     // Invalid session :(
                     int zeroToFourSeconds = (int) (Math.random() * 4000);
                     logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
-                                1 + zeroToFourSeconds / 1000,
-                                1 + zeroToFourSeconds / 100 % 10);
+                            () -> 1 + zeroToFourSeconds / 1000,
+                            () -> 1 + zeroToFourSeconds / 100 % 10);
                     fakeLastIdentificationTime -= 4000 - zeroToFourSeconds;
                 }
                 lastIdentificationPerAccount.put(api.getPrefixedToken(), fakeLastIdentificationTime);
@@ -512,7 +512,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 heartbeatAckReceived.set(true);
                 break;
             default:
-                logger.debug("Received unknown packet (op: {}, content: {})", op, packet.toString());
+                logger.debug("Received unknown packet (op: {}, content: {})", op, packet);
                 break;
         }
     }
@@ -778,7 +778,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         activityJson.put("name", activity.isPresent() ? activity.get().getName() : null);
         activityJson.put("type", activity.map(g -> g.getType().getId()).orElse(0));
         activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
-        logger.debug("Updating status (content: {})", updateStatus.toString());
+        logger.debug("Updating status (content: {})", updateStatus);
         websocket.get().sendText(updateStatus.toString());
     }
 

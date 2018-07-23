@@ -1,10 +1,10 @@
 package org.javacord.core.util.gateway;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.util.concurrent.ExecutorService;
 
@@ -51,7 +51,7 @@ public abstract class PacketHandler {
                     handle(packet);
                 } catch (Exception e) {
                     logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
-                            getType(), packet.toString(), e);
+                            getType(), packet, e);
                 }
             });
         } else {
@@ -59,7 +59,7 @@ public abstract class PacketHandler {
                 handle(packet);
             } catch (Exception e) {
                 logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
-                        getType(), packet.toString(), e);
+                        getType(), packet, e);
             }
         }
     }

@@ -1,11 +1,15 @@
 package org.javacord.core.util.logging;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.MDC.MDCCloseable;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.simple.SimpleLogger;
+import org.apache.logging.log4j.util.PropertiesUtil;
+import org.apache.logging.log4j.util.ProviderUtil;
+import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,28 +32,27 @@ public class LoggerUtil {
     public static Logger getLogger(String name) {
         AtomicBoolean logWarning = new AtomicBoolean(false);
         initialized.updateAndGet(initialized -> {
-            if (!initialized) {
-                try {
-                    // if there's no library this would cause a ClassNotFoundException
-                    Class.forName("org.slf4j.impl.StaticLoggerBinder");
-                } catch (ClassNotFoundException e) {
-                    noLogger.set(true);
-                    logWarning.set(true);
-                }
+            if (!initialized && !ProviderUtil.hasProviders()) {
+                noLogger.set(true);
+                logWarning.set(true);
             }
             return true;
         });
 
-        if (noLogger.get()) { // we don't want the SLF4J NOPLogger implementation
+        if (noLogger.get()) {
             return loggers.computeIfAbsent(name, key -> {
-                JavacordLogger logger = new JavacordLogger(name);
+                Level level = FallbackLoggerConfiguration.isTraceEnabled()
+                        ? Level.TRACE
+                        : (FallbackLoggerConfiguration.isDebugEnabled() ? Level.DEBUG : Level.INFO);
+                Logger logger = new SimpleLogger(name, level, true, false, true, true, "yyyy-MM-dd HH:mm:ss.SSSZ", null,
+                                                 new PropertiesUtil(new Properties()), System.out);
                 if (logWarning.get()) {
-                    logger.info("No SLF4J compatible logger was found. Using default javacord implementation!");
+                    logger.info("No Log4j2 compatible logger was found. Using default Javacord implementation!");
                 }
                 return new PrivacyProtectionLogger(logger);
             });
         } else {
-            return new PrivacyProtectionLogger(LoggerFactory.getLogger(name));
+            return new PrivacyProtectionLogger(LogManager.getLogger(name));
         }
     }
 
@@ -63,32 +66,4 @@ public class LoggerUtil {
         return getLogger(clazz.getName());
     }
 
-
-    /**
-     * Put a diagnostic context value (the {@code val} parameter) as identified with the
-     * {@code key} parameter into the current thread's diagnostic context map. The
-     * {@code key} parameter cannot be {@code null}. The {@code val} parameter
-     * can be {@code null} only if the underlying implementation supports it.
-     *
-     * <p>This method delegates all work to the MDC of the underlying logging system
-     * and is a no-op if there is no proper logging binding present, also regarding {@code null} key.
-     *
-     * <p>This method returns a {@code Closeable} object which can remove {@code key} when
-     * {@code close} is called.
-     *
-     * <p>Useful with Java 7 for example :
-     * {@code
-     *     try (MDCCloseable closeable = LoggerUtil.putCloseableToMdc(key, value)) {
-     *         ....
-     *     }
-     * }
-     *
-     * @param key non-{@code null} key
-     * @param val value to put in the map
-     * @return a {@code Closeable} which can remove {@code key} when {@code close} is called.
-     * @throws IllegalArgumentException in case the {@code key} parameter is {@code null} and the method is not a no-op
-     */
-    public static MDCCloseable putCloseableToMdc(String key, String val) throws IllegalArgumentException {
-        return noLogger.get() ? null : MDC.putCloseable(key, val);
-    }
 }

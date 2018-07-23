@@ -1,11 +1,11 @@
 package org.javacord.core.event.server;
 
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.server.ServerChangeIconEvent;
 import org.javacord.core.entity.IconImpl;
 import org.javacord.core.util.logging.LoggerUtil;
-import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;

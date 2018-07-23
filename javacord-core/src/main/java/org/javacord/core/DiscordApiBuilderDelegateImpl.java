@@ -1,6 +1,8 @@
 package org.javacord.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.CloseableThreadContext;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
@@ -11,8 +13,6 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 import org.javacord.core.util.rest.RestRequestResult;
-import org.slf4j.Logger;
-import org.slf4j.MDC.MDCCloseable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +72,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
             future.completeExceptionally(new IllegalArgumentException("You cannot login without a token!"));
             return future;
         }
-        try (MDCCloseable mdcCloseable = LoggerUtil.putCloseableToMdc("shard", Integer.toString(currentShard.get()))) {
+        try (CloseableThreadContext.Instance closeableThreadContextInstance =
+                     CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
             new DiscordApiImpl(
                     accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup, future);
         }
