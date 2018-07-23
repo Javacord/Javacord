@@ -63,7 +63,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
             if (packet.has("roles")) {
                 JsonNode jsonRoles = packet.get("roles");
                 Collection<Role> newRoles = new HashSet<>();
-                Collection<Role> oldRoles = server.getRolesOf(user);
+                Collection<Role> oldRoles = server.getRoles(user);
                 Collection<Role> intersection = new HashSet<>();
                 for (JsonNode roleIdJson : jsonRoles) {
                     api.getRoleById(roleIdJson.asText())
