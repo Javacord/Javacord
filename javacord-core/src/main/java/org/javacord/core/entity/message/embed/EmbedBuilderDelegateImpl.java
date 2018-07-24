@@ -25,6 +25,14 @@ import java.util.UUID;
  */
 public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
+    // Embed boundaries
+    private final static int MAX_TITLE_LENGTH = 256;
+    private final static int MAX_FIELD_AMOUNT = 25;
+    private final static int MAX_FIELD_NAME_LENGTH = 256;
+    private final static int MAX_FIELD_VALUE_LENGTH = 1024;
+    private final static int MAX_FOOTER_LENGTH = 2048;
+    private final static int MAX_AUTHOR_NAME_LENGTH = 256;
+
     // General embed stuff
     private String title = null;
     private String description = null;
@@ -57,6 +65,9 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setTitle(String title) {
+        if (title.length() > MAX_TITLE_LENGTH) {
+            throw new IllegalStateException("Embed Title can't be longer than " + MAX_TITLE_LENGTH + " characters.");
+        }
         this.title = title;
     }
 
@@ -87,6 +98,9 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setFooter(String text) {
+        if (text.length() > MAX_FOOTER_LENGTH) {
+            throw new IllegalStateException("Embed footer can't be longer than " + MAX_FOOTER_LENGTH + " characters.");
+        }
         footerText = text;
         footerIconUrl = null;
         footerIconContainer = null;
@@ -258,6 +272,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setAuthor(String name) {
+        if (name.length() > MAX_AUTHOR_NAME_LENGTH) {
+            throw new IllegalStateException("Embed author's name can't be longer than " + MAX_AUTHOR_NAME_LENGTH +
+                    " characters.");
+        }
         authorName = name;
         authorUrl = null;
         authorIconUrl = null;
@@ -266,6 +284,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setAuthor(String name, String url, String iconUrl) {
+        if (name.length() > MAX_AUTHOR_NAME_LENGTH) {
+            throw new IllegalStateException("Embed author's name can't be longer than " + MAX_AUTHOR_NAME_LENGTH +
+                    " characters.");
+        }
         authorName = name;
         authorUrl = url;
         authorIconUrl = iconUrl;
@@ -274,6 +296,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setAuthor(String name, String url, Icon icon) {
+        if (name.length() > MAX_AUTHOR_NAME_LENGTH) {
+            throw new IllegalStateException("Embed author's name can't be longer than " + MAX_AUTHOR_NAME_LENGTH +
+                    " characters.");
+        }
         authorName = name;
         authorUrl = url;
         authorIconUrl = icon.getUrl().toString();
@@ -282,6 +308,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setAuthor(String name, String url, File icon) {
+        if (name.length() > MAX_AUTHOR_NAME_LENGTH) {
+            throw new IllegalStateException("Embed author's name can't be longer than " + MAX_AUTHOR_NAME_LENGTH +
+                    " characters.");
+        }
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
@@ -300,6 +330,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setAuthor(String name, String url, InputStream icon, String fileType) {
+        if (name.length() > MAX_AUTHOR_NAME_LENGTH) {
+            throw new IllegalStateException("Embed author's name can't be longer than " + MAX_AUTHOR_NAME_LENGTH +
+                    " characters.");
+        }
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
@@ -318,6 +352,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setAuthor(String name, String url, byte[] icon, String fileType) {
+        if (name.length() > MAX_AUTHOR_NAME_LENGTH) {
+            throw new IllegalStateException("Embed author's name can't be longer than " + MAX_AUTHOR_NAME_LENGTH +
+                    " characters.");
+        }
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
@@ -336,6 +374,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setAuthor(String name, String url, BufferedImage icon, String fileType) {
+        if (name.length() > MAX_AUTHOR_NAME_LENGTH) {
+            throw new IllegalStateException("Embed author's name can't be longer than " + MAX_AUTHOR_NAME_LENGTH +
+                    " characters.");
+        }
         authorName = name;
         authorUrl = url;
         authorIconUrl = null;
@@ -421,6 +463,23 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void addField(String name, String value, boolean inline) {
+        if (name.isEmpty()) {
+            throw new IllegalStateException("The field's name can't be empty.");
+        }
+        if (name.length() > MAX_FIELD_NAME_LENGTH) {
+            throw new IllegalStateException("The field's name can't exceed " + MAX_FIELD_NAME_LENGTH +
+                    " characters.");
+        }
+        if (value.isEmpty()) {
+            throw new IllegalStateException("The field's value can't be empty.");
+        }
+        if (value.length() > MAX_FIELD_VALUE_LENGTH) {
+            throw new IllegalStateException("The field's value can't exceed " + MAX_FIELD_VALUE_LENGTH +
+                    " characters.");
+        }
+        if (fields.size() == MAX_FIELD_AMOUNT) {
+            throw new IllegalStateException("The embed can't contain more than " + MAX_FIELD_AMOUNT + " fields.");
+        }
         fields.add(new Object[]{name, value, inline});
     }
 

@@ -36,6 +36,7 @@ public class EmbedBuilder {
      *
      * @param title The title of the embed.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the title is too long.
      */
     public EmbedBuilder setTitle(String title) {
         delegate.setTitle(title);
@@ -101,6 +102,7 @@ public class EmbedBuilder {
      *
      * @param text The text of the footer.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text) {
         delegate.setFooter(text);
@@ -113,6 +115,7 @@ public class EmbedBuilder {
      * @param text The text of the footer.
      * @param iconUrl The url of the footer's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, String iconUrl) {
         delegate.setFooter(text, iconUrl);
@@ -125,6 +128,7 @@ public class EmbedBuilder {
      * @param text The text of the footer.
      * @param icon The footer's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, Icon icon) {
         delegate.setFooter(text, icon);
@@ -137,6 +141,7 @@ public class EmbedBuilder {
      * @param text The text of the footer.
      * @param icon The footer's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, File icon) {
         delegate.setFooter(text, icon);
@@ -150,6 +155,7 @@ public class EmbedBuilder {
      * @param text The text of the footer.
      * @param icon The footer's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, InputStream icon) {
         delegate.setFooter(text, icon);
@@ -163,6 +169,7 @@ public class EmbedBuilder {
      * @param icon The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, InputStream icon, String fileType) {
         delegate.setFooter(text, icon, fileType);
@@ -176,6 +183,7 @@ public class EmbedBuilder {
      * @param text The text of the footer.
      * @param icon The footer's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, byte[] icon) {
         delegate.setFooter(text, icon);
@@ -189,6 +197,7 @@ public class EmbedBuilder {
      * @param icon The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, byte[] icon, String fileType) {
         delegate.setFooter(text, icon, fileType);
@@ -202,6 +211,7 @@ public class EmbedBuilder {
      * @param text The text of the footer.
      * @param icon The footer's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, BufferedImage icon) {
         delegate.setFooter(text, icon);
@@ -215,6 +225,7 @@ public class EmbedBuilder {
      * @param icon The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the footer's text is too long.
      */
     public EmbedBuilder setFooter(String text, BufferedImage icon, String fileType) {
         delegate.setFooter(text, icon, fileType);
@@ -353,6 +364,7 @@ public class EmbedBuilder {
      *
      * @param name The name of the author.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name) {
         delegate.setAuthor(name);
@@ -366,6 +378,7 @@ public class EmbedBuilder {
      * @param url The url of the author.
      * @param iconUrl The url of the author's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, String iconUrl) {
         delegate.setAuthor(name, url, iconUrl);
@@ -379,6 +392,7 @@ public class EmbedBuilder {
      * @param url The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, Icon icon) {
         delegate.setAuthor(name, url, icon);
@@ -392,6 +406,7 @@ public class EmbedBuilder {
      * @param url The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, File icon) {
         delegate.setAuthor(name, url, icon);
@@ -406,6 +421,7 @@ public class EmbedBuilder {
      * @param url The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, InputStream icon) {
         delegate.setAuthor(name, url, icon);
@@ -420,6 +436,7 @@ public class EmbedBuilder {
      * @param icon The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, InputStream icon, String fileType) {
         delegate.setAuthor(name, url, icon, fileType);
@@ -434,6 +451,7 @@ public class EmbedBuilder {
      * @param url The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, byte[] icon) {
         delegate.setAuthor(name, url, icon);
@@ -448,6 +466,7 @@ public class EmbedBuilder {
      * @param icon The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, byte[] icon, String fileType) {
         delegate.setAuthor(name, url, icon, fileType);
@@ -462,6 +481,7 @@ public class EmbedBuilder {
      * @param url The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, BufferedImage icon) {
         delegate.setAuthor(name, url, icon);
@@ -476,6 +496,7 @@ public class EmbedBuilder {
      * @param icon The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the author is too long.
      */
     public EmbedBuilder setAuthor(String name, String url, BufferedImage icon, String fileType) {
         delegate.setAuthor(name, url, icon, fileType);
@@ -593,6 +614,11 @@ public class EmbedBuilder {
      * @param name The name of the field.
      * @param value The value of the field.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the field is empty.
+     * @throws IllegalStateException If the name of the field is too long.
+     * @throws IllegalStateException If the value of the field is empty.
+     * @throws IllegalStateException If the value of the field is too long.
+     * @throws IllegalStateException If the embed's maximum amount of fields is exceeded.
      */
     public EmbedBuilder addInlineField(String name, String value) {
         delegate.addField(name, value, true);
@@ -605,6 +631,11 @@ public class EmbedBuilder {
      * @param name The name of the field.
      * @param value The value of the field.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the field is empty.
+     * @throws IllegalStateException If the name of the field is too long.
+     * @throws IllegalStateException If the value of the field is empty.
+     * @throws IllegalStateException If the value of the field is too long.
+     * @throws IllegalStateException If the embed's maximum amount of fields is exceeded.
      */
     public EmbedBuilder addField(String name, String value) {
         delegate.addField(name, value, false);
@@ -618,6 +649,11 @@ public class EmbedBuilder {
      * @param value The value of the field.
      * @param inline Whether the field should be inline or not.
      * @return The current instance in order to chain call methods.
+     * @throws IllegalStateException If the name of the field is empty.
+     * @throws IllegalStateException If the name of the field is too long.
+     * @throws IllegalStateException If the value of the field is empty.
+     * @throws IllegalStateException If the value of the field is too long.
+     * @throws IllegalStateException If the embed's maximum amount of fields is exceeded.
      */
     public EmbedBuilder addField(String name, String value, boolean inline) {
         delegate.addField(name, value, inline);
