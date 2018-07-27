@@ -28,7 +28,7 @@ public class GuildMemberRemoveHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
-        api.getAllServerById(packet.get("guild_id").asLong())
+        api.getPossiblyUnreadyServerById(packet.get("guild_id").asLong())
                 .map(server -> (ServerImpl) server)
                 .ifPresent(server -> {
                     User user = api.getOrCreateUser(packet.get("user"));

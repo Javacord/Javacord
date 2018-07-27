@@ -32,7 +32,7 @@ public class GuildDeleteHandler extends PacketHandler {
         long serverId = packet.get("id").asLong();
         if (packet.has("unavailable") && packet.get("unavailable").asBoolean()) {
             api.addUnavailableServerToCache(serverId);
-            api.getAllServerById(serverId).ifPresent(server -> {
+            api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
                 ServerBecomesUnavailableEvent event = new ServerBecomesUnavailableEventImpl(server);
 
                 List<ServerBecomesUnavailableListener> listeners = new ArrayList<>();
@@ -45,7 +45,7 @@ public class GuildDeleteHandler extends PacketHandler {
             api.removeServerFromCache(serverId);
             return;
         }
-        api.getAllServerById(serverId).ifPresent(server -> {
+        api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             ServerLeaveEvent event = new ServerLeaveEventImpl(server);
 
             List<ServerLeaveListener> listeners = new ArrayList<>();

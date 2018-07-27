@@ -73,7 +73,7 @@ public class GuildUpdateHandler extends PacketHandler {
             return;
         }
         long id = packet.get("id").asLong();
-        api.getAllServerById(id).map(server -> (ServerImpl) server).ifPresent(server -> {
+        api.getPossiblyUnreadyServerById(id).map(server -> (ServerImpl) server).ifPresent(server -> {
             long oldApplicationId = server.getApplicationId().orElse(-1L);
             long newApplicationId = packet.hasNonNull("application_id") ? packet.get("application_id").asLong() : -1L;
             if (oldApplicationId != newApplicationId) {
