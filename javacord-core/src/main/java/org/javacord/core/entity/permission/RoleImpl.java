@@ -272,7 +272,7 @@ public class RoleImpl implements Role {
     /**
      * {@inheritDoc}
      *
-     * <p/><b><i>Implementation note:</i></b> Only roles from the same server can be compared
+     * <p><b><i>Implementation note:</i></b> Only roles from the same server can be compared
      *
      * @throws IllegalArgumentException If the roles are on different servers.
      */
