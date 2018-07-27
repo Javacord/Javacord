@@ -7,7 +7,11 @@ import org.javacord.api.entity.message.MessageActivityType;
 
 import java.util.Optional;
 
+/**
+ * The implementation of {@link MessageActivity}.
+ */
 public class MessageActivityImpl implements MessageActivity {
+
     private final MessageActivityType type;
     private final String partyId;
     private final Message message;
@@ -20,11 +24,7 @@ public class MessageActivityImpl implements MessageActivity {
      */
     public MessageActivityImpl(Message message, JsonNode data) {
         type = MessageActivityType.getMessageActivityTypeById(data.get("type").asInt());
-        if (data.has("party_id") && !data.get("party_id").isNull()) {
-            partyId = data.get("party_id").asText();
-        } else {
-            partyId = null;
-        }
+        partyId = data.has("party_id") ? data.get("party_id").asText() : null;
         this.message = message;
     }
 

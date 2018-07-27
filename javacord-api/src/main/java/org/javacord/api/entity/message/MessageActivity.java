@@ -22,7 +22,7 @@ public interface MessageActivity {
     Optional<String> getPartyId();
 
     /**
-     * Gets the {@link Message} of the activity.
+     * Gets the message of the activity.
      *
      * @return The message of the activity.
      */

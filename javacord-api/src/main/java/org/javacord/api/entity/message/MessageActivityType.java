@@ -1,19 +1,22 @@
 package org.javacord.api.entity.message;
 
+/**
+ * Represents a message activity type.
+ */
 public enum MessageActivityType {
 
     /**
-     * A join invite activity.
+     * A join activity.
      */
     JOIN(1),
 
     /**
-     * A spectate invite activity.
+     * A spectate activity.
      */
     SPECTATE(2),
 
     /**
-     * A listen invite activity.
+     * A listen activity.
      */
     LISTEN(3),
 
@@ -28,24 +31,33 @@ public enum MessageActivityType {
     UNKNOWN(-1);
 
     /**
-     * The int representing the id.
+     * The id of the type.
      */
-    final int id;
+    private final int id;
 
     /**
-     * Creates a new activity id.
+     * Creates a new message activity type.
      *
-     * @param id The int representation of the id.
+     * @param id The id of the type.
      */
     MessageActivityType(int id) {
         this.id = id;
     }
 
     /**
-     * Gets the id by its int representation.
+     * Gets the id of the message activity type.
      *
-     * @param id The int representation.
-     * @return The message id.
+     * @return The id of the message activity type.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Gets the message activity type by its id.
+     *
+     * @param id The id of the message activity type.
+     * @return The message activity type with the given id or {@link MessageActivityType#UNKNOWN} if unknown id.
      */
     public static MessageActivityType getMessageActivityTypeById(int id) {
         switch (id) {
