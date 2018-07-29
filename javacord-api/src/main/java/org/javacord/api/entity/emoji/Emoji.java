@@ -37,9 +37,9 @@ public interface Emoji extends Mentionable {
      * @param otherEmoji The emoji to compare with.
      * @return Whether the emoji is equal to the given emoji.
      */
-    default boolean equalsEmoji(Emoji otherEmoji) {
+    default boolean equalsUnicodeEmoji(Emoji otherEmoji) {
         if (otherEmoji.isUnicodeEmoji()) {
-            return equalsEmoji(otherEmoji.asUnicodeEmoji().orElse(""));
+            return equalsUnicodeEmoji(otherEmoji.asUnicodeEmoji().orElse(""));
         }
         if (isUnicodeEmoji()) {
             // This is an unicode emoji and the other emoji is a custom emoji
@@ -55,13 +55,32 @@ public interface Emoji extends Mentionable {
      * Checks if the emoji is equal to the given unicode emoji.
      * This can be used to safe some ugly optional checks.
      *
-     * @param otherEmoji The unicode emoji to compare with.
+     * @param otherUnicodeEmoji The unicode emoji to compare with.
      * @return Whether the emoji is equal to the given unicode emoji.
      */
-    default boolean equalsEmoji(String otherEmoji) {
+    default boolean equalsUnicodeEmoji(String otherUnicodeEmoji) {
         return asUnicodeEmoji()
-                .map(emoji -> emoji.equals(otherEmoji))
+                .map(emoji -> emoji.equals(otherUnicodeEmoji))
                 .orElse(false);
+    }
+
+    /**
+     * Checks if the emoji is equal to the given emoji string.
+     * This is useful when you only have a string that contains an emoji,
+     * which may be a custom emoji, but may as well be an unicode emoji.
+     * This can be used to safe some ugly optional checks.
+     *
+     * @param otherEmoji The emoji as its String representation.
+     * @return Whether the emojis are equal or not.
+     */
+    default boolean equalsEmoji(String otherEmoji) {
+        if (asCustomEmoji().isPresent()) {
+            return asCustomEmoji().get()
+                    .getMentionTag()
+                    .equals(otherEmoji);
+        } else {
+            return equalsUnicodeEmoji(otherEmoji);
+        }
     }
 
     /**
