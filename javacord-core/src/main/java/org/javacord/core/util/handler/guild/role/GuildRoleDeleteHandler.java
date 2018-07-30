@@ -31,11 +31,7 @@ public class GuildRoleDeleteHandler extends PacketHandler {
 
                 RoleDeleteEvent event = new RoleDeleteEventImpl(role);
 
-                api.getEventDispatcher().dispatchToRoleDeleteListeners(
-                        server,
-                        role,
-                        server,
-                        listener -> listener.onRoleDelete(event));
+                api.getEventDispatcher().dispatchRoleDeleteEvent(server, role, server, event);
             });
         });
     }

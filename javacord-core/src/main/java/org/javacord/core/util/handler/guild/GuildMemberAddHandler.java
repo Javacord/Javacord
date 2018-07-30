@@ -33,11 +33,7 @@ public class GuildMemberAddHandler extends PacketHandler {
 
                     ServerMemberJoinEvent event = new ServerMemberJoinEventImpl(server, user);
 
-                    api.getEventDispatcher().dispatchToServerMemberJoinListeners(
-                            server,
-                            server,
-                            user,
-                            listener -> listener.onServerMemberJoin(event));
+                    api.getEventDispatcher().dispatchServerMemberJoinEvent(server, server, user, event);
                 });
     }
 

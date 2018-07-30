@@ -72,10 +72,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 server.setName(newName);
                 ServerChangeNameEvent event = new ServerChangeNameEventImpl(server, newName, oldName);
 
-                api.getEventDispatcher().dispatchToServerChangeNameListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeName(event));
+                api.getEventDispatcher().dispatchServerChangeNameEvent(server, server, event);
             }
 
             String newIconHash = packet.get("icon").asText(null);
@@ -84,10 +81,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 server.setIconHash(newIconHash);
                 ServerChangeIconEvent event = new ServerChangeIconEventImpl(server, newIconHash, oldIconHash);
 
-                api.getEventDispatcher().dispatchToServerChangeIconListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeIcon(event));
+                api.getEventDispatcher().dispatchServerChangeIconEvent(server, server, event);
             }
 
             String newSplashHash = packet.get("splash").asText(null);
@@ -96,10 +90,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 server.setSplashHash(newSplashHash);
                 ServerChangeSplashEvent event = new ServerChangeSplashEventImpl(server, newSplashHash, oldSplashHash);
 
-                api.getEventDispatcher().dispatchToServerChangeSplashListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeSplash(event));
+                api.getEventDispatcher().dispatchServerChangeSplashEvent(server, server, event);
             }
 
             VerificationLevel newVerificationLevel = VerificationLevel.fromId(packet.get("verification_level").asInt());
@@ -109,10 +100,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 ServerChangeVerificationLevelEvent event = new ServerChangeVerificationLevelEventImpl(
                         server, newVerificationLevel, oldVerificationLevel);
 
-                api.getEventDispatcher().dispatchToServerChangeVerificationLevelListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeVerificationLevel(event));
+                api.getEventDispatcher().dispatchServerChangeVerificationLevelEvent(server, server, event);
             }
 
             Region newRegion = Region.getRegionByKey(packet.get("region").asText());
@@ -121,10 +109,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 server.setRegion(newRegion);
                 ServerChangeRegionEvent event = new ServerChangeRegionEventImpl(server, newRegion, oldRegion);
 
-                api.getEventDispatcher().dispatchToServerChangeRegionListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeRegion(event));
+                api.getEventDispatcher().dispatchServerChangeRegionEvent(server, server, event);
             }
 
             DefaultMessageNotificationLevel newDefaultMessageNotificationLevel =
@@ -137,10 +122,8 @@ public class GuildUpdateHandler extends PacketHandler {
                         new ServerChangeDefaultMessageNotificationLevelEventImpl(
                                 server, newDefaultMessageNotificationLevel, oldDefaultMessageNotificationLevel);
 
-                api.getEventDispatcher().dispatchToServerChangeDefaultMessageNotificationLevelListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeDefaultMessageNotificationLevel(event));
+                api.getEventDispatcher().dispatchServerChangeDefaultMessageNotificationLevelEvent(
+                        server, server, event);
             }
 
             long newOwnerId = packet.get("owner_id").asLong();
@@ -149,10 +132,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 server.setOwnerId(newOwnerId);
                 ServerChangeOwnerEvent event = new ServerChangeOwnerEventImpl(server, newOwnerId, oldOwner);
 
-                api.getEventDispatcher().dispatchToServerChangeOwnerListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeOwner(event));
+                api.getEventDispatcher().dispatchServerChangeOwnerEvent(server, server, event);
             }
 
             if (packet.has("system_channel_id")) {
@@ -165,10 +145,7 @@ public class GuildUpdateHandler extends PacketHandler {
                     ServerChangeSystemChannelEvent event =
                             new ServerChangeSystemChannelEventImpl(server, newSystemChannel, oldSystemChannel);
 
-                    api.getEventDispatcher().dispatchToServerChangeSystemChannelListeners(
-                            server,
-                            server,
-                            listener -> listener.onServerChangeSystemChannel(event));
+                    api.getEventDispatcher().dispatchServerChangeSystemChannelEvent(server, server, event);
                 }
             }
 
@@ -182,10 +159,7 @@ public class GuildUpdateHandler extends PacketHandler {
                     ServerChangeAfkChannelEvent event =
                             new ServerChangeAfkChannelEventImpl(server, newAfkChannel, oldAfkChannel);
 
-                    api.getEventDispatcher().dispatchToServerChangeAfkChannelListeners(
-                            server,
-                            server,
-                            listener -> listener.onServerChangeAfkChannel(event));
+                    api.getEventDispatcher().dispatchServerChangeAfkChannelEvent(server, server, event);
                 }
             }
 
@@ -196,10 +170,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 ServerChangeAfkTimeoutEvent event =
                         new ServerChangeAfkTimeoutEventImpl(server, newAfkTimeout, oldAfkTimeout);
 
-                api.getEventDispatcher().dispatchToServerChangeAfkTimeoutListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeAfkTimeout(event));
+                api.getEventDispatcher().dispatchServerChangeAfkTimeoutEvent(server, server, event);
             }
 
             ExplicitContentFilterLevel newExplicitContentFilterLevel =
@@ -210,10 +181,7 @@ public class GuildUpdateHandler extends PacketHandler {
                 ServerChangeExplicitContentFilterLevelEvent event = new ServerChangeExplicitContentFilterLevelEventImpl(
                         server, newExplicitContentFilterLevel, oldExplicitContentFilterLevel);
 
-                api.getEventDispatcher().dispatchToServerChangeExplicitContentFilterLevelListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeExplicitContentFilterLevel(event));
+                api.getEventDispatcher().dispatchServerChangeExplicitContentFilterLevelEvent(server, server, event);
             }
 
             MultiFactorAuthenticationLevel newMultiFactorAuthenticationLevel =
@@ -226,10 +194,7 @@ public class GuildUpdateHandler extends PacketHandler {
                         new ServerChangeMultiFactorAuthenticationLevelEventImpl(
                                 server, newMultiFactorAuthenticationLevel, oldMultiFactorAuthenticationLevel);
 
-                api.getEventDispatcher().dispatchToServerChangeMultiFactorAuthenticationLevelListeners(
-                        server,
-                        server,
-                        listener -> listener.onServerChangeMultiFactorAuthenticationLevel(event));
+                api.getEventDispatcher().dispatchServerChangeMultiFactorAuthenticationLevelEvent(server, server, event);
             }
         });
     }

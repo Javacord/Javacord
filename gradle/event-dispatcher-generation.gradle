@@ -12,7 +12,6 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeS
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver
 
 import javax.annotation.Generated
-import java.util.function.Consumer
 import java.util.function.Function
 
 buildscript {
@@ -52,7 +51,6 @@ project(':javacord-core') {
                     .setStorage(file("$outputDirectory/$eventDispatcherPath").toPath())
                     .addImport(ArrayList)
                     .addImport(Collection)
-                    .addImport(Consumer)
                     .addImport(List)
                     .addImport(typeSolver.solveType('org.javacord.core.DiscordApiImpl').qualifiedName)
                     .addImport(typeSolver.solveType('org.javacord.core.util.event.EventDispatcherBase').qualifiedName)
@@ -103,12 +101,14 @@ project(':javacord-core') {
             }.each { listener ->
                 eventDispatcherFile.addImport listener.qualifiedName
 
-                def method = eventDispatcherClass
-                    .addMethod("dispatchTo${listener.name}s", Modifier.PUBLIC)
-                def singletonMethod = eventDispatcherClass
-                    .addMethod("dispatchTo${listener.name}s", Modifier.PUBLIC)
-                def idMethod = eventDispatcherClass
-                    .addMethod("dispatchTo${listener.name}s", Modifier.PUBLIC)
+                def listenerMethod = listener.declaredMethods[0]
+                def eventType = listenerMethod.lastParam.getType()
+                def eventTypeName = eventType.typeDeclaration.name
+                eventDispatcherFile.addImport eventType.qualifiedName
+
+                def method = eventDispatcherClass.addMethod("dispatch$eventTypeName", Modifier.PUBLIC)
+                def singletonMethod = eventDispatcherClass.addMethod("dispatch$eventTypeName", Modifier.PUBLIC)
+                def idMethod = eventDispatcherClass.addMethod("dispatch$eventTypeName", Modifier.PUBLIC)
                 [method, singletonMethod, idMethod]
                     *.setJavadocComment("""
                         Dispatch an event to {@code $listener.name}s.
@@ -201,14 +201,14 @@ project(':javacord-core') {
                     [body, singletonBody, idBody]*.addStatement "listeners.addAll(getApi().get${listener.name}s());"
                 }
 
-                [method, singletonMethod, idMethod]
-                    *.addParameter("Consumer<$listener.name>", 'consumer')
+                [method, singletonMethod, idMethod]*.addParameter(eventTypeName, 'event')
                 [method, singletonMethod, idMethod].each {
                     it.javadocComment = it.javadocComment.orElseThrow { new AssertionError() }.content +
-                            '\n@param consumer The consumer.'
+                            '\n@param event The event.'
                 }
-                [body, singletonBody, idBody]
-                    *.addStatement 'dispatchEvent(threadSelector, listeners, consumer);'
+                [body, singletonBody, idBody]*.addStatement """
+                    dispatchEvent(threadSelector, listeners, listener -> listener.${listenerMethod.name}(event));
+                """
 
                 if (identicalMethods) {
                     method.remove()

@@ -32,12 +32,12 @@ public class TypingStartHandler extends PacketHandler {
             UserStartTypingEvent event = new UserStartTypingEventImpl(user, channel);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
-            api.getEventDispatcher().dispatchToUserStartTypingListeners(
+            api.getEventDispatcher().dispatchUserStartTypingEvent(
                     optionalServer.flatMap(Optional::<Object>of).orElse(api),
                     optionalServer.orElse(null),
                     channel,
                     user,
-                    listener -> listener.onUserStartTyping(event));
+                    event);
         }));
     }
 

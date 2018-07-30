@@ -68,11 +68,7 @@ public class ChannelCreateHandler extends PacketHandler {
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             ChannelCategory channelCategory = ((ServerImpl) server).getOrCreateChannelCategory(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(channelCategory);
-
-            api.getEventDispatcher().dispatchToServerChannelCreateListeners(
-                    server,
-                    server,
-                    listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
         });
     }
 
@@ -87,10 +83,7 @@ public class ChannelCreateHandler extends PacketHandler {
             ServerTextChannel textChannel = ((ServerImpl) server).getOrCreateServerTextChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(textChannel);
 
-            api.getEventDispatcher().dispatchToServerChannelCreateListeners(
-                    server,
-                    server,
-                    listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
         });
     }
 
@@ -105,10 +98,7 @@ public class ChannelCreateHandler extends PacketHandler {
             ServerVoiceChannel voiceChannel = ((ServerImpl) server).getOrCreateServerVoiceChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(voiceChannel);
 
-            api.getEventDispatcher().dispatchToServerChannelCreateListeners(
-                    server,
-                    server,
-                    listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
         });
     }
 
@@ -125,10 +115,7 @@ public class ChannelCreateHandler extends PacketHandler {
             PrivateChannel privateChannel = recipient.getOrCreateChannel(channel);
             PrivateChannelCreateEvent event = new PrivateChannelCreateEventImpl(privateChannel);
 
-            api.getEventDispatcher().dispatchToPrivateChannelCreateListeners(
-                    api,
-                    recipient,
-                    listener -> listener.onPrivateChannelCreate(event));
+            api.getEventDispatcher().dispatchPrivateChannelCreateEvent(api, recipient, event);
         }
     }
 
@@ -143,10 +130,7 @@ public class ChannelCreateHandler extends PacketHandler {
             GroupChannel groupChannel = new GroupChannelImpl(api, channel);
             GroupChannelCreateEvent event = new GroupChannelCreateEventImpl(groupChannel);
 
-            api.getEventDispatcher().dispatchToGroupChannelCreateListeners(
-                    api,
-                    groupChannel.getMembers(),
-                    listener -> listener.onGroupChannelCreate(event));
+            api.getEventDispatcher().dispatchGroupChannelCreateEvent(api, groupChannel.getMembers(), event);
         }
     }
 

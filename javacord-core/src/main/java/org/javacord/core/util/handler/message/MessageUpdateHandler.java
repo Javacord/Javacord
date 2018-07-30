@@ -78,23 +78,23 @@ public class MessageUpdateHandler extends PacketHandler {
 
                         Optional<Server> optionalServer =
                                 msg.getChannel().asServerChannel().map(ServerChannel::getServer);
-                        api.getEventDispatcher().dispatchToCachedMessagePinListeners(
+                        api.getEventDispatcher().dispatchCachedMessagePinEvent(
                                 optionalServer.flatMap(Optional::<Object>of).orElse(api),
                                 msg,
                                 optionalServer.orElse(null),
                                 msg.getChannel(),
-                                listener -> listener.onCachedMessagePin(event));
+                                event);
                     } else {
                         CachedMessageUnpinEvent event = new CachedMessageUnpinEventImpl(msg);
 
                         Optional<Server> optionalServer =
                                 msg.getChannel().asServerChannel().map(ServerChannel::getServer);
-                        api.getEventDispatcher().dispatchToCachedMessageUnpinListeners(
+                        api.getEventDispatcher().dispatchCachedMessageUnpinEvent(
                                 optionalServer.flatMap(Optional::<Object>of).orElse(api),
                                 msg,
                                 optionalServer.orElse(null),
                                 msg.getChannel(),
-                                listener -> listener.onCachedMessageUnpin(event));
+                                event);
                     }
                 }
             });
@@ -179,12 +179,12 @@ public class MessageUpdateHandler extends PacketHandler {
     private void dispatchEditEvent(MessageEditEvent event) {
         Optional<Server> optionalServer =
                 event.getChannel().asServerChannel().map(ServerChannel::getServer);
-        api.getEventDispatcher().dispatchToMessageEditListeners(
+        api.getEventDispatcher().dispatchMessageEditEvent(
                 optionalServer.flatMap(Optional::<Object>of).orElse(api),
                 event.getMessageId(),
                 optionalServer.orElse(null),
                 event.getChannel(),
-                listener -> listener.onMessageEdit(event));
+                event);
     }
 
 }

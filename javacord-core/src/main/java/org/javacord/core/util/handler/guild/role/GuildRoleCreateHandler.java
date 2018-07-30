@@ -29,10 +29,7 @@ public class GuildRoleCreateHandler extends PacketHandler {
             Role role = ((ServerImpl) server).getOrCreateRole(packet.get("role"));
             RoleCreateEvent event = new RoleCreateEventImpl(role);
 
-            api.getEventDispatcher().dispatchToRoleCreateListeners(
-                    server,
-                    server,
-                    listener -> listener.onRoleCreate(event));
+            api.getEventDispatcher().dispatchRoleCreateEvent(server, server, event);
         });
     }
 

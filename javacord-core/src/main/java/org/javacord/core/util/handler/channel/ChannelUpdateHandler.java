@@ -99,11 +99,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ServerChannelChangeNameEvent event =
                         new ServerChannelChangeNameEventImpl(channel, newName, oldName);
 
-                api.getEventDispatcher().dispatchToServerChannelChangeNameListeners(
-                        channel.getServer(),
-                        channel.getServer(),
-                        channel,
-                        listener -> listener.onServerChannelChangeName(event));
+                api.getEventDispatcher().dispatchServerChannelChangeNameEvent(
+                        channel.getServer(), channel.getServer(), channel, event);
             }
 
             ChannelCategory oldCategory = channel.asCategorizable().flatMap(Categorizable::getCategory).orElse(null);
@@ -126,11 +123,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ServerChannelChangePositionEvent event = new ServerChannelChangePositionEventImpl(
                         channel, newPosition, oldPosition, newRawPosition, oldRawPosition, newCategory, oldCategory);
 
-                api.getEventDispatcher().dispatchToServerChannelChangePositionListeners(
-                        channel.getServer(),
-                        channel.getServer(),
-                        channel,
-                        listener -> listener.onServerChannelChangePosition(event));
+                api.getEventDispatcher().dispatchServerChannelChangePositionEvent(
+                        channel.getServer(), channel.getServer(), channel, event);
             }
 
             Collection<Long> rolesWithOverwrittenPermissions = new HashSet<>();
@@ -219,12 +213,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ServerChannelChangeNsfwFlagEvent event =
                         new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
-                api.getEventDispatcher().dispatchToServerChannelChangeNsfwFlagListeners(
-                        channel.getServer(),
-                        channel,
-                        channel.getServer(),
-                        null,
-                        listener -> listener.onServerChannelChangeNsfwFlag(event));
+                api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
+                        channel.getServer(), channel, channel.getServer(), null, event);
             }
         });
     }
@@ -246,11 +236,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ServerTextChannelChangeTopicEvent event =
                         new ServerTextChannelChangeTopicEventImpl(channel, newTopic, oldTopic);
 
-                api.getEventDispatcher().dispatchToServerTextChannelChangeTopicListeners(
-                        channel.getServer(),
-                        channel.getServer(),
-                        channel,
-                        listener -> listener.onServerTextChannelChangeTopic(event));
+                api.getEventDispatcher().dispatchServerTextChannelChangeTopicEvent(
+                        channel.getServer(), channel.getServer(), channel, event);
             }
 
             boolean oldNsfwFlag = channel.isNsfw();
@@ -260,12 +247,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ServerChannelChangeNsfwFlagEvent event =
                         new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
-                api.getEventDispatcher().dispatchToServerChannelChangeNsfwFlagListeners(
-                        channel.getServer(),
-                        null,
-                        channel.getServer(),
-                        channel,
-                        listener -> listener.onServerChannelChangeNsfwFlag(event));
+                api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
+                        channel.getServer(), null, channel.getServer(), channel, event);
             }
         });
     }
@@ -285,11 +268,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ServerVoiceChannelChangeBitrateEvent event =
                         new ServerVoiceChannelChangeBitrateEventImpl(channel, newBitrate, oldBitrate);
 
-                api.getEventDispatcher().dispatchToServerVoiceChannelChangeBitrateListeners(
-                        channel.getServer(),
-                        channel.getServer(),
-                        channel,
-                        listener -> listener.onServerVoiceChannelChangeBitrate(event));
+                api.getEventDispatcher().dispatchServerVoiceChannelChangeBitrateEvent(
+                        channel.getServer(), channel.getServer(), channel, event);
             }
 
             int oldUserLimit = channel.getUserLimit().orElse(0);
@@ -299,11 +279,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ServerVoiceChannelChangeUserLimitEvent event =
                         new ServerVoiceChannelChangeUserLimitEventImpl(channel, newUserLimit, oldUserLimit);
 
-                api.getEventDispatcher().dispatchToServerVoiceChannelChangeUserLimitListeners(
-                        channel.getServer(),
-                        channel.getServer(),
-                        channel,
-                        listener -> listener.onServerVoiceChannelChangeUserLimit(event));
+                api.getEventDispatcher().dispatchServerVoiceChannelChangeUserLimitEvent(
+                        channel.getServer(), channel.getServer(), channel, event);
             }
         });
     }
@@ -332,11 +309,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 GroupChannelChangeNameEvent event =
                         new GroupChannelChangeNameEventImpl(channel, newName, oldName);
 
-                api.getEventDispatcher().dispatchToGroupChannelChangeNameListeners(
-                        api,
-                        Collections.singleton(channel),
-                        channel.getMembers(),
-                        listener -> listener.onGroupChannelChangeName(event));
+                api.getEventDispatcher().dispatchGroupChannelChangeNameEvent(
+                        api, Collections.singleton(channel), channel.getMembers(), event);
             }
         });
     }
@@ -360,13 +334,13 @@ public class ChannelUpdateHandler extends PacketHandler {
                 new ServerChannelChangeOverwrittenPermissionsEventImpl(
                         channel, newPermissions, oldPermissions, entity);
 
-        api.getEventDispatcher().dispatchToServerChannelChangeOverwrittenPermissionsListeners(
+        api.getEventDispatcher().dispatchServerChannelChangeOverwrittenPermissionsEvent(
                 channel.getServer(),
                 (entity instanceof Role) ? (Role) entity : null,
                 channel.getServer(),
                 channel,
                 (entity instanceof User) ? (User) entity : null,
-                listener -> listener.onServerChannelChangeOverwrittenPermissions(event));
+                event);
     }
 
 }

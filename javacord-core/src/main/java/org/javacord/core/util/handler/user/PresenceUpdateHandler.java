@@ -92,52 +92,37 @@ public class PresenceUpdateHandler extends PacketHandler {
     private void dispatchUserActivityChangeEvent(User user, Activity newActivity, Activity oldActivity) {
         UserChangeActivityEvent event = new UserChangeActivityEventImpl(user, newActivity, oldActivity);
 
-        api.getEventDispatcher().dispatchToUserChangeActivityListeners(
-                api,
-                user.getMutualServers(),
-                Collections.singleton(user),
-                listener -> listener.onUserChangeActivity(event));
+        api.getEventDispatcher().dispatchUserChangeActivityEvent(
+                api, user.getMutualServers(), Collections.singleton(user), event);
     }
 
     private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {
         UserChangeStatusEvent event = new UserChangeStatusEventImpl(user, newStatus, oldStatus);
 
-        api.getEventDispatcher().dispatchToUserChangeStatusListeners(
-                api,
-                user.getMutualServers(),
-                Collections.singleton(user),
-                listener -> listener.onUserChangeStatus(event));
+        api.getEventDispatcher().dispatchUserChangeStatusEvent(
+                api, user.getMutualServers(), Collections.singleton(user), event);
     }
 
     private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
         UserChangeNameEvent event = new UserChangeNameEventImpl(user, newName, oldName);
 
-        api.getEventDispatcher().dispatchToUserChangeNameListeners(
-                api,
-                user.getMutualServers(),
-                Collections.singleton(user),
-                listener -> listener.onUserChangeName(event));
+        api.getEventDispatcher().dispatchUserChangeNameEvent(
+                api, user.getMutualServers(), Collections.singleton(user), event);
     }
 
     private void dispatchUserChangeDiscriminatorEvent(User user, String newDiscriminator, String oldDiscriminator) {
         UserChangeDiscriminatorEvent event =
                 new UserChangeDiscriminatorEventImpl(user, newDiscriminator, oldDiscriminator);
 
-        api.getEventDispatcher().dispatchToUserChangeDiscriminatorListeners(
-                api,
-                user.getMutualServers(),
-                Collections.singleton(user),
-                listener -> listener.onUserChangeDiscriminator(event));
+        api.getEventDispatcher().dispatchUserChangeDiscriminatorEvent(
+                api, user.getMutualServers(), Collections.singleton(user), event);
     }
 
     private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
         UserChangeAvatarEvent event = new UserChangeAvatarEventImpl(user, newAvatarHash, oldAvatarHash);
 
-        api.getEventDispatcher().dispatchToUserChangeAvatarListeners(
-                api,
-                user.getMutualServers(),
-                Collections.singleton(user),
-                listener -> listener.onUserChangeAvatar(event));
+        api.getEventDispatcher().dispatchUserChangeAvatarEvent(
+                api, user.getMutualServers(), Collections.singleton(user), event);
     }
 
 }

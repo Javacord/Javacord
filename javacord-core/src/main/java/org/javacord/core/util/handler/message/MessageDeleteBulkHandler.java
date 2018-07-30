@@ -39,12 +39,12 @@ public class MessageDeleteBulkHandler extends PacketHandler {
                 api.removeMessageFromCache(messageId);
 
                 Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
-                api.getEventDispatcher().dispatchToMessageDeleteListeners(
+                api.getEventDispatcher().dispatchMessageDeleteEvent(
                         optionalServer.flatMap(Optional::<Object>of).orElse(api),
                         messageId,
                         optionalServer.orElse(null),
                         channel,
-                        listener -> listener.onMessageDelete(event));
+                        event);
             }
         });
     }

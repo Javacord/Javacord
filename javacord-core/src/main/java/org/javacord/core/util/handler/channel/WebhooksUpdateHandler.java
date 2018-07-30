@@ -26,11 +26,8 @@ public class WebhooksUpdateHandler extends PacketHandler {
         api.getServerTextChannelById(channelId).ifPresent(channel -> {
             WebhooksUpdateEvent event = new WebhooksUpdateEventImpl(channel);
 
-            api.getEventDispatcher().dispatchToWebhooksUpdateListeners(
-                    channel.getServer(),
-                    channel.getServer(),
-                    channel,
-                    listener -> listener.onWebhooksUpdate(event));
+            api.getEventDispatcher().dispatchWebhooksUpdateEvent(
+                    channel.getServer(), channel.getServer(), channel, event);
         });
     }
 

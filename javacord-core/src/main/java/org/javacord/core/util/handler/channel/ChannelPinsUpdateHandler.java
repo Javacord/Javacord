@@ -34,11 +34,11 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
             ChannelPinsUpdateEvent event = new ChannelPinsUpdateEventImpl(channel, lastPinTimestamp);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
-            api.getEventDispatcher().dispatchToChannelPinsUpdateListeners(
+            api.getEventDispatcher().dispatchChannelPinsUpdateEvent(
                     optionalServer.flatMap(Optional::<Object>of).orElse(api),
                     optionalServer.orElse(null),
                     channel,
-                    listener -> listener.onChannelPinsUpdate(event));
+                    event);
         });
     }
 

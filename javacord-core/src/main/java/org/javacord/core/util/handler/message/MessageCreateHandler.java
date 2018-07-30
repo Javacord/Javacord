@@ -32,12 +32,12 @@ public class MessageCreateHandler extends PacketHandler {
             MessageCreateEvent event = new MessageCreateEventImpl(message);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
-            api.getEventDispatcher().dispatchToMessageCreateListeners(
+            api.getEventDispatcher().dispatchMessageCreateEvent(
                     optionalServer.flatMap(Optional::<Object>of).orElse(api),
                     optionalServer.orElse(null),
                     channel,
                     message.getUserAuthor().orElse(null),
-                    listener -> listener.onMessageCreate(event));
+                    event);
         });
     }
 

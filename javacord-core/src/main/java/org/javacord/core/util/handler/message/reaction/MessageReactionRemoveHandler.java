@@ -49,13 +49,13 @@ public class MessageReactionRemoveHandler extends PacketHandler {
             ReactionRemoveEvent event = new ReactionRemoveEventImpl(api, messageId, channel, emoji, user);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
-            api.getEventDispatcher().dispatchToReactionRemoveListeners(
+            api.getEventDispatcher().dispatchReactionRemoveEvent(
                     optionalServer.flatMap(Optional::<Object>of).orElse(api),
                     messageId,
                     optionalServer.orElse(null),
                     channel,
                     user,
-                    listener -> listener.onReactionRemove(event));
+                    event);
         });
     }
 

@@ -47,11 +47,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             UserChangeNicknameEvent event =
                                     new UserChangeNicknameEventImpl(user, server, newNickname, oldNickname);
 
-                            api.getEventDispatcher().dispatchToUserChangeNicknameListeners(
-                                    server,
-                                    server,
-                                    user,
-                                    listener -> listener.onUserChangeNickname(event));
+                            api.getEventDispatcher().dispatchUserChangeNicknameEvent(server, server, user, event);
                         }
                     }
 
@@ -80,12 +76,8 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             ((RoleImpl) role).addUserToCache(user);
                             UserRoleAddEvent event = new UserRoleAddEventImpl(role, user);
 
-                            api.getEventDispatcher().dispatchToUserRoleAddListeners(
-                                    role.getServer(),
-                                    role,
-                                    role.getServer(),
-                                    user,
-                                    listener -> listener.onUserRoleAdd(event));
+                            api.getEventDispatcher().dispatchUserRoleAddEvent(
+                                    role.getServer(), role, role.getServer(), user, event);
                         }
 
                         // Removed roles
@@ -98,12 +90,8 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             ((RoleImpl) role).removeUserFromCache(user);
                             UserRoleRemoveEvent event = new UserRoleRemoveEventImpl(role, user);
 
-                            api.getEventDispatcher().dispatchToUserRoleRemoveListeners(
-                                    role.getServer(),
-                                    role,
-                                    role.getServer(),
-                                    user,
-                                    listener -> listener.onUserRoleRemove(event));
+                            api.getEventDispatcher().dispatchUserRoleRemoveEvent(
+                                    role.getServer(), role, role.getServer(), user, event);
                         }
                     }
                 });

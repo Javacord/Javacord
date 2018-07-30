@@ -33,11 +33,7 @@ public class GuildMemberRemoveHandler extends PacketHandler {
 
                     ServerMemberLeaveEvent event = new ServerMemberLeaveEventImpl(server, user);
 
-                    api.getEventDispatcher().dispatchToServerMemberLeaveListeners(
-                            server,
-                            server,
-                            user,
-                            listener -> listener.onServerMemberLeave(event));
+                    api.getEventDispatcher().dispatchServerMemberLeaveEvent(server, server, user, event);
                 });
     }
 

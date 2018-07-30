@@ -359,9 +359,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     closeReason, closeCodeString, closedByServer ? "server" : "client");
 
         LostConnectionEvent lostConnectionEvent = new LostConnectionEventImpl(api);
-        api.getEventDispatcher().dispatchToLostConnectionListeners(
-                null,
-                listener -> listener.onLostConnection(lostConnectionEvent));
+        api.getEventDispatcher().dispatchLostConnectionEvent(null, lostConnectionEvent);
 
         heartbeatTimer.updateAndGet(future -> {
             if (future != null) {
@@ -416,9 +414,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     logger.debug("Received RESUMED packet");
 
                     ResumeEvent resumeEvent = new ResumeEventImpl(api);
-                    api.getEventDispatcher().dispatchToResumeListeners(
-                            null,
-                            listener -> listener.onResume(resumeEvent));
+                    api.getEventDispatcher().dispatchResumeEvent(null, resumeEvent);
                 }
                 if (type.equals("READY")) {
                     reconnectAttempt.set(0);
@@ -454,9 +450,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             } catch (InterruptedException ignored) { }
                         }
                         ReconnectEvent reconnectEvent = new ReconnectEventImpl(api);
-                        api.getEventDispatcher().dispatchToReconnectListeners(
-                                null,
-                                listener -> listener.onReconnect(reconnectEvent));
+                        api.getEventDispatcher().dispatchReconnectEvent(null, reconnectEvent);
                         ready.complete(true);
                     });
                     logger.debug("Received READY packet");

@@ -111,11 +111,7 @@ public class ChannelDeleteHandler extends PacketHandler {
         recipient.getPrivateChannel().ifPresent(privateChannel -> {
             PrivateChannelDeleteEvent event = new PrivateChannelDeleteEventImpl(privateChannel);
 
-            api.getEventDispatcher().dispatchToPrivateChannelDeleteListeners(
-                    api,
-                    privateChannel,
-                    recipient,
-                    listener -> listener.onPrivateChannelDelete(event));
+            api.getEventDispatcher().dispatchPrivateChannelDeleteEvent(api, privateChannel, recipient, event);
 
             recipient.setChannel(null);
         });
@@ -132,11 +128,8 @@ public class ChannelDeleteHandler extends PacketHandler {
         api.getGroupChannelById(channelId).ifPresent(groupChannel -> {
             GroupChannelDeleteEvent event = new GroupChannelDeleteEventImpl(groupChannel);
 
-            api.getEventDispatcher().dispatchToGroupChannelDeleteListeners(
-                    api,
-                    Collections.singleton(groupChannel),
-                    groupChannel.getMembers(),
-                    listener -> listener.onGroupChannelDelete(event));
+            api.getEventDispatcher().dispatchGroupChannelDeleteEvent(
+                    api, Collections.singleton(groupChannel), groupChannel.getMembers(), event);
 
             api.removeGroupChannelFromCache(channelId);
         });
@@ -150,11 +143,8 @@ public class ChannelDeleteHandler extends PacketHandler {
     private void dispatchServerChannelDeleteEvent(ServerChannel channel) {
         ServerChannelDeleteEvent event = new ServerChannelDeleteEventImpl(channel);
 
-        api.getEventDispatcher().dispatchToServerChannelDeleteListeners(
-                channel.getServer(),
-                channel.getServer(),
-                channel,
-                listener -> listener.onServerChannelDelete(event));
+        api.getEventDispatcher().dispatchServerChannelDeleteEvent(
+                channel.getServer(), channel.getServer(), channel, event);
     }
 
 }

@@ -58,11 +58,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                                 new KnownCustomEmojiChangeNameEventImpl(emoji, newName, oldName);
                         ((KnownCustomEmojiImpl) emoji).setName(newName);
 
-                        api.getEventDispatcher().dispatchToKnownCustomEmojiChangeNameListeners(
-                                server,
-                                emoji,
-                                server,
-                                listener -> listener.onKnownCustomEmojiChangeName(event));
+                        api.getEventDispatcher().dispatchKnownCustomEmojiChangeNameEvent(server, emoji, server, event);
                     }
 
                     Collection<Role> oldWhitelist = emoji.getWhitelistedRoles().orElse(Collections.emptySet());
@@ -78,11 +74,8 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                                 new KnownCustomEmojiChangeWhitelistedRolesEventImpl(emoji, newWhitelist, oldWhitelist);
                         ((KnownCustomEmojiImpl) emoji).setWhitelist(newWhitelist);
 
-                        api.getEventDispatcher().dispatchToKnownCustomEmojiChangeWhitelistedRolesListeners(
-                                server,
-                                emoji,
-                                server,
-                                listener -> listener.onKnownCustomEmojiChangeWhitelistedRoles(event));
+                        api.getEventDispatcher().dispatchKnownCustomEmojiChangeWhitelistedRolesEvent(
+                                server, emoji, server, event);
                     }
                 } else {
                     KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(server, value);
@@ -90,10 +83,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
 
                     KnownCustomEmojiCreateEvent event = new KnownCustomEmojiCreateEventImpl(emoji);
 
-                    api.getEventDispatcher().dispatchToKnownCustomEmojiCreateListeners(
-                            server,
-                            server,
-                            listener -> listener.onKnownCustomEmojiCreate(event));
+                    api.getEventDispatcher().dispatchKnownCustomEmojiCreateEvent(server, server, event);
                 }
             });
 
@@ -106,11 +96,7 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
 
                         KnownCustomEmojiDeleteEvent event = new KnownCustomEmojiDeleteEventImpl(emoji);
 
-                        api.getEventDispatcher().dispatchToKnownCustomEmojiDeleteListeners(
-                                server,
-                                emoji,
-                                server,
-                                listener -> listener.onKnownCustomEmojiDelete(event));
+                        api.getEventDispatcher().dispatchKnownCustomEmojiDeleteEvent(server, emoji, server, event);
                     });
         });
     }

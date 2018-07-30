@@ -37,12 +37,12 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
             ReactionRemoveAllEvent event = new ReactionRemoveAllEventImpl(api, messageId, channel);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
-            api.getEventDispatcher().dispatchToReactionRemoveAllListeners(
+            api.getEventDispatcher().dispatchReactionRemoveAllEvent(
                     optionalServer.flatMap(Optional::<Object>of).orElse(api),
                     messageId,
                     optionalServer.orElse(null),
                     channel,
-                    listener -> listener.onReactionRemoveAll(event));
+                    event);
         });
     }
 
