@@ -33,6 +33,16 @@ public interface Permissions {
     PermissionState getState(PermissionType type);
 
     /**
+     * Creates a new permissions builder from this permissions object.
+     *
+     * @return The created builder.
+     * @see PermissionsBuilder#PermissionsBuilder(Permissions)
+     */
+    default PermissionsBuilder toBuilder() {
+        return new PermissionsBuilder(this);
+    }
+
+    /**
      * Gets a collection with permission types which are set to ({@link PermissionState#ALLOWED}).
      *
      * @return A collection with all allowed permissions.
@@ -55,20 +65,20 @@ public interface Permissions {
     }
 
     /**
-     * Gets a collection with permission types which are set to ({@link PermissionState#NONE}).
+     * Gets a collection with permission types which are set to ({@link PermissionState#UNSET}).
      *
      * @return A collection with all unset permissions.
      */
     default Collection<PermissionType> getUnsetPermissions() {
         return Collections.unmodifiableCollection(Arrays.stream(PermissionType.values())
-                .filter(type -> getState(type) == PermissionState.NONE)
+                .filter(type -> getState(type) == PermissionState.UNSET)
                 .collect(Collectors.toSet()));
     }
 
     /**
-     * Checks if the all permission types are set to {@link PermissionState#NONE}.
+     * Checks if the all permission types are set to {@link PermissionState#UNSET}.
      *
-     * @return Whether all permission types are set to NONE or not.
+     * @return Whether all permission types are set to UNSET or not.
      */
     boolean isEmpty(); // We could check it in a default method, but it's faster to just check it in the implementation
 

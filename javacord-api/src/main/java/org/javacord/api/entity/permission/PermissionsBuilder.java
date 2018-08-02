@@ -14,7 +14,7 @@ public class PermissionsBuilder {
     private final PermissionsBuilderDelegate delegate;
 
     /**
-     * Creates a new permissions builder with all types set to {@link PermissionState#NONE}.
+     * Creates a new permissions builder with all types set to {@link PermissionState#UNSET}.
      */
     public PermissionsBuilder() {
         delegate = DelegateFactory.createPermissionsBuilderDelegate();
@@ -39,6 +39,72 @@ public class PermissionsBuilder {
     public PermissionsBuilder setState(PermissionType type, PermissionState state) {
         delegate.setState(type, state);
         return this;
+    }
+
+    /**
+     * Sets the state for the given types to {@link PermissionState#ALLOWED}.
+     *
+     * @param types The types to change.
+     * @return The current instance in order to chain call methods.
+     */
+    public PermissionsBuilder setAllowed(PermissionType... types) {
+        for (PermissionType type : types) {
+            setState(type, PermissionState.ALLOWED);
+        }
+        return this;
+    }
+
+    /**
+     * Sets all states to {@link PermissionState#ALLOWED}.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public PermissionsBuilder setAllAllowed() {
+        return setAllowed(PermissionType.values());
+    }
+
+    /**
+     * Sets the state for the given types to {@link PermissionState#DENIED}.
+     *
+     * @param types The types to change.
+     * @return The current instance in order to chain call methods.
+     */
+    public PermissionsBuilder setDenied(PermissionType... types) {
+        for (PermissionType type : types) {
+            setState(type, PermissionState.DENIED);
+        }
+        return this;
+    }
+
+    /**
+     * Sets all states to {@link PermissionState#DENIED}.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public PermissionsBuilder setAllDenied() {
+        return setDenied(PermissionType.values());
+    }
+
+    /**
+     * Sets the state for the given types to {@link PermissionState#UNSET}.
+     *
+     * @param types The types to change.
+     * @return The current instance in order to chain call methods.
+     */
+    public PermissionsBuilder setUnset(PermissionType... types) {
+        for (PermissionType type : types) {
+            setState(type, PermissionState.UNSET);
+        }
+        return this;
+    }
+
+    /**
+     * Sets all states to {@link PermissionState#UNSET}.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public PermissionsBuilder setAllUnset() {
+        return setUnset(PermissionType.values());
     }
 
     /**

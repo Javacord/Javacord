@@ -171,10 +171,10 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
         PermissionsBuilder builder = new PermissionsBuilder(getServer().getPermissions(user));
         Permissions effectiveOverwrittenPermissions = getEffectiveOverwrittenPermissions(user);
         Arrays.stream(PermissionType.values())
-                .filter(type -> effectiveOverwrittenPermissions.getState(type) != PermissionState.NONE)
+                .filter(type -> effectiveOverwrittenPermissions.getState(type) != PermissionState.UNSET)
                 .forEachOrdered(type -> builder.setState(type, effectiveOverwrittenPermissions.getState(type)));
         Arrays.stream(PermissionType.values())
-                .filter(type -> builder.getState(type) == PermissionState.NONE)
+                .filter(type -> builder.getState(type) == PermissionState.UNSET)
                 .forEachOrdered(type -> builder.setState(type, PermissionState.DENIED));
         return builder.build();
     }

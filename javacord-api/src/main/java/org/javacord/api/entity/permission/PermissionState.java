@@ -8,16 +8,16 @@ public enum PermissionState {
     /**
      * The given {@link PermissionType type} is not set.
      */
-    NONE(),
+    UNSET,
 
     /**
      * The given {@link PermissionType type} is allowed.
      */
-    ALLOWED(),
+    ALLOWED,
 
     /**
      * The given {@link PermissionType type} is denied.
      * This is only for overwritten permissions!
      */
-    DENIED()
+    DENIED
 }

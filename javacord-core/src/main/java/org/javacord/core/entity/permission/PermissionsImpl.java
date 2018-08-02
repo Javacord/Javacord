@@ -10,7 +10,7 @@ import org.javacord.api.entity.permission.Permissions;
 public class PermissionsImpl implements Permissions {
 
     /**
-     * A permissions object with all permission types being {@link PermissionState#NONE}.
+     * A permissions object with all permission types being {@link PermissionState#UNSET}.
      */
     public static final Permissions EMPTY_PERMISSIONS = new PermissionsImpl(0, 0);
 
@@ -64,7 +64,7 @@ public class PermissionsImpl implements Permissions {
         if (type.isSet(denied)) {
             return PermissionState.DENIED;
         }
-        return PermissionState.NONE;
+        return PermissionState.UNSET;
     }
 
     @Override
