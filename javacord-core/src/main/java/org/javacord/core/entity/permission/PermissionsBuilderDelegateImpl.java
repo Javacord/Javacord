@@ -49,7 +49,7 @@ public class PermissionsBuilderDelegateImpl implements PermissionsBuilderDelegat
         if (type.isSet(denied)) {
             return PermissionState.DENIED;
         }
-        return PermissionState.NONE;
+        return PermissionState.UNSET;
     }
 
     @Override

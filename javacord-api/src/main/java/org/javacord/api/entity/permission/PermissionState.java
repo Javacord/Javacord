@@ -8,7 +8,7 @@ public enum PermissionState {
     /**
      * The given {@link PermissionType type} is not set.
      */
-    NONE(),
+    UNSET(),
 
     /**
      * The given {@link PermissionType type} is allowed.

@@ -14,7 +14,7 @@ public class PermissionsBuilder {
     private final PermissionsBuilderDelegate delegate;
 
     /**
-     * Creates a new permissions builder with all types set to {@link PermissionState#NONE}.
+     * Creates a new permissions builder with all types set to {@link PermissionState#UNSET}.
      */
     public PermissionsBuilder() {
         delegate = DelegateFactory.createPermissionsBuilderDelegate();
