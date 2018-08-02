@@ -20,9 +20,6 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.connection.LostConnectionEvent;
 import org.javacord.api.event.connection.ReconnectEvent;
 import org.javacord.api.event.connection.ResumeEvent;
-import org.javacord.api.listener.connection.LostConnectionListener;
-import org.javacord.api.listener.connection.ReconnectListener;
-import org.javacord.api.listener.connection.ResumeListener;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.event.connection.LostConnectionEventImpl;
 import org.javacord.core.event.connection.ReconnectEventImpl;
@@ -362,9 +359,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     closeReason, closeCodeString, closedByServer ? "server" : "client");
 
         LostConnectionEvent lostConnectionEvent = new LostConnectionEventImpl(api);
-        List<LostConnectionListener> listeners = new ArrayList<>(api.getLostConnectionListeners());
-        api.getEventDispatcher()
-                .dispatchEvent(null, listeners, listener -> listener.onLostConnection(lostConnectionEvent));
+        api.getEventDispatcher().dispatchLostConnectionEvent(null, lostConnectionEvent);
 
         heartbeatTimer.updateAndGet(future -> {
             if (future != null) {
@@ -419,9 +414,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     logger.debug("Received RESUMED packet");
 
                     ResumeEvent resumeEvent = new ResumeEventImpl(api);
-                    List<ResumeListener> listeners = new ArrayList<>(api.getResumeListeners());
-                    api.getEventDispatcher()
-                            .dispatchEvent(null, listeners, listener -> listener.onResume(resumeEvent));
+                    api.getEventDispatcher().dispatchResumeEvent(null, resumeEvent);
                 }
                 if (type.equals("READY")) {
                     reconnectAttempt.set(0);
@@ -457,9 +450,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             } catch (InterruptedException ignored) { }
                         }
                         ReconnectEvent reconnectEvent = new ReconnectEventImpl(api);
-                        List<ReconnectListener> listeners = new ArrayList<>(api.getReconnectListeners());
-                        api.getEventDispatcher()
-                                .dispatchEvent(null, listeners, listener -> listener.onReconnect(reconnectEvent));
+                        api.getEventDispatcher().dispatchReconnectEvent(null, reconnectEvent);
                         ready.complete(true);
                     });
                     logger.debug("Received READY packet");

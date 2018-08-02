@@ -1,0 +1,249 @@
+import com.github.javaparser.JavaParser
+import com.github.javaparser.ParserConfiguration.LanguageLevel
+import com.github.javaparser.ast.CompilationUnit
+import com.github.javaparser.ast.Modifier
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
+import com.github.javaparser.printer.PrettyPrinter
+import com.github.javaparser.printer.PrettyPrinterConfiguration
+import com.github.javaparser.symbolsolver.JavaSymbolSolver
+import com.github.javaparser.symbolsolver.model.resolution.TypeSolver
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver
+
+import javax.annotation.Generated
+import java.util.function.Function
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.javaparser:javaparser-symbol-solver-core:3.6.8'
+        classpath 'javax.annotation:javax.annotation-api:1.3.2'
+    }
+}
+
+project(':javacord-core') {
+    task generateEventDispatcher {
+        ext.outputDirectory = "$buildDir/generated/event-dispatcher"
+
+        def javacordApi = project(':javacord-api')
+        inputs.files javacordApi.sourceSets.main.allJava withPropertyName 'apiJavaFiles'
+        inputs.files sourceSets.main.allJava withPropertyName 'coreJavaFiles'
+        outputs.dir outputDirectory withPropertyName 'outputDirectory'
+
+        doLast {
+            delete outputDirectory
+
+            def typeSolver = new CombinedTypeSolver(
+                    (javacordApi.sourceSets.main.allJava.srcDirs + sourceSets.main.allJava.srcDirs)
+                            .findAll { it.directory }
+                            .collect { new JavaParserTypeSolver(it) }
+                            as TypeSolver[])
+            typeSolver.add new ReflectionTypeSolver()
+            def staticJavaparserConfiguration = JavaParser.staticConfiguration
+            staticJavaparserConfiguration.symbolResolver = new JavaSymbolSolver(typeSolver)
+            staticJavaparserConfiguration.languageLevel = LanguageLevel.JAVA_9
+
+            def eventDispatcherPath = 'org/javacord/core/util/event/EventDispatcher.java'
+            def eventDispatcherFile = new CompilationUnit('org.javacord.core.util.event')
+                    .setStorage(file("$outputDirectory/$eventDispatcherPath").toPath())
+                    .addImport(ArrayList)
+                    .addImport(Collection)
+                    .addImport(List)
+                    .addImport(typeSolver.solveType('org.javacord.core.DiscordApiImpl').qualifiedName)
+                    .addImport(typeSolver.solveType('org.javacord.core.util.event.EventDispatcherBase').qualifiedName)
+                    .addImport('org.javacord.api.listener.message.MessageAttachableListenerManager')
+            def eventDispatcherClass = eventDispatcherFile
+                    .addClass('EventDispatcher')
+                    .addSingleMemberAnnotation(Generated, '"event-dispatcher-generation.gradle"')
+                    .setJavadocComment('This class is used to dispatch events.')
+                    .addExtends('EventDispatcherBase')
+
+            eventDispatcherClass
+                    .addConstructor(Modifier.PUBLIC)
+                    .setJavadocComment('''
+                        Creates a new event dispatcher.
+
+                        @param api The discord api instance.
+                    '''.stripIndent().trim())
+                    .addParameter('DiscordApiImpl', 'api')
+                    .createBody()
+                    .addStatement('super(api);')
+
+            // determine which entity extends which attachable listener manager
+            def entityByAttachableListenerManager = javacordApi.sourceSets.main.allJava.matching {
+                include 'org/javacord/api/entity/**/*.java'
+            }.collectMany {
+                JavaParser.parse(it).findAll(ClassOrInterfaceDeclaration)
+            }.findAll {
+                it.extendedTypes.any { it.nameAsString.endsWith 'AttachableListenerManager' }
+            }.collectEntries {
+                [it.extendedTypes.find { it.nameAsString.endsWith 'AttachableListenerManager' }.nameAsString,
+                 it.resolve()]
+            }
+
+            def objectAttachableListener =
+                    typeSolver.solveType('org.javacord.api.listener.ObjectAttachableListener')
+            def globallyAttachableListener =
+                    typeSolver.solveType('org.javacord.api.listener.GloballyAttachableListener')
+            def userAttachableListener =
+                    typeSolver.solveType('org.javacord.api.listener.user.UserAttachableListener')
+            def messageAttachableListener =
+                    typeSolver.solveType('org.javacord.api.listener.message.MessageAttachableListener')
+
+            javacordApi.sourceSets.main.allJava.matching {
+                include 'org/javacord/api/listener/**/*Listener.java'
+                exclude 'org/javacord/api/listener/**/*AttachableListener.java'
+            }.collectMany {
+                JavaParser.parse(it).findAll(ClassOrInterfaceDeclaration)*.resolve()
+            }.each { listener ->
+                eventDispatcherFile.addImport listener.qualifiedName
+
+                def listenerMethod = listener.declaredMethods[0]
+                def eventType = listenerMethod.lastParam.getType()
+                def eventTypeName = eventType.typeDeclaration.name
+                eventDispatcherFile.addImport eventType.qualifiedName
+
+                def method = eventDispatcherClass.addMethod("dispatch$eventTypeName", Modifier.PUBLIC)
+                def singletonMethod = eventDispatcherClass.addMethod("dispatch$eventTypeName", Modifier.PUBLIC)
+                def idMethod = eventDispatcherClass.addMethod("dispatch$eventTypeName", Modifier.PUBLIC)
+                [method, singletonMethod, idMethod]
+                    *.setJavadocComment("""
+                        Dispatch an event to {@code $listener.name}s.
+
+                        @param threadSelector The dispatch thread selector.
+                    """.stripIndent().trim())
+                    *.addParameter(Object, 'threadSelector')
+
+                def body, singletonBody, idBody
+                (body, singletonBody, idBody) = [method, singletonMethod, idMethod]
+                    *.createBody()
+                    *.addStatement("List<$listener.name> listeners = new ArrayList<>();")
+
+                boolean identicalMethods = true
+                boolean idMethodNecessary = false
+
+                // find all attachable listeners that are not object or globally attachable listener themselves
+                listener.interfacesExtended.typeDeclaration.findAll {
+                    (it != objectAttachableListener) && (it != globallyAttachableListener) &&
+                            it.name.endsWith('AttachableListener')
+                }.sort { left, right ->
+                    Comparator.comparing { it.name }.thenComparing({ it.qualifiedName } as Function).compare left, right
+                }.each {
+                    identicalMethods = false
+
+                    def entity = entityByAttachableListenerManager."${it.name}Manager"
+                    eventDispatcherFile.addImport entity.qualifiedName
+                    def entityName = entity.name
+                    def entityVariableName = "${entityName.uncapitalize()}"
+
+                    method.addParameter "Collection<${entityName}>", "${entityVariableName}s"
+                    method.javadocComment = method.javadocComment.orElseThrow { new AssertionError() }.content +
+                            "\n@param ${entityVariableName}s The {@code $entityName}s."
+                    body.addStatement """
+                        if (${entityVariableName}s != null) {
+                            ${entityVariableName}s.stream()
+                                .map(${entityName}::get${listener.name}s)
+                                .forEach(listeners::addAll);
+                        }
+                    """
+
+                    def objectMethods = [singletonMethod]
+                    def objectBodies = [singletonBody]
+                    def idMethods = []
+                    def idBodies = []
+                    if (it == userAttachableListener) {
+                        idMethodNecessary = true
+                        idMethods << idMethod
+                        idBodies << idBody
+                    } else {
+                        objectMethods << idMethod
+                        objectBodies << idBody
+                    }
+                    def specialMessageAttachable = (it == messageAttachableListener) &&
+                            !listener.name.startsWith('CachedMessage')
+
+                    if (specialMessageAttachable) {
+                        objectMethods*.addParameter long, 'messageId'
+                        objectMethods.each {
+                            it.javadocComment = it.javadocComment.orElseThrow { new AssertionError() }.content +
+                                    "\n@param messageId The id of the {@link Message}."
+                        }
+                        objectBodies*.addStatement """
+                            listeners.addAll(
+                                    MessageAttachableListenerManager.get${listener.name}s(getApi(), messageId));
+                        """
+                    } else {
+                        objectMethods*.addParameter entityName, entityVariableName
+                        objectMethods.each {
+                            it.javadocComment = it.javadocComment.orElseThrow { new AssertionError() }.content +
+                                    "\n@param ${entityVariableName} The {@code $entityName}."
+                        }
+                        objectBodies*.addStatement """
+                            if ($entityVariableName != null) {
+                                listeners.addAll(${entityVariableName}.get${listener.name}s());
+                            }
+                        """
+                    }
+
+                    idMethods*.addParameter long, 'userId'
+                    idMethods.each {
+                        it.javadocComment = it.javadocComment.orElseThrow { new AssertionError() }.content +
+                                '\n@param userId The id of the {@link User}.'
+                    }
+                    idBodies*.addStatement """
+                        listeners.addAll(getApi().getObjectListeners(User.class, userId, ${listener.name}.class));
+                    """
+                }
+                if (listener.interfacesExtended.typeDeclaration.contains(globallyAttachableListener)) {
+                    [body, singletonBody, idBody]*.addStatement "listeners.addAll(getApi().get${listener.name}s());"
+                }
+
+                [method, singletonMethod, idMethod]*.addParameter(eventTypeName, 'event')
+                [method, singletonMethod, idMethod].each {
+                    it.javadocComment = it.javadocComment.orElseThrow { new AssertionError() }.content +
+                            '\n@param event The event.'
+                }
+                [body, singletonBody, idBody]*.addStatement """
+                    dispatchEvent(threadSelector, listeners, listener -> listener.${listenerMethod.name}(event));
+                """
+
+                if (identicalMethods) {
+                    method.remove()
+                }
+                if (!idMethodNecessary) {
+                    idMethod.remove()
+                }
+            }
+
+            eventDispatcherFile.storage.ifPresent {
+                it.save {
+                    new PrettyPrinter(new PrettyPrinterConfiguration()
+                            .setOrderImports(true)
+                            .setEndOfLineCharacter('\n')
+                            .setColumnAlignParameters(true)
+                            .setColumnAlignFirstMethodChain(true)
+                    ).print it
+                }
+            }
+        }
+    }
+    rootProject.generate.dependsOn generateEventDispatcher
+
+    sourceSets {
+        main {
+            java {
+                srcDir generateEventDispatcher.outputDirectory
+            }
+        }
+    }
+    compileJava.dependsOn generateEventDispatcher
+
+    idea {
+        module {
+            generatedSourceDirs << file(generateEventDispatcher.outputDirectory)
+        }
+    }
+}

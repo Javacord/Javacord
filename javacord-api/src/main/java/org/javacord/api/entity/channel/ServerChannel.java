@@ -12,19 +12,12 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.InviteBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.channel.server.ServerChannelAttachableListener;
-import org.javacord.api.listener.channel.server.ServerChannelChangeNameListener;
-import org.javacord.api.listener.channel.server.ServerChannelChangeOverwrittenPermissionsListener;
-import org.javacord.api.listener.channel.server.ServerChannelChangePositionListener;
-import org.javacord.api.listener.channel.server.ServerChannelDeleteListener;
-import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.listener.channel.server.ServerChannelAttachableListenerManager;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -33,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server channel.
  */
-public interface ServerChannel extends Channel, Nameable {
+public interface ServerChannel extends Channel, Nameable, ServerChannelAttachableListenerManager {
 
     /**
      * Gets the server of the channel.
@@ -300,114 +293,6 @@ public interface ServerChannel extends Channel, Nameable {
     default boolean canYouCreateInstantInvite() {
         return canCreateInstantInvite(getApi().getYourself());
     }
-
-    /**
-     * Adds a listener, which listens to this channel being deleted.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerChannelDeleteListener> addServerChannelDeleteListener(ServerChannelDeleteListener listener);
-
-    /**
-     * Gets a list with all registered server channel delete listeners.
-     *
-     * @return A list with all registered server channel delete listeners.
-     */
-    List<ServerChannelDeleteListener> getServerChannelDeleteListeners();
-
-    /**
-     * Adds a listener, which listens to this server channel name changes.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerChannelChangeNameListener> addServerChannelChangeNameListener(
-            ServerChannelChangeNameListener listener);
-
-    /**
-     * Gets a list with all registered server channel change name listeners.
-     *
-     * @return A list with all registered server channel change name listeners.
-     */
-    List<ServerChannelChangeNameListener> getServerChannelChangeNameListeners();
-
-    /**
-     * Adds a listener, which listens this server channel position changes.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerChannelChangePositionListener> addServerChannelChangePositionListener(
-            ServerChannelChangePositionListener listener);
-
-    /**
-     * Gets a list with all registered server channel change position listeners.
-     *
-     * @return A list with all registered server channel change position listeners.
-     */
-    List<ServerChannelChangePositionListener> getServerChannelChangePositionListeners();
-
-    /**
-     * Adds a listener, which listens to overwritten permission changes of this server.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-            addServerChannelChangeOverwrittenPermissionsListener(
-                    ServerChannelChangeOverwrittenPermissionsListener listener);
-
-    /**
-     * Gets a list with all registered server channel change overwritten permissions listeners.
-     *
-     * @return A list with all registered server channel change overwritten permissions listeners.
-     */
-    List<ServerChannelChangeOverwrittenPermissionsListener> getServerChannelChangeOverwrittenPermissionsListeners();
-
-    /**
-     * Adds a listener that implements one or more {@code ServerChannelAttachableListener}s.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    <T extends ServerChannelAttachableListener & ObjectAttachableListener>
-            Collection<ListenerManager<? extends ServerChannelAttachableListener>>
-                    addServerChannelAttachableListener(T listener);
-
-    /**
-     * Removes a listener that implements one or more {@code ServerChannelAttachableListener}s.
-     *
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends ServerChannelAttachableListener & ObjectAttachableListener> void removeServerChannelAttachableListener(
-            T listener);
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code ServerChannelAttachableListener}s and
-     * their assigned listener classes they listen to.
-     *
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more {@code ServerChannelAttachableListener}s
-     * and their assigned listener classes they listen to.
-     */
-    <T extends ServerChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getServerChannelAttachableListeners();
-
-    /**
-     * Removes a listener from this server channel.
-     *
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends ServerChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<? extends ServerChannel> getCurrentCachedInstance() {

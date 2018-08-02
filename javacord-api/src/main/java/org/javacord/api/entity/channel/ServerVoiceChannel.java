@@ -1,17 +1,9 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelAttachableListener;
-import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelChangeBitrateListener;
-import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelChangeUserLimitListener;
-import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
-import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
-import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelAttachableListenerManager;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +11,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server voice channel.
  */
-public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categorizable {
+public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categorizable,
+                                            ServerVoiceChannelAttachableListenerManager {
 
     @Override
     default ChannelType getType() {
@@ -143,114 +136,6 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     default CompletableFuture<Void> removeCategory() {
         return createUpdater().removeCategory().update();
     }
-
-    /**
-     * Adds a listener, which listens to users joining this server voice channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerVoiceChannelMemberJoinListener> addServerVoiceChannelMemberJoinListener(
-            ServerVoiceChannelMemberJoinListener listener);
-
-    /**
-     * Gets a list with all registered server voice channel member join listeners.
-     *
-     * @return A list with all registered server voice channel member join listeners.
-     */
-    List<ServerVoiceChannelMemberJoinListener> getServerVoiceChannelMemberJoinListeners();
-
-    /**
-     * Adds a listener, which listens to users leaving this server voice channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerVoiceChannelMemberLeaveListener> addServerVoiceChannelMemberLeaveListener(
-            ServerVoiceChannelMemberLeaveListener listener);
-
-    /**
-     * Gets a list with all registered server voice channel member leave listeners.
-     *
-     * @return A list with all registered server voice channel member leave listeners.
-     */
-    List<ServerVoiceChannelMemberLeaveListener> getServerVoiceChannelMemberLeaveListeners();
-
-    /**
-     * Adds a listener, which listens to bitrate changes of this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerVoiceChannelChangeBitrateListener> addServerVoiceChannelChangeBitrateListener(
-            ServerVoiceChannelChangeBitrateListener listener);
-
-    /**
-     * Gets a list with all registered server voice channel change bitrate listeners.
-     *
-     * @return A list with all registered server voice channel change bitrate listeners.
-     */
-    List<ServerVoiceChannelChangeBitrateListener> getServerVoiceChannelChangeBitrateListeners();
-
-    /**
-     * Adds a listener, which listens to user limit changes of this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerVoiceChannelChangeUserLimitListener> addServerVoiceChannelChangeUserLimitListener(
-            ServerVoiceChannelChangeUserLimitListener listener);
-
-    /**
-     * Gets a list with all registered server voice channel change user limit listeners.
-     *
-     * @return A list with all registered server voice channel change user limit listeners.
-     */
-    List<ServerVoiceChannelChangeUserLimitListener> getServerVoiceChannelChangeUserLimitListeners();
-
-    /**
-     * Adds a listener that implements one or more {@code ServerVoiceChannelAttachableListener}s.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener>
-            Collection<ListenerManager<? extends ServerVoiceChannelAttachableListener>>
-                    addServerVoiceChannelAttachableListener(T listener);
-
-    /**
-     * Removes a listener that implements one or more {@code ServerVoiceChannelAttachableListener}s.
-     *
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> void
-            removeServerVoiceChannelAttachableListener(T listener);
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code ServerVoiceChannelAttachableListener}s
-     * and their assigned listener classes they listen to.
-     *
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more
-     * {@code ServerVoiceChannelAttachableListener}s and their assigned listener classes they listen to.
-     */
-    <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getServerVoiceChannelAttachableListeners();
-
-    /**
-     * Removes a listener from this server voice channel.
-     *
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends ServerVoiceChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<ServerVoiceChannel> getCurrentCachedInstance() {

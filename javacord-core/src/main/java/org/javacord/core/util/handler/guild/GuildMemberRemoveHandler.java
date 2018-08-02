@@ -4,13 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
-import org.javacord.api.listener.server.member.ServerMemberLeaveListener;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.server.member.ServerMemberLeaveEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles the guild member remove packet.
@@ -37,13 +33,7 @@ public class GuildMemberRemoveHandler extends PacketHandler {
 
                     ServerMemberLeaveEvent event = new ServerMemberLeaveEventImpl(server, user);
 
-                    List<ServerMemberLeaveListener> listeners = new ArrayList<>();
-                    listeners.addAll(server.getServerMemberLeaveListeners());
-                    listeners.addAll(user.getServerMemberLeaveListeners());
-                    listeners.addAll(api.getServerMemberLeaveListeners());
-
-                    api.getEventDispatcher().dispatchEvent(server,
-                            listeners, listener -> listener.onServerMemberLeave(event));
+                    api.getEventDispatcher().dispatchServerMemberLeaveEvent(server, server, user, event);
                 });
     }
 

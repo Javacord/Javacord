@@ -89,10 +89,14 @@ subprojects {
 
 defaultTasks 'build'
 
+task 'generate'
+
 apply from: 'gradle/dependencies.gradle'
 apply from: 'gradle/jars.gradle'
 apply from: 'gradle/java9.gradle'
 apply from: 'gradle/tests.gradle'
 apply from: 'gradle/javadoc.gradle'
+apply from: 'gradle/listener-manager-generation.gradle'
+apply from: 'gradle/event-dispatcher-generation.gradle'
 apply from: 'gradle/readme.gradle'
 apply from: 'gradle/publishing.gradle'

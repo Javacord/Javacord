@@ -15,13 +15,11 @@ import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.message.CachedMessagePinListener;
-import org.javacord.api.listener.message.CachedMessageUnpinListener;
 import org.javacord.api.util.DiscordRegexPattern;
-import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.embed.EmbedImpl;
+import org.javacord.core.listener.message.InternalMessageAttachableListenerManager;
 import org.javacord.core.util.cache.MessageCacheImpl;
 
 import java.time.Instant;
@@ -38,7 +36,7 @@ import java.util.regex.Matcher;
 /**
  * The implementation of {@link Message}.
  */
-public class MessageImpl implements Message {
+public class MessageImpl implements Message, InternalMessageAttachableListenerManager {
 
     /**
      * The discord api instance.
@@ -417,29 +415,6 @@ public class MessageImpl implements Message {
     public CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis) {
         return removeOwnReactionsByEmoji(
                 Arrays.stream(unicodeEmojis).map(UnicodeEmojiImpl::fromString).toArray(Emoji[]::new));
-    }
-
-    @Override
-    public ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener) {
-        return ((DiscordApiImpl) getApi())
-                .addObjectListener(Message.class, getId(), CachedMessagePinListener.class, listener);
-    }
-
-    @Override
-    public List<CachedMessagePinListener> getCachedMessagePinListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Message.class, getId(), CachedMessagePinListener.class);
-    }
-
-    @Override
-    public ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(
-            CachedMessageUnpinListener listener) {
-        return ((DiscordApiImpl) getApi())
-                .addObjectListener(Message.class, getId(), CachedMessageUnpinListener.class, listener);
-    }
-
-    @Override
-    public List<CachedMessageUnpinListener> getCachedMessageUnpinListeners() {
-        return ((DiscordApiImpl) getApi()).getObjectListeners(Message.class, getId(), CachedMessageUnpinListener.class);
     }
 
     @Override

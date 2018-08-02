@@ -4,13 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
-import org.javacord.api.listener.server.member.ServerMemberJoinListener;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.server.member.ServerMemberJoinEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles the guild member add packet.
@@ -37,13 +33,7 @@ public class GuildMemberAddHandler extends PacketHandler {
 
                     ServerMemberJoinEvent event = new ServerMemberJoinEventImpl(server, user);
 
-                    List<ServerMemberJoinListener> listeners = new ArrayList<>();
-                    listeners.addAll(server.getServerMemberJoinListeners());
-                    listeners.addAll(user.getServerMemberJoinListeners());
-                    listeners.addAll(api.getServerMemberJoinListeners());
-
-                    api.getEventDispatcher().dispatchEvent(server,
-                            listeners, listener -> listener.onServerMemberJoin(event));
+                    api.getEventDispatcher().dispatchServerMemberJoinEvent(server, server, user, event);
                 });
     }
 

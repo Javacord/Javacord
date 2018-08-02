@@ -1,4 +1,4 @@
-package org.javacord.api.listener;
+package org.javacord.api.listener.channel;
 
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.listener.channel.server.ServerChannelAttachableListener;

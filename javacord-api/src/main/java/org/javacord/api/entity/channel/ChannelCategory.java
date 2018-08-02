@@ -1,16 +1,11 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.channel.server.ChannelCategoryAttachableListener;
-import org.javacord.api.listener.channel.server.ServerChannelChangeNsfwFlagListener;
-import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.listener.channel.server.ChannelCategoryAttachableListenerManager;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -18,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a channel category.
  */
-public interface ChannelCategory extends ServerChannel {
+public interface ChannelCategory extends ServerChannel, ChannelCategoryAttachableListenerManager {
 
     @Override
     default ChannelType getType() {
@@ -97,66 +92,6 @@ public interface ChannelCategory extends ServerChannel {
         }
         return CompletableFuture.completedFuture(null);
     }
-
-    /**
-     * Adds a listener, which listens to server channel nsfw flag changes of this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerChannelChangeNsfwFlagListener> addServerChannelChangeNsfwFlagListener(
-            ServerChannelChangeNsfwFlagListener listener);
-
-    /**
-     * Gets a list with all registered server channel change nsfw flag listeners.
-     *
-     * @return A list with all registered server channel change nsfw flag listeners.
-     */
-    List<ServerChannelChangeNsfwFlagListener> getServerChannelChangeNsfwFlagListeners();
-
-    /**
-     * Adds a listener that implements one or more {@code ChannelCategoryAttachableListener}s.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener>
-            Collection<ListenerManager<? extends ChannelCategoryAttachableListener>>
-                    addChannelCategoryAttachableListener(T listener);
-
-    /**
-     * Removes a listener that implements one or more {@code ChannelCategoryAttachableListener}s.
-     *
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void
-            removeChannelCategoryAttachableListener(T listener);
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code ChannelCategoryAttachableListener}s
-     * and their assigned listener classes they listen to.
-     *
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more
-     * {@code ChannelCategoryAttachableListener}s and their assigned listener classes they listen to.
-     */
-    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getChannelCategoryAttachableListeners();
-
-    /**
-     * Removes a listener from this server text channel.
-     *
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends ChannelCategoryAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<ChannelCategory> getCurrentCachedInstance() {

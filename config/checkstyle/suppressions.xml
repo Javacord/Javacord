@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE suppressions PUBLIC
-        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-        "http://checkstyle.sourceforge.net/dtds/suppressions_1_1.dtd">
+        "-//Puppy Crawl//DTD Suppressions 1.2//EN"
+        "http://checkstyle.sourceforge.net/dtds/suppressions_1_2.dtd">
 
 <suppressions>
     <suppress id="finalizer" files=".*[\\/]DiscordApiImpl.java$" />
+    <suppress checks="LineLength|CustomImportOrder|OverloadMethodsDeclarationOrder|Indentation"
+              files="[\\/]build[\\/][^\\/]+[\\/]generated[\\/]" />
 </suppressions>

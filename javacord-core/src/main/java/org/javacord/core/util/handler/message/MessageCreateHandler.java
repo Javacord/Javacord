@@ -4,13 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.core.event.message.MessageCreateEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles the message create packet.
@@ -32,19 +31,13 @@ public class MessageCreateHandler extends PacketHandler {
             Message message = api.getOrCreateMessage(channel, packet);
             MessageCreateEvent event = new MessageCreateEventImpl(message);
 
-            List<MessageCreateListener> listeners = new ArrayList<>(channel.getMessageCreateListeners());
-            if (channel instanceof ServerChannel) {
-                listeners.addAll(((ServerChannel) channel).getServer().getMessageCreateListeners());
-            }
-            message.getUserAuthor().ifPresent(user -> listeners.addAll(user.getMessageCreateListeners()));
-            listeners.addAll(api.getMessageCreateListeners());
-
-            if (channel instanceof ServerChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
-                        listeners, listener -> listener.onMessageCreate(event));
-            } else {
-                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onMessageCreate(event));
-            }
+            Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+            api.getEventDispatcher().dispatchMessageCreateEvent(
+                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.orElse(null),
+                    channel,
+                    message.getUserAuthor().orElse(null),
+                    event);
         });
     }
 

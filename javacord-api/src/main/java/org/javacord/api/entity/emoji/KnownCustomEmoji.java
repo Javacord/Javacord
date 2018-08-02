@@ -3,23 +3,17 @@ package org.javacord.api.entity.emoji;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.server.emoji.KnownCustomEmojiAttachableListener;
-import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeNameListener;
-import org.javacord.api.listener.server.emoji.KnownCustomEmojiChangeWhitelistedRolesListener;
-import org.javacord.api.listener.server.emoji.KnownCustomEmojiDeleteListener;
-import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.listener.server.emoji.KnownCustomEmojiAttachableListenerManager;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents a known custom emoji.
  */
-public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownCustomEmoji> {
+public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownCustomEmoji>,
+                                          KnownCustomEmojiAttachableListenerManager {
 
     /**
      * Gets the server of the emoji.
@@ -127,97 +121,6 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     default CompletableFuture<Void> removeWhitelist() {
         return createUpdater().removeWhitelist().update();
     }
-
-    /**
-     * Adds a listener, which listens to this custom emoji being updated.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<KnownCustomEmojiChangeNameListener> addKnownCustomEmojiChangeNameListener(
-            KnownCustomEmojiChangeNameListener listener);
-
-    /**
-     * Gets a list with all registered custom emoji update listeners.
-     *
-     * @return A list with all registered custom emoji update listeners.
-     */
-    List<KnownCustomEmojiChangeNameListener> getKnownCustomEmojiChangeNameListeners();
-
-    /**
-     * Adds a listener, which listens to custom emoji whitelisted roles changes in this server.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<KnownCustomEmojiChangeWhitelistedRolesListener> addKnownCustomEmojiChangeWhitelistedRolesListener(
-            KnownCustomEmojiChangeWhitelistedRolesListener listener);
-
-    /**
-     * Gets a list with all registered custom emoji change whitelisted roles listeners.
-     *
-     * @return A list with all registered custom emoji change whitelisted roles listeners.
-     */
-    List<KnownCustomEmojiChangeWhitelistedRolesListener> getKnownCustomEmojiChangeWhitelistedRolesListeners();
-
-    /**
-     * Adds a listener, which listens to this custom emoji being deleted.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<KnownCustomEmojiDeleteListener> addKnownCustomEmojiDeleteListener(
-            KnownCustomEmojiDeleteListener listener);
-
-    /**
-     * Gets a list with all registered custom emoji delete listeners.
-     *
-     * @return A list with all registered custom emoji delete listeners.
-     */
-    List<KnownCustomEmojiDeleteListener> getKnownCustomEmojiDeleteListeners();
-
-    /**
-     * Adds a listener that implements one or more {@code KnownCustomEmojiAttachableListener}s.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-            addKnownCustomEmojiAttachableListener(T listener);
-
-    /**
-     * Removes a listener that implements one or more {@code KnownCustomEmojiAttachableListener}s.
-     *
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> void
-            removeKnownCustomEmojiAttachableListener(T listener);
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code KnownCustomEmojiAttachableListener}s
-     * and their assigned listener classes they listen to.
-     *
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more
-     * {@code KnownCustomEmojiAttachableListener}s and their assigned listener classes they listen to.
-     */
-    <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getKnownCustomEmojiAttachableListeners();
-
-    /**
-     * Removes a listener from this custom emoji.
-     *
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends KnownCustomEmojiAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<KnownCustomEmoji> getCurrentCachedInstance() {

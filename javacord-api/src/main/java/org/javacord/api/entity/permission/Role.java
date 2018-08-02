@@ -8,24 +8,10 @@ import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.channel.server.ServerChannelChangeOverwrittenPermissionsListener;
-import org.javacord.api.listener.server.role.RoleAttachableListener;
-import org.javacord.api.listener.server.role.RoleChangeColorListener;
-import org.javacord.api.listener.server.role.RoleChangeHoistListener;
-import org.javacord.api.listener.server.role.RoleChangeMentionableListener;
-import org.javacord.api.listener.server.role.RoleChangeNameListener;
-import org.javacord.api.listener.server.role.RoleChangePermissionsListener;
-import org.javacord.api.listener.server.role.RoleChangePositionListener;
-import org.javacord.api.listener.server.role.RoleDeleteListener;
-import org.javacord.api.listener.server.role.UserRoleAddListener;
-import org.javacord.api.listener.server.role.UserRoleRemoveListener;
-import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.listener.server.role.RoleAttachableListenerManager;
 
 import java.awt.Color;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -33,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a Discord role, e.g. "moderator".
  */
 public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionable, Comparable<Role>,
-                              UpdatableFromCache<Role> {
+                              UpdatableFromCache<Role>, RoleAttachableListenerManager {
 
     /**
      * Gets the server of the role.
@@ -261,202 +247,6 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     default String getMentionTag() {
         return "<@&" + getIdAsString() + ">";
     }
-
-    /**
-     * Adds a listener, which listens to color changes of this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<RoleChangeColorListener> addRoleChangeColorListener(RoleChangeColorListener listener);
-
-    /**
-     * Gets a list with all registered role change color listeners.
-     *
-     * @return A list with all registered role change color listeners.
-     */
-    List<RoleChangeColorListener> getRoleChangeColorListeners();
-
-    /**
-     * Adds a listener, which listens to hoist changes of this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<RoleChangeHoistListener> addRoleChangeHoistListener(RoleChangeHoistListener listener);
-
-    /**
-     * Gets a list with all registered role change hoist listeners.
-     *
-     * @return A list with all registered role change hoist listeners.
-     */
-    List<RoleChangeHoistListener> getRoleChangeHoistListeners();
-
-    /**
-     * Adds a listener, which listens to mentionable changes of this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<RoleChangeMentionableListener> addRoleChangeMentionableListener(
-            RoleChangeMentionableListener listener);
-
-    /**
-     * Gets a list with all registered role change mentionable listeners.
-     *
-     * @return A list with all registered role change mentionable listeners.
-     */
-    List<RoleChangeMentionableListener> getRoleChangeMentionableListeners();
-
-    /**
-     * Adds a listener, which listens to name changes of this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<RoleChangeNameListener> addRoleChangeNameListener(RoleChangeNameListener listener);
-
-    /**
-     * Gets a list with all registered role change name listeners.
-     *
-     * @return A list with all registered role change name listeners.
-     */
-    List<RoleChangeNameListener> getRoleChangeNameListeners();
-
-    /**
-     * Adds a listener, which listens to permission changes of this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<RoleChangePermissionsListener> addRoleChangePermissionsListener(
-            RoleChangePermissionsListener listener);
-
-    /**
-     * Gets a list with all registered role change permissions listeners.
-     *
-     * @return A list with all registered role change permissions listeners.
-     */
-    List<RoleChangePermissionsListener> getRoleChangePermissionsListeners();
-
-    /**
-     * Adds a listener, which listens to position changes of this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<RoleChangePositionListener> addRoleChangePositionListener(RoleChangePositionListener listener);
-
-    /**
-     * Gets a list with all registered role change position listeners.
-     *
-     * @return A list with all registered role change position listeners.
-     */
-    java.util.List<RoleChangePositionListener> getRoleChangePositionListeners();
-
-    /**
-     * Adds a listener, which listens to overwritten permission changes of this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ServerChannelChangeOverwrittenPermissionsListener>
-            addServerChannelChangeOverwrittenPermissionsListener(
-                    ServerChannelChangeOverwrittenPermissionsListener listener);
-
-    /**
-     * Gets a list with all registered server channel change overwritten permissions listeners.
-     *
-     * @return A list with all registered server channel change overwritten permissions listeners.
-     */
-    java.util.List<ServerChannelChangeOverwrittenPermissionsListener>
-            getServerChannelChangeOverwrittenPermissionsListeners();
-
-    /**
-     * Adds a listener, which listens to this role being deleted.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<RoleDeleteListener> addRoleDeleteListener(RoleDeleteListener listener);
-
-    /**
-     * Gets a list with all registered role delete listeners.
-     *
-     * @return A list with all registered role delete listeners.
-     */
-    java.util.List<RoleDeleteListener> getRoleDeleteListeners();
-
-    /**
-     * Adds a listener, which listens to this user being added to this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<UserRoleAddListener> addUserRoleAddListener(UserRoleAddListener listener);
-
-    /**
-     * Gets a list with all registered user role add listeners.
-     *
-     * @return A list with all registered user role add listeners.
-     */
-    java.util.List<UserRoleAddListener> getUserRoleAddListeners();
-
-    /**
-     * Adds a listener, which listens to this user being removed from this role.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<UserRoleRemoveListener> addUserRoleRemoveListener(UserRoleRemoveListener listener);
-
-    /**
-     * Gets a list with all registered user role remove listeners.
-     *
-     * @return A list with all registered user role remove listeners.
-     */
-    java.util.List<UserRoleRemoveListener> getUserRoleRemoveListeners();
-
-    /**
-     * Adds a listener that implements one or more {@code RoleAttachableListener}s.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    <T extends RoleAttachableListener & ObjectAttachableListener> Collection<ListenerManager<T>>
-            addRoleAttachableListener(T listener);
-
-    /**
-     * Removes a listener that implements one or more {@code RoleAttachableListener}s.
-     *
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends RoleAttachableListener & ObjectAttachableListener> void removeRoleAttachableListener(T listener);
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code RoleAttachableListener}s and their
-     * assigned listener classes they listen to.
-     *
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more {@code RoleAttachableListener}s and their
-     * assigned listener classes they listen to.
-     */
-    <T extends RoleAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>> getRoleAttachableListeners();
-
-    /**
-     * Removes a listener from this role.
-     *
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends RoleAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<Role> getCurrentCachedInstance() {

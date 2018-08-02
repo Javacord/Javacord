@@ -4,13 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
-import org.javacord.api.listener.server.member.ServerMemberBanListener;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.server.member.ServerMemberBanEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles the guild ban add packet.
@@ -36,13 +32,7 @@ public class GuildBanAddHandler extends PacketHandler {
 
                     ServerMemberBanEvent event = new ServerMemberBanEventImpl(server, user);
 
-                    List<ServerMemberBanListener> listeners = new ArrayList<>();
-                    listeners.addAll(server.getServerMemberBanListeners());
-                    listeners.addAll(user.getServerMemberBanListeners());
-                    listeners.addAll(api.getServerMemberBanListeners());
-
-                    api.getEventDispatcher()
-                            .dispatchEvent(server, listeners, listener -> listener.onServerMemberBan(event));
+                    api.getEventDispatcher().dispatchServerMemberBanEvent(server, server, user, event);
                 });
     }
 

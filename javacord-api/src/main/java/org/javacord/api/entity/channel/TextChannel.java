@@ -7,27 +7,15 @@ import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.TextChannelAttachableListener;
-import org.javacord.api.listener.message.CachedMessagePinListener;
-import org.javacord.api.listener.message.CachedMessageUnpinListener;
-import org.javacord.api.listener.message.ChannelPinsUpdateListener;
+import org.javacord.api.listener.channel.TextChannelAttachableListenerManager;
 import org.javacord.api.listener.message.MessageCreateListener;
-import org.javacord.api.listener.message.MessageDeleteListener;
-import org.javacord.api.listener.message.MessageEditListener;
-import org.javacord.api.listener.message.reaction.ReactionAddListener;
-import org.javacord.api.listener.message.reaction.ReactionRemoveAllListener;
-import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
-import org.javacord.api.listener.user.UserStartTypingListener;
 import org.javacord.api.util.NonThrowingAutoCloseable;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.api.util.event.ListenerManager;
 import org.javacord.api.util.logging.ExceptionLogger;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -41,7 +29,7 @@ import java.util.stream.StreamSupport;
 /**
  * This class represents a text channel.
  */
-public interface TextChannel extends Channel, Messageable {
+public interface TextChannel extends Channel, Messageable, TextChannelAttachableListenerManager {
 
     /**
      * Displays the "xyz is typing..." message.
@@ -1165,203 +1153,6 @@ public interface TextChannel extends Channel, Messageable {
     default boolean canYouMentionEveryone() {
         return canMentionEveryone(getApi().getYourself());
     }
-
-    /**
-     * Adds a listener, which listens to message creates in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<MessageCreateListener> addMessageCreateListener(MessageCreateListener listener);
-
-    /**
-     * Gets a list with all registered message create listeners.
-     *
-     * @return A list with all registered message create listeners.
-     */
-    List<MessageCreateListener> getMessageCreateListeners();
-
-    /**
-     * Adds a listener, which listens to users starting to type in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<UserStartTypingListener> addUserStartTypingListener(UserStartTypingListener listener);
-
-    /**
-     * Gets a list with all registered user starts typing listeners.
-     *
-     * @return A list with all registered user starts typing listeners.
-     */
-    List<UserStartTypingListener> getUserStartTypingListeners();
-
-    /**
-     * Adds a listener, which listens to message deletions in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<MessageDeleteListener> addMessageDeleteListener(MessageDeleteListener listener);
-
-    /**
-     * Gets a list with all registered message delete listeners.
-     *
-     * @return A list with all registered message delete listeners.
-     */
-    List<MessageDeleteListener> getMessageDeleteListeners();
-
-    /**
-     * Adds a listener, which listens to message edits in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<MessageEditListener> addMessageEditListener(MessageEditListener listener);
-
-    /**
-     * Gets a list with all registered message edit listeners.
-     *
-     * @return A list with all registered message edit listeners.
-     */
-    List<MessageEditListener> getMessageEditListeners();
-
-    /**
-     * Adds a listener, which listens to reactions being added in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ReactionAddListener> addReactionAddListener(ReactionAddListener listener);
-
-    /**
-     * Gets a list with all registered reaction add listeners.
-     *
-     * @return A list with all registered reaction add listeners.
-     */
-    List<ReactionAddListener> getReactionAddListeners();
-
-    /**
-     * Adds a listener, which listens to reactions being removed in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ReactionRemoveListener> addReactionRemoveListener(ReactionRemoveListener listener);
-
-    /**
-     * Gets a list with all registered reaction remove listeners.
-     *
-     * @return A list with all registered reaction remove listeners.
-     */
-    List<ReactionRemoveListener> getReactionRemoveListeners();
-
-    /**
-     * Adds a listener, which listens to all reactions being removed at once from a message in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ReactionRemoveAllListener> addReactionRemoveAllListener(ReactionRemoveAllListener listener);
-
-    /**
-     * Gets a list with all registered reaction remove all listeners.
-     *
-     * @return A list with all registered reaction remove all listeners.
-     */
-    List<ReactionRemoveAllListener> getReactionRemoveAllListeners();
-
-    /**
-     * Adds a listener, which listens to all pin updates in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<ChannelPinsUpdateListener> addChannelPinsUpdateListener(ChannelPinsUpdateListener listener);
-
-    /**
-     * Gets a list with all registered channel pins update listeners.
-     *
-     * @return A list with all registered channel pins update listeners.
-     */
-    List<ChannelPinsUpdateListener> getChannelPinsUpdateListeners();
-
-    /**
-     * Adds a listener, which listens to all cached message pins in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<CachedMessagePinListener> addCachedMessagePinListener(CachedMessagePinListener listener);
-
-    /**
-     * Gets a list with all registered cached message pin listeners.
-     *
-     * @return A list with all registered cached message pin listeners.
-     */
-    List<CachedMessagePinListener> getCachedMessagePinListeners();
-
-    /**
-     * Adds a listener, which listens to all cached message unpins in this channel.
-     *
-     * @param listener The listener to add.
-     * @return The manager of the listener.
-     */
-    ListenerManager<CachedMessageUnpinListener> addCachedMessageUnpinListener(CachedMessageUnpinListener listener);
-
-    /**
-     * Gets a list with all registered cached message unpin listeners.
-     *
-     * @return A list with all registered cached message unpin listeners.
-     */
-    List<CachedMessageUnpinListener> getCachedMessageUnpinListeners();
-
-    /**
-     * Adds a listener that implements one or more {@code TextChannelAttachableListener}s.
-     * Adding a listener multiple times will only add it once
-     * and return the same listener managers on each invocation.
-     * The order of invocation is according to first addition.
-     *
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
-     * @return The managers for the added listener.
-     */
-    @SuppressWarnings("unchecked")
-    <T extends TextChannelAttachableListener & ObjectAttachableListener>
-            Collection<ListenerManager<? extends TextChannelAttachableListener>>
-                    addTextChannelAttachableListener(T listener);
-
-    /**
-     * Removes a listener that implements one or more {@code TextChannelAttachableListener}s.
-     *
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    @SuppressWarnings("unchecked")
-    <T extends TextChannelAttachableListener & ObjectAttachableListener> void
-            removeTextChannelAttachableListener(T listener);
-
-    /**
-     * Gets a map with all registered listeners that implement one or more {@code TextChannelAttachableListener}s and
-     * their assigned listener classes they listen to.
-     *
-     * @param <T> The type of the listeners.
-     * @return A map with all registered listeners that implement one or more {@code TextChannelAttachableListener}s and
-     *     their assigned listener classes they listen to.
-     */
-    @SuppressWarnings("unchecked")
-    <T extends TextChannelAttachableListener & ObjectAttachableListener> Map<T, List<Class<T>>>
-            getTextChannelAttachableListeners();
-
-    /**
-     * Removes a listener from this text channel.
-     *
-     * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
-     */
-    <T extends TextChannelAttachableListener & ObjectAttachableListener> void removeListener(
-            Class<T> listenerClass, T listener);
 
     @Override
     default Optional<? extends TextChannel> getCurrentCachedInstance() {

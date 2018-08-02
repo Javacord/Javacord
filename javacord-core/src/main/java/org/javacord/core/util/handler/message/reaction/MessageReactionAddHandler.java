@@ -5,16 +5,14 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
-import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.event.message.reaction.ReactionAddEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -50,20 +48,14 @@ public class MessageReactionAddHandler extends PacketHandler {
 
             ReactionAddEvent event = new ReactionAddEventImpl(api, messageId, channel, emoji, user);
 
-            List<ReactionAddListener> listeners = new ArrayList<>();
-            listeners.addAll(Message.getReactionAddListeners(api, messageId));
-            listeners.addAll(channel.getReactionAddListeners());
-            if (channel instanceof ServerChannel) {
-                listeners.addAll(((ServerChannel) channel).getServer().getReactionAddListeners());
-            }
-            listeners.addAll(user.getReactionAddListeners());
-            listeners.addAll(api.getReactionAddListeners());
-            if (channel instanceof ServerChannel) {
-                api.getEventDispatcher().dispatchEvent(((ServerChannel) channel).getServer(),
-                        listeners, listener -> listener.onReactionAdd(event));
-            } else {
-                api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onReactionAdd(event));
-            }
+            Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+            api.getEventDispatcher().dispatchReactionAddEvent(
+                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    messageId,
+                    optionalServer.orElse(null),
+                    channel,
+                    user,
+                    event);
         });
     }
 

@@ -2,6 +2,7 @@ package org.javacord.core.util.event;
 
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -17,14 +18,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * This class is used to dispatch events.
+ * This class is the base for the class used to dispatch events.
  */
-public class EventDispatcher {
+public abstract class EventDispatcherBase {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(EventDispatcher.class);
+    private static final Logger logger = LoggerUtil.getLogger(EventDispatcherBase.class);
 
     /**
      * The time which a listener task is allowed to take until it get's interrupted.
@@ -54,7 +55,7 @@ public class EventDispatcher {
     /**
      * The discord api instance.
      */
-    private final DiscordApi api;
+    private final DiscordApiImpl api;
 
     /**
      * This map which holds a queue for every object (usually a server) with tasks to call the waiting listeners.
@@ -78,7 +79,7 @@ public class EventDispatcher {
      *
      * @param api The discord api instance.
      */
-    public EventDispatcher(DiscordApi api) {
+    protected EventDispatcherBase(DiscordApiImpl api) {
         this.api = api;
         queuedListenerTasks.put(OBJECT_INDEPENDENT_TASK_INDICATOR, new LinkedList<>());
         api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
@@ -140,6 +141,15 @@ public class EventDispatcher {
     }
 
     /**
+     * Gets the discord api instance.
+     *
+     * @return The discord api instance.
+     */
+    protected DiscordApiImpl getApi() {
+        return api;
+    }
+
+    /**
      * Sets whether execution time checking should be enabled or not.
      *
      * @param enable Whether execution time checking should be enabled or not.
@@ -164,7 +174,7 @@ public class EventDispatcher {
      *                 <code>onXyz(Event)</code> method.
      * @param <T> The type of the listener.
      */
-    public <T> void dispatchEvent(Object object, List<T> listeners, Consumer<T> consumer) {
+    protected <T> void dispatchEvent(Object object, List<T> listeners, Consumer<T> consumer) {
         api.getThreadPool().getSingleThreadExecutorService("Event Dispatch Adder").submit(() -> { // (horrible name)
             if (object != null) { // Object dependent listeners
                 // Don't allow adding of more events while there are unfinished object independent tasks

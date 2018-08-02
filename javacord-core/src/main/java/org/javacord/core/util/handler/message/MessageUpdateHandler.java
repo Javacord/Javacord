@@ -10,9 +10,6 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.CachedMessagePinEvent;
 import org.javacord.api.event.message.CachedMessageUnpinEvent;
 import org.javacord.api.event.message.MessageEditEvent;
-import org.javacord.api.listener.message.CachedMessagePinListener;
-import org.javacord.api.listener.message.CachedMessageUnpinListener;
-import org.javacord.api.listener.message.MessageEditListener;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.embed.EmbedImpl;
@@ -79,41 +76,25 @@ public class MessageUpdateHandler extends PacketHandler {
                     if (newPinnedFlag) {
                         CachedMessagePinEvent event = new CachedMessagePinEventImpl(msg);
 
-                        List<CachedMessagePinListener> listeners = new ArrayList<>();
-                        listeners.addAll(msg.getCachedMessagePinListeners());
-                        listeners.addAll(msg.getChannel().getCachedMessagePinListeners());
-                        msg.getChannel().asServerChannel()
-                                .map(ServerChannel::getServer)
-                                .map(Server::getCachedMessagePinListeners)
-                                .ifPresent(listeners::addAll);
-                        listeners.addAll(api.getCachedMessagePinListeners());
-
-                        if (msg.getChannel() instanceof ServerChannel) {
-                            api.getEventDispatcher().dispatchEvent(((ServerChannel) msg.getChannel()).getServer(),
-                                    listeners, listener -> listener.onCachedMessagePin(event));
-                        } else {
-                            api.getEventDispatcher().dispatchEvent(
-                                    api, listeners, listener -> listener.onCachedMessagePin(event));
-                        }
+                        Optional<Server> optionalServer =
+                                msg.getChannel().asServerChannel().map(ServerChannel::getServer);
+                        api.getEventDispatcher().dispatchCachedMessagePinEvent(
+                                optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                                msg,
+                                optionalServer.orElse(null),
+                                msg.getChannel(),
+                                event);
                     } else {
                         CachedMessageUnpinEvent event = new CachedMessageUnpinEventImpl(msg);
 
-                        List<CachedMessageUnpinListener> listeners = new ArrayList<>();
-                        listeners.addAll(msg.getCachedMessageUnpinListeners());
-                        listeners.addAll(msg.getChannel().getCachedMessageUnpinListeners());
-                        msg.getChannel().asServerChannel()
-                                .map(ServerChannel::getServer)
-                                .map(Server::getCachedMessageUnpinListeners)
-                                .ifPresent(listeners::addAll);
-                        listeners.addAll(api.getCachedMessageUnpinListeners());
-
-                        if (msg.getChannel() instanceof ServerChannel) {
-                            api.getEventDispatcher().dispatchEvent(((ServerChannel) msg.getChannel()).getServer(),
-                                    listeners, listener -> listener.onCachedMessageUnpin(event));
-                        } else {
-                            api.getEventDispatcher().dispatchEvent(
-                                    api, listeners, listener -> listener.onCachedMessageUnpin(event));
-                        }
+                        Optional<Server> optionalServer =
+                                msg.getChannel().asServerChannel().map(ServerChannel::getServer);
+                        api.getEventDispatcher().dispatchCachedMessageUnpinEvent(
+                                optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                                msg,
+                                optionalServer.orElse(null),
+                                msg.getChannel(),
+                                event);
                     }
                 }
             });
@@ -196,20 +177,14 @@ public class MessageUpdateHandler extends PacketHandler {
      * @param event The event to dispatch.
      */
     private void dispatchEditEvent(MessageEditEvent event) {
-        List<MessageEditListener> listeners = new ArrayList<>();
-        listeners.addAll(Message.getMessageEditListeners(api, event.getMessageId()));
-        listeners.addAll(event.getChannel().getMessageEditListeners());
-        if (event.getChannel() instanceof ServerChannel) {
-            listeners.addAll(((ServerChannel) event.getChannel()).getServer().getMessageEditListeners());
-        }
-        listeners.addAll(api.getMessageEditListeners());
-
-        if (event.getChannel() instanceof ServerChannel) {
-            api.getEventDispatcher().dispatchEvent(((ServerChannel) event.getChannel()).getServer(),
-                    listeners, listener -> listener.onMessageEdit(event));
-        } else {
-            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onMessageEdit(event));
-        }
+        Optional<Server> optionalServer =
+                event.getChannel().asServerChannel().map(ServerChannel::getServer);
+        api.getEventDispatcher().dispatchMessageEditEvent(
+                optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                event.getMessageId(),
+                optionalServer.orElse(null),
+                event.getChannel(),
+                event);
     }
 
 }

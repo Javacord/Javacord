@@ -7,13 +7,9 @@ import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.group.GroupChannelCreateEvent;
 import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
 import org.javacord.api.event.channel.user.PrivateChannelCreateEvent;
-import org.javacord.api.listener.channel.group.GroupChannelCreateListener;
-import org.javacord.api.listener.channel.server.ServerChannelCreateListener;
-import org.javacord.api.listener.channel.user.PrivateChannelCreateListener;
 import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -22,9 +18,6 @@ import org.javacord.core.event.channel.server.ServerChannelCreateEventImpl;
 import org.javacord.core.event.channel.user.PrivateChannelCreateEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles the channel create packet.
@@ -75,13 +68,7 @@ public class ChannelCreateHandler extends PacketHandler {
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             ChannelCategory channelCategory = ((ServerImpl) server).getOrCreateChannelCategory(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(channelCategory);
-
-            List<ServerChannelCreateListener> listeners = new ArrayList<>();
-            listeners.addAll(server.getServerChannelCreateListeners());
-            listeners.addAll(api.getServerChannelCreateListeners());
-
-            api.getEventDispatcher().dispatchEvent(server, listeners,
-                    listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
         });
     }
 
@@ -96,12 +83,7 @@ public class ChannelCreateHandler extends PacketHandler {
             ServerTextChannel textChannel = ((ServerImpl) server).getOrCreateServerTextChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(textChannel);
 
-            List<ServerChannelCreateListener> listeners = new ArrayList<>();
-            listeners.addAll(server.getServerChannelCreateListeners());
-            listeners.addAll(api.getServerChannelCreateListeners());
-
-            api.getEventDispatcher().dispatchEvent(server, listeners,
-                    listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
         });
     }
 
@@ -116,12 +98,7 @@ public class ChannelCreateHandler extends PacketHandler {
             ServerVoiceChannel voiceChannel = ((ServerImpl) server).getOrCreateServerVoiceChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(voiceChannel);
 
-            List<ServerChannelCreateListener> listeners = new ArrayList<>();
-            listeners.addAll(server.getServerChannelCreateListeners());
-            listeners.addAll(api.getServerChannelCreateListeners());
-
-            api.getEventDispatcher().dispatchEvent(server, listeners,
-                    listener -> listener.onServerChannelCreate(event));
+            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
         });
     }
 
@@ -138,11 +115,7 @@ public class ChannelCreateHandler extends PacketHandler {
             PrivateChannel privateChannel = recipient.getOrCreateChannel(channel);
             PrivateChannelCreateEvent event = new PrivateChannelCreateEventImpl(privateChannel);
 
-            List<PrivateChannelCreateListener> listeners = new ArrayList<>();
-            listeners.addAll(recipient.getPrivateChannelCreateListeners());
-            listeners.addAll(api.getPrivateChannelCreateListeners());
-
-            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onPrivateChannelCreate(event));
+            api.getEventDispatcher().dispatchPrivateChannelCreateEvent(api, recipient, event);
         }
     }
 
@@ -157,13 +130,7 @@ public class ChannelCreateHandler extends PacketHandler {
             GroupChannel groupChannel = new GroupChannelImpl(api, channel);
             GroupChannelCreateEvent event = new GroupChannelCreateEventImpl(groupChannel);
 
-            List<GroupChannelCreateListener> listeners = new ArrayList<>();
-            groupChannel.getMembers().stream()
-                    .map(User::getGroupChannelCreateListeners)
-                    .forEach(listeners::addAll);
-            listeners.addAll(api.getGroupChannelCreateListeners());
-
-            api.getEventDispatcher().dispatchEvent(api, listeners, listener -> listener.onGroupChannelCreate(event));
+            api.getEventDispatcher().dispatchGroupChannelCreateEvent(api, groupChannel.getMembers(), event);
         }
     }
 
