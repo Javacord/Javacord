@@ -33,6 +33,16 @@ public interface Permissions {
     PermissionState getState(PermissionType type);
 
     /**
+     * Creates a new permissions builder from this permissions object.
+     *
+     * @return The created builder.
+     * @see PermissionsBuilder#PermissionsBuilder(Permissions)
+     */
+    default PermissionsBuilder toBuilder() {
+        return new PermissionsBuilder(this);
+    }
+
+    /**
      * Gets a collection with permission types which are set to ({@link PermissionState#ALLOWED}).
      *
      * @return A collection with all allowed permissions.
