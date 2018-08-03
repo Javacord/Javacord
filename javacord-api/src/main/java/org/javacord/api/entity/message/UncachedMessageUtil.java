@@ -61,7 +61,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    CompletableFuture<Void> deleteAll(long channelId, long... messageIds);
+    CompletableFuture<Void> delete(long channelId, long... messageIds);
 
     /**
      * Deletes multiple messages at once.
@@ -73,7 +73,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    CompletableFuture<Void> deleteAll(String channelId, String... messageIds);
+    CompletableFuture<Void> delete(String channelId, String... messageIds);
 
     /**
      * Deletes multiple messages at once.
@@ -84,7 +84,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    CompletableFuture<Void> deleteAll(Message... messages);
+    CompletableFuture<Void> delete(Message... messages);
 
     /**
      * Deletes multiple messages at once.
@@ -95,7 +95,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    CompletableFuture<Void> deleteAll(Iterable<Message> messages);
+    CompletableFuture<Void> delete(Iterable<Message> messages);
 
     /**
      * Updates the content of the message.

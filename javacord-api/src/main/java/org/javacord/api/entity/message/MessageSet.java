@@ -43,7 +43,7 @@ public interface MessageSet extends NavigableSet<Message> {
         return CompletableFuture.allOf(
                 stream().collect(Collectors.groupingBy(DiscordEntity::getApi, Collectors.toList()))
                         .entrySet().stream()
-                        .map(entry -> Message.deleteAll(entry.getKey(), entry.getValue()))
+                        .map(entry -> Message.delete(entry.getKey(), entry.getValue()))
                         .toArray(CompletableFuture[]::new));
     }
 
