@@ -261,8 +261,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> deleteAll(Iterable<Message> messages) {
-        return deleteAll(StreamSupport.stream(messages.spliterator(), false).mapToLong(Message::getId).toArray());
+    default CompletableFuture<Void> deleteMessages(Iterable<Message> messages) {
+        return deleteMessages(StreamSupport.stream(messages.spliterator(), false).mapToLong(Message::getId).toArray());
     }
 
     /**
@@ -274,8 +274,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> deleteAll(long... messageIds) {
-        return Message.deleteAll(getApi(), getId(), messageIds);
+    default CompletableFuture<Void> deleteMessages(long... messageIds) {
+        return Message.delete(getApi(), getId(), messageIds);
     }
 
     /**
@@ -287,7 +287,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> deleteAll(String... messageIds) {
+    default CompletableFuture<Void> deleteMessages(String... messageIds) {
         long[] messageLongIds = Arrays.stream(messageIds).filter(s -> {
             try {
                 //noinspection ResultOfMethodCallIgnored
@@ -297,7 +297,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
                 return false;
             }
         }).mapToLong(Long::parseLong).toArray();
-        return deleteAll(messageLongIds);
+        return deleteMessages(messageLongIds);
     }
 
     /**
@@ -309,8 +309,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    default CompletableFuture<Void> deleteAll(Message... messages) {
-        return deleteAll(Arrays.stream(messages).mapToLong(Message::getId).toArray());
+    default CompletableFuture<Void> deleteMessages(Message... messages) {
+        return deleteMessages(Arrays.stream(messages).mapToLong(Message::getId).toArray());
     }
 
     /**

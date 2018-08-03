@@ -131,8 +131,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    static CompletableFuture<Void> deleteAll(DiscordApi api, long channelId, long... messageIds) {
-        return api.getUncachedMessageUtil().deleteAll(channelId, messageIds);
+    static CompletableFuture<Void> delete(DiscordApi api, long channelId, long... messageIds) {
+        return api.getUncachedMessageUtil().delete(channelId, messageIds);
     }
 
     /**
@@ -146,8 +146,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    static CompletableFuture<Void> deleteAll(DiscordApi api, String channelId, String... messageIds) {
-        return api.getUncachedMessageUtil().deleteAll(channelId, messageIds);
+    static CompletableFuture<Void> delete(DiscordApi api, String channelId, String... messageIds) {
+        return api.getUncachedMessageUtil().delete(channelId, messageIds);
     }
 
     /**
@@ -160,8 +160,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    static CompletableFuture<Void> deleteAll(DiscordApi api, Message... messages) {
-        return api.getUncachedMessageUtil().deleteAll(messages);
+    static CompletableFuture<Void> delete(DiscordApi api, Message... messages) {
+        return api.getUncachedMessageUtil().delete(messages);
     }
 
     /**
@@ -174,8 +174,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
-    static CompletableFuture<Void> deleteAll(DiscordApi api, Iterable<Message> messages) {
-        return api.getUncachedMessageUtil().deleteAll(messages);
+    static CompletableFuture<Void> delete(DiscordApi api, Iterable<Message> messages) {
+        return api.getUncachedMessageUtil().delete(messages);
     }
 
     /**

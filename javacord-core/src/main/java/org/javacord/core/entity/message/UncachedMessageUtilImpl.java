@@ -78,7 +78,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<Void> deleteAll(long channelId, long... messageIds) {
+    public CompletableFuture<Void> delete(long channelId, long... messageIds) {
         // split by younger than two weeks / older than two weeks
         Instant twoWeeksAgo = Instant.now().minus(14, ChronoUnit.DAYS);
         Map<Boolean, List<Long>> messageIdsByAge = Arrays.stream(messageIds).distinct().boxed()
@@ -116,7 +116,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<Void> deleteAll(String channelId, String... messageIds) {
+    public CompletableFuture<Void> delete(String channelId, String... messageIds) {
         long[] messageLongIds = Arrays.stream(messageIds).filter(s -> {
             try {
                 //noinspection ResultOfMethodCallIgnored
@@ -126,24 +126,24 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                 return false;
             }
         }).mapToLong(Long::parseLong).toArray();
-        return deleteAll(Long.parseLong(channelId), messageLongIds);
+        return delete(Long.parseLong(channelId), messageLongIds);
     }
 
     @Override
-    public CompletableFuture<Void> deleteAll(Message... messages) {
+    public CompletableFuture<Void> delete(Message... messages) {
         return CompletableFuture.allOf(
                 Arrays.stream(messages)
                         .collect(Collectors.groupingBy(message -> message.getChannel().getId(),
                                 Collectors.mapping(Message::getId, Collectors.toList())))
                         .entrySet().stream()
-                        .map(entry -> deleteAll(entry.getKey(),
+                        .map(entry -> delete(entry.getKey(),
                                 entry.getValue().stream().mapToLong(Long::longValue).toArray()))
                         .toArray(CompletableFuture[]::new));
     }
 
     @Override
-    public CompletableFuture<Void> deleteAll(Iterable<Message> messages) {
-        return deleteAll(StreamSupport.stream(messages.spliterator(), false).toArray(Message[]::new));
+    public CompletableFuture<Void> delete(Iterable<Message> messages) {
+        return delete(StreamSupport.stream(messages.spliterator(), false).toArray(Message[]::new));
     }
 
     @Override
