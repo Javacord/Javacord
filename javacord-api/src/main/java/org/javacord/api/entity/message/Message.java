@@ -536,6 +536,14 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Deletes all reactions on this message by a specific user.
+     *
+     * @param user The user whose reactions should be deleted.
+     * @return A future to tell us if the deletion was successful.
+     */
+    CompletableFuture<Void> removeAllReactionsByUser(User user);
+
+    /**
      * Pins this message.
      *
      * @param api The discord api instance.

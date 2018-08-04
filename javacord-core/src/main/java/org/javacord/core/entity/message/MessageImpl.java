@@ -280,6 +280,13 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     @Override
+    public CompletableFuture<Void> removeAllReactionsByUser(User user) {
+        ArrayList<CompletableFuture<Void>> deletions = new ArrayList<>();
+        this.reactions.forEach(reaction -> deletions.add(reaction.removeUser(user)));
+        return CompletableFuture.allOf(deletions.toArray(new CompletableFuture[deletions.size()]));
+    }
+
+    @Override
     public String getContent() {
         return content;
     }
