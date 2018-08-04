@@ -2128,7 +2128,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default boolean canMuteMembers(User user) {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
-                                PermissionType.VOICE_MUTE_MEMBERS);
+                                PermissionType.MUTE_MEMBERS);
     }
 
     /**
@@ -2149,7 +2149,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default boolean canDeafenMembers(User user) {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
-                                PermissionType.VOICE_DEAFEN_MEMBERS);
+                                PermissionType.DEAFEN_MEMBERS);
     }
 
     /**
@@ -2170,7 +2170,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default boolean canMoveMembers(User user) {
         return hasAnyPermission(user,
                                 PermissionType.ADMINISTRATOR,
-                                PermissionType.VOICE_MOVE_MEMBERS);
+                                PermissionType.MOVE_MEMBERS);
     }
 
     /**
