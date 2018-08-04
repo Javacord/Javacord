@@ -29,7 +29,7 @@ public interface VoiceChannel extends Channel, VoiceChannelAttachableListenerMan
         return !severVoiceChannel.isPresent()
                || severVoiceChannel.get().hasAnyPermission(user,
                                                           PermissionType.ADMINISTRATOR,
-                                                          PermissionType.VOICE_CONNECT);
+                                                          PermissionType.CONNECT);
     }
 
     /**
@@ -58,7 +58,7 @@ public interface VoiceChannel extends Channel, VoiceChannelAttachableListenerMan
         return !serverVoiceChannel.isPresent()
                || serverVoiceChannel.get().hasAnyPermission(user,
                                                             PermissionType.ADMINISTRATOR,
-                                                            PermissionType.VOICE_MUTE_MEMBERS);
+                                                            PermissionType.MUTE_MEMBERS);
     }
 
     /**
