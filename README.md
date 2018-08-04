@@ -28,7 +28,7 @@ or download Javacord directly from [GitHub](https://github.com/Javacord/Javacord
 #### Gradle
 ```groovy
 repositories { mavenCentral() }
-dependencies { compile 'org.javacord:javacord:3.0.0-SNAPSHOT' }
+dependencies { compile 'org.javacord:javacord:3.0.0' }
 ```
 
 #### Maven
@@ -36,7 +36,7 @@ dependencies { compile 'org.javacord:javacord:3.0.0-SNAPSHOT' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <type>pom</type>
 </dependency>
 ```
