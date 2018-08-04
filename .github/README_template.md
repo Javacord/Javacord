@@ -1,5 +1,5 @@
 ![](https://javacord.org/img/javacord3_banner.png)
-# Javacord ![Latest version](https://shields.javacord.org/github/release/Javacord/Javacord.svg?colorB=brightgreen&style=flat-square) [![Latest JavaDocs](https://shields.javacord.org/badge/JavaDoc-latest-yellow.svg?style=flat-square)](https://javadoc.javacord.org) [![Javacord Wiki](https://shields.javacord.org/badge/Wiki-Home-red.svg?style=flat-square)](https://github.com/Javacord/Javacord/wiki) [![Javacord Discord server](https://shields.javacord.org/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
+# Javacord ![Latest version](https://shields.javacord.org/github/release/Javacord/Javacord.svg?label=Version&colorB=brightgreen&style=flat-square) [![Latest JavaDocs](https://shields.javacord.org/badge/JavaDoc-latest-yellow.svg?style=flat-square)](https://docs.javacord.org/api/v/latest/) [![Javacord Wiki](https://shields.javacord.org/badge/Wiki-Home-red.svg?style=flat-square)](https://javacord.org/wiki/) [![Javacord Discord server](https://shields.javacord.org/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
 An easy to use multithreaded library for creating Discord bots in Java.
 
 ## Feature Coverage
@@ -21,40 +21,29 @@ New features introduced by Discord are typically added in less than one week, de
 
 The recommended way to get Javacord is to use a build manager, like Gradle or Maven.  
 If you are not familiar with build managers, you can follow this [Setup Guide](#ide-setup) 
-or download it directly from
-[TeamCity](https://ci.javacord.org/viewType.html?buildTypeId=Javacord_PublishSnapshots&branch_Javacord=v_3&tab=buildTypeStatusDiv&state=successful).
-Just click on the latest build and go to the "Artifacts" tab to download the files.
+or download Javacord directly from [GitHub](https://github.com/Javacord/Javacord/releases/latest).
 
 ### Javacord Dependency
 
 #### Gradle
 ```groovy
-repositories { maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } }
+repositories { mavenCentral() }
 dependencies { compile 'org.javacord:javacord:$version' }
 ```
 
 #### Maven
 ```xml
-<repositories>
-    <repository>
-        <id>Sonatype Snapshots</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </repository>
-</repositories>
-
-<dependencies>
-    <dependency>
-        <groupId>org.javacord</groupId>
-        <artifactId>javacord</artifactId>
-        <version>$version</version>
-        <type>pom</type>
-    </dependency>
-</dependencies>
+<dependency>
+    <groupId>org.javacord</groupId>
+    <artifactId>javacord</artifactId>
+    <version>$version</version>
+    <type>pom</type>
+</dependency>
 ```
 
 ### Optional Logger Dependency
 
-Any Log4j 2 API or SLF4j compatible logging framework can be used to provide a more sophisticated logging experience
+Any Log4j 2 API compatible logging framework can be used to provide a more sophisticated logging experience
 with being able to configure log format, log targets (console, file, database, Discord direct message, ...),
 log levels per class, and much more.
 
@@ -62,34 +51,23 @@ For example Log4j Core in Gradle
 ```groovy
 dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
 ```
-
-or Logback via SLF4J in Gradle
-```groovy
-dependencies {
-    runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j:2.11.0'
-    runtimeOnly 'ch.qos.logback:logback-classic:1.2.3'
-}
-```
+Take a look at the [Logger Configuration](https://javacord.org/wiki/basic-tutorials/logger-configuration/) wiki article for further information.
 
 ## IDE Setup
 
-If you never used Maven before you should take a look at the setup tutorial:
-* **[IntelliJ & Maven Setup](https://github.com/Javacord/Javacord/wiki/How-to-setup-(IntelliJ-and-Maven))**
-* **[Eclipse & Maven Setup](https://github.com/Javacord/Javacord/wiki/How-to-setup-(Eclipse-and-Maven))**
+If you never used Gradle or Maven before you should take a look at one of the setup tutorials:
+* **[IntelliJ & Maven Setup](https://javacord.org/wiki/getting-started/intellij-maven/)**
+* **[Eclipse & Maven Setup](https://javacord.org/wiki/getting-started/eclipse-maven/)**
 
 ## Support
 
 Javacord's Discord community is an excellent resource if you have questions about the library.  
 * **[The Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3)**
 
-## Wiki
+## Documentation
 
-For additional information, take a look at the [Javacord wiki](https://github.com/Javacord/Javacord/wiki).  
-The wiki for Javacord 3 is a work in progress and not complete!
-
-## JavaDoc
-
-The JavaDoc for the latest snapshot build can be found on [TeamCity](https://javadoc.javacord.org).  
+* The [Javacord wiki](https://javacord.org/wiki/) is a great place to get started 
+* Additional documentation can be found in the [JavaDoc](https://docs.javacord.org/api/v/latest/)
 
 ## Logging in
 
@@ -98,18 +76,18 @@ Logging in is very simple
 public class MyFirstBot {
 
     public static void main(String[] args) {
-        // Read the token from the first program parameter when invoking the bot
-        String token = args[0];
+        // Insert your bot's token here
+        String token = "your token";
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
-        
+
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
             if (event.getMessage().getContent().equalsIgnoreCase("!ping")) {
                 event.getChannel().sendMessage("Pong!");
             }
         });
-        
+
         // Print the invite url of your bot
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
     }
@@ -122,8 +100,8 @@ You can also login non-blocking asynchronously
 public class MyFirstBot {
 
     public static void main(String[] args) {
-        // Read the token from the first program parameter when invoking the bot
-        String token = args[0];
+        // Insert your bot's token here
+        String token = "your token";
 
         new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
                     // Add a listener which answers with "Pong!" if someone writes "!ping"
@@ -147,11 +125,11 @@ Check out the [JavacordExampleBot](https://github.com/Javacord/JavacordExampleBo
 
 ## How to create a bot user and get its token 
 
-* **[Creating a Bot User Account](https://github.com/Javacord/Javacord/wiki/Creating-a-Bot-Account)**
+* **[Creating a Bot User Account](https://javacord.org/wiki/essential-knowledge/creating-a-bot-account/)**
 
 ## Version numbers
 
-The version number has the a 3-digit format: `major.minor.trivial`
+The version number has a 3-digit format: `major.minor.trivial`
 * `major`: Increased extremely rarely to mark a major release (usually a rewrite affecting very huge parts of the library).
  You can expect this digit to not change for several years.
 * `minor`: Any backwards incompatible change to the api. You can expect this digit to change about 1-3 times per year.
