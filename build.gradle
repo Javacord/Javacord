@@ -3,7 +3,6 @@ import org.ajoberstar.grgit.Grgit
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.4' apply false
-    id 'me.tatarka.gradle.pom' version '1.0' apply false
     id 'net.researchgate.release' version '2.7.0' apply false
     id 'org.ajoberstar.grgit' version '2.3.0' apply false
 }
