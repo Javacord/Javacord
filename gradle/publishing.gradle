@@ -1,9 +1,13 @@
 import io.codearte.gradle.nexus.BaseStagingTask
 import io.codearte.gradle.nexus.NexusStagingPlugin
+import org.ajoberstar.grgit.Grgit
 import wooga.gradle.github.publish.GithubPublishPlugin
 import wooga.gradle.github.publish.tasks.GithubPublish
 
 import javax.naming.ConfigurationException
+
+import static java.text.MessageFormat.format
+import static net.researchgate.release.ReleasePlugin.RELEASE_GROUP
 
 buildscript {
     repositories {
@@ -12,6 +16,8 @@ buildscript {
     dependencies {
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0'
         classpath 'gradle.plugin.net.wooga.gradle:atlas-github:1.0.1'
+        classpath 'net.researchgate:gradle-release:2.7.0'
+        classpath 'org.ajoberstar:grgit:2.3.0'
     }
 }
 
@@ -152,6 +158,27 @@ release {
         signTag = true
     }
 }
+
+task checkMergeNeeded() {
+    group RELEASE_GROUP
+    description 'Checks to see if there are any unmerged commits on branch "master".'
+    doLast {
+        def grgit = Grgit.open(dir: "$rootDir/.git")
+        try {
+            grgit.fetch remote: 'origin'
+            def unmergedCommits = grgit.log(includes: ['origin/master'], excludes: ['HEAD']).size()
+            if (unmergedCommits) {
+                throw new IllegalStateException(format('There {0,choice,' +
+                        '1#is one unmerged commit|' +
+                        '1<are {0,number,integer} unmerged commits} on "master".',
+                        unmergedCommits))
+            }
+        } finally {
+            grgit?.close()
+        }
+    }
+}
+beforeReleaseBuild.dependsOn checkMergeNeeded
 
 afterReleaseBuild.dependsOn allprojects.tasks*.withType(PublishToMavenRepository), closeRepository
 
