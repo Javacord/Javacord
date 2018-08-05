@@ -148,6 +148,7 @@ release {
     tagTemplate = 'v$version'
     buildTasks = ['buildAll']
     git {
+        requireBranch = 'development'
         signTag = true
     }
 }
