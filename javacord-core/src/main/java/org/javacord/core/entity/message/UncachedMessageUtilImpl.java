@@ -61,7 +61,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     public CompletableFuture<Void> delete(long channelId, long messageId, String reason) {
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.MESSAGE_DELETE)
                 .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
-                .setRatelimitRetries(250)
                 .setAuditLogReason(reason)
                 .execute(result -> null);
     }
@@ -249,7 +248,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(
                         Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), unicodeEmoji, "@me")
-                .setRatelimitRetries(500)
                 .execute(result -> null);
     }
 
@@ -274,7 +272,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
         );
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
                 .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), value, "@me")
-                .setRatelimitRetries(500)
                 .execute(result -> null);
     }
 
@@ -357,8 +354,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                             new RestRequest<List<User>>(api, RestMethod.GET, RestEndpoint.REACTION)
                                     .setUrlParameters(
                                             Long.toUnsignedString(channelId), Long.toUnsignedString(messageId), value)
-                                    .addQueryParameter("limit", "100")
-                                    .setRatelimitRetries(250);
+                                    .addQueryParameter("limit", "100");
                     if (!users.isEmpty()) {
                         request.addQueryParameter("after", users.get(users.size() - 1).getIdAsString());
                     }
@@ -401,7 +397,6 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                         Long.toUnsignedString(messageId),
                         value,
                         user.isYourself() ? "@me" : user.getIdAsString())
-                .setRatelimitRetries(250)
                 .execute(result -> null);
     }
 

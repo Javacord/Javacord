@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -39,13 +38,10 @@ public class RestRequest<T> {
     private final RestEndpoint endpoint;
 
     private volatile boolean includeAuthorizationHeader = true;
-    private volatile int ratelimitRetries = 50;
     private volatile String[] urlParameters = new String[0];
     private final Map<String, String> queryParameters = new HashMap<>();
     private final Map<String, String> headers = new HashMap<>();
     private volatile String body = null;
-
-    private final AtomicInteger retryCounter = new AtomicInteger();
 
     private final CompletableFuture<RestRequestResult> result = new CompletableFuture<>();
 
@@ -214,20 +210,6 @@ public class RestRequest<T> {
     }
 
     /**
-     * Sets the amount of ratelimit retries we should use with this request.
-     *
-     * @param retries The amount of ratelimit retries.
-     * @return The current instance in order to chain call methods.
-     */
-    public RestRequest<T> setRatelimitRetries(int retries) {
-        if (retries < 0) {
-            throw new IllegalArgumentException("Retries cannot be less than 0!");
-        }
-        this.ratelimitRetries = retries;
-        return this;
-    }
-
-    /**
      * Sets a custom major parameter.
      *
      * @param customMajorParam The custom parameter to set.
@@ -268,15 +250,6 @@ public class RestRequest<T> {
     public RestRequest<T> includeAuthorizationHeader(boolean includeAuthorizationHeader) {
         this.includeAuthorizationHeader = includeAuthorizationHeader;
         return this;
-    }
-
-    /**
-     * Increments the amounts of ratelimit retries.
-     *
-     * @return <code>true</code> if the maximum ratelimit retries were exceeded.
-     */
-    public boolean incrementRetryCounter() {
-        return retryCounter.incrementAndGet() > ratelimitRetries;
     }
 
     /**

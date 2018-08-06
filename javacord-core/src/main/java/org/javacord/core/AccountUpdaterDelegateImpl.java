@@ -113,12 +113,10 @@ public class AccountUpdaterDelegateImpl implements AccountUpdaterDelegate {
                             + Base64.getEncoder().encodeToString(bytes);
                     body.put("avatar", base64Avatar);
                 }).thenCompose(aVoid -> new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
-                        .setRatelimitRetries(0)
                         .setBody(body)
                         .execute(result -> null));
             }
             return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.CURRENT_USER)
-                    .setRatelimitRetries(0)
                     .setBody(body)
                     .execute(result -> null);
         } else {
