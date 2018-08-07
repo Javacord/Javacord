@@ -7,14 +7,18 @@ import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -43,11 +47,6 @@ public abstract class EventDispatcherBase {
     private static final int DEBUG_WARNING_DELAY_IN_MILLIS = 500; // 500 milliseconds
 
     /**
-     * A dummy object used for object independent tasks.
-     */
-    private static final Object OBJECT_INDEPENDENT_TASK_INDICATOR = new Object();
-
-    /**
      * Whether execution time checking should be enabled or not.
      */
     private volatile boolean executionTimeCheckingEnabled = true;
@@ -60,19 +59,20 @@ public abstract class EventDispatcherBase {
     /**
      * This map which holds a queue for every object (usually a server) with tasks to call the waiting listeners.
      */
-    private final ConcurrentHashMap<Object, Queue<Runnable>> queuedListenerTasks = new ConcurrentHashMap<>();
+    private final Map<Object, Queue<Runnable>> queuedListenerTasks = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * A list with all objects which currently have a running listener.
      */
-    private final List<Object> runningListeners = new ArrayList<>();
+    private final Set<Object> runningListeners = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * A map with all running listeners as it's key. The value contains an array where the first element is a long
      * with the start time of the listener (using {@link System#nanoTime()} and the second element is the object
      * of the listener (usually a server).
      */
-    private final ConcurrentHashMap<Future<?>, Object[]> activeListeners = new ConcurrentHashMap<>();
+    private final Map<AtomicReference<Future<?>>, Object[]> activeListeners =
+            Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Creates a new event dispatcher.
@@ -81,7 +81,7 @@ public abstract class EventDispatcherBase {
      */
     protected EventDispatcherBase(DiscordApiImpl api) {
         this.api = api;
-        queuedListenerTasks.put(OBJECT_INDEPENDENT_TASK_INDICATOR, new LinkedList<>());
+        queuedListenerTasks.put(null, new ConcurrentLinkedQueue<>());
         api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
             try {
                 if (!executionTimeCheckingEnabled) {
@@ -90,9 +90,10 @@ public abstract class EventDispatcherBase {
                 List<Object> canceledObjects = new ArrayList<>();
                 synchronized (activeListeners) {
                     long currentNanoTime = System.nanoTime();
-                    Iterator<Map.Entry<Future<?>, Object[]>> iterator = activeListeners.entrySet().iterator();
+                    Iterator<Map.Entry<AtomicReference<Future<?>>, Object[]>> iterator =
+                            activeListeners.entrySet().iterator();
                     while (iterator.hasNext()) {
-                        Map.Entry<Future<?>, Object[]> entry = iterator.next();
+                        Map.Entry<AtomicReference<Future<?>>, Object[]> entry = iterator.next();
                         long difference = currentNanoTime - ((long) entry.getValue()[0]);
                         Object object = entry.getValue()[1];
                         if (difference > DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L
@@ -114,15 +115,14 @@ public abstract class EventDispatcherBase {
                                     () -> (int) (difference / 1_000_000L));
                         }
                         if (difference > MAX_EXECUTION_TIME_IN_SECONDS * 1_000_000_000L) {
-                            entry.getKey().cancel(true);
+                            entry.getKey().get().cancel(true);
                             logger.error("Interrupted a {}, because it was running over {} seconds! This was most "
-                                    + "likely caused by a deadlock or very heavy computation/blocking operations in "
-                                    + "the listener thread. Make sure to not block listener threads!",
+                                            + "likely caused by a deadlock or very heavy computation/blocking "
+                                            + "operations in the listener thread. "
+                                            + "Make sure to not block listener threads!",
                                     () -> getThreadType(object), () -> MAX_EXECUTION_TIME_IN_SECONDS);
-                            synchronized (runningListeners) {
-                                runningListeners.remove(object);
-                                iterator.remove();
-                            }
+                            runningListeners.remove(object);
+                            iterator.remove();
                             canceledObjects.add(object);
                         }
                     }
@@ -163,42 +163,34 @@ public abstract class EventDispatcherBase {
      * Calling this method usually looks like this:
      * {@code dispatchEvent(server, listeners, listener -> listener.onXyz(event));}
      *
-     * @param object The object which is used to determine in which thread the consumer should be executed.
-     *               Usually the object is a server object (for server-dependent events), the discord api instance
-     *               (for server-independent events) or <code>null</code>. Providing a <code>null</code> parameter
-     *               means, that all previously consumers are going to run and then the new consumers. When
-     *               all null-parameter consumers were executed it begins to execute the other consumers like normal
-     *               again.
+     * @param object    The object which is used to determine in which thread the consumer should be executed.
+     *                  Usually the object is a server object (for server-dependent events), the discord api instance
+     *                  (for server-independent events) or <code>null</code>. Providing a <code>null</code> parameter
+     *                  means, that all previously consumers are going to run and then the new consumers. When
+     *                  all null-parameter consumers were executed it begins to execute the other consumers like normal
+     *                  again.
      * @param listeners A list with listeners which get consumed by the given consumer.
-     * @param consumer A consumer which consumes all listeners from the given list and is meant to call their
-     *                 <code>onXyz(Event)</code> method.
-     * @param <T> The type of the listener.
+     * @param consumer  A consumer which consumes all listeners from the given list and is meant to call their
+     *                  <code>onXyz(Event)</code> method.
+     * @param <T>       The type of the listener.
      */
     protected <T> void dispatchEvent(Object object, List<T> listeners, Consumer<T> consumer) {
         api.getThreadPool().getSingleThreadExecutorService("Event Dispatch Adder").submit(() -> { // (horrible name)
             if (object != null) { // Object dependent listeners
                 // Don't allow adding of more events while there are unfinished object independent tasks
-                synchronized (queuedListenerTasks) {
-                    while (!queuedListenerTasks.get(OBJECT_INDEPENDENT_TASK_INDICATOR).isEmpty()) {
-                        try {
+                Queue<Runnable> objectIndependentQueue = queuedListenerTasks.get(null);
+                while (!objectIndependentQueue.isEmpty()) {
+                    try {
+                        synchronized (queuedListenerTasks) {
                             // Just to be on the safe side, we use a timeout of 5 seconds
                             queuedListenerTasks.wait(5000);
-                        } catch (InterruptedException ignored) { }
-                    }
+                        }
+                    } catch (InterruptedException ignored) { }
                 }
-                synchronized (queuedListenerTasks) {
-                    Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(object, o -> new LinkedList<>());
-                    listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
-                }
-                checkRunningListenersAndStartIfPossible(object);
-            } else { // Object independent listeners
-                synchronized (queuedListenerTasks) {
-                    Queue<Runnable> queue = queuedListenerTasks
-                            .computeIfAbsent(OBJECT_INDEPENDENT_TASK_INDICATOR, o -> new LinkedList<>());
-                    listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
-                }
-                checkRunningListenersAndStartIfPossible(null);
             }
+            Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(object, o -> new ConcurrentLinkedQueue<>());
+            listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
+            checkRunningListenersAndStartIfPossible(object);
         });
     }
 
@@ -206,88 +198,77 @@ public abstract class EventDispatcherBase {
      * Checks if there are listeners running for the given object and if
      * not it takes one from the queue for the object and executes it.
      *
+     * <p>If all object-dependent tasks are finished,
+     * object-independent ones will be executed instead
+     * and after all object-independent are finished,
+     * new object-dependent tasks can get queued.
+     *
      * @param object The object which is used to determine in which thread the consumer should be executed.
      */
     private void checkRunningListenersAndStartIfPossible(Object object) {
-        // Make sure to not accidentally run it if there are other non independent task waiting for execution
-        if (object == OBJECT_INDEPENDENT_TASK_INDICATOR) {
-            object = null;
-        }
         synchronized (queuedListenerTasks) {
+            // if either
+            // - running for object-independent tasks or
+            // - running for object-dependent tasks, but queue is empty or not present
             Queue<Runnable> queue = object == null ? null : queuedListenerTasks.get(object);
             if (queue == null || queue.isEmpty()) {
-                if (queuedListenerTasks.get(OBJECT_INDEPENDENT_TASK_INDICATOR).isEmpty()) {
+                // if no object-independent tasks to be processed everything is fine, return
+                if (queuedListenerTasks.get(null).isEmpty()) {
                     return;
                 }
-                boolean moreTasks = queuedListenerTasks.entrySet()
+                // if object-independent tasks to be processed
+                // check whether there are still queued object-dependent tasks
+                boolean moreObjectDependentTasks = queuedListenerTasks.entrySet()
                         .stream()
                         .filter(entry -> !entry.getValue().isEmpty())
-                        .anyMatch(entry -> entry.getKey() != OBJECT_INDEPENDENT_TASK_INDICATOR);
-                synchronized (runningListeners) {
-                    if (moreTasks || !runningListeners.isEmpty()) {
-                        return;
-                    }
+                        .anyMatch(entry -> entry.getKey() != null);
+                // if there are object-dependent tasks scheduled or there are still tasks running => retry later
+                if (moreObjectDependentTasks || !runningListeners.isEmpty()) {
+                    return;
                 }
-                object = OBJECT_INDEPENDENT_TASK_INDICATOR;
-                queue = queuedListenerTasks.get(OBJECT_INDEPENDENT_TASK_INDICATOR);
+                // force object-independent task being handled
+                // after all queued object-dependent tasks are finished
+                // and before new object-dependent tasks will get queued
+                object = null;
+                queue = queuedListenerTasks.get(null);
             }
             Object taskIndicator = object;
-            final Queue<Runnable> finalQueue = queue;
-            synchronized (runningListeners) {
-                if (!runningListeners.contains(taskIndicator) && !queue.isEmpty()) {
-                    runningListeners.add(taskIndicator);
-                    // Yes, an array is a hacky solution, but whatever works ;-)
-                    // Because of the synchronization on activeListener we can be sure, that activeListener[0] gets
-                    // initialized before being accessed inside the runnable.
-                    Future<?>[] activeListener = new Future<?>[1];
-                    // Call the listener
-                    synchronized (activeListener) {
-                        activeListener[0] = api.getThreadPool().getExecutorService().submit(() -> {
-                            if (taskIndicator instanceof ServerImpl) {
-                                Object serverReadyNotifier = new Object();
-                                ((ServerImpl) taskIndicator)
-                                        .addServerReadyConsumer(s -> {
-                                            synchronized (serverReadyNotifier) {
-                                                serverReadyNotifier.notifyAll();
-                                            }
-                                        });
-                                synchronized (serverReadyNotifier) {
-                                    while (!((ServerImpl) taskIndicator).isReady()) {
-                                        try {
-                                            serverReadyNotifier.wait(5000);
-                                        } catch (InterruptedException ignored) { }
+            Queue<Runnable> taskQueue = queue;
+            // if there is something to execute and there is task running already
+            if (!queue.isEmpty() && runningListeners.add(taskIndicator)) {
+                AtomicReference<Future<?>> activeListener = new AtomicReference<>();
+                activeListener.set(api.getThreadPool().getExecutorService().submit(() -> {
+                    if (taskIndicator instanceof ServerImpl) {
+                        Object serverReadyNotifier = new Object();
+                        ((ServerImpl) taskIndicator)
+                                .addServerReadyConsumer(s -> {
+                                    synchronized (serverReadyNotifier) {
+                                        serverReadyNotifier.notifyAll();
                                     }
-                                }
-                            }
-                            synchronized (activeListeners) {
-                                synchronized (activeListener) {
-                                    // Add the future to the list of active listeners
-                                    activeListeners
-                                            .put(activeListener[0], new Object[]{System.nanoTime(), taskIndicator});
-                                }
-                            }
+                                });
+                        while (!((ServerImpl) taskIndicator).isReady()) {
                             try {
-                                finalQueue.poll().run();
-                            } catch (Throwable t) {
-                                logger.error("Unhandled exception in {}!", () -> getThreadType(taskIndicator), () -> t);
-                            }
-                            synchronized (activeListeners) {
-                                synchronized (runningListeners) {
-                                    if (!Thread.interrupted()) {
-                                        activeListeners.remove(activeListener[0]);
-                                        runningListeners.remove(taskIndicator);
-                                    }
+                                synchronized (serverReadyNotifier) {
+                                    serverReadyNotifier.wait(5000);
                                 }
-                            }
-                            // Inform the dispatchEvent method that it maybe can queue new listeners now
-                            synchronized (queuedListenerTasks) {
-                                queuedListenerTasks.notifyAll();
-                            }
-                            checkRunningListenersAndStartIfPossible(taskIndicator);
-                        });
+                            } catch (InterruptedException ignored) { }
+                        }
                     }
-
-                }
+                    // Add the future to the list of active listeners
+                    activeListeners.put(activeListener, new Object[]{System.nanoTime(), taskIndicator});
+                    try {
+                        taskQueue.poll().run();
+                    } catch (Throwable t) {
+                        logger.error("Unhandled exception in {}!", () -> getThreadType(taskIndicator), () -> t);
+                    }
+                    activeListeners.remove(activeListener);
+                    runningListeners.remove(taskIndicator);
+                    // Inform the dispatchEvent method that it maybe can queue new listeners now
+                    synchronized (queuedListenerTasks) {
+                        queuedListenerTasks.notifyAll();
+                    }
+                    checkRunningListenersAndStartIfPossible(taskIndicator);
+                }));
             }
         }
     }
@@ -301,11 +282,11 @@ public abstract class EventDispatcherBase {
     private String getThreadType(Object taskIndicator) {
         String threadType;
         if (taskIndicator instanceof DiscordApi) {
-            threadType = "global listener thread";
-        } else if (taskIndicator == OBJECT_INDEPENDENT_TASK_INDICATOR) {
-            threadType = "connection listener thread";
+            threadType = "a global listener thread";
+        } else if (taskIndicator == null) {
+            threadType = "a connection listener thread";
         } else {
-            threadType = String.format("listener thread for %s", taskIndicator);
+            threadType = String.format("a listener thread for %s", taskIndicator);
         }
         return threadType;
     }
