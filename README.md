@@ -56,8 +56,9 @@ Take a look at the [Logger Configuration](https://javacord.org/wiki/basic-tutori
 ## IDE Setup
 
 If you have never used Gradle or Maven before, you should take a look at one of the setup tutorials:
-* **[IntelliJ & Maven Setup](https://javacord.org/wiki/getting-started/intellij-maven/)**
-* **[Eclipse & Maven Setup](https://javacord.org/wiki/getting-started/eclipse-maven/)**
+* **[IntelliJ & Gradle](https://javacord.org/wiki/getting-started/intellij-gradle/)** _(recommended)_
+* **[IntelliJ & Maven](https://javacord.org/wiki/getting-started/intellij-maven/)**
+* **[Eclipse & Maven](https://javacord.org/wiki/getting-started/eclipse-maven/)**
 
 ## Support
 
