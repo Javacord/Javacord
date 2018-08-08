@@ -1,5 +1,5 @@
 ![](https://javacord.org/img/javacord3_banner.png)
-# Javacord ![Latest version](https://shields.javacord.org/github/release/Javacord/Javacord.svg?label=Version&colorB=brightgreen&style=flat-square) [![Latest JavaDocs](https://shields.javacord.org/badge/JavaDoc-latest-yellow.svg?style=flat-square)](https://docs.javacord.org/api/v/latest/) [![Javacord Wiki](https://shields.javacord.org/badge/Wiki-Home-red.svg?style=flat-square)](https://javacord.org/wiki/) [![Javacord Discord server](https://shields.javacord.org/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
+# Javacord [![Latest version](https://shields.javacord.org/github/release/Javacord/Javacord.svg?label=Version&colorB=brightgreen&style=flat-square)](https://github.com/Javacord/Javacord/releases/latest) [![Latest JavaDocs](https://shields.javacord.org/badge/JavaDoc-Latest-yellow.svg?style=flat-square)](https://docs.javacord.org/api/v/latest/) [![Javacord Wiki](https://shields.javacord.org/badge/Wiki-Home-red.svg?style=flat-square)](https://javacord.org/wiki/) [![Javacord Discord server](https://shields.javacord.org/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
 An easy to use multithreaded library for creating Discord bots in Java.
 
 ## Feature Coverage
@@ -28,7 +28,7 @@ or download Javacord directly from [GitHub](https://github.com/Javacord/Javacord
 #### Gradle
 ```groovy
 repositories { mavenCentral() }
-dependencies { compile 'org.javacord:javacord:$version' }
+dependencies { implementation 'org.javacord:javacord:$version' }
 ```
 
 #### Maven
@@ -43,11 +43,11 @@ dependencies { compile 'org.javacord:javacord:$version' }
 
 ### Optional Logger Dependency
 
-Any Log4j 2 API compatible logging framework can be used to provide a more sophisticated logging experience
+Any Log4j-2-compatible logging framework can be used to provide a more sophisticated logging experience
 with being able to configure log format, log targets (console, file, database, Discord direct message, ...),
 log levels per class, and much more.
 
-For example Log4j Core in Gradle
+For example, Log4j Core in Gradle
 ```groovy
 dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
 ```
@@ -55,18 +55,18 @@ Take a look at the [Logger Configuration](https://javacord.org/wiki/basic-tutori
 
 ## IDE Setup
 
-If you never used Gradle or Maven before you should take a look at one of the setup tutorials:
+If you have never used Gradle or Maven before, you should take a look at one of the setup tutorials:
 * **[IntelliJ & Maven Setup](https://javacord.org/wiki/getting-started/intellij-maven/)**
 * **[Eclipse & Maven Setup](https://javacord.org/wiki/getting-started/eclipse-maven/)**
 
 ## Support
 
 Javacord's Discord community is an excellent resource if you have questions about the library.  
-* **[The Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3)**
+* **[The Javacord Server](https://discord.gg/0qJ2jjyneLEgG7y3)**
 
 ## Documentation
 
-* The [Javacord wiki](https://javacord.org/wiki/) is a great place to get started 
+* The [Javacord Wiki](https://javacord.org/wiki/) is a great place to get started 
 * Additional documentation can be found in the [JavaDoc](https://docs.javacord.org/api/v/latest/)
 
 ## Logging in
@@ -121,7 +121,7 @@ public class MyFirstBot {
 }
 ```
 
-Check out the [JavacordExampleBot](https://github.com/Javacord/JavacordExampleBot) to learn more.
+Check out the [Example Bot](https://github.com/Javacord/Example-Bot) to learn more.
 
 ## How to create a bot user and get its token 
 
@@ -146,4 +146,4 @@ class to stay for at least 6 months before it finally gets removed, but this is 
 
 ## Discord Server
 
-Join the [Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3) for support, status updates, or just chatting with other users.
+Join the [Javacord Server](https://discord.gg/0qJ2jjyneLEgG7y3) for support, status updates, or just chatting with other users.
