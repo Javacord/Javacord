@@ -3,20 +3,26 @@ package org.javacord.core.util.ratelimit;
 import org.javacord.api.DiscordApi;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.rest.RestEndpoint;
+import org.javacord.core.util.rest.RestRequest;
 
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RatelimitBucket {
 
+    // The key is the token, as global ratelimits are shared across the same account.
+    private static final Map<String, Long> globalRatelimitResetTimestamp = new ConcurrentHashMap<>();
+
     private final DiscordApiImpl api;
+
+    private final ConcurrentLinkedQueue<RestRequest<?>> requestQueue = new ConcurrentLinkedQueue<>();
 
     private final RestEndpoint endpoint;
     private final String majorUrlParameter;
 
-    private volatile long rateLimitResetTimestamp = 0;
-    private volatile int rateLimitRemaining = 1;
-
-    private volatile boolean hasActiveScheduler = false;
+    private volatile long ratelimitResetTimestamp = 0;
+    private volatile int ratelimitRemaining = 1;
 
     /**
      * Creates a RatelimitBucket for the given endpoint / parameter combination.
@@ -45,58 +51,58 @@ public class RatelimitBucket {
     }
 
     /**
-     * Gets the rest endpoint of the bucket.
+     * Sets a global ratelimit.
      *
-     * @return The endpoint of the bucket. If it's a global limit, the endpoint will be not be present.
+     * @param api A discord api instance.
+     * @param resetTimestamp The reset timestamp of the global ratelimit.
      */
-    public Optional<RestEndpoint> getEndpoint() {
-        return Optional.ofNullable(endpoint);
+    public static void setGlobalRatelimitResetTimestamp(DiscordApi api, long resetTimestamp) {
+        globalRatelimitResetTimestamp.put(api.getToken(), resetTimestamp);
     }
 
     /**
-     * Checks if this bucket has an active scheduler.
+     * Adds the given request to the bucket's queue.
      *
-     * @return Whether this bucket has an active scheduler or not.
+     * @param request The request to add.
      */
-    public synchronized boolean hasActiveScheduler() {
-        return hasActiveScheduler;
+    public void addRequestToQueue(RestRequest<?> request) {
+        requestQueue.add(request);
     }
 
     /**
-     * Sets if this bucket has an active scheduler.
+     * Polls a request from the bucket's queue.
      *
-     * @param hasActiveScheduler Whether this bucket has an active scheduler or not.
+     * @return The polled request.
      */
-    public synchronized void setHasActiveScheduler(boolean hasActiveScheduler) {
-        this.hasActiveScheduler = hasActiveScheduler;
+    public RestRequest<?> pollRequestFromQueue() {
+        return requestQueue.poll();
     }
 
     /**
-     * Checks if there is still "space" in this bucket, which means that you can still send requests without being
-     * ratelimited.
+     * Peeks a request from the bucket's queue.
      *
-     * @return Whether you can send requests without being ratelimited or not.
+     * @return The peeked request.
      */
-    public boolean hasSpace() {
-        return rateLimitRemaining > 0 || getTimeTillSpaceGetsAvailable() <= 0;
+    public RestRequest<?> peekRequestFromQueue() {
+        return requestQueue.peek();
     }
 
     /**
      * Sets the remaining requests till ratelimit.
      *
-     * @param rateLimitRemaining The remaining requests till ratelimit.
+     * @param ratelimitRemaining The remaining requests till ratelimit.
      */
-    public void setRateLimitRemaining(int rateLimitRemaining) {
-        this.rateLimitRemaining = rateLimitRemaining;
+    public void setRatelimitRemaining(int ratelimitRemaining) {
+        this.ratelimitRemaining = ratelimitRemaining;
     }
 
     /**
      * Sets the ratelimit reset timestamp.
      *
-     * @param rateLimitResetTimestamp The rateLimit reset timestamp.
+     * @param ratelimitResetTimestamp The ratelimit reset timestamp.
      */
-    public void setRateLimitResetTimestamp(long rateLimitResetTimestamp) {
-        this.rateLimitResetTimestamp = rateLimitResetTimestamp;
+    public void setRatelimitResetTimestamp(long ratelimitResetTimestamp) {
+        this.ratelimitResetTimestamp = ratelimitResetTimestamp;
     }
 
     /**
@@ -105,11 +111,13 @@ public class RatelimitBucket {
      * @return The time in seconds how long you have to wait till there's space in the bucket again.
      */
     public int getTimeTillSpaceGetsAvailable() {
-        if (rateLimitRemaining > 0) {
+        long globalRatelimitResetTimestamp =
+                RatelimitBucket.globalRatelimitResetTimestamp.getOrDefault(api.getToken(), 0L);
+        long timestamp = System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset());
+        if (ratelimitRemaining > 0 && (globalRatelimitResetTimestamp - timestamp) <= 0) {
             return 0;
         }
-        long timestamp = System.currentTimeMillis() + (api.getTimeOffset() == null ? 0 : api.getTimeOffset());
-        return (int) (rateLimitResetTimestamp - timestamp);
+        return (int) (Math.max(ratelimitResetTimestamp, globalRatelimitResetTimestamp) - timestamp);
     }
 
     /**

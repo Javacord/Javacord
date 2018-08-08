@@ -1059,7 +1059,6 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
                 }
                 httpClient.dispatcher().executorService().shutdown();
                 httpClient.connectionPool().evictAll();
-                ratelimitManager.cleanup();
             }
             disconnectCalled = true;
         }

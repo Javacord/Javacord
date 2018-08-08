@@ -32,7 +32,6 @@ public interface InternalTextChannel extends TextChannel, InternalTextChannelAtt
     @Override
     default CompletableFuture<Void> type() {
         return new RestRequest<Void>(getApi(), RestMethod.POST, RestEndpoint.CHANNEL_TYPING)
-                .setRatelimitRetries(0)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> null);
     }
