@@ -54,7 +54,8 @@ public class ServerTextChannelImpl extends ServerChannelImpl
         parentId = Long.valueOf(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
         topic = data.has("topic") && !data.get("topic").isNull() ? data.get("topic").asText() : "";
         messageCache = new MessageCacheImpl(
-                api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds());
+                api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
+                api.isDefaultAutomaticMessageCacheCleanupEnabled());
     }
 
     /**

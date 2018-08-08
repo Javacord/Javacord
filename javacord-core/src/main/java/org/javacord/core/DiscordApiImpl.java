@@ -161,6 +161,11 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
     private volatile int defaultMessageCacheStorageTimeInSeconds = 60 * 60 * 12;
 
     /**
+     * Whether automatic message cache cleanup is enabled by default.
+     */
+    private boolean defaultAutomaticMessageCacheCleanupEnabled = true;
+
+    /**
      * The function to calculate the reconnect delay.
      */
     private volatile Function<Integer, Integer> reconnectDelayProvider;
@@ -945,6 +950,21 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
     @Override
     public int getDefaultMessageCacheStorageTimeInSeconds() {
         return defaultMessageCacheStorageTimeInSeconds;
+    }
+
+    @Override
+    public void setAutomaticMessageCacheCleanupEnabled(boolean automaticMessageCacheCleanupEnabled) {
+        this.defaultAutomaticMessageCacheCleanupEnabled = automaticMessageCacheCleanupEnabled;
+        getChannels().stream()
+                .filter(TextChannel.class::isInstance)
+                .map(TextChannel.class::cast)
+                .forEach(channel -> channel.getMessageCache()
+                        .setAutomaticCleanupEnabled(automaticMessageCacheCleanupEnabled));
+    }
+
+    @Override
+    public boolean isDefaultAutomaticMessageCacheCleanupEnabled() {
+        return defaultAutomaticMessageCacheCleanupEnabled;
     }
 
     @Override

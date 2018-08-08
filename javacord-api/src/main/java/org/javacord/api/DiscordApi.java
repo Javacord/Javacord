@@ -134,6 +134,21 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     int getDefaultMessageCacheStorageTimeInSeconds();
 
     /**
+     * Sets whether automatic message cache cleanup is enabled for
+     * all existing message caches and all newly created ones.
+     *
+     * @param automaticMessageCacheCleanupEnabled Whether automatic message cache cleanup is enabled.
+     */
+    void setAutomaticMessageCacheCleanupEnabled(boolean automaticMessageCacheCleanupEnabled);
+
+    /**
+     * Gets whether automatic message cache cleanup is enabled.
+     *
+     * @return Whether automatic message cache cleanup is enabled.
+     */
+    boolean isDefaultAutomaticMessageCacheCleanupEnabled();
+
+    /**
      * Gets the current shard of the bot, starting with <code>0</code>.
      *
      * @return The current shard of the bot.

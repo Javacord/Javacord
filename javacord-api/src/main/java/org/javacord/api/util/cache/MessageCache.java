@@ -38,4 +38,11 @@ public interface MessageCache {
      */
     void setStorageTimeInSeconds(int storageTimeInSeconds);
 
+    /**
+     * Sets whether automatic message cache cleanup is enabled.
+     *
+     * @param automaticCleanupEnabled Whether automatic message cache cleanup is enabled.
+     */
+    void setAutomaticCleanupEnabled(boolean automaticCleanupEnabled);
+
 }
