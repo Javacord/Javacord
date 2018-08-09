@@ -75,7 +75,7 @@ project(':javacord-core') {
 
             // determine which entity extends which attachable listener manager
             def entityByAttachableListenerManager = javacordApi.sourceSets.main.allJava.matching {
-                include 'org/javacord/api/entity/**/*.java'
+                exclude '**/*AttachableListenerManager.java'
             }.collectMany {
                 JavaParser.parse(it).findAll(ClassOrInterfaceDeclaration)
             }.findAll {

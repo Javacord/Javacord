@@ -89,9 +89,9 @@ task generateListenerManagers {
             }
         }
 
-        // determine which entity extends which attachable listener manager
-        def entityByAttachableListenerManager = javacordApi.sourceSets.main.allJava.matching {
-            include 'org/javacord/api/entity/**/*.java'
+        // determine which object class extends which attachable listener manager
+        def objectClassByAttachableListenerManager = javacordApi.sourceSets.main.allJava.matching {
+            exclude '**/*AttachableListenerManager.java'
         }.collectMany {
             JavaParser.parse(it).findAll(ClassOrInterfaceDeclaration)
         }.findAll {
@@ -161,9 +161,9 @@ task generateListenerManagers {
                 internalAttachableListenerManagerInterface
                         .addMethod('getId')
                         .setJavadocComment('''
-                            Gets the id of the Discord entity.
+                            Gets the id of this object.
 
-                            @return The id of the Discord entity.
+                            @return The id of this object.
                         '''.stripIndent())
                         .setType(long)
                         .removeBody()
@@ -222,7 +222,7 @@ task generateListenerManagers {
             }
 
             listeners.each {
-                addConcreteListenerMethods typeSolver, attachableInterface, it, entityByAttachableListenerManager,
+                addConcreteListenerMethods typeSolver, attachableInterface, it, objectClassByAttachableListenerManager,
                         attachableListenerManagerFile, attachableListenerManagerInterface,
                         uncachedMessageAttachableListenerManagerFile, uncachedMessageAttachableListenerManagerInterface,
                         internalUncachedMessageAttachableListenerManagerFile,
@@ -254,12 +254,11 @@ task generateListenerManagers {
                                 "? extends $attachableInterface.name" : 'T'
                 addGenericObjectAttachableListenerMethods typeSolver, attachableInterface,
                         attachableListenerManagerFile, attachableListenerManagerInterface,
-                        listenerManagerTypeParameter, uncachedMessageAttachableListenerManagerFile,
-                        uncachedMessageAttachableListenerManagerInterface,
+                        listenerManagerTypeParameter, uncachedMessageAttachableListenerManagerInterface,
                         internalUncachedMessageAttachableListenerManagerFile,
-                        internalUncachedMessageAttachableListenerManagerInterface, entityByAttachableListenerManager,
-                        internalAttachableListenerManagerFile, internalAttachableListenerManagerInterface,
-                        attachableInterfacesWithDirectSubtypes
+                        internalUncachedMessageAttachableListenerManagerInterface,
+                        objectClassByAttachableListenerManager, internalAttachableListenerManagerFile,
+                        internalAttachableListenerManagerInterface, attachableInterfacesWithDirectSubtypes
             }
 
             [
@@ -305,7 +304,7 @@ configure([javacordApi, javacordCore]) {
     }
 }
 
-def addConcreteListenerMethods(typeSolver, attachableInterface, listener, entityByAttachableListenerManager,
+def addConcreteListenerMethods(typeSolver, attachableInterface, listener, objectClassByAttachableListenerManager,
                                attachableListenerManagerFile, attachableListenerManagerInterface,
                                uncachedMessageAttachableListenerManagerFile,
                                uncachedMessageAttachableListenerManagerInterface,
@@ -359,7 +358,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, entity
 
     def globallyAttachable =
             attachableInterface == typeSolver.solveType('org.javacord.api.listener.GloballyAttachableListener')
-    def entity = entityByAttachableListenerManager."${attachableInterface.name}Manager"
+    def objectClass = objectClassByAttachableListenerManager."${attachableInterface.name}Manager"
 
     def methodImplementation
     switch (Object) {
@@ -376,16 +375,16 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, entity
         default:
             methodImplementation =
                     "return ((DiscordApiImpl) getApi()).addObjectListener(" +
-                            "${entity.name}.class, getId(), ${listener.name}.class, listener);"
+                            "${objectClass.name}.class, getId(), ${listener.name}.class, listener);"
             break
     }
 
     if (!globallyAttachable) {
-        internalAttachableListenerManagerFile.addImport(entity.qualifiedName)
+        internalAttachableListenerManagerFile.addImport(objectClass.qualifiedName)
     }
 
     if (specialMessageAttachable) {
-        internalUncachedMessageAttachableListenerManagerFile.addImport(entity.qualifiedName)
+        internalUncachedMessageAttachableListenerManagerFile.addImport(objectClass.qualifiedName)
 
         internalUncachedMessageAttachableListenerManagerInterface
                 .addMethod("add$listener.name", Modifier.DEFAULT)
@@ -447,7 +446,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, entity
         default:
             methodImplementation =
                     "return ((DiscordApiImpl) getApi()).getObjectListeners(" +
-                            "${entity.name}.class, getId(), ${listener.name}.class);"
+                            "${objectClass.name}.class, getId(), ${listener.name}.class);"
             break
     }
 
@@ -607,11 +606,11 @@ def addGenericGloballyAttachableListenerMethods(attachableListenerManagerInterfa
 
 def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, attachableListenerManagerFile,
                                               attachableListenerManagerInterface, listenerManagerTypeParameter,
-                                              uncachedMessageAttachableListenerManagerFile,
                                               uncachedMessageAttachableListenerManagerInterface,
                                               internalUncachedMessageAttachableListenerManagerFile,
                                               internalUncachedMessageAttachableListenerManagerInterface,
-                                              entityByAttachableListenerManager, internalAttachableListenerManagerFile,
+                                              objectClassByAttachableListenerManager,
+                                              internalAttachableListenerManagerFile,
                                               internalAttachableListenerManagerInterface,
                                               attachableInterfacesWithDirectSubtypes) {
     if (uncachedMessageAttachableListenerManagerInterface) {
@@ -658,7 +657,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
             .addParameter('T', 'listener')
             .removeBody()
 
-    def entity = entityByAttachableListenerManager."${attachableInterface.name}Manager"
+    def objectClass = objectClassByAttachableListenerManager."${attachableInterface.name}Manager"
 
     if (uncachedMessageAttachableListenerManagerInterface) {
         internalUncachedMessageAttachableListenerManagerFile
@@ -678,7 +677,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
             .addImport(Collection)
             .addImport(Map)
             .addImport(attachableInterface.qualifiedName)
-            .addImport(entity.qualifiedName)
+            .addImport(objectClass.qualifiedName)
             .addImport(typeSolver.solveType('org.javacord.api.listener.ObjectAttachableListener').qualifiedName)
 
     def subtypes = [[attachableInterface]]
@@ -761,12 +760,12 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
                                     }.join()
                                 }{
                                     return Stream.of(((DiscordApiImpl) getApi()).addObjectListener(
-                                            ${entity.name}.class, getId(), listenerClass, listener));
+                                            ${objectClass.name}.class, getId(), listenerClass, listener));
                                 }
                             })"""
                         } else {
                             ".map(listenerClass -> ((DiscordApiImpl) getApi()).addObjectListener(" +
-                                    "${entity.name}.class, getId(), listenerClass, listener))"
+                                    "${objectClass.name}.class, getId(), listenerClass, listener))"
                         }
                     }
                     .collect(Collectors.toList());
@@ -863,13 +862,13 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
                                         } else """
                                     }.join()
                                 }{
-                                    ((DiscordApiImpl) getApi()).removeObjectListener(${entity.name}.class, getId(),
+                                    ((DiscordApiImpl) getApi()).removeObjectListener(${objectClass.name}.class, getId(),
                                                                                      listenerClass, listener);
                                 }
                             })"""
                         } else {
                             ".forEach(listenerClass -> ((DiscordApiImpl) getApi()).removeObjectListener(" +
-                                    "${entity.name}.class, getId(), listenerClass, listener))"
+                                    "${objectClass.name}.class, getId(), listenerClass, listener))"
                         }
                     };
         """
@@ -952,7 +951,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
         method.addSingleMemberAnnotation(SuppressWarnings, '"unchecked"')
         body.addStatement(
                 "Map<T, List<Class<T>>> listeners = ((DiscordApiImpl) getApi()).getObjectListeners(" +
-                        "${entity.name}.class, getId());")
+                        "${objectClass.name}.class, getId());")
         subtypes.reverse().each {
             body.addStatement """
                 get${it.name}s().forEach((listener, listenerClasses) -> listeners
@@ -966,7 +965,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
         }
         body.addStatement("return listeners;")
     } else {
-        body.addStatement("return ((DiscordApiImpl) getApi()).getObjectListeners(${entity.name}.class, getId());")
+        body.addStatement("return ((DiscordApiImpl) getApi()).getObjectListeners(${objectClass.name}.class, getId());")
     }
 
     if (uncachedMessageAttachableListenerManagerInterface) {
@@ -974,7 +973,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
             uncachedMessageAttachableListenerManagerInterface
                     .addMethod('removeListener')
                     .setJavadocComment('''
-                        Removes a listener from this entity.
+                        Removes a listener from this object.
 
                         @param messageId The id of the message.
                         @param listenerClass The listener class.
@@ -992,7 +991,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
     attachableListenerManagerInterface
             .addMethod('removeListener')
             .setJavadocComment("""
-                Removes a listener from this entity.
+                Removes a listener from this object.
 
                 @param listenerClass The listener class.
                 @param listener The listener to remove.
@@ -1043,7 +1042,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
         body.addStatement 'MessageAttachableListenerManager.removeListener(getApi(), getId(), listenerClass, listener);'
     } else {
         body.addStatement "((DiscordApiImpl) getApi()).removeObjectListener(" +
-                "${entity.name}.class, getId(), listenerClass, listener);"
+                "${objectClass.name}.class, getId(), listenerClass, listener);"
     }
 }
 
