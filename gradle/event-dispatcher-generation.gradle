@@ -29,9 +29,10 @@ project(':javacord-core') {
         ext.outputDirectory = "$buildDir/generated/event-dispatcher"
 
         def javacordApi = project(':javacord-api')
-        inputs.files javacordApi.sourceSets.main.allJava withPropertyName 'apiJavaFiles'
-        inputs.files sourceSets.main.allJava withPropertyName 'coreJavaFiles'
+        inputs.files javacordApi.sourceSets.main.allJava withPropertyName 'apiJavaFiles' withPathSensitivity PathSensitivity.RELATIVE
+        inputs.files sourceSets.main.allJava withPropertyName 'coreJavaFiles' withPathSensitivity PathSensitivity.RELATIVE
         outputs.dir outputDirectory withPropertyName 'outputDirectory'
+        outputs.cacheIf { true }
 
         doLast {
             delete outputDirectory

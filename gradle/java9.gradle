@@ -55,8 +55,9 @@ if (JavaVersion.current().java9Compatible) {
         task generateModuleInfo {
             ext.outputDirectory = "$buildDir/generated/module-info"
 
-            inputs.files sourceSets.main.allJava withPropertyName 'javaFiles'
+            inputs.files sourceSets.main.allJava withPropertyName 'javaFiles' withPathSensitivity PathSensitivity.RELATIVE
             outputs.dir outputDirectory withPropertyName 'outputDirectory'
+            outputs.cacheIf { true }
 
             doLast {
                 delete outputDirectory

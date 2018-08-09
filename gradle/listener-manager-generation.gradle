@@ -32,10 +32,11 @@ task generateListenerManagers {
     ext.apiOutputDirectory = "$javacordApi.buildDir/generated/listener-manager-interfaces"
     ext.coreOutputDirectory = "$javacordCore.buildDir/generated/listener-manager-interfaces"
 
-    inputs.files javacordApi.sourceSets.main.allJava withPropertyName 'apiJavaFiles'
-    inputs.files javacordCore.sourceSets.main.allJava withPropertyName 'coreJavaFiles'
+    inputs.files javacordApi.sourceSets.main.allJava withPropertyName 'apiJavaFiles' withPathSensitivity PathSensitivity.RELATIVE
+    inputs.files javacordCore.sourceSets.main.allJava withPropertyName 'coreJavaFiles' withPathSensitivity PathSensitivity.RELATIVE
     outputs.dir apiOutputDirectory withPropertyName 'apiOutputDirectory'
     outputs.dir coreOutputDirectory withPropertyName 'coreOutputDirectory'
+    outputs.cacheIf { true }
 
     doLast {
         delete apiOutputDirectory
