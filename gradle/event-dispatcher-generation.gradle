@@ -114,9 +114,18 @@ project(':javacord-core') {
                     *.setJavadocComment("""
                         Dispatch an event to {@code $listener.name}s.
 
-                        @param threadSelector The dispatch thread selector.
+                        @param queueSelector The object which is used to determine in which queue the event should be
+                                             dispatched. Usually the object is a server object (for server-dependent
+                                             events), a discord api instance (for server-independent events, like DMs or
+                                             GMs) or {@code null} (for lifecycle events, like connection lost, resume or
+                                             reconnect). Providing {@code null} means, that already started dispatchings
+                                             are going to be finished, then all events with a {@code null} queue
+                                             selector are dispatched and finally other events are dispatched like normal
+                                             again. Events with the same queue selector are dispatched sequentially in
+                                             the correct order of enqueueal, but on arbitrary threads from a thread
+                                             pool. Events with different queue selectors are dispatched in parallel.
                     """.stripIndent().trim())
-                    *.addParameter(Object, 'threadSelector')
+                    *.addParameter('DispatchQueueSelector', 'queueSelector')
 
                 def body, singletonBody, idBody
                 (body, singletonBody, idBody) = [method, singletonMethod, idMethod]
@@ -208,7 +217,7 @@ project(':javacord-core') {
                             '\n@param event The event.'
                 }
                 [body, singletonBody, idBody]*.addStatement """
-                    dispatchEvent(threadSelector, listeners, listener -> listener.${listenerMethod.name}(event));
+                    dispatchEvent(queueSelector, listeners, listener -> listener.${listenerMethod.name}(event));
                 """
 
                 if (identicalMethods) {

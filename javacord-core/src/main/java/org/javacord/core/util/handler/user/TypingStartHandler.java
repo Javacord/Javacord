@@ -6,6 +6,7 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.user.UserStartTypingEvent;
 import org.javacord.core.event.user.UserStartTypingEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class TypingStartHandler extends PacketHandler {
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
             api.getEventDispatcher().dispatchUserStartTypingEvent(
-                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                     optionalServer.orElse(null),
                     channel,
                     user,

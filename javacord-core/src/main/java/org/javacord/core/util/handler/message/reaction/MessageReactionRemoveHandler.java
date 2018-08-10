@@ -11,6 +11,7 @@ import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.event.message.reaction.ReactionRemoveEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class MessageReactionRemoveHandler extends PacketHandler {
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
             api.getEventDispatcher().dispatchReactionRemoveEvent(
-                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                     messageId,
                     optionalServer.orElse(null),
                     channel,

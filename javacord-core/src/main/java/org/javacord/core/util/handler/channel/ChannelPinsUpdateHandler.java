@@ -6,6 +6,7 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.ChannelPinsUpdateEvent;
 import org.javacord.core.event.message.ChannelPinsUpdateEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.time.Instant;
@@ -35,7 +36,7 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
             api.getEventDispatcher().dispatchChannelPinsUpdateEvent(
-                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                     optionalServer.orElse(null),
                     channel,
                     event);

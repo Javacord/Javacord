@@ -8,6 +8,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.reaction.ReactionRemoveAllEvent;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.event.message.reaction.ReactionRemoveAllEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
             api.getEventDispatcher().dispatchReactionRemoveAllEvent(
-                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                     messageId,
                     optionalServer.orElse(null),
                     channel,

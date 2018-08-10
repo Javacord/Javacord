@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.channel.server.text.WebhooksUpdateEvent;
 import org.javacord.core.event.channel.server.text.WebhooksUpdateEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 /**
@@ -27,7 +28,7 @@ public class WebhooksUpdateHandler extends PacketHandler {
             WebhooksUpdateEvent event = new WebhooksUpdateEventImpl(channel);
 
             api.getEventDispatcher().dispatchWebhooksUpdateEvent(
-                    channel.getServer(), channel.getServer(), channel, event);
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
         });
     }
 

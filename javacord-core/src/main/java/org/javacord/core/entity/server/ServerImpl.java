@@ -42,6 +42,7 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.listener.server.InternalServerAttachableListenerManager;
 import org.javacord.core.util.Cleanupable;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -71,7 +72,7 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link Server}.
  */
-public class ServerImpl implements Server, Cleanupable, InternalServerAttachableListenerManager {
+public class ServerImpl implements Server, Cleanupable, InternalServerAttachableListenerManager, DispatchQueueSelector {
 
     /**
      * The logger of this class.

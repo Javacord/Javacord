@@ -6,6 +6,7 @@ import org.javacord.api.event.server.ServerBecomesUnavailableEvent;
 import org.javacord.api.event.server.ServerLeaveEvent;
 import org.javacord.core.event.server.ServerBecomesUnavailableEventImpl;
 import org.javacord.core.event.server.ServerLeaveEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 /**
@@ -30,7 +31,8 @@ public class GuildDeleteHandler extends PacketHandler {
             api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
                 ServerBecomesUnavailableEvent event = new ServerBecomesUnavailableEventImpl(server);
 
-                api.getEventDispatcher().dispatchServerBecomesUnavailableEvent(server, server, event);
+                api.getEventDispatcher().dispatchServerBecomesUnavailableEvent(
+                        (DispatchQueueSelector) server, server, event);
             });
             api.removeServerFromCache(serverId);
             return;
@@ -38,7 +40,7 @@ public class GuildDeleteHandler extends PacketHandler {
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             ServerLeaveEvent event = new ServerLeaveEventImpl(server);
 
-            api.getEventDispatcher().dispatchServerLeaveEvent(server, server, event);
+            api.getEventDispatcher().dispatchServerLeaveEvent((DispatchQueueSelector) server, server, event);
         });
         api.removeServerFromCache(serverId);
     }

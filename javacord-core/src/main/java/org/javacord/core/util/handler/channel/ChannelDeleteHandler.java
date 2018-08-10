@@ -11,6 +11,7 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.group.GroupChannelDeleteEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelDeleteEventImpl;
 import org.javacord.core.event.channel.user.PrivateChannelDeleteEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -144,7 +145,7 @@ public class ChannelDeleteHandler extends PacketHandler {
         ServerChannelDeleteEvent event = new ServerChannelDeleteEventImpl(channel);
 
         api.getEventDispatcher().dispatchServerChannelDeleteEvent(
-                channel.getServer(), channel.getServer(), channel, event);
+                (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
     }
 
 }

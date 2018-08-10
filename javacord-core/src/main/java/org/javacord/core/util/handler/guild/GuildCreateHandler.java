@@ -31,14 +31,14 @@ public class GuildCreateHandler extends PacketHandler {
         }
         long id = packet.get("id").asLong();
         if (api.getUnavailableServers().contains(id)) {
-            Server server = new ServerImpl(api, packet);
+            ServerImpl server = new ServerImpl(api, packet);
             ServerBecomesAvailableEvent event = new ServerBecomesAvailableEventImpl(server);
 
             api.getEventDispatcher().dispatchServerBecomesAvailableEvent(server, event);
             return;
         }
 
-        Server server = new ServerImpl(api, packet);
+        ServerImpl server = new ServerImpl(api, packet);
         ServerJoinEvent event = new ServerJoinEventImpl(server);
 
         api.getEventDispatcher().dispatchServerJoinEvent(server, event);
