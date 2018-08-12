@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.listener.server.emoji.InternalKnownCustomEmojiAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -109,6 +110,22 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     @Override
     public boolean isManaged() {
         return managed;
+    }
+
+    @Override
+    public CompletableFuture<Optional<User>> requestCreator() {
+        return new RestRequest<Optional<User>>(getApi(), RestMethod.GET, RestEndpoint.CUSTOM_EMOJI)
+                .setUrlParameters(server.getIdAsString(), Long.toUnsignedString(getId()))
+                .execute(result -> {
+                    JsonNode jsonBody = result.getJsonBody();
+                    if (jsonBody.has("user")) {
+                        long id = jsonBody.get("user").get("id").asLong();
+                        return Optional.of(getApi().getCachedUserById(id)
+                                .orElseGet(() -> getApi().getUserById(id).join()));
+                    } else {
+                        return Optional.empty();
+                    }
+                });
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.javacord.api.entity.emoji;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.server.emoji.KnownCustomEmojiAttachableListenerManager;
 
 import java.util.Collection;
@@ -68,6 +69,13 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * @return Whether this emoji is managed or not.
      */
     boolean isManaged();
+
+    /**
+     * Requests the creator of the KnownCustomEmoji.
+     *
+     * @return A completable Future to contain the creator of the KnownCustomEmoji.
+     */
+    CompletableFuture<Optional<User>> requestCreator();
 
     /**
      * Updates the name of the emoji.
