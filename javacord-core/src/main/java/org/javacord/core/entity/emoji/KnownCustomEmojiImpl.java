@@ -113,19 +113,26 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     }
 
     @Override
-    public CompletableFuture<Optional<User>> requestCreator() {
-        return new RestRequest<Optional<User>>(getApi(), RestMethod.GET, RestEndpoint.CUSTOM_EMOJI)
+    public CompletableFuture<User> requestCreator() {
+        CompletableFuture<User> future = new CompletableFuture<>();
+        new RestRequest<User>(getApi(), RestMethod.GET, RestEndpoint.CUSTOM_EMOJI)
                 .setUrlParameters(server.getIdAsString(), Long.toUnsignedString(getId()))
                 .execute(result -> {
                     JsonNode jsonBody = result.getJsonBody();
                     if (jsonBody.has("user")) {
                         long id = jsonBody.get("user").get("id").asLong();
-                        return Optional.of(getApi().getCachedUserById(id)
-                                .orElseGet(() -> getApi().getUserById(id).join()));
+                        return getApi().getCachedUserById(id)
+                                .orElseGet(() -> getApi().getUserById(id).join());
+                    }
+                    return null;
+                }).thenAcceptAsync(userResponse -> {
+                    if (userResponse == null) {
+                        future.completeExceptionally(new NullPointerException("No creator was found!"));
                     } else {
-                        return Optional.empty();
+                        future.complete(userResponse);
                     }
                 });
+        return future;
     }
 
     @Override

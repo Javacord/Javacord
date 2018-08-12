@@ -75,7 +75,7 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      *
      * @return A completable Future to contain the creator of the KnownCustomEmoji.
      */
-    CompletableFuture<Optional<User>> requestCreator();
+    CompletableFuture<User> requestCreator();
 
     /**
      * Updates the name of the emoji.
