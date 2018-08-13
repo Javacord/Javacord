@@ -2,7 +2,10 @@ package org.javacord.api.entity.message.embed;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
+import org.javacord.api.entity.message.embed.parts.EditableEmbedField;
+import org.javacord.api.entity.message.embed.parts.EmbedField;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -11,7 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -112,7 +115,7 @@ public class EmbedBuilder {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
+     * @param text    The text of the footer.
      * @param iconUrl The url of the footer's icon.
      * @return The current instance in order to chain call methods.
      */
@@ -161,8 +164,8 @@ public class EmbedBuilder {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
-     * @param icon The footer's icon.
+     * @param text     The text of the footer.
+     * @param icon     The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -187,8 +190,8 @@ public class EmbedBuilder {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
-     * @param icon The footer's icon.
+     * @param text     The text of the footer.
+     * @param icon     The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -213,8 +216,8 @@ public class EmbedBuilder {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
-     * @param icon The footer's icon.
+     * @param text     The text of the footer.
+     * @param icon     The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -271,7 +274,7 @@ public class EmbedBuilder {
     /**
      * Sets the image of the embed.
      *
-     * @param image The image.
+     * @param image    The image.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -295,7 +298,7 @@ public class EmbedBuilder {
     /**
      * Sets the image of the embed.
      *
-     * @param image The image.
+     * @param image    The image.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -319,7 +322,7 @@ public class EmbedBuilder {
     /**
      * Sets the image of the embed.
      *
-     * @param image The image.
+     * @param image    The image.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -364,8 +367,8 @@ public class EmbedBuilder {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
+     * @param name    The name of the author.
+     * @param url     The url of the author.
      * @param iconUrl The url of the author's icon.
      * @return The current instance in order to chain call methods.
      */
@@ -378,7 +381,7 @@ public class EmbedBuilder {
      * Sets the author of the embed.
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
      */
@@ -391,7 +394,7 @@ public class EmbedBuilder {
      * Sets the author of the embed.
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
      */
@@ -405,7 +408,7 @@ public class EmbedBuilder {
      * This method assumes the file type is "png"!
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
      */
@@ -417,9 +420,9 @@ public class EmbedBuilder {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
-     * @param icon The author's icon.
+     * @param name     The name of the author.
+     * @param url      The url of the author.
+     * @param icon     The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -433,7 +436,7 @@ public class EmbedBuilder {
      * This method assumes the file type is "png"!
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
      */
@@ -445,9 +448,9 @@ public class EmbedBuilder {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
-     * @param icon The author's icon.
+     * @param name     The name of the author.
+     * @param url      The url of the author.
+     * @param icon     The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -461,7 +464,7 @@ public class EmbedBuilder {
      * This method assumes the file type is "png"!
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      * @return The current instance in order to chain call methods.
      */
@@ -473,9 +476,9 @@ public class EmbedBuilder {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
-     * @param icon The author's icon.
+     * @param name     The name of the author.
+     * @param url      The url of the author.
+     * @param icon     The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
@@ -533,7 +536,7 @@ public class EmbedBuilder {
      * Sets the thumbnail of the embed.
      *
      * @param thumbnail The thumbnail.
-     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @param fileType  The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(InputStream thumbnail, String fileType) {
@@ -557,7 +560,7 @@ public class EmbedBuilder {
      * Sets the thumbnail of the embed.
      *
      * @param thumbnail The thumbnail.
-     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @param fileType  The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(byte[] thumbnail, String fileType) {
@@ -581,7 +584,7 @@ public class EmbedBuilder {
      * Sets the thumbnail of the embed.
      *
      * @param thumbnail The thumbnail.
-     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @param fileType  The type of the file, e.g. "png" or "gif".
      * @return The current instance in order to chain call methods.
      */
     public EmbedBuilder setThumbnail(BufferedImage thumbnail, String fileType) {
@@ -592,7 +595,7 @@ public class EmbedBuilder {
     /**
      * Adds an inline field to the embed.
      *
-     * @param name The name of the field.
+     * @param name  The name of the field.
      * @param value The value of the field.
      * @return The current instance in order to chain call methods.
      */
@@ -604,7 +607,7 @@ public class EmbedBuilder {
     /**
      * Adds a non-inline field to the embed.
      *
-     * @param name The name of the field.
+     * @param name  The name of the field.
      * @param value The value of the field.
      * @return The current instance in order to chain call methods.
      */
@@ -616,8 +619,8 @@ public class EmbedBuilder {
     /**
      * Adds a field to the embed.
      *
-     * @param name The name of the field.
-     * @param value The value of the field.
+     * @param name   The name of the field.
+     * @param value  The value of the field.
      * @param inline Whether the field should be inline or not.
      * @return The current instance in order to chain call methods.
      */
@@ -630,12 +633,13 @@ public class EmbedBuilder {
      * Updates all fields of the embed that satisfy the given predicate using the given updater.
      *
      * @param predicate The predicate that fields have to satisfy to get updated.
-     * @param updater The updater for the fields; the {@code EditableEmbedField} is only valid during the run of the
-     *                updater; any try to save it in a variable and reuse it later after this method call will fail
-     *                with exceptions.
+     * @param updater   The updater for the fields.
+     * @param <T>       Type variable to be returned by the updater.
      * @return The current instance in order to chain call methods.
      */
-    public EmbedBuilder updateFields(Predicate<EmbedField> predicate, Consumer<EditableEmbedField> updater) {
+    public <T extends EmbedField> EmbedBuilder updateFields(
+            Predicate<EmbedField> predicate,
+            Function<EditableEmbedField, T> updater) {
         delegate.updateFields(predicate, updater);
         return this;
     }
@@ -643,12 +647,12 @@ public class EmbedBuilder {
     /**
      * Updates all fields of the embed using the given updater.
      *
-     * @param updater The updater for the fields; the {@code EditableEmbedField} is only valid during the run of the
-     *                updater; any try to save it in a variable and reuse it later after this method call will fail
-     *                with exceptions.
+     * @param updater The updater for the fields.
+     * @param <T>     Type variable to be returned by the updater.
      * @return The current instance in order to chain call methods.
      */
-    public EmbedBuilder updateAllFields(Consumer<EditableEmbedField> updater) {
+    public <T extends EmbedField> EmbedBuilder updateAllFields(
+            Function<EditableEmbedField, T> updater) {
         delegate.updateFields(field -> true, updater);
         return this;
     }
@@ -681,6 +685,16 @@ public class EmbedBuilder {
      */
     public boolean requiresAttachments() {
         return delegate.requiresAttachments();
+    }
+
+    /**
+     * Builds and returns the embed, based on the set things.
+     *
+     * @return An EmbedDraft object to be used in a messageable.
+     * @see Messageable#sendMessage(EmbedDraft)
+     */
+    public EmbedDraft build() {
+        return delegate.build();
     }
 
 }

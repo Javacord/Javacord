@@ -12,13 +12,13 @@ import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageType;
 import org.javacord.api.entity.message.Reaction;
-import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.embed.SentEmbed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
-import org.javacord.core.entity.message.embed.EmbedImpl;
+import org.javacord.core.entity.message.embed.SentEmbedImpl;
 import org.javacord.core.listener.message.InternalMessageAttachableListenerManager;
 import org.javacord.core.util.cache.MessageCacheImpl;
 
@@ -96,7 +96,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     /**
      * A list with all embeds.
      */
-    private final List<Embed> embeds = new ArrayList<>();
+    private final List<SentEmbed> embeds = new ArrayList<>();
 
     /**
      * A list with all reactions.
@@ -149,7 +149,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
         if (data.has("embeds")) {
             for (JsonNode embedJson : data.get("embeds")) {
-                Embed embed = new EmbedImpl(embedJson);
+                SentEmbed embed = new SentEmbedImpl(this, embedJson);
                 embeds.add(embed);
             }
         }
@@ -231,7 +231,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      *
      * @param embeds The embeds to set.
      */
-    public void setEmbeds(List<Embed> embeds) {
+    public void setEmbeds(List<SentEmbed> embeds) {
         this.embeds.clear();
         this.embeds.addAll(embeds);
     }
@@ -336,7 +336,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     @Override
-    public List<Embed> getEmbeds() {
+    public List<SentEmbed> getEmbeds() {
         return Collections.unmodifiableList(new ArrayList<>(embeds));
     }
 

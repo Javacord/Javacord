@@ -1,6 +1,6 @@
 package org.javacord.api.entity.message;
 
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedDraft;
 
 import java.io.File;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(
-            String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName) {
+            String content, EmbedDraft embed, boolean tts, String nonce, InputStream stream, String fileName) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
@@ -44,7 +44,7 @@ public interface Messageable {
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(
-            String content, EmbedBuilder embed, boolean tts, String nonce, File... files) {
+            String content, EmbedDraft embed, boolean tts, String nonce, File... files) {
         MessageBuilder messageBuilder = new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
@@ -65,7 +65,7 @@ public interface Messageable {
      * @param nonce The nonce of the message.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, boolean tts, String nonce) {
+    default CompletableFuture<Message> sendMessage(String content, EmbedDraft embed, boolean tts, String nonce) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
@@ -81,7 +81,7 @@ public interface Messageable {
      * @param embed The embed which should be displayed.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed) {
+    default CompletableFuture<Message> sendMessage(String content, EmbedDraft embed) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
@@ -106,7 +106,7 @@ public interface Messageable {
      * @param embed The embed which should be displayed.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(EmbedBuilder embed) {
+    default CompletableFuture<Message> sendMessage(EmbedDraft embed) {
         return new MessageBuilder()
                 .setEmbed(embed)
                 .send(this);
@@ -177,7 +177,7 @@ public interface Messageable {
      * @param files The file(s) to send.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(EmbedBuilder embed, File... files) {
+    default CompletableFuture<Message> sendMessage(EmbedDraft embed, File... files) {
         MessageBuilder messageBuilder = new MessageBuilder()
                 .setEmbed(embed);
         for (File file : files) {
@@ -194,7 +194,7 @@ public interface Messageable {
      * @param fileName The name of the file.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(EmbedBuilder embed, InputStream stream, String fileName) {
+    default CompletableFuture<Message> sendMessage(EmbedDraft embed, InputStream stream, String fileName) {
         return new MessageBuilder()
                 .setEmbed(embed)
                 .addAttachment(stream, fileName)
@@ -209,7 +209,7 @@ public interface Messageable {
      * @param files The file(s) to send.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, File... files) {
+    default CompletableFuture<Message> sendMessage(String content, EmbedDraft embed, File... files) {
         MessageBuilder messageBuilder = new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed);
@@ -228,7 +228,7 @@ public interface Messageable {
      * @param fileName The name of the file.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, InputStream stream,
+    default CompletableFuture<Message> sendMessage(String content, EmbedDraft embed, InputStream stream,
                                                    String fileName) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)

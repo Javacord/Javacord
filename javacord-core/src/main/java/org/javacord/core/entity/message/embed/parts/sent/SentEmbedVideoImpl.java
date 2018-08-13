@@ -1,36 +1,31 @@
-package org.javacord.core.entity.message.embed;
+package org.javacord.core.entity.message.embed.parts.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.entity.message.embed.EmbedImage;
+import org.javacord.api.entity.message.embed.parts.sent.SentEmbedVideo;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * The implementation of {@link EmbedImage}.
- */
-public class EmbedImageImpl implements EmbedImage {
+public class SentEmbedVideoImpl implements SentEmbedVideo {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(EmbedImageImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(SentEmbedVideoImpl.class);
 
     private final String url;
-    private final String proxyUrl;
     private final int height;
     private final int width;
 
     /**
-     * Creates a new embed image.
+     * Creates a new embed video.
      *
      * @param data The json data of the image.
      */
-    public EmbedImageImpl(JsonNode data) {
+    public SentEmbedVideoImpl(JsonNode data) {
         url = data.has("url") ? data.get("url").asText() : null;
-        proxyUrl = data.has("proxy_url") ? data.get("proxy_url").asText() : null;
         height = data.has("height") ? data.get("height").asInt() : -1;
         width = data.has("width") ? data.get("width").asInt() : -1;
     }
@@ -43,20 +38,7 @@ public class EmbedImageImpl implements EmbedImage {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
-            logger.warn("Seems like the url of the embed image is malformed! Please contact the developer!", e);
-            return null;
-        }
-    }
-
-    @Override
-    public URL getProxyUrl() {
-        if (proxyUrl == null) {
-            return null;
-        }
-        try {
-            return new URL(proxyUrl);
-        } catch (MalformedURLException e) {
-            logger.warn("Seems like the proxy url of the embed image is malformed! Please contact the developer!", e);
+            logger.warn("Seems like the url of the embed provider is malformed! Please contact the developer!", e);
             return null;
         }
     }
@@ -70,5 +52,4 @@ public class EmbedImageImpl implements EmbedImage {
     public int getWidth() {
         return width;
     }
-
 }

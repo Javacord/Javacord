@@ -2,7 +2,7 @@ package org.javacord.core.event.message;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.embed.SentEmbed;
 import org.javacord.api.event.message.MessageEditEvent;
 
 import java.util.Collections;
@@ -27,17 +27,16 @@ public class MessageEditEventImpl extends RequestableMessageEventImpl implements
     /**
      * The new embeds of the message.
      */
-    private final List<Embed> newEmbeds;
+    private final List<SentEmbed> newEmbeds;
 
     /**
      * The old embeds of the message. May be <code>null</code>!
      */
-    private final List<Embed> oldEmbeds;
+    private final List<SentEmbed> oldEmbeds;
 
     /**
      * Creates a new message edit event.
-     *
-     * @param api The discord api instance.
+     *  @param api The discord api instance.
      * @param messageId The id of the message.
      * @param channel The text channel in which the message was sent.
      * @param newContent The new content of the message.
@@ -46,8 +45,8 @@ public class MessageEditEventImpl extends RequestableMessageEventImpl implements
      * @param oldEmbeds The old embeds of the message.
      */
     public MessageEditEventImpl(
-            DiscordApi api, long messageId, TextChannel channel, String newContent, List<Embed> newEmbeds,
-            String oldContent, List<Embed> oldEmbeds) {
+            DiscordApi api, long messageId, TextChannel channel, String newContent, List<SentEmbed> newEmbeds,
+            String oldContent, List<SentEmbed> oldEmbeds) {
         super(api, messageId, channel);
         this.newContent = newContent;
         this.newEmbeds = newEmbeds;
@@ -66,12 +65,12 @@ public class MessageEditEventImpl extends RequestableMessageEventImpl implements
     }
 
     @Override
-    public List<Embed> getNewEmbeds() {
+    public List<SentEmbed> getNewEmbeds() {
         return newEmbeds == null ? Collections.emptyList() : newEmbeds;
     }
 
     @Override
-    public Optional<List<Embed>> getOldEmbeds() {
+    public Optional<List<SentEmbed>> getOldEmbeds() {
         return Optional.ofNullable(oldEmbeds);
     }
 

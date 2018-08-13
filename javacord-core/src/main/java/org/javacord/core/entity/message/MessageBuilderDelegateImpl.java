@@ -11,11 +11,11 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedDraft;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
+import org.javacord.core.entity.message.embed.EmbedDraftImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -29,7 +29,9 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link MessageBuilderDelegate}.
@@ -49,7 +51,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     /**
      * The embed of the message. Might be <code>null</code>.
      */
-    private EmbedBuilder embed = null;
+    private EmbedDraftImpl embed = null;
 
     /**
      * If the message should be text to speech or not.
@@ -110,8 +112,8 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
-    public void setEmbed(EmbedBuilder embed) {
-        this.embed = embed;
+    public void setEmbed(EmbedDraft embed) {
+        this.embed = (EmbedDraftImpl) embed;
     }
 
     @Override
@@ -232,7 +234,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 .put("tts", tts);
         body.putArray("mentions");
         if (embed != null) {
-            ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
+            embed.toJsonNode(body.putObject("embed"));
         }
         if (nonce != null) {
             body.put("nonce", nonce);
@@ -252,8 +254,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                     // Add the attachments required for the embed
                     if (embed != null) {
                         tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
+                                embed.getRequiredAttachments());
                     }
+                    tempAttachments = tempAttachments.stream()
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
                     Collections.reverse(tempAttachments);
                     for (int i = 0; i < tempAttachments.size(); i++) {
                         byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();

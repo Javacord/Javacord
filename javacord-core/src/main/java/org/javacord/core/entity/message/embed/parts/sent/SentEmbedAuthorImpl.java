@@ -1,8 +1,10 @@
-package org.javacord.core.entity.message.embed;
+package org.javacord.core.entity.message.embed.parts.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.entity.message.embed.EmbedAuthor;
+import org.javacord.api.entity.message.embed.parts.draft.EmbedDraftAuthor;
+import org.javacord.api.entity.message.embed.parts.sent.SentEmbedAuthor;
+import org.javacord.core.entity.message.embed.parts.draft.EmbedDraftAuthorImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.net.MalformedURLException;
@@ -10,14 +12,14 @@ import java.net.URL;
 import java.util.Optional;
 
 /**
- * The implementation of {@link EmbedAuthor}.
+ * The implementation of {@link SentEmbedAuthor}.
  */
-public class EmbedAuthorImpl implements EmbedAuthor {
+public class SentEmbedAuthorImpl implements SentEmbedAuthor {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(EmbedAuthorImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(SentEmbedAuthorImpl.class);
 
     private final String name;
     private final String url;
@@ -29,7 +31,7 @@ public class EmbedAuthorImpl implements EmbedAuthor {
      *
      * @param data The json data of the author.
      */
-    public EmbedAuthorImpl(JsonNode data) {
+    public SentEmbedAuthorImpl(JsonNode data) {
         name = data.has("name") ? data.get("name").asText() : null;
         url = data.has("url") && !data.get("url").isNull() ? data.get("url").asText() : null;
         iconUrl = data.has("icon_url") && !data.get("icon_url").isNull() ? data.get("icon_url").asText() : null;
@@ -79,6 +81,16 @@ public class EmbedAuthorImpl implements EmbedAuthor {
             logger.warn("Seems like the embed author's proxy icon url is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public EmbedDraftAuthor toDraft() {
+        return new EmbedDraftAuthorImpl(
+                getName(),
+                getUrl().map(URL::toExternalForm).orElse(null),
+                getIconUrl().map(URL::toExternalForm).orElse(null),
+                null
+        );
     }
 
 }

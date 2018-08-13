@@ -1,14 +1,15 @@
-package org.javacord.api.entity.message.embed;
+package org.javacord.api.entity.message.embed.parts.draft;
 
 import org.javacord.api.entity.Nameable;
+import org.javacord.api.entity.message.embed.parts.EmbedAuthor;
 
 import java.net.URL;
 import java.util.Optional;
 
 /**
- * This interface represents an embed author.
+ * This class represents an embed author for an EmbedDraft.
  */
-public interface EmbedAuthor extends Nameable {
+public interface EmbedDraftAuthor extends Nameable, EmbedAuthor {
 
     /**
      * Gets the url of the author.
@@ -23,12 +24,4 @@ public interface EmbedAuthor extends Nameable {
      * @return The url of the author icon.
      */
     Optional<URL> getIconUrl();
-
-    /**
-     * Gets the proxy url of the author icon.
-     *
-     * @return The proxy url of the author icon.
-     */
-    Optional<URL> getProxyIconUrl();
-
 }

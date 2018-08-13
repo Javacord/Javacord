@@ -5,14 +5,14 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.embed.SentEmbed;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.CachedMessagePinEvent;
 import org.javacord.api.event.message.CachedMessageUnpinEvent;
 import org.javacord.api.event.message.MessageEditEvent;
 import org.javacord.core.entity.message.MessageImpl;
-import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
-import org.javacord.core.entity.message.embed.EmbedImpl;
+import org.javacord.core.entity.message.embed.EmbedDraftImpl;
+import org.javacord.core.entity.message.embed.SentEmbedImpl;
 import org.javacord.core.event.message.CachedMessagePinEventImpl;
 import org.javacord.core.event.message.CachedMessageUnpinEventImpl;
 import org.javacord.core.event.message.MessageEditEventImpl;
@@ -120,7 +120,7 @@ public class MessageUpdateHandler extends PacketHandler {
                 }
 
                 String oldContent = message.map(Message::getContent).orElse(null);
-                List<Embed> oldEmbeds = message.map(Message::getEmbeds).orElse(null);
+                List<SentEmbed> oldEmbeds = message.map(Message::getEmbeds).orElse(null);
 
                 String newContent = null;
                 if (packet.has("content")) {
@@ -128,14 +128,14 @@ public class MessageUpdateHandler extends PacketHandler {
                     String finalNewContent = newContent;
                     message.ifPresent(msg -> msg.setContent(finalNewContent));
                 }
-                List<Embed> newEmbeds = null;
+                List<SentEmbed> newEmbeds = null;
                 if (packet.has("embeds")) {
                     newEmbeds = new ArrayList<>();
                     for (JsonNode embedJson : packet.get("embeds")) {
-                        Embed embed = new EmbedImpl(embedJson);
+                        SentEmbed embed = new SentEmbedImpl(message.orElse(null), embedJson);
                         newEmbeds.add(embed);
                     }
-                    List<Embed> finalNewEmbeds = newEmbeds;
+                    List<SentEmbed> finalNewEmbeds = newEmbeds;
                     message.ifPresent(msg -> msg.setEmbeds(finalNewEmbeds));
                 }
 
@@ -149,11 +149,9 @@ public class MessageUpdateHandler extends PacketHandler {
                         isMostLikelyAnEdit = true;
                     } else {
                         for (int i = 0; i < newEmbeds.size(); i++) {
-                            if (!((EmbedBuilderDelegateImpl) newEmbeds.get(i)
-                                    .toBuilder().getDelegate()).toJsonNode().toString()
-                                    .equals(((EmbedBuilderDelegateImpl) oldEmbeds.get(i)
-                                            .toBuilder().getDelegate()).toJsonNode().toString())) {
+                            if (!newEmbeds.get(i).equals(oldEmbeds.get(i))) {
                                 isMostLikelyAnEdit = true;
+                                break;
                             }
                         }
                     }

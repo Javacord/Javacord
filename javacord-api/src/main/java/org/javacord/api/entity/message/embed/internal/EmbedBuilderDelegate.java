@@ -2,9 +2,10 @@ package org.javacord.api.entity.message.embed.internal;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.MessageAuthor;
-import org.javacord.api.entity.message.embed.EditableEmbedField;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.message.embed.EmbedField;
+import org.javacord.api.entity.message.embed.EmbedDraft;
+import org.javacord.api.entity.message.embed.parts.EditableEmbedField;
+import org.javacord.api.entity.message.embed.parts.EmbedField;
 import org.javacord.api.entity.user.User;
 
 import java.awt.Color;
@@ -12,7 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -71,7 +72,7 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
+     * @param text    The text of the footer.
      * @param iconUrl The url of the footer's icon.
      */
     void setFooter(String text, String iconUrl);
@@ -104,8 +105,8 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
-     * @param icon The footer's icon.
+     * @param text     The text of the footer.
+     * @param icon     The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setFooter(String text, InputStream icon, String fileType);
@@ -122,8 +123,8 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
-     * @param icon The footer's icon.
+     * @param text     The text of the footer.
+     * @param icon     The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setFooter(String text, byte[] icon, String fileType);
@@ -140,8 +141,8 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the footer of the embed.
      *
-     * @param text The text of the footer.
-     * @param icon The footer's icon.
+     * @param text     The text of the footer.
+     * @param icon     The footer's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setFooter(String text, BufferedImage icon, String fileType);
@@ -178,7 +179,7 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the image of the embed.
      *
-     * @param image The image.
+     * @param image    The image.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setImage(InputStream image, String fileType);
@@ -194,7 +195,7 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the image of the embed.
      *
-     * @param image The image.
+     * @param image    The image.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setImage(byte[] image, String fileType);
@@ -210,7 +211,7 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the image of the embed.
      *
-     * @param image The image.
+     * @param image    The image.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setImage(BufferedImage image, String fileType);
@@ -239,8 +240,8 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
+     * @param name    The name of the author.
+     * @param url     The url of the author.
      * @param iconUrl The url of the author's icon.
      */
     void setAuthor(String name, String url, String iconUrl);
@@ -249,7 +250,7 @@ public interface EmbedBuilderDelegate {
      * Sets the author of the embed.
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      */
     void setAuthor(String name, String url, Icon icon);
@@ -258,7 +259,7 @@ public interface EmbedBuilderDelegate {
      * Sets the author of the embed.
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      */
     void setAuthor(String name, String url, File icon);
@@ -268,7 +269,7 @@ public interface EmbedBuilderDelegate {
      * This method assumes the file type is "png"!
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      */
     void setAuthor(String name, String url, InputStream icon);
@@ -276,9 +277,9 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
-     * @param icon The author's icon.
+     * @param name     The name of the author.
+     * @param url      The url of the author.
+     * @param icon     The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setAuthor(String name, String url, InputStream icon, String fileType);
@@ -288,7 +289,7 @@ public interface EmbedBuilderDelegate {
      * This method assumes the file type is "png"!
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      */
     void setAuthor(String name, String url, byte[] icon);
@@ -296,9 +297,9 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
-     * @param icon The author's icon.
+     * @param name     The name of the author.
+     * @param url      The url of the author.
+     * @param icon     The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setAuthor(String name, String url, byte[] icon, String fileType);
@@ -308,7 +309,7 @@ public interface EmbedBuilderDelegate {
      * This method assumes the file type is "png"!
      *
      * @param name The name of the author.
-     * @param url The url of the author.
+     * @param url  The url of the author.
      * @param icon The author's icon.
      */
     void setAuthor(String name, String url, BufferedImage icon);
@@ -316,9 +317,9 @@ public interface EmbedBuilderDelegate {
     /**
      * Sets the author of the embed.
      *
-     * @param name The name of the author.
-     * @param url The url of the author.
-     * @param icon The author's icon.
+     * @param name     The name of the author.
+     * @param url      The url of the author.
+     * @param icon     The author's icon.
      * @param fileType The type of the file, e.g. "png" or "gif".
      */
     void setAuthor(String name, String url, BufferedImage icon, String fileType);
@@ -356,7 +357,7 @@ public interface EmbedBuilderDelegate {
      * Sets the thumbnail of the embed.
      *
      * @param thumbnail The thumbnail.
-     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @param fileType  The type of the file, e.g. "png" or "gif".
      */
     void setThumbnail(InputStream thumbnail, String fileType);
 
@@ -372,7 +373,7 @@ public interface EmbedBuilderDelegate {
      * Sets the thumbnail of the embed.
      *
      * @param thumbnail The thumbnail.
-     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @param fileType  The type of the file, e.g. "png" or "gif".
      */
     void setThumbnail(byte[] thumbnail, String fileType);
 
@@ -388,15 +389,15 @@ public interface EmbedBuilderDelegate {
      * Sets the thumbnail of the embed.
      *
      * @param thumbnail The thumbnail.
-     * @param fileType The type of the file, e.g. "png" or "gif".
+     * @param fileType  The type of the file, e.g. "png" or "gif".
      */
     void setThumbnail(BufferedImage thumbnail, String fileType);
 
     /**
      * Adds a field to the embed.
      *
-     * @param name The name of the field.
-     * @param value The value of the field.
+     * @param name   The name of the field.
+     * @param value  The value of the field.
      * @param inline Whether the field should be inline or not.
      */
     void addField(String name, String value, boolean inline);
@@ -405,11 +406,12 @@ public interface EmbedBuilderDelegate {
      * Updates all fields of the embed that satisfy the given predicate using the given updater.
      *
      * @param predicate The predicate that fields have to satisfy to get updated.
-     * @param updater The updater for the fields; the {@code EditableEmbedField} is only valid during the run of the
-     *                updater; any try to save it in a variable and reuse it later after this method call will fail
-     *                with exceptions.
+     * @param updater   The updater for the fields.
+     * @param <T>       A type variable so the updater returns a valid EmbedField.
      */
-    void updateFields(Predicate<EmbedField> predicate, Consumer<EditableEmbedField> updater);
+    <T extends EmbedField> void updateFields(
+            Predicate<EmbedField> predicate,
+            Function<EditableEmbedField, T> updater);
 
     /**
      * Removes all fields of the embed that satisfy the given predicate.
@@ -425,4 +427,10 @@ public interface EmbedBuilderDelegate {
      */
     boolean requiresAttachments();
 
+    /**
+     * Builds and returns an EmbedDraft, which will be later used by the Message to send the embed.
+     *
+     * @return An EmbedDraft to be used by the Message.
+     */
+    EmbedDraft build();
 }

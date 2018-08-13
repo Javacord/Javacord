@@ -6,7 +6,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.Reaction;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedDraft;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageEvent;
@@ -85,12 +85,12 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
     }
 
     @Override
-    public CompletableFuture<Void> editMessage(EmbedBuilder embed) {
+    public CompletableFuture<Void> editMessage(EmbedDraft embed) {
         return Message.edit(getApi(), getChannel().getId(), getMessageId(), null, embed);
     }
 
     @Override
-    public CompletableFuture<Void> editMessage(String content, EmbedBuilder embed) {
+    public CompletableFuture<Void> editMessage(String content, EmbedDraft embed) {
         return Message.edit(getApi(), getChannel().getId(), getMessageId(), content, embed);
     }
 

@@ -1,11 +1,8 @@
-package org.javacord.api.entity.message.embed;
+package org.javacord.api.entity.message.embed.parts.sent;
 
 import java.net.URL;
 
-/**
- * This interface represents an embed video.
- */
-public interface EmbedVideo {
+public interface SentEmbedVideo {
 
     /**
      * Gets the url of the video.
@@ -27,5 +24,4 @@ public interface EmbedVideo {
      * @return The width of the video.
      */
     int getWidth();
-
 }
