@@ -49,7 +49,7 @@ log levels per class, and much more.
 
 For example, Log4j Core in Gradle
 ```groovy
-dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
+dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:$log4jVersion' }
 ```
 Take a look at the [Logger Configuration](https://javacord.org/wiki/basic-tutorials/logger-configuration/) wiki article for further information.
 
