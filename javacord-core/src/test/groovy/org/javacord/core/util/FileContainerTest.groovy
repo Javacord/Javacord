@@ -17,4 +17,25 @@ class FileContainerTest extends Specification {
             fileContainer.asByteArray(null).join()
     }
 
+    def 'creating FileContainer with BufferedImage and unsupported file format throws exception'() {
+        when:
+            new FileContainer(Stub(BufferedImage), 'file.txt')
+
+        then:
+            IllegalArgumentException iae = thrown()
+            iae.message == 'No image writer found for format "txt"'
+    }
+
+    def 'configuring FileContainer with BufferedImage with unsupported file format throws exception'() {
+        given:
+            def fileContainer = new FileContainer(Stub(BufferedImage), 'file.png')
+
+        when:
+            fileContainer.setFileTypeOrName 'file.txt'
+
+        then:
+            IllegalArgumentException iae = thrown()
+            iae.message == 'No image writer found for format "txt"'
+    }
+
 }

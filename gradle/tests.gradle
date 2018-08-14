@@ -6,6 +6,8 @@ subprojects {
         testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
 
         testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0'
+        testRuntimeOnly 'net.bytebuddy:byte-buddy:1.8.17'
+        testRuntimeOnly 'org.objenesis:objenesis'
     }
 
     // we don't need aggregation from multiple runs and it prevents caching of the task
