@@ -249,7 +249,7 @@ public class FileContainer {
         try {
             if (fileAsBufferedImage != null) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(fileAsBufferedImage, fileTypeOrName, os);
+                ImageIO.write(fileAsBufferedImage, getFileType(), os);
                 future.complete(new ByteArrayInputStream(os.toByteArray()));
                 return future;
             }
