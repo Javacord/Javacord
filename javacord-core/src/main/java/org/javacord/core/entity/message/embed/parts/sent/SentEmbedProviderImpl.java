@@ -1,22 +1,22 @@
-package org.javacord.core.entity.message.embed;
+package org.javacord.core.entity.message.embed.parts.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.entity.message.embed.EmbedProvider;
+import org.javacord.api.entity.message.embed.parts.sent.SentEmbedProvider;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * The implementation of {@link EmbedProvider}.
+ * The implementation of {@link SentEmbedProvider}.
  */
-public class EmbedProviderImpl implements EmbedProvider {
+public class SentEmbedProviderImpl implements SentEmbedProvider {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(EmbedProviderImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(SentEmbedProviderImpl.class);
 
     private final String name;
     private final String url;
@@ -26,7 +26,7 @@ public class EmbedProviderImpl implements EmbedProvider {
      *
      * @param data The json data of the provider.
      */
-    public EmbedProviderImpl(JsonNode data) {
+    public SentEmbedProviderImpl(JsonNode data) {
         name = data.has("name") ? data.get("name").asText() : null;
         url = data.has("url") && !data.get("url").isNull() ? data.get("url").asText() : null;
     }

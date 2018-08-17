@@ -3,7 +3,7 @@ package org.javacord.api.entity.message;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedDraft;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.internal.DelegateFactory;
@@ -34,7 +34,7 @@ public class MessageBuilder {
         MessageBuilder builder = new MessageBuilder();
         builder.getStringBuilder().append(message.getContent());
         if (!message.getEmbeds().isEmpty()) {
-            builder.setEmbed(message.getEmbeds().get(0).toBuilder());
+            builder.setEmbed(message.getEmbeds().get(0).asEmbedDraft());
         }
         for (MessageAttachment attachment : message.getAttachments()) {
             builder.addAttachment(attachment.getUrl());
@@ -118,7 +118,7 @@ public class MessageBuilder {
      * @param embed The embed to set.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder setEmbed(EmbedBuilder embed) {
+    public MessageBuilder setEmbed(EmbedDraft embed) {
         delegate.setEmbed(embed);
         return this;
     }

@@ -1,18 +1,14 @@
-package org.javacord.api.entity.message.embed;
+package org.javacord.api.entity.message.embed.parts.sent;
+
+import org.javacord.api.entity.message.embed.parts.EmbedImage;
+import org.javacord.api.entity.message.embed.parts.draft.EmbedDraftImage;
 
 import java.net.URL;
 
 /**
  * This interface represents an embed image.
  */
-public interface EmbedImage {
-
-    /**
-     * Gets the url of the image.
-     *
-     * @return The url of the image.
-     */
-    URL getUrl();
+public interface SentEmbedImage extends EmbedImage {
 
     /**
      * Gets the proxy url of the image.
@@ -35,4 +31,10 @@ public interface EmbedImage {
      */
     int getWidth();
 
+    /**
+     * Creates a draft instance according to this sent version.
+     *
+     * @return The new draft instance.
+     */
+    EmbedDraftImage toDraft();
 }

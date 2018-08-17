@@ -1,7 +1,7 @@
 package org.javacord.api.entity.message;
 
 import org.javacord.api.entity.emoji.Emoji;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedDraft;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.UncachedMessageAttachableListenerManager;
 
@@ -125,7 +125,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(long channelId, long messageId, EmbedBuilder embed);
+    CompletableFuture<Void> edit(long channelId, long messageId, EmbedDraft embed);
 
     /**
      * Updates the embed of the message.
@@ -135,7 +135,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(String channelId, String messageId, EmbedBuilder embed);
+    CompletableFuture<Void> edit(String channelId, String messageId, EmbedDraft embed);
 
     /**
      * Updates the content and the embed of the message.
@@ -146,7 +146,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(long channelId, long messageId, String content, EmbedBuilder embed);
+    CompletableFuture<Void> edit(long channelId, long messageId, String content, EmbedDraft embed);
 
     /**
      * Updates the content and the embed of the message.
@@ -157,7 +157,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(String channelId, String messageId, String content, EmbedBuilder embed);
+    CompletableFuture<Void> edit(String channelId, String messageId, String content, EmbedDraft embed);
 
     /**
      * Updates the content and the embed of the message.
@@ -171,7 +171,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Void> edit(long channelId, long messageId, String content, boolean updateContent,
-                                 EmbedBuilder embed, boolean updateEmbed);
+                                 EmbedDraft embed, boolean updateEmbed);
 
     /**
      * Updates the content and the embed of the message.
@@ -185,7 +185,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Void> edit(String channelId, String messageId, String content, boolean updateContent,
-                                 EmbedBuilder embed, boolean updateEmbed);
+                                 EmbedDraft embed, boolean updateEmbed);
 
     /**
      * Removes the content of the message.

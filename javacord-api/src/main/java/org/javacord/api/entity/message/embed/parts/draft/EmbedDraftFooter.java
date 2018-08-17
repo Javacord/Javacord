@@ -1,12 +1,14 @@
-package org.javacord.api.entity.message.embed;
+package org.javacord.api.entity.message.embed.parts.draft;
+
+import org.javacord.api.entity.message.embed.parts.EmbedFooter;
 
 import java.net.URL;
 import java.util.Optional;
 
 /**
- * This interface represents an embed footer.
+ * This class represents the footer for an embed draft.
  */
-public interface EmbedFooter {
+public interface EmbedDraftFooter extends EmbedFooter {
 
     /**
      * Gets the footer text.
@@ -21,12 +23,4 @@ public interface EmbedFooter {
      * @return The url of the footer icon.
      */
     Optional<URL> getIconUrl();
-
-    /**
-     * Gets the proxy url of the footer icon.
-     *
-     * @return The proxy url of the footer icon.
-     */
-    Optional<URL> getProxyIconUrl();
-
 }
