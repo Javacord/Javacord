@@ -18,17 +18,24 @@ task verifyReadme {
 check.dependsOn verifyReadme
 
 task updateReadme(dependsOn: verifyReadme) {
+    def coreRuntimeClasspath = project(':javacord-core').configurations.runtimeClasspath
+
     inputs.property 'version', version
     inputs.file '.github/README_template.md' withPropertyName 'readmeTemplate'
+    inputs.files coreRuntimeClasspath withPropertyName 'coreRuntimeClasspath' withNormalizer ClasspathNormalizer
     outputs.file 'README.md' withPropertyName 'readme'
     outputs.file '.github/README.md.sha256' withPropertyName 'readmeChecksum'
 
     doLast {
+        def log4jVersion = coreRuntimeClasspath
+                .allDependencies
+                .find { (it.group == 'org.apache.logging.log4j') && (it.name == 'log4j-api') }
+                .version
         copy {
             from '.github/README_template.md'
             into '.'
             rename { 'README.md' }
-            expand version: version
+            expand version: version, log4jVersion: log4jVersion
         }
         file('.github/README.md.sha256').text = calculateReadmeChecksum()
     }
