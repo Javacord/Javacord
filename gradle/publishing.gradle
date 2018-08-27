@@ -1,14 +1,13 @@
 import io.codearte.gradle.nexus.BaseStagingTask
 import io.codearte.gradle.nexus.NexusStagingPlugin
+import net.researchgate.release.ReleasePlugin
 import org.ajoberstar.grgit.Grgit
 import org.kohsuke.github.GitHub
 import wooga.gradle.github.publish.GithubPublishPlugin
 import wooga.gradle.github.publish.tasks.GithubPublish
 
 import javax.naming.ConfigurationException
-
-import static java.text.MessageFormat.format
-import static net.researchgate.release.ReleasePlugin.RELEASE_GROUP
+import java.text.MessageFormat
 
 buildscript {
     repositories {
@@ -162,7 +161,7 @@ release {
 }
 
 task checkMergeNeeded() {
-    group RELEASE_GROUP
+    group ReleasePlugin.RELEASE_GROUP
     description 'Checks to see if there are any unmerged commits on branch "master".'
     doLast {
         def grgit = Grgit.open(dir: "$rootDir/.git")
@@ -170,7 +169,7 @@ task checkMergeNeeded() {
             grgit.fetch remote: 'origin'
             def unmergedCommits = grgit.log(includes: ['origin/master'], excludes: ['HEAD']).size()
             if (unmergedCommits) {
-                throw new IllegalStateException(format('There {0,choice,' +
+                throw new IllegalStateException(MessageFormat.format('There {0,choice,' +
                         '1#is one unmerged commit|' +
                         '1<are {0,number,integer} unmerged commits} on "master".',
                         unmergedCommits))
@@ -217,7 +216,7 @@ afterReleaseBuild.dependsOn tasks.withType(GithubPublish)
 preTagCommit.dependsOn updateReadme
 
 task createPullRequestForReleaseTag() {
-    group RELEASE_GROUP
+    group ReleasePlugin.RELEASE_GROUP
     description 'Creates a PR from the release tag to the branch "master".'
     doLast {
         def tagName = tagNameSupplier.call()
