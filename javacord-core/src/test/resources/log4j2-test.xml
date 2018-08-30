@@ -5,11 +5,14 @@
             <PatternLayout>
                 <Pattern><![CDATA[%d <%p> <%t> <%x> <%X> <%c> %m%n]]></Pattern>
             </PatternLayout>
+            <ThresholdFilter level="DEBUG"/>
         </Console>
+        <List name="Test Appender"/>
     </Appenders>
     <Loggers>
-        <Root level="DEBUG">
+        <Root level="ALL">
             <AppenderRef ref="Console Appender"/>
+            <AppenderRef ref="Test Appender"/>
         </Root>
     </Loggers>
 </Configuration>

@@ -22,6 +22,18 @@ subprojects {
     test.finalizedBy jacocoTestReport
 }
 
+project(':javacord-core') {
+    dependencies {
+        testImplementation 'org.apache.logging.log4j:log4j-core:2.11.0'
+        testImplementation 'org.apache.logging.log4j:log4j-core:2.11.0:tests'
+    }
+
+    // Log4J Core has some annotation processor
+    // This suppresses a build warning regarding the processor
+    // With Gradle 5.0 the processor is ignored anyway so then the line can be removed
+    compileTestGroovy.options.compilerArgs << '-proc:none'
+}
+
 if (project.hasProperty('teamcity')) {
     afterEvaluate {
         def dataPaths = subprojects.tasks*.withType(Test).flatten()

@@ -211,7 +211,7 @@ public class RatelimitManager {
      */
     private void calculateOffset(long currentTime, RestRequestResult result) {
         // Double-checked locking for better performance
-        if (api.getTimeOffset() != null) {
+        if ((api.getTimeOffset() != null) || (result == null)) {
             return;
         }
         synchronized (api) {
