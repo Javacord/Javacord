@@ -37,7 +37,8 @@ public class RestRequestResult {
         } else {
             stringBody = body.string();
             ObjectMapper mapper = request.getApi().getObjectMapper();
-            jsonBody = mapper.readTree(stringBody);
+            JsonNode jsonBody = mapper.readTree(stringBody);
+            this.jsonBody = jsonBody == null ? NullNode.getInstance() : jsonBody;
         }
     }
 
