@@ -15,6 +15,13 @@ import java.util.concurrent.CompletableFuture;
 public interface DiscordApiBuilderDelegate {
 
     /**
+     * Sets whether all SSL certificates should be trusted when connecting to the Discord API and websocket.
+     *
+     * @param trustAllCertificates Whether to trust all SSL certificates.
+     */
+    void setTrustAllCertificates(boolean trustAllCertificates);
+
+    /**
      * Sets the token.
      *
      * @param token The token to set.

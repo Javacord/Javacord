@@ -1,9 +1,13 @@
 package org.javacord.core
 
+import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.test.appender.ListAppender
 import org.javacord.api.entity.server.Server
+import org.javacord.api.exception.NotFoundException
 import org.javacord.test.MockProxyManager
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
+import org.mockserver.verify.VerificationTimes
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll
@@ -16,7 +20,7 @@ import java.util.concurrent.CompletionException
 class DiscordApiImplTest extends Specification {
 
     @Subject
-    def api = new DiscordApiImpl(null)
+    def api = new DiscordApiImpl(null, false)
 
     def 'getAllServers returns all servers'() {
         given:
@@ -94,7 +98,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken')
+            def api = new DiscordApiImpl('fakeBotToken', false)
 
         when:
             api.applicationInfo.join()
@@ -102,6 +106,39 @@ class DiscordApiImplTest extends Specification {
         then:
             CompletionException ce = thrown()
             ce.cause instanceof SSLHandshakeException
+    }
+
+    @RestoreSystemProperties
+    def 'REST calls with man-in-the-middle attack allowed do not fail with handshake exception'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            MockProxyManager.setHttpSystemProperties()
+            def api = new DiscordApiImpl('fakeBotToken', true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    def 'allowing man-in-the-middle attacks logs a warning on api instantiation'() {
+        when:
+            new DiscordApiImpl('fakeBotToken', true)
+
+        then:
+            def expectedWarning = 'All SSL certificates are trusted when connecting to the Discord API and websocket.' +
+                    ' This increases the risk of man-in-the-middle attacks!'
+            ListAppender.getListAppender('Test Appender').events
+                    .findAll { it.level == Level.WARN }
+                    .any { it.message.formattedMessage == expectedWarning }
     }
 
 }

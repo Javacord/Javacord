@@ -65,6 +65,22 @@ public class DiscordApiBuilder {
     }
 
     /**
+     * Sets whether all SSL certificates should be trusted when connecting to the Discord API and web socket.
+     * This might for example be necessary when connecting through a decrypting proxy.
+     * Be aware that this also increases the risk of man-in-the-middle attacks, which basically is,
+     * what a decrypting proxy does. Due to this risk, a warning is logged when connecting with this property
+     * set to {@code true}. If you do not care about this risk, you can suppress this warning using your logging
+     * configuration.
+     *
+     * @param trustAllCertificates Whether to trust all SSL certificates.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setTrustAllCertificates(boolean trustAllCertificates) {
+        delegate.setTrustAllCertificates(trustAllCertificates);
+        return this;
+    }
+
+    /**
      * Sets the token which is required for the login process.
      * A tutorial on how to get the token can be found in the
      * <a href="https://github.com/Javacord/Javacord/wiki">Javacord wiki</a>.

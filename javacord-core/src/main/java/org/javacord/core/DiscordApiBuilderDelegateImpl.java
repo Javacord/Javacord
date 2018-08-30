@@ -35,6 +35,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private static final Logger logger = LoggerUtil.getLogger(DiscordApiBuilderDelegateImpl.class);
 
     /**
+     * Whether all SSL certificates should be trusted when connecting to the Discord API and websocket.
+     */
+    private volatile boolean trustAllCertificates = false;
+
+    /**
      * The token which is used to login. Must be present in order to login!
      */
     private volatile String token = null;
@@ -75,8 +80,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
-            new DiscordApiImpl(
-                    accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup, future);
+            new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup,
+                    trustAllCertificates, future);
         }
         return future;
     }
@@ -118,6 +123,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         setCurrentShard(currentShard);
         return result;
+    }
+
+    @Override
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        this.trustAllCertificates = trustAllCertificates;
     }
 
     @Override
@@ -197,7 +207,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     private void setRecommendedTotalShards(CompletableFuture<Void> future) {
-        DiscordApiImpl api = new DiscordApiImpl(token);
+        DiscordApiImpl api = new DiscordApiImpl(token, trustAllCertificates);
         RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(api, RestMethod.GET, RestEndpoint.GATEWAY_BOT);
         botGatewayRequest
                 .execute(RestRequestResult::getJsonBody)

@@ -47,6 +47,7 @@ import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.event.EventDispatcher;
 import org.javacord.core.util.event.ListenerManagerImpl;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
+import org.javacord.core.util.http.TrustAllTrustManager;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.ratelimit.RatelimitManager;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -290,22 +291,24 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
      * Creates a new discord api instance that can be used for auto-ratelimited REST calls,
      * but does not connect to the Discord WebSocket.
      *
-     * @param token The token used to connect without any account type specific prefix.
+     * @param token                The token used to connect without any account type specific prefix.
+     * @param trustAllCertificates Whether to trust all SSL certificates.
      */
-    public DiscordApiImpl(String token) {
-        this(AccountType.BOT, token, 0, 1, false, null);
+    public DiscordApiImpl(String token, boolean trustAllCertificates) {
+        this(AccountType.BOT, token, 0, 1, false, trustAllCertificates, null);
     }
 
     /**
      * Creates a new discord api instance.
      *
-     * @param accountType The account type of the instance.
-     * @param token The token used to connect without any account type specific prefix.
-     * @param currentShard The current shard the bot should connect to.
-     * @param totalShards  The total amount of shards.
+     * @param accountType             The account type of the instance.
+     * @param token                   The token used to connect without any account type specific prefix.
+     * @param currentShard            The current shard the bot should connect to.
+     * @param totalShards             The total amount of shards.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
-     * @param ready The future which will be completed when the connection to Discord was successful.
+     * @param trustAllCertificates    Whether to trust all SSL certificates.
+     * @param ready                   The future which will be completed when the connection to Discord was successful.
      */
     public DiscordApiImpl(
             AccountType accountType,
@@ -313,6 +316,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
             int currentShard,
             int totalShards,
             boolean waitForServersOnStartup,
+            boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
     ) {
         this.accountType = accountType;
@@ -323,15 +327,21 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5)) + (currentShard * 6);
 
-        this.httpClient = new OkHttpClient.Builder()
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
                 .addInterceptor(chain -> chain.proceed(chain.request()
                         .newBuilder()
                         .addHeader("User-Agent", Javacord.USER_AGENT)
                         .build()))
                 .addInterceptor(
                         new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY)
-                )
-                .build();
+                );
+        if (trustAllCertificates) {
+            logger.warn("All SSL certificates are trusted when connecting to the Discord API and websocket. "
+                    + "This increases the risk of man-in-the-middle attacks!");
+            TrustAllTrustManager trustManager = new TrustAllTrustManager();
+            httpClientBuilder.sslSocketFactory(trustManager.createSslSocketFactory(), trustManager);
+        }
+        this.httpClient = httpClientBuilder.build();
         this.eventDispatcher = new EventDispatcher(this);
 
         if (ready != null) {
