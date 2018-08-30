@@ -26,6 +26,9 @@ project(':javacord-core') {
     dependencies {
         testImplementation 'org.apache.logging.log4j:log4j-core:2.11.0'
         testImplementation 'org.apache.logging.log4j:log4j-core:2.11.0:tests'
+        testImplementation 'org.mock-server:mockserver-netty:5.5.0'
+
+        testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
     }
 
     // Log4J Core has some annotation processor
