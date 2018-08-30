@@ -162,4 +162,28 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
     }
 
+    def 'REST calls are done via system default proxy selector configured proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            def defaultProxySelector = ProxySelector.default
+            ProxySelector.default = MockProxyManager.proxySelector
+            def api = new DiscordApiImpl('fakeBotToken', true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            ProxySelector.default = defaultProxySelector
+    }
+
 }
