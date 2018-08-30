@@ -141,4 +141,25 @@ class DiscordApiImplTest extends Specification {
                     .any { it.message.formattedMessage == expectedWarning }
     }
 
+    @RestoreSystemProperties
+    def 'REST calls are done via system properties configured HTTP proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            MockProxyManager.setHttpSystemProperties()
+            def api = new DiscordApiImpl('fakeBotToken', true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
 }
