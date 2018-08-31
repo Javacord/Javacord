@@ -15,6 +15,7 @@ import org.javacord.core.util.rest.RestRequest;
 import org.javacord.core.util.rest.RestRequestResult;
 
 import java.net.Proxy;
+import java.net.ProxySelector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +35,12 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      * The logger of this class.
      */
     private static final Logger logger = LoggerUtil.getLogger(DiscordApiBuilderDelegateImpl.class);
+
+    /**
+     * The proxy selector which should be used to determine the proxies that should be used to connect to the Discord
+     * REST API and websocket.
+     */
+    private volatile ProxySelector proxySelector;
 
     /**
      * The proxy which should be used to connect to the Discord REST API and websocket.
@@ -87,7 +94,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
             new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup,
-                    proxy, trustAllCertificates, future);
+                    proxySelector, proxy, trustAllCertificates, future);
         }
         return future;
     }
@@ -129,6 +136,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         setCurrentShard(currentShard);
         return result;
+    }
+
+    @Override
+    public void setProxySelector(ProxySelector proxySelector) {
+        this.proxySelector = proxySelector;
     }
 
     @Override
@@ -218,7 +230,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     private void setRecommendedTotalShards(CompletableFuture<Void> future) {
-        DiscordApiImpl api = new DiscordApiImpl(token, proxy, trustAllCertificates);
+        DiscordApiImpl api = new DiscordApiImpl(token, proxySelector, proxy, trustAllCertificates);
         RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(api, RestMethod.GET, RestEndpoint.GATEWAY_BOT);
         botGatewayRequest
                 .execute(RestRequestResult::getJsonBody)

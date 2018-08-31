@@ -67,16 +67,47 @@ public class DiscordApiBuilder {
     }
 
     /**
-     * Sets the proxy which should be used to connect to the Discord REST API and web socket.
-     * If this is not set explicitly, {@link ProxySelector#getDefault()} is used to select an appropriate proxy.
+     * Sets the proxy selector which should be used to determine the proxies that should be used to connect to the
+     * Discord REST API and web socket.
+     * If no explicit proxy is configured using {@link #setProxy(Proxy)} and no proxy selector is configured using this
+     * method, {@link ProxySelector#getDefault()} is used to select appropriate proxies.
      * If {@link ProxySelector#setDefault(ProxySelector)} was not used to set a custom proxy selector,
      * the default one evaluates the system properties {@code https.proxyHost}, {@code https.proxyPort},
      * {@code http.nonProxyHosts}, {@code socksProxyHost}, {@code socksProxyPort} and {@code socksProxyVersion} as
      * documented on the <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking
      * Properties</a> page.
      *
+     * <p><b>Note:</b> It is an error to configure an explicit proxy via {@link #setProxy(Proxy)} and a proxy selector
+     * using this method.
+     *
+     * @param proxySelector The proxy selector to set.
+     * @return The current instance in order to chain call methods.
+     * @see #setProxy(Proxy)
+     * @see ProxySelector#getDefault()
+     * @see ProxySelector#setDefault(ProxySelector)
+     * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>
+     */
+    public DiscordApiBuilder setProxySelector(ProxySelector proxySelector) {
+        delegate.setProxySelector(proxySelector);
+        return this;
+    }
+
+    /**
+     * Sets the proxy which should be used to connect to the Discord REST API and web socket.
+     * If this is not set explicitly, the proxy selector configured with {@link #setProxySelector(ProxySelector)} is
+     * used to select appropriate proxies. If both are not set, {@link ProxySelector#getDefault()} is used to select
+     * appropriate proxies. If {@link ProxySelector#setDefault(ProxySelector)} was not used to set a custom proxy
+     * selector, the default one evaluates the system properties {@code https.proxyHost}, {@code https.proxyPort},
+     * {@code http.nonProxyHosts}, {@code socksProxyHost}, {@code socksProxyPort} and {@code socksProxyVersion} as
+     * documented on the <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking
+     * Properties</a> page.
+     *
+     * <p><b>Note:</b> It is an error to configure an explicit proxy using this method and a proxy selector using
+     * {@link #setProxySelector(ProxySelector)}.
+     *
      * @param proxy The proxy to set.
      * @return The current instance in order to chain call methods.
+     * @see #setProxySelector(ProxySelector)
      * @see ProxySelector#getDefault()
      * @see ProxySelector#setDefault(ProxySelector)
      * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>

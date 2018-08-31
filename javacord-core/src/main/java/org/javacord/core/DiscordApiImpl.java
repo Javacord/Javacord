@@ -58,6 +58,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.net.Proxy;
+import java.net.ProxySelector;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -293,11 +294,13 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
      * but does not connect to the Discord WebSocket.
      *
      * @param token                The token used to connect without any account type specific prefix.
+     * @param proxySelector        The proxy selector which should be used to determine the proxies that should be used
+     *                             to connect to the Discord REST API and websocket.
      * @param proxy                The proxy which should be used to connect to the Discord REST API and websocket.
      * @param trustAllCertificates Whether to trust all SSL certificates.
      */
-    public DiscordApiImpl(String token, Proxy proxy, boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, false, proxy, trustAllCertificates, null);
+    public DiscordApiImpl(String token, ProxySelector proxySelector, Proxy proxy, boolean trustAllCertificates) {
+        this(AccountType.BOT, token, 0, 1, false, proxySelector, proxy, trustAllCertificates, null);
     }
 
     /**
@@ -309,6 +312,8 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
      * @param totalShards             The total amount of shards.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
+     * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
+     *                                used to connect to the Discord REST API and websocket.
      * @param proxy                   The proxy which should be used to connect to the Discord REST API and websocket.
      * @param trustAllCertificates    Whether to trust all SSL certificates.
      * @param ready                   The future which will be completed when the connection to Discord was successful.
@@ -319,6 +324,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
             int currentShard,
             int totalShards,
             boolean waitForServersOnStartup,
+            ProxySelector proxySelector,
             Proxy proxy,
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
@@ -331,6 +337,10 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5)) + (currentShard * 6);
 
+        if ((proxySelector != null) && (proxy != null)) {
+            throw new IllegalStateException("proxy and proxySelector must not be configured both");
+        }
+
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
                 .addInterceptor(chain -> chain.proceed(chain.request()
                         .newBuilder()
@@ -340,6 +350,9 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
                         new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY)
                 )
                 .proxy(proxy);
+        if (proxySelector != null) {
+            httpClientBuilder.proxySelector(proxySelector);
+        }
         if (trustAllCertificates) {
             logger.warn("All SSL certificates are trusted when connecting to the Discord API and websocket. "
                     + "This increases the risk of man-in-the-middle attacks!");
