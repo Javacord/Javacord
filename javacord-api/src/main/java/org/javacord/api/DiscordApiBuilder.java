@@ -4,6 +4,8 @@ import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -62,6 +64,26 @@ public class DiscordApiBuilder {
      */
     public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         return delegate.loginShards(shards);
+    }
+
+    /**
+     * Sets the proxy which should be used to connect to the Discord REST API and web socket.
+     * If this is not set explicitly, {@link ProxySelector#getDefault()} is used to select an appropriate proxy.
+     * If {@link ProxySelector#setDefault(ProxySelector)} was not used to set a custom proxy selector,
+     * the default one evaluates the system properties {@code https.proxyHost}, {@code https.proxyPort},
+     * {@code http.nonProxyHosts}, {@code socksProxyHost}, {@code socksProxyPort} and {@code socksProxyVersion} as
+     * documented on the <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking
+     * Properties</a> page.
+     *
+     * @param proxy The proxy to set.
+     * @return The current instance in order to chain call methods.
+     * @see ProxySelector#getDefault()
+     * @see ProxySelector#setDefault(ProxySelector)
+     * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>
+     */
+    public DiscordApiBuilder setProxy(Proxy proxy) {
+        delegate.setProxy(proxy);
+        return this;
     }
 
     /**

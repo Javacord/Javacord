@@ -20,7 +20,7 @@ import java.util.concurrent.CompletionException
 class DiscordApiImplTest extends Specification {
 
     @Subject
-    def api = new DiscordApiImpl(null, false)
+    def api = new DiscordApiImpl(null, null, false)
 
     def 'getAllServers returns all servers'() {
         given:
@@ -98,7 +98,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', false)
+            def api = new DiscordApiImpl('fakeBotToken', null, false)
 
         when:
             api.applicationInfo.join()
@@ -115,7 +115,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', true)
+            def api = new DiscordApiImpl('fakeBotToken', null, true)
 
         when:
             api.applicationInfo.join()
@@ -131,7 +131,7 @@ class DiscordApiImplTest extends Specification {
 
     def 'allowing man-in-the-middle attacks logs a warning on api instantiation'() {
         when:
-            new DiscordApiImpl('fakeBotToken', true)
+            new DiscordApiImpl('fakeBotToken', null, true)
 
         then:
             def expectedWarning = 'All SSL certificates are trusted when connecting to the Discord API and websocket.' +
@@ -148,7 +148,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', true)
+            def api = new DiscordApiImpl('fakeBotToken', null, true)
 
         when:
             api.applicationInfo.join()
@@ -169,7 +169,7 @@ class DiscordApiImplTest extends Specification {
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             def defaultProxySelector = ProxySelector.default
             ProxySelector.default = MockProxyManager.proxySelector
-            def api = new DiscordApiImpl('fakeBotToken', true)
+            def api = new DiscordApiImpl('fakeBotToken', null, true)
 
         when:
             api.applicationInfo.join()
@@ -184,6 +184,25 @@ class DiscordApiImplTest extends Specification {
 
         cleanup:
             ProxySelector.default = defaultProxySelector
+    }
+
+    def 'REST calls are done via explicitly configured proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            def api = new DiscordApiImpl('fakeBotToken', MockProxyManager.proxy, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
     }
 
 }
