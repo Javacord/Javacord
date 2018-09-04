@@ -47,6 +47,7 @@ import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.event.EventDispatcher;
 import org.javacord.core.util.event.ListenerManagerImpl;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
+import org.javacord.core.util.http.DefaultProxyAuthenticator;
 import org.javacord.core.util.http.TrustAllTrustManager;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.ratelimit.RatelimitManager;
@@ -349,6 +350,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
                 .addInterceptor(
                         new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY)
                 )
+                .proxyAuthenticator(new DefaultProxyAuthenticator())
                 .proxy(proxy);
         if (proxySelector != null) {
             httpClientBuilder.proxySelector(proxySelector);

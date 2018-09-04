@@ -1,10 +1,13 @@
 package org.javacord.core
 
+import io.netty.handler.codec.http.HttpHeaderNames
+import okhttp3.Credentials
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.test.appender.ListAppender
 import org.javacord.api.entity.server.Server
 import org.javacord.api.exception.NotFoundException
 import org.javacord.test.MockProxyManager
+import org.mockserver.configuration.ConfigurationProperties
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.verify.VerificationTimes
@@ -231,6 +234,41 @@ class DiscordApiImplTest extends Specification {
 
         and:
             MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @RestoreSystemProperties
+    def 'REST calls through authenticated HTTP proxy use the system default authenticator'() {
+        given:
+            def username = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
+            ConfigurationProperties.httpProxyServerUsername username
+            ConfigurationProperties.httpProxyServerPassword password
+
+        and:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+
+        and:
+            def defaultAuthenticator = Authenticator.theAuthenticator
+            Authenticator.default = Mock(Authenticator) {
+                (1.._) * getPasswordAuthentication() >> new PasswordAuthentication(username, password as char[])
+            }
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            Authenticator.default = defaultAuthenticator
     }
 
 }
