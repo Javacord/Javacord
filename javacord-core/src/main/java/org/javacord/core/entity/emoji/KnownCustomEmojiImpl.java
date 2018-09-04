@@ -113,7 +113,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
 
     @Override
     public String toString() {
-        return String.format("KnownCustomEmoji (id: %s, name: %s, animated: %b, server: %s)",
+        return String.format("KnownCustomEmoji (id: %s, name: %s, animated: %b, server: %#s)",
                 getIdAsString(), getName(), isAnimated(), getServer());
     }
 

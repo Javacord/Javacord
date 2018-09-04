@@ -283,7 +283,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
 
     @Override
     public String toString() {
-        return String.format("Role (id: %s, name: %s, server: %s)", getIdAsString(), getName(), getServer());
+        return String.format("Role (id: %s, name: %s, server: %#s)", getIdAsString(), getName(), getServer());
     }
 
 }
