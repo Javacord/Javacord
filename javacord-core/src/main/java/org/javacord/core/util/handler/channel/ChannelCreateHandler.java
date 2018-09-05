@@ -16,6 +16,7 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.group.GroupChannelCreateEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelCreateEventImpl;
 import org.javacord.core.event.channel.user.PrivateChannelCreateEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -68,7 +69,7 @@ public class ChannelCreateHandler extends PacketHandler {
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             ChannelCategory channelCategory = ((ServerImpl) server).getOrCreateChannelCategory(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(channelCategory);
-            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
         });
     }
 
@@ -83,7 +84,7 @@ public class ChannelCreateHandler extends PacketHandler {
             ServerTextChannel textChannel = ((ServerImpl) server).getOrCreateServerTextChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(textChannel);
 
-            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
         });
     }
 
@@ -98,7 +99,7 @@ public class ChannelCreateHandler extends PacketHandler {
             ServerVoiceChannel voiceChannel = ((ServerImpl) server).getOrCreateServerVoiceChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(voiceChannel);
 
-            api.getEventDispatcher().dispatchServerChannelCreateEvent(server, server, event);
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
         });
     }
 

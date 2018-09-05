@@ -16,6 +16,7 @@ import org.javacord.core.entity.message.embed.EmbedImpl;
 import org.javacord.core.event.message.CachedMessagePinEventImpl;
 import org.javacord.core.event.message.CachedMessageUnpinEventImpl;
 import org.javacord.core.event.message.MessageEditEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -79,7 +80,7 @@ public class MessageUpdateHandler extends PacketHandler {
                         Optional<Server> optionalServer =
                                 msg.getChannel().asServerChannel().map(ServerChannel::getServer);
                         api.getEventDispatcher().dispatchCachedMessagePinEvent(
-                                optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                                optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                                 msg,
                                 optionalServer.orElse(null),
                                 msg.getChannel(),
@@ -90,7 +91,7 @@ public class MessageUpdateHandler extends PacketHandler {
                         Optional<Server> optionalServer =
                                 msg.getChannel().asServerChannel().map(ServerChannel::getServer);
                         api.getEventDispatcher().dispatchCachedMessageUnpinEvent(
-                                optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                                optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                                 msg,
                                 optionalServer.orElse(null),
                                 msg.getChannel(),
@@ -180,7 +181,7 @@ public class MessageUpdateHandler extends PacketHandler {
         Optional<Server> optionalServer =
                 event.getChannel().asServerChannel().map(ServerChannel::getServer);
         api.getEventDispatcher().dispatchMessageEditEvent(
-                optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                 event.getMessageId(),
                 optionalServer.orElse(null),
                 event.getChannel(),

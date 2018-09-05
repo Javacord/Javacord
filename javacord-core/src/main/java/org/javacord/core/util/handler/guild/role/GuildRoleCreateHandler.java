@@ -6,6 +6,7 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.server.role.RoleCreateEvent;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.server.role.RoleCreateEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 /**
@@ -29,7 +30,7 @@ public class GuildRoleCreateHandler extends PacketHandler {
             Role role = ((ServerImpl) server).getOrCreateRole(packet.get("role"));
             RoleCreateEvent event = new RoleCreateEventImpl(role);
 
-            api.getEventDispatcher().dispatchRoleCreateEvent(server, server, event);
+            api.getEventDispatcher().dispatchRoleCreateEvent((DispatchQueueSelector) server, server, event);
         });
     }
 

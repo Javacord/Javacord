@@ -12,6 +12,7 @@ import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.server.role.UserRoleAddEventImpl;
 import org.javacord.core.event.server.role.UserRoleRemoveEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             UserRoleAddEvent event = new UserRoleAddEventImpl(role, user);
 
                             api.getEventDispatcher().dispatchUserRoleAddEvent(
-                                    role.getServer(), role, role.getServer(), user, event);
+                                    (DispatchQueueSelector) role.getServer(), role, role.getServer(), user, event);
                         }
 
                         // Removed roles
@@ -91,7 +92,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             UserRoleRemoveEvent event = new UserRoleRemoveEventImpl(role, user);
 
                             api.getEventDispatcher().dispatchUserRoleRemoveEvent(
-                                    role.getServer(), role, role.getServer(), user, event);
+                                    (DispatchQueueSelector) role.getServer(), role, role.getServer(), user, event);
                         }
                     }
                 });

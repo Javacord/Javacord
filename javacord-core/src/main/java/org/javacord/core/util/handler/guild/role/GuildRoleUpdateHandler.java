@@ -17,6 +17,7 @@ import org.javacord.core.event.server.role.RoleChangeMentionableEventImpl;
 import org.javacord.core.event.server.role.RoleChangeNameEventImpl;
 import org.javacord.core.event.server.role.RoleChangePermissionsEventImpl;
 import org.javacord.core.event.server.role.RoleChangePositionEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.awt.Color;
@@ -49,7 +50,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 RoleChangeColorEvent event = new RoleChangeColorEventImpl(
                         role, role.getColor().orElse(null), oldColorObject);
 
-                api.getEventDispatcher().dispatchRoleChangeColorEvent(role.getServer(), role, role.getServer(), event);
+                api.getEventDispatcher().dispatchRoleChangeColorEvent(
+                        (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
             }
 
             boolean oldHoist = role.isDisplayedSeparately();
@@ -59,7 +61,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
 
                 RoleChangeHoistEvent event = new RoleChangeHoistEventImpl(role, oldHoist);
 
-                api.getEventDispatcher().dispatchRoleChangeHoistEvent(role.getServer(), role, role.getServer(), event);
+                api.getEventDispatcher().dispatchRoleChangeHoistEvent(
+                        (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
             }
 
             boolean oldMentionable = role.isMentionable();
@@ -70,7 +73,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 RoleChangeMentionableEvent event = new RoleChangeMentionableEventImpl(role, oldMentionable);
 
                 api.getEventDispatcher().dispatchRoleChangeMentionableEvent(
-                        role.getServer(), role, role.getServer(), event);
+                        (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
             }
 
             String oldName = role.getName();
@@ -80,7 +83,8 @@ public class GuildRoleUpdateHandler extends PacketHandler {
 
                 RoleChangeNameEvent event = new RoleChangeNameEventImpl(role, newName, oldName);
 
-                api.getEventDispatcher().dispatchRoleChangeNameEvent(role.getServer(), role, role.getServer(), event);
+                api.getEventDispatcher().dispatchRoleChangeNameEvent(
+                        (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
             }
 
             Permissions oldPermissions = role.getPermissions();
@@ -92,7 +96,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                         new RoleChangePermissionsEventImpl(role, newPermissions, oldPermissions);
 
                 api.getEventDispatcher().dispatchRoleChangePermissionsEvent(
-                        role.getServer(), role, role.getServer(), event);
+                        (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
             }
 
             int oldPosition = role.getPosition();
@@ -103,7 +107,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 RoleChangePositionEvent event = new RoleChangePositionEventImpl(role, newPosition, oldPosition);
 
                 api.getEventDispatcher().dispatchRoleChangePositionEvent(
-                        role.getServer(), role, role.getServer(), event);
+                        (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
             }
         });
     }

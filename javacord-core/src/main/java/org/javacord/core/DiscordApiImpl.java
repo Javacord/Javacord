@@ -43,6 +43,7 @@ import org.javacord.core.listener.InternalGloballyAttachableListenerManager;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.concurrent.ThreadPoolImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.event.EventDispatcher;
 import org.javacord.core.util.event.ListenerManagerImpl;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
@@ -78,7 +79,7 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link DiscordApi}.
  */
-public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableListenerManager {
+public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableListenerManager, DispatchQueueSelector {
 
     /**
      * The logger of this class.

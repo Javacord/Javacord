@@ -31,6 +31,7 @@ import org.javacord.core.event.channel.server.ServerChannelChangePositionEventIm
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeBitrateEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -100,7 +101,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerChannelChangeNameEventImpl(channel, newName, oldName);
 
                 api.getEventDispatcher().dispatchServerChannelChangeNameEvent(
-                        channel.getServer(), channel.getServer(), channel, event);
+                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
             }
 
             ChannelCategory oldCategory = channel.asCategorizable().flatMap(Categorizable::getCategory).orElse(null);
@@ -124,7 +125,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         channel, newPosition, oldPosition, newRawPosition, oldRawPosition, newCategory, oldCategory);
 
                 api.getEventDispatcher().dispatchServerChannelChangePositionEvent(
-                        channel.getServer(), channel.getServer(), channel, event);
+                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
             }
 
             Collection<Long> rolesWithOverwrittenPermissions = new HashSet<>();
@@ -214,7 +215,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
                 api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
-                        channel.getServer(), channel, channel.getServer(), null, event);
+                        (DispatchQueueSelector) channel.getServer(), channel, channel.getServer(), null, event);
             }
         });
     }
@@ -237,7 +238,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerTextChannelChangeTopicEventImpl(channel, newTopic, oldTopic);
 
                 api.getEventDispatcher().dispatchServerTextChannelChangeTopicEvent(
-                        channel.getServer(), channel.getServer(), channel, event);
+                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
             }
 
             boolean oldNsfwFlag = channel.isNsfw();
@@ -248,7 +249,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
                 api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
-                        channel.getServer(), null, channel.getServer(), channel, event);
+                        (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel, event);
             }
         });
     }
@@ -269,7 +270,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerVoiceChannelChangeBitrateEventImpl(channel, newBitrate, oldBitrate);
 
                 api.getEventDispatcher().dispatchServerVoiceChannelChangeBitrateEvent(
-                        channel.getServer(), channel.getServer(), channel, event);
+                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
             }
 
             int oldUserLimit = channel.getUserLimit().orElse(0);
@@ -280,7 +281,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerVoiceChannelChangeUserLimitEventImpl(channel, newUserLimit, oldUserLimit);
 
                 api.getEventDispatcher().dispatchServerVoiceChannelChangeUserLimitEvent(
-                        channel.getServer(), channel.getServer(), channel, event);
+                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
             }
         });
     }
@@ -335,7 +336,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         channel, newPermissions, oldPermissions, entity);
 
         api.getEventDispatcher().dispatchServerChannelChangeOverwrittenPermissionsEvent(
-                channel.getServer(),
+                (DispatchQueueSelector) channel.getServer(),
                 (entity instanceof Role) ? (Role) entity : null,
                 channel.getServer(),
                 channel,

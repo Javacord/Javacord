@@ -7,6 +7,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.core.event.message.MessageCreateEventImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class MessageCreateHandler extends PacketHandler {
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
             api.getEventDispatcher().dispatchMessageCreateEvent(
-                    optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                    optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                     optionalServer.orElse(null),
                     channel,
                     message.getUserAuthor().orElse(null),

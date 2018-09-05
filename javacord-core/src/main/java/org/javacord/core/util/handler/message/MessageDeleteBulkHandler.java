@@ -7,6 +7,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageDeleteEvent;
 import org.javacord.core.event.message.MessageDeleteEventImpl;
 import org.javacord.core.util.cache.MessageCacheImpl;
+import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class MessageDeleteBulkHandler extends PacketHandler {
 
                 Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
                 api.getEventDispatcher().dispatchMessageDeleteEvent(
-                        optionalServer.flatMap(Optional::<Object>of).orElse(api),
+                        optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                         messageId,
                         optionalServer.orElse(null),
                         channel,
