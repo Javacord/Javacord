@@ -532,7 +532,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
                 author.put("icon_url", authorIconUrl);
             }
             if (authorIconContainer != null) {
-                author.put("url", "attachment://" + authorIconContainer.getFileTypeOrName());
+                author.put("icon_url", "attachment://" + authorIconContainer.getFileTypeOrName());
             }
         }
         if (thumbnailUrl != null && !thumbnailUrl.equals("")) {
