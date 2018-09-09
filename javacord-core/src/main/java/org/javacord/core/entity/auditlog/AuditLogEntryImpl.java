@@ -236,7 +236,7 @@ public class AuditLogEntryImpl implements AuditLogEntry {
             Icon oldIcon = oldVal != null ? new IconImpl(getApi(), new URL(baseUrl + getTarget()
                     .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldVal.asText() + ".png")) : null;
             Icon newIcon = newVal != null ? new IconImpl(getApi(), new URL(baseUrl + getTarget()
-                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + oldVal.asText() + ".png")) : null;
+                    .map(DiscordEntity::getIdAsString).orElse("0") + "/" + newVal.asText() + ".png")) : null;
             return new AuditLogChangeImpl<>(type, oldIcon, newIcon);
         } catch (MalformedURLException e) {
             logger.warn("Seems like the icon's url is malformed! Please contact the developer!", e);
