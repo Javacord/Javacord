@@ -3,6 +3,7 @@ package org.javacord.api.internal;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.util.auth.Authenticator;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -30,6 +31,13 @@ public interface DiscordApiBuilderDelegate {
      * @param proxy The poxy to set.
      */
     void setProxy(Proxy proxy);
+
+    /**
+     * Sets the authenticator that should be used to authenticate against proxies that require it.
+     *
+     * @param authenticator The proxy authenticator to set.
+     */
+    void setProxyAuthenticator(Authenticator authenticator);
 
     /**
      * Sets whether all SSL certificates should be trusted when connecting to the Discord API and websocket.

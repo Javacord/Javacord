@@ -26,6 +26,7 @@ import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
+import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.concurrent.ThreadPool;
 import org.javacord.api.util.event.ListenerManager;
 import org.javacord.core.entity.activity.ActivityImpl;
@@ -47,7 +48,7 @@ import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.event.EventDispatcher;
 import org.javacord.core.util.event.ListenerManagerImpl;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
-import org.javacord.core.util.http.DefaultProxyAuthenticator;
+import org.javacord.core.util.http.ProxyAuthenticator;
 import org.javacord.core.util.http.TrustAllTrustManager;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.ratelimit.RatelimitManager;
@@ -298,10 +299,13 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
      * @param proxySelector        The proxy selector which should be used to determine the proxies that should be used
      *                             to connect to the Discord REST API and websocket.
      * @param proxy                The proxy which should be used to connect to the Discord REST API and websocket.
+     * @param proxyAuthenticator   The authenticator that should be used to authenticate against proxies that require
+     *                             it.
      * @param trustAllCertificates Whether to trust all SSL certificates.
      */
-    public DiscordApiImpl(String token, ProxySelector proxySelector, Proxy proxy, boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, false, proxySelector, proxy, trustAllCertificates, null);
+    public DiscordApiImpl(String token, ProxySelector proxySelector, Proxy proxy, Authenticator proxyAuthenticator,
+                          boolean trustAllCertificates) {
+        this(AccountType.BOT, token, 0, 1, false, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
     }
 
     /**
@@ -316,6 +320,8 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
      * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
      *                                used to connect to the Discord REST API and websocket.
      * @param proxy                   The proxy which should be used to connect to the Discord REST API and websocket.
+     * @param proxyAuthenticator      The authenticator that should be used to authenticate against proxies that require
+     *                                it.
      * @param trustAllCertificates    Whether to trust all SSL certificates.
      * @param ready                   The future which will be completed when the connection to Discord was successful.
      */
@@ -327,6 +333,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
             boolean waitForServersOnStartup,
             ProxySelector proxySelector,
             Proxy proxy,
+            Authenticator proxyAuthenticator,
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
     ) {
@@ -350,7 +357,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
                 .addInterceptor(
                         new HttpLoggingInterceptor(LoggerUtil.getLogger(OkHttpClient.class)::trace).setLevel(Level.BODY)
                 )
-                .proxyAuthenticator(new DefaultProxyAuthenticator())
+                .proxyAuthenticator(new ProxyAuthenticator(proxyAuthenticator))
                 .proxy(proxy);
         if (proxySelector != null) {
             httpClientBuilder.proxySelector(proxySelector);

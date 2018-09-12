@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
+import org.javacord.api.util.auth.Authenticator;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.PrivacyProtectionLogger;
@@ -46,6 +47,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      * The proxy which should be used to connect to the Discord REST API and websocket.
      */
     private volatile Proxy proxy;
+
+    /**
+     * The authenticator that should be used to authenticate against proxies that require it.
+     */
+    private volatile Authenticator proxyAuthenticator;
 
     /**
      * Whether all SSL certificates should be trusted when connecting to the Discord API and websocket.
@@ -94,7 +100,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
             new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup,
-                    proxySelector, proxy, trustAllCertificates, future);
+                    proxySelector, proxy, proxyAuthenticator, trustAllCertificates, future);
         }
         return future;
     }
@@ -146,6 +152,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public void setProxy(Proxy proxy) {
         this.proxy = proxy;
+    }
+
+    @Override
+    public void setProxyAuthenticator(Authenticator authenticator) {
+        proxyAuthenticator = authenticator;
     }
 
     @Override
@@ -230,7 +241,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     private void setRecommendedTotalShards(CompletableFuture<Void> future) {
-        DiscordApiImpl api = new DiscordApiImpl(token, proxySelector, proxy, trustAllCertificates);
+        DiscordApiImpl api = new DiscordApiImpl(token, proxySelector, proxy, proxyAuthenticator, trustAllCertificates);
         RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(api, RestMethod.GET, RestEndpoint.GATEWAY_BOT);
         botGatewayRequest
                 .execute(RestRequestResult::getJsonBody)

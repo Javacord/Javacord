@@ -23,7 +23,7 @@ import java.util.concurrent.CompletionException
 class DiscordApiImplTest extends Specification {
 
     @Subject
-    def api = new DiscordApiImpl(null, null, null, false)
+    def api = new DiscordApiImpl(null, null, null, null, false)
 
     def 'getAllServers returns all servers'() {
         given:
@@ -101,7 +101,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', null, null, false)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, false)
 
         when:
             api.applicationInfo.join()
@@ -118,7 +118,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -134,7 +134,7 @@ class DiscordApiImplTest extends Specification {
 
     def 'allowing man-in-the-middle attacks logs a warning on api instantiation'() {
         when:
-            new DiscordApiImpl('fakeBotToken', null, null, true)
+            new DiscordApiImpl('fakeBotToken', null, null, null, true)
 
         then:
             def expectedWarning = 'All SSL certificates are trusted when connecting to the Discord API and websocket.' +
@@ -151,7 +151,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -172,7 +172,7 @@ class DiscordApiImplTest extends Specification {
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             def defaultProxySelector = ProxySelector.default
             ProxySelector.default = MockProxyManager.proxySelector
-            def api = new DiscordApiImpl('fakeBotToken', null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -194,7 +194,7 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.mockProxy.when(
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, null, true)
 
         when:
             api.applicationInfo.join()
@@ -210,7 +210,7 @@ class DiscordApiImplTest extends Specification {
 
     def 'configuring proxy and proxySelector throws an IllegalStateException'() {
         when:
-            new DiscordApiImpl('fakeBotToken', Stub(ProxySelector), Proxy.NO_PROXY, true)
+            new DiscordApiImpl('fakeBotToken', Stub(ProxySelector), Proxy.NO_PROXY, null, true)
 
         then:
             IllegalStateException ise = thrown()
@@ -222,7 +222,7 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.mockProxy.when(
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-            def api = new DiscordApiImpl('fakeBotToken', MockProxyManager.proxySelector, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', MockProxyManager.proxySelector, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -254,7 +254,7 @@ class DiscordApiImplTest extends Specification {
             Authenticator.default = Mock(Authenticator) {
                 (1.._) * getPasswordAuthentication() >> new PasswordAuthentication(username, password as char[])
             }
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, null, true)
 
         when:
             api.applicationInfo.join()
@@ -269,6 +269,38 @@ class DiscordApiImplTest extends Specification {
 
         cleanup:
             Authenticator.default = defaultAuthenticator
+    }
+
+    @RestoreSystemProperties
+    def 'REST calls through authenticated HTTP proxy use an explicit authenticator'() {
+        given:
+            def username = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
+            String credentials = Credentials.basic username, password
+            ConfigurationProperties.httpProxyServerUsername username
+            ConfigurationProperties.httpProxyServerPassword password
+
+        and:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+
+        and:
+            org.javacord.api.util.auth.Authenticator authenticator = Mock {
+                (1.._) * authenticate(_, _, _) >> [(HttpHeaderNames.PROXY_AUTHORIZATION as String): [null, credentials]]
+            }
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, authenticator, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
     }
 
 }

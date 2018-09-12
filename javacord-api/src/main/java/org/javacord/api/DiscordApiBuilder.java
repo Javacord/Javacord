@@ -2,6 +2,7 @@ package org.javacord.api;
 
 import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
+import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.net.Proxy;
@@ -83,6 +84,7 @@ public class DiscordApiBuilder {
      * @param proxySelector The proxy selector to set.
      * @return The current instance in order to chain call methods.
      * @see #setProxy(Proxy)
+     * @see #setProxyAuthenticator(Authenticator)
      * @see ProxySelector#getDefault()
      * @see ProxySelector#setDefault(ProxySelector)
      * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>
@@ -107,6 +109,7 @@ public class DiscordApiBuilder {
      *
      * @param proxy The proxy to set.
      * @return The current instance in order to chain call methods.
+     * @see #setProxyAuthenticator(Authenticator)
      * @see #setProxySelector(ProxySelector)
      * @see ProxySelector#getDefault()
      * @see ProxySelector#setDefault(ProxySelector)
@@ -114,6 +117,24 @@ public class DiscordApiBuilder {
      */
     public DiscordApiBuilder setProxy(Proxy proxy) {
         delegate.setProxy(proxy);
+        return this;
+    }
+
+    /**
+     * Sets the authenticator that should be used to authenticate against proxies that require it.
+     * If this is not set explicitly, the authenticator configured with
+     * {@link java.net.Authenticator#setDefault(java.net.Authenticator)}, if any, is used to get credentials for
+     * {@code Basic} auth if the proxy supports it. If you need to support a more sophisticated authentication algorithm
+     * or scheme, use this method to set an own authenticator.
+     *
+     * @param authenticator The proxy authenticator to set.
+     * @return The current instance in order to chain call methods.
+     * @see #setProxy(Proxy)
+     * @see #setProxySelector(ProxySelector)
+     * @see java.net.Authenticator#setDefault(java.net.Authenticator)
+     */
+    public DiscordApiBuilder setProxyAuthenticator(Authenticator authenticator) {
+        delegate.setProxyAuthenticator(authenticator);
         return this;
     }
 
