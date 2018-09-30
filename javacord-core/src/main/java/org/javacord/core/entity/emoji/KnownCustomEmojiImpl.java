@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.listener.server.emoji.InternalKnownCustomEmojiAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -109,6 +110,29 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     @Override
     public boolean isManaged() {
         return managed;
+    }
+
+    @Override
+    public CompletableFuture<User> requestCreator() {
+        CompletableFuture<User> future = new CompletableFuture<>();
+        new RestRequest<User>(getApi(), RestMethod.GET, RestEndpoint.CUSTOM_EMOJI)
+                .setUrlParameters(server.getIdAsString(), Long.toUnsignedString(getId()))
+                .execute(result -> {
+                    JsonNode jsonBody = result.getJsonBody();
+                    if (jsonBody.has("user")) {
+                        long id = jsonBody.get("user").get("id").asLong();
+                        return getApi().getCachedUserById(id)
+                                .orElseGet(() -> getApi().getUserById(id).join());
+                    }
+                    return null;
+                }).thenAcceptAsync(userResponse -> {
+                    if (userResponse == null) {
+                        future.completeExceptionally(new NullPointerException("No creator was found!"));
+                    } else {
+                        future.complete(userResponse);
+                    }
+                });
+        return future;
     }
 
     @Override
