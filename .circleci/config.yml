@@ -78,11 +78,12 @@ jobs:
           name: Collecting test results
           command: |
             mkdir ~/test-results
+            cd build
             find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
-              [ -d {}/build/test-results/test ] &&
-              [ -n "$(ls -A {}/build/test-results/test)" ] &&
+              [ -d {}/test-results/test ] &&
+              [ -n "$(ls -A {}/test-results/test)" ] &&
               mkdir ~/test-results/{} &&
-              cp -a {}/build/test-results/test/* ~/test-results/{} || true
+              cp -a {}/test-results/test/* ~/test-results/{} || true
               ' \;
           when: always
 
@@ -94,18 +95,19 @@ jobs:
           name: Collecting artifacts
           command: |
             mkdir ~/artifacts
+            cd build
             find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
-              [ -d {}/build/libs ] &&
-              [ -n "$(ls -A {}/build/libs)" ] &&
+              [ -d {}/libs ] &&
+              [ -n "$(ls -A {}/libs)" ] &&
               mkdir ~/artifacts/{} &&
-              cp -a {}/build/libs/* ~/artifacts/{} || true
+              cp -a {}/libs/* ~/artifacts/{} || true
               ' \;
             find -mindepth 1 -maxdepth 1 -type d -exec sh -c '
-              [ -d {}/build/reports/tests/test ] &&
-              [ -n "$(ls -A {}/build/reports/tests/test)" ] &&
+              [ -d {}/reports/tests/test ] &&
+              [ -n "$(ls -A {}/reports/tests/test)" ] &&
               { [ ! -d ~/artifacts/{} ] && mkdir ~/artifacts/{} || true; } &&
               mkdir ~/artifacts/{}/test-report &&
-              cp -a {}/build/reports/tests/test/* ~/artifacts/{}/test-report || true
+              cp -a {}/reports/tests/test/* ~/artifacts/{}/test-report || true
               ' \;
           when: always
 
