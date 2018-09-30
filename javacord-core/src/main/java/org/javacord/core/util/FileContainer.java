@@ -79,7 +79,7 @@ public class FileContainer {
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileTypeOrName = type;
+        setFileTypeOrName(type);
     }
 
     /**
@@ -166,6 +166,9 @@ public class FileContainer {
      */
     public void setFileTypeOrName(String type) {
         fileTypeOrName = type;
+        if ((fileAsBufferedImage != null) && !ImageIO.getImageWritersByFormatName(getFileType()).hasNext()) {
+            throw new IllegalArgumentException(String.format("No image writer found for format \"%s\"", getFileType()));
+        }
     }
 
     /**
@@ -249,7 +252,7 @@ public class FileContainer {
         try {
             if (fileAsBufferedImage != null) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(fileAsBufferedImage, fileTypeOrName, os);
+                ImageIO.write(fileAsBufferedImage, getFileType(), os);
                 future.complete(new ByteArrayInputStream(os.toByteArray()));
                 return future;
             }
