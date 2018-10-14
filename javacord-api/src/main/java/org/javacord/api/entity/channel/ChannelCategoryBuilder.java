@@ -1,6 +1,9 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
+import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -34,6 +37,20 @@ public class ChannelCategoryBuilder extends ServerChannelBuilder {
     @Override
     public ChannelCategoryBuilder setName(String name) {
         delegate.setName(name);
+        return this;
+    }
+
+    @Override
+    public <T extends Permissionable & DiscordEntity> ChannelCategoryBuilder addPermissionOverwrite(
+                T permissionable, Permissions permissions) {
+        delegate.addPermissionOverwrite(permissionable, permissions);
+        return this;
+    }
+
+    @Override
+    public <T extends Permissionable & DiscordEntity> ChannelCategoryBuilder removePermissionOverwrite(
+                T permissionable) {
+        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 
