@@ -4,7 +4,7 @@ import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 
 /**
- * This listener listens to servers becoming unavailable.
+ * This listener listens to servers becoming available.
  * Unavailability means, that a Discord server is down due to a temporary outage.
  *
  * @see <a href="https://discordapp.com/developers/docs/topics/gateway#guild-unavailability">Discord docs</a>
