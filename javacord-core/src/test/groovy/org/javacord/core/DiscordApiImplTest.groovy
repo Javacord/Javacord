@@ -4,6 +4,7 @@ import io.netty.handler.codec.http.HttpHeaderNames
 import okhttp3.Credentials
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.test.appender.ListAppender
+import org.javacord.api.AccountType
 import org.javacord.api.entity.server.Server
 import org.javacord.api.exception.NotFoundException
 import org.javacord.test.MockProxyManager
@@ -11,6 +12,8 @@ import org.mockserver.configuration.ConfigurationProperties
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.verify.VerificationTimes
+import spock.lang.IgnoreIf
+import spock.lang.PendingFeature
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll
@@ -194,7 +197,7 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.mockProxy.when(
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, null, true)
 
         when:
             api.applicationInfo.join()
@@ -254,7 +257,7 @@ class DiscordApiImplTest extends Specification {
             Authenticator.default = Mock(Authenticator) {
                 (1.._) * getPasswordAuthentication() >> new PasswordAuthentication(username, password as char[])
             }
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, null, true)
 
         when:
             api.applicationInfo.join()
@@ -289,7 +292,7 @@ class DiscordApiImplTest extends Specification {
             org.javacord.api.util.auth.Authenticator authenticator = Mock {
                 (1.._) * authenticate(_, _, _) >> [(HttpHeaderNames.PROXY_AUTHORIZATION as String): [null, credentials]]
             }
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxy, authenticator, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, authenticator, true)
 
         when:
             api.applicationInfo.join()
@@ -301,6 +304,111 @@ class DiscordApiImplTest extends Specification {
 
         and:
             MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @IgnoreIf({
+        // SOCKS4 implementation in Java 8 is broken and never used
+        // but always SOCKS5, so do not execute this test on Java 8
+        def javaVersion = System.properties.'java.version'
+        javaVersion.startsWith('1.8.') || (javaVersion == '1.8') ||
+                javaVersion.startsWith('8.') || (javaVersion == '8')
+    })
+    @PendingFeature(exceptions = MissingMethodException,
+            reason = 'OkHttp does not resolve the hostname currently, so SOCKS4 cannot work')
+    @RestoreSystemProperties
+    def 'REST calls are done via system properties configured SOCKS4 proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            MockProxyManager.setSocks4SystemProperties()
+
+        and:
+            def api = new DiscordApiImpl(AccountType.BOT, 'fakeBotToken', 0, 1, false, null, null, null, true, null,
+                    { [InetAddress.getLoopbackAddress()] })
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @IgnoreIf({
+        // SOCKS5 implementation in Java 8 is broken when the answer
+        // contains a domain type address which MockProxy supplies,
+        // so do not execute this test on Java 8
+        def javaVersion = System.properties.'java.version'
+        javaVersion.startsWith('1.8.') || (javaVersion == '1.8') ||
+                javaVersion.startsWith('8.') || (javaVersion == '8')
+    })
+    @RestoreSystemProperties
+    def 'REST calls are done via system properties configured SOCKS5 proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            MockProxyManager.setSocks5SystemProperties()
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @IgnoreIf({
+        // SOCKS5 implementation in Java 8 is broken when the answer
+        // contains a domain type address which MockProxy supplies,
+        // so do not execute this test on Java 8
+        def javaVersion = System.properties.'java.version'
+        javaVersion.startsWith('1.8.') || (javaVersion == '1.8') ||
+                javaVersion.startsWith('8.') || (javaVersion == '8')
+    })
+    @RestoreSystemProperties
+    def 'REST calls through authenticated SOCKS5 proxy use the system default authenticator'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.socksProxy, null, true)
+
+        and:
+            def username = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
+            ConfigurationProperties.socksProxyServerUsername username
+            ConfigurationProperties.socksProxyServerPassword password
+
+        and:
+            def defaultAuthenticator = Authenticator.theAuthenticator
+            Authenticator.default = Mock(Authenticator) {
+                (1.._) * getPasswordAuthentication() >> new PasswordAuthentication(username, password as char[])
+            }
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            Authenticator.default = defaultAuthenticator
     }
 
 }
