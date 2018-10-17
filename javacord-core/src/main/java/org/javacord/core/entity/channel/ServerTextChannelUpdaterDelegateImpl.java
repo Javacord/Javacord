@@ -32,6 +32,16 @@ public class ServerTextChannelUpdaterDelegateImpl extends ServerChannelUpdaterDe
     protected boolean modifyCategory = false;
 
     /**
+     * The slowmode delay.
+     */
+    protected int delay = 0;
+
+    /**
+     * Whether the slowmode delay should be modified or not.
+     */
+    protected boolean modifyDelay = false;
+
+    /**
      * Creates a new server text channel updater delegate.
      *
      * @param channel The channel to update.
@@ -62,6 +72,12 @@ public class ServerTextChannelUpdaterDelegateImpl extends ServerChannelUpdaterDe
     }
 
     @Override
+    public void setSlowmodeDelayinSeconds(int delay) {
+        this.delay = delay;
+        this.modifyDelay = true;
+    }
+
+    @Override
     protected boolean prepareUpdateBody(ObjectNode body) {
         boolean patchChannel = super.prepareUpdateBody(body);
         if (topic != null) {
@@ -74,6 +90,10 @@ public class ServerTextChannelUpdaterDelegateImpl extends ServerChannelUpdaterDe
         }
         if (modifyCategory) {
             body.put("parent_id", category == null ? null : category.getIdAsString());
+            patchChannel = true;
+        }
+        if (modifyDelay) {
+            body.put("rate_limit_per_user", delay);
             patchChannel = true;
         }
         return patchChannel;

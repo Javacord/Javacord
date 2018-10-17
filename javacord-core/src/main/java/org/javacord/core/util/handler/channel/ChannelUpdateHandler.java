@@ -14,6 +14,7 @@ import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeNsfwFlagEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangePositionEvent;
+import org.javacord.api.event.channel.server.text.ServerTextChannelChangeSlowmodeEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeTopicEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeBitrateEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEvent;
@@ -28,6 +29,7 @@ import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNsfwFlagEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeOverwrittenPermissionsEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangePositionEventImpl;
+import org.javacord.core.event.channel.server.text.ServerTextChannelChangeSlowmodeEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeBitrateEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEventImpl;
@@ -250,6 +252,18 @@ public class ChannelUpdateHandler extends PacketHandler {
 
                 api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
                         (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel, event);
+            }
+
+            int oldSlowmodeDelay = channel.getSlowmodeDelayInSeconds();
+            int newSlowmodeDelay = jsonChannel.get("rate_limit_per_user").asInt(0);
+            if (oldSlowmodeDelay != newSlowmodeDelay) {
+                channel.setSlowmodeDelayInSeconds(newSlowmodeDelay);
+                ServerTextChannelChangeSlowmodeEvent event =
+                        new ServerTextChannelChangeSlowmodeEventImpl(channel, oldSlowmodeDelay, newSlowmodeDelay);
+
+                api.getEventDispatcher().dispatchServerTextChannelChangeSlowmodeEvent(
+                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
+                );
             }
         });
     }

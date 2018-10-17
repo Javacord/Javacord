@@ -70,6 +70,26 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
         return this;
     }
 
+    /**
+     * Set the delay for slowmode.
+     *
+     * @param delay The delay in seconds.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerTextChannelUpdater setSlowmodeDelayInSeconds(int delay) {
+        delegate.setSlowmodeDelayinSeconds(delay);
+        return this;
+    }
+
+    /**
+     * Unset the slowmode.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerTextChannelUpdater unsetSlowmode() {
+        return this.setSlowmodeDelayInSeconds(0);
+    }
+
     @Override
     public ServerTextChannelUpdater setAuditLogReason(String reason) {
         delegate.setAuditLogReason(reason);
