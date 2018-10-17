@@ -10,6 +10,10 @@ subprojects {
         testRuntimeOnly 'org.objenesis:objenesis'
     }
 
+    jacoco {
+        toolVersion '0.8.2'
+    }
+
     // we don't need aggregation from multiple runs and it prevents caching of the task
     tasks.withType(Test) {
         jacoco.append false
