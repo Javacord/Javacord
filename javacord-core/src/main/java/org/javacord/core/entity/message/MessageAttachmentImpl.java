@@ -140,12 +140,12 @@ public class MessageAttachmentImpl implements MessageAttachment {
 
     @Override
     public CompletableFuture<byte[]> downloadAsByteArray() {
-        return new FileContainer(getProxyUrl()).asByteArray(getApi());
+        return new FileContainer(getUrl()).asByteArray(getApi());
     }
 
     @Override
     public CompletableFuture<BufferedImage> downloadAsImage() {
-        return new FileContainer(getProxyUrl()).asBufferedImage(getApi());
+        return new FileContainer(getUrl()).asBufferedImage(getApi());
     }
 
     @Override
