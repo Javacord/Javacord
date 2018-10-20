@@ -62,6 +62,17 @@ public class ServerTextChannelBuilder extends ServerChannelBuilder {
         return this;
     }
 
+    /**
+     * Sets the slowmode of the channel.
+     *
+     * @param delay The delay in seconds.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerTextChannelBuilder setSlowmodeDelayInSeconds(int delay) {
+        delegate.setSlowmodeDelayInSeconds(delay);
+        return this;
+    }
+
     @Override
     public <T extends Permissionable & DiscordEntity> ServerTextChannelBuilder addPermissionOverwrite(
             T permissionable, Permissions permissions) {

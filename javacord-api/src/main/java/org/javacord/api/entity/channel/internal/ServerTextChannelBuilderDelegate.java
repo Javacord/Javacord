@@ -27,10 +27,16 @@ public interface ServerTextChannelBuilderDelegate extends ServerChannelBuilderDe
     void setCategory(ChannelCategory category);
 
     /**
+     * Sets the slowmode delay of the channel.
+     *
+     * @param delay The delay in seconds.
+     */
+    void setSlowmodeDelayInSeconds(int delay);
+
+    /**
      * Creates the server text channel.
      *
      * @return The created text channel.
      */
     CompletableFuture<ServerTextChannel> create();
-
 }

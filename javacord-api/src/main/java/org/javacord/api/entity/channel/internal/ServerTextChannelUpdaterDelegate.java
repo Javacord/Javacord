@@ -35,4 +35,11 @@ public interface ServerTextChannelUpdaterDelegate extends ServerChannelUpdaterDe
      */
     void removeCategory();
 
+    /**
+     * Sets the slowmode delay.
+     *
+     * @param delay The delay in seconds.
+     */
+    void setSlowmodeDelayinSeconds(int delay);
+
 }

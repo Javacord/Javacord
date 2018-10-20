@@ -29,6 +29,16 @@ public class ServerTextChannelBuilderDelegateImpl extends ServerChannelBuilderDe
     private ChannelCategory category = null;
 
     /**
+     * The slowmode delay of the channel.
+     */
+    private int delay;
+
+    /**
+     * Whether the delay has been modified from the original value.
+     */
+    private boolean delayModified;
+
+    /**
      * Creates a new server text channel builder delegate.
      *
      * @param server The server of the server text channel.
@@ -48,6 +58,12 @@ public class ServerTextChannelBuilderDelegateImpl extends ServerChannelBuilderDe
     }
 
     @Override
+    public void setSlowmodeDelayInSeconds(int delay) {
+        this.delay = delay;
+        delayModified = true;
+    }
+
+    @Override
     public CompletableFuture<ServerTextChannel> create() {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("type", 0);
@@ -57,6 +73,9 @@ public class ServerTextChannelBuilderDelegateImpl extends ServerChannelBuilderDe
         }
         if (category != null) {
             body.put("parent_id", category.getIdAsString());
+        }
+        if (delayModified) {
+            body.put("rate_limit_per_user", delay);
         }
         return new RestRequest<ServerTextChannel>(server.getApi(), RestMethod.POST, RestEndpoint.SERVER_CHANNEL)
                 .setUrlParameters(server.getIdAsString())

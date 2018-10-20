@@ -42,6 +42,11 @@ public class ServerTextChannelImpl extends ServerChannelImpl
     private volatile String topic;
 
     /**
+     * The slowmode delay of the channel.
+     */
+    private volatile int delay;
+
+    /**
      * Creates a new server text channel object.
      *
      * @param api The discord api instance.
@@ -53,6 +58,7 @@ public class ServerTextChannelImpl extends ServerChannelImpl
         nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
         parentId = Long.valueOf(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
         topic = data.has("topic") && !data.get("topic").isNull() ? data.get("topic").asText() : "";
+        delay = data.has("rate_limit_per_user") ? data.get("rate_limit_per_user").asInt(0) : 0;
         messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
@@ -83,6 +89,20 @@ public class ServerTextChannelImpl extends ServerChannelImpl
      */
     public void setParentId(long parentId) {
         this.parentId = parentId;
+    }
+
+    /**
+     * Sets the slowmode delay of the channel.
+     *
+     * @param delay The delay in seconds.
+     */
+    public void setSlowmodeDelayInSeconds(int delay) {
+        this.delay = delay;
+    }
+
+    @Override
+    public int getSlowmodeDelayInSeconds() {
+        return delay;
     }
 
     @Override
