@@ -78,7 +78,9 @@ import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -1327,6 +1329,38 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             return messages.values().stream()
                     .map(Reference::get)
                     .filter(Objects::nonNull).collect(Collectors.toCollection(MessageSetImpl::new));
+        }
+    }
+
+    /**
+     * Get messages from the cache that satisfy a given condition.
+     *
+     * @param filter The filter for messages to be included.
+     * @return A set of cached messages satisfying the condition.
+     */
+    public MessageSet getCachedMessagesWhere(Predicate<Message> filter) {
+        synchronized (messages) {
+            return messages.values().stream()
+                    .map(Reference::get)
+                    .filter(Objects::nonNull)
+                    .filter(filter)
+                    .collect(Collectors.toCollection(MessageSetImpl::new));
+        }
+    }
+
+    /**
+     * Execute a task for every message in cache that satisfied a given condition.
+     *
+     * @param filter The condition on which to execute the code.
+     * @param action The action to be applied to the messages.
+     */
+    public void forEachCachedMessageWhere(Predicate<Message> filter, Consumer<Message> action) {
+        synchronized (messages) {
+            messages.values().stream()
+                    .map(Reference::get)
+                    .filter(Objects::nonNull)
+                    .filter(filter)
+                    .forEach(action);
         }
     }
 

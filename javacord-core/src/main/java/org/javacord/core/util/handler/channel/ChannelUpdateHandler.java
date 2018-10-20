@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Handles the channel update packet.
@@ -128,6 +129,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             }
         }
 
+        final AtomicBoolean areYouAffected = new AtomicBoolean(false);
         ChannelCategory oldCategory = channel.asCategorizable().flatMap(Categorizable::getCategory).orElse(null);
         ChannelCategory newCategory = jsonChannel.hasNonNull("parent_id")
                 ? channel.getServer().getChannelCategoryById(jsonChannel.get("parent_id").asLong(-1)).orElse(null)
@@ -142,7 +144,6 @@ public class ChannelUpdateHandler extends PacketHandler {
                 ((ServerVoiceChannelImpl) channel).setParentId(newCategory == null ? -1 : newCategory.getId());
             }
             channel.setPosition(newRawPosition);
-
             int newPosition = channel.getPosition();
 
             ServerChannelChangePositionEvent event = new ServerChannelChangePositionEventImpl(
@@ -188,6 +189,9 @@ public class ChannelUpdateHandler extends PacketHandler {
                     if (server.isReady()) {
                         dispatchServerChannelChangeOverwrittenPermissionsEvent(
                                 channel, newOverwrittenPermissions, oldOverwrittenPermissions, entity);
+                        areYouAffected.compareAndSet(false, entity instanceof User && ((User) entity).isYourself());
+                        areYouAffected.compareAndSet(false, entity instanceof Role
+                                && ((Role) entity).getUsers().stream().anyMatch(User::isYourself));
                     }
                 }
             }
@@ -209,6 +213,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                 if (server.isReady()) {
                     dispatchServerChannelChangeOverwrittenPermissionsEvent(
                             channel, PermissionsImpl.EMPTY_PERMISSIONS, oldPermissions, user);
+                    areYouAffected.compareAndSet(false, user.isYourself());
                 }
             });
         }
@@ -225,8 +230,16 @@ public class ChannelUpdateHandler extends PacketHandler {
                 if (server.isReady()) {
                     dispatchServerChannelChangeOverwrittenPermissionsEvent(
                             channel, PermissionsImpl.EMPTY_PERMISSIONS, oldPermissions, role);
+                    areYouAffected.compareAndSet(false, role.getUsers().stream().anyMatch(User::isYourself));
                 }
             });
+        }
+
+        if (areYouAffected.get() && !channel.canYouSee()) {
+            api.forEachCachedMessageWhere(
+                    msg -> msg.getChannel().getId() == channelId,
+                    msg -> api.removeMessageFromCache(msg.getId())
+            );
         }
     }
 

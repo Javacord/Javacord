@@ -2,7 +2,9 @@ package org.javacord.core.util.handler.guild.role;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.role.RoleChangeColorEvent;
 import org.javacord.api.event.server.role.RoleChangeHoistEvent;
 import org.javacord.api.event.server.role.RoleChangeMentionableEvent;
@@ -21,6 +23,9 @@ import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.awt.Color;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Handles the guild role create packet.
@@ -97,6 +102,17 @@ public class GuildRoleUpdateHandler extends PacketHandler {
 
                 api.getEventDispatcher().dispatchRoleChangePermissionsEvent(
                         (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
+                // If bot is affected remove messages from cache that are no longer visible
+                if (role.getUsers().stream().anyMatch(User::isYourself)) {
+                    Set<Long> unreadableChannels = role.getServer().getTextChannels().stream()
+                            .filter(((Predicate<ServerTextChannel>)ServerTextChannel::canYouSee).negate())
+                            .map(ServerTextChannel::getId)
+                            .collect(Collectors.toSet());
+                    api.forEachCachedMessageWhere(
+                            msg -> unreadableChannels.contains(msg.getChannel().getId()),
+                            msg -> api.removeMessageFromCache(msg.getId())
+                    );
+                }
             }
 
             int oldPosition = role.getPosition();
