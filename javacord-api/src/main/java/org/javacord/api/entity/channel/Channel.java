@@ -2,11 +2,11 @@ package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
-import org.javacord.api.entity.channel.internal.ChannelBase;
+import org.javacord.api.entity.channel.internal.ChannelSpecialization;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.ChannelAttachableListenerManager;
-import org.javacord.api.util.Specializable;
+
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -14,7 +14,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The class represents a channel.
  */
-public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttachableListenerManager, ChannelBase, Specializable<ChannelBase> {
+public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttachableListenerManager,
+        ChannelSpecialization {
 
     /**
      * Gets the type of the channel.
