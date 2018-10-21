@@ -3,6 +3,7 @@ package org.javacord.api.entity.message;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -805,12 +806,41 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     * Returns <code>true</code> if the message was sent as a private message, returns <code>false</code> if not.
+     * Checks if the message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
      *
-     * @return Whether or not the message was sent as a private message.
+     * @return Whether or not the message was sent in a private channel.
+     * @deprecated Use {@link Message#isPrivateMessage()} instead.
      */
+    @Deprecated // Deprecated to be consistent with #isServerMessage() and #isGroupMessage()
     default boolean isPrivate() {
-        return getChannel() instanceof PrivateChannel;
+        return getChannel().getType() == ChannelType.PRIVATE_CHANNEL;
+    }
+
+    /**
+     * Checks if the message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
+     *
+     * @return Whether or not the message was sent in a private channel.
+     */
+    default boolean isPrivateMessage() {
+        return getChannel().getType() == ChannelType.PRIVATE_CHANNEL;
+    }
+
+    /**
+     * Checks if the message was sent in a {@link ChannelType#SERVER_TEXT_CHANNEL server channel}.
+     *
+     * @return Whether or not the message was sent in a server channel.
+     */
+    default boolean isServerMessage() {
+        return getChannel().getType() == ChannelType.SERVER_TEXT_CHANNEL;
+    }
+
+    /**
+     * Checks if the message was sent in a {@link ChannelType#GROUP_CHANNEL group channel}.
+     *
+     * @return Whether or not the message was sent in a group channel.
+     */
+    default boolean isGroupMessage() {
+        return getChannel().getType() == ChannelType.GROUP_CHANNEL;
     }
 
     /**
