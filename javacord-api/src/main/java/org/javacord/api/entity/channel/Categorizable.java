@@ -1,12 +1,14 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.channel.internal.ChannelSpecialization;
+
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents an entity which can have a channel category.
  */
-public interface Categorizable {
+public interface Categorizable extends ChannelSpecialization {
 
     /**
      * Gets the category of the channel.

@@ -1,13 +1,14 @@
 package org.javacord.api.entity.emoji;
 
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.util.Specializable;
 
 import java.util.Optional;
 
 /**
  * This class represents an emoji which can be a custom emoji (known or unknown) or a unicode emoji.
  */
-public interface Emoji extends Mentionable {
+public interface Emoji extends Mentionable, Specializable<Emoji> {
 
     /**
      * Gets the emoji as unicode emoji.
@@ -21,14 +22,18 @@ public interface Emoji extends Mentionable {
      *
      * @return The emoji as custom emoji.
      */
-    Optional<CustomEmoji> asCustomEmoji();
+    default Optional<CustomEmoji> asCustomEmoji() {
+        return as(CustomEmoji.class);
+    }
 
     /**
      * Gets the emoji as known custom emoji.
      *
      * @return The emoji as known custom emoji.
      */
-    Optional<KnownCustomEmoji> asKnownCustomEmoji();
+    default Optional<KnownCustomEmoji> asKnownCustomEmoji() {
+        return as(KnownCustomEmoji.class);
+    }
 
     /**
      * Checks if the emoji is equal to the given emoji.
