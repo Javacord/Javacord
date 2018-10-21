@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
@@ -60,6 +61,24 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 }
             });
         }
+
+        if (api.getYourself().getId() == userId) {
+            handleSelf(packet);
+        }
+    }
+
+    private void handleSelf(JsonNode packet) {
+        // We need the session id to connect to an audio websocket
+        String sessionId = packet.get("session_id").asText();
+        long channelId = packet.get("channel_id").asLong();
+        api.getServerVoiceChannelById(channelId)
+                .map(ServerChannel::getServer)
+                .map(ServerImpl.class::cast)
+                .flatMap(ServerImpl::getPossiblyUnconnectedAudioConnection)
+                .ifPresent(connection -> {
+                    connection.setSessionId(sessionId);
+                    connection.tryConnect();
+                });
     }
 
     private void handleServerVoiceChannel(JsonNode packet, long userId) {

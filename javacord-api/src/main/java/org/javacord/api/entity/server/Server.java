@@ -1,5 +1,6 @@
 package org.javacord.api.entity.server;
 
+import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Nameable;
@@ -48,6 +49,13 @@ import java.util.stream.Collectors;
  * The class represents a Discord server, sometimes also called guild.
  */
 public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Server>, ServerAttachableListenerManager {
+
+    /**
+     * Gets the audio connection in this server.
+     *
+     * @return The audio connection in this server.
+     */
+    Optional<AudioConnection> getAudioConnection();
 
     /**
      * Gets the region of the server.
