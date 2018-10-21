@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.util.gateway.AudioWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 
 public class AudioConnectionImpl implements AudioConnection {
@@ -17,6 +18,11 @@ public class AudioConnectionImpl implements AudioConnection {
      * The voice channel of the audio connection.
      */
     private final ServerVoiceChannel channel;
+
+    /**
+     * The websocket adapter for this audio connection.
+     */
+    private volatile AudioWebSocketAdapter websocketAdapter;
 
     /**
      * Whether the audio connection is currently connecting or already connected.
@@ -48,6 +54,33 @@ public class AudioConnectionImpl implements AudioConnection {
         ((DiscordApiImpl) channel.getApi())
                 .getWebSocketAdapter()
                 .sendVoiceStateUpdate(channel.getServer(), channel, false, false);
+    }
+
+    /**
+     * Gets the session id of the audio connection.
+     *
+     * @return The session id of the audio connection.
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    /**
+     * Gets the token for the audio connection.
+     *
+     * @return The token for the audio connection.
+     */
+    public String getToken() {
+        return token;
+    }
+
+    /**
+     * Gets the endpoint for the audio websocket.
+     *
+     * @return The endpoint for the audio websocket.
+     */
+    public String getEndpoint() {
+        return endpoint;
     }
 
     /**
@@ -88,6 +121,7 @@ public class AudioConnectionImpl implements AudioConnection {
         }
         connectingOrConnected = true;
         logger.debug("Received all information required to connect to voice channel {}", channel);
+        websocketAdapter = new AudioWebSocketAdapter(this);
         return true;
     }
 

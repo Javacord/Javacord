@@ -603,31 +603,15 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     @Override
     public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception {
-        Inflater decompressor = new Inflater();
-        decompressor.setInput(binary);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(binary.length);
-        byte[] buf = new byte[1024];
-        while (!decompressor.finished()) {
-            int count;
-            try {
-                count = decompressor.inflate(buf);
-            } catch (DataFormatException e) {
-                logger.warn("An error occurred while decompressing data", e);
-                return;
-            }
-            bos.write(buf, 0, count);
-        }
+        String message;
         try {
-            bos.close();
-        } catch (IOException ignored) { }
-        byte[] decompressedData = bos.toByteArray();
-        try {
-            String message = new String(decompressedData, "UTF-8");
-            logger.trace("onTextMessage: text='{}'", message);
-            onTextMessage(websocket, message);
-        } catch (UnsupportedEncodingException e) {
+            message = BinaryMessageDecompressor.decompress(binary);
+        } catch (DataFormatException e) {
             logger.warn("An error occurred while decompressing data", e);
+            return;
         }
+        logger.trace("onTextMessage: text='{}'", message);
+        onTextMessage(websocket, message);
     }
 
     /**
