@@ -814,6 +814,15 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
+     * Sets the audio connection of the server.
+     *
+     * @param audioConnection The audio connection.
+     */
+    public void setAudioConnection(AudioConnectionImpl audioConnection) {
+        this.audioConnection = audioConnection;
+    }
+
+    /**
      * Gets the audio connection of the server.
      * Unlike {@link #getAudioConnection()}, this also returns the audio connection if the bot is not yet connected.
      *

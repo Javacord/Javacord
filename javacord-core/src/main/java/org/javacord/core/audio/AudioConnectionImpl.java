@@ -3,6 +3,7 @@ package org.javacord.core.audio;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 public class AudioConnectionImpl implements AudioConnection {
@@ -44,6 +45,9 @@ public class AudioConnectionImpl implements AudioConnection {
      */
     public AudioConnectionImpl(ServerVoiceChannel channel) {
         this.channel = channel;
+        ((DiscordApiImpl) channel.getApi())
+                .getWebSocketAdapter()
+                .sendVoiceStateUpdate(channel.getServer(), channel, false, false);
     }
 
     /**
