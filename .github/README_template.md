@@ -84,7 +84,7 @@ public class MyFirstBot {
 
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
-            if (event.getMessage().getContent().equalsIgnoreCase("!ping")) {
+            if (event.getMessageContent().equalsIgnoreCase("!ping")) {
                 event.getChannel().sendMessage("Pong!");
             }
         });
@@ -107,7 +107,7 @@ public class MyFirstBot {
         new DiscordApiBuilder().setToken(token).login().thenAccept(api -> {
                     // Add a listener which answers with "Pong!" if someone writes "!ping"
                     api.addMessageCreateListener(event -> {
-                        if (event.getMessage().getContent().equalsIgnoreCase("!ping")) {
+                        if (event.getMessageContent().equalsIgnoreCase("!ping")) {
                             event.getChannel().sendMessage("Pong!");
                         }
                     });
