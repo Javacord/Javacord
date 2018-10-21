@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.listener.server.emoji.InternalKnownCustomEmojiAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -44,6 +45,11 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     private final boolean managed;
 
     /**
+     * Id of the user who created the emoji. 0 if no user was given.
+     */
+    private volatile long creatorId;
+
+    /**
      * Creates a new known custom emoji.
      *
      * @param api The discord api instance.
@@ -60,6 +66,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
             }
         }
         requiresColons = !data.hasNonNull("require_colons") || data.get("require_colons").asBoolean();
+        creatorId = data.has("user") ? data.get("user").asLong() : 0L;
         managed = data.get("managed").asBoolean(false);
     }
 
@@ -109,6 +116,25 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     @Override
     public boolean isManaged() {
         return managed;
+    }
+
+    @Override
+    public CompletableFuture<Optional<User>> getCreator() {
+        if (creatorId == 0L) {
+            return new RestRequest<Optional<User>>(getApi(), RestMethod.GET, RestEndpoint.CUSTOM_EMOJI)
+                    .setUrlParameters(server.getIdAsString(), this.getIdAsString())
+                    .execute(result -> {
+                        JsonNode userJson = result.getJsonBody().get("user");
+                        if (userJson.isMissingNode()) {
+                            return Optional.empty();
+                        } else {
+                            creatorId = userJson.get("id").asLong();
+                            return Optional.of(((DiscordApiImpl) getApi()).getOrCreateUser(userJson));
+                        }
+                    });
+        } else {
+            return getApi().getUserById(creatorId).thenApply(Optional::of);
+        }
     }
 
     @Override
