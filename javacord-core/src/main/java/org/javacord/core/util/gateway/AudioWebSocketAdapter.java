@@ -1,5 +1,7 @@
 package org.javacord.core.util.gateway;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neovisionaries.ws.client.WebSocket;
@@ -8,12 +10,14 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
+import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.WebSocketLogger;
 
 import javax.net.ssl.SSLContext;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DataFormatException;
 
@@ -29,6 +33,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
      */
     private final AudioConnectionImpl connection;
 
+    private final DiscordApiImpl api;
+
     private final AtomicReference<WebSocket> websocket = new AtomicReference<>();
 
     /**
@@ -38,16 +44,37 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
      */
     public AudioWebSocketAdapter(AudioConnectionImpl connection) {
         this.connection = connection;
+        this.api = (DiscordApiImpl) connection.getChannel().getApi();
         connect();
     }
 
     @Override
-    public void onTextMessage(WebSocket websocket, String text) {
-        logger.debug("Received audio websocket packet: {}", text);
+    public void onTextMessage(WebSocket websocket, String text) throws Exception {
+        ObjectMapper mapper = api.getObjectMapper();
+        JsonNode packet = mapper.readTree(text);
+
+        int op = packet.get("op").asInt();
+        Optional<VoiceGatewayOpcode> opcode = VoiceGatewayOpcode.fromCode(op);
+        if (!opcode.isPresent()) {
+            logger.debug("Received unknown audio websocket packet (audio connection: {}, op: {}, content: {})",
+                    connection, op, packet);
+            return;
+        }
+
+        switch (opcode.get()) {
+            case HELLO:
+                logger.debug("Received HELLO packet for audio connection {}", connection);
+                JsonNode data = packet.get("d");
+                int heartbeatInterval = data.get("heartbeat_interval").asInt();
+                sendIdentify(websocket);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
-    public void onBinaryMessage(WebSocket websocket, byte[] binary) {
+    public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception {
         String message;
         try {
             message = BinaryMessageDecompressor.decompress(binary);
