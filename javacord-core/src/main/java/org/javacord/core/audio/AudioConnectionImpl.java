@@ -129,4 +129,10 @@ public class AudioConnectionImpl implements AudioConnection {
     public ServerVoiceChannel getChannel() {
         return channel;
     }
+
+    @Override
+    public String toString() {
+        return String
+                .format("AudioConnection (channel: %#s, sessionId: %s, endpoint: %s)", channel, sessionId, endpoint);
+    }
 }

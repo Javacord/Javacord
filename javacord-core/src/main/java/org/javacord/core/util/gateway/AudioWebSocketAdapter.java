@@ -62,7 +62,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         int op = packet.get("op").asInt();
         Optional<VoiceGatewayOpcode> opcode = VoiceGatewayOpcode.fromCode(op);
         if (!opcode.isPresent()) {
-            logger.debug("Received unknown audio websocket packet (audio connection: {}, op: {}, content: {})",
+            logger.debug("Received unknown audio websocket packet ({}, op: {}, content: {})",
                     connection, op, packet);
             return;
         }
