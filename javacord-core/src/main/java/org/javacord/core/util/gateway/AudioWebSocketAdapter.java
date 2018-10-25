@@ -117,6 +117,26 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     @Override
     public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
                                WebSocketFrame clientCloseFrame, boolean closedByServer) {
+
+        Optional<WebSocketFrame> closeFrameOptional =
+                Optional.ofNullable(closedByServer ? serverCloseFrame : clientCloseFrame);
+
+        String closeReason = closeFrameOptional
+                .map(WebSocketFrame::getCloseReason)
+                .orElse("unknown");
+
+        String closeCodeString = closeFrameOptional
+                .map(closeFrame -> {
+                    int code = closeFrame.getCloseCode();
+                    return WebSocketCloseCode.fromCode(code)
+                            .map(closeCode -> closeCode + " (" + code + ")")
+                            .orElseGet(() -> String.valueOf(code));
+                })
+                .orElse("'unknown'");
+
+        logger.info("Websocket closed with reason '{}' and code {} by {} for {}!",
+                closeReason, closeCodeString, closedByServer ? "server" : "client", connection);
+
         // Squash it, until it stops beating
         heart.squash();
     }
