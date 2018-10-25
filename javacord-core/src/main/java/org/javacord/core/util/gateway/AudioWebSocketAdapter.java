@@ -16,6 +16,8 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.WebSocketLogger;
 
 import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +41,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     private final AtomicReference<WebSocket> websocket = new AtomicReference<>();
 
     private final Heart heart;
+
+    private AudioUdpSocket socket;
 
     /**
      * Created a new audio websocket adapter.
@@ -81,9 +85,13 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
             case READY:
                 logger.debug("Received {} packet for {}", opcode.get().name(), connection);
                 data = packet.get("d");
+
                 String ip = data.get("ip").asText();
                 int port = data.get("port").asInt();
                 int ssrc = data.get("ssrc").asInt();
+
+                socket = new AudioUdpSocket(connection, new InetSocketAddress(ip, port), ssrc);
+                sendSelectProtocol(websocket);
                 break;
             case HEARTBEAT_ACK:
                 // Handled in the heart
@@ -166,5 +174,27 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         logger.debug("Sending voice identify packet for {}", connection);
         WebSocketFrame identifyFrame = WebSocketFrame.createTextFrame(identifyPacket.toString());
         websocket.sendFrame(identifyFrame);
+    }
+
+    /**
+     * Sends a "select protocol" packet.
+     *
+     * @param websocket The websocket the packet should be sent to.
+     * @throws IOException  If an I/O error occurs.
+     */
+    private void sendSelectProtocol(WebSocket websocket) throws IOException {
+        InetSocketAddress address = socket.discoverIp();
+        ObjectNode selectProtocolPacket = JsonNodeFactory.instance.objectNode();
+        selectProtocolPacket
+                .put("op", VoiceGatewayOpcode.SELECT_PROTOCOL.getCode())
+                .putObject("d")
+                .put("protocol", "udp")
+                .putObject("data")
+                .put("address", address.getHostString())
+                .put("port", address.getPort())
+                .put("mode", "xsalsa20_poly1305");
+        logger.debug("Sending select protocol packet for {}", connection);
+        WebSocketFrame selectProtocolFrame = WebSocketFrame.createTextFrame(selectProtocolPacket.toString());
+        websocket.sendFrame(selectProtocolFrame);
     }
 }
