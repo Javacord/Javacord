@@ -14,6 +14,7 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
+import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
@@ -70,9 +71,6 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
@@ -92,11 +90,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.atomic.AtomicReference;
@@ -105,7 +101,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 
 /**
  * The main websocket adapter.
@@ -128,8 +123,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private final AtomicReference<WebSocket> websocket = new AtomicReference<>();
 
-    private final AtomicReference<Future<?>> heartbeatTimer = new AtomicReference<>();
-    private final AtomicBoolean heartbeatAckReceived = new AtomicBoolean();
+    private final Heart heart;
 
     private volatile int lastSeq = -1;
     private volatile String sessionId = null;
@@ -191,6 +185,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     DiscordWebSocketAdapter(DiscordApiImpl api, boolean reconnect) {
         this.api = api;
         this.reconnect = reconnect;
+        this.heart = new Heart(api, websocket, false);
 
         registerHandlers();
         connect();
@@ -293,13 +288,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     public void disconnect() {
         reconnect = false;
         websocket.get().sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
-        // cancel heartbeat timer if within one minute no disconnect event was dispatched
-        api.getThreadPool().getDaemonScheduler().schedule(() -> heartbeatTimer.updateAndGet(future -> {
-            if (future != null) {
-                future.cancel(false);
-            }
-            return null;
-        }), 1, TimeUnit.MINUTES);
+        // cancel heartbeat if within one minute no disconnect event was dispatched
+        api.getThreadPool().getDaemonScheduler().schedule(heart::squash, 1, TimeUnit.MINUTES);
     }
 
     /**
@@ -454,12 +444,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         LostConnectionEvent lostConnectionEvent = new LostConnectionEventImpl(api);
         api.getEventDispatcher().dispatchLostConnectionEvent(null, lostConnectionEvent);
 
-        heartbeatTimer.updateAndGet(future -> {
-            if (future != null) {
-                future.cancel(false);
-            }
-            return null;
-        });
+        // Squash it, until it stops beating
+        heart.squash();
 
         if (!ready.isDone()) {
             ready.complete(false);
@@ -480,6 +466,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     public void onTextMessage(WebSocket websocket, String text) throws Exception {
         ObjectMapper mapper = api.getObjectMapper();
         JsonNode packet = mapper.readTree(text);
+
+        heart.handlePacket(packet);
 
         int op = packet.get("op").asInt();
         Optional<GatewayOpcode> opcode = GatewayOpcode.fromCode(op);
@@ -550,7 +538,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 break;
             case HEARTBEAT:
-                sendHeartbeat(websocket);
+                heart.beat();
                 break;
             case RECONNECT:
                 websocket.sendClose(WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
@@ -577,12 +565,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
                 JsonNode data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
-                heartbeatTimer.updateAndGet(future -> {
-                    if (future != null) {
-                        future.cancel(false);
-                    }
-                    return startHeartbeat(websocket, heartbeatInterval);
-                });
+                heart.startBeating(heartbeatInterval);
 
                 if (sessionId == null) {
                     sendIdentify(websocket);
@@ -592,8 +575,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 break;
             case HEARTBEAT_ACK:
-                logger.debug("Heartbeat ACK received");
-                heartbeatAckReceived.set(true);
+                // Handled by the heart
                 break;
             default:
                 logger.debug("Received unknown packet (op: {}, content: {})", op, packet);
@@ -612,45 +594,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         }
         logger.trace("onTextMessage: text='{}'", message);
         onTextMessage(websocket, message);
-    }
-
-    /**
-     * Starts the heartbeat.
-     *
-     * @param websocket The websocket the heartbeat should be sent to.
-     * @param heartbeatInterval The heartbeat interval.
-     * @return The timer used for the heartbeat.
-     */
-    private Future<?> startHeartbeat(final WebSocket websocket, final int heartbeatInterval) {
-        // first heartbeat should assume last heartbeat was answered properly
-        heartbeatAckReceived.set(true);
-        return api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
-            try {
-                if (heartbeatAckReceived.getAndSet(false)) {
-                    sendHeartbeat(websocket);
-                    logger.debug("Sent heartbeat (interval: {})", heartbeatInterval);
-                } else {
-                    websocket.sendClose(WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
-                                        WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
-                }
-            } catch (Throwable t) {
-                logger.error("Failed to send heartbeat or close web socket!", t);
-            }
-        }, 0, heartbeatInterval, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Sends the heartbeat.
-     *
-     * @param websocket The websocket the heartbeat should be sent to.
-     */
-    private void sendHeartbeat(WebSocket websocket) {
-        ObjectNode heartbeatPacket = JsonNodeFactory.instance.objectNode();
-        heartbeatPacket.put("op", GatewayOpcode.HEARTBEAT.getCode());
-        heartbeatPacket.put("d", lastSeq);
-        WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
-        nextHeartbeatFrame.set(heartbeatFrame);
-        websocket.sendFrame(heartbeatFrame);
     }
 
     /**
@@ -747,7 +690,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("channel_id", (channel == null) ? null : channel.getIdAsString())
                 .put("self_mute", (selfMuted == null) ? server.isSelfMuted(yourself) : selfMuted)
                 .put("self_deaf", (selfDeafened == null) ? server.isSelfDeafened(yourself) : selfDeafened);
-        logger.debug("Sending VOICE_STATE_UPDATE packet for channel {} on server {}", channel, server);
+        logger.debug("Sending VOICE_STATE_UPDATE packet for {} on {}", channel, server);
         websocket.get().sendText(updateVoiceStatePacket.toString());
     }
 
@@ -844,7 +787,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("afk", false)
                 .putNull("since");
         ObjectNode activityJson = data.putObject("game");
-        activityJson.put("name", activity.isPresent() ? activity.get().getName() : null);
+        activityJson.put("name", activity.map(Nameable::getName).orElse(null));
         activityJson.put("type", activity.map(g -> g.getType().getId()).orElse(0));
         activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
         logger.debug("Updating status (content: {})", updateStatus);

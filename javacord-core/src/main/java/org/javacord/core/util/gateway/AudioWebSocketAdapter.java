@@ -18,6 +18,7 @@ import org.javacord.core.util.logging.WebSocketLogger;
 import javax.net.ssl.SSLContext;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DataFormatException;
 
@@ -37,6 +38,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
     private final AtomicReference<WebSocket> websocket = new AtomicReference<>();
 
+    private final Heart heart;
+
     /**
      * Created a new audio websocket adapter.
      *
@@ -45,6 +48,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     public AudioWebSocketAdapter(AudioConnectionImpl connection) {
         this.connection = connection;
         this.api = (DiscordApiImpl) connection.getChannel().getApi();
+        this.heart = new Heart(api, websocket, true);
         connect();
     }
 
@@ -52,6 +56,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     public void onTextMessage(WebSocket websocket, String text) throws Exception {
         ObjectMapper mapper = api.getObjectMapper();
         JsonNode packet = mapper.readTree(text);
+
+        heart.handlePacket(packet);
 
         int op = packet.get("op").asInt();
         Optional<VoiceGatewayOpcode> opcode = VoiceGatewayOpcode.fromCode(op);
@@ -63,10 +69,24 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
         switch (opcode.get()) {
             case HELLO:
-                logger.debug("Received HELLO packet for audio connection {}", connection);
+                logger.debug("Received {} packet for {}", opcode.get().name(), connection);
+                sendIdentify(websocket);
+
                 JsonNode data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
-                sendIdentify(websocket);
+                // The heartbeat should be multiplied by 0.75 because of a Discord bug.
+                // This will be removed in a future version.
+                heart.startBeating((int) (heartbeatInterval * 0.75));
+                break;
+            case READY:
+                logger.debug("Received {} packet for {}", opcode.get().name(), connection);
+                data = packet.get("d");
+                String ip = data.get("ip").asText();
+                int port = data.get("port").asInt();
+                int ssrc = data.get("ssrc").asInt();
+                break;
+            case HEARTBEAT_ACK:
+                // Handled in the heart
                 break;
             default:
                 break;
@@ -84,6 +104,13 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         }
         logger.trace("onTextMessage: text='{}'", message);
         onTextMessage(websocket, message);
+    }
+
+    @Override
+    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame,
+                               WebSocketFrame clientCloseFrame, boolean closedByServer) {
+        // Squash it, until it stops beating
+        heart.squash();
     }
 
     /**
@@ -110,8 +137,17 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
             websocket.addListener(new WebSocketLogger());
             websocket.connect();
         } catch (Throwable t) {
-            logger.warn("An error occurred while connecting to audio websocket for audio connection", connection, t);
+            logger.warn("An error occurred while connecting to audio websocket for {}", connection, t);
         }
+    }
+
+    /**
+     * Disconnects from the websocket.
+     */
+    public void disconnect() {
+        websocket.get().sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
+        // cancel heartbeat timer if within one minute no disconnect event was dispatched
+        api.getThreadPool().getDaemonScheduler().schedule(heart::squash, 1, TimeUnit.MINUTES);
     }
 
     /**
@@ -127,7 +163,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                 .put("user_id", connection.getServer().getApi().getYourself().getIdAsString())
                 .put("session_id", connection.getSessionId())
                 .put("token", connection.getToken());
-        logger.debug("Sending voice identify packet for audio connection {}", connection);
+        logger.debug("Sending voice identify packet for {}", connection);
         WebSocketFrame identifyFrame = WebSocketFrame.createTextFrame(identifyPacket.toString());
         websocket.sendFrame(identifyFrame);
     }
