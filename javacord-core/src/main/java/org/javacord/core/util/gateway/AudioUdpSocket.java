@@ -98,7 +98,7 @@ public class AudioUdpSocket {
 
         executorService.submit(() -> {
             try {
-                long nextFrameTimestamp;
+                long nextFrameTimestamp = System.nanoTime();
                 while (true) {
                     AudioSource source = connection.getCurrentAudioSourceBlocking(Long.MAX_VALUE, TimeUnit.DAYS);
                     if (source == null) {
@@ -108,10 +108,10 @@ public class AudioUdpSocket {
                     AudioPacket packet;
                     if (!source.hasNextFrame()) {
                         packet = new AudioPacket(ssrc, sequence, sequence * 960);
-                        nextFrameTimestamp = System.nanoTime() + 20_000_000;
+                        nextFrameTimestamp = nextFrameTimestamp + 20_000_000;
                     } else {
                         packet = new AudioPacket(source.getNextFrame(), ssrc, sequence, ((int) sequence) * 960);
-                        nextFrameTimestamp = System.nanoTime() + 20_000_000;
+                        nextFrameTimestamp = nextFrameTimestamp + 20_000_000;
                     }
 
                     sequence++;
