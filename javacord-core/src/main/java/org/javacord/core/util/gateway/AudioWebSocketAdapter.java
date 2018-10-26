@@ -43,6 +43,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     private final Heart heart;
 
     private AudioUdpSocket socket;
+    private int ssrc;
 
     /**
      * Created a new audio websocket adapter.
@@ -88,10 +89,20 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
                 String ip = data.get("ip").asText();
                 int port = data.get("port").asInt();
-                int ssrc = data.get("ssrc").asInt();
+                ssrc = data.get("ssrc").asInt();
 
                 socket = new AudioUdpSocket(connection, new InetSocketAddress(ip, port), ssrc);
                 sendSelectProtocol(websocket);
+
+                // TODO remove
+                sendSpeaking(websocket, true);
+                Thread.sleep(1000);
+                break;
+            case SESSION_DESCRIPTION:
+                data = packet.get("d");
+                byte[] secretKey = api.getObjectMapper().convertValue(data.get("secret_key"), byte[].class);
+                socket.setSecretKey(secretKey);
+                socket.startSending();
                 break;
             case HEARTBEAT_ACK:
                 // Handled in the heart
@@ -216,5 +227,24 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         logger.debug("Sending select protocol packet for {}", connection);
         WebSocketFrame selectProtocolFrame = WebSocketFrame.createTextFrame(selectProtocolPacket.toString());
         websocket.sendFrame(selectProtocolFrame);
+    }
+
+    /**
+     * Sends the identify packet.
+     *
+     * @param websocket The websocket the packet should be sent to.
+     * @param speaking Whether speaking should be displayed or not.
+     */
+    private void sendSpeaking(WebSocket websocket, boolean speaking) {
+        ObjectNode speakingPacket = JsonNodeFactory.instance.objectNode();
+        speakingPacket
+                .put("op", VoiceGatewayOpcode.SPEAKING.getCode())
+                .putObject("d")
+                .put("speaking", 1)
+                .put("delay", 0)
+                .put("ssrc", ssrc);
+        logger.debug("Sending speaking packet for {} (packet: {})", connection, speakingPacket);
+        WebSocketFrame speakingFrame = WebSocketFrame.createTextFrame(speakingPacket.toString());
+        websocket.sendFrame(speakingFrame);
     }
 }

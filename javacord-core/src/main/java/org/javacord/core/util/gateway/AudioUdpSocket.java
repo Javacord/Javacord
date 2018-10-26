@@ -1,6 +1,10 @@
 package org.javacord.core.util.gateway;
 
+import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
+import org.javacord.api.audio.AudioSource;
 import org.javacord.core.audio.AudioConnectionImpl;
+import org.javacord.core.util.logging.LoggerUtil;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -9,30 +13,55 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class AudioUdpSocket {
 
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(AudioUdpSocket.class);
+
     private final DatagramSocket socket;
 
-    private final AudioConnectionImpl audioConnection;
+    private final AudioConnectionImpl connection;
     private final InetSocketAddress address;
     private final int ssrc;
 
     /**
+     * The secret key used to encrypt audio packets.
+     */
+    private byte[] secretKey;
+
+    /**
+     * Gets incremented for every packet sent.
+     */
+    private char sequence = (char) 0;
+
+    /**
      * Creates a new audio udp socket.
      *
-     * @param audioConnection The audio connection that uses the socket.
+     * @param connection The audio connection that uses the socket.
      * @param address The address to connect to.
      * @param ssrc The ssrc.
      * @throws SocketException If the socket could not be opened,
      *                         or the socket could not bind to the specified local port.
      */
-    public AudioUdpSocket(
-            AudioConnectionImpl audioConnection, InetSocketAddress address, int ssrc) throws SocketException {
-        this.audioConnection = audioConnection;
+    public AudioUdpSocket(AudioConnectionImpl connection, InetSocketAddress address, int ssrc) throws SocketException {
+        this.connection = connection;
         this.address = address;
         this.ssrc = ssrc;
         socket = new DatagramSocket();
+    }
+
+    /**
+     * Sets the secret key which is used to encrypt audio packets.
+     *
+     * @param secretKey The secret key.
+     */
+    public void setSecretKey(byte[] secretKey) {
+        this.secretKey = secretKey;
     }
 
     /**
@@ -57,6 +86,48 @@ public class AudioUdpSocket {
         int port = ByteBuffer.wrap(new byte[]{buffer[69], buffer[68]}).getShort() & 0xffff;
 
         return new InetSocketAddress(ip, port);
+    }
+
+    /**
+     * Starts polling frames from the audio connection and sending them through the socket.
+     */
+    public void startSending() {
+        DiscordApi api = connection.getChannel().getApi();
+        ExecutorService executorService = api.getThreadPool().getSingleThreadExecutorService(
+                String.format("Javacord Audio Send Thread (%#s)", connection.getServer()));
+
+        executorService.submit(() -> {
+            try {
+                long nextFrameTimestamp;
+                while (true) {
+                    AudioSource source = connection.getCurrentAudioSourceBlocking(Long.MAX_VALUE, TimeUnit.DAYS);
+                    if (source == null) {
+                        logger.error("Got null audio source without being interrupted ({})", connection);
+                        return;
+                    }
+                    AudioPacket packet;
+                    if (!source.hasNextFrame()) {
+                        packet = new AudioPacket(ssrc, sequence, sequence * 960);
+                        nextFrameTimestamp = System.nanoTime() + 20_000_000;
+                    } else {
+                        packet = new AudioPacket(source.getNextFrame(), ssrc, sequence, ((int) sequence) * 960);
+                        nextFrameTimestamp = System.nanoTime() + 20_000_000;
+                    }
+
+                    sequence++;
+
+                    packet.encrypt(secretKey);
+                    try {
+                        Thread.sleep(Math.max(0, nextFrameTimestamp - System.nanoTime()) / 1_000_000);
+                        socket.send(packet.asUdpPacket(address));
+                    } catch (IOException e) {
+                        logger.error("Failed to send audio packet for {}", connection);
+                    }
+                }
+            } catch (InterruptedException e) {
+                logger.debug("Got interrupted while waiting for next audio source packet");
+            }
+        });
     }
 
 }
