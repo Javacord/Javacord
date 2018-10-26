@@ -301,17 +301,38 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         try {
             WebSocketFactory factory = new WebSocketFactory();
             String webSocketUri = getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION;
-            List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(
-                    webSocketUri.replace("wss://", "https://").replace("ws://", "http://")));
-            Optional<Proxy> httpProxy = proxies.stream().filter(proxy -> proxy.type() == Proxy.Type.HTTP).findAny();
-            if (proxies.stream().noneMatch(proxy -> proxy.type() == Proxy.Type.DIRECT) && httpProxy.isPresent()) {
-                SocketAddress proxyAddress = httpProxy.get().address();
-                if (proxyAddress instanceof InetSocketAddress) {
+            Proxy proxy = api.getProxy().orElseGet(() -> {
+                List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(
+                        webSocketUri.replace("wss://", "https://").replace("ws://", "http://")));
+
+                return proxies.stream()
+                        .filter(p -> p.type() == Proxy.Type.DIRECT)
+                        .findAny()
+                        .orElseGet(() -> proxies.stream()
+                                .filter(p -> p.type() == Proxy.Type.HTTP)
+                                .findAny()
+                                .orElseGet(() -> proxies.get(0)));
+            });
+            switch (proxy.type()) {
+                case DIRECT:
+                    // nothing to do
+                    break;
+
+                case HTTP:
+                    SocketAddress proxyAddress = proxy.address();
+                    if (!(proxyAddress instanceof InetSocketAddress)) {
+                        throw new WebSocketException(
+                                null, "HTTP proxies without an InetSocketAddress are not supported currently");
+                    }
                     InetSocketAddress proxyInetAddress = ((InetSocketAddress) proxyAddress);
                     factory.getProxySettings()
                             .setHost(proxyInetAddress.getHostString())
                             .setPort(proxyInetAddress.getPort());
-                }
+                    break;
+
+                default:
+                    throw new WebSocketException(
+                            null, "Proxies of type '" + proxy.type() + "' are not supported currently");
             }
             if (api.isTrustAllCertificates()) {
                 factory.setSSLSocketFactory(new TrustAllTrustManager().createSslSocketFactory());

@@ -155,4 +155,33 @@ class DiscordWebSocketAdapterTest extends Specification {
             ProxySelector.default = defaultProxySelector
     }
 
+    def 'WebSocket calls are done via explicitly configured proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            DiscordApiImpl api = Stub {
+                getThreadPool() >> threadPool
+                // do not wait for identify rate limit by using a different token each time
+                getPrefixedToken() >> UUID.randomUUID().toString()
+                getProxy() >> Optional.of(MockProxyManager.httpProxy)
+                isTrustAllCertificates() >> true
+            }
+
+        when:
+            new DiscordWebSocketAdapter(api, false)
+            ListAppender.getListAppender('Test Appender').events
+                    .findAll { it.level == Level.WARN }
+                    .findAll { it.thrown }
+                    .each { throw it.thrown }
+
+        then:
+            OpeningHandshakeException ohe = thrown()
+            ohe.message == 'The status code of the opening handshake response is not \'101 Switching Protocols\'. ' +
+                    'The status line is: HTTP/1.1 404 Not Found'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
 }
