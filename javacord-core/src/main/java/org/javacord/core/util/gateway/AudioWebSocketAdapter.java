@@ -79,9 +79,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
                 JsonNode data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
-                // The heartbeat should be multiplied by 0.75 because of a Discord bug.
-                // This will be removed in a future version.
-                heart.startBeating((int) (heartbeatInterval * 0.75));
+                heart.startBeating(heartbeatInterval);
                 break;
             case READY:
                 logger.debug("Received {} packet for {}", opcode.get().name(), connection);
