@@ -15,6 +15,13 @@ public interface AudioConnection {
     void queue(AudioSource source);
 
     /**
+     * Disconnects from the voice channel.
+     *
+     * <p><b>A disconnected audio source cannot be reused!</b>
+     */
+    void close();
+
+    /**
      * Gets the current audio source.
      *
      * @return The current audio source.

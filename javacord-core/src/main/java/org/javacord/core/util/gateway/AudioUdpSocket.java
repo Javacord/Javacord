@@ -13,7 +13,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class AudioUdpSocket {
@@ -24,10 +23,13 @@ public class AudioUdpSocket {
     private static final Logger logger = LoggerUtil.getLogger(AudioUdpSocket.class);
 
     private final DatagramSocket socket;
+    private final String threadName;
 
     private final AudioConnectionImpl connection;
     private final InetSocketAddress address;
     private final int ssrc;
+
+    private volatile boolean shouldSend = false;
 
     /**
      * The secret key used to encrypt audio packets.
@@ -52,7 +54,9 @@ public class AudioUdpSocket {
         this.connection = connection;
         this.address = address;
         this.ssrc = ssrc;
+
         socket = new DatagramSocket();
+        threadName = String.format("Javacord Audio Send Thread (%#s)", connection.getServer());
     }
 
     /**
@@ -92,14 +96,16 @@ public class AudioUdpSocket {
      * Starts polling frames from the audio connection and sending them through the socket.
      */
     public void startSending() {
-        DiscordApi api = connection.getChannel().getApi();
-        ExecutorService executorService = api.getThreadPool().getSingleThreadExecutorService(
-                String.format("Javacord Audio Send Thread (%#s)", connection.getServer()));
+        if (shouldSend) {
+            return;
+        }
+        shouldSend = true;
 
-        executorService.submit(() -> {
+        DiscordApi api = connection.getChannel().getApi();
+        api.getThreadPool().getSingleThreadExecutorService(threadName).submit(() -> {
             try {
                 long nextFrameTimestamp = System.nanoTime();
-                while (true) {
+                while (shouldSend) {
                     AudioSource source = connection.getCurrentAudioSourceBlocking(Long.MAX_VALUE, TimeUnit.DAYS);
                     if (source == null) {
                         logger.error("Got null audio source without being interrupted ({})", connection);
@@ -125,9 +131,22 @@ public class AudioUdpSocket {
                     }
                 }
             } catch (InterruptedException e) {
-                logger.debug("Got interrupted while waiting for next audio source packet");
+                if (shouldSend) {
+                    logger.debug("Got interrupted unexpectedly while waiting for next audio source packet");
+                }
             }
         });
+    }
+
+    /**
+     * Starts polling frames from the audio connection.
+     */
+    public void stopSending() {
+        shouldSend = false;
+        connection.getChannel()
+                .getApi()
+                .getThreadPool()
+                .removeAndShutdownSingleThreadExecutorService(threadName);
     }
 
 }

@@ -192,6 +192,11 @@ public class AudioConnectionImpl implements AudioConnection {
     }
 
     @Override
+    public void close() {
+        websocketAdapter.disconnect();
+    }
+
+    @Override
     public Optional<AudioSource> getCurrentAudioSource() {
         return Optional.ofNullable(
                 currentSource.updateAndGet(source -> {

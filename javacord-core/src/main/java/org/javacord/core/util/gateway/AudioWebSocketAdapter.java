@@ -182,6 +182,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
      * Disconnects from the websocket.
      */
     public void disconnect() {
+        socket.stopSending();
         websocket.get().sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
         // cancel heartbeat timer if within one minute no disconnect event was dispatched
         api.getThreadPool().getDaemonScheduler().schedule(heart::squash, 1, TimeUnit.MINUTES);
