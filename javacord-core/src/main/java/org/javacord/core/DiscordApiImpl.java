@@ -193,6 +193,11 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
     private final boolean waitForServersOnStartup;
 
     /**
+     * Whether to trust all SSL certificates.
+     */
+    private final boolean trustAllCertificates;
+
+    /**
      * The user of the connected account.
      */
     private volatile User you;
@@ -378,6 +383,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
         this.currentShard = currentShard;
         this.totalShards = totalShards;
         this.waitForServersOnStartup = waitForServersOnStartup;
+        this.trustAllCertificates = trustAllCertificates;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5)) + (currentShard * 6);
 
@@ -1060,6 +1066,15 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
     @Override
     public boolean isWaitingForServersOnStartup() {
         return waitForServersOnStartup;
+    }
+
+    /**
+     * Whether to trust all SSL certificates.
+     *
+     * @return whether to trust all SSL certificates.
+     */
+    public boolean isTrustAllCertificates() {
+        return trustAllCertificates;
     }
 
     @Override

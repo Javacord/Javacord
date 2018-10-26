@@ -57,17 +57,21 @@ import org.javacord.core.util.handler.user.PresenceUpdateHandler;
 import org.javacord.core.util.handler.user.PresencesReplaceHandler;
 import org.javacord.core.util.handler.user.TypingStartHandler;
 import org.javacord.core.util.handler.user.UserUpdateHandler;
+import org.javacord.core.util.http.TrustAllTrustManager;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.WebSocketLogger;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
-import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.SocketAddress;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -122,7 +126,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private volatile int lastSeq = -1;
     private volatile String sessionId = null;
 
-    private volatile boolean reconnect = true;
+    private volatile boolean reconnect;
 
     private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify =
             new AtomicMarkableReference<>(null, false);
@@ -167,7 +171,18 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * @param api The discord api instance.
      */
     public DiscordWebSocketAdapter(DiscordApiImpl api) {
+        this(api, true);
+    }
+
+    /**
+     * Creates a new discord websocket adapter.
+     *
+     * @param api       The discord api instance.
+     * @param reconnect Whether to try to reconnect.
+     */
+    DiscordWebSocketAdapter(DiscordApiImpl api, boolean reconnect) {
         this.api = api;
+        this.reconnect = reconnect;
 
         registerHandlers();
         connect();
@@ -283,15 +298,25 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * Connects the websocket.
      */
     private void connect() {
-        WebSocketFactory factory = new WebSocketFactory();
         try {
-            factory.setSSLContext(SSLContext.getDefault());
-        } catch (NoSuchAlgorithmException e) {
-            logger.warn("An error occurred while setting ssl context", e);
-        }
-        try {
-            WebSocket websocket = factory.createSocket(
-                    getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION);
+            WebSocketFactory factory = new WebSocketFactory();
+            String webSocketUri = getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION;
+            List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(
+                    webSocketUri.replace("wss://", "https://").replace("ws://", "http://")));
+            Optional<Proxy> httpProxy = proxies.stream().filter(proxy -> proxy.type() == Proxy.Type.HTTP).findAny();
+            if (proxies.stream().noneMatch(proxy -> proxy.type() == Proxy.Type.DIRECT) && httpProxy.isPresent()) {
+                SocketAddress proxyAddress = httpProxy.get().address();
+                if (proxyAddress instanceof InetSocketAddress) {
+                    InetSocketAddress proxyInetAddress = ((InetSocketAddress) proxyAddress);
+                    factory.getProxySettings()
+                            .setHost(proxyInetAddress.getHostString())
+                            .setPort(proxyInetAddress.getPort());
+                }
+            }
+            if (api.isTrustAllCertificates()) {
+                factory.setSSLSocketFactory(new TrustAllTrustManager().createSslSocketFactory());
+            }
+            WebSocket websocket = factory.createSocket(webSocketUri);
             this.websocket.set(websocket);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
