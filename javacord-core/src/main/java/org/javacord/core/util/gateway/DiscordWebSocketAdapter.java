@@ -302,7 +302,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             WebSocketFactory factory = new WebSocketFactory();
             String webSocketUri = getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION;
             Proxy proxy = api.getProxy().orElseGet(() -> {
-                List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(
+                List<Proxy> proxies = api.getProxySelector().orElseGet(ProxySelector::getDefault).select(URI.create(
                         webSocketUri.replace("wss://", "https://").replace("ws://", "http://")));
 
                 return proxies.stream()

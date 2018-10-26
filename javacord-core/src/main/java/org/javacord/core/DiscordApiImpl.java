@@ -193,6 +193,12 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
     private final boolean waitForServersOnStartup;
 
     /**
+     * The proxy selector which should be used to determine the proxies that should be used to connect to the Discord
+     * REST API and websocket.
+     */
+    private final ProxySelector proxySelector;
+
+    /**
      * The proxy which should be used to connect to the Discord REST API and websocket.
      */
     private final Proxy proxy;
@@ -388,6 +394,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
         this.currentShard = currentShard;
         this.totalShards = totalShards;
         this.waitForServersOnStartup = waitForServersOnStartup;
+        this.proxySelector = proxySelector;
         this.proxy = proxy;
         this.trustAllCertificates = trustAllCertificates;
         this.reconnectDelayProvider = x ->
@@ -1072,6 +1079,17 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
     @Override
     public boolean isWaitingForServersOnStartup() {
         return waitForServersOnStartup;
+    }
+
+    /**
+     * The proxy selector which should be used to determine the proxies that should be used to connect to the Discord
+     * REST API and websocket.
+     *
+     * @return the proxy selector which should be used to determine the proxies that should be used to connect to the
+     *     Discord REST API and websocket.
+     */
+    public Optional<ProxySelector> getProxySelector() {
+        return Optional.ofNullable(proxySelector);
     }
 
     /**
