@@ -24,6 +24,11 @@ public class AudioConnectionImpl implements AudioConnection {
     private static final Logger logger = LoggerUtil.getLogger(AudioConnectionImpl.class);
 
     /**
+     * The discord api instance.
+     */
+    private final DiscordApiImpl api;
+
+    /**
      * The voice channel of the audio connection.
      */
     private final ServerVoiceChannel channel;
@@ -75,8 +80,8 @@ public class AudioConnectionImpl implements AudioConnection {
      */
     public AudioConnectionImpl(ServerVoiceChannel channel) {
         this.channel = channel;
-        ((DiscordApiImpl) channel.getApi())
-                .getWebSocketAdapter()
+        api = (DiscordApiImpl) channel.getApi();
+        api.getWebSocketAdapter()
                 .sendVoiceStateUpdate(channel.getServer(), channel, false, false);
     }
 
@@ -201,6 +206,8 @@ public class AudioConnectionImpl implements AudioConnection {
     @Override
     public void close() {
         websocketAdapter.disconnect();
+        api.getWebSocketAdapter()
+                .sendVoiceStateUpdate(channel.getServer(), null, false, false);
     }
 
     @Override
