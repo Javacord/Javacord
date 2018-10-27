@@ -106,7 +106,9 @@ public class AudioUdpSocket {
             try {
                 long nextFrameTimestamp = System.nanoTime();
                 boolean dontSleep = true;
+                long framesOfSilenceToPlay = 5;
                 while (shouldSend) {
+                    // Get the current audio source. If none is available, it will block the thread
                     AudioSource source = connection.getCurrentAudioSourceBlocking(Long.MAX_VALUE, TimeUnit.DAYS);
                     if (source == null) {
                         logger.error("Got null audio source without being interrupted ({})", connection);
@@ -119,26 +121,36 @@ public class AudioUdpSocket {
                         continue;
                     }
 
-                    AudioPacket packet;
-                    if (!source.hasNextFrame()) {
-                        packet = new AudioPacket(ssrc, sequence, sequence * 960);
-                        nextFrameTimestamp = nextFrameTimestamp + 20_000_000;
-                    } else {
-                        packet = new AudioPacket(source.getNextFrame(), ssrc, sequence, ((int) sequence) * 960);
-                        nextFrameTimestamp = nextFrameTimestamp + 20_000_000;
+                    AudioPacket packet = null;
+                    byte[] frame = source.hasNextFrame() ? source.getNextFrame() : null;
+
+                    if (frame != null || framesOfSilenceToPlay > 0) {
+                        packet = new AudioPacket(frame, ssrc, sequence, ((int) sequence) * 960);
+                        // We can stop sending frames of silence after 5 seconds
+                        if (frame == null) {
+                            framesOfSilenceToPlay--;
+                        } else {
+                            framesOfSilenceToPlay = 5;
+                        }
                     }
+
+                    nextFrameTimestamp = nextFrameTimestamp + 20_000_000;
 
                     sequence++;
 
-                    packet.encrypt(secretKey);
+                    if (packet != null) {
+                        packet.encrypt(secretKey);
+                    }
                     try {
                         if (dontSleep) {
-                            nextFrameTimestamp = System.nanoTime() + 20_000;
+                            nextFrameTimestamp = System.nanoTime() + 20_000_000;
                             dontSleep = false;
                         } else {
                             Thread.sleep(Math.max(0, nextFrameTimestamp - System.nanoTime()) / 1_000_000);
                         }
-                        socket.send(packet.asUdpPacket(address));
+                        if (packet != null) {
+                            socket.send(packet.asUdpPacket(address));
+                        }
                     } catch (IOException e) {
                         logger.error("Failed to send audio packet for {}", connection);
                     }
