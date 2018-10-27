@@ -105,12 +105,20 @@ public class AudioUdpSocket {
         api.getThreadPool().getSingleThreadExecutorService(threadName).submit(() -> {
             try {
                 long nextFrameTimestamp = System.nanoTime();
+                boolean dontSleep = true;
                 while (shouldSend) {
                     AudioSource source = connection.getCurrentAudioSourceBlocking(Long.MAX_VALUE, TimeUnit.DAYS);
                     if (source == null) {
                         logger.error("Got null audio source without being interrupted ({})", connection);
                         return;
                     }
+
+                    if (source.hasFinished()) {
+                        connection.dequeueCurrentSource();
+                        dontSleep = true;
+                        continue;
+                    }
+
                     AudioPacket packet;
                     if (!source.hasNextFrame()) {
                         packet = new AudioPacket(ssrc, sequence, sequence * 960);
@@ -124,7 +132,12 @@ public class AudioUdpSocket {
 
                     packet.encrypt(secretKey);
                     try {
-                        Thread.sleep(Math.max(0, nextFrameTimestamp - System.nanoTime()) / 1_000_000);
+                        if (dontSleep) {
+                            nextFrameTimestamp = System.nanoTime() + 20_000;
+                            dontSleep = false;
+                        } else {
+                            Thread.sleep(Math.max(0, nextFrameTimestamp - System.nanoTime()) / 1_000_000);
+                        }
                         socket.send(packet.asUdpPacket(address));
                     } catch (IOException e) {
                         logger.error("Failed to send audio packet for {}", connection);

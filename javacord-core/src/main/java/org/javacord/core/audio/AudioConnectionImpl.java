@@ -186,6 +186,13 @@ public class AudioConnectionImpl implements AudioConnection {
         return source;
     }
 
+    /**
+     * Dequeues the current audio source.
+     */
+    public void dequeueCurrentSource() {
+        currentSource.set(null);
+    }
+
     @Override
     public void queue(AudioSource source) {
         queue.add(source);
