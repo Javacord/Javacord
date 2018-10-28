@@ -51,6 +51,16 @@ public class SilentAudioSource implements AudioSource {
     }
 
     @Override
+    public boolean isMuted() {
+        return true;
+    }
+
+    @Override
+    public void setMuted(boolean muted) {
+        // NOP
+    }
+
+    @Override
     public AudioSource copy() {
         return new SilentAudioSource(initialDuration * 20, TimeUnit.MILLISECONDS);
     }

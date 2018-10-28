@@ -31,6 +31,23 @@ public interface AudioSource extends Cloneable {
     boolean hasFinished();
 
     /**
+     * Checks whether the audio source is muted.
+     *
+     * @return Whether the audio source is muted.
+     */
+    boolean isMuted();
+
+    /**
+     * Sets whether the audio source should be muted.
+     *
+     * <p>A muted audio source will still continue. This means, that after unmuting the audio source will be at
+     * a different "position".
+     *
+     * @param muted Whether the audio source should be muted.
+     */
+    void setMuted(boolean muted);
+
+    /**
      * Creates a copy of the audio source which can be reused for another audio connection.
      *
      * @return A copy of the audio source.

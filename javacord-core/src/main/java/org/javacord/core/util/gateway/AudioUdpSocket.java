@@ -124,6 +124,11 @@ public class AudioUdpSocket {
                     AudioPacket packet = null;
                     byte[] frame = source.hasNextFrame() ? source.getNextFrame() : null;
 
+                    // If the source is muted, replace the frame with a muted frame
+                    if (source.isMuted()) {
+                        frame = null;
+                    }
+
                     if (frame != null || framesOfSilenceToPlay > 0) {
                         packet = new AudioPacket(frame, ssrc, sequence, ((int) sequence) * 960);
                         // We can stop sending frames of silence after 5 seconds
