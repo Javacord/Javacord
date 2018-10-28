@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neovisionaries.ws.client.ProxySettings;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -67,11 +68,14 @@ import org.javacord.core.util.rest.RestRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.Authenticator;
 import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -325,9 +329,21 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                 null, "HTTP proxies without an InetSocketAddress are not supported currently");
                     }
                     InetSocketAddress proxyInetAddress = ((InetSocketAddress) proxyAddress);
-                    factory.getProxySettings()
-                            .setHost(proxyInetAddress.getHostString())
-                            .setPort(proxyInetAddress.getPort());
+                    String proxyHost = proxyInetAddress.getHostString();
+                    int proxyPort = proxyInetAddress.getPort();
+                    ProxySettings proxySettings = factory.getProxySettings();
+                    proxySettings.setHost(proxyHost).setPort(proxyPort);
+
+                    URL webSocketUrl = URI.create(
+                            webSocketUri.replace("wss://", "https://").replace("ws://", "http://")).toURL();
+                    PasswordAuthentication credentials = Authenticator.requestPasswordAuthentication(
+                            proxyHost, proxyInetAddress.getAddress(), proxyPort, webSocketUrl.getProtocol(), null,
+                            "Basic", webSocketUrl, Authenticator.RequestorType.PROXY);
+                    if (credentials != null) {
+                        proxySettings
+                                .setId(credentials.getUserName())
+                                .setPassword(String.valueOf(credentials.getPassword()));
+                    }
                     break;
 
                 default:

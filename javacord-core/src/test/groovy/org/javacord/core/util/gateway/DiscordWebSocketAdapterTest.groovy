@@ -7,6 +7,7 @@ import org.apache.logging.log4j.test.appender.ListAppender
 import org.javacord.core.DiscordApiImpl
 import org.javacord.core.util.concurrent.ThreadPoolImpl
 import org.javacord.test.MockProxyManager
+import org.mockserver.configuration.ConfigurationProperties
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.verify.VerificationTimes
@@ -211,6 +212,51 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         and:
             MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @RestoreSystemProperties
+    def 'WebSocket calls through authenticated HTTP proxy use the system default authenticator'() {
+        given:
+            def username = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
+            ConfigurationProperties.httpProxyServerUsername username
+            ConfigurationProperties.httpProxyServerPassword password
+
+        and:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+
+        and:
+            def defaultAuthenticator = Authenticator.theAuthenticator
+            Authenticator.default = Mock(Authenticator) {
+                (1.._) * getPasswordAuthentication() >> new PasswordAuthentication(username, password as char[])
+            }
+            DiscordApiImpl api = Stub {
+                getThreadPool() >> threadPool
+                // do not wait for identify rate limit by using a different token each time
+                getPrefixedToken() >> UUID.randomUUID().toString()
+                getProxy() >> Optional.of(MockProxyManager.httpProxy)
+                isTrustAllCertificates() >> true
+            }
+
+        when:
+            new DiscordWebSocketAdapter(api, false)
+            ListAppender.getListAppender('Test Appender').events
+                    .findAll { it.level == Level.WARN }
+                    .findAll { it.thrown }
+                    .each { throw it.thrown }
+
+        then:
+            OpeningHandshakeException ohe = thrown()
+            ohe.message == 'The status code of the opening handshake response is not \'101 Switching Protocols\'. ' +
+                    'The status line is: HTTP/1.1 404 Not Found'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            Authenticator.default = defaultAuthenticator
     }
 
 }
