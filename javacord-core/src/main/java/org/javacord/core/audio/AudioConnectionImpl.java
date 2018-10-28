@@ -74,6 +74,16 @@ public class AudioConnectionImpl implements AudioConnection {
     private volatile String endpoint;
 
     /**
+     * Whether the bot is muted or not.
+     */
+    private volatile boolean muted;
+
+    /**
+     * Whether the bot is deafened or not.
+     */
+    private volatile boolean deafened;
+
+    /**
      * Creates a new audi connection.
      *
      * @param channel The channel of the audio connection.
@@ -207,7 +217,7 @@ public class AudioConnectionImpl implements AudioConnection {
     public void close() {
         websocketAdapter.disconnect();
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), null, false, false);
+                .sendVoiceStateUpdate(channel.getServer(), null, muted, deafened);
     }
 
     @Override
@@ -224,6 +234,30 @@ public class AudioConnectionImpl implements AudioConnection {
     @Override
     public ServerVoiceChannel getChannel() {
         return channel;
+    }
+
+    @Override
+    public boolean isSelfMuted() {
+        return muted;
+    }
+
+    @Override
+    public void setSelfMuted(boolean muted) {
+        this.muted = muted;
+        api.getWebSocketAdapter()
+                .sendVoiceStateUpdate(channel.getServer(), channel, muted, deafened);
+    }
+
+    @Override
+    public boolean isSelfDeafened() {
+        return deafened;
+    }
+
+    @Override
+    public void setSelfDeafened(boolean deafened) {
+        this.deafened = deafened;
+        api.getWebSocketAdapter()
+                .sendVoiceStateUpdate(channel.getServer(), channel, muted, deafened);
     }
 
     @Override

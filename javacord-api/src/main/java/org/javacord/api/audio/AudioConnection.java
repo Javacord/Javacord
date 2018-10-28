@@ -36,6 +36,42 @@ public interface AudioConnection {
     ServerVoiceChannel getChannel();
 
     /**
+     * Gets the self-muted status of this connection.
+     *
+     * <p>This is solely visual. A muted bot can still play audio.
+     *
+     * @return Whether or not the connection is self-muted.
+     */
+    boolean isSelfMuted();
+
+    /**
+     * Sets the self-muted status of this connection.
+     *
+     * <p>This is solely visual. A muted bot can still play audio.
+     *
+     * @param muted Whether or not to self-mute this connection.
+     */
+    void setSelfMuted(boolean muted);
+
+    /**
+     * Gets the self-deafened status of this connection.
+     *
+     * <p>This is solely visual. A deafened bot can still receive audio.
+     *
+     * @return Whether or not the connection is self-deafened.
+     */
+    boolean isSelfDeafened();
+
+    /**
+     * Sets the self-deafened status of this connection.
+     *
+     * <p>This is solely visual. A deafened bot can still receive audio.
+     *
+     * @param deafened Whether or not to self-deafen this connection.
+     */
+    void setSelfDeafened(boolean deafened);
+
+    /**
      * Gets the server of the audio connection.
      *
      * @return The server of the audio connection.
