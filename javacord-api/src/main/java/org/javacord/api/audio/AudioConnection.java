@@ -15,6 +15,23 @@ public interface AudioConnection {
     void queue(AudioSource source);
 
     /**
+     * Dequeues the given audio source.
+     *
+     * @param source The audio source to dequeue if present.
+     * @return If this queue changed as a result of the call.
+     */
+    boolean dequeue(AudioSource source);
+
+    /**
+     * Dequeues the current audio source if present.
+     *
+     * @return If this queue changed as a result of the call.
+     */
+    default boolean dequeueCurrentSource() {
+        return getCurrentAudioSource().map(this::dequeue).orElse(false);
+    }
+
+    /**
      * Disconnects from the voice channel.
      *
      * <p><b>A disconnected audio source cannot be reused!</b>

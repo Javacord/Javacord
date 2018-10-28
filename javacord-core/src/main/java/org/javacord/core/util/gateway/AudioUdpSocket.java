@@ -116,7 +116,7 @@ public class AudioUdpSocket {
                     }
 
                     if (source.hasFinished()) {
-                        connection.dequeueCurrentSource();
+                        connection.removeCurrentSource();
                         dontSleep = true;
                         continue;
                     }

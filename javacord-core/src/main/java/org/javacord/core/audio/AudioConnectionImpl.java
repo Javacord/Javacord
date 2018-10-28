@@ -202,15 +202,25 @@ public class AudioConnectionImpl implements AudioConnection {
     }
 
     /**
-     * Dequeues the current audio source.
+     * Removes the current audio source.
      */
-    public void dequeueCurrentSource() {
+    public void removeCurrentSource() {
         currentSource.set(null);
     }
 
     @Override
     public void queue(AudioSource source) {
         queue.add(source);
+    }
+
+    @Override
+    public boolean dequeue(AudioSource source) {
+        if (currentSource.get() == source) {
+            removeCurrentSource();
+            return true;
+        } else {
+            return queue.remove(source);
+        }
     }
 
     @Override
