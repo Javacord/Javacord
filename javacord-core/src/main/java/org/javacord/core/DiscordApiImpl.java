@@ -204,6 +204,11 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
     private final Proxy proxy;
 
     /**
+     * The authenticator that should be used to authenticate against proxies that require it.
+     */
+    private final Authenticator proxyAuthenticator;
+
+    /**
      * Whether to trust all SSL certificates.
      */
     private final boolean trustAllCertificates;
@@ -396,6 +401,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
         this.waitForServersOnStartup = waitForServersOnStartup;
         this.proxySelector = proxySelector;
         this.proxy = proxy;
+        this.proxyAuthenticator = proxyAuthenticator;
         this.trustAllCertificates = trustAllCertificates;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5)) + (currentShard * 6);
@@ -1099,6 +1105,15 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
      */
     public Optional<Proxy> getProxy() {
         return Optional.ofNullable(proxy);
+    }
+
+    /**
+     * The authenticator that should be used to authenticate against proxies that require it.
+     *
+     * @return the authenticator that should be used to authenticate against proxies that require it.
+     */
+    public Optional<Authenticator> getProxyAuthenticator() {
+        return Optional.ofNullable(proxyAuthenticator);
     }
 
     /**

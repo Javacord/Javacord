@@ -21,10 +21,14 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.connection.LostConnectionEvent;
 import org.javacord.api.event.connection.ReconnectEvent;
 import org.javacord.api.event.connection.ResumeEvent;
+import org.javacord.api.util.auth.Authenticator;
+import org.javacord.api.util.auth.Request;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.event.connection.LostConnectionEventImpl;
 import org.javacord.core.event.connection.ReconnectEventImpl;
 import org.javacord.core.event.connection.ResumeEventImpl;
+import org.javacord.core.util.auth.NvWebSocketResponseImpl;
+import org.javacord.core.util.auth.NvWebSocketRouteImpl;
 import org.javacord.core.util.concurrent.ThreadFactory;
 import org.javacord.core.util.handler.ReadyHandler;
 import org.javacord.core.util.handler.ResumedHandler;
@@ -68,7 +72,6 @@ import org.javacord.core.util.rest.RestRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
@@ -334,15 +337,42 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     ProxySettings proxySettings = factory.getProxySettings();
                     proxySettings.setHost(proxyHost).setPort(proxyPort);
 
+                    Optional<Authenticator> proxyAuthenticator = api.getProxyAuthenticator();
                     URL webSocketUrl = URI.create(
                             webSocketUri.replace("wss://", "https://").replace("ws://", "http://")).toURL();
-                    PasswordAuthentication credentials = Authenticator.requestPasswordAuthentication(
-                            proxyHost, proxyInetAddress.getAddress(), proxyPort, webSocketUrl.getProtocol(), null,
-                            "Basic", webSocketUrl, Authenticator.RequestorType.PROXY);
-                    if (credentials != null) {
-                        proxySettings
-                                .setId(credentials.getUserName())
-                                .setPassword(String.valueOf(credentials.getPassword()));
+                    if (proxyAuthenticator.isPresent()) {
+                        Map<String, List<String>> requestHeaders = proxyAuthenticator.get().authenticate(
+                                new NvWebSocketRouteImpl(webSocketUrl, proxy, proxyInetAddress),
+                                new Request() { },
+                                new NvWebSocketResponseImpl());
+                        if (requestHeaders != null) {
+                            requestHeaders.forEach((headerName, headerValues) -> {
+                                if (headerValues == null) {
+                                    proxySettings.getHeaders().remove(headerName);
+                                    return;
+                                }
+                                if (headerValues.isEmpty()) {
+                                    return;
+                                }
+                                String firstHeaderValue = headerValues.get(0);
+                                if (firstHeaderValue == null) {
+                                    proxySettings.getHeaders().remove(headerName);
+                                } else {
+                                    proxySettings.addHeader(headerName, firstHeaderValue);
+                                }
+                                headerValues.stream().skip(1).forEach(
+                                        headerValue -> proxySettings.addHeader(headerName, headerValue));
+                            });
+                        }
+                    } else {
+                        PasswordAuthentication credentials = java.net.Authenticator.requestPasswordAuthentication(
+                                proxyHost, proxyInetAddress.getAddress(), proxyPort, webSocketUrl.getProtocol(), null,
+                                "Basic", webSocketUrl, java.net.Authenticator.RequestorType.PROXY);
+                        if (credentials != null) {
+                            proxySettings
+                                    .setId(credentials.getUserName())
+                                    .setPassword(String.valueOf(credentials.getPassword()));
+                        }
                     }
                     break;
 
