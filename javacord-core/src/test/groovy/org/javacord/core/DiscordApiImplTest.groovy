@@ -514,4 +514,43 @@ class DiscordApiImplTest extends Specification {
             ProxySelector.default = defaultProxySelector
     }
 
+    @RestoreSystemProperties
+    def 'Explicitly configured authenticator for REST calls takes precedence'() {
+        given:
+            def username = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
+            String credentials = Credentials.basic username, password
+            ConfigurationProperties.httpProxyServerUsername username
+            ConfigurationProperties.httpProxyServerPassword password
+
+        and:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+
+        and:
+            def defaultAuthenticator = Authenticator.theAuthenticator
+            Authenticator.default = Mock(Authenticator) {
+                0 * getPasswordAuthentication()
+            }
+            org.javacord.api.util.auth.Authenticator authenticator = Mock {
+                (1.._) * authenticate(_, _, _) >> [(HttpHeaderNames.PROXY_AUTHORIZATION as String): [null, credentials]]
+            }
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, authenticator, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            Authenticator.default = defaultAuthenticator
+    }
+
 }
