@@ -14,6 +14,8 @@ import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.verify.VerificationTimes
 import spock.lang.AutoCleanup
+import spock.lang.IgnoreIf
+import spock.lang.PendingFeature
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
@@ -302,6 +304,143 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         and:
             MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @IgnoreIf({
+        // SOCKS4 implementation in Java 8 is broken and never used
+        // but always SOCKS5, so do not execute this test on Java 8
+        def javaVersion = System.properties.'java.version'
+        javaVersion.startsWith('1.8.') || (javaVersion == '1.8') ||
+                javaVersion.startsWith('8.') || (javaVersion == '8')
+    })
+    @PendingFeature(exceptions = MissingMethodException, reason = 'NV WebSocket does not yet support SOCKS proxies')
+    @RestoreSystemProperties
+    def 'WebSocket calls are done via system properties configured SOCKS4 proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            MockProxyManager.setSocks4SystemProperties()
+
+        and:
+            DiscordApiImpl api = Stub {
+                getThreadPool() >> threadPool
+                // do not wait for identify rate limit by using a different token each time
+                getPrefixedToken() >> UUID.randomUUID().toString()
+                isTrustAllCertificates() >> true
+            }
+
+        when:
+            new DiscordWebSocketAdapter(api, false)
+            ListAppender.getListAppender('Test Appender').events
+                    .findAll { it.level == Level.WARN }
+                    .findAll { it.thrown }
+                    .each { throw it.thrown }
+
+        then:
+            OpeningHandshakeException ohe = thrown()
+            ohe.message == 'The status code of the opening handshake response is not \'101 Switching Protocols\'. ' +
+                    'The status line is: HTTP/1.1 404 Not Found'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @IgnoreIf({
+        // SOCKS5 implementation in Java 8 is broken when the answer
+        // contains a domain type address which MockProxy supplies,
+        // so do not execute this test on Java 8
+        def javaVersion = System.properties.'java.version'
+        javaVersion.startsWith('1.8.') || (javaVersion == '1.8') ||
+                javaVersion.startsWith('8.') || (javaVersion == '8')
+    })
+    @PendingFeature(exceptions = [], reason = 'NV WebSocket does not yet support SOCKS proxies')
+    @RestoreSystemProperties
+    def 'WebSocket calls are done via system properties configured SOCKS5 proxy'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            MockProxyManager.setSocks5SystemProperties()
+
+        and:
+            DiscordApiImpl api = Stub {
+                getThreadPool() >> threadPool
+                // do not wait for identify rate limit by using a different token each time
+                getPrefixedToken() >> UUID.randomUUID().toString()
+                isTrustAllCertificates() >> true
+            }
+
+        when:
+            new DiscordWebSocketAdapter(api, false)
+            ListAppender.getListAppender('Test Appender').events
+                    .findAll { it.level == Level.WARN }
+                    .findAll { it.thrown }
+                    .each { throw it.thrown }
+
+        then:
+            OpeningHandshakeException ohe = thrown()
+            ohe.message == 'The status code of the opening handshake response is not \'101 Switching Protocols\'. ' +
+                    'The status line is: HTTP/1.1 404 Not Found'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+    }
+
+    @IgnoreIf({
+        // SOCKS5 implementation in Java 8 is broken when the answer
+        // contains a domain type address which MockProxy supplies,
+        // so do not execute this test on Java 8
+        def javaVersion = System.properties.'java.version'
+        javaVersion.startsWith('1.8.') || (javaVersion == '1.8') ||
+                javaVersion.startsWith('8.') || (javaVersion == '8')
+    })
+    @PendingFeature(exceptions = MissingMethodException, reason = 'NV WebSocket does not yet support SOCKS proxies')
+    @RestoreSystemProperties
+    def 'WebSocket calls through authenticated SOCKS5 proxy use the system default authenticator'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+
+        and:
+            DiscordApiImpl api = Stub {
+                getThreadPool() >> threadPool
+                // do not wait for identify rate limit by using a different token each time
+                getPrefixedToken() >> UUID.randomUUID().toString()
+                getProxy() >> Optional.of(MockProxyManager.socksProxy)
+                isTrustAllCertificates() >> true
+            }
+
+        and:
+            def username = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
+            ConfigurationProperties.socksProxyServerUsername username
+            ConfigurationProperties.socksProxyServerPassword password
+
+        and:
+            def defaultAuthenticator = Authenticator.theAuthenticator
+            Authenticator.default = Mock(Authenticator) {
+                (1.._) * getPasswordAuthentication() >> new PasswordAuthentication(username, password as char[])
+            }
+
+        when:
+            new DiscordWebSocketAdapter(api, false)
+            ListAppender.getListAppender('Test Appender').events
+                    .findAll { it.level == Level.WARN }
+                    .findAll { it.thrown }
+                    .each { throw it.thrown }
+
+        then:
+            OpeningHandshakeException ohe = thrown()
+            ohe.message == 'The status code of the opening handshake response is not \'101 Switching Protocols\'. ' +
+                    'The status line is: HTTP/1.1 404 Not Found'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            Authenticator.default = defaultAuthenticator
     }
 
 }
