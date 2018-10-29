@@ -411,4 +411,107 @@ class DiscordApiImplTest extends Specification {
             Authenticator.default = defaultAuthenticator
     }
 
+    @RestoreSystemProperties
+    def 'Explicitly configured proxy for REST calls takes precedence'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            System.properties.'https.proxyHost' = '0.0.0.1'
+            System.properties.'https.proxyPort' = '1'
+            def defaultProxySelector = ProxySelector.default
+            ProxySelector.default = new ProxySelector() {
+                @Override
+                List<Proxy> select(URI uri) {
+                    [new Proxy(
+                            Proxy.Type.HTTP,
+                            new InetSocketAddress(InetAddress.getByAddress([0, 0, 0, 1] as byte[]), 1))]
+                }
+
+                @Override
+                void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
+                }
+            }
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, null, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            ProxySelector.default = defaultProxySelector
+    }
+
+    @RestoreSystemProperties
+    def 'Explicitly configured proxy selector for REST calls takes precedence'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            System.properties.'https.proxyHost' = '0.0.0.1'
+            System.properties.'https.proxyPort' = '1'
+            def defaultProxySelector = ProxySelector.default
+            ProxySelector.default = new ProxySelector() {
+                @Override
+                List<Proxy> select(URI uri) {
+                    [new Proxy(
+                            Proxy.Type.HTTP,
+                            new InetSocketAddress(InetAddress.getByAddress([0, 0, 0, 1] as byte[]), 1))]
+                }
+
+                @Override
+                void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
+                }
+            }
+            def api = new DiscordApiImpl('fakeBotToken', MockProxyManager.proxySelector, null, null, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            ProxySelector.default = defaultProxySelector
+    }
+
+    @RestoreSystemProperties
+    def 'System default proxy selector for REST calls takes precedence over system properties'() {
+        given:
+            MockProxyManager.mockProxy.when(
+                    HttpRequest.request()
+            ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            System.properties.'https.proxyHost' = '0.0.0.1'
+            System.properties.'https.proxyPort' = '1'
+            def defaultProxySelector = ProxySelector.default
+            ProxySelector.default = MockProxyManager.proxySelector
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
+
+        when:
+            api.applicationInfo.join()
+
+        then:
+            CompletionException ce = thrown()
+            ce.cause instanceof NotFoundException
+            ce.cause.message == 'Received a 404 response from Discord with body !'
+
+        and:
+            MockProxyManager.mockProxy.verify HttpRequest.request(), VerificationTimes.atLeast(1)
+
+        cleanup:
+            ProxySelector.default = defaultProxySelector
+    }
+
 }
