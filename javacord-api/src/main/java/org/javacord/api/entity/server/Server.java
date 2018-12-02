@@ -483,6 +483,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Checks if the given user is a member of this server.
+     *
+     * @param user The user to check.
+     * @return If the user is a member of this server.
+     */
+    boolean isMember(User user);
+
+    /**
      * Gets a sorted list (by position) with all roles of the server.
      *
      * @return A sorted list (by position) with all roles of the server.

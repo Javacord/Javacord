@@ -949,6 +949,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public boolean isMember(User user) {
+        return members.containsKey(user.getId());
+    }
+
+    @Override
     public List<Role> getRoles() {
         return Collections.unmodifiableList(roles.values().stream()
                 .sorted(Comparator.comparingInt(Role::getPosition))
