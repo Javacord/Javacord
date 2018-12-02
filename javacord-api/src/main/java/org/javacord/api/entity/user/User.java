@@ -136,9 +136,8 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return All mutual servers with this user.
      */
     default Collection<Server> getMutualServers() {
-        // TODO This is probably not the most efficient way to do it
         return getApi().getServers().stream()
-                .filter(server -> server.getMembers().contains(this))
+                .filter(server -> server.isMember(this))
                 .collect(Collectors.toList());
     }
 
