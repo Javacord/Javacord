@@ -420,6 +420,9 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
      * @return The used http client.
      */
     public OkHttpClient getHttpClient() {
+        if (disconnectCalled) {
+            throw new IllegalStateException("disconnect was called already");
+        }
         return httpClient;
     }
 
@@ -1078,10 +1081,10 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
                     // shutdown thread pool if within one minute no disconnect event was dispatched
                     threadPool.getDaemonScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
                 }
+                disconnectCalled = true;
                 httpClient.dispatcher().executorService().shutdown();
                 httpClient.connectionPool().evictAll();
             }
-            disconnectCalled = true;
         }
     }
 
