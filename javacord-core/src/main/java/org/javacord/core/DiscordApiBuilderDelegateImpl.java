@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -126,8 +127,18 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
+    public Optional<String> getToken() {
+        return Optional.ofNullable(token);
+    }
+
+    @Override
     public void setAccountType(AccountType type) {
         this.accountType = type;
+    }
+
+    @Override
+    public AccountType getAccountType() {
+        return accountType;
     }
 
     @Override
@@ -142,6 +153,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
+    public int getTotalShards() {
+        return totalShards.get();
+    }
+
+    @Override
     public void setCurrentShard(int currentShard) {
         if (currentShard >= totalShards.get()) {
             throw new IllegalArgumentException("currentShard cannot be greater or equal than totalShards!");
@@ -153,8 +169,18 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
+    public int getCurrentShard() {
+        return currentShard.get();
+    }
+
+    @Override
     public void setWaitForServersOnStartup(boolean waitForServersOnStartup) {
         this.waitForServersOnStartup = waitForServersOnStartup;
+    }
+
+    @Override
+    public boolean isWaitingForServersOnStartup() {
+        return waitForServersOnStartup;
     }
 
     @Override
@@ -189,15 +215,5 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
                     return null;
                 })
                 .whenComplete((nothing, throwable) -> api.disconnect());
-    }
-
-    @Override
-    public int getTotalShards() {
-        return totalShards.get();
-    }
-
-    @Override
-    public int getCurrentShard() {
-        return currentShard.get();
     }
 }

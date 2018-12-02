@@ -5,6 +5,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -21,11 +22,25 @@ public interface DiscordApiBuilderDelegate {
     void setToken(String token);
 
     /**
+     * Gets the token.
+     *
+     * @return The token.
+     */
+    Optional<String> getToken();
+
+    /**
      * Sets the account type.
      *
      * @param accountType The account type to set.
      */
     void setAccountType(AccountType accountType);
+
+    /**
+     * Gets the account type.
+     *
+     * @return The account type.
+     */
+    AccountType getAccountType();
 
     /**
      * Sets the total shards.
@@ -36,6 +51,13 @@ public interface DiscordApiBuilderDelegate {
     void setTotalShards(int totalShards);
 
     /**
+     * Gets the total shards.
+     *
+     * @return The total shards.
+     */
+    int getTotalShards();
+
+    /**
      * Sets the current shards.
      *
      * @param currentShard The current shards to set.
@@ -44,11 +66,25 @@ public interface DiscordApiBuilderDelegate {
     void setCurrentShard(int currentShard);
 
     /**
+     * Sets the current shard.
+     *
+     * @return The current shard.
+     */
+    int getCurrentShard();
+
+    /**
      * Sets the wait for servers on startup flag.
      *
      * @param waitForServersOnStartup The wait for servers on startup flag to set.
      */
     void setWaitForServersOnStartup(boolean waitForServersOnStartup);
+
+    /**
+     * Checks if Javacord should wait for all servers to become available on startup.
+     *
+     * @return If Javacord should wait.
+     */
+    boolean isWaitingForServersOnStartup();
 
     /**
      * Logs the bot in.
@@ -73,19 +109,5 @@ public interface DiscordApiBuilderDelegate {
      * @return A future to check if the action was successful.
      */
     CompletableFuture<Void> setRecommendedTotalShards();
-
-    /**
-     * Gets the total shards.
-     *
-     * @return The total shards.
-     */
-    int getTotalShards();
-
-    /**
-     * Sets the current shard.
-     *
-     * @return The current shard.
-     */
-    int getCurrentShard();
 
 }

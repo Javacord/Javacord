@@ -5,6 +5,7 @@ import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
@@ -77,6 +78,16 @@ public class DiscordApiBuilder {
     }
 
     /**
+     * Gets the token that will be used to login.
+     *
+     * @return The token.
+     * @see #setToken(String)
+     */
+    public Optional<String> getToken() {
+        return delegate.getToken();
+    }
+
+    /**
      * Sets the account type.
      * By default the builder assumes that you want to login to a bot account.
      * Please notice, that public client bots are not allowed by Discord!
@@ -87,6 +98,16 @@ public class DiscordApiBuilder {
     public DiscordApiBuilder setAccountType(AccountType type) {
         delegate.setAccountType(type);
         return this;
+    }
+
+    /**
+     * Gets the account type.
+     *
+     * @return The account type.
+     * @see #setAccountType(AccountType)
+     */
+    public AccountType getAccountType() {
+        return delegate.getAccountType();
     }
 
     /**
@@ -104,6 +125,17 @@ public class DiscordApiBuilder {
     }
 
     /**
+     * Gets the total amount of shards.
+     * Sharding is disabled if set to {@code 1}.
+     *
+     * @return The total amount of shards.
+     * @see #setTotalShards(int)
+     */
+    public int getTotalShards() {
+        return delegate.getTotalShards();
+    }
+
+    /**
      * Sets shard for server sharding.
      * Sharding allows you to split your bot into several independent instances.
      * A shard only handles a subset of a bot's servers.
@@ -115,6 +147,16 @@ public class DiscordApiBuilder {
     public DiscordApiBuilder setCurrentShard(int currentShard) {
         delegate.setCurrentShard(currentShard);
         return this;
+    }
+
+    /**
+     * Gets the current shard.
+     *
+     * @return The current shard.
+     * @see #setCurrentShard(int)
+     */
+    public int getCurrentShard() {
+        return delegate.getCurrentShard();
     }
 
     /**
@@ -131,6 +173,16 @@ public class DiscordApiBuilder {
     public DiscordApiBuilder setWaitForServersOnStartup(boolean waitForServersOnStartup) {
         delegate.setWaitForServersOnStartup(waitForServersOnStartup);
         return this;
+    }
+
+    /**
+     * Checks if Javacord should wait for all servers to become available on startup.
+     *
+     * @return If Javacord should wait.
+     * @see #setWaitForServersOnStartup(boolean)
+     */
+    public boolean isWaitingForServersOnStartup() {
+        return delegate.isWaitingForServersOnStartup();
     }
 
     /**
