@@ -361,7 +361,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             CompletableFuture<DiscordApi> ready
     ) {
         this(accountType, token, currentShard, totalShards, waitForServersOnStartup, proxySelector, proxy,
-                proxyAuthenticator, trustAllCertificates, ready, null);
+                proxyAuthenticator, trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList());
     }
 
     /**
@@ -393,8 +393,47 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Authenticator proxyAuthenticator,
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready,
-            Dns dns
-    ) {
+            Dns dns) {
+        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, proxySelector, proxy,
+                proxyAuthenticator, trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList());
+    }
+
+    /**
+     * Creates a new discord api instance.
+     * @param accountType             The account type of the instance.
+     * @param token                   The token used to connect without any account type specific prefix.
+     * @param currentShard            The current shard the bot should connect to.
+     * @param totalShards             The total amount of shards.
+     * @param waitForServersOnStartup Whether Javacord should wait for all servers
+     *                                to become available on startup or not.
+     * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
+     *                                used to connect to the Discord REST API and websocket.
+     * @param proxy                   The proxy which should be used to connect to the Discord REST API and websocket.
+     * @param proxyAuthenticator      The authenticator that should be used to authenticate against proxies that require
+     *                                it.
+     * @param trustAllCertificates    Whether to trust all SSL certificates.
+     * @param ready                   The future which will be completed when the connection to Discord was successful.
+     * @param dns                     The DNS instance to use in the OkHttp client. This should only be used in testing.
+     * @param listenerSourceMap       The functions to create listeners for pre-registration.
+     * @param unspecifiedListeners    The listeners of unspecified types to pre-register.
+     */
+    @SuppressWarnings("unchecked")
+    public DiscordApiImpl(
+            AccountType accountType,
+            String token,
+            int currentShard,
+            int totalShards,
+            boolean waitForServersOnStartup,
+            ProxySelector proxySelector,
+            Proxy proxy,
+            Authenticator proxyAuthenticator,
+            boolean trustAllCertificates,
+            CompletableFuture<DiscordApi> ready,
+            Dns dns,
+            Map<Class<? extends GloballyAttachableListener>,
+                    List<Function<DiscordApi,GloballyAttachableListener>>
+                    > listenerSourceMap,
+            List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners) {
         this.accountType = accountType;
         this.token = token;
         this.currentShard = currentShard;
@@ -442,6 +481,19 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                     this.websocketAdapter = new DiscordWebSocketAdapter(this);
                     this.websocketAdapter.isReady().whenComplete((readyReceived, throwable) -> {
                         if (readyReceived) {
+                            // Register listeners
+                            listenerSourceMap.forEach((clazz, listenerSources) ->
+                                    listenerSources.forEach(listenerSource -> {
+                                        Class<GloballyAttachableListener> type
+                                                = (Class<GloballyAttachableListener>) clazz;
+                                        GloballyAttachableListener listener = listenerSource.apply(this);
+                                        addListener(type, type.cast(listener));
+                                    }
+                            ));
+                            unspecifiedListeners.stream()
+                                    .map(source -> source.apply(this))
+                                    .forEach(this::addListener);
+                            // Application information
                             if (accountType == AccountType.BOT) {
                                 getApplicationInfo().whenComplete((applicationInfo, exception) -> {
                                     if (exception != null) {

@@ -2,6 +2,8 @@ package org.javacord.api;
 
 import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
+import org.javacord.api.listener.ChainableGloballyAttachableListenerManager;
+import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -10,13 +12,15 @@ import java.net.ProxySelector;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 /**
  * This class is used to login to a Discord account.
  */
-public class DiscordApiBuilder {
+public class DiscordApiBuilder implements ChainableGloballyAttachableListenerManager {
 
     /**
      * The delegate used to create a {@link DiscordApi} instance.
@@ -285,5 +289,81 @@ public class DiscordApiBuilder {
      */
     public CompletableFuture<DiscordApiBuilder> setRecommendedTotalShards() {
         return delegate.setRecommendedTotalShards().thenCompose(nothing -> CompletableFuture.completedFuture(this));
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(Class<T> listenerClass, T listener) {
+        delegate.addListener(listenerClass, listener);
+        return this;
+    }
+
+    @Override
+    public DiscordApiBuilder addListener(GloballyAttachableListener listener) {
+        delegate.addListener(listener);
+        return this;
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(
+                                            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+        delegate.addListener(listenerClass, listenerSupplier);
+        return this;
+    }
+
+    @Override
+    public DiscordApiBuilder addListener(Supplier<GloballyAttachableListener> listenerSupplier) {
+        delegate.addListener(listenerSupplier);
+        return this;
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(
+                                Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+        delegate.addListener(listenerClass, listenerFunction);
+        return this;
+    }
+
+    @Override
+    public DiscordApiBuilder addListener(Function<DiscordApi, GloballyAttachableListener> listenerFunction) {
+        delegate.addListener(listenerFunction);
+        return this;
+    }
+
+    @Override
+    public DiscordApiBuilder removeListener(GloballyAttachableListener listener) {
+        delegate.removeListener(listener);
+        return this;
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> DiscordApiBuilder removeListener(Class<T> listenerClass, T listener) {
+        delegate.removeListener(listenerClass, listener);
+        return this;
+    }
+
+    @Override
+    public DiscordApiBuilder removeListenerSupplier(Supplier<GloballyAttachableListener> listenerSupplier) {
+        delegate.removeListenerSupplier(listenerSupplier);
+        return this;
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> DiscordApiBuilder removeListenerSupplier(
+                                                            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+        delegate.removeListenerSupplier(listenerClass, listenerSupplier);
+        return this;
+    }
+
+    @Override
+    public DiscordApiBuilder removeListenerFunction(Function<DiscordApi, GloballyAttachableListener> listenerFunction) {
+        delegate.removeListenerFunction(listenerFunction);
+        return this;
+    }
+
+    @Override
+    public <T extends GloballyAttachableListener> DiscordApiBuilder removeListenerFunction(
+                                                    Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+        delegate.removeListenerFunction(listenerClass, listenerFunction);
+        return this;
     }
 }

@@ -13,6 +13,8 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import javax.annotation.Generated
 import javax.naming.ConfigurationException
+import java.util.function.Function
+import java.util.function.Supplier
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -114,6 +116,8 @@ task generateListenerManagers {
 
         def discordApiName =
                 typeSolver.solveType('org.javacord.api.DiscordApi').qualifiedName
+        def discordApiBuilderName =
+                typeSolver.solveType('org.javacord.api.DiscordApiBuilder').qualifiedName
         def discordApiImplName =
                 typeSolver.solveType('org.javacord.core.DiscordApiImpl').qualifiedName
         def listenerManagerName =
@@ -144,7 +148,24 @@ task generateListenerManagers {
             def corePackageName = attachableInterface.packageName.replaceFirst(/\.api(?=.|$)/, '.core')
             def internalAttachableListenerManagerFile
             def internalAttachableListenerManagerInterface
-            if (!attachableInterface.equals(globallyAttachableListener)) {
+            def chainableGloballyAttachableListenerManagerFile
+            def chainableGloballyAttachableListenerManagerInterface
+            if (attachableInterface.equals(globallyAttachableListener)) {
+                chainableGloballyAttachableListenerManagerFile = new CompilationUnit(attachableInterface.packageName)
+                        .setStorage(file("$apiOutputDirectory/" +
+                        "${attachableInterface.packageName.replace '.', '/'}/" +
+                        'ChainableGloballyAttachableListenerManager.java').toPath())
+                        .addImport(Function)
+                        .addImport(Supplier)
+                        .addImport(discordApiName)
+                        .addImport(discordApiBuilderName)
+                chainableGloballyAttachableListenerManagerInterface = chainableGloballyAttachableListenerManagerFile
+                        .addInterface('ChainableGloballyAttachableListenerManager')
+                        .addSingleMemberAnnotation(Generated, '"listener-manager-generation.gradle"')
+                        .setJavadocComment(
+                        'This class can be used to add and retrieve {@link GloballyAttachableListener}s ' +
+                                'on the {@link DiscordApiBuilder}.')
+            } else {
                 internalAttachableListenerManagerFile =
                         new CompilationUnit(corePackageName)
                                 .setStorage(file("$coreOutputDirectory/" +
@@ -239,6 +260,8 @@ task generateListenerManagers {
             listeners.each {
                 addConcreteListenerMethods typeSolver, attachableInterface, it, objectClassByAttachableListenerManager,
                         attachableListenerManagerFile, attachableListenerManagerInterface,
+                        chainableGloballyAttachableListenerManagerFile,
+                        chainableGloballyAttachableListenerManagerInterface,
                         uncachedMessageAttachableListenerManagerFile, uncachedMessageAttachableListenerManagerInterface,
                         internalUncachedMessageAttachableListenerManagerFile,
                         internalUncachedMessageAttachableListenerManagerInterface,
@@ -246,7 +269,8 @@ task generateListenerManagers {
             }
 
             if (attachableInterface.equals(globallyAttachableListener)) {
-                addGenericGloballyAttachableListenerMethods(attachableListenerManagerInterface)
+                addGenericGloballyAttachableListenerMethods attachableListenerManagerInterface,
+                        chainableGloballyAttachableListenerManagerInterface
             } else {
                 if (uncachedMessageAttachableListenerManagerInterface) {
                     uncachedMessageAttachableListenerManagerFile.addImport objectAttachableListener.qualifiedName
@@ -278,6 +302,7 @@ task generateListenerManagers {
 
             [
                     attachableListenerManagerFile,
+                    chainableGloballyAttachableListenerManagerFile,
                     internalAttachableListenerManagerFile,
                     uncachedMessageAttachableListenerManagerFile,
                     internalUncachedMessageAttachableListenerManagerFile
@@ -321,6 +346,8 @@ configure([javacordApi, javacordCore]) {
 
 def addConcreteListenerMethods(typeSolver, attachableInterface, listener, objectClassByAttachableListenerManager,
                                attachableListenerManagerFile, attachableListenerManagerInterface,
+                               chainableGloballyAttachableListenerManagerFile,
+                               chainableGloballyAttachableListenerManagerInterface,
                                uncachedMessageAttachableListenerManagerFile,
                                uncachedMessageAttachableListenerManagerInterface,
                                internalUncachedMessageAttachableListenerManagerFile,
@@ -331,6 +358,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
 
     if (listener.packageName != attachableInterface.packageName) {
         attachableListenerManagerFile.addImport listener.qualifiedName
+        chainableGloballyAttachableListenerManagerFile?.addImport listener.qualifiedName
         if (specialMessageAttachable) {
             uncachedMessageAttachableListenerManagerFile.addImport listener.qualifiedName
         }
@@ -377,6 +405,51 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
         addListenerMethod
                 .createBody()
                 .addStatement("return addListener(${listener.name}.class, listener);")
+
+        chainableGloballyAttachableListenerManagerInterface
+                .addMethod("add$listener.name", Modifier.DEFAULT)
+                .setJavadocComment("""
+                    Adds a {@code $listener.name} to all created {@code DiscordApi} instances.
+
+                    @param listener The listener to add.
+                    @return The current instance in order to chain call methods.
+                """.stripIndent())
+                .setType("DiscordApiBuilder")
+                .addParameter(listener.name, 'listener')
+                .createBody()
+                .addStatement("return addListener(${listener.name}.class, listener);")
+
+        chainableGloballyAttachableListenerManagerInterface
+                .addMethod("add$listener.name", Modifier.DEFAULT)
+                .setJavadocComment("""
+                    Adds a {@code $listener.name} to all created {@code DiscordApi} instances. The supplier is called
+                    for every created {@code DiscordApi} instance, so either the same or different instances can be
+                    registered. One example would be a method reference to a default constructor like
+                    {@code MyListener::new}.
+
+                    @param listenerSupplier The supplier of listeners to add.
+                    @return The current instance in order to chain call methods.
+                """.stripIndent())
+                .setType("DiscordApiBuilder")
+                .addParameter("Supplier<$listener.name>", 'listenerSupplier')
+                .createBody()
+                .addStatement("return addListener(${listener.name}.class, listenerSupplier);")
+
+        chainableGloballyAttachableListenerManagerInterface
+                .addMethod("add$listener.name", Modifier.DEFAULT)
+                .setJavadocComment("""
+                    Adds a {@code $listener.name} to all created {@code DiscordApi} instances. The function is called
+                    for every created {@code DiscordApi} instance, so either the same or different instances can be
+                    registered. One example would be a method reference to a constructor with a {@code DiscordApi}
+                    parameter like {@code MyListener::new}.
+
+                    @param listenerFunction The function to provide listeners to add.
+                    @return The current instance in order to chain call methods.
+                """.stripIndent())
+                .setType("DiscordApiBuilder")
+                .addParameter("Function<DiscordApi, $listener.name>", 'listenerFunction')
+                .createBody()
+                .addStatement("return addListener(${listener.name}.class, listenerFunction);")
     } else {
         addListenerMethod.removeBody()
     }
@@ -533,7 +606,8 @@ def addMessageSpecificConcreteListenerMethods(
     }
 }
 
-def addGenericGloballyAttachableListenerMethods(attachableListenerManagerInterface) {
+def addGenericGloballyAttachableListenerMethods(
+        attachableListenerManagerInterface, chainableGloballyAttachableListenerManagerInterface) {
     attachableListenerManagerInterface
             .addMethod('addListener')
             .setJavadocComment('''
@@ -568,6 +642,115 @@ def addGenericGloballyAttachableListenerMethods(attachableListenerManagerInterfa
             .addParameter('GloballyAttachableListener', 'listener')
             .removeBody()
 
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('addListener')
+            .setJavadocComment('''
+                Adds a {@code GloballyAttachableListener} to all created {@code DiscordApi} instances.
+                Adding a listener multiple times will only add it once.
+                The order of invocation is according to first addition.
+
+                @param listenerClass The listener class.
+                @param listener The listener to add.
+                @param <T> The type of the listener.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .addTypeParameter('T extends GloballyAttachableListener')
+            .setType('DiscordApiBuilder')
+            .addParameter('Class<T>', 'listenerClass')
+            .addParameter('T', 'listener')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('addListener')
+            .setJavadocComment('''
+                Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
+                {@code DiscordApi} instances.
+                Adding a listener multiple times will only add it once.
+                The order of invocation is according to first addition.
+
+                @param listener The listener to add.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .setType('DiscordApiBuilder')
+            .addParameter('GloballyAttachableListener', 'listener')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('addListener')
+            .setJavadocComment('''
+                Adds a {@code GloballyAttachableListener} to all created {@code DiscordApi} instances. The supplier is
+                called for every created {@code DiscordApi} instance, so either the same or different instances can be
+                registered. One example would be a method reference to a default constructor like
+                {@code MyListener::new}.
+                Adding a listener multiple times will only add it once.
+                The order of invocation is according to first addition.
+
+                @param listenerClass The listener class.
+                @param listenerSupplier The supplier of listeners to add.
+                @param <T> The type of the listener.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .addTypeParameter('T extends GloballyAttachableListener')
+            .setType('DiscordApiBuilder')
+            .addParameter('Class<T>', 'listenerClass')
+            .addParameter('Supplier<T>', 'listenerSupplier')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('addListener')
+            .setJavadocComment('''
+                Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
+                {@code DiscordApi} instances. The supplier is called for every created {@code DiscordApi} instance,
+                so either the same or different instances can be registered. One example would be a method reference
+                to a default constructor like {@code MyListener::new}.
+                Adding a listener multiple times will only add it once.
+                The order of invocation is according to first addition.
+
+                @param listenerSupplier The supplier of listeners to add.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .setType('DiscordApiBuilder')
+            .addParameter('Supplier<GloballyAttachableListener>', 'listenerSupplier')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('addListener')
+            .setJavadocComment('''
+                Adds a {@code GloballyAttachableListener} to all created {@code DiscordApi} instances. The function
+                is called for every created {@code DiscordApi} instance, so either the same or different instances
+                can be registered. One example would be a method reference to a constructor with a {@code DiscordApi}
+                parameter like {@code MyListener::new}.
+                Adding a listener multiple times will only add it once.
+                The order of invocation is according to first addition.
+
+                @param listenerClass The listener class.
+                @param listenerFunction The function to provide listeners to add.
+                @param <T> The type of the listener.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .addTypeParameter('T extends GloballyAttachableListener')
+            .setType('DiscordApiBuilder')
+            .addParameter('Class<T>', 'listenerClass')
+            .addParameter('Function<DiscordApi, T>', 'listenerFunction')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('addListener')
+            .setJavadocComment('''
+                Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
+                {@code DiscordApi} instances. The function is called for every created {@code DiscordApi} instance,
+                so either the same or different instances can be registered. One example would be a method reference
+                to a constructor with a {@code DiscordApi} parameter like {@code MyListener::new}.
+                Adding a listener multiple times will only add it once.
+                The order of invocation is according to first addition.
+
+                @param listenerFunction The function to provide listeners to add.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .setType('DiscordApiBuilder')
+            .addParameter('Function<DiscordApi, GloballyAttachableListener>', 'listenerFunction')
+            .removeBody()
+
     attachableListenerManagerInterface
             .addMethod('removeListener')
             .setJavadocComment('''
@@ -590,6 +773,109 @@ def addGenericGloballyAttachableListenerMethods(attachableListenerManagerInterfa
             .addTypeParameter('T extends GloballyAttachableListener')
             .addParameter('Class<T>', 'listenerClass')
             .addParameter('T', 'listener')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('removeListener')
+            .setJavadocComment('''
+                Removes a listener that implements one or more {@code GloballyAttachableListener}s from the list of
+                listeners to be added to {@code DiscordApi} instances. If the listener was already added to a
+                {@code DiscordApi} instance, it will not get removed by calling this method.
+                This method should normally only be used before calling one of the login methods.
+
+                @param listener The listener to remove.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .setType('DiscordApiBuilder')
+            .addParameter('GloballyAttachableListener', 'listener')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('removeListener')
+            .setJavadocComment('''
+                Removes a {@code GloballyAttachableListener} from the list of listeners to be added to
+                {@code DiscordApi} instances. If the listener was already added to a {@code DiscordApi} instance,
+                it will not get removed by calling this method.
+                This method should normally only be used before calling one of the login methods.
+
+                @param listenerClass The listener class.
+                @param listener The listener to remove.
+                @param <T> The type of the listener.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .addTypeParameter('T extends GloballyAttachableListener')
+            .setType('DiscordApiBuilder')
+            .addParameter('Class<T>', 'listenerClass')
+            .addParameter('T', 'listener')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('removeListenerSupplier')
+            .setJavadocComment('''
+                Removes a supplier of listeners that implements one or more {@code GloballyAttachableListener}s
+                from the list of listeners to be added to {@code DiscordApi} instances. If the listener was already
+                added to a {@code DiscordApi} instance, it will not get removed by calling this method.
+                This method should normally only be used before calling one of the login methods.
+
+                @param listenerSupplier The supplier of listeners to remove.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .setType('DiscordApiBuilder')
+            .addParameter('Supplier<GloballyAttachableListener>', 'listenerSupplier')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('removeListenerSupplier')
+            .setJavadocComment('''
+                Removes a supplier of {@code GloballyAttachableListener}s from the list of listeners to be added to
+                {@code DiscordApi} instances. If the listener was already added to a {@code DiscordApi} instance,
+                it will not get removed by calling this method.
+                This method should normally only be used before calling one of the login methods.
+
+                @param listenerClass The listener class.
+                @param listenerSupplier The supplier of listeners to remove.
+                @param <T> The type of the listener.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .addTypeParameter('T extends GloballyAttachableListener')
+            .setType('DiscordApiBuilder')
+            .addParameter('Class<T>', 'listenerClass')
+            .addParameter('Supplier<T>', 'listenerSupplier')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('removeListenerFunction')
+            .setJavadocComment('''
+                Removes a function that provides listeners that implements one or more
+                {@code GloballyAttachableListener}s from the list of listeners to be added to {@code DiscordApi}
+                instances. If the listener was already added to a {@code DiscordApi} instance, it will not get
+                removed by calling this method.
+                This method should normally only be used before calling one of the login methods.
+
+                @param listenerFunction The function to provide listeners to remove.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .setType('DiscordApiBuilder')
+            .addParameter('Function<DiscordApi, GloballyAttachableListener>', 'listenerFunction')
+            .removeBody()
+
+    chainableGloballyAttachableListenerManagerInterface
+            .addMethod('removeListenerFunction')
+            .setJavadocComment('''
+                Removes a function that provides {@code GloballyAttachableListener}s from the list of listeners to be
+                added to {@code DiscordApi} instances. If the listener was already added to a {@code DiscordApi}
+                instance, it will not get removed by calling this method.
+                This method should normally only be used before calling one of the login methods.
+
+                @param listenerClass The listener class.
+                @param listenerFunction The function to provide listeners to remove.
+                @param <T> The type of the listener.
+                @return The current instance in order to chain call methods.
+            '''.stripIndent())
+            .addTypeParameter('T extends GloballyAttachableListener')
+            .setType('DiscordApiBuilder')
+            .addParameter('Class<T>', 'listenerClass')
+            .addParameter('Function<DiscordApi, T>', 'listenerFunction')
             .removeBody()
 
     attachableListenerManagerInterface
