@@ -74,7 +74,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
         api.getServerVoiceChannelById(channelId)
                 .map(ServerChannel::getServer)
                 .map(ServerImpl.class::cast)
-                .flatMap(ServerImpl::getPossiblyUnconnectedAudioConnection)
+                .flatMap(ServerImpl::getPendingAudioConnection)
                 .ifPresent(connection -> {
                     connection.setSessionId(sessionId);
                     connection.tryConnect();

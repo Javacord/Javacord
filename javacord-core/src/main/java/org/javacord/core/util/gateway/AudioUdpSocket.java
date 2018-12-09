@@ -131,7 +131,7 @@ public class AudioUdpSocket {
 
                     if (frame != null || framesOfSilenceToPlay > 0) {
                         packet = new AudioPacket(frame, ssrc, sequence, ((int) sequence) * 960);
-                        // We can stop sending frames of silence after 5 seconds
+                        // We can stop sending frames of silence after 5 frames
                         if (frame == null) {
                             framesOfSilenceToPlay--;
                         } else {

@@ -101,6 +101,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                 byte[] secretKey = api.getObjectMapper().convertValue(data.get("secret_key"), byte[].class);
                 socket.setSecretKey(secretKey);
                 socket.startSending();
+                // We established a connection with the udp socket. Now we are ready to send audio! :-)
+                connection.getReadyFuture().complete(connection);
                 break;
             case HEARTBEAT_ACK:
                 // Handled in the heart
@@ -148,6 +150,22 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
         // Squash it, until it stops beating
         heart.squash();
+
+        if (!connection.getReadyFuture().isDone()) {
+            connection.getReadyFuture().completeExceptionally(
+                    new IllegalStateException(
+                            "Audio websocket closed with reason '"
+                            + closeReason
+                            + "' and code "
+                            + closeCodeString
+                            + " by "
+                            + (closedByServer ? "server" : "client")
+                            + " before "
+                            + VoiceGatewayOpcode.SESSION_DESCRIPTION.name()
+                            + " packet was received"
+                    )
+            );
+        }
     }
 
     /**

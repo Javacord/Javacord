@@ -28,7 +28,7 @@ public class VoiceServerUpdateHandler extends PacketHandler {
         // We need the session id to connect to an audio websocket
         api.getServerById(serverId)
                 .map(ServerImpl.class::cast)
-                .flatMap(ServerImpl::getPossiblyUnconnectedAudioConnection)
+                .flatMap(ServerImpl::getPendingAudioConnection)
                 .ifPresent(connection -> {
                     connection.setToken(token);
                     connection.setEndpoint(endpoint);

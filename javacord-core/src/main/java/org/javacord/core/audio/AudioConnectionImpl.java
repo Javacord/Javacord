@@ -10,6 +10,7 @@ import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,6 +38,11 @@ public class AudioConnectionImpl implements AudioConnection {
      * A lock to ensure we don't accidentally poll two elements from the queue.
      */
     private final ReentrantLock currentSourceLock = new ReentrantLock();
+
+    /**
+     * A future that finishes once the connection is fully established.
+     */
+    private final CompletableFuture<AudioConnection> readyFuture;
 
     /**
      * The source that gets played at the moment.
@@ -87,12 +93,23 @@ public class AudioConnectionImpl implements AudioConnection {
      * Creates a new audi connection.
      *
      * @param channel The channel of the audio connection.
+     * @param readyFuture An uncompleted future that gets completed when the connection is fully established.
      */
-    public AudioConnectionImpl(ServerVoiceChannel channel) {
+    public AudioConnectionImpl(ServerVoiceChannel channel, CompletableFuture<AudioConnection> readyFuture) {
         this.channel = channel;
+        this.readyFuture = readyFuture;
         api = (DiscordApiImpl) channel.getApi();
         api.getWebSocketAdapter()
                 .sendVoiceStateUpdate(channel.getServer(), channel, false, false);
+    }
+
+    /**
+     * Gets a future that finishes once the connection is fully established.
+     *
+     * @return The future.
+     */
+    public CompletableFuture<AudioConnection> getReadyFuture() {
+        return readyFuture;
     }
 
     /**
