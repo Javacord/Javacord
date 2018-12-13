@@ -2,8 +2,11 @@ package org.javacord.api;
 
 import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
+import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.internal.DelegateFactory;
 
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -62,6 +65,93 @@ public class DiscordApiBuilder {
      */
     public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         return delegate.loginShards(shards);
+    }
+
+    /**
+     * Sets the proxy selector which should be used to determine the proxies that should be used to connect to the
+     * Discord REST API and web socket.
+     * If no explicit proxy is configured using {@link #setProxy(Proxy)} and no proxy selector is configured using this
+     * method, {@link ProxySelector#getDefault()} is used to select appropriate proxies.
+     * If {@link ProxySelector#setDefault(ProxySelector)} was not used to set a custom proxy selector,
+     * the default one evaluates the system properties {@code https.proxyHost}, {@code https.proxyPort},
+     * {@code http.nonProxyHosts}, {@code socksProxyHost}, {@code socksProxyPort} and {@code socksProxyVersion} as
+     * documented on the <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking
+     * Properties</a> page.
+     *
+     * <p><b>Note:</b> It is an error to configure an explicit proxy via {@link #setProxy(Proxy)} and a proxy selector
+     * using this method.
+     *
+     * @param proxySelector The proxy selector to set.
+     * @return The current instance in order to chain call methods.
+     * @see #setProxy(Proxy)
+     * @see #setProxyAuthenticator(Authenticator)
+     * @see ProxySelector#getDefault()
+     * @see ProxySelector#setDefault(ProxySelector)
+     * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>
+     */
+    public DiscordApiBuilder setProxySelector(ProxySelector proxySelector) {
+        delegate.setProxySelector(proxySelector);
+        return this;
+    }
+
+    /**
+     * Sets the proxy which should be used to connect to the Discord REST API and web socket.
+     * If this is not set explicitly, the proxy selector configured with {@link #setProxySelector(ProxySelector)} is
+     * used to select appropriate proxies. If both are not set, {@link ProxySelector#getDefault()} is used to select
+     * appropriate proxies. If {@link ProxySelector#setDefault(ProxySelector)} was not used to set a custom proxy
+     * selector, the default one evaluates the system properties {@code https.proxyHost}, {@code https.proxyPort},
+     * {@code http.nonProxyHosts}, {@code socksProxyHost}, {@code socksProxyPort} and {@code socksProxyVersion} as
+     * documented on the <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking
+     * Properties</a> page.
+     *
+     * <p><b>Note:</b> It is an error to configure an explicit proxy using this method and a proxy selector using
+     * {@link #setProxySelector(ProxySelector)}.
+     *
+     * @param proxy The proxy to set.
+     * @return The current instance in order to chain call methods.
+     * @see #setProxyAuthenticator(Authenticator)
+     * @see #setProxySelector(ProxySelector)
+     * @see ProxySelector#getDefault()
+     * @see ProxySelector#setDefault(ProxySelector)
+     * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>
+     */
+    public DiscordApiBuilder setProxy(Proxy proxy) {
+        delegate.setProxy(proxy);
+        return this;
+    }
+
+    /**
+     * Sets the authenticator that should be used to authenticate against proxies that require it.
+     * If this is not set explicitly, the authenticator configured with
+     * {@link java.net.Authenticator#setDefault(java.net.Authenticator)}, if any, is used to get credentials for
+     * {@code Basic} auth if the proxy supports it. If you need to support a more sophisticated authentication algorithm
+     * or scheme, use this method to set an own authenticator.
+     *
+     * @param authenticator The proxy authenticator to set.
+     * @return The current instance in order to chain call methods.
+     * @see #setProxy(Proxy)
+     * @see #setProxySelector(ProxySelector)
+     * @see java.net.Authenticator#setDefault(java.net.Authenticator)
+     */
+    public DiscordApiBuilder setProxyAuthenticator(Authenticator authenticator) {
+        delegate.setProxyAuthenticator(authenticator);
+        return this;
+    }
+
+    /**
+     * Sets whether all SSL certificates should be trusted when connecting to the Discord API and web socket.
+     * This might for example be necessary when connecting through a decrypting proxy.
+     * Be aware that this also increases the risk of man-in-the-middle attacks, which basically is,
+     * what a decrypting proxy does. Due to this risk, a warning is logged when connecting with this property
+     * set to {@code true}. If you do not care about this risk, you can suppress this warning using your logging
+     * configuration.
+     *
+     * @param trustAllCertificates Whether to trust all SSL certificates.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setTrustAllCertificates(boolean trustAllCertificates) {
+        delegate.setTrustAllCertificates(trustAllCertificates);
+        return this;
     }
 
     /**

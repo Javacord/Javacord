@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
+import org.javacord.api.util.auth.Authenticator;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.PrivacyProtectionLogger;
@@ -14,6 +15,8 @@ import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 import org.javacord.core.util.rest.RestRequestResult;
 
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +36,27 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      * The logger of this class.
      */
     private static final Logger logger = LoggerUtil.getLogger(DiscordApiBuilderDelegateImpl.class);
+
+    /**
+     * The proxy selector which should be used to determine the proxies that should be used to connect to the Discord
+     * REST API and websocket.
+     */
+    private volatile ProxySelector proxySelector;
+
+    /**
+     * The proxy which should be used to connect to the Discord REST API and websocket.
+     */
+    private volatile Proxy proxy;
+
+    /**
+     * The authenticator that should be used to authenticate against proxies that require it.
+     */
+    private volatile Authenticator proxyAuthenticator;
+
+    /**
+     * Whether all SSL certificates should be trusted when connecting to the Discord API and websocket.
+     */
+    private volatile boolean trustAllCertificates = false;
 
     /**
      * The token which is used to login. Must be present in order to login!
@@ -75,8 +99,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
-            new DiscordApiImpl(
-                    accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup, future);
+            new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup,
+                    proxySelector, proxy, proxyAuthenticator, trustAllCertificates, future);
         }
         return future;
     }
@@ -118,6 +142,26 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         setCurrentShard(currentShard);
         return result;
+    }
+
+    @Override
+    public void setProxySelector(ProxySelector proxySelector) {
+        this.proxySelector = proxySelector;
+    }
+
+    @Override
+    public void setProxy(Proxy proxy) {
+        this.proxy = proxy;
+    }
+
+    @Override
+    public void setProxyAuthenticator(Authenticator authenticator) {
+        proxyAuthenticator = authenticator;
+    }
+
+    @Override
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        this.trustAllCertificates = trustAllCertificates;
     }
 
     @Override
@@ -197,7 +241,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     private void setRecommendedTotalShards(CompletableFuture<Void> future) {
-        DiscordApiImpl api = new DiscordApiImpl(token);
+        DiscordApiImpl api = new DiscordApiImpl(token, proxySelector, proxy, proxyAuthenticator, trustAllCertificates);
         RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(api, RestMethod.GET, RestEndpoint.GATEWAY_BOT);
         botGatewayRequest
                 .execute(RestRequestResult::getJsonBody)

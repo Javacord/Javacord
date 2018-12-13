@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neovisionaries.ws.client.ProxySettings;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -20,10 +21,14 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.connection.LostConnectionEvent;
 import org.javacord.api.event.connection.ReconnectEvent;
 import org.javacord.api.event.connection.ResumeEvent;
+import org.javacord.api.util.auth.Authenticator;
+import org.javacord.api.util.auth.Request;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.event.connection.LostConnectionEventImpl;
 import org.javacord.core.event.connection.ReconnectEventImpl;
 import org.javacord.core.event.connection.ResumeEventImpl;
+import org.javacord.core.util.auth.NvWebSocketResponseImpl;
+import org.javacord.core.util.auth.NvWebSocketRouteImpl;
 import org.javacord.core.util.concurrent.ThreadFactory;
 import org.javacord.core.util.handler.ReadyHandler;
 import org.javacord.core.util.handler.ResumedHandler;
@@ -57,17 +62,23 @@ import org.javacord.core.util.handler.user.PresenceUpdateHandler;
 import org.javacord.core.util.handler.user.PresencesReplaceHandler;
 import org.javacord.core.util.handler.user.TypingStartHandler;
 import org.javacord.core.util.handler.user.UserUpdateHandler;
+import org.javacord.core.util.http.TrustAllTrustManager;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.WebSocketLogger;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
-import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.SocketAddress;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -122,7 +133,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private volatile int lastSeq = -1;
     private volatile String sessionId = null;
 
-    private volatile boolean reconnect = true;
+    private volatile boolean reconnect;
 
     private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify =
             new AtomicMarkableReference<>(null, false);
@@ -167,7 +178,18 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * @param api The discord api instance.
      */
     public DiscordWebSocketAdapter(DiscordApiImpl api) {
+        this(api, true);
+    }
+
+    /**
+     * Creates a new discord websocket adapter.
+     *
+     * @param api       The discord api instance.
+     * @param reconnect Whether to try to reconnect.
+     */
+    DiscordWebSocketAdapter(DiscordApiImpl api, boolean reconnect) {
         this.api = api;
+        this.reconnect = reconnect;
 
         registerHandlers();
         connect();
@@ -283,15 +305,85 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
      * Connects the websocket.
      */
     private void connect() {
-        WebSocketFactory factory = new WebSocketFactory();
         try {
-            factory.setSSLContext(SSLContext.getDefault());
-        } catch (NoSuchAlgorithmException e) {
-            logger.warn("An error occurred while setting ssl context", e);
-        }
-        try {
-            WebSocket websocket = factory.createSocket(
-                    getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION);
+            WebSocketFactory factory = new WebSocketFactory();
+            String webSocketUri = getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION;
+            Proxy proxy = api.getProxy().orElseGet(() -> {
+                List<Proxy> proxies = api.getProxySelector().orElseGet(ProxySelector::getDefault).select(URI.create(
+                        webSocketUri.replace("wss://", "https://").replace("ws://", "http://")));
+
+                return proxies.stream()
+                        .filter(p -> p.type() == Proxy.Type.DIRECT)
+                        .findAny()
+                        .orElseGet(() -> proxies.stream()
+                                .filter(p -> p.type() == Proxy.Type.HTTP)
+                                .findAny()
+                                .orElseGet(() -> proxies.get(0)));
+            });
+            switch (proxy.type()) {
+                case DIRECT:
+                    // nothing to do
+                    break;
+
+                case HTTP:
+                    SocketAddress proxyAddress = proxy.address();
+                    if (!(proxyAddress instanceof InetSocketAddress)) {
+                        throw new WebSocketException(
+                                null, "HTTP proxies without an InetSocketAddress are not supported currently");
+                    }
+                    InetSocketAddress proxyInetAddress = ((InetSocketAddress) proxyAddress);
+                    String proxyHost = proxyInetAddress.getHostString();
+                    int proxyPort = proxyInetAddress.getPort();
+                    ProxySettings proxySettings = factory.getProxySettings();
+                    proxySettings.setHost(proxyHost).setPort(proxyPort);
+
+                    Optional<Authenticator> proxyAuthenticator = api.getProxyAuthenticator();
+                    URL webSocketUrl = URI.create(
+                            webSocketUri.replace("wss://", "https://").replace("ws://", "http://")).toURL();
+                    if (proxyAuthenticator.isPresent()) {
+                        Map<String, List<String>> requestHeaders = proxyAuthenticator.get().authenticate(
+                                new NvWebSocketRouteImpl(webSocketUrl, proxy, proxyInetAddress),
+                                new Request() { },
+                                new NvWebSocketResponseImpl());
+                        if (requestHeaders != null) {
+                            requestHeaders.forEach((headerName, headerValues) -> {
+                                if (headerValues == null) {
+                                    proxySettings.getHeaders().remove(headerName);
+                                    return;
+                                }
+                                if (headerValues.isEmpty()) {
+                                    return;
+                                }
+                                String firstHeaderValue = headerValues.get(0);
+                                if (firstHeaderValue == null) {
+                                    proxySettings.getHeaders().remove(headerName);
+                                } else {
+                                    proxySettings.addHeader(headerName, firstHeaderValue);
+                                }
+                                headerValues.stream().skip(1).forEach(
+                                        headerValue -> proxySettings.addHeader(headerName, headerValue));
+                            });
+                        }
+                    } else {
+                        PasswordAuthentication credentials = java.net.Authenticator.requestPasswordAuthentication(
+                                proxyHost, proxyInetAddress.getAddress(), proxyPort, webSocketUrl.getProtocol(), null,
+                                "Basic", webSocketUrl, java.net.Authenticator.RequestorType.PROXY);
+                        if (credentials != null) {
+                            proxySettings
+                                    .setId(credentials.getUserName())
+                                    .setPassword(String.valueOf(credentials.getPassword()));
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new WebSocketException(
+                            null, "Proxies of type '" + proxy.type() + "' are not supported currently");
+            }
+            if (api.isTrustAllCertificates()) {
+                factory.setSSLSocketFactory(new TrustAllTrustManager().createSslSocketFactory());
+            }
+            WebSocket websocket = factory.createSocket(webSocketUri);
             this.websocket.set(websocket);
             websocket.addHeader("Accept-Encoding", "gzip");
             websocket.addListener(this);
