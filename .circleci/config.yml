@@ -7,6 +7,9 @@ jobs:
 
     working_directory: ~/javacord
 
+    environment:
+      GRADLE_OPTS: -Xmx2G
+
     steps:
       - checkout
 
@@ -40,7 +43,7 @@ jobs:
       # download and cache dependencies and Gradle
       - run:
           name: Downloading Dependencies
-          command: ./gradlew --max-workers 2 downloadDependencies
+          command: ./gradlew --max-workers 2 --no-daemon downloadDependencies
 
       - save_cache:
           paths:
@@ -55,7 +58,7 @@ jobs:
       # build everything needed for publication
       - run:
           name: Building Project
-          command: ./gradlew --max-workers 2 --continue clean build
+          command: ./gradlew --max-workers 2 --no-daemon --continue clean build
 
       # cache gradle build caches
       - run:
