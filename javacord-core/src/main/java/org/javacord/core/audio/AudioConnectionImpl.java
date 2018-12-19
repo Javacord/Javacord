@@ -5,6 +5,7 @@ import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.audio.AudioSource;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.gateway.AudioWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -245,6 +246,8 @@ public class AudioConnectionImpl implements AudioConnection {
         websocketAdapter.disconnect();
         api.getWebSocketAdapter()
                 .sendVoiceStateUpdate(channel.getServer(), null, muted, deafened);
+        ((ServerImpl) channel.getServer()).setAudioConnection(null);
+        ((ServerImpl) channel.getServer()).setPendingAudioConnection(null);
     }
 
     @Override
