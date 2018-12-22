@@ -72,7 +72,7 @@ public class ServerTextChannelUpdaterDelegateImpl extends ServerChannelUpdaterDe
     }
 
     @Override
-    public void setSlowmodeDelayinSeconds(int delay) {
+    public void setSlowmodeDelayInSeconds(int delay) {
         this.delay = delay;
         this.modifyDelay = true;
     }

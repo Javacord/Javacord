@@ -77,7 +77,7 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
      * @return The current instance in order to chain call methods.
      */
     public ServerTextChannelUpdater setSlowmodeDelayInSeconds(int delay) {
-        delegate.setSlowmodeDelayinSeconds(delay);
+        delegate.setSlowmodeDelayInSeconds(delay);
         return this;
     }
 
