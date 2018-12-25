@@ -40,6 +40,6 @@ public interface ServerTextChannelUpdaterDelegate extends ServerChannelUpdaterDe
      *
      * @param delay The delay in seconds.
      */
-    void setSlowmodeDelayinSeconds(int delay);
+    void setSlowmodeDelayInSeconds(int delay);
 
 }
