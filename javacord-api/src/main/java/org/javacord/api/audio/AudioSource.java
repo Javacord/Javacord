@@ -1,6 +1,16 @@
 package org.javacord.api.audio;
 
-public interface AudioSource extends Cloneable {
+import org.javacord.api.DiscordApi;
+import org.javacord.api.listener.audio.AudioSourceAttachableListenerManager;
+
+public interface AudioSource extends Cloneable, AudioSourceAttachableListenerManager {
+
+    /**
+     * Gets the discord api instance for this audio source.
+     *
+     * @return The discord api instance.
+     */
+    DiscordApi getApi();
 
     /**
      * Polls for the next 20ms of audio from the source.

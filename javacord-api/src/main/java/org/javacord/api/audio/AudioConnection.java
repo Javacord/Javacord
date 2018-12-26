@@ -2,10 +2,11 @@ package org.javacord.api.audio;
 
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.listener.audio.AudioConnectionAttachableListenerManager;
 
 import java.util.Optional;
 
-public interface AudioConnection {
+public interface AudioConnection extends AudioConnectionAttachableListenerManager {
 
     /**
      * Queues the audio source.
@@ -34,7 +35,7 @@ public interface AudioConnection {
     /**
      * Disconnects from the voice channel.
      *
-     * <p><b>A disconnected audio source cannot be reused!</b>
+     * <p><b>A disconnected audio connection cannot be reused!</b>
      */
     void close();
 

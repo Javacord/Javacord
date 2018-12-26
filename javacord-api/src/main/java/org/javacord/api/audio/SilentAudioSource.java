@@ -1,5 +1,7 @@
 package org.javacord.api.audio;
 
+import org.javacord.api.DiscordApi;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -7,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>Can be used to create "gaps" between audio sources.
  */
-public class SilentAudioSource implements AudioSource {
+public class SilentAudioSource extends AudioSourceBase {
 
     /**
      * A frame of silence.
@@ -24,12 +26,14 @@ public class SilentAudioSource implements AudioSource {
      * multiple of {@code 20ms}. E.g. when trying to set the duration to {@code 79ms}, the duration will instead be
      * set to {@code 60ms}.
      *
+     * @param api The discord api instance.
      * @param duration How long it should be silent.
      * @param unit A {@code TimeUnit} determining how to interpret the {@code duration} parameter.
      *             As audio frames have a fixed size of {@code 20ms}, units bellow {@link TimeUnit#MILLISECONDS} are
      *             not recommended.
      */
-    public SilentAudioSource(long duration, TimeUnit unit) {
+    public SilentAudioSource(DiscordApi api, long duration, TimeUnit unit) {
+        super(api);
         initialDuration = unit.toMillis(duration) / 20;
         this.duration = initialDuration;
     }
@@ -56,12 +60,7 @@ public class SilentAudioSource implements AudioSource {
     }
 
     @Override
-    public void setMuted(boolean muted) {
-        // NOP
-    }
-
-    @Override
     public AudioSource copy() {
-        return new SilentAudioSource(initialDuration * 20, TimeUnit.MILLISECONDS);
+        return new SilentAudioSource(getApi(), initialDuration * 20, TimeUnit.MILLISECONDS);
     }
 }

@@ -1,6 +1,7 @@
 package org.javacord.api.util.internal;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -211,6 +212,14 @@ public interface DelegateFactoryDelegate {
      * @return A new webhook updater delegate.
      */
     WebhookUpdaterDelegate createWebhookUpdaterDelegate(Webhook webhook);
+
+    /**
+     * Creates a new audio source base delegate.
+     *
+     * @param api The discord api instance.
+     * @return A new audio source base delegate.
+     */
+    AudioSourceBaseDelegate createAudioSourceBaseDelegate(DiscordApi api);
 
     /**
      * Creates a new exception logger delegate.

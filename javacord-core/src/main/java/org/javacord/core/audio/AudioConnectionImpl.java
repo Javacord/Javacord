@@ -1,11 +1,13 @@
 package org.javacord.core.audio;
 
 import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.audio.AudioSource;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.listener.audio.InternalAudioConnectionAttachableListenerManager;
 import org.javacord.core.util.gateway.AudioWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -15,10 +17,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AudioConnectionImpl implements AudioConnection {
+public class AudioConnectionImpl implements AudioConnection, InternalAudioConnectionAttachableListenerManager {
+
+    /**
+     * An internal counter for the audio connection id.
+     */
+    private static final AtomicInteger idCounter = new AtomicInteger(0);
 
     /**
      * The logger of this class.
@@ -54,6 +62,11 @@ public class AudioConnectionImpl implements AudioConnection {
      * A queue with all audio sources for this connection.
      */
     private final BlockingQueue<AudioSource> queue = new LinkedBlockingQueue<>();
+
+    /**
+     * An artificial id for the connection.
+     */
+    private final long id;
 
     /**
      * The websocket adapter for this audio connection.
@@ -99,6 +112,7 @@ public class AudioConnectionImpl implements AudioConnection {
     public AudioConnectionImpl(ServerVoiceChannel channel, CompletableFuture<AudioConnection> readyFuture) {
         this.channel = channel;
         this.readyFuture = readyFuture;
+        id = idCounter.getAndIncrement();
         api = (DiscordApiImpl) channel.getApi();
         api.getWebSocketAdapter()
                 .sendVoiceStateUpdate(channel.getServer(), channel, false, false);
@@ -173,7 +187,7 @@ public class AudioConnectionImpl implements AudioConnection {
      * @return Whether it will try to connect or not.
      */
     public synchronized boolean tryConnect() {
-        if (connectingOrConnected || this.sessionId == null || this.token == null || this.endpoint == null) {
+        if (connectingOrConnected || sessionId == null || token == null || endpoint == null) {
             return false;
         }
         connectingOrConnected = true;
@@ -192,7 +206,7 @@ public class AudioConnectionImpl implements AudioConnection {
      * @throws InterruptedException If interrupted while waiting.
      */
     public AudioSource getCurrentAudioSourceBlocking(long timeout, TimeUnit unit) throws InterruptedException {
-        AudioSource source = null;
+        AudioSource source;
         currentSourceLock.lock();
         try {
             AtomicBoolean poll = new AtomicBoolean(false);
@@ -224,6 +238,16 @@ public class AudioConnectionImpl implements AudioConnection {
      */
     public void removeCurrentSource() {
         currentSource.set(null);
+    }
+
+    @Override
+    public DiscordApi getApi() {
+        return getChannel().getApi();
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override
