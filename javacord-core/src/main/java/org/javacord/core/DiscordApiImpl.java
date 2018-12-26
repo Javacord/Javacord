@@ -41,7 +41,6 @@ import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
-import org.javacord.core.listener.InternalGloballyAttachableListenerManager;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.concurrent.ThreadPoolImpl;
@@ -85,7 +84,7 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link DiscordApi}.
  */
-public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableListenerManager, DispatchQueueSelector {
+public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     /**
      * The logger of this class.
@@ -974,13 +973,7 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
                                                Collectors.mapping(Entry::getValue, Collectors.toList()))));
     }
 
-    /**
-     * Gets all globally attachable listeners of the given class.
-     *
-     * @param listenerClass The class of the listener.
-     * @param <T> The class of the listener.
-     * @return A list with all listeners of the given type.
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends GloballyAttachableListener> List<T> getListeners(Class<T> listenerClass) {
         return Collections.unmodifiableList((List<T>) Optional.ofNullable(listenerClass)
@@ -988,11 +981,6 @@ public class DiscordApiImpl implements DiscordApi, InternalGloballyAttachableLis
                 .map(Map::keySet)
                 .map(ArrayList::new)
                 .orElseGet(ArrayList::new));
-    }
-
-    @Override
-    public DiscordApi getApi() {
-        return this;
     }
 
     @Override

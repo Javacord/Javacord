@@ -130,41 +130,44 @@ task generateListenerManagers {
                             "This class can be used to add and retrieve {@link ${attachableInterface.name}}s.")
 
             def corePackageName = attachableInterface.packageName.replaceFirst(/\.api(?=.|$)/, '.core')
-            def internalAttachableListenerManagerFile =
-                    new CompilationUnit(corePackageName)
-                            .setStorage(file("$coreOutputDirectory/" +
-                                    "${corePackageName.replace '.', '/'}/" +
-                                    "Internal${attachableInterface.name}Manager.java").toPath())
-                            .addImport(List)
-                            .addImport(discordApiName)
-                            .addImport(discordApiImplName)
-                            .addImport(listenerManagerName)
-                            .addImport("${attachableInterface.packageName}.${attachableInterface.name}Manager")
-            def internalAttachableListenerManagerInterface = internalAttachableListenerManagerFile
-                    .addInterface("Internal${attachableInterface.name}Manager")
-                    .addSingleMemberAnnotation(Generated, '"listener-manager-generation.gradle"')
-                    .setJavadocComment(
-                            "The implementation of {@code ${attachableInterface.name}Manager}.")
-                    .addExtendedType("${attachableInterface.name}Manager")
+            def internalAttachableListenerManagerFile
+            def internalAttachableListenerManagerInterface
+            if (!attachableInterface.equals(globallyAttachableListener)) {
+                internalAttachableListenerManagerFile =
+                        new CompilationUnit(corePackageName)
+                                .setStorage(file("$coreOutputDirectory/" +
+                                "${corePackageName.replace '.', '/'}/" +
+                                "Internal${attachableInterface.name}Manager.java").toPath())
+                                .addImport(List)
+                                .addImport(discordApiName)
+                                .addImport(discordApiImplName)
+                                .addImport(listenerManagerName)
+                                .addImport("${attachableInterface.packageName}.${attachableInterface.name}Manager")
 
-            internalAttachableListenerManagerInterface
-                    .addMethod('getApi')
-                    .setJavadocComment('''
+                internalAttachableListenerManagerInterface = internalAttachableListenerManagerFile
+                        .addInterface("Internal${attachableInterface.name}Manager")
+                        .addSingleMemberAnnotation(Generated, '"listener-manager-generation.gradle"')
+                        .setJavadocComment(
+                        "The implementation of {@code ${attachableInterface.name}Manager}.")
+                        .addExtendedType("${attachableInterface.name}Manager")
+
+                internalAttachableListenerManagerInterface
+                        .addMethod('getApi')
+                        .setJavadocComment('''
                         Gets the discord api instance.
 
                         @return The discord api instance.
                     '''.stripIndent())
-                    .setType('DiscordApi')
-                    .removeBody()
+                        .setType('DiscordApi')
+                        .removeBody()
 
-            if (!attachableInterface.equals(globallyAttachableListener)) {
                 internalAttachableListenerManagerInterface
                         .addMethod('getId')
                         .setJavadocComment('''
-                            Gets the id of this object.
+                        Gets the id of this object.
 
-                            @return The id of this object.
-                        '''.stripIndent())
+                        @return The id of this object.
+                    '''.stripIndent())
                         .setType(long)
                         .removeBody()
             }
@@ -323,7 +326,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
     if (specialMessageAttachable) {
         internalUncachedMessageAttachableListenerManagerFile.addImport listener.qualifiedName
     }
-    internalAttachableListenerManagerFile.addImport listener.qualifiedName
+    internalAttachableListenerManagerFile?.addImport listener.qualifiedName
 
     if (specialMessageAttachable) {
         addMessageSpecificConcreteListenerMethods typeSolver, attachableInterface, listener,
@@ -344,8 +347,11 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
                 .removeBody()
     }
 
-    attachableListenerManagerInterface
-            .addMethod("add$listener.name")
+    def globallyAttachable =
+            attachableInterface == typeSolver.solveType('org.javacord.api.listener.GloballyAttachableListener')
+
+    def addListenerMethod = attachableListenerManagerInterface
+            .addMethod("add$listener.name", *(globallyAttachable ? [Modifier.DEFAULT] : []))
             .setJavadocComment("""
                 Adds a {@code $listener.name}.
 
@@ -354,34 +360,23 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
             """.stripIndent())
             .setType("ListenerManager<$listener.name>")
             .addParameter(listener.name, 'listener')
-            .removeBody()
 
-    def globallyAttachable =
-            attachableInterface == typeSolver.solveType('org.javacord.api.listener.GloballyAttachableListener')
+    if (globallyAttachable) {
+        addListenerMethod
+                .createBody()
+                .addStatement("return addListener(${listener.name}.class, listener);")
+    } else {
+        addListenerMethod.removeBody()
+    }
+
     def objectClass = objectClassByAttachableListenerManager."${attachableInterface.name}Manager"
 
-    def methodImplementation
-    switch (Object) {
-        case { globallyAttachable }:
-            methodImplementation =
-                    "return ((DiscordApiImpl) getApi()).addListener(${listener.name}.class, listener);"
-            break
+    def methodImplementation = specialMessageAttachable ?
+            "return MessageAttachableListenerManager.add$listener.name(getApi(), getId(), listener);" :
+            "return ((DiscordApiImpl) getApi()).addObjectListener(" +
+                    "${objectClass.name}.class, getId(), ${listener.name}.class, listener);"
 
-        case { specialMessageAttachable }:
-            methodImplementation =
-                    "return MessageAttachableListenerManager.add$listener.name(getApi(), getId(), listener);"
-            break
-
-        default:
-            methodImplementation =
-                    "return ((DiscordApiImpl) getApi()).addObjectListener(" +
-                            "${objectClass.name}.class, getId(), ${listener.name}.class, listener);"
-            break
-    }
-
-    if (!globallyAttachable) {
-        internalAttachableListenerManagerFile.addImport(objectClass.qualifiedName)
-    }
+    internalAttachableListenerManagerFile?.addImport(objectClass.qualifiedName)
 
     if (specialMessageAttachable) {
         internalUncachedMessageAttachableListenerManagerFile.addImport(objectClass.qualifiedName)
@@ -399,12 +394,12 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
     }
 
     internalAttachableListenerManagerInterface
-            .addMethod("add$listener.name", Modifier.DEFAULT)
-            .addMarkerAnnotation(Override)
-            .setType("ListenerManager<$listener.name>")
-            .addParameter(listener.name, 'listener')
-            .createBody()
-            .addStatement(methodImplementation)
+            ?.addMethod("add$listener.name", Modifier.DEFAULT)
+            ?.addMarkerAnnotation(Override)
+            ?.setType("ListenerManager<$listener.name>")
+            ?.addParameter(listener.name, 'listener')
+            ?.createBody()
+            ?.addStatement(methodImplementation)
 
     if (specialMessageAttachable) {
         [long, String].each { messageIdType ->
@@ -422,33 +417,27 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
         }
     }
 
-    attachableListenerManagerInterface
-            .addMethod("get${listener.name}s")
+    def getListenersMethod = attachableListenerManagerInterface
+            .addMethod("get${listener.name}s", *(globallyAttachable ? [Modifier.DEFAULT] : []))
             .setJavadocComment("""
                 Gets a list with all registered {@code $listener.name}s.
 
                 @return A list with all registered {@code $listener.name}s.
             """.stripIndent())
             .setType("List<$listener.name>")
-            .removeBody()
 
-    switch (Object) {
-        case { globallyAttachable }:
-            methodImplementation =
-                    "return ((DiscordApiImpl) getApi()).getListeners(${listener.name}.class);"
-            break
-
-        case { specialMessageAttachable }:
-            methodImplementation =
-                    "return MessageAttachableListenerManager.get${listener.name}s(getApi(), getId());"
-            break
-
-        default:
-            methodImplementation =
-                    "return ((DiscordApiImpl) getApi()).getObjectListeners(" +
-                            "${objectClass.name}.class, getId(), ${listener.name}.class);"
-            break
+    if (globallyAttachable) {
+        getListenersMethod
+                .createBody()
+                .addStatement("return getListeners(${listener.name}.class);")
+    } else {
+        getListenersMethod.removeBody()
     }
+
+    methodImplementation = specialMessageAttachable ?
+            "return MessageAttachableListenerManager.get${listener.name}s(getApi(), getId());" :
+            "return ((DiscordApiImpl) getApi()).getObjectListeners(" +
+                    "${objectClass.name}.class, getId(), ${listener.name}.class);"
 
     if (specialMessageAttachable) {
         [long, String].each { messageIdType ->
@@ -480,11 +469,11 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
     }
 
     internalAttachableListenerManagerInterface
-            .addMethod("get${listener.name}s", Modifier.DEFAULT)
-            .addMarkerAnnotation(Override)
-            .setType("List<$listener.name>")
-            .createBody()
-            .addStatement(methodImplementation)
+            ?.addMethod("get${listener.name}s", Modifier.DEFAULT)
+            ?.addMarkerAnnotation(Override)
+            ?.setType("List<$listener.name>")
+            ?.createBody()
+            ?.addStatement(methodImplementation)
 }
 
 def addMessageSpecificConcreteListenerMethods(
@@ -601,6 +590,20 @@ def addGenericGloballyAttachableListenerMethods(attachableListenerManagerInterfa
             '''.stripIndent())
             .addTypeParameter('T extends GloballyAttachableListener')
             .setType('Map<T, List<Class<T>>>')
+            .removeBody()
+
+    attachableListenerManagerInterface
+            .addMethod('getListeners')
+            .setJavadocComment('''
+                Gets all globally attachable listeners of the given class.
+
+                @param listenerClass The class of the listener.
+                @param <T> The class of the listener.
+                @return A list with all listeners of the given type.
+            '''.stripIndent())
+            .addTypeParameter('T extends GloballyAttachableListener')
+            .setType('List<T>')
+            .addParameter('Class<T>', 'listenerClass')
             .removeBody()
 }
 
