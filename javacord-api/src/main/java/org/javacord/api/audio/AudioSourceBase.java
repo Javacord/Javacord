@@ -4,6 +4,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.audio.AudioSourceAttachableListener;
+import org.javacord.api.listener.audio.AudioSourceFinishedListener;
 import org.javacord.api.util.event.ListenerManager;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -40,6 +41,15 @@ public abstract class AudioSourceBase implements AudioSource {
         delegate = DelegateFactory.createAudioSourceBaseDelegate(api);
     }
 
+    /**
+     * Gets the delegate used by this audio source internally.
+     *
+     * @return The delegate used by this audio source internally.
+     */
+    public AudioSourceBaseDelegate getDelegate() {
+        return delegate;
+    }
+
     @Override
     public boolean isMuted() {
         return muted;
@@ -62,6 +72,17 @@ public abstract class AudioSourceBase implements AudioSource {
     @Override
     public final DiscordApi getApi() {
         return delegate.getApi();
+    }
+
+    @Override
+    public final ListenerManager<AudioSourceFinishedListener>
+            addAudioSourceFinishedListener(AudioSourceFinishedListener listener) {
+        return delegate.addAudioSourceFinishedListener(listener);
+    }
+
+    @Override
+    public final List<AudioSourceFinishedListener> getAudioSourceFinishedListeners() {
+        return delegate.getAudioSourceFinishedListeners();
     }
 
     @Override

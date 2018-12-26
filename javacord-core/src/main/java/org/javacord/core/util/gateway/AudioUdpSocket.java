@@ -1,9 +1,12 @@
 package org.javacord.core.util.gateway;
 
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.AudioSource;
+import org.javacord.api.audio.AudioSourceBase;
+import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.event.audio.AudioSourceFinishedEventImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.io.IOException;
@@ -101,7 +104,7 @@ public class AudioUdpSocket {
         }
         shouldSend = true;
 
-        DiscordApi api = connection.getChannel().getApi();
+        DiscordApiImpl api = (DiscordApiImpl) connection.getChannel().getApi();
         api.getThreadPool().getSingleThreadExecutorService(threadName).submit(() -> {
             try {
                 long nextFrameTimestamp = System.nanoTime();
@@ -118,6 +121,14 @@ public class AudioUdpSocket {
                     if (source.hasFinished()) {
                         connection.removeCurrentSource();
                         dontSleep = true;
+
+                        // Dispatch AudioSourceFinishedEvent AFTER removing the source.
+                        // Otherwise AudioSourceFinishedEvent#getNextSource() won't work
+                        api.getEventDispatcher().dispatchAudioSourceFinishedEvent(
+                                (ServerImpl) connection.getServer(),
+                                connection,
+                                ((AudioSourceBase) source).getDelegate(),
+                                new AudioSourceFinishedEventImpl(source, connection));
                         continue;
                     }
 
