@@ -2,8 +2,11 @@ package org.javacord.api.audio;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.listener.audio.AudioSourceAttachableListenerManager;
+import org.javacord.api.util.Specializable;
 
-public interface AudioSource extends Cloneable, AudioSourceAttachableListenerManager {
+import java.util.Optional;
+
+public interface AudioSource extends Cloneable, AudioSourceAttachableListenerManager, Specializable<AudioSource> {
 
     /**
      * Gets the discord api instance for this audio source.
@@ -41,6 +44,38 @@ public interface AudioSource extends Cloneable, AudioSourceAttachableListenerMan
     boolean hasFinished();
 
     /**
+     * Mutes the audio source.
+     *
+     * <p>Equivalent to calling {@code setMuted(true)}.
+     *
+     * @see #setMuted(boolean)
+     */
+    default void mute() {
+        setMuted(true);
+    }
+
+    /**
+     * Unmutes the audio source.
+     *
+     * <p>Equivalent to calling {@code setMuted(false)}.
+     *
+     * @see #setMuted(boolean)
+     */
+    default void unmute() {
+        setMuted(false);
+    }
+
+    /**
+     * Sets whether the audio source should be muted.
+     *
+     * <p>A muted audio source will still continue.
+     * This means, that after unmuting the audio source will be at a different "position".
+     *
+     * @param muted Whether the audio source should be muted.
+     */
+    void setMuted(boolean muted);
+
+    /**
      * Checks whether the audio source is muted.
      *
      * @return Whether the audio source is muted.
@@ -48,19 +83,18 @@ public interface AudioSource extends Cloneable, AudioSourceAttachableListenerMan
     boolean isMuted();
 
     /**
-     * Sets whether the audio source should be muted.
-     *
-     * <p>A muted audio source will still continue. This means, that after unmuting the audio source will be at
-     * a different "position".
-     *
-     * @param muted Whether the audio source should be muted.
-     */
-    void setMuted(boolean muted);
-
-    /**
      * Creates a copy of the audio source which can be reused for another audio connection.
      *
      * @return A copy of the audio source.
      */
     AudioSource copy();
+
+    /**
+     * Gets this audio source as a {@code PauseableAudioSource}.
+     *
+     * @return This audio source as {@code PauseableAudioSource}.
+     */
+    default Optional<PauseableAudioSource> asPauseableAudioSource() {
+        return as(PauseableAudioSource.class);
+    }
 }

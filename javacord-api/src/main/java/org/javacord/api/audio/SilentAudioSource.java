@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>Can be used to create "gaps" between audio sources.
  */
-public class SilentAudioSource extends AudioSourceBase {
+public class SilentAudioSource extends AudioSourceBase implements PauseableAudioSource {
 
     /**
      * A frame of silence.
@@ -18,6 +18,7 @@ public class SilentAudioSource extends AudioSourceBase {
 
     private final long initialDuration;
     private long duration;
+    private volatile boolean paused = false;
 
     /**
      * Creates a new silent audio source.
@@ -45,6 +46,10 @@ public class SilentAudioSource extends AudioSourceBase {
 
     @Override
     public boolean hasNextFrame() {
+        if (paused) {
+            // Don't decrement the duration if paused
+            return false;
+        }
         duration--;
         return false;
     }
@@ -62,5 +67,15 @@ public class SilentAudioSource extends AudioSourceBase {
     @Override
     public AudioSource copy() {
         return new SilentAudioSource(getApi(), initialDuration * 20, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    @Override
+    public boolean isPaused() {
+        return paused;
     }
 }
