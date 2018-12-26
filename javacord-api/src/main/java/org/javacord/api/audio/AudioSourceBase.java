@@ -69,6 +69,11 @@ public abstract class AudioSourceBase implements AudioSource {
         return !hasNextFrame();
     }
 
+    // Required because Object#clone() is protected by default.
+    // Without this abstract method, you cannot compile the class.
+    @Override
+    public abstract AudioSource clone();
+
     @Override
     public final DiscordApi getApi() {
         return delegate.getApi();

@@ -74,7 +74,7 @@ public class AudioSourceBaseDelegateImpl implements
     }
 
     @Override
-    public AudioSource copy() {
+    public AudioSource clone() {
         throw new UnsupportedOperationException("Not supported in delegate");
     }
 }

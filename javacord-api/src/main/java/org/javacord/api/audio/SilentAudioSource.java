@@ -65,7 +65,7 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
     }
 
     @Override
-    public AudioSource copy() {
+    public AudioSource clone() {
         return new SilentAudioSource(getApi(), initialDuration * 20, TimeUnit.MILLISECONDS);
     }
 

@@ -87,7 +87,7 @@ public interface AudioSource extends Cloneable, AudioSourceAttachableListenerMan
      *
      * @return A copy of the audio source.
      */
-    AudioSource copy();
+    AudioSource clone();
 
     /**
      * Gets this audio source as a {@code PauseableAudioSource}.
