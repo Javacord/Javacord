@@ -12,6 +12,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeS
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver
 
 import javax.annotation.Generated
+import javax.naming.ConfigurationException
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -90,15 +91,26 @@ task generateListenerManagers {
         }
 
         // determine which object class extends which attachable listener manager
-        def objectClassByAttachableListenerManager = javacordApi.sourceSets.main.allJava.matching {
+        def objectClassByAttachableListenerManagerEntries = javacordApi.sourceSets.main.allJava.matching {
             exclude '**/*AttachableListenerManager.java'
         }.collectMany {
             JavaParser.parse(it).findAll(ClassOrInterfaceDeclaration)
         }.findAll {
             it.extendedTypes.any { it.nameAsString.endsWith 'AttachableListenerManager' }
-        }.collectEntries {
+        }.collect {
             [it.extendedTypes.find { it.nameAsString.endsWith 'AttachableListenerManager' }.nameAsString, it.resolve()]
         }
+        def multipleObjectClassesAvailable = objectClassByAttachableListenerManagerEntries
+                .groupBy { it.first() }
+                .findAll { it.value.size() > 1 }
+        if (multipleObjectClassesAvailable) {
+            throw new ConfigurationException("Multiple attachable listener manager inheritance discovered\n\t- " +
+                    multipleObjectClassesAvailable.sort().collect {
+                        "$it.key is implemented / extended by the following ${it.value.size()} types " +
+                                "while only one is expected:\n\t\t- ${it.value*.get(1).name.sort().join('\n\t\t- ')}"
+                    }.join('\n\t- '))
+        }
+        def objectClassByAttachableListenerManager = objectClassByAttachableListenerManagerEntries.collectEntries { it }
 
         def discordApiName =
                 typeSolver.solveType('org.javacord.api.DiscordApi').qualifiedName
@@ -370,6 +382,9 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
     }
 
     def objectClass = objectClassByAttachableListenerManager."${attachableInterface.name}Manager"
+    if (!objectClass) {
+        throw new ConfigurationException("Found no type extending / implementing ${attachableInterface.name}Manager")
+    }
 
     def methodImplementation = specialMessageAttachable ?
             "return MessageAttachableListenerManager.add$listener.name(getApi(), getId(), listener);" :
@@ -661,6 +676,9 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
             .removeBody()
 
     def objectClass = objectClassByAttachableListenerManager."${attachableInterface.name}Manager"
+    if (!objectClass) {
+        throw new ConfigurationException("Found no type extending / implementing ${attachableInterface.name}Manager")
+    }
 
     if (uncachedMessageAttachableListenerManagerInterface) {
         internalUncachedMessageAttachableListenerManagerFile

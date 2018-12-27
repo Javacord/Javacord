@@ -12,6 +12,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeS
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver
 
 import javax.annotation.Generated
+import javax.naming.ConfigurationException
 import java.util.function.Function
 
 buildscript {
@@ -73,17 +74,29 @@ project(':javacord-core') {
                     .createBody()
                     .addStatement('super(api);')
 
-            // determine which entity extends which attachable listener manager
-            def entityByAttachableListenerManager = javacordApi.sourceSets.main.allJava.matching {
+            // determine which object class extends which attachable listener manager
+            def objectClassByAttachableListenerManagerEntries = javacordApi.sourceSets.main.allJava.matching {
                 exclude '**/*AttachableListenerManager.java'
             }.collectMany {
                 JavaParser.parse(it).findAll(ClassOrInterfaceDeclaration)
             }.findAll {
                 it.extendedTypes.any { it.nameAsString.endsWith 'AttachableListenerManager' }
-            }.collectEntries {
+            }.collect {
                 [it.extendedTypes.find { it.nameAsString.endsWith 'AttachableListenerManager' }.nameAsString,
                  it.resolve()]
             }
+            def multipleObjectClassesAvailable = objectClassByAttachableListenerManagerEntries
+                    .groupBy { it.first() }
+                    .findAll { it.value.size() > 1 }
+            if (multipleObjectClassesAvailable) {
+                throw new ConfigurationException("Multiple attachable listener manager inheritance discovered\n\t- " +
+                        multipleObjectClassesAvailable.sort().collect {
+                            "$it.key is implemented / extended by the following ${it.value.size()} types " +
+                                    "while only one is expected:\n\t\t- ${it.value*.get(1).name.sort().join('\n\t\t- ')}"
+                        }.join('\n\t- '))
+            }
+            def objectClassByAttachableListenerManager =
+                    objectClassByAttachableListenerManagerEntries.collectEntries { it }
 
             def objectAttachableListener =
                     typeSolver.solveType('org.javacord.api.listener.ObjectAttachableListener')
@@ -144,18 +157,18 @@ project(':javacord-core') {
                 }.each {
                     identicalMethods = false
 
-                    def entity = entityByAttachableListenerManager."${it.name}Manager"
-                    eventDispatcherFile.addImport entity.qualifiedName
-                    def entityName = entity.name
-                    def entityVariableName = "${entityName.uncapitalize()}"
+                    def objectClass = objectClassByAttachableListenerManager."${it.name}Manager"
+                    eventDispatcherFile.addImport objectClass.qualifiedName
+                    def objectClassName = objectClass.name
+                    def objectClassVariableName = "${objectClassName.uncapitalize()}"
 
-                    method.addParameter "Collection<${entityName}>", "${entityVariableName}s"
+                    method.addParameter "Collection<${objectClassName}>", "${objectClassVariableName}s"
                     method.javadocComment = method.javadocComment.orElseThrow { new AssertionError() }.content +
-                            "\n@param ${entityVariableName}s The {@code $entityName}s."
+                            "\n@param ${objectClassVariableName}s The {@code $objectClassName}s."
                     body.addStatement """
-                        if (${entityVariableName}s != null) {
-                            ${entityVariableName}s.stream()
-                                .map(${entityName}::get${listener.name}s)
+                        if (${objectClassVariableName}s != null) {
+                            ${objectClassVariableName}s.stream()
+                                .map(${objectClassName}::get${listener.name}s)
                                 .forEach(listeners::addAll);
                         }
                     """
@@ -186,14 +199,14 @@ project(':javacord-core') {
                                     MessageAttachableListenerManager.get${listener.name}s(getApi(), messageId));
                         """
                     } else {
-                        objectMethods*.addParameter entityName, entityVariableName
+                        objectMethods*.addParameter objectClassName, objectClassVariableName
                         objectMethods.each {
                             it.javadocComment = it.javadocComment.orElseThrow { new AssertionError() }.content +
-                                    "\n@param ${entityVariableName} The {@code $entityName}."
+                                    "\n@param ${objectClassVariableName} The {@code $objectClassName}."
                         }
                         objectBodies*.addStatement """
-                            if ($entityVariableName != null) {
-                                listeners.addAll(${entityVariableName}.get${listener.name}s());
+                            if ($objectClassVariableName != null) {
+                                listeners.addAll(${objectClassVariableName}.get${listener.name}s());
                             }
                         """
                     }
