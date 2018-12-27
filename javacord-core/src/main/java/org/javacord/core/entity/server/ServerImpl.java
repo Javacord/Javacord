@@ -70,6 +70,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -172,6 +173,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * If the server is ready (all members are cached).
      */
     private volatile boolean ready = false;
+
+    /**
+     * A lock that is used ti prevent lock on {@code audioConnection} and {@code pendingAudioConnection}.
+     */
+    private final ReentrantLock audioConnectionLock = new ReentrantLock();
 
     /**
      * The current audio connection of the server.
@@ -827,7 +833,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * @param audioConnection The audio connection.
      */
     public void setAudioConnection(AudioConnectionImpl audioConnection) {
-        this.audioConnection = audioConnection;
+        audioConnectionLock.lock();
+        try {
+            this.audioConnection = audioConnection;
+        } finally {
+            audioConnectionLock.unlock();
+        }
     }
 
     /**
@@ -839,7 +850,31 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * @param audioConnection The audio connection.
      */
     public void setPendingAudioConnection(AudioConnectionImpl audioConnection) {
-        pendingAudioConnection = audioConnection;
+        audioConnectionLock.lock();
+        try {
+            pendingAudioConnection = audioConnection;
+        } finally {
+            audioConnectionLock.unlock();
+        }
+    }
+
+    /**
+     * Removes an audio connection from the server.
+     *
+     * @param audioConnection The audio connection to remove.
+     */
+    public void removeAudioConnection(AudioConnection audioConnection) {
+        audioConnectionLock.lock();
+        try {
+            if (pendingAudioConnection == audioConnection) {
+                pendingAudioConnection = null;
+            }
+            if (this.audioConnection == audioConnection) {
+                this.audioConnection = null;
+            }
+        } finally {
+            audioConnectionLock.unlock();
+        }
     }
 
     /**

@@ -270,8 +270,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         websocketAdapter.disconnect();
         api.getWebSocketAdapter()
                 .sendVoiceStateUpdate(channel.getServer(), null, muted, deafened);
-        ((ServerImpl) channel.getServer()).setAudioConnection(null);
-        ((ServerImpl) channel.getServer()).setPendingAudioConnection(null);
+        ((ServerImpl) channel.getServer()).removeAudioConnection(this);
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
+import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.WebSocketLogger;
 
@@ -144,6 +145,9 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                             .orElseGet(() -> String.valueOf(code));
                 })
                 .orElse("'unknown'");
+
+        // Remove the connection from the server to allow the user to establish a new connection
+        ((ServerImpl) connection.getServer()).removeAudioConnection(connection);
 
         logger.info("Websocket closed with reason '{}' and code {} by {} for {}!",
                 closeReason, closeCodeString, closedByServer ? "server" : "client", connection);
