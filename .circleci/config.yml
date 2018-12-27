@@ -7,6 +7,9 @@ jobs:
 
     working_directory: ~/javacord
 
+    environment:
+      _JAVA_OPTIONS: -Xmx2G
+
     steps:
       - checkout
 
