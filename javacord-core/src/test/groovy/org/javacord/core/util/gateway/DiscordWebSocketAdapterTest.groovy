@@ -57,7 +57,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -83,7 +83,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -113,7 +113,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -143,7 +143,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -175,7 +175,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -204,7 +204,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -246,7 +246,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -292,7 +292,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -332,7 +332,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -373,7 +373,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -426,7 +426,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -479,7 +479,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -531,7 +531,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -571,7 +571,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }
@@ -621,7 +621,7 @@ class DiscordWebSocketAdapterTest extends Specification {
 
         when:
             new DiscordWebSocketAdapter(api, false)
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .findAll { it.thrown }
                     .each { throw it.thrown }

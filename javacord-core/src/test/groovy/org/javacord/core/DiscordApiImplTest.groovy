@@ -142,7 +142,7 @@ class DiscordApiImplTest extends Specification {
         then:
             def expectedWarning = 'All SSL certificates are trusted when connecting to the Discord API and websocket.' +
                     ' This increases the risk of man-in-the-middle attacks!'
-            ListAppender.getListAppender('Test Appender').events
+            new ArrayList<>(ListAppender.getListAppender('Test Appender').events)
                     .findAll { it.level == Level.WARN }
                     .any { it.message.formattedMessage == expectedWarning }
     }
