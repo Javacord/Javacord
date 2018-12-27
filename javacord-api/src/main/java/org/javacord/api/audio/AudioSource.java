@@ -106,4 +106,13 @@ public interface AudioSource extends Cloneable, AudioSourceAttachableListenerMan
     default Optional<DownloadableAudioSource> asDownloadableAudioSource() {
         return as(DownloadableAudioSource.class);
     }
+
+    /**
+     * Gets this audio source as a {@code BufferableAudioSource}.
+     *
+     * @return This audio source as {@code BufferableAudioSource}.
+     */
+    default Optional<BufferableAudioSource> asBufferableAudioSource() {
+        return as(BufferableAudioSource.class);
+    }
 }
