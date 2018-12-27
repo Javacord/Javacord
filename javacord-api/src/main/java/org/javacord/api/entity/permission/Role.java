@@ -245,7 +245,7 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
 
     @Override
     default String getMentionTag() {
-        return "<@&" + getIdAsString() + ">";
+        return isEveryoneRole() ? "@everyone" : "<@&" + getIdAsString() + ">";
     }
 
     @Override
