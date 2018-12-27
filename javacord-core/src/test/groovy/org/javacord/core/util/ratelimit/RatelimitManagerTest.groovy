@@ -41,7 +41,7 @@ class RatelimitManagerTest extends Specification {
             // is finished and the message got logged if the exception happened
             threadPool.shutdown()
             threadPool.executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)
-            !ListAppender.getListAppender('Test Appender').events.any { it.thrown }
+            !new ArrayList<>(ListAppender.getListAppender('Test Appender').events).any { it.thrown }
 
         cleanup:
             threadPool?.shutdown()
