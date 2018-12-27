@@ -16,12 +16,37 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
     void queue(AudioSource source);
 
     /**
+     * Queues the given audio sources.
+     *
+     * @param sources The audio sources to queue.
+     */
+    default void queue(AudioSource... sources) {
+        for (AudioSource source : sources) {
+            queue(source);
+        }
+    }
+
+    /**
      * Dequeues the given audio source.
      *
      * @param source The audio source to dequeue if present.
      * @return If this queue changed as a result of the call.
      */
     boolean dequeue(AudioSource source);
+
+    /**
+     * Dequeues the given audio sources.
+     *
+     * @param sources The audio sources to dequeue if present.
+     * @return If this queue changed as a result of the call.
+     */
+    default boolean dequeue(AudioSource... sources) {
+        boolean changed = false;
+        for (AudioSource source : sources) {
+            changed = changed || dequeue(source);
+        }
+        return changed;
+    }
 
     /**
      * Dequeues the current audio source if present.
