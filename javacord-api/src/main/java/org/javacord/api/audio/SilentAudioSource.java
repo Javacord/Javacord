@@ -43,7 +43,7 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
 
     @Override
     public byte[] getNextFrame() {
-        return null;
+        return applyTransformers(null);
     }
 
     @Override

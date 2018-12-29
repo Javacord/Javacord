@@ -2,9 +2,11 @@ package org.javacord.core.audio;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.AudioSource;
+import org.javacord.api.audio.AudioTransformer;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.core.listener.audio.InternalAudioSourceAttachableListenerManager;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -46,6 +48,26 @@ public class AudioSourceBaseDelegateImpl implements
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public void addTransformer(AudioTransformer transformer) {
+        throw new UnsupportedOperationException("Not supported in delegate");
+    }
+
+    @Override
+    public boolean removeTransformer(AudioTransformer transformer) {
+        throw new UnsupportedOperationException("Not supported in delegate");
+    }
+
+    @Override
+    public List<AudioTransformer> getTransformers() {
+        throw new UnsupportedOperationException("Not supported in delegate");
+    }
+
+    @Override
+    public void removeTransformers() {
+        throw new UnsupportedOperationException("Not supported in delegate");
     }
 
     @Override

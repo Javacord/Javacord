@@ -4,6 +4,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.listener.audio.AudioSourceAttachableListenerManager;
 import org.javacord.api.util.Specializable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AudioSource extends Cloneable, AudioSourceAttachableListenerManager, Specializable<AudioSource> {
@@ -14,6 +15,33 @@ public interface AudioSource extends Cloneable, AudioSourceAttachableListenerMan
      * @return The discord api instance.
      */
     DiscordApi getApi();
+
+    /**
+     * Adds a transformer to the audio source.
+     *
+     * @param transformer The transformer.
+     */
+    void addTransformer(AudioTransformer transformer);
+
+    /**
+     * Removes a transformer from the audio source.
+     *
+     * @param transformer The transformer.
+     * @return If the audio source contained the specified transformer.
+     */
+    boolean removeTransformer(AudioTransformer transformer);
+
+    /**
+     * Gets a list of all transformers of this audio source.
+     *
+     * @return A list with all transformers.
+     */
+    List<AudioTransformer> getTransformers();
+
+    /**
+     * Removes all transformers from the audio source.
+     */
+    void removeTransformers();
 
     /**
      * Polls for the next 20ms of audio from the source.
@@ -84,6 +112,8 @@ public interface AudioSource extends Cloneable, AudioSourceAttachableListenerMan
 
     /**
      * Creates a copy of the audio source which can be reused for another audio connection.
+     *
+     * <p>Does not clone the state of the audio source, e.g. if it is muted, it's transformers, etc.
      *
      * @return A copy of the audio source.
      */
