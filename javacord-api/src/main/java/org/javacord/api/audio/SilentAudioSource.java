@@ -2,22 +2,24 @@ package org.javacord.api.audio;
 
 import org.javacord.api.DiscordApi;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A silent audio source that's always muted.
  *
  * <p>Can be used to create "gaps" between audio sources.
  */
-public class SilentAudioSource extends AudioSourceBase implements PauseableAudioSource {
+public class SilentAudioSource extends AudioSourceBase implements PauseableAudioSource, SeekableAudioSource {
 
     /**
      * A frame of silence.
      */
     public static final byte[] SILENCE_FRAME = {(byte) 0xF8, (byte) 0xFF, (byte) 0xFE};
 
-    private final long initialDuration;
-    private long duration;
+    private final long duration;
+    private final AtomicLong position;
     private volatile boolean paused = false;
 
     /**
@@ -35,8 +37,8 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
      */
     public SilentAudioSource(DiscordApi api, long duration, TimeUnit unit) {
         super(api);
-        initialDuration = unit.toMillis(duration) / 20;
-        this.duration = initialDuration;
+        this.duration = unit.toMillis(duration) / 20;
+        position = new AtomicLong(this.duration);
     }
 
     @Override
@@ -47,16 +49,16 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
     @Override
     public boolean hasNextFrame() {
         if (paused) {
-            // Don't decrement the duration if paused
+            // Don't increment the position if paused
             return false;
         }
-        duration--;
+        position.getAndIncrement();
         return false;
     }
 
     @Override
     public boolean hasFinished() {
-        return duration <= 0;
+        return position.get() >= duration;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
 
     @Override
     public AudioSource clone() {
-        return new SilentAudioSource(getApi(), initialDuration * 20, TimeUnit.MILLISECONDS);
+        return new SilentAudioSource(getApi(), duration * 20, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -77,5 +79,28 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
     @Override
     public boolean isPaused() {
         return paused;
+    }
+
+    @Override
+    public long setPosition(long position, TimeUnit unit) {
+        long newPosition = unit.toMillis(position) / 20;
+
+        // Don't set a position that's larger than the duration
+        if (newPosition >= duration) {
+            newPosition = duration;
+        }
+        this.position.set(newPosition);
+
+        return unit.convert(newPosition * 20, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public Duration getPosition() {
+        return Duration.ofMillis(position.get() * 20);
+    }
+
+    @Override
+    public Duration getDuration() {
+        return Duration.ofMillis(duration * 20);
     }
 }
