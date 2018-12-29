@@ -26,7 +26,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server channel.
  */
-public interface ServerChannel extends Channel, Nameable, ServerChannelAttachableListenerManager {
+public interface ServerChannel extends Channel, Nameable, ServerChannelAttachableListenerManager,
+        Comparable<ServerChannel> {
 
     /**
      * Gets the server of the channel.
@@ -309,6 +310,21 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
             result.completeExceptionally(new NoSuchElementException());
             return result;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p><b><i>Implementation note:</i></b> Only channels from the same server can be compared
+     *
+     * @throws IllegalArgumentException If the channels are on different servers.
+     */
+    @Override
+    default int compareTo(ServerChannel channel) {
+        if (!getServer().equals(channel.getServer())) {
+            throw new IllegalArgumentException("Only channels from the same server can be compared for order");
+        }
+        return getPosition() - channel.getPosition();
     }
 
 }
