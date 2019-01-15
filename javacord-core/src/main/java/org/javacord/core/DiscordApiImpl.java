@@ -910,6 +910,38 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
+     * Remove all listeners attached to an object.
+     *
+     * @param objectClass The class of the object.
+     * @param objectId The id of the object.
+     */
+    public void removeObjectListeners(Class<?> objectClass, long objectId) {
+        if (objectClass == null) {
+            return;
+        }
+        synchronized (objectListeners) {
+            Map<Long, Map<Class<? extends ObjectAttachableListener>,
+                    Map<ObjectAttachableListener, ListenerManagerImpl<? extends ObjectAttachableListener>>>>
+                    objects = objectListeners.get(objectClass);
+            if (objects == null) {
+                return;
+            }
+            // Remove all listeners
+            objects.computeIfPresent(objectId, (id, listeners) -> {
+                listeners.values().stream()
+                        .flatMap(map -> map.values().stream())
+                        .forEach(ListenerManagerImpl::removed);
+                listeners.clear();
+                return null;
+            });
+            // Cleanup
+            if (objects.isEmpty()) {
+                objectListeners.remove(objectClass);
+            }
+        }
+    }
+
+    /**
      * Gets a map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and their
      * assigned listener classes they listen to.
      *
