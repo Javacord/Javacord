@@ -159,7 +159,7 @@ public class RatelimitManager {
      */
     private void handleResponse(
             RestRequest<?> request, RestRequestResult result, RatelimitBucket bucket, long responseTimestamp) {
-        if (result == null) {
+        if (result == null || result.getResponse() == null) {
             return;
         }
         Response response = result.getResponse();
@@ -211,7 +211,7 @@ public class RatelimitManager {
      */
     private void calculateOffset(long currentTime, RestRequestResult result) {
         // Double-checked locking for better performance
-        if ((api.getTimeOffset() != null) || (result == null)) {
+        if ((api.getTimeOffset() != null) || (result == null) || (result.getResponse() == null)) {
             return;
         }
         synchronized (api) {
