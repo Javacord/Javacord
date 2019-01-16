@@ -36,6 +36,7 @@ import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.auditlog.AuditLogImpl;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
+import org.javacord.core.entity.channel.ServerChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
@@ -990,7 +991,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public List<Role> getRoles() {
         return Collections.unmodifiableList(roles.values().stream()
-                .sorted(Comparator.comparingInt(Role::getPosition))
+                .sorted()
                 .collect(Collectors.toList()));
     }
 
@@ -1194,9 +1195,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         .map(categorizable -> !categorizable.getCategory().isPresent())
                         .orElse(false))
                 .sorted(Comparator
-                                .<ServerChannel>comparingInt(channel -> channel.getType().getId())
-                                .thenComparingInt(ServerChannel::getRawPosition)
-                                .thenComparingLong(ServerChannel::getId))
+                        .<ServerChannel>comparingInt(channel -> channel.getType().getId())
+                        .thenComparing(ServerChannelImpl.COMPARE_BY_RAW_POSITION))
                 .collect(Collectors.toList());
         getChannelCategories().forEach(category -> {
             channels.add(category);
@@ -1209,7 +1209,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public List<ChannelCategory> getChannelCategories() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ChannelCategory)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition).thenComparingLong(ServerChannel::getId))
+                .sorted(ServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .map(channel -> (ChannelCategory) channel)
                 .collect(Collectors.toList()));
     }
@@ -1218,7 +1218,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public List<ServerTextChannel> getTextChannels() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerTextChannel)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition).thenComparingLong(ServerChannel::getId))
+                .sorted(ServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .map(channel -> (ServerTextChannel) channel)
                 .collect(Collectors.toList()));
     }
@@ -1227,7 +1227,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public List<ServerVoiceChannel> getVoiceChannels() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(channel -> channel instanceof ServerVoiceChannel)
-                .sorted(Comparator.comparingInt(ServerChannel::getRawPosition).thenComparingLong(ServerChannel::getId))
+                .sorted(ServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .map(channel -> (ServerVoiceChannel) channel)
                 .collect(Collectors.toList()));
     }

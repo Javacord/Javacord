@@ -29,11 +29,25 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     Server getServer();
 
     /**
-     * Gets the position of the role.
+     * Gets the real position of the role.
      *
-     * @return The position of the role.
+     * <p>Will return <code>-1</code> if the Role got deleted.
+     *
+     * @return The real position of the role.
      */
-    int getPosition();
+    default int getPosition() {
+        return getServer().getRoles().indexOf(this);
+    }
+
+    /**
+     * Gets the raw position of the role.
+     *
+     * <p>This is the position that gets send by discord. It might not be unique and there might be a gap between
+     * roles.
+     *
+     * @return The raw position of the role.
+     */
+    int getRawPosition();
 
     /**
      * Gets the color of the role.

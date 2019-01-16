@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
 
     private static final Comparator<Role> ROLE_COMPARATOR = Comparator
-            .comparingInt(Role::getPosition)
+            .comparingInt(Role::getRawPosition)
             .thenComparing(Comparator.comparing(Role::getId).reversed());
 
     /**
@@ -56,9 +56,9 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     private volatile String name;
 
     /**
-     * The position of the role.
+     * The raw position of the role.
      */
-    private volatile int position;
+    private volatile int rawPosition;
 
     /**
      * The color of the role.
@@ -107,7 +107,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
         this.server = server;
         this.id = data.get("id").asLong();
         this.name = data.get("name").asText();
-        this.position = data.get("position").asInt();
+        this.rawPosition = data.get("position").asInt();
         this.color = data.get("color").asInt(0);
         this.hoist = data.get("hoist").asBoolean(false);
         this.mentionable = data.get("mentionable").asBoolean(false);
@@ -198,12 +198,12 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     }
 
     /**
-     * Sets the position of the role.
+     * Sets the raw position of the role.
      *
-     * @param position The position to set.
+     * @param position The raw position to set.
      */
-    public void setPosition(int position) {
-        this.position = position;
+    public void setRawPosition(int position) {
+        this.rawPosition = position;
     }
 
     @Override
@@ -227,8 +227,8 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     }
 
     @Override
-    public int getPosition() {
-        return position;
+    public int getRawPosition() {
+        return rawPosition;
     }
 
     @Override
