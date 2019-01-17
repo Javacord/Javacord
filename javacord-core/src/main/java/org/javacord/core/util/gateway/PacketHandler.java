@@ -49,17 +49,17 @@ public abstract class PacketHandler {
             executorService.submit(() -> {
                 try {
                     handle(packet);
-                } catch (Exception e) {
+                } catch (Throwable t) {
                     logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
-                            getType(), packet, e);
+                            getType(), packet, t);
                 }
             });
         } else {
             try {
                 handle(packet);
-            } catch (Exception e) {
+            } catch (Throwable t) {
                 logger.warn("Couldn't handle packet of type {}. Please contact the developer! (packet: {})",
-                        getType(), packet, e);
+                        getType(), packet, t);
             }
         }
     }
