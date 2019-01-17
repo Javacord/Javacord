@@ -7,6 +7,8 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.listener.webhook.WebhookAttachableListener;
+import org.javacord.api.listener.webhook.WebhookAttachableListenerManager;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -19,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a webhook.
  * Webhook objects won't receive any updates!
  */
-public interface Webhook extends DiscordEntity, Updatable<Webhook> {
+public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttachableListenerManager {
 
     /**
      * Gets the server id of the webhook.

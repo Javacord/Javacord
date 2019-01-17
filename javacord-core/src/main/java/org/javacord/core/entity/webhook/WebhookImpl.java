@@ -11,6 +11,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
+import org.javacord.core.listener.webhook.InternalWebhookAttachableListenerManager;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -25,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link Webhook}.
  */
-public class WebhookImpl implements Webhook {
+public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerManager {
 
     /**
      * The logger of this class.
