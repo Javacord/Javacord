@@ -79,6 +79,16 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     Optional<Activity> getActivity();
 
     /**
+     * Checks if the user can manage the target role.
+     *
+     * @param role The role that is to be managed.
+     * @return Whether the user can manage the role.
+     */
+    default boolean canManageRole(Role role) {
+        return role.getServer().canManageRole(this, role);
+    }
+
+    /**
      * Gets the server voice channels the user is connected to.
      *
      * @return The server voice channels the user is connected to.
