@@ -2,6 +2,7 @@ package org.javacord.core.util.handler.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
@@ -20,6 +21,8 @@ import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -53,15 +56,30 @@ public class PresenceUpdateHandler extends PacketHandler {
                     dispatchUserActivityChangeEvent(user, newActivity, oldActivity);
                 }
             }
+            UserStatus oldStatus = user.getStatus();
+            UserStatus newStatus = oldStatus;
             if (packet.has("status")) {
-                UserStatus newStatus = UserStatus.fromString(
-                        packet.has("status") ? packet.get("status").asText(null) : null);
-                UserStatus oldStatus = user.getStatus();
+                newStatus = UserStatus.fromString(packet.get("status").asText(null));
                 user.setStatus(newStatus);
-                if (newStatus != oldStatus) {
-                    dispatchUserStatusChangeEvent(user, newStatus, oldStatus);
-                }
             }
+            Map<DiscordClient, UserStatus> newClientStatus = new HashMap<>();
+            Map<DiscordClient, UserStatus> oldClientStatus = new HashMap<>();
+            for (DiscordClient client : DiscordClient.values()) {
+                oldClientStatus.put(client, user.getStatusOnClient(client));
+                if (packet.has("client_status")) {
+                    JsonNode clientStatus = packet.get("client_status");
+                    if (clientStatus.hasNonNull(client.getName())) {
+                        UserStatus status = UserStatus.fromString(clientStatus.get(client.getName()).asText());
+                        user.setClientStatus(client, status);
+                    } else {
+                        user.setClientStatus(client, UserStatus.OFFLINE);
+                    }
+                }
+                newClientStatus.put(client, user.getStatusOnClient(client));
+            }
+
+            dispatchUserStatusChangeEventIfChangeDetected(user, newStatus, oldStatus, newClientStatus, oldClientStatus);
+
             if (packet.get("user").has("username")) {
                 String newName = packet.get("user").get("username").asText();
                 String oldName = user.getName();
@@ -96,8 +114,25 @@ public class PresenceUpdateHandler extends PacketHandler {
                 api, user.getMutualServers(), Collections.singleton(user), event);
     }
 
-    private void dispatchUserStatusChangeEvent(User user, UserStatus newStatus, UserStatus oldStatus) {
-        UserChangeStatusEvent event = new UserChangeStatusEventImpl(user, newStatus, oldStatus);
+    private void dispatchUserStatusChangeEventIfChangeDetected(User user, UserStatus newStatus, UserStatus oldStatus,
+                                                               Map<DiscordClient, UserStatus> newClientStatus,
+                                                               Map<DiscordClient, UserStatus> oldClientStatus) {
+        // Only dispatch the event if something changed
+        boolean shouldDispatch = false;
+        if (newClientStatus != oldClientStatus) {
+            shouldDispatch = true;
+        }
+        for (DiscordClient client : DiscordClient.values()) {
+            if (newClientStatus.get(client) != oldClientStatus.get(client)) {
+                shouldDispatch = true;
+            }
+        }
+        if (!shouldDispatch) {
+            return;
+        }
+
+        UserChangeStatusEvent event =
+                new UserChangeStatusEventImpl(user, newStatus, oldStatus, newClientStatus, oldClientStatus);
 
         api.getEventDispatcher().dispatchUserChangeStatusEvent(
                 api, user.getMutualServers(), Collections.singleton(user), event);
