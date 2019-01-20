@@ -2,6 +2,7 @@ package org.javacord.core.util.handler.guild;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.server.ServerBecomesUnavailableEvent;
 import org.javacord.api.event.server.ServerLeaveEvent;
 import org.javacord.core.event.server.ServerBecomesUnavailableEventImpl;
@@ -42,6 +43,7 @@ public class GuildDeleteHandler extends PacketHandler {
 
             api.getEventDispatcher().dispatchServerLeaveEvent((DispatchQueueSelector) server, server, event);
         });
+        api.removeObjectListeners(Server.class, serverId);
         api.removeServerFromCache(serverId);
     }
 

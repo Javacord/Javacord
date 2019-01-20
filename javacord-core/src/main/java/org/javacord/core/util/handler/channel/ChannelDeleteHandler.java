@@ -2,7 +2,15 @@ package org.javacord.core.util.handler.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.channel.Channel;
+import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.GroupChannel;
+import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.event.channel.group.GroupChannelDeleteEvent;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.channel.user.PrivateChannelDeleteEvent;
@@ -70,6 +78,9 @@ public class ChannelDeleteHandler extends PacketHandler {
                             ((ServerImpl) server).removeChannelFromCache(channel.getId());
                         }
                 ));
+        api.removeObjectListeners(ChannelCategory.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
     }
 
     /**
@@ -85,6 +96,10 @@ public class ChannelDeleteHandler extends PacketHandler {
                     dispatchServerChannelDeleteEvent(channel);
                     ((ServerImpl) server).removeChannelFromCache(channel.getId());
                 }));
+        api.removeObjectListeners(ServerTextChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(TextChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
     }
 
     /**
@@ -100,6 +115,10 @@ public class ChannelDeleteHandler extends PacketHandler {
                     dispatchServerChannelDeleteEvent(channel);
                     ((ServerImpl) server).removeChannelFromCache(channel.getId());
                 }));
+        api.removeObjectListeners(ServerVoiceChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(VoiceChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
     }
 
     /**
@@ -113,6 +132,11 @@ public class ChannelDeleteHandler extends PacketHandler {
             PrivateChannelDeleteEvent event = new PrivateChannelDeleteEventImpl(privateChannel);
 
             api.getEventDispatcher().dispatchPrivateChannelDeleteEvent(api, privateChannel, recipient, event);
+            long channelId = privateChannel.getId();
+            api.removeObjectListeners(PrivateChannel.class, channelId);
+            api.removeObjectListeners(VoiceChannel.class, channelId);
+            api.removeObjectListeners(TextChannel.class, channelId);
+            api.removeObjectListeners(Channel.class, channelId);
 
             recipient.setChannel(null);
         });
@@ -131,6 +155,10 @@ public class ChannelDeleteHandler extends PacketHandler {
 
             api.getEventDispatcher().dispatchGroupChannelDeleteEvent(
                     api, Collections.singleton(groupChannel), groupChannel.getMembers(), event);
+            api.removeObjectListeners(GroupChannel.class, channelId);
+            api.removeObjectListeners(VoiceChannel.class, channelId);
+            api.removeObjectListeners(TextChannel.class, channelId);
+            api.removeObjectListeners(Channel.class, channelId);
 
             api.removeGroupChannelFromCache(channelId);
         });

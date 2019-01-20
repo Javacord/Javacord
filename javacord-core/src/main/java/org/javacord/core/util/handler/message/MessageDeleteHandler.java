@@ -3,10 +3,10 @@ package org.javacord.core.util.handler.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageDeleteEvent;
 import org.javacord.core.event.message.MessageDeleteEventImpl;
-import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
@@ -34,8 +34,6 @@ public class MessageDeleteHandler extends PacketHandler {
         api.getTextChannelById(channelId).ifPresent(channel -> {
             MessageDeleteEvent event = new MessageDeleteEventImpl(api, messageId, channel);
 
-            api.getCachedMessageById(messageId)
-                    .ifPresent(((MessageCacheImpl) channel.getMessageCache())::removeMessage);
             api.removeMessageFromCache(messageId);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
@@ -45,6 +43,7 @@ public class MessageDeleteHandler extends PacketHandler {
                     optionalServer.orElse(null),
                     channel,
                     event);
+            api.removeObjectListeners(Message.class, messageId);
         });
     }
 }
