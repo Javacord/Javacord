@@ -113,9 +113,7 @@ public class WebhookBuilderDelegateImpl implements WebhookBuilderDelegate {
             throw new IllegalStateException("Name is no optional parameter!");
         }
         ObjectNode body = JsonNodeFactory.instance.objectNode();
-        if (name != null) {
-            body.put("name", name);
-        }
+        body.put("name", name);
         if (avatar != null) {
             return avatar.asByteArray(channel.getApi()).thenAccept(bytes -> {
                 String base64Avatar = "data:image/" + avatar.getFileType() + ";base64,"
