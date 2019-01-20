@@ -1,5 +1,6 @@
 package org.javacord.core.util.logging;
 
+import com.neovisionaries.ws.client.ThreadType;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFrame;
@@ -16,11 +17,6 @@ public class WebSocketLogger implements WebSocketListener {
     @Override
     public void onStateChanged(WebSocket websocket, WebSocketState newState) {
         logger.trace("onStateChanged: newState='{}'", newState);
-    }
-
-    @Override
-    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
-        logger.trace("onConnected: headers='{}'", headers);
     }
 
     @Override
@@ -76,6 +72,11 @@ public class WebSocketLogger implements WebSocketListener {
     }
 
     @Override
+    public void onTextMessage(WebSocket websocket, byte[] data) {
+        logger.trace("onTextFrame: data='{}'", data);
+    }
+
+    @Override
     public void onBinaryMessage(WebSocket websocket, byte[] binary) {
         logger.trace("onBinaryMessage: binary='{}'", binary);
     }
@@ -93,6 +94,26 @@ public class WebSocketLogger implements WebSocketListener {
     @Override
     public void onFrameUnsent(WebSocket websocket, WebSocketFrame frame) {
         logger.trace("onFrameUnsent: frame='{}'", frame);
+    }
+
+    @Override
+    public void onThreadCreated(WebSocket websocket, ThreadType threadType, Thread thread) {
+        logger.trace("onThreadCreated: threadType='{}' thread='{}'", threadType, thread);
+    }
+
+    @Override
+    public void onThreadStarted(WebSocket websocket, ThreadType threadType, Thread thread) {
+        logger.trace("onThreadStarted: threadType='{}' thread='{}'", threadType, thread);
+    }
+
+    @Override
+    public void onThreadStopping(WebSocket websocket, ThreadType threadType, Thread thread) {
+        logger.trace("onThreadStopping: threadType='{}' thread='{}'", threadType, thread);
+    }
+
+    @Override
+    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
+        logger.trace("onConnected: headers='{}'", headers);
     }
 
     @Override
