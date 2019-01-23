@@ -12,13 +12,13 @@ import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageType;
 import org.javacord.api.entity.message.Reaction;
-import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
-import org.javacord.core.entity.message.embed.EmbedImpl;
+import org.javacord.core.entity.message.embed.sent.SentEmbedImpl;
 import org.javacord.core.listener.message.InternalMessageAttachableListenerManager;
 import org.javacord.core.util.cache.MessageCacheImpl;
 
@@ -96,7 +96,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     /**
      * A list with all embeds.
      */
-    private final List<Embed> embeds = new ArrayList<>();
+    private final List<SentEmbed> sentEmbeds = new ArrayList<>();
 
     /**
      * A list with all reactions.
@@ -149,8 +149,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
         if (data.has("embeds")) {
             for (JsonNode embedJson : data.get("embeds")) {
-                Embed embed = new EmbedImpl(embedJson);
-                embeds.add(embed);
+                SentEmbed sentEmbed = new SentEmbedImpl(embedJson);
+                sentEmbeds.add(sentEmbed);
             }
         }
 
@@ -229,11 +229,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     /**
      * Sets the embeds of the message.
      *
-     * @param embeds The embeds to set.
+     * @param sentEmbeds The embeds to set.
      */
-    public void setEmbeds(List<Embed> embeds) {
-        this.embeds.clear();
-        this.embeds.addAll(embeds);
+    public void setSentEmbeds(List<SentEmbed> sentEmbeds) {
+        this.sentEmbeds.clear();
+        this.sentEmbeds.addAll(sentEmbeds);
     }
 
     /**
@@ -336,8 +336,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     @Override
-    public List<Embed> getEmbeds() {
-        return Collections.unmodifiableList(new ArrayList<>(embeds));
+    public List<SentEmbed> getSentEmbeds() {
+        return Collections.unmodifiableList(new ArrayList<>(sentEmbeds));
     }
 
     @Override

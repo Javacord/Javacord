@@ -1,31 +1,12 @@
 package org.javacord.api.entity.message.embed;
 
-import java.net.URL;
+import org.javacord.api.entity.message.embed.sent.SentEmbedVideo;
 
 /**
  * This interface represents an embed video.
+ *
+ * @deprecated Replaced by {@link SentEmbedVideo}.
  */
-public interface EmbedVideo {
-
-    /**
-     * Gets the url of the video.
-     *
-     * @return The url of the video.
-     */
-    URL getUrl();
-
-    /**
-     * Gets the height of the video.
-     *
-     * @return The height of the video.
-     */
-    int getHeight();
-
-    /**
-     * Gets the width of the video.
-     *
-     * @return The width of the video.
-     */
-    int getWidth();
-
+@Deprecated
+public interface EmbedVideo extends SentEmbedVideo {
 }

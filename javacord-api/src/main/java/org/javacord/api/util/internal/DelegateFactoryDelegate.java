@@ -225,5 +225,4 @@ public interface DelegateFactoryDelegate {
      * @return A new discord exception validator.
      */
     DiscordExceptionValidator createDiscordExceptionValidator();
-
 }

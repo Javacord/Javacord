@@ -1,34 +1,12 @@
 package org.javacord.api.entity.message.embed;
 
-import org.javacord.api.entity.Nameable;
-
-import java.net.URL;
-import java.util.Optional;
+import org.javacord.api.entity.message.embed.sent.SentEmbedAuthor;
 
 /**
  * This interface represents an embed author.
+ *
+ * @deprecated Replaced by {@link SentEmbedAuthor}.
  */
-public interface EmbedAuthor extends Nameable {
-
-    /**
-     * Gets the url of the author.
-     *
-     * @return The url of the author.
-     */
-    Optional<URL> getUrl();
-
-    /**
-     * Gets the url of the author icon.
-     *
-     * @return The url of the author icon.
-     */
-    Optional<URL> getIconUrl();
-
-    /**
-     * Gets the proxy url of the author icon.
-     *
-     * @return The proxy url of the author icon.
-     */
-    Optional<URL> getProxyIconUrl();
-
+@Deprecated
+public interface EmbedAuthor extends SentEmbedAuthor {
 }

@@ -11,11 +11,12 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -49,7 +50,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     /**
      * The embed of the message. Might be <code>null</code>.
      */
-    private EmbedBuilder embed = null;
+    private EmbedDraft embed = null;
 
     /**
      * If the message should be text to speech or not.
@@ -110,7 +111,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
-    public void setEmbed(EmbedBuilder embed) {
+    public void setEmbed(EmbedDraft embed) {
         this.embed = embed;
     }
 
@@ -271,7 +272,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 .put("tts", tts);
         body.putArray("mentions");
         if (embed != null) {
-            ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
+            ((EmbedDraftImpl) embed).applyToNode(body);
         }
         if (nonce != null) {
             body.put("nonce", nonce);
@@ -290,8 +291,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
                     // Add the attachments required for the embed
                     if (embed != null) {
-                        tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
+                        tempAttachments.addAll(((EmbedDraftImpl) embed).getAttachments());
                     }
                     Collections.reverse(tempAttachments);
                     for (int i = 0; i < tempAttachments.size(); i++) {

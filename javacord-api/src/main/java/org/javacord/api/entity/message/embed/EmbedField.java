@@ -1,24 +1,12 @@
 package org.javacord.api.entity.message.embed;
 
-import org.javacord.api.entity.Nameable;
+import org.javacord.api.entity.message.embed.sent.SentEmbedField;
 
 /**
  * This interface represents an embed field.
+ *
+ * @deprecated Replaced by {@link SentEmbedField}.
  */
-public interface EmbedField extends Nameable {
-
-    /**
-     * Gets the value of the field.
-     *
-     * @return The value of the field.
-     */
-    String getValue();
-
-    /**
-     * Gets whether or not this field should display inline.
-     *
-     * @return Whether or not this field should display inline.
-     */
-    boolean isInline();
-
+@Deprecated
+public interface EmbedField extends SentEmbedField {
 }

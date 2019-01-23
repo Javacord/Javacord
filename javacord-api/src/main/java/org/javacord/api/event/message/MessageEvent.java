@@ -1,7 +1,7 @@
 package org.javacord.api.event.message;
 
 import org.javacord.api.entity.emoji.Emoji;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.TextChannelEvent;
@@ -57,7 +57,7 @@ public interface MessageEvent extends TextChannelEvent {
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> editMessage(EmbedBuilder embed);
+    CompletableFuture<Void> editMessage(EmbedDraft embed);
 
     /**
      * Updates the content and the embed of the message involved in the event.
@@ -66,7 +66,7 @@ public interface MessageEvent extends TextChannelEvent {
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> editMessage(String content, EmbedBuilder embed);
+    CompletableFuture<Void> editMessage(String content, EmbedDraft embed);
 
     /**
      * Adds a unicode reaction to the message involved in the event.

@@ -5,14 +5,14 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.CachedMessagePinEvent;
 import org.javacord.api.event.message.CachedMessageUnpinEvent;
 import org.javacord.api.event.message.MessageEditEvent;
 import org.javacord.core.entity.message.MessageImpl;
-import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
-import org.javacord.core.entity.message.embed.EmbedImpl;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
+import org.javacord.core.entity.message.embed.sent.SentEmbedImpl;
 import org.javacord.core.event.message.CachedMessagePinEventImpl;
 import org.javacord.core.event.message.CachedMessageUnpinEventImpl;
 import org.javacord.core.event.message.MessageEditEventImpl;
@@ -121,7 +121,7 @@ public class MessageUpdateHandler extends PacketHandler {
                 }
 
                 String oldContent = message.map(Message::getContent).orElse(null);
-                List<Embed> oldEmbeds = message.map(Message::getEmbeds).orElse(null);
+                List<SentEmbed> oldSentEmbeds = message.map(Message::getSentEmbeds).orElse(null);
 
                 String newContent = null;
                 if (packet.has("content")) {
@@ -129,15 +129,15 @@ public class MessageUpdateHandler extends PacketHandler {
                     String finalNewContent = newContent;
                     message.ifPresent(msg -> msg.setContent(finalNewContent));
                 }
-                List<Embed> newEmbeds = null;
+                List<SentEmbed> newSentEmbeds = null;
                 if (packet.has("embeds")) {
-                    newEmbeds = new ArrayList<>();
+                    newSentEmbeds = new ArrayList<>();
                     for (JsonNode embedJson : packet.get("embeds")) {
-                        Embed embed = new EmbedImpl(embedJson);
-                        newEmbeds.add(embed);
+                        SentEmbed sentEmbed = new SentEmbedImpl(embedJson);
+                        newSentEmbeds.add(sentEmbed);
                     }
-                    List<Embed> finalNewEmbeds = newEmbeds;
-                    message.ifPresent(msg -> msg.setEmbeds(finalNewEmbeds));
+                    List<SentEmbed> finalNewSentEmbeds = newSentEmbeds;
+                    message.ifPresent(msg -> msg.setSentEmbeds(finalNewSentEmbeds));
                 }
 
                 if (oldContent != null && newContent != null && !oldContent.equals(newContent)) {
@@ -145,15 +145,15 @@ public class MessageUpdateHandler extends PacketHandler {
                     isMostLikelyAnEdit = true;
                 }
 
-                if (oldEmbeds != null && newEmbeds != null) {
-                    if (newEmbeds.size() != oldEmbeds.size()) {
+                if (oldSentEmbeds != null && newSentEmbeds != null) {
+                    if (newSentEmbeds.size() != oldSentEmbeds.size()) {
                         isMostLikelyAnEdit = true;
                     } else {
-                        for (int i = 0; i < newEmbeds.size(); i++) {
-                            if (!((EmbedBuilderDelegateImpl) newEmbeds.get(i)
-                                    .toBuilder().getDelegate()).toJsonNode().toString()
-                                    .equals(((EmbedBuilderDelegateImpl) oldEmbeds.get(i)
-                                            .toBuilder().getDelegate()).toJsonNode().toString())) {
+                        for (int i = 0; i < newSentEmbeds.size(); i++) {
+                            if (!((EmbedDraftImpl) newSentEmbeds.get(i)
+                                    .toEmbedDraft()).toJsonNode().toString()
+                                    .equals(((EmbedDraftImpl) oldSentEmbeds.get(i)
+                                            .toEmbedDraft()).toJsonNode().toString())) {
                                 isMostLikelyAnEdit = true;
                             }
                         }
@@ -162,7 +162,7 @@ public class MessageUpdateHandler extends PacketHandler {
 
                 if (isMostLikelyAnEdit) {
                     editEvent = new MessageEditEventImpl(
-                            api, messageId, channel, newContent, newEmbeds, oldContent, oldEmbeds);
+                            api, messageId, channel, newContent, newSentEmbeds, oldContent, oldSentEmbeds);
                 }
             }
 

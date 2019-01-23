@@ -1,6 +1,6 @@
 package org.javacord.api.event.message;
 
-import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,13 +29,13 @@ public interface MessageEditEvent extends RequestableMessageEvent {
      *
      * @return The new embeds of the message.
      */
-    List<Embed> getNewEmbeds();
+    List<SentEmbed> getNewSentEmbeds();
 
     /**
      * Gets the old embeds of the message. It will only be present, if the message is in the cache.
      *
      * @return The old embeds of the message.
      */
-    Optional<List<Embed>> getOldEmbeds();
+    Optional<List<SentEmbed>> getOldSentEmbeds();
 
 }

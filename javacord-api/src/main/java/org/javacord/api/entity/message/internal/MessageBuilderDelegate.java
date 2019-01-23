@@ -7,7 +7,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.user.User;
 
 import java.awt.image.BufferedImage;
@@ -72,7 +72,7 @@ public interface MessageBuilderDelegate {
      *
      * @param embed The embed to set.
      */
-    void setEmbed(EmbedBuilder embed);
+    void setEmbed(EmbedDraft embed);
 
     /**
      * Sets if the message should be text to speech.

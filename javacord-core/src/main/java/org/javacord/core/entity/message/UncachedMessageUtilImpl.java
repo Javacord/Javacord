@@ -9,10 +9,10 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.UncachedMessageUtil;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
 import org.javacord.core.listener.message.InternalUncachedMessageAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -156,30 +156,30 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<Void> edit(long channelId, long messageId, EmbedBuilder embed) {
+    public CompletableFuture<Void> edit(long channelId, long messageId, EmbedDraft embed) {
         return edit(channelId, messageId, null, false, embed, true);
     }
 
     @Override
-    public CompletableFuture<Void> edit(String channelId, String messageId, EmbedBuilder embed) {
+    public CompletableFuture<Void> edit(String channelId, String messageId, EmbedDraft embed) {
         return edit(channelId, messageId, null, false, embed, true);
     }
 
     @Override
     public CompletableFuture<Void> edit(
-            long channelId, long messageId, String content, EmbedBuilder embed) {
+            long channelId, long messageId, String content, EmbedDraft embed) {
         return edit(channelId, messageId, content, true, embed, true);
     }
 
     @Override
     public CompletableFuture<Void> edit(
-            String channelId, String messageId, String content, EmbedBuilder embed) {
+            String channelId, String messageId, String content, EmbedDraft embed) {
         return edit(channelId, messageId, content, true, embed, true);
     }
 
     @Override
     public CompletableFuture<Void> edit(long channelId, long messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
+                                        boolean updateContent, EmbedDraft embed, boolean updateEmbed) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         if (updateContent) {
             if (content == null) {
@@ -192,7 +192,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
             if (embed == null) {
                 body.putNull("embed");
             } else {
-                ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
+                ((EmbedDraftImpl) embed).applyToNode(body);
             }
         }
         return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
@@ -203,7 +203,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
 
     @Override
     public CompletableFuture<Void> edit(String channelId, String messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
+                                        boolean updateContent, EmbedDraft embed, boolean updateEmbed) {
         try {
             return edit(Long.parseLong(channelId), Long.parseLong(messageId), content, true, embed, true);
         } catch (NumberFormatException e) {
