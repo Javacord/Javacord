@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
@@ -22,9 +23,11 @@ import org.javacord.core.util.rest.RestRequest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The implementation of {@link User}.
@@ -82,6 +85,11 @@ public class UserImpl implements User, Cleanupable, InternalUserAttachableListen
     private volatile UserStatus status = UserStatus.OFFLINE;
 
     /**
+     * The status of the user on a given client.
+     */
+    private final Map<DiscordClient, UserStatus> clientStatus = new ConcurrentHashMap<>();
+
+    /**
      * Creates a new user.
      *
      * @param api The discord api instance.
@@ -131,6 +139,16 @@ public class UserImpl implements User, Cleanupable, InternalUserAttachableListen
      */
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    /**
+     * Sets the client status of the user.
+     *
+     * @param client The client.
+     * @param status The status to set.
+     */
+    public void setClientStatus(DiscordClient client, UserStatus status) {
+        clientStatus.put(client, status);
     }
 
     /**
@@ -208,6 +226,11 @@ public class UserImpl implements User, Cleanupable, InternalUserAttachableListen
     @Override
     public UserStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public UserStatus getStatusOnClient(DiscordClient client) {
+        return clientStatus.getOrDefault(client, UserStatus.OFFLINE);
     }
 
     /**

@@ -2,6 +2,7 @@ package org.javacord.api.entity.user;
 
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
@@ -20,10 +21,12 @@ import org.javacord.api.listener.user.UserAttachableListenerManager;
 
 import java.awt.Color;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -120,11 +123,77 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     }
 
     /**
-     * Gets the status of the user.
+     * Gets the connection status of the user as it is displayed in the user list.
+     *
+     * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
+     *
+     * <p>To see if a non-offline user is connected via a mobile client, a desktop client, a web client or any
+     * combination of the three use the {@link #getStatusOnClient(DiscordClient)}} method.
      *
      * @return The status of the user.
      */
     UserStatus getStatus();
+
+    /**
+     * Gets the status of the user on the given client.
+     *
+     * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
+     *
+     * @param client The client.
+     * @return The status of the user
+     * @see #getStatus()
+     */
+    UserStatus getStatusOnClient(DiscordClient client);
+
+    /**
+     * Gets the status of the user on the {@link DiscordClient#DESKTOP desktop} client.
+     *
+     * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
+     *
+     * @return The status of the the user.
+     * @see #getStatusOnClient(DiscordClient)
+     */
+    default UserStatus getDesktopStatus() {
+        return getStatusOnClient(DiscordClient.DESKTOP);
+    }
+
+    /**
+     * Gets the status of the user on the {@link DiscordClient#MOBILE mobile} client.
+     *
+     * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
+     *
+     * @return The status of the the user.
+     * @see #getStatusOnClient(DiscordClient)
+     */
+    default UserStatus getMobileStatus() {
+        return getStatusOnClient(DiscordClient.MOBILE);
+    }
+
+    /**
+     * Gets the status of the user on the {@link DiscordClient#WEB web} (browser) client.
+     *
+     * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
+     *
+     * @return The status of the the user.
+     * @see #getStatusOnClient(DiscordClient)
+     */
+    default UserStatus getWebStatus() {
+        return getStatusOnClient(DiscordClient.WEB);
+    }
+
+    /**
+     * Gets all clients of the user that are not {@link UserStatus#OFFLINE offline}.
+     *
+     * @return A set with the clients.
+     * @see #getStatusOnClient(DiscordClient)
+     */
+    default Set<DiscordClient> getCurrentClients() {
+        Set<DiscordClient> connectedClients = Arrays
+                .stream(DiscordClient.values())
+                .filter(client -> getStatusOnClient(client) != UserStatus.OFFLINE)
+                .collect(Collectors.toSet());
+        return Collections.unmodifiableSet(connectedClients);
+    }
 
     /**
      * Gets the avatar of the user.

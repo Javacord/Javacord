@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
@@ -329,6 +330,18 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 if (presenceJson.has("status")) {
                     UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());
                     user.setStatus(status);
+                }
+
+                if (presenceJson.has("client_status")) {
+                    JsonNode clientStatus = presenceJson.get("client_status");
+                    for (DiscordClient client : DiscordClient.values()) {
+                        if (clientStatus.hasNonNull(client.getName())) {
+                            user.setClientStatus(
+                                    client, UserStatus.fromString(clientStatus.get(client.getName()).asText()));
+                        } else {
+                            user.setClientStatus(client, UserStatus.OFFLINE);
+                        }
+                    }
                 }
             }
         }
