@@ -10,7 +10,8 @@ public enum MessageDecoration {
     STRIKEOUT("~~"),
     CODE_SIMPLE("`"),
     CODE_LONG("```"),
-    UNDERLINE("__");
+    UNDERLINE("__"),
+    SPOILER("||");
 
     /**
      * The prefix of the decoration.

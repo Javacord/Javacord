@@ -37,6 +37,7 @@ public class MessageBuilder {
             builder.setEmbed(message.getEmbeds().get(0).toBuilder());
         }
         for (MessageAttachment attachment : message.getAttachments()) {
+            // Since spoiler status is encoded in the file name, it is copied automatically.
             builder.addAttachment(attachment.getUrl());
         }
         return builder;
@@ -210,6 +211,81 @@ public class MessageBuilder {
     }
 
     /**
+     * Adds a file to the message and marks it as spoiler.
+     *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachmentAsSpoiler(BufferedImage, String)
+     */
+    public MessageBuilder addFileAsSpoiler(BufferedImage image, String fileName) {
+        delegate.addFile(image, "SPOILER_" + fileName);
+        return this;
+    }
+
+    /**
+     * Adds a file to the message and marks it as spoiler.
+     *
+     * @param file The file to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachmentAsSpoiler(File)
+     */
+    public MessageBuilder addFileAsSpoiler(File file) {
+        delegate.addFileAsSpoiler(file);
+        return this;
+    }
+
+    /**
+     * Adds a file to the message and marks it as spoiler.
+     *
+     * @param icon The icon to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachmentAsSpoiler(Icon)
+     */
+    public MessageBuilder addFileAsSpoiler(Icon icon) {
+        delegate.addFileAsSpoiler(icon);
+        return this;
+    }
+
+    /**
+     * Adds a file to the message.
+     *
+     * @param url The url of the attachment.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(URL)
+     */
+    public MessageBuilder addFileAsSpoiler(URL url) {
+        delegate.addFileAsSpoiler(url);
+        return this;
+    }
+
+    /**
+     * Adds a file to the message and marks it as spoiler.
+     *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachmentAsSpoiler(byte[], String)
+     */
+    public MessageBuilder addFileAsSpoiler(byte[] bytes, String fileName) {
+        delegate.addFile(bytes, "SPOILER_" + fileName);
+        return this;
+    }
+
+    /**
+     * Adds a file to the message and marks it as spoiler.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     * @see #addAttachment(InputStream, String)
+     */
+    public MessageBuilder addFileAsSpoiler(InputStream stream, String fileName) {
+        delegate.addFile(stream, "SPOILER_" + fileName);
+        return this;
+    }
+
+    /**
      * Adds an attachment to the message.
      *
      * @param image The image to add as an attachment.
@@ -275,6 +351,75 @@ public class MessageBuilder {
      */
     public MessageBuilder addAttachment(InputStream stream, String fileName) {
         delegate.addAttachment(stream, fileName);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName) {
+        delegate.addAttachment(image, "SPOILER_" + fileName);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param file The file to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachmentAsSpoiler(File file) {
+        delegate.addAttachmentAsSpoiler(file);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param icon The icon to add as an attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachmentAsSpoiler(Icon icon) {
+        delegate.addAttachmentAsSpoiler(icon);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param url The url of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachmentAsSpoiler(URL url) {
+        delegate.addAttachmentAsSpoiler(url);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachmentAsSpoiler(byte[] bytes, String fileName) {
+        delegate.addAttachment(bytes, "SPOILER_" + fileName);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName) {
+        delegate.addAttachment(stream, "SPOILER_" + fileName);
         return this;
     }
 

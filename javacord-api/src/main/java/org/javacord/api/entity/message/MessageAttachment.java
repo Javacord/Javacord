@@ -85,4 +85,16 @@ public interface MessageAttachment extends DiscordEntity {
      */
     CompletableFuture<BufferedImage> downloadAsImage();
 
+    /**
+     * Checks whether the attachment is marked as a spoiler.
+     *
+     * <p>Discord encodes the information on whether a file is considered a spoiler in the file name. Any file whose
+     * filename starts with {@code SPOILER_} is considered a spoiler.
+     *
+     * @return The spoiler status.
+     */
+    default boolean isSpoiler() {
+        return getFileName().startsWith("SPOILER_");
+    }
+
 }
