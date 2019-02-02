@@ -12,7 +12,7 @@ import java.util.Optional;
 public abstract class EmbedDraftFileContainerAttachableMember<D extends EmbedDraftMember, S extends SentEmbedMember>
         extends EmbedDraftMemberImpl<D, S> {
     protected URI fileUri;
-    private FileContainer container;
+    protected FileContainer container;
 
     protected EmbedDraftFileContainerAttachableMember(EmbedDraft parent, Class<D> dClass, Class<S> sClass) {
         super(parent, dClass, sClass);

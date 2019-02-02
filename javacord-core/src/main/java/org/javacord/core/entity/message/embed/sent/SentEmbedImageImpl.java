@@ -1,6 +1,7 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
 import org.javacord.api.entity.message.embed.sent.SentEmbedImage;
@@ -42,9 +43,8 @@ public class SentEmbedImageImpl extends SentEmbedMemberImpl<EmbedDraftImage, Sen
     }
 
     @Override
-    public URL getUrl() {
-        assert url != null : "Discord didn't send a URL!";
-        return url;
+    public Optional<URL> getUrl() {
+        return Optional.of(url);
     }
 
     @Override

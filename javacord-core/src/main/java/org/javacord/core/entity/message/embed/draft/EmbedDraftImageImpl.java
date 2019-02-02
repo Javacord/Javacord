@@ -1,6 +1,7 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
@@ -24,7 +25,10 @@ public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember
     }
 
     public EmbedDraftImageImpl(BaseEmbed parent, BaseEmbedImage member) {
-        this(parent.toEmbedDraft(), member.getUrl());
+        this(parent.toEmbedDraft(), member.getUrl().orElse(null));
+        if (url == null) {
+            container = ((EmbedDraftFileContainerAttachableMember) member).container;
+        }
     }
 
     @Override
@@ -34,8 +38,8 @@ public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember
     }
 
     @Override
-    public URL getUrl() {
-        return url;
+    public Optional<URL> getUrl() {
+        return Optional.ofNullable(url);
     }
 
     @Override
@@ -43,7 +47,7 @@ public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember
         final String jsonFieldName = "image";
         ObjectNode node = frame.putObject(jsonFieldName);
 
-        node.put("url", getAttachmentUrlAsString().orElse(getUrl().toExternalForm()));
+        node.put("url", getAttachmentUrlAsString().orElse(getUrl().map(URL::toExternalForm).orElse(null)));
 
         return jsonFieldName;
     }

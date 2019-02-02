@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.awt.Color;
 import java.net.URL;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -73,15 +74,10 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         this.timestamp = timestamp;
         this.color = color;
 
-        this.author = new EmbedDraftAuthorImpl(this, authorName, authorUrl, authorIconUrl);
-        this.thumbnail = new EmbedDraftThumbnailImpl(this, thumbnailUrl);
-        this.image = new EmbedDraftImageImpl(this, imageUrl);
-        this.footer = new EmbedDraftFooterImpl(this, footerText, footerIconUrl);
-
-        author.attachContainer(authorIconContainer);
-        thumbnail.attachContainer(thumbnailContainer);
-        image.attachContainer(imageContainer);
-        footer.attachContainer(footerIconContainer);
+        this.author = createAuthor(authorName, authorUrl, authorIconUrl, authorIconContainer);
+        this.thumbnail = createThumbnail(thumbnailUrl, thumbnailContainer);
+        this.image = createImage(imageUrl, imageContainer);
+        this.footer = createFooter(footerText, footerIconUrl, footerIconContainer);
 
         this.fields = new ArrayList<>();
         fields.stream()
@@ -103,6 +99,46 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
             return (D) new EmbedDraftThumbnailImpl(parent, (SentEmbedThumbnail) member);
         }
         throw new AssertionError();
+    }
+
+    private EmbedDraftAuthorImpl createAuthor(String authorName, URL authorUrl, URL authorIconUrl, FileContainer authorIconContainer) {
+        if (authorName == null) {
+            return null;
+        }
+
+        EmbedDraftAuthorImpl author = new EmbedDraftAuthorImpl(this, authorName, authorUrl, authorIconUrl);
+        author.attachContainer(authorIconContainer);
+        return author;
+    }
+
+    private EmbedDraftThumbnailImpl createThumbnail(URL thumbnailUrl, FileContainer thumbnailContainer) {
+        if (thumbnailUrl == null && thumbnailContainer == null) {
+            return null;
+        }
+
+        EmbedDraftThumbnailImpl thumbnail = new EmbedDraftThumbnailImpl(this, thumbnailUrl);
+        thumbnail.attachContainer(thumbnailContainer);
+        return thumbnail;
+    }
+
+    private EmbedDraftImageImpl createImage(URL imageUrl, FileContainer imageContainer) {
+        if (imageUrl == null && imageContainer == null) {
+            return null;
+        }
+
+        EmbedDraftImageImpl image = new EmbedDraftImageImpl(this, imageUrl);
+        image.attachContainer(imageContainer);
+        return image;
+    }
+
+    private EmbedDraftFooterImpl createFooter(String footerText, URL footerIconUrl, FileContainer footerIconContainer) {
+        if (footerText == null && (footerIconUrl == null && footerIconContainer == null)) {
+            return null;
+        }
+
+        EmbedDraftFooterImpl footer = new EmbedDraftFooterImpl(this, footerText, footerIconUrl);
+        footer.attachContainer(footerIconContainer);
+        return footer;
     }
 
     @Override
@@ -277,7 +313,9 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
 
     @Override
     public List<EmbedDraftFieldImpl> getFields() {
-        return null;
+        return fields.stream()
+                .map(EmbedDraftFieldImpl.class::cast)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -290,6 +328,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
 
     public List<FileContainer> getAttachments() {
         return Stream.of(author, thumbnail, image, footer)
+                .filter(Objects::nonNull)
                 .map(EmbedDraftFileContainerAttachableMember::getContainer)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -303,8 +342,8 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         getTitle().ifPresent(title -> node.put("title", title));
         getDescription().ifPresent(description -> node.put("description", description));
         getUrl().map(URL::toExternalForm).ifPresent(url -> node.put("url", url));
-        getTimestamp().map(Instant::toEpochMilli).ifPresent(epoch -> node.put("timestamp", epoch));
-        getColor().map(Color::getRGB).ifPresent(rgb -> node.put("color", rgb));
+        getTimestamp().map(DateTimeFormatter.ISO_INSTANT::format).ifPresent(epoch -> node.put("timestamp", epoch));
+        getColor().map(clr -> clr.getRGB() & 0xFFFFFF).ifPresent(rgb -> node.put("color", rgb));
         getFooter().ifPresent(footer -> footer.applyToNode(node));
         getImage().ifPresent(image -> image.applyToNode(node));
         getThumbnail().ifPresent(thumbnail -> thumbnail.applyToNode(node));

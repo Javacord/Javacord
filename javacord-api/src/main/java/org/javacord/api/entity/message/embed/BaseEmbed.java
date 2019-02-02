@@ -82,20 +82,24 @@ public interface BaseEmbed extends Specializable<BaseEmbed> {
      */
     List<? extends BaseEmbedField> getFields();
 
+    /**
+     * Creates a builder, based on the embed.
+     * You can use this method, if you want to resend an embed, you received as a message.
+     *
+     * @return A builder with the values of this embed.
+     */
     default EmbedBuilder toBuilder() {
         EmbedBuilder builder = new EmbedBuilder();
-
         getTitle().ifPresent(builder::setTitle);
         getDescription().ifPresent(builder::setDescription);
         getUrl().ifPresent(builder::setUrl);
         getTimestamp().ifPresent(builder::setTimestamp);
         getColor().ifPresent(builder::setColor);
-        getFooter().ifPresent(builder::setFooter);
-        getImage().ifPresent(builder::setImage);
-        getThumbnail().ifPresent(builder::setThumbnail);
         getAuthor().ifPresent(builder::setAuthor);
+        getThumbnail().ifPresent(builder::setThumbnail);
+        getImage().ifPresent(builder::setImage);
+        getFooter().ifPresent(builder::setFooter);
         getFields().forEach(builder::addField);
-
         return builder;
     }
 

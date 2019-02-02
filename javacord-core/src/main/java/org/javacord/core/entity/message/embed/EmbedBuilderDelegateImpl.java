@@ -17,6 +17,7 @@ import org.javacord.api.entity.message.embed.BaseEmbedImage;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftFileContainerAttachableMember;
 import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
 import org.javacord.core.util.FileContainer;
 
@@ -103,6 +104,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
                 author.getUrl().orElse(null),
                 author.getIconUrl().orElse(null)
         );
+        // if the icon url is empty, author is an EmbedDraftAuthor with an attachment
+        if (!author.getIconUrl().isPresent()) {
+            this.authorIconContainer = ((EmbedDraftFileContainerAttachableMember) author).getContainer();
+        }
     }
 
     @Override
@@ -117,7 +122,11 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setThumbnail(BaseEmbedThumbnail thumbnail) {
-        setThumbnail(thumbnail.getUrl());
+        setThumbnail(thumbnail.getUrl().orElse(null));
+        // if the url is empty, thumbnail is an EmbedDraftThumbnail with an attachment
+        if (!thumbnail.getUrl().isPresent()) {
+            this.thumbnailContainer = ((EmbedDraftFileContainerAttachableMember) thumbnail).getContainer();
+        }
     }
 
     @Override
@@ -132,7 +141,11 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     @Override
     public void setImage(BaseEmbedImage image) {
-        setImage(image.getUrl());
+        setImage(image.getUrl().orElse(null));
+        // if the url is empty, image is an EmbedDraftImage with an attachment
+        if (!image.getUrl().isPresent()) {
+            this.imageContainer = ((EmbedDraftFileContainerAttachableMember) image).getContainer();
+        }
     }
 
     @Override
@@ -153,6 +166,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
                 footer.getText(),
                 footer.getIconUrl().orElse(null)
         );
+        // if the icon url is empty, footer is an EmbedDraftFooter with an attachment
+        if (!footer.getIconUrl().isPresent()) {
+            this.footerIconContainer = ((EmbedDraftFileContainerAttachableMember) footer).getContainer();
+        }
     }
 
     @Override

@@ -1,14 +1,14 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URL;
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
 import org.javacord.api.entity.message.embed.sent.SentEmbedThumbnail;
 import org.javacord.core.util.JsonNodeable;
-
-import java.net.URL;
 
 public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftThumbnail, SentEmbedThumbnail>
         implements EmbedDraftThumbnail, JsonNodeable {
@@ -24,7 +24,10 @@ public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMe
     }
 
     public EmbedDraftThumbnailImpl(BaseEmbed parent, BaseEmbedThumbnail embedThumbnail) {
-        this(parent.toEmbedDraft(), embedThumbnail.getUrl());
+        this(parent.toEmbedDraft(), embedThumbnail.getUrl().orElse(null));
+        if (url == null) {
+            container = ((EmbedDraftFileContainerAttachableMember) embedThumbnail).container;
+        }
     }
 
     @Override
@@ -34,8 +37,8 @@ public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMe
     }
 
     @Override
-    public URL getUrl() {
-        return url;
+    public Optional<URL> getUrl() {
+        return Optional.ofNullable(url);
     }
 
     @Override
@@ -43,7 +46,7 @@ public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMe
         final String jsonFieldName = "thumbnail";
         ObjectNode node = frame.putObject(jsonFieldName);
 
-        node.put("url", getAttachmentUrlAsString().orElse(getUrl().toExternalForm()));
+        node.put("url", getAttachmentUrlAsString().orElse(getUrl().map(URL::toExternalForm).orElse(null)));
         return jsonFieldName;
     }
 }
