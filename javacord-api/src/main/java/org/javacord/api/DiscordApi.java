@@ -938,20 +938,21 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @return A collection with all channels of the bot.
      */
-    default Collection<Channel> getChannels() {
-        Collection<Channel> channels = new ArrayList<>();
-        channels.addAll(getPrivateChannels());
-        channels.addAll(getServerChannels());
-        channels.addAll(getGroupChannels());
-        return Collections.unmodifiableCollection(channels);
-    }
+    Collection<Channel> getChannels();
 
     /**
      * Gets a collection with all group channels of the bot.
      *
      * @return A collection with all group channels of the bot.
      */
-    Collection<GroupChannel> getGroupChannels();
+    default Collection<GroupChannel> getGroupChannels() {
+        // Not very efficient, but it's a client-only feature and normal users can only be in 100 servers anyway
+        return Collections.unmodifiableList(
+                getChannels().stream()
+                        .filter(GroupChannel.class::isInstance)
+                        .map(GroupChannel.class::cast)
+                        .collect(Collectors.toList()));
+    }
 
     /**
      * Gets a collection with all private channels of the bot.
@@ -959,11 +960,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A collection with all private channels of the bot.
      */
     default Collection<PrivateChannel> getPrivateChannels() {
+        // TODO This can be improved
         return Collections.unmodifiableList(
-                getCachedUsers().stream()
-                        .map(User::getPrivateChannel)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
+                getChannels().stream()
+                        .filter(PrivateChannel.class::isInstance)
+                        .map(PrivateChannel.class::cast)
                         .collect(Collectors.toList()));
     }
 
@@ -973,6 +974,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A collection with all server channels of the bot.
      */
     default Collection<ServerChannel> getServerChannels() {
+        // TODO This can be improved
         Collection<ServerChannel> channels = new ArrayList<>();
         getServers().forEach(server -> channels.addAll(server.getChannels()));
         return Collections.unmodifiableCollection(channels);
@@ -984,6 +986,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A collection with all channel categories of the bot.
      */
     default Collection<ChannelCategory> getChannelCategories() {
+        // TODO This can be improved
         Collection<ChannelCategory> channels = new ArrayList<>();
         getServers().forEach(server -> channels.addAll(server.getChannelCategories()));
         return Collections.unmodifiableCollection(channels);
@@ -995,6 +998,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A collection with all server text channels of the bot.
      */
     default Collection<ServerTextChannel> getServerTextChannels() {
+        // TODO This can be improved
         Collection<ServerTextChannel> channels = new ArrayList<>();
         getServers().forEach(server -> channels.addAll(server.getTextChannels()));
         return Collections.unmodifiableCollection(channels);
@@ -1006,6 +1010,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A collection with all server voice channels of the bot.
      */
     default Collection<ServerVoiceChannel> getServerVoiceChannels() {
+        // TODO This can be improved
         Collection<ServerVoiceChannel> channels = new ArrayList<>();
         getServers().forEach(server -> channels.addAll(server.getVoiceChannels()));
         return Collections.unmodifiableCollection(channels);
@@ -1017,11 +1022,12 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A collection with all text channels of the bot.
      */
     default Collection<TextChannel> getTextChannels() {
-        Collection<TextChannel> channels = new ArrayList<>();
-        channels.addAll(getPrivateChannels());
-        channels.addAll(getServerTextChannels());
-        channels.addAll(getGroupChannels());
-        return Collections.unmodifiableCollection(channels);
+        // TODO This can be improved
+        return Collections.unmodifiableList(
+                getChannels().stream()
+                        .filter(TextChannel.class::isInstance)
+                        .map(TextChannel.class::cast)
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1030,11 +1036,12 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A collection with all voice channels of the bot.
      */
     default Collection<VoiceChannel> getVoiceChannels() {
-        Collection<VoiceChannel> channels = new ArrayList<>();
-        channels.addAll(getPrivateChannels());
-        channels.addAll(getServerVoiceChannels());
-        channels.addAll(getGroupChannels());
-        return Collections.unmodifiableCollection(channels);
+        // TODO This can be improved
+        return Collections.unmodifiableList(
+                getChannels().stream()
+                        .filter(VoiceChannel.class::isInstance)
+                        .map(VoiceChannel.class::cast)
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -1043,11 +1050,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @param id The id of the channel.
      * @return The channel with the given id.
      */
-    default Optional<Channel> getChannelById(long id) {
-        return getChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
-    }
+    Optional<Channel> getChannelById(long id);
 
     /**
      * Gets a channel by its id.
@@ -1098,9 +1101,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The text channel with the given id.
      */
     default Optional<TextChannel> getTextChannelById(long id) {
-        return getTextChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asTextChannel);
     }
 
     /**
@@ -1152,9 +1153,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The voice channel with the given id.
      */
     default Optional<VoiceChannel> getVoiceChannelById(long id) {
-        return getVoiceChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asVoiceChannel);
     }
 
     /**
@@ -1206,9 +1205,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The server channel with the given id.
      */
     default Optional<ServerChannel> getServerChannelById(long id) {
-        return getServerChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asServerChannel);
     }
 
     /**
@@ -1260,9 +1257,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The channel category with the given id.
      */
     default Optional<ChannelCategory> getChannelCategoryById(long id) {
-        return getChannelCategories().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asChannelCategory);
     }
 
     /**
@@ -1314,9 +1309,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The server text channel with the given id.
      */
     default Optional<ServerTextChannel> getServerTextChannelById(long id) {
-        return getServerTextChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asServerTextChannel);
     }
 
     /**
@@ -1368,9 +1361,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The server voice channel with the given id.
      */
     default Optional<ServerVoiceChannel> getServerVoiceChannelById(long id) {
-        return getServerVoiceChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asServerVoiceChannel);
     }
 
     /**
@@ -1422,9 +1413,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The private channel with the given id.
      */
     default Optional<PrivateChannel> getPrivateChannelById(long id) {
-        return getPrivateChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asPrivateChannel);
     }
 
     /**
@@ -1448,9 +1437,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The group channel with the given id.
      */
     default Optional<GroupChannel> getGroupChannelById(long id) {
-        return getGroupChannels().stream()
-                .filter(channel -> channel.getId() == id)
-                .findAny();
+        return getChannelById(id).flatMap(Channel::asGroupChannel);
     }
 
     /**

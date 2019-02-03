@@ -13,7 +13,7 @@ import org.javacord.api.Javacord;
 import org.javacord.api.entity.ApplicationInfo;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
-import org.javacord.api.entity.channel.GroupChannel;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
@@ -250,6 +250,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final ReferenceQueue<User> usersCleanupQueue = new ReferenceQueue<>();
 
     /**
+     * Allows for a quick lookup for channels by their id.
+     */
+    private final ConcurrentHashMap<Long, Channel> channels = new ConcurrentHashMap<>();
+
+    /**
      * A map which contains all servers that are ready.
      */
     private final ConcurrentHashMap<Long, Server> servers = new ConcurrentHashMap<>();
@@ -258,11 +263,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * A map which contains all servers that are not ready.
      */
     private final ConcurrentHashMap<Long, Server> nonReadyServers = new ConcurrentHashMap<>();
-
-    /**
-     * A map which contains all group channels.
-     */
-    private final ConcurrentHashMap<Long, GroupChannel> groupChannels = new ConcurrentHashMap<>();
 
     /**
      * A set with all unavailable servers.
@@ -571,10 +571,10 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);
         servers.clear();
-        groupChannels.values().stream()
+        channels.values().stream()
+                .filter(Cleanupable.class::isInstance)
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);
-        groupChannels.clear();
         unavailableServers.clear();
         customEmojis.clear();
         messages.clear();
@@ -663,9 +663,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      *
      * @param channel The channel to add.
      */
-    public void addGroupChannelToCache(GroupChannel channel) {
-        GroupChannel oldChannel = groupChannels.put(channel.getId(), channel);
-        if ((oldChannel != null) && (oldChannel != channel)) {
+    public void addChannelToCache(Channel channel) {
+        Channel oldChannel = channels.put(channel.getId(), channel);
+        if (oldChannel != channel && oldChannel instanceof Cleanupable) {
             ((Cleanupable) oldChannel).cleanup();
         }
     }
@@ -675,9 +675,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      *
      * @param channelId The id of the channel to remove.
      */
-    public void removeGroupChannelFromCache(long channelId) {
-        groupChannels.computeIfPresent(channelId, (key, groupChannel) -> {
-            ((Cleanupable) groupChannel).cleanup();
+    public void removeChannelFromCache(long channelId) {
+        channels.computeIfPresent(channelId, (key, channel) -> {
+            if (channel instanceof Cleanupable) {
+                ((Cleanupable) channel).cleanup();
+            }
             return null;
         });
     }
@@ -1353,13 +1355,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public Collection<GroupChannel> getGroupChannels() {
-        return Collections.unmodifiableCollection(groupChannels.values());
+    public Collection<Channel> getChannels() {
+        return Collections.unmodifiableCollection(new ArrayList<>(channels.values()));
     }
 
     @Override
-    public Optional<GroupChannel> getGroupChannelById(long id) {
-        return Optional.ofNullable(groupChannels.get(id));
+    public Optional<Channel> getChannelById(long id) {
+        return Optional.ofNullable(channels.get(id));
     }
 
     @Override

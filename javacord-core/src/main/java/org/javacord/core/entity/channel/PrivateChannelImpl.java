@@ -55,6 +55,8 @@ public class PrivateChannelImpl implements PrivateChannel, Cleanupable, Internal
 
         id = Long.parseLong(data.get("id").asText());
         recipient.setChannel(this);
+
+        api.addChannelToCache(this);
     }
 
     @Override

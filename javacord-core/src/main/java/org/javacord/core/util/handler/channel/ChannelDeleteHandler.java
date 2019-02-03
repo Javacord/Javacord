@@ -42,6 +42,7 @@ public class ChannelDeleteHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         int type = packet.get("type").asInt();
+        api.removeChannelFromCache(packet.get("id").asLong());
         switch (type) {
             case 0:
                 handleServerTextChannel(packet);
@@ -159,8 +160,6 @@ public class ChannelDeleteHandler extends PacketHandler {
             api.removeObjectListeners(VoiceChannel.class, channelId);
             api.removeObjectListeners(TextChannel.class, channelId);
             api.removeObjectListeners(Channel.class, channelId);
-
-            api.removeGroupChannelFromCache(channelId);
         });
     }
 

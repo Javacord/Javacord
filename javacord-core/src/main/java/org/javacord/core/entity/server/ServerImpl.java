@@ -1219,6 +1219,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public void cleanup() {
         channels.values().stream()
+                .map(ServerChannel::getId)
+                .forEach(api::removeChannelFromCache);
+        channels.values().stream()
                 .filter(Cleanupable.class::isInstance)
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);

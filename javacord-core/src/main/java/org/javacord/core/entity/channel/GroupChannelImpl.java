@@ -78,7 +78,7 @@ public class GroupChannelImpl implements GroupChannel, Cleanupable, InternalText
             recipients.add(api.getOrCreateUser(recipientJson));
         }
 
-        this.messageCache = new MessageCacheImpl(
+        messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
 
@@ -86,7 +86,7 @@ public class GroupChannelImpl implements GroupChannel, Cleanupable, InternalText
         name = data.has("name") && !data.get("name").isNull() ? data.get("name").asText() : null;
         iconId = data.has("icon") && !data.get("icon").isNull() ? data.get("icon").asText() : null;
 
-        api.addGroupChannelToCache(this);
+        api.addChannelToCache(this);
     }
 
     @Override
