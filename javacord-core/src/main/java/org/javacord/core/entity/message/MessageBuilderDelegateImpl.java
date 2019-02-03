@@ -150,6 +150,21 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
+    public void addFileAsSpoiler(File file) {
+        addAttachmentAsSpoiler(file);
+    }
+
+    @Override
+    public void addFileAsSpoiler(Icon icon) {
+        addAttachmentAsSpoiler(icon);
+    }
+
+    @Override
+    public void addFileAsSpoiler(URL url) {
+        addAttachmentAsSpoiler(url);
+    }
+
+    @Override
     public void addAttachment(BufferedImage image, String fileName) {
         if (image == null || fileName == null) {
             throw new IllegalArgumentException("image and fileName cannot be null!");
@@ -195,6 +210,30 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             throw new IllegalArgumentException("stream and fileName cannot be null!");
         }
         attachments.add(new FileContainer(stream, fileName));
+    }
+
+    @Override
+    public void addAttachmentAsSpoiler(File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("file cannot be null!");
+        }
+        attachments.add(new FileContainer(file, true));
+    }
+
+    @Override
+    public void addAttachmentAsSpoiler(Icon icon) {
+        if (icon == null) {
+            throw new IllegalArgumentException("icon cannot be null!");
+        }
+        attachments.add(new FileContainer(icon, true));
+    }
+
+    @Override
+    public void addAttachmentAsSpoiler(URL url) {
+        if (url == null) {
+            throw new IllegalArgumentException("url cannot be null!");
+        }
+        attachments.add(new FileContainer(url, true));
     }
 
     @Override

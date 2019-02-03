@@ -88,28 +88,48 @@ public class FileContainer {
      * @param file The file as a file.
      */
     public FileContainer(File file) {
+        this(file, false);
+    }
+
+    /**
+     * Creates a new file container with a file.
+     *
+     * @param file The file as a file.
+     * @param isSpoiler Whether the file is to be marked as spoiler.
+     */
+    public FileContainer(File file, boolean isSpoiler) {
         fileAsBufferedImage = null;
         fileAsFile = file;
         fileAsIcon = null;
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileTypeOrName = file.getName();
+        fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + file.getName();
     }
 
     /**
      * Creates a new file container with an icon.
      *
-     * @param file The file a an icon.
+     * @param file The file as an icon.
      */
     public FileContainer(Icon file) {
+        this(file, false);
+    }
+
+    /**
+     * Creates a new file container with an icon.
+     *
+     * @param file The file as an icon.
+     * @param isSpoiler Whether the icon is marked as a spoiler.
+     */
+    public FileContainer(Icon file, boolean isSpoiler) {
         fileAsBufferedImage = null;
         fileAsFile = null;
         fileAsIcon = file;
         fileAsUrl = null;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileTypeOrName = file.getUrl().getFile();
+        fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + file.getUrl().getFile();
     }
 
     /**
@@ -118,13 +138,23 @@ public class FileContainer {
      * @param file The file as an url.
      */
     public FileContainer(URL file) {
+        this(file, false);
+    }
+
+    /**
+     * Creates a new file container with an url.
+     *
+     * @param file The file as an url.
+     * @param isSpoiler Whether the file is to be marked as spoiler.
+     */
+    public FileContainer(URL file, boolean isSpoiler) {
         fileAsBufferedImage = null;
         fileAsFile = null;
         fileAsIcon = null;
         fileAsUrl = file;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileTypeOrName = file.getFile();
+        fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + file.getFile();
     }
 
     /**

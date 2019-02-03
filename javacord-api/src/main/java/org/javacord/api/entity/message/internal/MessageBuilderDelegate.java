@@ -133,6 +133,24 @@ public interface MessageBuilderDelegate {
     void addFile(InputStream stream, String fileName);
 
     /**
+     * Adds a spoiler attachment to the message.
+     * @param file The file to add as an attachment.
+     */
+    void addFileAsSpoiler(File file);
+
+    /**
+     * Adds a spoiler attachment to the message.
+     * @param icon The icon to add as an attachment.
+     */
+    void addFileAsSpoiler(Icon icon);
+
+    /**
+     * Adds a spoiler attachment to the message.
+     * @param url The url of the attachment.
+     */
+    void addFileAsSpoiler(URL url);
+
+    /**
      * Adds an attachment to the message.
      *
      * @param image The image to add as an attachment.
@@ -178,6 +196,24 @@ public interface MessageBuilderDelegate {
     void addAttachment(InputStream stream, String fileName);
 
     /**
+     * Adds a spoiler attachment to the message.
+     * @param file The file to add as an attachment.
+     */
+    void addAttachmentAsSpoiler(File file);
+
+    /**
+     * Adds a spoiler attachment to the message.
+     * @param icon The icon to add as an attachment.
+     */
+    void addAttachmentAsSpoiler(Icon icon);
+
+    /**
+     * Adds a spoiler attachment to the message.
+     * @param url The url of the attachment.
+     */
+    void addAttachmentAsSpoiler(URL url);
+
+    /**
      * Sets the nonce of the message.
      *
      * @param nonce The nonce to set.
@@ -214,5 +250,4 @@ public interface MessageBuilderDelegate {
      * @return The sent message.
      */
     CompletableFuture<Message> send(Messageable messageable);
-
 }
