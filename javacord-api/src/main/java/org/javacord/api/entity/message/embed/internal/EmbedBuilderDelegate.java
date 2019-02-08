@@ -20,31 +20,31 @@ public interface EmbedBuilderDelegate {
 
     void setDescription(String description);
 
-    void setUrl(URL url);
+    void setUrl(String url);
 
     void setTimestamp(Instant timestamp);
 
     void setColor(Color color);
 
-    void setAuthor(String name, URL url, URL iconUrl);
+    void setAuthor(String name, String url, String iconUrl);
 
-    void setAuthor(String name, URL url, Object icon, String fileType);
+    void setAuthor(String name, String url, Object icon, String fileType);
 
     void setAuthor(BaseEmbedAuthor author);
 
-    void setThumbnail(URL url);
+    void setThumbnail(String url);
 
     void setThumbnail(Object image, String fileType);
 
     void setThumbnail(BaseEmbedThumbnail thumbnail);
 
-    void setImage(URL url);
+    void setImage(String url);
 
     void setImage(Object image, String fileType);
 
     void setImage(BaseEmbedImage image);
 
-    void setFooter(String text, URL iconUrl);
+    void setFooter(String text, String iconUrl);
 
     void setFooter(String text, Object icon, String fileType);
 

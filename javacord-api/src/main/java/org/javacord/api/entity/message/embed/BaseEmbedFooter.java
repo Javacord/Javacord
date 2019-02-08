@@ -19,6 +19,6 @@ public interface BaseEmbedFooter extends Specializable<BaseEmbedFooter> {
      *
      * @return The url of the footer icon.
      */
-    Optional<URL> getIconUrl();
+    Optional<String> getIconUrl();
 
 }

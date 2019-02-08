@@ -36,7 +36,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
     protected final List<EmbedDraftField> fields;
     protected String title;
     protected String description;
-    protected URL url;
+    protected String url;
     protected Instant timestamp;
     protected Color color;
     protected EmbedDraftAuthorImpl author;
@@ -47,23 +47,23 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
     public EmbedDraftImpl(
             String title,
             String description,
-            URL url,
+            String url,
             Instant timestamp,
             Color color,
 
             String authorName,
-            URL authorUrl,
-            URL authorIconUrl,
+            String authorUrl,
+            String authorIconUrl,
             FileContainer authorIconContainer,
 
-            URL thumbnailUrl,
+            String thumbnailUrl,
             FileContainer thumbnailContainer,
 
-            URL imageUrl,
+            String imageUrl,
             FileContainer imageContainer,
 
             String footerText,
-            URL footerIconUrl,
+            String footerIconUrl,
             FileContainer footerIconContainer,
 
             List<? extends BaseEmbedField> fields
@@ -101,7 +101,12 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         throw new AssertionError();
     }
 
-    private EmbedDraftAuthorImpl createAuthor(String authorName, URL authorUrl, URL authorIconUrl, FileContainer authorIconContainer) {
+    private EmbedDraftAuthorImpl createAuthor(
+            String authorName,
+            String authorUrl,
+            String authorIconUrl,
+            FileContainer authorIconContainer
+    ) {
         if (authorName == null) {
             return null;
         }
@@ -111,7 +116,10 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         return author;
     }
 
-    private EmbedDraftThumbnailImpl createThumbnail(URL thumbnailUrl, FileContainer thumbnailContainer) {
+    private EmbedDraftThumbnailImpl createThumbnail(
+            String thumbnailUrl,
+            FileContainer thumbnailContainer
+    ) {
         if (thumbnailUrl == null && thumbnailContainer == null) {
             return null;
         }
@@ -121,7 +129,10 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         return thumbnail;
     }
 
-    private EmbedDraftImageImpl createImage(URL imageUrl, FileContainer imageContainer) {
+    private EmbedDraftImageImpl createImage(
+            String imageUrl,
+            FileContainer imageContainer
+    ) {
         if (imageUrl == null && imageContainer == null) {
             return null;
         }
@@ -131,7 +142,11 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         return image;
     }
 
-    private EmbedDraftFooterImpl createFooter(String footerText, URL footerIconUrl, FileContainer footerIconContainer) {
+    private EmbedDraftFooterImpl createFooter(
+            String footerText,
+            String footerIconUrl,
+            FileContainer footerIconContainer
+    ) {
         if (footerText == null && (footerIconUrl == null && footerIconContainer == null)) {
             return null;
         }
@@ -154,7 +169,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
     }
 
     @Override
-    public EmbedDraft setUrl(URL url) {
+    public EmbedDraft setUrl(String url) {
         this.url = url;
         return this;
     }
@@ -277,7 +292,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
     }
 
     @Override
-    public Optional<URL> getUrl() {
+    public Optional<String> getUrl() {
         return Optional.ofNullable(url);
     }
 
@@ -341,7 +356,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
 
         getTitle().ifPresent(title -> node.put("title", title));
         getDescription().ifPresent(description -> node.put("description", description));
-        getUrl().map(URL::toExternalForm).ifPresent(url -> node.put("url", url));
+        getUrl().ifPresent(url -> node.put("url", url));
         getTimestamp().map(DateTimeFormatter.ISO_INSTANT::format).ifPresent(epoch -> node.put("timestamp", epoch));
         getColor().map(clr -> clr.getRGB() & 0xFFFFFF).ifPresent(rgb -> node.put("color", rgb));
         getFooter().ifPresent(footer -> footer.applyToNode(node));

@@ -6,5 +6,5 @@ import org.javacord.api.entity.message.embed.sent.SentEmbedImage;
 import java.net.URL;
 
 public interface EmbedDraftImage extends BaseEmbedImage, EmbedDraftMember<EmbedDraftImage, SentEmbedImage> {
-    EmbedDraftImage setUrl(URL url);
+    EmbedDraftImage setUrl(String url);
 }

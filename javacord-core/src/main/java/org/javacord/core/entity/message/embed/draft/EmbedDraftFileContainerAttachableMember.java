@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public abstract class EmbedDraftFileContainerAttachableMember<D extends EmbedDraftMember, S extends SentEmbedMember>
         extends EmbedDraftMemberImpl<D, S> {
-    protected URI fileUri;
+    protected String fileUri;
     protected FileContainer container;
 
     protected EmbedDraftFileContainerAttachableMember(EmbedDraft parent, Class<D> dClass, Class<S> sClass) {
@@ -26,20 +26,9 @@ public abstract class EmbedDraftFileContainerAttachableMember<D extends EmbedDra
         return container;
     }
 
-    public Optional<String> getAttachmentUrlAsString() {
-        if (container == null) {
-            return Optional.empty();
-        }
-        return Optional.of(fileUri.toString());
-    }
-
     public void attachContainer(FileContainer container) {
         if (container == null) return;
         this.container = container;
-        try {
-            fileUri = new URI("attachment://"+container.getFileTypeOrName());
-        } catch (URISyntaxException e) {
-            throw new AssertionError("Unexpected error creating attachment file URL", e);
-        }
+        this.fileUri = "attachment://"+container.getFileTypeOrName();
     }
 }

@@ -18,7 +18,7 @@ public class SentEmbedImpl implements SentEmbed {
     private final String title;
     private final String type;
     private final String description;
-    private final URL url;
+    private final String url;
     private final Instant timestamp;
     private final Color color;
     private final SentEmbedAuthor author;
@@ -33,15 +33,7 @@ public class SentEmbedImpl implements SentEmbed {
         this.title = data.path("title").asText(null);
         this.type = data.path("type").asText(null);
         this.description = data.path("description").asText(null);
-        try {
-            url = data.has("url") ? new URL(data.get("url").asText()) : null;
-        } catch (MalformedURLException e) {
-            /*
-            If any URL cannot be parsed, we have reached an unreachable state, as the URL fields are
-            OPTIONAL but not NULLABLE. We can assert that URLs coming from Discord are always valid.
-            */
-            throw new AssertionError("The URL recieved from discord is invalid!", e);
-        }
+        this.url = data.path("url").asText(null);
         this.timestamp = data.has("timestamp") ? Instant.parse(data.get("timestamp").asText()) : null;
         this.color = data.has("color") ? new Color(data.get("color").asInt()) : null;
 
@@ -72,7 +64,7 @@ public class SentEmbedImpl implements SentEmbed {
     }
 
     @Override
-    public Optional<URL> getUrl() {
+    public Optional<String> getUrl() {
         return ofNullable(url);
     }
 

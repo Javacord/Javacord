@@ -15,13 +15,13 @@ public interface BaseEmbedAuthor extends Nameable, Specializable<BaseEmbedAuthor
      *
      * @return The url of the author.
      */
-    Optional<URL> getUrl();
+    Optional<String> getUrl();
 
     /**
      * Gets the url of the author icon.
      *
      * @return The url of the author icon.
      */
-    Optional<URL> getIconUrl();
+    Optional<String> getIconUrl();
 
 }

@@ -16,9 +16,9 @@ public class SentEmbedAuthorImpl extends SentEmbedMemberImpl<EmbedDraftAuthor, S
         implements SentEmbedAuthor {
 
     private final String name;
-    private final URL url;
-    private final URL iconUrl;
-    private final URL proxyIconUrl;
+    private final String url;
+    private final String iconUrl;
+    private final String proxyIconUrl;
 
     /**
      * Creates a new embed author.
@@ -29,17 +29,9 @@ public class SentEmbedAuthorImpl extends SentEmbedMemberImpl<EmbedDraftAuthor, S
         super(parent, EmbedDraftAuthor.class, SentEmbedAuthor.class);
 
         name = data.path("name").asText(null);
-        try {
-            url = data.has("url") ? new URL(data.get("url").asText()) : null;
-            iconUrl = data.has("icon_url") ? new URL(data.get("icon_url").asText()) : null;
-            proxyIconUrl = data.has("proxy_icon_url") ? new URL(data.get("proxy_icon_url").asText()) : null;
-        } catch (MalformedURLException e) {
-            /*
-            If any URL cannot be parsed, we have reaced an unreachable state, as the URL fields are
-            OPTIONAL but not NULLABLE. We can assert that URLs coming from Discord are always valid.
-            */
-            throw new AssertionError("The URL recieved from discord is invalid!", e);
-        }
+        url = data.path("url").asText(null);
+        iconUrl = data.path("icon_url").asText(null);
+        proxyIconUrl = data.path("proxy_icon_url").asText(null);
     }
 
     @Override
@@ -48,17 +40,17 @@ public class SentEmbedAuthorImpl extends SentEmbedMemberImpl<EmbedDraftAuthor, S
     }
 
     @Override
-    public Optional<URL> getUrl() {
+    public Optional<String> getUrl() {
         return Optional.ofNullable(url);
     }
 
     @Override
-    public Optional<URL> getIconUrl() {
+    public Optional<String> getIconUrl() {
         return Optional.ofNullable(iconUrl);
     }
 
     @Override
-    public Optional<URL> getProxyIconUrl() {
+    public Optional<String> getProxyIconUrl() {
         return Optional.ofNullable(proxyIconUrl);
     }
 }

@@ -12,6 +12,6 @@ public interface BaseEmbedThumbnail extends Specializable<BaseEmbedThumbnail> {
      *
      * @return The url of the thumbnail.
      */
-    Optional<URL> getUrl();
+    Optional<String> getUrl();
 
 }

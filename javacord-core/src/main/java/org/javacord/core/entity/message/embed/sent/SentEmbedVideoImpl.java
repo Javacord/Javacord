@@ -14,7 +14,7 @@ import org.javacord.api.entity.message.embed.sent.SentEmbedVideo;
 public class SentEmbedVideoImpl implements SentEmbedVideo {
 
     private final SentEmbed parent;
-    private final URL url;
+    private final String url;
     private final int height;
     private final int width;
 
@@ -26,22 +26,14 @@ public class SentEmbedVideoImpl implements SentEmbedVideo {
     public SentEmbedVideoImpl(SentEmbed parent, JsonNode data) {
         this.parent = parent;
 
-        try {
-            url = data.has("url") ? new URL(data.get("url").asText()) : null;
-        } catch (MalformedURLException e) {
-            /*
-            If any URL cannot be parsed, we have reached an unreachable state, as the URL fields are
-            OPTIONAL but not NULLABLE. We can assert that URLs coming from Discord are always valid.
-            */
-            throw new AssertionError("The URL recieved from discord is invalid!", e);
-        }
+        url = data.path("url").asText(null);
         height = data.has("height") ? data.get("height").asInt() : -1;
         width = data.has("width") ? data.get("width").asInt() : -1;
     }
 
     @Override
-    public URL getUrl() {
-        assert url != null : "Discord didn't send a URL!";
+    public String getUrl() {
+        assert url != null : "Discord didn't send an URL!";
         return url;
     }
 

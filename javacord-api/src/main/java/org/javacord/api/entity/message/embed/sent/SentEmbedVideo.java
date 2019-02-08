@@ -12,6 +12,6 @@ public interface SentEmbedVideo extends MissingEmbedDraftMember<SentEmbedVideo>,
      *
      * @return The url of the video.
      */
-    URL getUrl();
+    String getUrl();
 
 }

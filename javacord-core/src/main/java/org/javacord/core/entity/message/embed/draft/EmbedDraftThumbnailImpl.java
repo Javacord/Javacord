@@ -12,33 +12,27 @@ import org.javacord.core.util.JsonNodeable;
 
 public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftThumbnail, SentEmbedThumbnail>
         implements EmbedDraftThumbnail, JsonNodeable {
-    private URL url;
-
-    protected EmbedDraftThumbnailImpl(EmbedDraft parent, URL url) {
+    protected EmbedDraftThumbnailImpl(EmbedDraft parent, String url) {
         super(parent, EmbedDraftThumbnail.class, SentEmbedThumbnail.class);
-        this.url = url;
-    }
-
-    public EmbedDraftThumbnailImpl(EmbedDraft parent, String url) {
-        this(parent, urlOrNull(url));
+        this.fileUri = url;
     }
 
     public EmbedDraftThumbnailImpl(BaseEmbed parent, BaseEmbedThumbnail embedThumbnail) {
         this(parent.toEmbedDraft(), embedThumbnail.getUrl().orElse(null));
-        if (url == null) {
+        if (fileUri == null) {
             container = ((EmbedDraftFileContainerAttachableMember) embedThumbnail).container;
         }
     }
 
     @Override
-    public EmbedDraftThumbnail setUrl(URL url) {
-        this.url = url;
+    public EmbedDraftThumbnail setUrl(String url) {
+        this.fileUri = url;
         return this;
     }
 
     @Override
-    public Optional<URL> getUrl() {
-        return Optional.ofNullable(url);
+    public Optional<String> getUrl() {
+        return Optional.ofNullable(fileUri);
     }
 
     @Override
@@ -46,7 +40,8 @@ public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMe
         final String jsonFieldName = "thumbnail";
         ObjectNode node = frame.putObject(jsonFieldName);
 
-        node.put("url", getAttachmentUrlAsString().orElse(getUrl().map(URL::toExternalForm).orElse(null)));
+        node.put("url", fileUri);
+
         return jsonFieldName;
     }
 }

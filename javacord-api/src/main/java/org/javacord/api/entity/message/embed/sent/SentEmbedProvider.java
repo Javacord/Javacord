@@ -12,6 +12,6 @@ public interface SentEmbedProvider extends Nameable, MissingEmbedDraftMember<Sen
      *
      * @return The url of the provider.
      */
-    URL getUrl();
+    String getUrl();
 
 }

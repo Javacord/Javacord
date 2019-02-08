@@ -29,27 +29,27 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     // General embed stuff
     protected String title = null;
     protected String description = null;
-    protected URL url = null;
+    protected String url = null;
     protected Instant timestamp = null;
     protected Color color = null;
 
     // Author
     protected String authorName = null;
-    protected URL authorUrl = null;
-    protected URL authorIconUrl = null;
+    protected String authorUrl = null;
+    protected String authorIconUrl = null;
     protected FileContainer authorIconContainer = null;
 
     // Thumbnail
-    protected URL thumbnailUrl = null;
+    protected String thumbnailUrl = null;
     protected FileContainer thumbnailContainer = null;
 
     // Image
-    protected URL imageUrl = null;
+    protected String imageUrl = null;
     protected FileContainer imageContainer = null;
 
     // Footer
     protected String footerText = null;
-    protected URL footerIconUrl = null;
+    protected String footerIconUrl = null;
     protected FileContainer footerIconContainer = null;
 
     // Fields
@@ -70,7 +70,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setUrl(URL url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 
@@ -85,14 +85,14 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setAuthor(String name, URL url, URL iconUrl) {
+    public void setAuthor(String name, String url, String iconUrl) {
         this.authorName = name;
         this.authorUrl = url;
         this.authorIconUrl = iconUrl;
     }
 
     @Override
-    public void setAuthor(String name, URL url, Object icon, String fileType) {
+    public void setAuthor(String name, String url, Object icon, String fileType) {
         setAuthor(name, url, null);
         this.authorIconContainer = createFileContainer(icon, fileType);
     }
@@ -111,7 +111,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setThumbnail(URL url) {
+    public void setThumbnail(String url) {
         this.thumbnailUrl = url;
     }
 
@@ -130,7 +130,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setImage(URL url) {
+    public void setImage(String url) {
         this.imageUrl = url;
     }
 
@@ -149,7 +149,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setFooter(String text, URL iconUrl) {
+    public void setFooter(String text, String iconUrl) {
         this.footerText = text;
         this.footerIconUrl = iconUrl;
     }

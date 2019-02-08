@@ -8,5 +8,5 @@ import java.net.URL;
 public interface EmbedDraftFooter extends BaseEmbedFooter, EmbedDraftMember<EmbedDraftFooter, SentEmbedFooter> {
     EmbedDraftFooter setText(String text);
 
-    EmbedDraftFooter setIconUrl(URL url);
+    EmbedDraftFooter setIconUrl(String url);
 }

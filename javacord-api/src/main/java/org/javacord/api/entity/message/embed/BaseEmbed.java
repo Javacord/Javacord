@@ -31,7 +31,7 @@ public interface BaseEmbed extends Specializable<BaseEmbed> {
      *
      * @return The url of the embed.
      */
-    Optional<URL> getUrl();
+    Optional<String> getUrl();
 
     /**
      * Gets the timestamp of the embed.

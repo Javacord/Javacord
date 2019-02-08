@@ -14,23 +14,18 @@ import java.util.Optional;
 public class EmbedDraftFooterImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftFooter, SentEmbedFooter>
         implements EmbedDraftFooter, JsonNodeable {
     private String text;
-    private URL icon;
 
-    protected EmbedDraftFooterImpl(EmbedDraft parent, String text, URL iconUrl) {
+    protected EmbedDraftFooterImpl(EmbedDraft parent, String text, String iconUrl) {
         super(parent, EmbedDraftFooter.class, SentEmbedFooter.class);
 
         this.text = text;
-        this.icon = iconUrl;
+        this.fileUri = iconUrl;
     }
 
     public EmbedDraftFooterImpl(BaseEmbed parent, BaseEmbedFooter baseEmbedFooter) {
         this(parent.toEmbedDraft(),
                 baseEmbedFooter.getText(),
                 baseEmbedFooter.getIconUrl().orElse(null));
-    }
-
-    public EmbedDraftFooterImpl(EmbedDraft parent, String text, String url) {
-        this(parent, text, urlOrNull(url));
     }
 
     @Override
@@ -40,8 +35,8 @@ public class EmbedDraftFooterImpl extends EmbedDraftFileContainerAttachableMembe
     }
 
     @Override
-    public EmbedDraftFooter setIconUrl(URL url) {
-        this.icon = url;
+    public EmbedDraftFooter setIconUrl(String url) {
+        this.fileUri = url;
         return this;
     }
 
@@ -51,8 +46,8 @@ public class EmbedDraftFooterImpl extends EmbedDraftFileContainerAttachableMembe
     }
 
     @Override
-    public Optional<URL> getIconUrl() {
-        return Optional.ofNullable(icon);
+    public Optional<String> getIconUrl() {
+        return Optional.ofNullable(fileUri);
     }
 
     @Override
@@ -61,12 +56,7 @@ public class EmbedDraftFooterImpl extends EmbedDraftFileContainerAttachableMembe
         ObjectNode node = frame.putObject(jsonFieldName);
 
         node.put("text", text);
-
-        Optional<String> iconUrl = getAttachmentUrlAsString();
-        if (!iconUrl.isPresent()) {
-            iconUrl = getIconUrl().map(URL::toExternalForm);
-        }
-        iconUrl.ifPresent(url -> node.put("icon_url", url));
+        node.put("icon_url", fileUri);
 
         return jsonFieldName;
     }

@@ -13,6 +13,6 @@ public interface SentEmbedAuthor extends BaseEmbedAuthor, SentEmbedMember<EmbedD
      *
      * @return The proxy url of the author icon.
      */
-    Optional<URL> getProxyIconUrl();
+    Optional<String> getProxyIconUrl();
 
 }

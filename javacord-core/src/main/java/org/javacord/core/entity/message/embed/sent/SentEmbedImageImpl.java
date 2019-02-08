@@ -15,8 +15,8 @@ import java.util.OptionalInt;
  */
 public class SentEmbedImageImpl extends SentEmbedMemberImpl<EmbedDraftImage, SentEmbedImage> implements SentEmbedImage {
 
-    private final URL url;
-    private final URL proxyUrl;
+    private final String url;
+    private final String proxyUrl;
     private final int height;
     private final int width;
 
@@ -28,27 +28,19 @@ public class SentEmbedImageImpl extends SentEmbedMemberImpl<EmbedDraftImage, Sen
     public SentEmbedImageImpl(SentEmbed parent, JsonNode data) {
         super(parent, EmbedDraftImage.class, SentEmbedImage.class);
 
-        try {
-            url = data.has("url") ? new URL(data.get("url").asText()) : null;
-            proxyUrl = data.has("proxy_url") ? new URL(data.get("proxy_url").asText()) : null;
-        } catch (MalformedURLException e) {
-            /*
-            If any URL cannot be parsed, we have reaced an unreachable state, as the URL fields are
-            OPTIONAL but not NULLABLE. We can assert that URLs coming from Discord are always valid.
-            */
-            throw new AssertionError("The URL recieved from discord is invalid!", e);
-        }
+        url = data.path("url").asText(null);
+        proxyUrl = data.path("proxy_url").asText(null);
         height = data.path("height").asInt(-1);
         width = data.path("width").asInt(-1);
     }
 
     @Override
-    public Optional<URL> getUrl() {
+    public Optional<String> getUrl() {
         return Optional.of(url);
     }
 
     @Override
-    public URL getProxyUrl() {
+    public String getProxyUrl() {
         assert proxyUrl != null : "Discord didn't send a proxy URL!";
         return proxyUrl;
     }

@@ -13,33 +13,28 @@ import java.net.URL;
 
 public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftImage, SentEmbedImage>
         implements EmbedDraftImage, JsonNodeable {
-    private URL url;
 
-    protected EmbedDraftImageImpl(EmbedDraft parent, URL url) {
+    protected EmbedDraftImageImpl(EmbedDraft parent, String url) {
         super(parent, EmbedDraftImage.class, SentEmbedImage.class);
-        this.url = url;
-    }
-
-    public EmbedDraftImageImpl(EmbedDraft parent, String url) {
-        this(parent, urlOrNull(url));
+        this.fileUri = url;
     }
 
     public EmbedDraftImageImpl(BaseEmbed parent, BaseEmbedImage member) {
         this(parent.toEmbedDraft(), member.getUrl().orElse(null));
-        if (url == null) {
+        if (fileUri == null) {
             container = ((EmbedDraftFileContainerAttachableMember) member).container;
         }
     }
 
     @Override
-    public EmbedDraftImage setUrl(URL url) {
-        this.url = url;
+    public EmbedDraftImage setUrl(String url) {
+        this.fileUri = url;
         return this;
     }
 
     @Override
-    public Optional<URL> getUrl() {
-        return Optional.ofNullable(url);
+    public Optional<String> getUrl() {
+        return Optional.ofNullable(fileUri);
     }
 
     @Override
@@ -47,7 +42,7 @@ public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember
         final String jsonFieldName = "image";
         ObjectNode node = frame.putObject(jsonFieldName);
 
-        node.put("url", getAttachmentUrlAsString().orElse(getUrl().map(URL::toExternalForm).orElse(null)));
+        node.put("url", fileUri);
 
         return jsonFieldName;
     }

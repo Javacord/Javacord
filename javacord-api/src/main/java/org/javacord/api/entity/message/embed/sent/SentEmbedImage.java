@@ -12,6 +12,6 @@ public interface SentEmbedImage extends BaseEmbedImage, SentEmbedImageMember<Emb
      *
      * @return The proxy url of the image.
      */
-    URL getProxyUrl();
+    String getProxyUrl();
 
 }

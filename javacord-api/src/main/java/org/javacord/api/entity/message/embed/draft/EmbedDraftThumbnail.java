@@ -8,6 +8,6 @@ import java.net.URL;
 public interface EmbedDraftThumbnail extends BaseEmbedThumbnail,
         EmbedDraftMember<EmbedDraftThumbnail, SentEmbedThumbnail> {
 
-    EmbedDraftThumbnail setUrl(URL url);
+    EmbedDraftThumbnail setUrl(String url);
 
 }

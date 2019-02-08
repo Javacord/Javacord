@@ -15,7 +15,7 @@ public class SentEmbedProviderImpl implements SentEmbedProvider {
 
     private final SentEmbed parent;
     private final String name;
-    private final URL url;
+    private final String url;
 
     /**
      * Creates a new embed provider.
@@ -26,15 +26,7 @@ public class SentEmbedProviderImpl implements SentEmbedProvider {
         this.parent = parent;
 
         name = data.has("name") ? data.get("name").asText() : null;
-        try {
-            url = data.has("url") ? new URL(data.get("url").asText()) : null;
-        } catch (MalformedURLException e) {
-            /*
-            If any URL cannot be parsed, we have reaced an unreachable state, as the URL fields are
-            OPTIONAL but not NULLABLE. We can assert that URLs coming from Discord are always valid.
-            */
-            throw new AssertionError("The URL recieved from discord is invalid!", e);
-        }
+        url = data.path("url").asText(null);
     }
 
     @Override
@@ -43,7 +35,7 @@ public class SentEmbedProviderImpl implements SentEmbedProvider {
     }
 
     @Override
-    public URL getUrl() {
+    public String getUrl() {
         assert url != null : "Discord didn't send a URL!";
         return url;
     }

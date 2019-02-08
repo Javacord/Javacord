@@ -13,5 +13,5 @@ public interface SentEmbedFooter extends BaseEmbedFooter, SentEmbedMember<EmbedD
      *
      * @return The proxy url of the footer icon.
      */
-    Optional<URL> getProxyIconUrl();
+    Optional<String> getProxyIconUrl();
 }

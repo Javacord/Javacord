@@ -13,6 +13,6 @@ public interface SentEmbedThumbnail extends BaseEmbedThumbnail,
      *
      * @return The proxy url of the image.
      */
-    URL getProxyUrl();
+    String getProxyUrl();
 
 }

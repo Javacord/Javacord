@@ -1,20 +1,18 @@
 package org.javacord.api.entity.message.embed.draft;
 
-import java.net.URL;
-import org.javacord.api.entity.message.embed.BaseEmbed;
-
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.javacord.api.entity.message.embed.BaseEmbed;
 
 public interface EmbedDraft extends BaseEmbed {
     EmbedDraft setTitle(String title);
 
     EmbedDraft setDescription(String description);
 
-    EmbedDraft setUrl(URL url);
+    EmbedDraft setUrl(String url);
 
     EmbedDraft setTimestamp(Instant timestamp);
 

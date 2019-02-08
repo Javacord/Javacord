@@ -15,8 +15,8 @@ import java.util.Optional;
 public class SentEmbedFooterImpl extends SentEmbedMemberImpl<EmbedDraftFooter, SentEmbedFooter> implements SentEmbedFooter {
 
     private final String text;
-    private final URL iconUrl;
-    private final URL proxyIconUrl;
+    private final String iconUrl;
+    private final String proxyIconUrl;
 
     /**
      * Creates a new embed footer.
@@ -27,16 +27,8 @@ public class SentEmbedFooterImpl extends SentEmbedMemberImpl<EmbedDraftFooter, S
         super(parent, EmbedDraftFooter.class, SentEmbedFooter.class);
 
         text = data.path("text").asText(null);
-        try {
-            iconUrl = data.has("icon_url") ? new URL(data.get("icon_url").asText()) : null;
-            proxyIconUrl = data.has("proxy_icon_url") ? new URL(data.get("proxy_icon_url").asText()) : null;
-        } catch (MalformedURLException e) {
-            /*
-            If any URL cannot be parsed, we have reaced an unreachable state, as the URL fields are
-            OPTIONAL but not NULLABLE. We can assert that URLs coming from Discord are always valid.
-            */
-            throw new AssertionError("The URL recieved from discord is invalid!", e);
-        }
+        iconUrl = data.path("icon_url").asText(null);
+        proxyIconUrl = data.path("proxy_icon_url").asText(null);
     }
 
     @Override
@@ -45,12 +37,12 @@ public class SentEmbedFooterImpl extends SentEmbedMemberImpl<EmbedDraftFooter, S
     }
 
     @Override
-    public Optional<URL> getIconUrl() {
+    public Optional<String> getIconUrl() {
         return Optional.ofNullable(iconUrl);
     }
 
     @Override
-    public Optional<URL> getProxyIconUrl() {
+    public Optional<String> getProxyIconUrl() {
         return Optional.ofNullable(proxyIconUrl);
     }
 

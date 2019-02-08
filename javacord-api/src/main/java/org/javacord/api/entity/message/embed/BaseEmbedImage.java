@@ -12,6 +12,6 @@ public interface BaseEmbedImage extends Specializable<BaseEmbedImage> {
      *
      * @return The url of the image.
      */
-    Optional<URL> getUrl();
+    Optional<String> getUrl();
 
 }

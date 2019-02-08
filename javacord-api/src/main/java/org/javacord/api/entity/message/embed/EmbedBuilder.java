@@ -44,7 +44,7 @@ public class EmbedBuilder {
         return this;
     }
 
-    public EmbedBuilder setUrl(URL url) {
+    public EmbedBuilder setUrl(String url) {
         delegate.setUrl(url);
         return this;
     }
@@ -64,53 +64,53 @@ public class EmbedBuilder {
     }
 
     public EmbedBuilder setAuthor(String name) {
-        return setAuthor(name, null, (URL) null);
+        return setAuthor(name, null, (String) null);
     }
 
-    public EmbedBuilder setAuthor(String name, URL url) {
-        return setAuthor(name, url, (URL) null);
+    public EmbedBuilder setAuthor(String name, String url) {
+        return setAuthor(name, url, (String) null);
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, URL iconUrl) {
+    public EmbedBuilder setAuthor(String name, String url, String iconUrl) {
         delegate.setAuthor(name, url, iconUrl);
         return this;
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, Icon icon) {
+    public EmbedBuilder setAuthor(String name, String url, Icon icon) {
         String iconUrl = icon.getUrl().toExternalForm();
         delegate.setAuthor(name, url, icon, iconUrl.substring(iconUrl.lastIndexOf('.') + 1));
         return this;
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, File icon) {
+    public EmbedBuilder setAuthor(String name, String url, File icon) {
         String fileName = icon.getName();
         delegate.setAuthor(name, url, icon, fileName.substring(fileName.lastIndexOf('.') + 1));
         return this;
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, InputStream icon) {
+    public EmbedBuilder setAuthor(String name, String url, InputStream icon) {
         return setAuthor(name, url, icon, "png");
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, InputStream icon, String fileType) {
+    public EmbedBuilder setAuthor(String name, String url, InputStream icon, String fileType) {
         delegate.setAuthor(name, url, icon, fileType);
         return this;
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, byte[] icon) {
+    public EmbedBuilder setAuthor(String name, String url, byte[] icon) {
         return setAuthor(name, url, icon, "png");
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, byte[] icon, String fileType) {
+    public EmbedBuilder setAuthor(String name, String url, byte[] icon, String fileType) {
         delegate.setAuthor(name, url, icon, fileType);
         return this;
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, BufferedImage icon) {
+    public EmbedBuilder setAuthor(String name, String url, BufferedImage icon) {
         return setAuthor(name, url, icon, "png");
     }
 
-    public EmbedBuilder setAuthor(String name, URL url, BufferedImage icon, String fileType) {
+    public EmbedBuilder setAuthor(String name, String url, BufferedImage icon, String fileType) {
         delegate.setAuthor(name, url, icon, fileType);
         return this;
     }
@@ -120,7 +120,7 @@ public class EmbedBuilder {
         return this;
     }
 
-    public EmbedBuilder setThumbnail(URL url) {
+    public EmbedBuilder setThumbnail(String url) {
         delegate.setThumbnail(url);
         return this;
     }
@@ -169,7 +169,7 @@ public class EmbedBuilder {
         return this;
     }
 
-    public EmbedBuilder setImage(URL url) {
+    public EmbedBuilder setImage(String url) {
         delegate.setImage(url);
         return this;
     }
@@ -219,10 +219,10 @@ public class EmbedBuilder {
     }
 
     public EmbedBuilder setFooter(String text) {
-        return setFooter(text, (URL) null);
+        return setFooter(text, (String) null);
     }
 
-    public EmbedBuilder setFooter(String text, URL iconUrl) {
+    public EmbedBuilder setFooter(String text, String iconUrl) {
         delegate.setFooter(text, iconUrl);
         return this;
     }
