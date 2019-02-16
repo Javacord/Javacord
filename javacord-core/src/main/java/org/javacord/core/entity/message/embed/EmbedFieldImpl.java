@@ -31,20 +31,6 @@ public abstract class EmbedFieldImpl implements BaseEmbedField {
         return updater;
     }
 
-    protected class Updater {
-        public void setName(String name) {
-            EmbedFieldImpl.this.name = name;
-        }
-
-        public void setValue(String value) {
-            EmbedFieldImpl.this.value = value;
-        }
-
-        public void setInline(boolean inline) {
-            EmbedFieldImpl.this.inline = inline;
-        }
-    }
-
     @Override
     public String getName() {
         return name;
@@ -58,6 +44,20 @@ public abstract class EmbedFieldImpl implements BaseEmbedField {
     @Override
     public boolean isInline() {
         return inline;
+    }
+
+    protected class Updater {
+        public void setName(String name) {
+            EmbedFieldImpl.this.name = name;
+        }
+
+        public void setValue(String value) {
+            EmbedFieldImpl.this.value = value;
+        }
+
+        public void setInline(boolean inline) {
+            EmbedFieldImpl.this.inline = inline;
+        }
     }
 
 }

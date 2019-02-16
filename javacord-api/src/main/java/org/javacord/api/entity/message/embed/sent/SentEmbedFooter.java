@@ -1,10 +1,8 @@
 package org.javacord.api.entity.message.embed.sent;
 
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbedFooter;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
-
-import java.net.URL;
-import java.util.Optional;
 
 public interface SentEmbedFooter extends BaseEmbedFooter, SentEmbedMember<EmbedDraftFooter, SentEmbedFooter> {
 

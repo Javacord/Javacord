@@ -2,13 +2,10 @@ package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Optional;
-import org.javacord.api.entity.message.embed.sent.SentEmbed;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
-import org.javacord.api.entity.message.embed.sent.SentEmbedThumbnail;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.OptionalInt;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
+import org.javacord.api.entity.message.embed.sent.SentEmbedThumbnail;
 
 /**
  * The implementation of {@link SentEmbedThumbnail}.

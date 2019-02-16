@@ -1,13 +1,12 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.api.entity.message.embed.sent.SentEmbed;
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedField;
 import org.javacord.core.entity.message.embed.EmbedFieldImpl;
 import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
-
-import java.util.Optional;
 
 /**
  * The implementation of {@link SentEmbedField}.

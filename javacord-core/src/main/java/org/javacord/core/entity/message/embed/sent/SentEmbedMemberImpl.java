@@ -1,7 +1,7 @@
 package org.javacord.core.entity.message.embed.sent;
 
-import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedMember;
 import org.javacord.core.entity.message.embed.BaseEmbedMemberImpl;
 

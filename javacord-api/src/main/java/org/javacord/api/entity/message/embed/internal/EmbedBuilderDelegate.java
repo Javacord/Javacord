@@ -1,15 +1,19 @@
 package org.javacord.api.entity.message.embed.internal;
 
 import java.awt.Color;
-import java.net.URL;
 import java.time.Instant;
 import org.javacord.api.entity.message.embed.BaseEmbedAuthor;
 import org.javacord.api.entity.message.embed.BaseEmbedField;
 import org.javacord.api.entity.message.embed.BaseEmbedFooter;
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
+import org.javacord.api.entity.message.embed.BaseEmbedMember;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
 
 /**
  * This class is internally used by the {@link EmbedBuilder} to created embeds.
@@ -30,25 +34,25 @@ public interface EmbedBuilderDelegate {
 
     void setAuthor(String name, String url, Object icon, String fileType);
 
-    void setAuthor(BaseEmbedAuthor author);
+    <T extends BaseEmbedAuthor & BaseEmbedMember<?, ? extends EmbedDraftAuthor, ?>> void setAuthor(T author);
 
     void setThumbnail(String url);
 
     void setThumbnail(Object image, String fileType);
 
-    void setThumbnail(BaseEmbedThumbnail thumbnail);
+    <T extends BaseEmbedThumbnail & BaseEmbedMember<?, ? extends EmbedDraftThumbnail, ?>> void setThumbnail(T thumbnail);
 
     void setImage(String url);
 
     void setImage(Object image, String fileType);
 
-    void setImage(BaseEmbedImage image);
+    <T extends BaseEmbedImage & BaseEmbedMember<?, ? extends EmbedDraftImage, ?>> void setImage(T image);
 
     void setFooter(String text, String iconUrl);
 
     void setFooter(String text, Object icon, String fileType);
 
-    void setFooter(BaseEmbedFooter footer);
+    <T extends BaseEmbedFooter & BaseEmbedMember<?, ? extends EmbedDraftFooter, ?>> void setFooter(T footer);
 
     void addField(String name, String value, boolean inline);
 

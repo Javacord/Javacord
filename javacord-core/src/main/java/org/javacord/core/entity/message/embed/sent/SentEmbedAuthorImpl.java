@@ -1,13 +1,10 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.api.entity.message.embed.sent.SentEmbed;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
-import org.javacord.api.entity.message.embed.sent.SentEmbedAuthor;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Optional;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
+import org.javacord.api.entity.message.embed.sent.SentEmbedAuthor;
 
 /**
  * The implementation of {@link SentEmbedAuthor}.

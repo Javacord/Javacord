@@ -2,7 +2,6 @@ package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.awt.Color;
-import java.net.URL;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedField;
+import org.javacord.api.entity.message.embed.BaseEmbedMember;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
@@ -51,17 +51,21 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
             Instant timestamp,
             Color color,
 
+            BaseEmbedMember<?, ? extends EmbedDraftAuthor, ?> author,
             String authorName,
             String authorUrl,
             String authorIconUrl,
             FileContainer authorIconContainer,
 
+            BaseEmbedMember<?, ? extends EmbedDraftThumbnail, ?> thumbnail,
             String thumbnailUrl,
             FileContainer thumbnailContainer,
 
+            BaseEmbedMember<?, ? extends EmbedDraftImage, ?> image,
             String imageUrl,
             FileContainer imageContainer,
 
+            BaseEmbedMember<?, ? extends EmbedDraftFooter, ?> footer,
             String footerText,
             String footerIconUrl,
             FileContainer footerIconContainer,
@@ -74,10 +78,45 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         this.timestamp = timestamp;
         this.color = color;
 
-        this.author = createAuthor(authorName, authorUrl, authorIconUrl, authorIconContainer);
-        this.thumbnail = createThumbnail(thumbnailUrl, thumbnailContainer);
-        this.image = createImage(imageUrl, imageContainer);
-        this.footer = createFooter(footerText, footerIconUrl, footerIconContainer);
+        if (author != null) {
+            if (author instanceof EmbedDraftAuthorImpl) {
+                this.author = (EmbedDraftAuthorImpl) author;
+            } else {
+                this.author = (EmbedDraftAuthorImpl) author.toDraftMember();
+            }
+        } else {
+            this.author = createAuthor(authorName, authorUrl, authorIconUrl, authorIconContainer);
+        }
+
+        if (thumbnail != null) {
+            if (thumbnail instanceof EmbedDraftThumbnailImpl) {
+                this.thumbnail = (EmbedDraftThumbnailImpl) thumbnail;
+            } else {
+                this.thumbnail = (EmbedDraftThumbnailImpl) thumbnail.toDraftMember();
+            }
+        } else {
+            this.thumbnail = createThumbnail(thumbnailUrl, thumbnailContainer);
+        }
+
+        if (image != null) {
+            if (image instanceof EmbedDraftImageImpl) {
+                this.image = (EmbedDraftImageImpl) image;
+            } else {
+                this.image = (EmbedDraftImageImpl) image.toDraftMember();
+            }
+        } else {
+            this.image = createImage(imageUrl, imageContainer);
+        }
+
+        if (footer != null) {
+            if (footer instanceof EmbedDraftFooterImpl) {
+                this.footer = (EmbedDraftFooterImpl) footer;
+            } else {
+                this.footer = (EmbedDraftFooterImpl) footer.toDraftMember();
+            }
+        } else {
+            this.footer = createFooter(footerText, footerIconUrl, footerIconContainer);
+        }
 
         this.fields = new ArrayList<>();
         fields.stream()

@@ -1,7 +1,6 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.net.URL;
 import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;

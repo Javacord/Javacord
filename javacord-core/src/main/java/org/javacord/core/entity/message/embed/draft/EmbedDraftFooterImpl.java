@@ -1,15 +1,13 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedFooter;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
 import org.javacord.api.entity.message.embed.sent.SentEmbedFooter;
 import org.javacord.core.util.JsonNodeable;
-
-import java.net.URL;
-import java.util.Optional;
 
 public class EmbedDraftFooterImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftFooter, SentEmbedFooter>
         implements EmbedDraftFooter, JsonNodeable {

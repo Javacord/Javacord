@@ -1,12 +1,11 @@
 package org.javacord.core.entity.message.embed;
 
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedMember;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
 import org.javacord.api.entity.message.embed.sent.SentEmbedMember;
 import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
-
-import java.util.Optional;
 
 public abstract class BaseEmbedMemberImpl<E extends BaseEmbed, D extends EmbedDraftMember, S extends SentEmbedMember>
         implements BaseEmbedMember<E, D, S> {

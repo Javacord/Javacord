@@ -5,10 +5,6 @@ import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
 import org.javacord.api.entity.message.embed.sent.SentEmbedMember;
 import org.javacord.core.util.FileContainer;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Optional;
-
 public abstract class EmbedDraftFileContainerAttachableMember<D extends EmbedDraftMember, S extends SentEmbedMember>
         extends EmbedDraftMemberImpl<D, S> {
     protected String fileUri;
@@ -29,6 +25,6 @@ public abstract class EmbedDraftFileContainerAttachableMember<D extends EmbedDra
     public void attachContainer(FileContainer container) {
         if (container == null) return;
         this.container = container;
-        this.fileUri = "attachment://"+container.getFileTypeOrName();
+        this.fileUri = "attachment://" + container.getFileTypeOrName();
     }
 }

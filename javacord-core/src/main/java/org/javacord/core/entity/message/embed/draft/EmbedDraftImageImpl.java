@@ -9,8 +9,6 @@ import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
 import org.javacord.api.entity.message.embed.sent.SentEmbedImage;
 import org.javacord.core.util.JsonNodeable;
 
-import java.net.URL;
-
 public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftImage, SentEmbedImage>
         implements EmbedDraftImage, JsonNodeable {
 

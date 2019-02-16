@@ -1,8 +1,7 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
-
 import java.util.OptionalInt;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
 
 interface SentEmbedImageMember<D extends EmbedDraftMember, S extends SentEmbedMember> extends SentEmbedMember<D, S> {
 

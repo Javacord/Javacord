@@ -1,7 +1,5 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import java.net.URL;
-
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
 

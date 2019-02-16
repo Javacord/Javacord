@@ -1,8 +1,6 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import java.net.URL;
 import java.util.Optional;
-
 import org.javacord.api.entity.message.embed.BaseEmbedAuthor;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
 

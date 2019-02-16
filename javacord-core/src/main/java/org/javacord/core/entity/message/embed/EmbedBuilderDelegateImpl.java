@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +13,14 @@ import org.javacord.api.entity.message.embed.BaseEmbedAuthor;
 import org.javacord.api.entity.message.embed.BaseEmbedField;
 import org.javacord.api.entity.message.embed.BaseEmbedFooter;
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
+import org.javacord.api.entity.message.embed.BaseEmbedMember;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
-import org.javacord.core.entity.message.embed.draft.EmbedDraftFileContainerAttachableMember;
 import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
 import org.javacord.core.util.FileContainer;
 
@@ -26,34 +29,33 @@ import org.javacord.core.util.FileContainer;
  */
 public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
+    // Fields
+    protected final List<BaseEmbedField> fields;
     // General embed stuff
     protected String title = null;
     protected String description = null;
     protected String url = null;
     protected Instant timestamp = null;
     protected Color color = null;
-
     // Author
+    protected BaseEmbedMember<?, ? extends EmbedDraftAuthor, ?> author = null;
     protected String authorName = null;
     protected String authorUrl = null;
     protected String authorIconUrl = null;
     protected FileContainer authorIconContainer = null;
-
     // Thumbnail
+    protected BaseEmbedMember<?, ? extends EmbedDraftThumbnail, ?> thumbnail = null;
     protected String thumbnailUrl = null;
     protected FileContainer thumbnailContainer = null;
-
     // Image
+    protected BaseEmbedMember<?, ? extends EmbedDraftImage, ?> image = null;
     protected String imageUrl = null;
     protected FileContainer imageContainer = null;
-
     // Footer
+    protected BaseEmbedMember<?, ? extends EmbedDraftFooter, ?> footer = null;
     protected String footerText = null;
     protected String footerIconUrl = null;
     protected FileContainer footerIconContainer = null;
-
-    // Fields
-    protected final List<BaseEmbedField> fields;
 
     public EmbedBuilderDelegateImpl() {
         fields = new ArrayList<>();
@@ -98,16 +100,13 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setAuthor(BaseEmbedAuthor author) {
-        setAuthor(
-                author.getName(),
-                author.getUrl().orElse(null),
-                author.getIconUrl().orElse(null)
-        );
-        // if the icon url is empty, author is an EmbedDraftAuthor with an attachment
-        if (!author.getIconUrl().isPresent()) {
-            this.authorIconContainer = ((EmbedDraftFileContainerAttachableMember) author).getContainer();
-        }
+    public <T extends BaseEmbedAuthor & BaseEmbedMember<?, ? extends EmbedDraftAuthor, ?>> void setAuthor(T author) {
+        this.author = author;
+
+        this.authorName = null;
+        this.authorUrl = null;
+        this.authorIconUrl = null;
+        this.authorIconContainer = null;
     }
 
     @Override
@@ -121,12 +120,13 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setThumbnail(BaseEmbedThumbnail thumbnail) {
-        setThumbnail(thumbnail.getUrl().orElse(null));
-        // if the url is empty, thumbnail is an EmbedDraftThumbnail with an attachment
-        if (!thumbnail.getUrl().isPresent()) {
-            this.thumbnailContainer = ((EmbedDraftFileContainerAttachableMember) thumbnail).getContainer();
-        }
+    public <T extends BaseEmbedThumbnail & BaseEmbedMember<?, ? extends EmbedDraftThumbnail, ?>> void setThumbnail(
+            T thumbnail
+    ) {
+        this.thumbnail = thumbnail;
+
+        this.thumbnailUrl = null;
+        this.thumbnailContainer = null;
     }
 
     @Override
@@ -140,12 +140,11 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setImage(BaseEmbedImage image) {
-        setImage(image.getUrl().orElse(null));
-        // if the url is empty, image is an EmbedDraftImage with an attachment
-        if (!image.getUrl().isPresent()) {
-            this.imageContainer = ((EmbedDraftFileContainerAttachableMember) image).getContainer();
-        }
+    public <T extends BaseEmbedImage & BaseEmbedMember<?, ? extends EmbedDraftImage, ?>> void setImage(T image) {
+        this.image = image;
+
+        this.imageUrl = null;
+        this.imageContainer = null;
     }
 
     @Override
@@ -161,15 +160,12 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public void setFooter(BaseEmbedFooter footer) {
-        setFooter(
-                footer.getText(),
-                footer.getIconUrl().orElse(null)
-        );
-        // if the icon url is empty, footer is an EmbedDraftFooter with an attachment
-        if (!footer.getIconUrl().isPresent()) {
-            this.footerIconContainer = ((EmbedDraftFileContainerAttachableMember) footer).getContainer();
-        }
+    public <T extends BaseEmbedFooter & BaseEmbedMember<?, ? extends EmbedDraftFooter, ?>> void setFooter(T footer) {
+        this.footer = footer;
+
+        this.footerText = null;
+        this.footerIconUrl = null;
+        this.footerIconContainer = null;
     }
 
     @Override
@@ -191,10 +187,10 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
                 timestamp,
                 color,
 
-                authorName, authorUrl, authorIconUrl, authorIconContainer,
-                thumbnailUrl, thumbnailContainer,
-                imageUrl, imageContainer,
-                footerText, footerIconUrl, footerIconContainer,
+                author, authorName, authorUrl, authorIconUrl, authorIconContainer,
+                thumbnail, thumbnailUrl, thumbnailContainer,
+                image, imageUrl, imageContainer,
+                footer, footerText, footerIconUrl, footerIconContainer,
                 fields
         );
     }

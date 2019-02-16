@@ -1,13 +1,10 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.api.entity.message.embed.sent.SentEmbed;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
-import org.javacord.api.entity.message.embed.sent.SentEmbedFooter;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Optional;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
+import org.javacord.api.entity.message.embed.sent.SentEmbedFooter;
 
 /**
  * The implementation of {@link SentEmbedFooter}.

@@ -2,6 +2,7 @@ package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedField;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
@@ -9,8 +10,6 @@ import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
 import org.javacord.api.entity.message.embed.sent.SentEmbedField;
 import org.javacord.core.entity.message.embed.EmbedFieldImpl;
 import org.javacord.core.util.JsonNodeable;
-
-import java.util.Optional;
 
 // EmbedDraftFieldImpl cannot extend EmbedDraftMember because it extends EmbedFieldImpl
 public class EmbedDraftFieldImpl extends EmbedFieldImpl implements EmbedDraftField, JsonNodeable {

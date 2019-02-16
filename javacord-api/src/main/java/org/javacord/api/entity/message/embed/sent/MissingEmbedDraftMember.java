@@ -1,8 +1,7 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
-
 import java.util.Optional;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
 
 public interface MissingEmbedDraftMember<S extends SentEmbedMember> extends SentEmbedMember<EmbedDraftMember, S> {
     @Override
