@@ -86,25 +86,22 @@ public interface BaseEmbed extends Specializable<BaseEmbed> {
      *
      * @return A builder with the values of this embed.
      */
-    default EmbedBuilder toBuilder() {
-        EmbedBuilder builder = new EmbedBuilder();
-        getTitle().ifPresent(builder::setTitle);
-        getDescription().ifPresent(builder::setDescription);
-        getUrl().ifPresent(builder::setUrl);
-        getTimestamp().ifPresent(builder::setTimestamp);
-        getColor().ifPresent(builder::setColor);
-        getAuthor().ifPresent(builder::setAuthor);
-        getThumbnail().ifPresent(builder::setThumbnail);
-        getImage().ifPresent(builder::setImage);
-        getFooter().ifPresent(builder::setFooter);
-        getFields().forEach(builder::addField);
-        return builder;
-    }
+    EmbedBuilder toBuilder();
 
+    /**
+     * Creates an EmbedDraft object from this embed.
+     *
+     * @return A new EmbedDraft created from this embed.
+     */
     default EmbedDraft toEmbedDraft() {
-        return as(EmbedDraft.class).orElse(this.toBuilder().build());
+        return toBuilder().build();
     }
 
+    /**
+     * Tries to cast this embed to a SentEmbed.
+     *
+     * @return An optional SentEmbed.
+     */
     default Optional<SentEmbed> asSentEmbed() {
         return as(SentEmbed.class);
     }

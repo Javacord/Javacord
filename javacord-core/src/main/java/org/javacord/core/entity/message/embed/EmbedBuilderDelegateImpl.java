@@ -29,34 +29,42 @@ import org.javacord.core.util.FileContainer;
  */
 public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
-    // Fields
-    protected final List<BaseEmbedField> fields;
     // General embed stuff
     protected String title = null;
     protected String description = null;
     protected String url = null;
     protected Instant timestamp = null;
     protected Color color = null;
+
     // Author
     protected BaseEmbedMember<?, ? extends EmbedDraftAuthor, ?> author = null;
     protected String authorName = null;
     protected String authorUrl = null;
     protected String authorIconUrl = null;
     protected FileContainer authorIconContainer = null;
+
     // Thumbnail
     protected BaseEmbedMember<?, ? extends EmbedDraftThumbnail, ?> thumbnail = null;
     protected String thumbnailUrl = null;
     protected FileContainer thumbnailContainer = null;
+
     // Image
     protected BaseEmbedMember<?, ? extends EmbedDraftImage, ?> image = null;
     protected String imageUrl = null;
     protected FileContainer imageContainer = null;
+
     // Footer
     protected BaseEmbedMember<?, ? extends EmbedDraftFooter, ?> footer = null;
     protected String footerText = null;
     protected String footerIconUrl = null;
     protected FileContainer footerIconContainer = null;
 
+    // Fields
+    protected final List<BaseEmbedField> fields;
+
+    /**
+     * Constructor of the delegate implementation.
+     */
     public EmbedBuilderDelegateImpl() {
         fields = new ArrayList<>();
     }
@@ -195,6 +203,16 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
         );
     }
 
+    /**
+     * Generates a new {@code FileContainer} based on the provided image object and file type.
+     *
+     * @param image The image object. Must be one of {@link Icon},
+     * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
+     * If this argument is {@code null}, the method returns {@code null}.
+     * If this argument is none of the said types, the method returns {@code null}.
+     * @param fileType The image type of the object.
+     * @return A new {@code FileContainer} or {@code null}.
+     */
     private FileContainer createFileContainer(Object image, String fileType) {
         if (image == null) {
             return null;
@@ -213,7 +231,7 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
         } else if (image.getClass() == byte[].class) {
             container = new FileContainer((byte[]) image, fileType);
         } else {
-            throw new AssertionError();
+            return null;
         }
 
         container.setFileTypeOrName(UUID.randomUUID().toString() + "." + fileType);
@@ -221,11 +239,22 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
         return container;
     }
 
+    /**
+     * Preliminary implementation for {@code BaseEmbedField}.
+     * Only used for carrying embed field data with the delegate.
+     */
     private class PreliminaryField implements BaseEmbedField {
         private final String name;
         private final String value;
         private final boolean inline;
 
+        /**
+         * Private constructor.
+         *
+         * @param name The fields name.
+         * @param value The fields value.
+         * @param inline The fields inline value.
+         */
         private PreliminaryField(String name, String value, boolean inline) {
             this.name = name;
             this.value = value;

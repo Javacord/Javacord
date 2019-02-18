@@ -372,7 +372,7 @@ public class EmbedBuilder {
      * {@link BaseEmbedMember#toDraftMember()} on embed draft construction.
      *
      * @param author The author for the embed.
-     * @param <T> Generic type for the thumbnail to match a BaseEmbedAuthor and a
+     * @param <T> Generic type for the author to match a BaseEmbedAuthor and a
      * BaseEmbedMember that can be converted to an EmbedDraftAuthor.
      * @return This instance of the builder.
      */

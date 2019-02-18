@@ -6,6 +6,7 @@ import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedField;
 import org.javacord.core.entity.message.embed.EmbedFieldImpl;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftFieldImpl;
 import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
 
 /**
@@ -16,7 +17,7 @@ public class SentEmbedFieldImpl extends EmbedFieldImpl implements SentEmbedField
     private final SentEmbed parent;
 
     /**
-     * Creates a new embed field.
+     * Constructor.
      *
      * @param data The json data of the field.
      */
@@ -35,7 +36,7 @@ public class SentEmbedFieldImpl extends EmbedFieldImpl implements SentEmbedField
 
     @Override
     public EmbedDraftField toDraftMember() {
-        return EmbedDraftImpl.createFrom(parent.toEmbedDraft(), this);
+        return new EmbedDraftFieldImpl(parent, this);
     }
 
     @Override

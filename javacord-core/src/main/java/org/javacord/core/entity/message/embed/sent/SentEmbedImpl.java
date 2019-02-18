@@ -18,6 +18,9 @@ import org.javacord.api.entity.message.embed.sent.SentEmbedVideo;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Implementation of {@link SentEmbed}.
+ */
 public class SentEmbedImpl implements SentEmbed {
     private final String title;
     private final String type;
@@ -33,6 +36,11 @@ public class SentEmbedImpl implements SentEmbed {
     private final SentEmbedProvider provider;
     private final List<SentEmbedField> fields;
 
+    /**
+     * Constructor.
+     *
+     * @param data The JsonNode to create the embed from.
+     */
     public SentEmbedImpl(JsonNode data) {
         this.title = data.path("title").asText(null);
         this.type = data.path("type").asText(null);
