@@ -1,5 +1,8 @@
 package org.javacord.api.entity.permission;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * This enum contains all types of permissions.
  */
@@ -90,6 +93,18 @@ public enum PermissionType {
             return i - getValue();
         }
         return i;
+    }
+
+    public static Set<PermissionType> fromBitmask(int bitmask) {
+        Set<PermissionType> set = new HashSet<>();
+
+        for (PermissionType value : values()) {
+            if (value.isSet(bitmask)) {
+                set.add(value);
+            }
+        }
+
+        return set;
     }
 
 }
