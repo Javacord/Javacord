@@ -82,4 +82,44 @@ public interface Permissions {
      */
     boolean isEmpty(); // We could check it in a default method, but it's faster to just check it in the implementation
 
+    /**
+     * Creates a {@code Permissions} object from the given bitmask.
+     * Permissions that are not included are marked as {@link PermissionState#UNSET}.
+     *
+     * @param bitmask The bitmask of allowed permissions.
+     * @return A {@code Permissions} object created from the given bitmask.
+     */
+    static Permissions fromBitmask(int bitmask) {
+        return fromBitmask(bitmask, 0);
+    }
+
+    /**
+     * Creates a {@code Permissions} object from the given bitmasks.
+     *
+     * <p>Permissions that are not included in any bitmap are marked as {@link PermissionState#UNSET}.
+     * If a permission is included in both the allowed and denied bitmap,
+     * it is marked as {@link PermissionState#UNSET}.
+     *
+     * @param allowedBitmask The bitmask of allowed permissions.
+     * @param deniedBitmask The bitmask of denied permissions.
+     * @return A {@code Permissions} object created from the given bitmasks.
+     */
+    static Permissions fromBitmask(int allowedBitmask, int deniedBitmask) {
+        PermissionsBuilder permissionsBuilder = new PermissionsBuilder();
+
+        for (PermissionType permissionType : PermissionType.values()) {
+            if (permissionType.isSet(allowedBitmask) && permissionType.isSet(deniedBitmask)) {
+                permissionsBuilder.setState(permissionType, PermissionState.UNSET);
+            } else if (permissionType.isSet(allowedBitmask)) {
+                permissionsBuilder.setState(permissionType, PermissionState.ALLOWED);
+            } else if (permissionType.isSet(deniedBitmask)) {
+                permissionsBuilder.setState(permissionType, PermissionState.DENIED);
+            } else {
+                permissionsBuilder.setState(permissionType, PermissionState.UNSET);
+            }
+        }
+
+        return permissionsBuilder.build();
+    }
+
 }
