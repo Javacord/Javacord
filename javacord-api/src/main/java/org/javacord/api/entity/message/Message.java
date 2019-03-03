@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,6 +52,35 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     default MessageBuilder toMessageBuilder() {
         return MessageBuilder.fromMessage(this);
+    }
+
+    /**
+     * Deletes the message after the given delay.
+     *
+     * @param time The time to be deleted after.
+     * @param unit The unit to measure the given {@code time} in.
+     * @return A future that completes once the message is deleted.
+     */
+    default ScheduledFuture<Void> deleteAfter(long time, TimeUnit unit) {
+        return deleteAfter(time, unit, null);
+    }
+
+    /**
+     * Deletes the message after the given delay with the given reason.
+     *
+     * @param time The time to be deleted after.
+     * @param unit The unit to measure the given {@code time} in.
+     * @param reason The reason why the message has been deleted.
+     * @return A future that completes once the message is deleted.
+     */
+    default ScheduledFuture<Void> deleteAfter(long time, TimeUnit unit, String reason) {
+        return getApi()
+                .getThreadPool()
+                .getScheduler()
+                .schedule(() -> {
+                    this.delete(reason);
+                    return null;
+                }, time, unit);
     }
 
     /**
