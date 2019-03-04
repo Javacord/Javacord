@@ -1,9 +1,13 @@
 package org.javacord.api.entity.message.embed.sent;
 
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
 
-public interface SentEmbedImage extends BaseEmbedImage, SentEmbedImageMember<EmbedDraftImage, SentEmbedImage> {
+import java.util.Optional;
+
+public interface SentEmbedImage extends BaseEmbedImage {
+
+    @Override
+    SentEmbed getEmbed();
 
     /**
      * Gets the proxy url of the image.
@@ -11,5 +15,19 @@ public interface SentEmbedImage extends BaseEmbedImage, SentEmbedImageMember<Emb
      * @return The proxy url of the image.
      */
     String getProxyUrl();
+
+    /**
+     * Gets the height of the image.
+     *
+     * @return The height of the image.
+     */
+    Optional<Integer> getHeight();
+
+    /**
+     * Gets the width of the image.
+     *
+     * @return The width of the image.
+     */
+    Optional<Integer> getWidth();
 
 }

@@ -368,15 +368,11 @@ public class EmbedBuilder {
 
     /**
      * Sets the author for the embed from a previously constructed author.
-     * The exact instance is set to this embed builder, and is being converted to an {@link EmbedDraftAuthor} using
-     * {@link BaseEmbedMember#toDraftMember()} on embed draft construction.
      *
      * @param author The author for the embed.
-     * @param <T> Generic type for the author to match a BaseEmbedAuthor and a
-     * BaseEmbedMember that can be converted to an EmbedDraftAuthor.
      * @return This instance of the builder.
      */
-    public <T extends BaseEmbedAuthor & BaseEmbedMember<?, EmbedDraftAuthor, ?>> EmbedBuilder setAuthor(T author) {
+    public EmbedBuilder setAuthor(BaseEmbedAuthor author) {
         delegate.setAuthor(author);
         return this;
     }
@@ -489,17 +485,11 @@ public class EmbedBuilder {
 
     /**
      * Sets the thumbnail from a previously constructed Thumbnail.
-     * The exact instance is set to this embed builder, and is being converted to an {@link EmbedDraftThumbnail} using
-     * {@link BaseEmbedMember#toDraftMember()} on embed draft construction.
      *
      * @param thumbnail The thumbnail to set.
-     * @param <T> Generic type for the thumbnail to match a BaseEmbedThumbnail and a
-     * BaseEmbedMember that can be converted to an EmbedDraftThumbnail.
      * @return This instance of the builder.
      */
-    public <T extends BaseEmbedThumbnail & BaseEmbedMember<?, EmbedDraftThumbnail, ?>> EmbedBuilder setThumbnail(
-            T thumbnail
-    ) {
+    public EmbedBuilder setThumbnail(BaseEmbedThumbnail thumbnail) {
         delegate.setThumbnail(thumbnail);
         return this;
     }
@@ -612,15 +602,11 @@ public class EmbedBuilder {
 
     /**
      * Sets the image for the embed.
-     * The exact instance is set to this embed builder, and is being converted to an {@link EmbedDraftImage} using
-     * {@link BaseEmbedMember#toDraftMember()} on embed draft construction.
      *
      * @param image The image to be used.
-     * @param <T> Generic type for the image to match a BaseEmbedImage and a
-     * BaseEmbedMember that can be converted to an EmbedDraftImage.
      * @return This instance of the builder.
      */
-    public <T extends BaseEmbedImage & BaseEmbedMember<?, EmbedDraftImage, ?>> EmbedBuilder setImage(T image) {
+    public EmbedBuilder setImage(BaseEmbedImage image) {
         delegate.setImage(image);
         return this;
     }
@@ -752,15 +738,11 @@ public class EmbedBuilder {
 
     /**
      * Sets the embeds footer to a previously constructed footer.
-     * The exact instance is set to this embed builder, and is being converted to an {@link EmbedDraftFooter} using
-     * {@link BaseEmbedMember#toDraftMember()} on embed draft construction.
      *
      * @param footer The footer to set.
-     * @param <T> Generic type for the footer to match a BaseEmbedFooter and a
-     * BaseEmbedMember that can be converted to an EmbedDraftFooter.
      * @return This instance of the builder.
      */
-    public <T extends BaseEmbedFooter & BaseEmbedMember<?, EmbedDraftFooter, ?>> EmbedBuilder setFooter(T footer) {
+    public EmbedBuilder setFooter(BaseEmbedFooter footer) {
         delegate.setFooter(footer);
         return this;
     }

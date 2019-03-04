@@ -1,23 +1,19 @@
 package org.javacord.api.entity.message.embed.internal;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.InputStream;
-import java.time.Instant;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.embed.BaseEmbedAuthor;
 import org.javacord.api.entity.message.embed.BaseEmbedField;
 import org.javacord.api.entity.message.embed.BaseEmbedFooter;
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
-import org.javacord.api.entity.message.embed.BaseEmbedMember;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.time.Instant;
 
 /**
  * This class is internally used by the {@link EmbedBuilder} to created embeds.
@@ -84,10 +80,8 @@ public interface EmbedBuilderDelegate {
      * Sets the author of the embed.
      *
      * @param author An instance of {@code BaseEmbedAuthor} to be set to the embed.
-     * @param <T> Generic type for the author to match a BaseEmbedAuthor and a
-     * BaseEmbedMember that can be converted to an EmbedDraftAuthor.
      */
-    <T extends BaseEmbedAuthor & BaseEmbedMember<?, ? extends EmbedDraftAuthor, ?>> void setAuthor(T author);
+    void setAuthor(BaseEmbedAuthor author);
 
     /**
      * Sets the thumbnail of the embed.
@@ -109,10 +103,8 @@ public interface EmbedBuilderDelegate {
      * Sets the thumbnail of the embed.
      *
      * @param thumbnail An instance of {@code BaseEmbedThumbnail} to be set to the embed.
-     * @param <T> Generic type for the thumbnail to match a BaseEmbedThumbnail and a
-     * BaseEmbedMember that can be converted to an EmbedDraftThumbnail.
      */
-    <T extends BaseEmbedThumbnail & BaseEmbedMember<?, ? extends EmbedDraftThumbnail, ?>> void setThumbnail(T thumbnail);
+    void setThumbnail(BaseEmbedThumbnail thumbnail);
 
     /**
      * Sets the image of the embed.
@@ -134,10 +126,8 @@ public interface EmbedBuilderDelegate {
      * Sets the image of the embed.
      *
      * @param image An instance of {@code BaseEmbedImage} to be set to the embed.
-     * @param <T> Generic type for the image to match a BaseEmbedImage and a
-     * BaseEmbedMember that can be converted to an EmbedDraftImage.
      */
-    <T extends BaseEmbedImage & BaseEmbedMember<?, ? extends EmbedDraftImage, ?>> void setImage(T image);
+    void setImage(BaseEmbedImage image);
 
     /**
      * Sets the footer of the embed.
@@ -161,10 +151,8 @@ public interface EmbedBuilderDelegate {
      * Sets the image of the embed.
      *
      * @param footer An instance of {@code BaseEmbedFooter} to be set to the embed.
-     * @param <T> Generic type for the image to match a BaseEmbedFooter and a
-     * BaseEmbedMember that can be converted to an EmbedDraftFooter.
      */
-    <T extends BaseEmbedFooter & BaseEmbedMember<?, ? extends EmbedDraftFooter, ?>> void setFooter(T footer);
+    void setFooter(BaseEmbedFooter footer);
 
     /**
      * Adds a field to the embed.

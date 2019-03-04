@@ -1,9 +1,16 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
 
-public interface SentEmbedVideo extends MissingEmbedDraftMember<SentEmbedVideo>,
-        SentEmbedImageMember<EmbedDraftMember, SentEmbedVideo> {
+import java.util.Optional;
+
+public interface SentEmbedVideo {
+
+    /**
+     * Gets the embed that this video is part of.
+     *
+     * @return The parent embed.
+     */
+    SentEmbed getEmbed();
 
     /**
      * Gets the url of the video.
@@ -11,5 +18,19 @@ public interface SentEmbedVideo extends MissingEmbedDraftMember<SentEmbedVideo>,
      * @return The url of the video.
      */
     String getUrl();
+
+    /**
+     * Gets the height of the image.
+     *
+     * @return The height of the image.
+     */
+    Optional<Integer> getHeight();
+
+    /**
+     * Gets the width of the image.
+     *
+     * @return The width of the image.
+     */
+    Optional<Integer> getWidth();
 
 }

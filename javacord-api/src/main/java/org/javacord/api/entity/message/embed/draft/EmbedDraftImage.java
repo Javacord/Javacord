@@ -3,6 +3,20 @@ package org.javacord.api.entity.message.embed.draft;
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
 import org.javacord.api.entity.message.embed.sent.SentEmbedImage;
 
-public interface EmbedDraftImage extends BaseEmbedImage, EmbedDraftMember<EmbedDraftImage, SentEmbedImage> {
+/**
+ * Draft representation of an embed's image.
+ */
+public interface EmbedDraftImage extends BaseEmbedImage {
+
+    @Override
+    EmbedDraft getEmbed();
+
+    /**
+     * Sets the URL of the image.
+     *
+     * @param url The URL to set.
+     * @return This instance of the image.
+     */
     EmbedDraftImage setUrl(String url);
+
 }

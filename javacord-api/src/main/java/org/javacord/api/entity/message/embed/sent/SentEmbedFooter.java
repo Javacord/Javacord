@@ -1,10 +1,13 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbedFooter;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
 
-public interface SentEmbedFooter extends BaseEmbedFooter, SentEmbedMember<EmbedDraftFooter, SentEmbedFooter> {
+import java.util.Optional;
+
+public interface SentEmbedFooter extends BaseEmbedFooter {
+
+    @Override
+    SentEmbed getEmbed();
 
     /**
      * Gets the proxy url of the footer icon.
@@ -12,4 +15,5 @@ public interface SentEmbedFooter extends BaseEmbedFooter, SentEmbedMember<EmbedD
      * @return The proxy url of the footer icon.
      */
     Optional<String> getProxyIconUrl();
+
 }

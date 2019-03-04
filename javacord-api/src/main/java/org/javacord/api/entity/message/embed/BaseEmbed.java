@@ -8,6 +8,9 @@ import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.util.Specializable;
 
+/**
+ * Basic representation of an embed.
+ */
 public interface BaseEmbed extends Specializable<BaseEmbed> {
 
     /**
@@ -89,7 +92,7 @@ public interface BaseEmbed extends Specializable<BaseEmbed> {
     EmbedBuilder toBuilder();
 
     /**
-     * Creates an EmbedDraft object from this embed.
+     * Creates a new EmbedDraft object from this embed.
      *
      * @return A new EmbedDraft created from this embed.
      */

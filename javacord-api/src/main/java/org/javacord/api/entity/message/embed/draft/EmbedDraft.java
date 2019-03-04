@@ -13,6 +13,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
  * Representation of an unsent embed that can be sent to discord.
  */
 public interface EmbedDraft extends BaseEmbed {
+
     /**
      * Sets the title of the embed.
      *
@@ -71,50 +72,91 @@ public interface EmbedDraft extends BaseEmbed {
      */
     EmbedDraft modifyThumbnail(Function<EmbedDraftThumbnail, EmbedDraftThumbnail> thumbnailFunction);
 
+    /**
+     * Used to modify the image object of the embed.
+     * If no image was set before, this method creates a new EmbedDraftImage object which then can be modified.
+     *
+     * @param imageFunction A function to modify the image. Can return {@code null} to remove the image.
+     * @return This instance of the embed.
+     */
     EmbedDraft modifyImage(Function<EmbedDraftImage, EmbedDraftImage> imageFunction);
 
+    /**
+     * Used to modify the footer object of the embed.
+     * If no footer was set before, this method creates a new EmbedDraftFooter object which then can be modified.
+     *
+     * @param footerFunction A function to modify the footer. Can return {@code null} to remove the footer.
+     * @return This instance of the embed.
+     */
     EmbedDraft modifyFooter(Function<EmbedDraftFooter, EmbedDraftFooter> footerFunction);
 
-    EmbedDraft addField(EmbedDraftField field);
+    @Override
+    Optional<EmbedDraftFooter> getFooter();
 
+    @Override
+    Optional<EmbedDraftImage> getImage();
+
+    @Override
+    Optional<EmbedDraftThumbnail> getThumbnail();
+
+    @Override
+    Optional<EmbedDraftAuthor> getAuthor();
+
+    @Override
+    List<EmbedDraftField> getFields();
+
+    /**
+     * Adds a field to the embed and modifies the field using the given function.
+     *
+     * @param fieldFunction The function to be used to modify the added field.
+     * @return This instance of the embed.
+     */
+    EmbedDraft addField(Function<EmbedDraftField, EmbedDraftField> fieldFunction);
+
+    /**
+     * Modifies all fields that fit the predicate using the given function.
+     *
+     * @param fieldPredicate The predicate to use for checking which fields are to be removed.
+     * @param fieldFunction The function to be used to modify the fields.
+     * @return This instance of the embed.
+     */
     EmbedDraft modifyFields(
             Predicate<EmbedDraftField> fieldPredicate,
             Function<EmbedDraftField, EmbedDraftField> fieldFunction
     );
 
-    @Override
-    Optional<EmbedDraftFooter> getFooter();
-
-    EmbedDraft setFooter(EmbedDraftFooter footer);
-
-    @Override
-    Optional<EmbedDraftImage> getImage();
-
-    EmbedDraft setImage(EmbedDraftImage image);
-
-    @Override
-    Optional<EmbedDraftThumbnail> getThumbnail();
-
-    EmbedDraft setThumbnail(EmbedDraftThumbnail thumbnail);
-
-    @Override
-    Optional<EmbedDraftAuthor> getAuthor();
-
-    EmbedDraft setAuthor(EmbedDraftAuthor author);
-
-    @Override
-    List<EmbedDraftField> getFields();
-
+    /**
+     * Modifies all fields using the given function.
+     *
+     * @param fieldFunction The function to be used to modify the fields.
+     * @return This instance of the embed.
+     */
     default EmbedDraft modifyAllFields(Function<EmbedDraftField, EmbedDraftField> fieldFunction) {
         return modifyFields(any -> true, fieldFunction);
     }
 
+    /**
+     * Removes all fields that fit the predicate.
+     *
+     * @param fieldPredicate The predicate to use for checking which fields are to be removed.
+     * @return This instance of the embed.
+     */
     EmbedDraft removeFields(Predicate<EmbedDraftField> fieldPredicate);
 
+    /**
+     * Removes all fields from the embed.
+     *
+     * @return This instance of the embed.
+     */
     default EmbedDraft removeAllFields() {
         return removeFields(any -> true);
     }
 
+    /**
+     * Returns whether the embed requires any attachments to be uploaded.
+     *
+     * @return Whether the embed requires any attachments to be uploaded.
+     */
     boolean requiresAttachments();
 
     @Override
@@ -132,4 +174,5 @@ public interface EmbedDraft extends BaseEmbed {
         getFields().forEach(builder::addField);
         return builder;
     }
+
 }

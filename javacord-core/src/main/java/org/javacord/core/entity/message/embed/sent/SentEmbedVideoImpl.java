@@ -36,12 +36,12 @@ public class SentEmbedVideoImpl implements SentEmbedVideo {
     }
 
     @Override
-    public OptionalInt getHeight() {
+    public Optional<Integer> getHeight() {
         return height == -1 ? OptionalInt.empty() : OptionalInt.of(height);
     }
 
     @Override
-    public OptionalInt getWidth() {
+    public Optional<Integer> getWidth() {
         return width == -1 ? OptionalInt.empty() : OptionalInt.of(width);
     }
 
