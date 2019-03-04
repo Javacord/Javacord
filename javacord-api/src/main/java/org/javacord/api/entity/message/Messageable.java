@@ -1,9 +1,10 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
-import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 
 /**
  * This class represents an entity which can receive messages.

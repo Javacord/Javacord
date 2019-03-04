@@ -745,17 +745,6 @@ public class EmbedBuilder {
     }
 
     /**
-     * Adds a new non-inline field to the embed.
-     *
-     * @param name The name of the field.
-     * @param value The value of the field.
-     * @return This instance of the builder.
-     */
-    public EmbedBuilder addField(String name, String value) {
-        return addField(name, value, false);
-    }
-
-    /**
      * Adds a new inline field to the embed.
      *
      * @param name The name of the field.
@@ -764,6 +753,17 @@ public class EmbedBuilder {
      */
     public EmbedBuilder addInlineField(String name, String value) {
         return addField(name, value, true);
+    }
+
+    /**
+     * Adds a new non-inline field to the embed.
+     *
+     * @param name The name of the field.
+     * @param value The value of the field.
+     * @return This instance of the builder.
+     */
+    public EmbedBuilder addField(String name, String value) {
+        return addField(name, value, false);
     }
 
     /**

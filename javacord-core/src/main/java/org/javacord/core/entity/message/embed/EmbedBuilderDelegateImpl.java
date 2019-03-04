@@ -196,11 +196,12 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
 
     /**
      * Generates a new {@code FileContainer} based on the provided image object and file type.
-     *
-     * @param image The image object. Must be one of {@link Icon},
+     * The {@code image} parameter must be one of {@link Icon},
      * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
-     * If this argument is {@code null}, the method returns {@code null}.
-     * If this argument is none of the said types, the method returns {@code null}.
+     * If the {@code image} parameter is {@code null}, the method returns {@code null}.
+     * If the {@code image} parameter is none of the said types, the method returns {@code null}.
+     *
+     * @param image The image object.
      * @param fileType The image type of the object.
      * @return A new {@code FileContainer} or {@code null}.
      */

@@ -67,11 +67,12 @@ public interface EmbedBuilderDelegate {
 
     /**
      * Sets the author of the embed.
+     * The {@code icon} parameter must be one of {@link Icon},
+     * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
      *
      * @param name The name of the author.
      * @param url The URL as a String of the author.
-     * @param icon The Icon of the author as an object. Must be one of {@link Icon},
-     * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
+     * @param icon The Icon of the author as an object.
      * @param fileType The image type of the file object.
      */
     void setAuthor(String name, String url, Object icon, String fileType);
@@ -92,9 +93,10 @@ public interface EmbedBuilderDelegate {
 
     /**
      * Sets the thumbnail of the embed.
-     *
-     * @param image The image of the thumbnail as an object. Must be one of {@link Icon},
+     * The {@code image} parameter must be one of {@link Icon},
      * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
+     *
+     * @param image The image of the thumbnail as an object.
      * @param fileType The image type of the file object.
      */
     void setThumbnail(Object image, String fileType);
@@ -115,9 +117,10 @@ public interface EmbedBuilderDelegate {
 
     /**
      * Sets the image of the embed.
-     *
-     * @param image The image as an object. Must be one of {@link Icon},
+     * The {@code image} parameter must be one of {@link Icon},
      * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
+     *
+     * @param image The image as an object.
      * @param fileType The image type of the file object.
      */
     void setImage(Object image, String fileType);
@@ -139,10 +142,11 @@ public interface EmbedBuilderDelegate {
 
     /**
      * Sets the footer of the embed.
+     * The {@code icon} parameter must be one of {@link Icon},
+     * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
      *
      * @param text The text of the footer.
-     * @param icon The image as an object. Must be one of {@link Icon},
-     * {@link File}, {@link InputStream}, {@link BufferedImage} or {@link byte[]}.
+     * @param icon The image as an object.
      * @param fileType The image type of the file object.
      */
     void setFooter(String text, Object icon, String fileType);

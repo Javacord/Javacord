@@ -1,6 +1,5 @@
 package org.javacord.api.entity.message.embed.sent;
 
-
 import java.util.Optional;
 
 public interface SentEmbedVideo {

@@ -1,6 +1,5 @@
 package org.javacord.api.listener.message;
 
-import java.net.MalformedURLException;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;

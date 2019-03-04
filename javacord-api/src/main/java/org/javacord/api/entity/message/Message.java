@@ -11,8 +11,8 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
-import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * This class represents a Discord message.
  */
 public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFromCache<Message>,
-                                 MessageAttachableListenerManager {
+        MessageAttachableListenerManager {
 
     Pattern ESCAPED_CHARACTER =
             Pattern.compile("\\\\(?<char>[^a-zA-Z0-9\\p{javaWhitespace}\\xa0\\u2007\\u202E\\u202F])");
@@ -44,9 +44,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Returns a {@code MessageBuilder} according to this {@code Message}.
      *
-     * @see MessageBuilder#fromMessage(Message)
-     *
      * @return The {@code MessageBuilder}.
+     * @see MessageBuilder#fromMessage(Message)
      */
     default MessageBuilder toMessageBuilder() {
         return MessageBuilder.fromMessage(this);
@@ -763,7 +762,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Sets if the the message is kept in cache forever.
      *
-     * @param cachedForever  Whether the message should be kept in cache forever or not.
+     * @param cachedForever Whether the message should be kept in cache forever or not.
      */
     void setCachedForever(boolean cachedForever);
 
@@ -1347,9 +1346,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
         return !channel.isPresent()
                 || channel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || channel.get().hasPermissions(user,
-                    PermissionType.READ_MESSAGES,
-                    PermissionType.READ_MESSAGE_HISTORY,
-                    PermissionType.ADD_REACTIONS);
+                PermissionType.READ_MESSAGES,
+                PermissionType.READ_MESSAGE_HISTORY,
+                PermissionType.ADD_REACTIONS);
     }
 
     /**

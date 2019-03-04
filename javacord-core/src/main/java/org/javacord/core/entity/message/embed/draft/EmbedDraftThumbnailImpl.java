@@ -9,11 +9,20 @@ import org.javacord.core.util.JsonNodeable;
 
 import java.util.Optional;
 
+/**
+ * Implementation of {@link EmbedDraftThumbnail}.
+ */
 public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMember
         implements EmbedDraftThumbnail, JsonNodeable {
     private final EmbedDraft parent;
 
-    protected EmbedDraftThumbnailImpl(EmbedDraft parent, String url) {
+    /**
+     * 
+     *
+     * @param parent
+     * @param url
+     */
+    public EmbedDraftThumbnailImpl(EmbedDraft parent, String url) {
         this.parent = parent;
 
         this.fileUri = url;
