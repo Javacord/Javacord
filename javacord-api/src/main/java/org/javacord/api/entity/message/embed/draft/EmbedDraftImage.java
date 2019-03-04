@@ -1,7 +1,6 @@
 package org.javacord.api.entity.message.embed.draft;
 
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
-import org.javacord.api.entity.message.embed.sent.SentEmbedImage;
 
 /**
  * Draft representation of an embed's image.

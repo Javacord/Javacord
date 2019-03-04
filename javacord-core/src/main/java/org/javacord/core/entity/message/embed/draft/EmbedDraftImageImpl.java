@@ -1,19 +1,22 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedImage;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
-import org.javacord.api.entity.message.embed.sent.SentEmbedImage;
 import org.javacord.core.util.JsonNodeable;
 
-public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftImage, SentEmbedImage>
+import java.util.Optional;
+
+public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember
         implements EmbedDraftImage, JsonNodeable {
 
+    private final EmbedDraft parent;
+
     protected EmbedDraftImageImpl(EmbedDraft parent, String url) {
-        super(parent, EmbedDraftImage.class, SentEmbedImage.class);
+        this.parent = parent;
+
         this.fileUri = url;
     }
 
@@ -25,6 +28,11 @@ public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember
     }
 
     @Override
+    public EmbedDraft getEmbed() {
+        return parent;
+    }
+
+    @Override
     public EmbedDraftImage setUrl(String url) {
         this.fileUri = url;
         return this;
@@ -33,6 +41,11 @@ public class EmbedDraftImageImpl extends EmbedDraftFileContainerAttachableMember
     @Override
     public Optional<String> getUrl() {
         return Optional.ofNullable(fileUri);
+    }
+
+    @Override
+    public EmbedDraftImage toEmbedDraftImage() {
+        return this;
     }
 
     @Override

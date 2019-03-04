@@ -1,10 +1,10 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Optional;
-import java.util.OptionalInt;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedVideo;
+
+import java.util.Optional;
 
 /**
  * The implementation of {@link SentEmbedVideo}.
@@ -37,12 +37,12 @@ public class SentEmbedVideoImpl implements SentEmbedVideo {
 
     @Override
     public Optional<Integer> getHeight() {
-        return height == -1 ? OptionalInt.empty() : OptionalInt.of(height);
+        return height == -1 ? Optional.empty() : Optional.of(height);
     }
 
     @Override
     public Optional<Integer> getWidth() {
-        return width == -1 ? OptionalInt.empty() : OptionalInt.of(width);
+        return width == -1 ? Optional.empty() : Optional.of(width);
     }
 
     @Override

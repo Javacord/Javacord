@@ -1,17 +1,19 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedAuthor;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftAuthorImpl;
+
+import java.util.Optional;
 
 /**
  * The implementation of {@link SentEmbedAuthor}.
  */
-public class SentEmbedAuthorImpl extends SentEmbedMemberImpl<EmbedDraftAuthor, SentEmbedAuthor>
-        implements SentEmbedAuthor {
+public class SentEmbedAuthorImpl implements SentEmbedAuthor {
 
+    private final SentEmbed parent;
     private final String name;
     private final String url;
     private final String iconUrl;
@@ -23,7 +25,7 @@ public class SentEmbedAuthorImpl extends SentEmbedMemberImpl<EmbedDraftAuthor, S
      * @param data The json data of the author.
      */
     public SentEmbedAuthorImpl(SentEmbed parent, JsonNode data) {
-        super(parent, EmbedDraftAuthor.class, SentEmbedAuthor.class);
+        this.parent = parent;
 
         name = data.path("name").asText(null);
         url = data.path("url").asText(null);
@@ -44,6 +46,16 @@ public class SentEmbedAuthorImpl extends SentEmbedMemberImpl<EmbedDraftAuthor, S
     @Override
     public Optional<String> getIconUrl() {
         return Optional.ofNullable(iconUrl);
+    }
+
+    @Override
+    public EmbedDraftAuthor toEmbedDraftAuthor() {
+        return new EmbedDraftAuthorImpl(parent, this);
+    }
+
+    @Override
+    public SentEmbed getEmbed() {
+        return parent;
     }
 
     @Override

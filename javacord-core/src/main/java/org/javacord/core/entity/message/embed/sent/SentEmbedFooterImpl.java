@@ -1,16 +1,19 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedFooter;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftFooterImpl;
+
+import java.util.Optional;
 
 /**
  * The implementation of {@link SentEmbedFooter}.
  */
-public class SentEmbedFooterImpl extends SentEmbedMemberImpl<EmbedDraftFooter, SentEmbedFooter> implements SentEmbedFooter {
+public class SentEmbedFooterImpl implements SentEmbedFooter {
 
+    private final SentEmbed parent;
     private final String text;
     private final String iconUrl;
     private final String proxyIconUrl;
@@ -21,7 +24,7 @@ public class SentEmbedFooterImpl extends SentEmbedMemberImpl<EmbedDraftFooter, S
      * @param data The json data of the footer.
      */
     public SentEmbedFooterImpl(SentEmbed parent, JsonNode data) {
-        super(parent, EmbedDraftFooter.class, SentEmbedFooter.class);
+        this.parent = parent;
 
         text = data.path("text").asText(null);
         iconUrl = data.path("icon_url").asText(null);
@@ -36,6 +39,16 @@ public class SentEmbedFooterImpl extends SentEmbedMemberImpl<EmbedDraftFooter, S
     @Override
     public Optional<String> getIconUrl() {
         return Optional.ofNullable(iconUrl);
+    }
+
+    @Override
+    public EmbedDraftFooter toEmbedDraftFooter() {
+        return new EmbedDraftFooterImpl(parent, this);
+    }
+
+    @Override
+    public SentEmbed getEmbed() {
+        return parent;
     }
 
     @Override

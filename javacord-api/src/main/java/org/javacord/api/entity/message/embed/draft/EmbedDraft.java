@@ -1,13 +1,14 @@
 package org.javacord.api.entity.message.embed.draft;
 
+import org.javacord.api.entity.message.embed.BaseEmbed;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+
 import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import org.javacord.api.entity.message.embed.BaseEmbed;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 /**
  * Representation of an unsent embed that can be sent to discord.

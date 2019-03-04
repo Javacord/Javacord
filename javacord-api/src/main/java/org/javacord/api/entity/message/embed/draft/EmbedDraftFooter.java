@@ -1,7 +1,6 @@
 package org.javacord.api.entity.message.embed.draft;
 
 import org.javacord.api.entity.message.embed.BaseEmbedFooter;
-import org.javacord.api.entity.message.embed.sent.SentEmbedFooter;
 
 /**
  * Draft representation of an embed's footer.

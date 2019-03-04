@@ -1,9 +1,10 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import java.util.List;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface SentEmbed extends BaseEmbed {
 

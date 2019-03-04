@@ -1,19 +1,16 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedField;
 import org.javacord.core.entity.message.embed.EmbedFieldImpl;
 import org.javacord.core.entity.message.embed.draft.EmbedDraftFieldImpl;
-import org.javacord.core.entity.message.embed.draft.EmbedDraftImpl;
 
 /**
  * The implementation of {@link SentEmbedField}.
  */
 public class SentEmbedFieldImpl extends EmbedFieldImpl implements SentEmbedField {
-
     private final SentEmbed parent;
 
     /**
@@ -30,17 +27,12 @@ public class SentEmbedFieldImpl extends EmbedFieldImpl implements SentEmbedField
     }
 
     @Override
-    public Optional<SentEmbed> getEmbed() {
-        return Optional.ofNullable(parent);
-    }
-
-    @Override
-    public EmbedDraftField toDraftMember() {
+    public EmbedDraftField toEmbedDraftField() {
         return new EmbedDraftFieldImpl(parent, this);
     }
 
     @Override
-    public Optional<SentEmbedField> asSentEmbedMember() {
-        return Optional.of(this);
+    public SentEmbed getEmbed() {
+        return parent;
     }
 }

@@ -1,7 +1,8 @@
 package org.javacord.api.entity.message.embed.sent;
 
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
+
+import java.util.Optional;
 
 public interface SentEmbedThumbnail extends BaseEmbedThumbnail {
 

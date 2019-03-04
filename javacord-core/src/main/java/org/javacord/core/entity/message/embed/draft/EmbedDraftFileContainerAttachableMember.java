@@ -1,18 +1,10 @@
 package org.javacord.core.entity.message.embed.draft;
 
-import org.javacord.api.entity.message.embed.draft.EmbedDraft;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftMember;
-import org.javacord.api.entity.message.embed.sent.SentEmbedMember;
 import org.javacord.core.util.FileContainer;
 
-public abstract class EmbedDraftFileContainerAttachableMember<D extends EmbedDraftMember, S extends SentEmbedMember>
-        extends EmbedDraftMemberImpl<D, S> {
+public abstract class EmbedDraftFileContainerAttachableMember {
     protected String fileUri;
     protected FileContainer container;
-
-    protected EmbedDraftFileContainerAttachableMember(EmbedDraft parent, Class<D> dClass, Class<S> sClass) {
-        super(parent, dClass, sClass);
-    }
 
     public boolean hasAttachment() {
         return container != null;

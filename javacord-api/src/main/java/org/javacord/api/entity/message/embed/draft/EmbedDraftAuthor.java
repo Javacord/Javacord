@@ -1,7 +1,6 @@
 package org.javacord.api.entity.message.embed.draft;
 
 import org.javacord.api.entity.message.embed.BaseEmbedAuthor;
-import org.javacord.api.entity.message.embed.sent.SentEmbedAuthor;
 
 /**
  * Draft representation of an embed's author.

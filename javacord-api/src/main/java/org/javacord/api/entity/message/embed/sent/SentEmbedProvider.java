@@ -2,6 +2,8 @@ package org.javacord.api.entity.message.embed.sent;
 
 import org.javacord.api.entity.Nameable;
 
+import java.util.Optional;
+
 public interface SentEmbedProvider extends Nameable {
 
     /**
@@ -9,7 +11,7 @@ public interface SentEmbedProvider extends Nameable {
      *
      * @return The parent embed.
      */
-    SentEmbed getEmbed();
+    Optional<SentEmbed> getEmbed();
 
     /**
      * Gets the url of the provider.

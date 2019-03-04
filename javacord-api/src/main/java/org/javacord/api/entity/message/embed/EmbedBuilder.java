@@ -1,19 +1,16 @@
 package org.javacord.api.entity.message.embed;
 
+import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
+import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
+import org.javacord.api.entity.user.User;
+import org.javacord.api.util.internal.DelegateFactory;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.time.Instant;
-import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.message.embed.draft.EmbedDraft;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
-import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
-import org.javacord.api.entity.user.User;
-import org.javacord.api.util.internal.DelegateFactory;
 
 /**
  * This class is used to create embeds.

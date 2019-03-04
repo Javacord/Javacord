@@ -1,6 +1,20 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.message.embed.BaseEmbedAuthor;
+import org.javacord.api.entity.message.embed.BaseEmbedField;
+import org.javacord.api.entity.message.embed.BaseEmbedFooter;
+import org.javacord.api.entity.message.embed.BaseEmbedImage;
+import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
+import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
+import org.javacord.core.util.FileContainer;
+import org.javacord.core.util.JsonNodeable;
+
 import java.awt.Color;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -12,21 +26,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.javacord.api.entity.message.embed.BaseEmbedField;
-import org.javacord.api.entity.message.embed.BaseEmbedMember;
-import org.javacord.api.entity.message.embed.draft.EmbedDraft;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftFooter;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftImage;
-import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
-import org.javacord.core.util.FileContainer;
-import org.javacord.core.util.JsonNodeable;
 
 /**
  * Implementation for {@link EmbedDraft}.
  */
 public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
+    protected final List<EmbedDraftField> fields;
     protected String title;
     protected String description;
     protected String url;
@@ -36,18 +41,16 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
     protected EmbedDraftThumbnailImpl thumbnail;
     protected EmbedDraftImageImpl image;
     protected EmbedDraftFooterImpl footer;
-    protected final List<EmbedDraftField> fields;
 
     /**
      * Constructor.
-     *
+     * <p>
      * Members {@code author}, {@code thumbnail}, {@code image}, {@code footer} and the fields can either be constructed
      * by this constructor or passed as preconstructed objects. If an already constructed and fitting version is
      * available, that one gets used and the partial parameters are ignored.
      * If said Members already are valid {@code EmbedDraftMember}s, they get cast to their respective implementation
-     * type. If that is not the case, the respective embed draft member is created using
-     * {@link BaseEmbedMember#toDraftMember()}.
-     *
+     * type. If that is not the case, the respective embed draft member is created.
+     * <p>
      * All arguments may be {@code null}.
      *
      * @param title The title of the embed.
@@ -79,21 +82,21 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
             Instant timestamp,
             Color color,
 
-            BaseEmbedMember<?, ? extends EmbedDraftAuthor, ?> author,
+            BaseEmbedAuthor author,
             String authorName,
             String authorUrl,
             String authorIconUrl,
             FileContainer authorIconContainer,
 
-            BaseEmbedMember<?, ? extends EmbedDraftThumbnail, ?> thumbnail,
+            BaseEmbedThumbnail thumbnail,
             String thumbnailUrl,
             FileContainer thumbnailContainer,
 
-            BaseEmbedMember<?, ? extends EmbedDraftImage, ?> image,
+            BaseEmbedImage image,
             String imageUrl,
             FileContainer imageContainer,
 
-            BaseEmbedMember<?, ? extends EmbedDraftFooter, ?> footer,
+            BaseEmbedFooter footer,
             String footerText,
             String footerIconUrl,
             FileContainer footerIconContainer,
@@ -110,7 +113,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
             if (author instanceof EmbedDraftAuthorImpl) {
                 this.author = (EmbedDraftAuthorImpl) author;
             } else {
-                this.author = (EmbedDraftAuthorImpl) author.toDraftMember();
+                this.author = (EmbedDraftAuthorImpl) author.toEmbedDraftAuthor();
             }
         } else {
             this.author = createAuthor(authorName, authorUrl, authorIconUrl, authorIconContainer);
@@ -120,7 +123,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
             if (thumbnail instanceof EmbedDraftThumbnailImpl) {
                 this.thumbnail = (EmbedDraftThumbnailImpl) thumbnail;
             } else {
-                this.thumbnail = (EmbedDraftThumbnailImpl) thumbnail.toDraftMember();
+                this.thumbnail = (EmbedDraftThumbnailImpl) thumbnail.toEmbedDraftThumbnail();
             }
         } else {
             this.thumbnail = createThumbnail(thumbnailUrl, thumbnailContainer);
@@ -130,7 +133,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
             if (image instanceof EmbedDraftImageImpl) {
                 this.image = (EmbedDraftImageImpl) image;
             } else {
-                this.image = (EmbedDraftImageImpl) image.toDraftMember();
+                this.image = (EmbedDraftImageImpl) image.toEmbedDraftImage();
             }
         } else {
             this.image = createImage(imageUrl, imageContainer);
@@ -140,7 +143,7 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
             if (footer instanceof EmbedDraftFooterImpl) {
                 this.footer = (EmbedDraftFooterImpl) footer;
             } else {
-                this.footer = (EmbedDraftFooterImpl) footer.toDraftMember();
+                this.footer = (EmbedDraftFooterImpl) footer.toEmbedDraftFooter();
             }
         } else {
             this.footer = createFooter(footerText, footerIconUrl, footerIconContainer);
@@ -286,12 +289,6 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
     }
 
     @Override
-    public EmbedDraft setAuthor(EmbedDraftAuthor author) {
-        this.author = (EmbedDraftAuthorImpl) author;
-        return this;
-    }
-
-    @Override
     public EmbedDraft modifyAuthor(Function<EmbedDraftAuthor, EmbedDraftAuthor> authorFunction) {
         if (authorFunction == null) {
             author = null;
@@ -313,24 +310,12 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
     }
 
     @Override
-    public EmbedDraft setThumbnail(EmbedDraftThumbnail thumbnail) {
-        this.thumbnail = (EmbedDraftThumbnailImpl) thumbnail;
-        return this;
-    }
-
-    @Override
     public EmbedDraft modifyThumbnail(Function<EmbedDraftThumbnail, EmbedDraftThumbnail> thumbnailFunction) {
         if (thumbnailFunction == null) {
             author = null;
         } else {
-            thumbnailFunction.accept(thumbnail);
+            thumbnailFunction.apply(thumbnail);
         }
-        return this;
-    }
-
-    @Override
-    public EmbedDraft setImage(EmbedDraftImage image) {
-        this.image = (EmbedDraftImageImpl) image;
         return this;
     }
 
@@ -339,14 +324,8 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         if (imageFunction == null) {
             author = null;
         } else {
-            imageFunction.accept(image);
+            imageFunction.apply(image);
         }
-        return this;
-    }
-
-    @Override
-    public EmbedDraft setFooter(EmbedDraftFooter footer) {
-        this.footer = (EmbedDraftFooterImpl) footer;
         return this;
     }
 
@@ -355,14 +334,8 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         if (footerFunction == null) {
             author = null;
         } else {
-            footerFunction.accept(footer);
+            footerFunction.apply(footer);
         }
-        return this;
-    }
-
-    @Override
-    public EmbedDraft addField(EmbedDraftField field) {
-        this.fields.add(field);
         return this;
     }
 
@@ -441,6 +414,11 @@ public class EmbedDraftImpl implements EmbedDraft, JsonNodeable {
         return fields.stream()
                 .map(EmbedDraftFieldImpl.class::cast)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public EmbedDraft addField(Function<EmbedDraftField, EmbedDraftField> fieldFunction) {
+        return null;
     }
 
     @Override

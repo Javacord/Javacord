@@ -1,21 +1,22 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedAuthor;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftAuthor;
-import org.javacord.api.entity.message.embed.sent.SentEmbedAuthor;
 import org.javacord.core.util.JsonNodeable;
 
-public class EmbedDraftAuthorImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftAuthor, SentEmbedAuthor>
+import java.util.Optional;
+
+public class EmbedDraftAuthorImpl extends EmbedDraftFileContainerAttachableMember
         implements EmbedDraftAuthor, JsonNodeable {
+    private final EmbedDraft parent;
     private String name;
     private String url;
 
     protected EmbedDraftAuthorImpl(EmbedDraft parent, String name, String url, String iconUrl) {
-        super(parent, EmbedDraftAuthor.class, SentEmbedAuthor.class);
+        this.parent = parent;
 
         this.name = name;
         this.url = url;
@@ -23,10 +24,23 @@ public class EmbedDraftAuthorImpl extends EmbedDraftFileContainerAttachableMembe
     }
 
     public EmbedDraftAuthorImpl(BaseEmbed parent, BaseEmbedAuthor baseEmbedAuthor) {
-        this(parent.toEmbedDraft(),
+        this(
+                parent.toEmbedDraft(),
                 baseEmbedAuthor.getName(),
                 baseEmbedAuthor.getUrl().orElse(null),
-                baseEmbedAuthor.getUrl().orElse(null));
+                baseEmbedAuthor.getUrl().orElse(null)
+        );
+    }
+
+    @Override
+    public EmbedDraft getEmbed() {
+        return parent;
+    }
+
+    @Override
+    public EmbedDraftAuthor setName(String name) {
+        this.name = name;
+        return this;
     }
 
     @Override
@@ -49,6 +63,11 @@ public class EmbedDraftAuthorImpl extends EmbedDraftFileContainerAttachableMembe
     @Override
     public Optional<String> getIconUrl() {
         return Optional.ofNullable(fileUri);
+    }
+
+    @Override
+    public EmbedDraftAuthor toEmbedDraftAuthor() {
+        return this;
     }
 
     @Override

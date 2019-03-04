@@ -1,10 +1,11 @@
 package org.javacord.api.entity.message.embed;
 
-import java.util.Optional;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftField;
 import org.javacord.api.entity.message.embed.sent.SentEmbedField;
 import org.javacord.api.util.Specializable;
+
+import java.util.Optional;
 
 /**
  * Basic representation of an embed's field.

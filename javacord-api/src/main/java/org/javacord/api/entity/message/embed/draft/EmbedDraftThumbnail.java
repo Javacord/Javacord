@@ -1,7 +1,6 @@
 package org.javacord.api.entity.message.embed.draft;
 
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
-import org.javacord.api.entity.message.embed.sent.SentEmbedThumbnail;
 
 /**
  * Draft representation of an embed's thumbnail.

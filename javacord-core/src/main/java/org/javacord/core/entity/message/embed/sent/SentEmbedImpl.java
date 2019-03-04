@@ -1,12 +1,6 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.awt.Color;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedAuthor;
 import org.javacord.api.entity.message.embed.sent.SentEmbedField;
@@ -15,6 +9,13 @@ import org.javacord.api.entity.message.embed.sent.SentEmbedImage;
 import org.javacord.api.entity.message.embed.sent.SentEmbedProvider;
 import org.javacord.api.entity.message.embed.sent.SentEmbedThumbnail;
 import org.javacord.api.entity.message.embed.sent.SentEmbedVideo;
+
+import java.awt.Color;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 

@@ -1,7 +1,6 @@
 package org.javacord.api.entity.message.embed.draft;
 
 import org.javacord.api.entity.message.embed.BaseEmbedField;
-import org.javacord.api.entity.message.embed.sent.SentEmbedField;
 
 /**
  * Draft representation of an embed's field.

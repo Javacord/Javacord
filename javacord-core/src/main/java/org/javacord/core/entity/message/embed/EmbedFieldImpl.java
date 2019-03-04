@@ -7,7 +7,6 @@ import org.javacord.api.entity.message.embed.BaseEmbedField;
  */
 public abstract class EmbedFieldImpl implements BaseEmbedField {
 
-    private final Updater updater;
     protected String name;
     protected String value;
     protected boolean inline;
@@ -23,12 +22,6 @@ public abstract class EmbedFieldImpl implements BaseEmbedField {
         this.name = name;
         this.value = value;
         this.inline = inline;
-
-        updater = new Updater();
-    }
-
-    public Updater getUpdater() {
-        return updater;
     }
 
     @Override
@@ -44,20 +37,6 @@ public abstract class EmbedFieldImpl implements BaseEmbedField {
     @Override
     public boolean isInline() {
         return inline;
-    }
-
-    protected class Updater {
-        public void setName(String name) {
-            EmbedFieldImpl.this.name = name;
-        }
-
-        public void setValue(String value) {
-            EmbedFieldImpl.this.value = value;
-        }
-
-        public void setInline(boolean inline) {
-            EmbedFieldImpl.this.inline = inline;
-        }
     }
 
 }

@@ -1,12 +1,13 @@
 package org.javacord.api.entity.message.embed;
 
+import org.javacord.api.entity.message.embed.draft.EmbedDraft;
+import org.javacord.api.entity.message.embed.sent.SentEmbed;
+import org.javacord.api.util.Specializable;
+
 import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import org.javacord.api.entity.message.embed.draft.EmbedDraft;
-import org.javacord.api.entity.message.embed.sent.SentEmbed;
-import org.javacord.api.util.Specializable;
 
 /**
  * Basic representation of an embed.

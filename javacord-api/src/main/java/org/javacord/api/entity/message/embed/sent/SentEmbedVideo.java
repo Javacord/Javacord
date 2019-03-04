@@ -10,7 +10,7 @@ public interface SentEmbedVideo {
      *
      * @return The parent embed.
      */
-    SentEmbed getEmbed();
+    Optional<SentEmbed> getEmbed();
 
     /**
      * Gets the url of the video.

@@ -1,18 +1,19 @@
 package org.javacord.core.entity.message.embed.sent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Optional;
-import java.util.OptionalInt;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
 import org.javacord.api.entity.message.embed.sent.SentEmbed;
 import org.javacord.api.entity.message.embed.sent.SentEmbedThumbnail;
+import org.javacord.core.entity.message.embed.draft.EmbedDraftThumbnailImpl;
+
+import java.util.Optional;
 
 /**
  * The implementation of {@link SentEmbedThumbnail}.
  */
-public class SentEmbedThumbnailImpl extends SentEmbedMemberImpl<EmbedDraftThumbnail, SentEmbedThumbnail>
-        implements SentEmbedThumbnail {
+public class SentEmbedThumbnailImpl implements SentEmbedThumbnail {
 
+    private final SentEmbed parent;
     private final String url;
     private final String proxyUrl;
     private final int height;
@@ -24,7 +25,7 @@ public class SentEmbedThumbnailImpl extends SentEmbedMemberImpl<EmbedDraftThumbn
      * @param data The json data of the thumbnail.
      */
     public SentEmbedThumbnailImpl(SentEmbed parent, JsonNode data) {
-        super(parent, EmbedDraftThumbnail.class, SentEmbedThumbnail.class);
+        this.parent = parent;
 
         url = data.path("url").asText(null);
         proxyUrl = data.path("proxy_url").asText(null);
@@ -38,6 +39,16 @@ public class SentEmbedThumbnailImpl extends SentEmbedMemberImpl<EmbedDraftThumbn
     }
 
     @Override
+    public EmbedDraftThumbnail toEmbedDraftThumbnail() {
+        return new EmbedDraftThumbnailImpl(parent, this);
+    }
+
+    @Override
+    public SentEmbed getEmbed() {
+        return parent;
+    }
+
+    @Override
     public String getProxyUrl() {
         assert proxyUrl != null : "Discord didn't send a proxy URL!";
         return proxyUrl;
@@ -45,12 +56,12 @@ public class SentEmbedThumbnailImpl extends SentEmbedMemberImpl<EmbedDraftThumbn
 
     @Override
     public Optional<Integer> getHeight() {
-        return height == -1 ? OptionalInt.empty() : OptionalInt.of(height);
+        return height == -1 ? Optional.empty() : Optional.of(height);
     }
 
     @Override
     public Optional<Integer> getWidth() {
-        return width == -1 ? OptionalInt.empty() : OptionalInt.of(width);
+        return width == -1 ? Optional.empty() : Optional.of(width);
     }
 
 }

@@ -1,18 +1,21 @@
 package org.javacord.core.entity.message.embed.draft;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Optional;
 import org.javacord.api.entity.message.embed.BaseEmbed;
 import org.javacord.api.entity.message.embed.BaseEmbedThumbnail;
 import org.javacord.api.entity.message.embed.draft.EmbedDraft;
 import org.javacord.api.entity.message.embed.draft.EmbedDraftThumbnail;
-import org.javacord.api.entity.message.embed.sent.SentEmbedThumbnail;
 import org.javacord.core.util.JsonNodeable;
 
-public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMember<EmbedDraftThumbnail, SentEmbedThumbnail>
+import java.util.Optional;
+
+public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMember
         implements EmbedDraftThumbnail, JsonNodeable {
+    private final EmbedDraft parent;
+
     protected EmbedDraftThumbnailImpl(EmbedDraft parent, String url) {
-        super(parent, EmbedDraftThumbnail.class, SentEmbedThumbnail.class);
+        this.parent = parent;
+
         this.fileUri = url;
     }
 
@@ -24,6 +27,11 @@ public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMe
     }
 
     @Override
+    public EmbedDraft getEmbed() {
+        return parent;
+    }
+
+    @Override
     public EmbedDraftThumbnail setUrl(String url) {
         this.fileUri = url;
         return this;
@@ -32,6 +40,11 @@ public class EmbedDraftThumbnailImpl extends EmbedDraftFileContainerAttachableMe
     @Override
     public Optional<String> getUrl() {
         return Optional.ofNullable(fileUri);
+    }
+
+    @Override
+    public EmbedDraftThumbnail toEmbedDraftThumbnail() {
+        return this;
     }
 
     @Override
