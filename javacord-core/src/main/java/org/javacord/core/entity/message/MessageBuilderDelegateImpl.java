@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
@@ -266,6 +268,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
     @Override
     public CompletableFuture<Message> send(TextChannel channel) {
+        return send(channel.getApi(), channel.getId());
+    }
+
+    @Override
+    public CompletableFuture<Message> send(DiscordApi api, long channelId) {
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("content", toString() == null ? "" : toString())
                 .put("tts", tts);
@@ -277,12 +284,12 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             body.put("nonce", nonce);
         }
 
-        RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
-                .setUrlParameters(channel.getIdAsString());
+        RestRequest<Message> request = new RestRequest<Message>(api, RestMethod.POST, RestEndpoint.MESSAGE)
+                .setUrlParameters(String.valueOf(channelId));
         if (!attachments.isEmpty() || (embed != null && embed.requiresAttachments())) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             // We access files etc. so this should be async
-            channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            api.getThreadPool().getExecutorService().submit(() -> {
                 try {
                     MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
@@ -295,7 +302,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                     }
                     Collections.reverse(tempAttachments);
                     for (int i = 0; i < tempAttachments.size(); i++) {
-                        byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();
+                        byte[] bytes = tempAttachments.get(i).asByteArray(api).join();
 
                         String mediaType = URLConnection
                                 .guessContentTypeFromName(tempAttachments.get(i).getFileTypeOrName());
@@ -307,8 +314,10 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                     }
 
                     request.setMultipartBody(multipartBodyBuilder.build());
-                    request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                            .getOrCreateMessage(channel, result.getJsonBody()))
+                    request.execute(result -> ((DiscordApiImpl) api)
+                            .getOrCreateMessage(api.getChannelById(channelId)
+                                    .flatMap(Channel::asTextChannel)
+                                    .orElseThrow(AssertionError::new), result.getJsonBody()))
                             .whenComplete((message, throwable) -> {
                                 if (throwable != null) {
                                     future.completeExceptionally(throwable);
@@ -323,8 +332,10 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             return future;
         } else {
             request.setBody(body);
-            return request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                    .getOrCreateMessage(channel, result.getJsonBody()));
+            return request.execute(result -> ((DiscordApiImpl) api)
+                    .getOrCreateMessage(api.getChannelById(channelId)
+                            .flatMap(Channel::asTextChannel)
+                            .orElseThrow(AssertionError::new), result.getJsonBody()));
         }
     }
 

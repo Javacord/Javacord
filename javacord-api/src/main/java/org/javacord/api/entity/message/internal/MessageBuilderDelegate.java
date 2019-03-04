@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message.internal;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -250,4 +251,13 @@ public interface MessageBuilderDelegate {
      * @return The sent message.
      */
     CompletableFuture<Message> send(Messageable messageable);
+
+    /**
+     * Sends the message.
+     *
+     * @param api The API to send the message with.
+     * @param channelId The ID of the channel to send the message in.
+     * @return The sent message.
+     */
+    CompletableFuture<Message> send(DiscordApi api, long channelId);
 }
