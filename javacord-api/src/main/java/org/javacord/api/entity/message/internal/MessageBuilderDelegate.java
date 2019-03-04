@@ -256,8 +256,18 @@ public interface MessageBuilderDelegate {
      * Sends the message.
      *
      * @param api The API to send the message with.
+     * @param userId The ID of the user to send the message to.
+     * @return The sent message.
+     */
+    CompletableFuture<Message> sendToUser(DiscordApi api, long userId);
+
+    /**
+     * Sends the message.
+     *
+     * @param api The API to send the message with.
      * @param channelId The ID of the channel to send the message in.
      * @return The sent message.
      */
-    CompletableFuture<Message> send(DiscordApi api, long channelId);
+    CompletableFuture<Message> sendToChannel(DiscordApi api, long channelId);
+
 }

@@ -480,8 +480,19 @@ public class MessageBuilder {
      * @param channelId The ID of the channel to send the message in.
      * @return The sent message.
      */
-    public CompletableFuture<Message> send(DiscordApi api, long channelId) {
-        return delegate.send(api, channelId);
+    public CompletableFuture<Message> sendToChannel(DiscordApi api, long channelId) {
+        return delegate.sendToChannel(api, channelId);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param api The API to send the message with.
+     * @param userId The ID of the user to send the message to.
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> sendToUser(DiscordApi api, long userId) {
+        return delegate.sendToUser(api, userId);
     }
 
 }

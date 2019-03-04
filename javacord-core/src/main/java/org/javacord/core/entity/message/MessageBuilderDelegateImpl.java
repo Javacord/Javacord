@@ -268,11 +268,17 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
     @Override
     public CompletableFuture<Message> send(TextChannel channel) {
-        return send(channel.getApi(), channel.getId());
+        return sendToChannel(channel.getApi(), channel.getId());
     }
 
     @Override
-    public CompletableFuture<Message> send(DiscordApi api, long channelId) {
+    public CompletableFuture<Message> sendToUser(DiscordApi api, long userId) {
+        return api.getUserById(userId)
+                .thenCompose(this::send);
+    }
+
+    @Override
+    public CompletableFuture<Message> sendToChannel(DiscordApi api, long channelId) {
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("content", toString() == null ? "" : toString())
                 .put("tts", tts);
