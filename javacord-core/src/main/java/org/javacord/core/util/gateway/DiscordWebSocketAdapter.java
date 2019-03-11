@@ -529,9 +529,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                 allUsersLoaded = api.getAllServers().stream()
                                         .noneMatch(server -> server.getMemberCount() != server.getMembers().size());
                             }
-                            if (sameUnavailableServerCounter > 20
+                            if (sameUnavailableServerCounter > 1000
                                     && lastGuildMembersChunkReceived + 5000 < System.currentTimeMillis()) {
-                                // It has been more than two seconds since no more servers became available and more
+                                // It has been more than 1 minute since no more servers became available and more
                                 // than five seconds since the last guild member chunk event was received. We
                                 // can assume that this will not change anytime soon, most likely because Discord
                                 // itself has some issues. Let's break the loop!
