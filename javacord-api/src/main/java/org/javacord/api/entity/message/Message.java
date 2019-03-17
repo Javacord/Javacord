@@ -724,6 +724,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     boolean isPinned();
 
     /**
+     * Checks if this message is text-to-speech.
+     *
+     * @return Whether this message is text-to-speech or not.
+     */
+    boolean isTts();
+
+    /**
      * Checks if the message mentions everyone.
      *
      * @return Whether the message mentions everyone or not.
