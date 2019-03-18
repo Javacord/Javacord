@@ -69,6 +69,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private volatile boolean pinned;
 
     /**
+     * The text-to-speech flag of the message.
+     */
+    private volatile boolean tts;
+
+    /**
      * If the message mentions everyone or not.
      */
     private volatile boolean mentionsEveryone;
@@ -133,6 +138,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         content = data.get("content").asText();
 
         pinned = data.get("pinned").asBoolean(false);
+        tts = data.get("tts").asBoolean(false);
         mentionsEveryone = data.get("mention_everyone").asBoolean(false);
 
         lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull()
@@ -237,6 +243,15 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     /**
+     * Set the tts flag for the message.
+     *
+     * @param tts The new flag.
+     */
+    public void setTts(boolean tts) {
+        this.tts = tts;
+    }
+
+    /**
      * Adds an emoji to the list of reactions.
      *
      * @param emoji The emoji.
@@ -328,6 +343,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public boolean isPinned() {
         return pinned;
+    }
+
+    @Override
+    public boolean isTts() {
+        return tts;
     }
 
     @Override
