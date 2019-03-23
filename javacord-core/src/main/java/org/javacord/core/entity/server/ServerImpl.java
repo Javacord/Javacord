@@ -318,8 +318,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 long userId = Long.parseLong(presenceJson.get("user").get("id").asText());
                 UserImpl user = api.getCachedUserById(userId)
                         .map(UserImpl.class::cast)
-                        // Users with presences should already be cached
-                        .orElseThrow(AssertionError::new);
+                        .orElse(null);
+
+                if (user == null) {
+                    // In theory, every user in "presences" should also be in "members", but Discord is weird
+                    // sometimes. This happens very rarely, but when it happens, we should ignore the presence.
+                    // It might be a similar issue than https://github.com/discordapp/discord-api-docs/issues/855
+                    logger.debug("Found rogue presence. Ignoring it. ({})", presenceJson);
+                    continue;
+                }
+
                 if (presenceJson.has("game")) {
                     Activity activity = null;
                     if (!presenceJson.get("game").isNull()) {
