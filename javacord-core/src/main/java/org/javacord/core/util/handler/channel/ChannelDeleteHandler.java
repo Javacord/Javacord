@@ -62,6 +62,7 @@ public class ChannelDeleteHandler extends PacketHandler {
                 LoggerUtil.getLogger(ChannelDeleteHandler.class).warn("Unexpected packet type. Your Javacord version"
                         + " might be out of date.");
         }
+        api.removeChannelFromCache(packet.get("id").asLong());
     }
 
     /**
@@ -159,8 +160,6 @@ public class ChannelDeleteHandler extends PacketHandler {
             api.removeObjectListeners(VoiceChannel.class, channelId);
             api.removeObjectListeners(TextChannel.class, channelId);
             api.removeObjectListeners(Channel.class, channelId);
-
-            api.removeGroupChannelFromCache(channelId);
         });
     }
 
