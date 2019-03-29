@@ -258,7 +258,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * @param you Whether this reaction is used by you or not.
      */
     public void addReaction(Emoji emoji, boolean you) {
-        Optional<Reaction> reaction = reactions.stream().filter(r -> emoji == r.getEmoji()).findAny();
+        Optional<Reaction> reaction = reactions.stream().filter(r -> emoji.equalsEmoji(r.getEmoji())).findAny();
         reaction.ifPresent(r -> ((ReactionImpl) r).incrementCount(you));
         if (!reaction.isPresent()) {
             reactions.add(new ReactionImpl(this, emoji, 1, you));
@@ -272,7 +272,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * @param you Whether this reaction is used by you or not.
      */
     public void removeReaction(Emoji emoji, boolean you) {
-        Optional<Reaction> reaction = reactions.stream().filter(r -> emoji == r.getEmoji()).findAny();
+        Optional<Reaction> reaction = reactions.stream().filter(r -> emoji.equalsEmoji(r.getEmoji())).findAny();
         reaction.ifPresent(r -> ((ReactionImpl) r).decrementCount(you));
         reactions.removeIf(r -> r.getCount() <= 0);
     }
