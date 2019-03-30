@@ -1,9 +1,11 @@
 package org.javacord.core.util.handler.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -30,6 +32,8 @@ import java.util.Collections;
  */
 public class ChannelDeleteHandler extends PacketHandler {
 
+    private static final Logger logger = LoggerUtil.getLogger(ChannelDeleteHandler.class);
+
     /**
      * Creates a new instance of this class.
      *
@@ -41,26 +45,34 @@ public class ChannelDeleteHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
-        int type = packet.get("type").asInt();
+        ChannelType type = ChannelType.fromId(packet.get("type").asInt());
         switch (type) {
-            case 0:
+            case SERVER_TEXT_CHANNEL:
                 handleServerTextChannel(packet);
                 break;
-            case 1:
+            case PRIVATE_CHANNEL:
                 handlePrivateChannel(packet);
                 break;
-            case 2:
+            case SERVER_VOICE_CHANNEL:
                 handleServerVoiceChannel(packet);
                 break;
-            case 3:
+            case GROUP_CHANNEL:
                 handleGroupChannel(packet);
                 break;
-            case 4:
+            case CHANNEL_CATEGORY:
                 handleCategory(packet);
                 break;
+            case SERVER_NEWS_CHANNEL:
+                // TODO Handle server news channel differently
+                handleServerTextChannel(packet);
+                break;
+            case SERVER_STORE_CHANNEL:
+                // TODO Handle store channels
+                logger.debug("Received CHANNEL_DELETE packet for a store channel. These are not supported in this"
+                        + " Javacord version and get ignored!");
+                break;
             default:
-                LoggerUtil.getLogger(ChannelDeleteHandler.class).warn("Unexpected packet type. Your Javacord version"
-                        + " might be out of date.");
+                logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
         }
         api.removeChannelFromCache(packet.get("id").asLong());
     }

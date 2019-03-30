@@ -10,6 +10,8 @@ public enum ChannelType {
     SERVER_VOICE_CHANNEL(2),
     GROUP_CHANNEL(3),
     CHANNEL_CATEGORY(4),
+    SERVER_NEWS_CHANNEL(5),
+    SERVER_STORE_CHANNEL(6),
     UNKNOWN(-1);
 
     /**

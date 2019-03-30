@@ -15,6 +15,7 @@ import org.javacord.api.entity.auditlog.AuditLog;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -266,18 +267,29 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
         if (data.has("channels")) {
             for (JsonNode channel : data.get("channels")) {
-                switch (channel.get("type").asInt()) {
-                    case 0:
+                switch (ChannelType.fromId(channel.get("type").asInt())) {
+                    case SERVER_TEXT_CHANNEL:
                         getOrCreateServerTextChannel(channel);
                         break;
-                    case 2:
+                    case SERVER_VOICE_CHANNEL:
                         getOrCreateServerVoiceChannel(channel);
                         break;
-                    case 4:
+                    case CHANNEL_CATEGORY:
                         getOrCreateChannelCategory(channel);
                         break;
+                    case SERVER_NEWS_CHANNEL:
+                        // TODO Handle server news channel differently
+                        logger.debug("{} has a news channel. In this Javacord version it is treated as a normal "
+                                + "text channel!", this);
+                        getOrCreateServerTextChannel(channel);
+                        break;
+                    case SERVER_STORE_CHANNEL:
+                        // TODO Handle store channels
+                        logger.debug("{} has a store channel. These are not supported in this Javacord version"
+                                + " and get ignored!", this);
+                        break;
                     default:
-                        logger.warn("Unknown channel type. Your Javacord version might be outdated.");
+                        logger.warn("Unknown or unexpected channel type. Your Javacord version might be outdated!");
                 }
             }
         }
@@ -587,9 +599,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public ChannelCategory getOrCreateChannelCategory(JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
-        int type = data.get("type").asInt();
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
-            if (type == 4) {
+            if (type == ChannelType.CHANNEL_CATEGORY) {
                 return getChannelCategoryById(id).orElseGet(() -> new ChannelCategoryImpl(api, this, data));
             }
         }
@@ -605,9 +617,10 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public ServerTextChannel getOrCreateServerTextChannel(JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
-        int type = data.get("type").asInt();
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
-            if (type == 0) {
+            // TODO Treat news channels differently
+            if (type == ChannelType.SERVER_TEXT_CHANNEL || type == ChannelType.SERVER_NEWS_CHANNEL) {
                 return getTextChannelById(id).orElseGet(() -> new ServerTextChannelImpl(api, this, data));
             }
         }
@@ -623,9 +636,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public ServerVoiceChannel getOrCreateServerVoiceChannel(JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
-        int type = data.get("type").asInt();
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
-            if (type == 2) {
+            if (type == ChannelType.SERVER_VOICE_CHANNEL) {
                 return getVoiceChannelById(id).orElseGet(() -> new ServerVoiceChannelImpl(api, this, data));
             }
         }

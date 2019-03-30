@@ -1,10 +1,12 @@
 package org.javacord.core.util.handler.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
@@ -51,6 +53,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChannelUpdateHandler extends PacketHandler {
 
+    private static final Logger logger = LoggerUtil.getLogger(ChannelUpdateHandler.class);
+
     /**
      * Creates a new instance of this class.
      *
@@ -62,29 +66,36 @@ public class ChannelUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
-        int type = packet.get("type").asInt();
+        ChannelType type = ChannelType.fromId(packet.get("type").asInt());
         switch (type) {
-            case 0:
+            case SERVER_TEXT_CHANNEL:
                 handleServerChannel(packet);
                 handleServerTextChannel(packet);
                 break;
-            case 1:
+            case PRIVATE_CHANNEL:
                 handlePrivateChannel(packet);
                 break;
-            case 2:
+            case SERVER_VOICE_CHANNEL:
                 handleServerChannel(packet);
                 handleServerVoiceChannel(packet);
                 break;
-            case 3:
+            case GROUP_CHANNEL:
                 handleGroupChannel(packet);
                 break;
-            case 4:
+            case CHANNEL_CATEGORY:
                 handleServerChannel(packet);
                 handleChannelCategory(packet);
                 break;
+            case SERVER_NEWS_CHANNEL:
+                handleServerChannel(packet);
+                break;
+            case SERVER_STORE_CHANNEL:
+                // TODO Handle store channels
+                logger.debug("Received CHANNEL_UPDATE packet for a store channel. These are not supported in this"
+                        + " Javacord version and get ignored!");
+                break;
             default:
-                LoggerUtil.getLogger(ChannelUpdateHandler.class).warn("Unexpected packet type. Your Javacord version"
-                        + " might be out of date.");
+                logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
         }
     }
 
