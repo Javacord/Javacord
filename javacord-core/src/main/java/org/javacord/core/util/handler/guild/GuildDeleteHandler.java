@@ -34,6 +34,10 @@ public class GuildDeleteHandler extends PacketHandler {
 
                 api.getEventDispatcher().dispatchServerBecomesUnavailableEvent(
                         (DispatchQueueSelector) server, server, event);
+                api.forEachCachedMessageWhere(
+                        msg -> msg.getServer().map(s -> s.getId() == serverId).orElse(false),
+                        msg -> api.removeMessageFromCache(msg.getId())
+                );
             });
             api.removeServerFromCache(serverId);
             return;
@@ -44,6 +48,10 @@ public class GuildDeleteHandler extends PacketHandler {
             api.getEventDispatcher().dispatchServerLeaveEvent((DispatchQueueSelector) server, server, event);
         });
         api.removeObjectListeners(Server.class, serverId);
+        api.forEachCachedMessageWhere(
+                msg -> msg.getServer().map(s -> s.getId() == serverId).orElse(false),
+                msg -> api.removeMessageFromCache(msg.getId())
+        );
         api.removeServerFromCache(serverId);
     }
 

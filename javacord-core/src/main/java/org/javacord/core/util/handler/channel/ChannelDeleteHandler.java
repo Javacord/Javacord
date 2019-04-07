@@ -108,6 +108,10 @@ public class ChannelDeleteHandler extends PacketHandler {
                 .ifPresent(server -> server.getTextChannelById(channelId).ifPresent(channel -> {
                     dispatchServerChannelDeleteEvent(channel);
                     ((ServerImpl) server).removeChannelFromCache(channel.getId());
+                    api.forEachCachedMessageWhere(
+                            msg -> msg.getChannel().getId() == channelId,
+                            msg -> api.removeMessageFromCache(msg.getId())
+                    );
                 }));
         api.removeObjectListeners(ServerTextChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
@@ -150,7 +154,10 @@ public class ChannelDeleteHandler extends PacketHandler {
             api.removeObjectListeners(VoiceChannel.class, channelId);
             api.removeObjectListeners(TextChannel.class, channelId);
             api.removeObjectListeners(Channel.class, channelId);
-
+            api.forEachCachedMessageWhere(
+                    msg -> msg.getChannel().getId() == privateChannel.getId(),
+                    msg -> api.removeMessageFromCache(msg.getId())
+            );
             recipient.setChannel(null);
         });
     }
@@ -172,6 +179,10 @@ public class ChannelDeleteHandler extends PacketHandler {
             api.removeObjectListeners(VoiceChannel.class, channelId);
             api.removeObjectListeners(TextChannel.class, channelId);
             api.removeObjectListeners(Channel.class, channelId);
+            api.forEachCachedMessageWhere(
+                    msg -> msg.getChannel().getId() == groupChannel.getId(),
+                    msg -> api.removeMessageFromCache(msg.getId())
+            );
         });
     }
 

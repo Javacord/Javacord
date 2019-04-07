@@ -2,6 +2,7 @@ package org.javacord.core.util.handler.guild;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
@@ -19,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Handles the guild member update packet.
@@ -95,6 +99,18 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                     (DispatchQueueSelector) role.getServer(), role, role.getServer(), user, event);
                         }
                     }
+
+                    if (user.isYourself()) {
+                        Set<Long> unreadableChannels = server.getTextChannels().stream()
+                                .filter(((Predicate<ServerTextChannel>)ServerTextChannel::canYouSee).negate())
+                                .map(ServerTextChannel::getId)
+                                .collect(Collectors.toSet());
+                        api.forEachCachedMessageWhere(
+                                msg -> unreadableChannels.contains(msg.getChannel().getId()),
+                                msg -> api.removeMessageFromCache(msg.getId())
+                        );
+                    }
+
                 });
     }
 
