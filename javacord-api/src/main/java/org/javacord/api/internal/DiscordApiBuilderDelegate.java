@@ -3,6 +3,7 @@ package org.javacord.api.internal;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
 
 import java.net.Proxy;
@@ -10,6 +11,8 @@ import java.net.ProxySelector;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This class is internally used by the {@link DiscordApiBuilder} to create discord api instances.
@@ -142,4 +145,148 @@ public interface DiscordApiBuilderDelegate {
      */
     CompletableFuture<Void> setRecommendedTotalShards();
 
+
+    /**
+     * Adds a {@code GloballyAttachableListener} to all created {@code DiscordApi} instances.
+     * Adding a listener multiple times will only add it once.
+     * The order of invocation is according to first addition.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to add.
+     * @param <T> The type of the listener.
+     */
+    <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, T listener);
+
+    /**
+     * Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
+     * {@code DiscordApi} instances.
+     * Adding a listener multiple times will only add it once.
+     * The order of invocation is according to first addition.
+     *
+     * @param listener The listener to add.
+     */
+    void addListener(GloballyAttachableListener listener);
+
+    /**
+     * Adds a {@code GloballyAttachableListener} to all created {@code DiscordApi} instances. The supplier is
+     * called for every created {@code DiscordApi} instance, so either the same or different instances can be
+     * registered. One example would be a method reference to a default constructor like
+     * {@code MyListener::new}.
+     * Adding a listener multiple times will only add it once.
+     * The order of invocation is according to first addition.
+     *
+     * @param listenerClass The listener class.
+     * @param listenerSupplier The supplier of listeners to add.
+     * @param <T> The type of the listener.
+     */
+    <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, Supplier<T> listenerSupplier);
+
+    /**
+     * Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
+     * {@code DiscordApi} instances. The supplier is called for every created {@code DiscordApi} instance,
+     * so either the same or different instances can be registered. One example would be a method reference
+     * to a default constructor like {@code MyListener::new}.
+     * Adding a listener multiple times will only add it once.
+     * The order of invocation is according to first addition.
+     *
+     * @param listenerSupplier The supplier of listeners to add.
+     */
+    void addListener(Supplier<GloballyAttachableListener> listenerSupplier);
+
+    /**
+     * Adds a {@code GloballyAttachableListener} to all created {@code DiscordApi} instances. The function
+     * is called for every created {@code DiscordApi} instance, so either the same or different instances
+     * can be registered. One example would be a method reference to a constructor with a {@code DiscordApi}
+     * parameter like {@code MyListener::new}.
+     * Adding a listener multiple times will only add it once.
+     * The order of invocation is according to first addition.
+     *
+     * @param listenerClass The listener class.
+     * @param listenerFunction The function to provide listeners to add.
+     * @param <T> The type of the listener.
+     */
+    <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass,
+                                                            Function<DiscordApi, T> listenerFunction);
+
+    /**
+     * Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
+     * {@code DiscordApi} instances. The function is called for every created {@code DiscordApi} instance,
+     * so either the same or different instances can be registered. One example would be a method reference
+     * to a constructor with a {@code DiscordApi} parameter like {@code MyListener::new}.
+     * Adding a listener multiple times will only add it once.
+     * The order of invocation is according to first addition.
+     *
+     * @param listenerFunction The function to provide listeners to add.
+     */
+    void addListener(Function<DiscordApi, GloballyAttachableListener> listenerFunction);
+
+    /**
+     * Removes a listener that implements one or more {@code GloballyAttachableListener}s from the list of
+     * listeners to be added to {@code DiscordApi} instances. If the listener was already added to a
+     * {@code DiscordApi} instance, it will not get removed by calling this method.
+     * This method should normally only be used before calling one of the login methods.
+     *
+     * @param listener The listener to remove.
+     */
+    void removeListener(GloballyAttachableListener listener);
+
+    /**
+     * Removes a {@code GloballyAttachableListener} from the list of listeners to be added to
+     * {@code DiscordApi} instances. If the listener was already added to a {@code DiscordApi} instance,
+     * it will not get removed by calling this method.
+     * This method should normally only be used before calling one of the login methods.
+     *
+     * @param listenerClass The listener class.
+     * @param listener The listener to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends GloballyAttachableListener> void removeListener(Class<T> listenerClass, T listener);
+
+    /**
+     * Removes a supplier of listeners that implements one or more {@code GloballyAttachableListener}s
+     * from the list of listeners to be added to {@code DiscordApi} instances. If the listener was already
+     * added to a {@code DiscordApi} instance, it will not get removed by calling this method.
+     * This method should normally only be used before calling one of the login methods.
+     *
+     * @param listenerSupplier The supplier of listeners to remove.
+     */
+    void removeListenerSupplier(Supplier<GloballyAttachableListener> listenerSupplier);
+
+    /**
+     * Removes a supplier of {@code GloballyAttachableListener}s from the list of listeners to be added to
+     * {@code DiscordApi} instances. If the listener was already added to a {@code DiscordApi} instance,
+     * it will not get removed by calling this method.
+     * This method should normally only be used before calling one of the login methods.
+     *
+     * @param listenerClass The listener class.
+     * @param listenerSupplier The supplier of listeners to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends GloballyAttachableListener> void removeListenerSupplier(Class<T> listenerClass,
+                                                                       Supplier<T> listenerSupplier);
+
+    /**
+     * Removes a function that provides listeners that implements one or more
+     * {@code GloballyAttachableListener}s from the list of listeners to be added to {@code DiscordApi}
+     * instances. If the listener was already added to a {@code DiscordApi} instance, it will not get
+     * removed by calling this method.
+     * This method should normally only be used before calling one of the login methods.
+     *
+     * @param listenerFunction The function to provide listeners to remove.
+     */
+    void removeListenerFunction(Function<DiscordApi, GloballyAttachableListener> listenerFunction);
+
+    /**
+     * Removes a function that provides {@code GloballyAttachableListener}s from the list of listeners to be
+     * added to {@code DiscordApi} instances. If the listener was already added to a {@code DiscordApi}
+     * instance, it will not get removed by calling this method.
+     * This method should normally only be used before calling one of the login methods.
+     *
+     * @param listenerClass The listener class.
+     * @param listenerFunction The function to provide listeners to remove.
+     * @param <T> The type of the listener.
+     */
+    <T extends GloballyAttachableListener> void removeListenerFunction(Class<T> listenerClass,
+                                                                       Function<DiscordApi, T> listenerFunction);
+    
 }
