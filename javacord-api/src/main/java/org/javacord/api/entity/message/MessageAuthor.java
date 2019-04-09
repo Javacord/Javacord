@@ -15,6 +15,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents either a user or a webhook.
+ *
+ * <p>Do not confuse a webhook with a bot account which is also considered to be a user.
  */
 public interface MessageAuthor extends DiscordEntity, Nameable {
 
@@ -66,6 +68,11 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     /**
      * Checks if the author of the message is a user.
      *
+     * <p>A user might be a human user using any number of Discord client applications or a bot user connecting
+     * via Discord's bot api. See {@link #isRegularUser} and {@link #isBotUser} for further detail.
+     *
+     * <p>The opposite of this method is {@link #isWebhook()}.
+     *
      * @return Whether the author is a user or not.
      */
     boolean isUser();
@@ -78,6 +85,30 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
      */
     default boolean isBotOwner() {
         return getApi().getAccountType() == AccountType.BOT && isUser() && getApi().getOwnerId() == getId();
+    }
+
+    /**
+     * Checks if the author is a bot user.
+     *
+     * <p>Keep in mind, that if this returns {@code false}, it does not mean that the message was sent by a regular
+     * user. It's still possible that the message was sent via a webhook.
+     *
+     * @return Whether the author is a bot user.
+     */
+    default boolean isBotUser() {
+        return asUser().map(User::isBot).orElse(false);
+    }
+
+    /**
+     * Checks if the author is a regular user.
+     *
+     * <p>Keep in mind, that if this returns {@code false}, it does not mean that the message was sent by a bot
+     * user. It's still possible that the message was sent via a webhook.
+     *
+     * @return Whether the author is a regular user.
+     */
+    default boolean isRegularUser() {
+        return asUser().map(user -> !user.isBot()).orElse(false);
     }
 
     /**
@@ -553,6 +584,8 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
 
     /**
      * Checks if the author is a webhook.
+     *
+     * <p>The opposite of this method is {@link #isUser()}.
      *
      * @return Whether the author is a webhook or not.
      */
