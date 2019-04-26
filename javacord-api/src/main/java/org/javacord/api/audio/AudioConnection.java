@@ -5,6 +5,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.listener.audio.AudioConnectionAttachableListenerManager;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public interface AudioConnection extends AudioConnectionAttachableListenerManager {
 
@@ -56,6 +57,26 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
     default boolean dequeueCurrentSource() {
         return getCurrentAudioSource().map(this::dequeue).orElse(false);
     }
+
+    /**
+     * Moves the connection to a different channel.
+     * The channel must be in the same server as the current connection.
+     *
+     * @param destChannel The channel to move to.
+     * @return A CompletableFuture indicating whether or not the move was successful.
+     */
+    CompletableFuture<Void> moveTo(ServerVoiceChannel destChannel);
+
+    /**
+     * Moves the connection to a different channel.
+     * The channel must be in the same server as the current connection.
+     *
+     * @param destChannel The channel to move to.
+     * @param selfMute    Whether or not to be self-muted on join.
+     * @param selfDeafen  Whether or not to be self-deafened on join.
+     * @return A CompletableFuture indicating whether or not the move was successful.
+     */
+    CompletableFuture<Void> moveTo(ServerVoiceChannel destChannel, boolean selfMute, boolean selfDeafen);
 
     /**
      * Disconnects from the voice channel.

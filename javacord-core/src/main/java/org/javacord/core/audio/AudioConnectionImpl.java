@@ -41,7 +41,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     /**
      * The voice channel of the audio connection.
      */
-    private final ServerVoiceChannel channel;
+    private ServerVoiceChannel channel;
 
     /**
      * A lock to ensure we don't accidentally poll two elements from the queue.
@@ -52,6 +52,11 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      * A future that finishes once the connection is fully established.
      */
     private final CompletableFuture<AudioConnection> readyFuture;
+
+    /**
+     * A future that finishes once the connection has been moved to a different channel.
+     */
+    private CompletableFuture<Void> movingFuture;
 
     /**
      * The source that gets played at the moment.
@@ -155,6 +160,15 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     }
 
     /**
+     * Sets the channel of the connection.
+     *
+     * @param channel The channel of the connection.
+     */
+    public void setChannel(ServerVoiceChannel channel) {
+        this.channel = channel;
+    }
+
+    /**
      * Sets the session id of the connection.
      *
      * @param sessionId The session id of the connection.
@@ -187,6 +201,10 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      * @return Whether it will try to connect or not.
      */
     public synchronized boolean tryConnect() {
+        if (movingFuture != null && !movingFuture.isDone()) {
+            movingFuture.complete(null);
+            return true;
+        }
         if (connectingOrConnected || sessionId == null || token == null || endpoint == null) {
             return false;
         }
@@ -263,6 +281,29 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         } else {
             return queue.remove(source);
         }
+    }
+
+    @Override
+    public CompletableFuture<Void> moveTo(ServerVoiceChannel destChannel) {
+        return moveTo(destChannel, muted, deafened);
+    }
+
+    @Override
+    public CompletableFuture<Void> moveTo(ServerVoiceChannel destChannel, boolean selfMute, boolean selfDeafen) {
+        movingFuture = new CompletableFuture<>();
+        if (!destChannel.getServer().equals(channel.getServer())) {
+            movingFuture.completeExceptionally(
+                    new IllegalArgumentException("Cannot move to a voice channel not in the same server!"));
+            return movingFuture;
+        }
+        if (destChannel.equals(channel)) {
+            movingFuture.complete(null);
+        } else {
+            movingFuture.thenRun(() -> setChannel(destChannel));
+            api.getWebSocketAdapter()
+                    .sendVoiceStateUpdate(channel.getServer(), destChannel, selfMute, selfDeafen);
+        }
+        return movingFuture;
     }
 
     @Override
