@@ -7,7 +7,7 @@ import org.javacord.api.util.Specializable;
 import java.util.List;
 import java.util.Optional;
 
-public interface AudioSource extends Cloneable, AudioSourceAttachableListenerManager, Specializable<AudioSource> {
+public interface AudioSource extends AudioSourceAttachableListenerManager, Specializable<AudioSource> {
 
     /**
      * Gets the discord api instance for this audio source.
@@ -111,13 +111,13 @@ public interface AudioSource extends Cloneable, AudioSourceAttachableListenerMan
     boolean isMuted();
 
     /**
-     * Creates a copy of the audio source which can be reused for another audio connection.
+     * Creates a copy of the audio source that can be reused for another audio connection.
      *
-     * <p>Does not clone the state of the audio source, e.g. if it is muted, it's transformers, etc.
+     * <p>Does not copy the state of the audio source, e.g. if it is muted, it's transformers, etc.
      *
      * @return A copy of the audio source.
      */
-    AudioSource clone();
+    AudioSource copy();
 
     /**
      * Gets this audio source as a {@code PauseableAudioSource}.

@@ -41,6 +41,17 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
         position = new AtomicLong(this.duration);
     }
 
+    /**
+     * Creates a new silent audio source and copies the duration settings from the given one.
+     *
+     * <p>Does not copy the state of the audio source, e.g. if it is muted, it's transformers, etc.
+     *
+     * @param toCopy The silent audio source to copy from.
+     */
+    public SilentAudioSource(SilentAudioSource toCopy) {
+        this(toCopy.getApi(), toCopy.duration * 20, TimeUnit.MILLISECONDS);
+    }
+
     @Override
     public byte[] getNextFrame() {
         return applyTransformers(null);
@@ -67,8 +78,8 @@ public class SilentAudioSource extends AudioSourceBase implements PauseableAudio
     }
 
     @Override
-    public AudioSource clone() {
-        return new SilentAudioSource(getApi(), duration * 20, TimeUnit.MILLISECONDS);
+    public AudioSource copy() {
+        return new SilentAudioSource(this);
     }
 
     @Override
