@@ -2,7 +2,6 @@ package org.javacord.core.util.gateway;
 
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.audio.AudioSource;
-import org.javacord.api.audio.AudioSourceBase;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -127,7 +126,7 @@ public class AudioUdpSocket {
                         api.getEventDispatcher().dispatchAudioSourceFinishedEvent(
                                 (ServerImpl) connection.getServer(),
                                 connection,
-                                ((AudioSourceBase) source).getDelegate(),
+                                source,
                                 new AudioSourceFinishedEventImpl(source, connection));
                         continue;
                     }
