@@ -457,8 +457,11 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
                 if (member.isYourself()) {
                     ((DiscordApiImpl) server.getApi()).getWebSocketAdapter()
                             .sendVoiceStateUpdate(server, channel, null, null);
-                } else {
+                } else if (channel != null) {
                     updateNode.put("channel_id", channel.getId());
+                    patchMember = true;
+                } else {
+                    updateNode.putNull("channel_id");
                     patchMember = true;
                 }
             }
