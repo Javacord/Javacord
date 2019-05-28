@@ -1288,6 +1288,16 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Kicks the given user from any voice channel.
+     *
+     * @param user The user to kick.
+     * @return A future to check if the kick was successful.
+     */
+    default CompletableFuture<Void> kickUserFromVoiceChannel(User user) {
+        return createUpdater().setVoiceChannel(user, null).update();
+    }
+
+    /**
      * Mutes yourself locally for the server.
      *
      * <p>This cannot be undone by other users. If you want to mute yourself server-sidely, so that others can unmute
