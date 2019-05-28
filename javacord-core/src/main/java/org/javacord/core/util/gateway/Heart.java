@@ -3,7 +3,6 @@ package org.javacord.core.util.gateway;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
@@ -13,6 +12,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Every animal has a heart.
@@ -26,7 +27,8 @@ public class Heart {
     private static final Logger stethoscope = LoggerUtil.getLogger(Heart.class);
 
     private final DiscordApi api;
-    private final AtomicReference<WebSocket> websocket;
+    private final Consumer<WebSocketFrame> heartbeatFrameSender;
+    private final BiConsumer<Integer, String> closeFrameSender;
     private final boolean voice;
 
     private final AtomicReference<Future<?>> heartbeatTimer = new AtomicReference<>();
@@ -36,13 +38,16 @@ public class Heart {
     /**
      * Ba boom, ba boom, ba boom, ba boom, ...
      *
-     * @param api The heart of every Javacord bot.
-     * @param websocket The animal.
-     * @param voice Voice websocket hearts beat differently.
+     * @param api                  The heart of every Javacord bot.
+     * @param heartbeatFrameSender A consumer that forwards the given frame to the corresponding web socket.
+     * @param closeFrameSender     A bi consumer that sends a close frame with the given code and reason.
+     * @param voice                Voice websocket hearts beat differently.
      */
-    public Heart(DiscordApi api, AtomicReference<WebSocket> websocket, boolean voice) {
+    public Heart(DiscordApi api, Consumer<WebSocketFrame> heartbeatFrameSender,
+                 BiConsumer<Integer, String> closeFrameSender, boolean voice) {
         this.api = api;
-        this.websocket = websocket;
+        this.heartbeatFrameSender = heartbeatFrameSender;
+        this.closeFrameSender = closeFrameSender;
         this.voice = voice;
     }
 
@@ -84,7 +89,7 @@ public class Heart {
                     if (heartbeatAckReceived.getAndSet(false)) {
                         beat();
                     } else {
-                        websocket.get().sendClose(
+                        closeFrameSender.accept(
                                 WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
                                 WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
                     }
@@ -104,7 +109,7 @@ public class Heart {
                 .put("op", voice ? VoiceGatewayOpcode.HEARTBEAT.getCode() : GatewayOpcode.HEARTBEAT.getCode())
                 .put("d", voice ? (int) (Math.random() * Integer.MAX_VALUE) : lastSeq);
         WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
-        websocket.get().sendFrame(heartbeatFrame);
+        heartbeatFrameSender.accept(heartbeatFrame);
         // Ba boom, ba boom, ba boom, ba boom, ...
         stethoscope.debug("Sent heartbeat (voice: {}, packet: {})", voice, heartbeatPacket);
     }
