@@ -305,6 +305,13 @@ public class RestRequest<T> {
      * @throws Exception If something went wrong while executing the request.
      */
     public RestRequestResult executeBlocking() throws Exception {
+        api.getGlobalRatelimiter().ifPresent(ratelimiter -> {
+            try {
+                ratelimiter.requestQuota();
+            } catch (InterruptedException e) {
+                logger.warn("Encountered unexpected ratelimiter interrupt", e);
+            }
+        });
         Request.Builder requestBuilder = new Request.Builder();
         HttpUrl.Builder httpUrlBuilder = endpoint.getOkHttpUrl(urlParameters).newBuilder();
         queryParameters.forEach(httpUrlBuilder::addQueryParameter);

@@ -6,6 +6,8 @@ import org.javacord.api.listener.ChainableGloballyAttachableListenerManager;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.internal.DelegateFactory;
+import org.javacord.api.util.ratelimit.LocalRatelimiter;
+import org.javacord.api.util.ratelimit.Ratelimiter;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -69,6 +71,22 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      */
     public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         return delegate.loginShards(shards);
+    }
+
+    /**
+     * Sets a ratelimiter that can be used to control global ratelimits.
+     *
+     * <p>By default, no ratelimiter is set, but for large bots or special use-cases, it can be useful to provide
+     * a ratelimiter with a hardcoded ratelimit to prevent hitting the global ratelimit.
+     *
+     * <p>An easy implementation is available with the {@link LocalRatelimiter}.
+     *
+     * @param ratelimiter The ratelimiter used to control global ratelimits.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setGlobalRatelimiter(Ratelimiter ratelimiter) {
+        delegate.setGlobalRatelimiter(ratelimiter);
+        return this;
     }
 
     /**
