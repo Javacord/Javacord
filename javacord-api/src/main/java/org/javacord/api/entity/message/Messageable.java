@@ -1,6 +1,8 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
 
 import java.io.File;
 import java.io.InputStream;
@@ -10,6 +12,20 @@ import java.util.concurrent.CompletableFuture;
  * This class represents an entity which can receive messages.
  */
 public interface Messageable {
+
+    /**
+     * Gets he channel that this interface will send to.
+     * If this Messageable is a user, this method will call {@link User#openPrivateChannel()}.
+     *
+     * @return The channel.
+     */
+    default CompletableFuture<? extends TextChannel> getChannel() {
+        if (this instanceof User) {
+            return ((User) this).openPrivateChannel();
+        } else {
+            return CompletableFuture.completedFuture((TextChannel) this);
+        }
+    }
 
     /**
      * Sends a message.
