@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -720,6 +721,25 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Gets a message by a channel and message id.
+     *
+     * @param messageId The id of the message.
+     * @param channelId The id of the channel.
+     * @return The message from those IDs.
+     */
+    default CompletableFuture<Message> getMessageById(long messageId, long channelId) {
+        return getChannelById(channelId)
+                .flatMap(Channel::asTextChannel)
+                .map(textChannel -> getMessageById(messageId, textChannel))
+                .orElseGet(() -> {
+                    CompletableFuture<Message> failingFuture = new CompletableFuture<>();
+                    failingFuture.completeExceptionally(
+                            new NoSuchElementException("No channel with id " + channelId + " found"));
+                    return failingFuture;
+                });
     }
 
     /**
