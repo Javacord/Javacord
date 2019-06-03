@@ -728,7 +728,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @param messageId The id of the message.
      * @param channelId The id of the channel.
-     * @return The message from those IDs.
+     * @return The message with the given id from the text channel with the given id.
      */
     default CompletableFuture<Message> getMessageById(long messageId, long channelId) {
         return getChannelById(channelId)
