@@ -52,7 +52,7 @@ public interface Emoji extends Mentionable, Specializable<Emoji> {
         }
         // Both are custom emojis, so we have to compare the id
         long thisId = asCustomEmoji().map(CustomEmoji::getId).orElseThrow(AssertionError::new);
-        long otherId = asCustomEmoji().map(CustomEmoji::getId).orElseThrow(AssertionError::new);
+        long otherId = otherEmoji.asCustomEmoji().map(CustomEmoji::getId).orElseThrow(AssertionError::new);
         return thisId == otherId;
     }
 
