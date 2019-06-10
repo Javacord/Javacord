@@ -20,8 +20,11 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DataFormatException;
 
@@ -47,14 +50,30 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     private int ssrc;
 
     /**
+     * A boolean to indicate if the websocket should try to reconnect.
+     *
+     * <p>Used to prevent automatic reconnects after a wanted websocket close.
+     */
+    private volatile boolean reconnect;
+
+    /**
+     * Whether a {@link VoiceGatewayOpcode#RESUME} should be sent or a normal connect.
+     */
+    private volatile boolean sendResume;
+
+    // A reconnect attempt counter
+    private final AtomicInteger reconnectAttempt = new AtomicInteger();
+
+    /**
      * Created a new audio websocket adapter.
      *
      * @param connection The connection for the adapter.
      */
     public AudioWebSocketAdapter(AudioConnectionImpl connection) {
         this.connection = connection;
-        this.api = (DiscordApiImpl) connection.getChannel().getApi();
-        this.heart = new Heart(
+        reconnect = true;
+        api = (DiscordApiImpl) connection.getChannel().getApi();
+        heart = new Heart(
                 api,
                 heartbeatFrame -> websocket.get().sendFrame(heartbeatFrame),
                 (code, reason) -> websocket.get().sendClose(code, reason),
@@ -80,8 +99,9 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         switch (opcode.get()) {
             case HELLO:
                 logger.debug("Received {} packet for {}", opcode.get().name(), connection);
-                sendIdentify(websocket);
-
+                if (!sendResume) {
+                    sendIdentify(websocket);
+                }
                 JsonNode data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
                 heart.startBeating(heartbeatInterval);
@@ -112,6 +132,9 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
             case HEARTBEAT_ACK:
                 // Handled in the heart
                 break;
+            case RESUMED:
+                logger.info("Successfully resumed audio websocket connection for {}", connection);
+                break;
             default:
                 break;
         }
@@ -128,6 +151,13 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         }
         logger.trace("onTextMessage: text='{}'", message);
         onTextMessage(websocket, message);
+    }
+
+    @Override
+    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
+        if (sendResume) {
+            sendResume(websocket);
+        }
     }
 
     @Override
@@ -150,8 +180,10 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                 })
                 .orElse("'unknown'");
 
-        // Remove the connection from the server to allow the user to establish a new connection
-        ((ServerImpl) connection.getServer()).removeAudioConnection(connection);
+        if (!reconnect) {
+            // Remove the connection from the server to allow the user to establish a new connection
+            ((ServerImpl) connection.getServer()).removeAudioConnection(connection);
+        }
 
         logger.info("Websocket closed with reason '{}' and code {} by {} for {}!",
                 closeReason, closeCodeString, closedByServer ? "server" : "client", connection);
@@ -173,6 +205,20 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                             + " packet was received"
                     )
             );
+        }
+
+        if (reconnect) {
+            sendResume = !closeFrameOptional
+                    .map(WebSocketFrame::getCloseCode)
+                    .flatMap(WebSocketCloseCode::fromCode)
+                    .map(WebSocketCloseCode.SESSION_TIMEOUT::equals)// Do not send resume
+                    .orElse(false);
+            reconnectAttempt.incrementAndGet();
+            logger.info("Trying to reconnect/resume audio websocket in {} seconds!",
+                    api.getReconnectDelay(reconnectAttempt.get()));
+            // Reconnect after a (short?) delay depending on the amount of reconnect attempts
+            api.getThreadPool().getScheduler()
+                    .schedule(this::connect, api.getReconnectDelay(reconnectAttempt.get()), TimeUnit.SECONDS);
         }
     }
 
@@ -201,6 +247,15 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
             websocket.connect();
         } catch (Throwable t) {
             logger.warn("An error occurred while connecting to audio websocket for {}", connection, t);
+            if (reconnect) {
+                sendResume = false;
+                reconnectAttempt.incrementAndGet();
+                logger.info("Trying to reconnect/resume audio websocket in {} seconds!",
+                        api.getReconnectDelay(reconnectAttempt.get()));
+                // Reconnect after a (short?) delay depending on the amount of reconnect attempts
+                api.getThreadPool().getScheduler()
+                        .schedule(this::connect, api.getReconnectDelay(reconnectAttempt.get()), TimeUnit.SECONDS);
+            }
         }
     }
 
@@ -208,10 +263,28 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
      * Disconnects from the websocket.
      */
     public void disconnect() {
+        reconnect = false;
         socket.stopSending();
         websocket.get().sendClose(WebSocketCloseReason.DISCONNECT.getNumericCloseCode());
         // cancel heartbeat timer if within one minute no disconnect event was dispatched
         api.getThreadPool().getDaemonScheduler().schedule(heart::squash, 1, TimeUnit.MINUTES);
+    }
+
+    /**
+     * Sends the resume packet.
+     *
+     * @param websocket The websocket the resume packet should be sent to.
+     */
+    private void sendResume(WebSocket websocket) {
+        ObjectNode resumePacket = JsonNodeFactory.instance.objectNode()
+                .put("op", VoiceGatewayOpcode.RESUME.getCode());
+        ObjectNode data = resumePacket.putObject("d");
+        data.put("server_id", connection.getServer().getIdAsString())
+                .put("session_id", connection.getSessionId())
+                .put("token", connection.getToken());
+        logger.debug("Sending resume packet for {}", connection);
+        WebSocketFrame resumeFrame = WebSocketFrame.createTextFrame(resumePacket.toString());
+        websocket.sendFrame(resumeFrame);
     }
 
     /**
