@@ -82,8 +82,10 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      * Disconnects from the voice channel.
      *
      * <p><b>A disconnected audio connection cannot be reused!</b>
+     *
+     * @return A CompletableFuture which completes when the connection has been disconnected.
      */
-    void close();
+    CompletableFuture<Void> close();
 
     /**
      * Gets the current audio source.

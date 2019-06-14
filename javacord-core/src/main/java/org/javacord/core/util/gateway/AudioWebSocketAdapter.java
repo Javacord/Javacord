@@ -191,6 +191,10 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         // Squash it, until it stops beating
         heart.squash();
 
+        if (connection.getDisconnectFuture() != null) {
+            connection.getDisconnectFuture().complete(null);
+        }
+
         if (!connection.getReadyFuture().isDone()) {
             connection.getReadyFuture().completeExceptionally(
                     new IllegalStateException(

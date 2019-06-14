@@ -41,7 +41,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     /**
      * The voice channel of the audio connection.
      */
-    private ServerVoiceChannel channel;
+    private volatile ServerVoiceChannel channel;
 
     /**
      * A lock to ensure we don't accidentally poll two elements from the queue.
@@ -57,6 +57,11 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      * A future that finishes once the connection has been moved to a different channel.
      */
     private CompletableFuture<Void> movingFuture;
+
+    /**
+     * A future that finishes once the connection has been disconnected.
+     */
+    private CompletableFuture<Void> disconnectFuture;
 
     /**
      * The source that gets played at the moment.
@@ -130,6 +135,15 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      */
     public CompletableFuture<AudioConnection> getReadyFuture() {
         return readyFuture;
+    }
+
+    /**
+     * Gets a future that finishes once the connection has been disconnected.
+     *
+     * @return The future.
+     */
+    public CompletableFuture<Void> getDisconnectFuture() {
+        return disconnectFuture;
     }
 
     /**
@@ -298,20 +312,21 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         }
         if (destChannel.equals(channel)) {
             movingFuture.complete(null);
-        } else {
-            movingFuture.thenRun(() -> setChannel(destChannel));
-            api.getWebSocketAdapter()
-                    .sendVoiceStateUpdate(channel.getServer(), destChannel, selfMute, selfDeafen);
+            return movingFuture;
         }
-        return movingFuture;
+        api.getWebSocketAdapter()
+                .sendVoiceStateUpdate(channel.getServer(), destChannel, selfMute, selfDeafen);
+        return movingFuture.thenRun(() -> setChannel(destChannel));
     }
 
     @Override
-    public void close() {
+    public CompletableFuture<Void> close() {
+        disconnectFuture = new CompletableFuture<>();
         websocketAdapter.disconnect();
         api.getWebSocketAdapter()
                 .sendVoiceStateUpdate(channel.getServer(), null, muted, deafened);
         ((ServerImpl) channel.getServer()).removeAudioConnection(this);
+        return disconnectFuture;
     }
 
     @Override
