@@ -731,8 +731,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The message with the given id from the text channel with the given id.
      */
     default CompletableFuture<Message> getMessageById(long messageId, long channelId) {
-        return getChannelById(channelId)
-                .flatMap(Channel::asTextChannel)
+        return getTextChannelById(channelId)
                 .map(textChannel -> getMessageById(messageId, textChannel))
                 .orElseGet(() -> {
                     CompletableFuture<Message> failingFuture = new CompletableFuture<>();
