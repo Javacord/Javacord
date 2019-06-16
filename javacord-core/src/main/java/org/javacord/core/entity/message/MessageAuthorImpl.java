@@ -3,6 +3,7 @@ package org.javacord.core.entity.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
@@ -10,6 +11,7 @@ import org.javacord.core.entity.user.UserImpl;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link MessageAuthor}.
@@ -51,6 +53,16 @@ public class MessageAuthorImpl implements MessageAuthor {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return asUser().map(DiscordEntity::getEntityType)
+                .orElseGet(() -> asWebhook()
+                        .map(CompletableFuture::join) // todo Find a better solution for this
+                        .map(DiscordEntity::getEntityType)
+                        .orElseThrow(AssertionError::new) // if not a webhook either, something is wrong
+                );
     }
 
     @Override

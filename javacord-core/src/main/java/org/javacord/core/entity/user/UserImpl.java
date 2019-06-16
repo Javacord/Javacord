@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.PrivateChannel;
@@ -294,6 +295,11 @@ public class UserImpl implements User, Cleanupable, InternalUserAttachableListen
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.USER;
     }
 
     @Override

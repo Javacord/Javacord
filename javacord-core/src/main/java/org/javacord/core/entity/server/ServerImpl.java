@@ -8,6 +8,7 @@ import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.activity.Activity;
@@ -814,6 +815,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.SERVER;
     }
 
     @Override

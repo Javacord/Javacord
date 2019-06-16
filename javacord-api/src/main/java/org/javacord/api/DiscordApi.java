@@ -1,6 +1,7 @@
 package org.javacord.api;
 
 import org.javacord.api.entity.ApplicationInfo;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
@@ -717,6 +718,28 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     default Optional<Message> getCachedMessageById(String id) {
         try {
             return getCachedMessageById(Long.valueOf(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets the entity that matches the given ID.
+     *
+     * @param id The ID of the entity to look for.
+     * @return The entity with the given ID.
+     */
+    Optional<? extends DiscordEntity> getCachedEntityById(long id);
+
+    /**
+     * Gets the entity that matches the given ID.
+     *
+     * @param id The ID of the entity to look for.
+     * @return The entity with the given ID.
+     */
+    default Optional<? extends DiscordEntity> getCachedEntityById(String id) {
+        try {
+            return getCachedEntityById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }

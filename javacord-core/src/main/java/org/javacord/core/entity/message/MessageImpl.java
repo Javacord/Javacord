@@ -3,6 +3,7 @@ package org.javacord.core.entity.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
@@ -292,6 +293,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.MESSAGE;
     }
 
     @Override

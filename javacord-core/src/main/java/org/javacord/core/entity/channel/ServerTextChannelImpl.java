@@ -2,6 +2,7 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.util.cache.MessageCache;
@@ -153,4 +154,8 @@ public class ServerTextChannelImpl extends ServerChannelImpl
         return String.format("ServerTextChannel (id: %s, name: %s)", getIdAsString(), getName());
     }
 
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.SERVER_TEXT_CHANNEL;
+    }
 }

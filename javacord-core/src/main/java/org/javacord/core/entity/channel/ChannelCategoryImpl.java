@@ -2,6 +2,7 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -85,4 +86,8 @@ public class ChannelCategoryImpl extends ServerChannelImpl
         return String.format("ChannelCategory (id: %s, name: %s)", getIdAsString(), getName());
     }
 
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.CHANNEL_CATEGORY;
+    }
 }

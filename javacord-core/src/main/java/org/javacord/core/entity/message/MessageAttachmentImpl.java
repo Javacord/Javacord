@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.core.util.FileContainer;
@@ -91,6 +92,11 @@ public class MessageAttachmentImpl implements MessageAttachment {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.MESSAGE_ATTACHMENT;
     }
 
     @Override

@@ -56,5 +56,11 @@ public interface DiscordEntity {
         return Long.toUnsignedString(getId());
     }
 
+    /**
+     * Gets the absolute type of this {@code DiscordEntity}.
+     *
+     * @return The type of this entity.
+     */
+    DiscordEntityType getEntityType();
 
 }

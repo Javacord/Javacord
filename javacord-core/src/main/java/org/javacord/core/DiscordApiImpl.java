@@ -11,6 +11,7 @@ import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.ApplicationInfo;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
@@ -82,6 +83,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The implementation of {@link DiscordApi}.
@@ -1419,6 +1421,17 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Optional<Message> getCachedMessageById(long id) {
         return Optional.ofNullable(messages.get(id)).map(Reference::get);
+    }
+
+    @Override
+    public Optional<? extends DiscordEntity> getCachedEntityById(long id) {
+        return Stream.of(users, channels, servers, customEmojis, messages)
+                .map(Map::entrySet)
+                .flatMap(Collection::stream)
+                .filter(entity -> entity.getKey() == id)
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .map(DiscordEntity.class::cast);
     }
 
     @Override

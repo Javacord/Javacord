@@ -3,6 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.cache.MessageCache;
@@ -67,6 +68,11 @@ public class PrivateChannelImpl implements PrivateChannel, Cleanupable, Internal
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.PRIVATE_CHANNEL;
     }
 
     @Override

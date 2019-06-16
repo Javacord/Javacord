@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.user.User;
@@ -97,6 +98,11 @@ public class GroupChannelImpl implements GroupChannel, Cleanupable, InternalText
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.GROUP_CHANNEL;
     }
 
     @Override

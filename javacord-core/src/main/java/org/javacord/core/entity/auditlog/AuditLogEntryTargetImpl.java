@@ -2,6 +2,7 @@ package org.javacord.core.entity.auditlog;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.auditlog.AuditLogEntryTarget;
 
@@ -41,6 +42,11 @@ public class AuditLogEntryTargetImpl implements AuditLogEntryTarget {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.AUDIT_LOG_ENTRY_TARGET;
     }
 
     @Override

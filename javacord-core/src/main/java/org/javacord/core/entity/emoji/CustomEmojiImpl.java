@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.DiscordEntityType;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.core.DiscordApiImpl;
@@ -80,6 +81,11 @@ public class CustomEmojiImpl implements CustomEmoji {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public DiscordEntityType getEntityType() {
+        return DiscordEntityType.CUSTOM_EMOJI;
     }
 
     @Override
