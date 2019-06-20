@@ -111,11 +111,20 @@ public class ServerVoiceChannelImpl extends ServerChannelImpl
 
     @Override
     public CompletableFuture<AudioConnection> connect() {
-        CompletableFuture<AudioConnection> future = new CompletableFuture<>();
-        AudioConnectionImpl connection = new AudioConnectionImpl(this, future);
-        ((ServerImpl) getServer()).setPendingAudioConnection(connection);
-        future.thenAccept(conn -> ((ServerImpl) getServer()).setAudioConnection((AudioConnectionImpl) conn));
-        return future;
+        return getServer()
+                .getAudioConnection()
+                .map(AudioConnection::close)
+                .orElseGet(() -> CompletableFuture.completedFuture(null))
+                .thenCompose(closedAudioConnection -> {
+                    CompletableFuture<AudioConnection> future = new CompletableFuture<>();
+                    AudioConnectionImpl connection = new AudioConnectionImpl(this, future);
+                    ((ServerImpl) getServer()).setPendingAudioConnection(connection);
+                    return future;
+                })
+                .thenApply(conn -> {
+                    ((ServerImpl) getServer()).setAudioConnection((AudioConnectionImpl) conn);
+                    return conn;
+                });
     }
 
     @Override

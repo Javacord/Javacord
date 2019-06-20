@@ -21,7 +21,7 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     }
 
     /**
-     * Connects to the voice channel.
+     * Connects to the voice channel and disconnects any existing connections in the server.
      *
      * @return The audio connection.
      */
