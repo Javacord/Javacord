@@ -7,7 +7,7 @@ import org.javacord.api.listener.server.ServerAttachableListener;
 import org.javacord.api.listener.user.UserAttachableListener;
 
 /**
- * This listener listens to users joining a server voice channel.
+ * This listener listens to users leaving a server voice channel.
  */
 @FunctionalInterface
 public interface ServerVoiceChannelMemberLeaveListener extends ServerAttachableListener, UserAttachableListener,
@@ -15,7 +15,7 @@ public interface ServerVoiceChannelMemberLeaveListener extends ServerAttachableL
         GloballyAttachableListener, ObjectAttachableListener {
 
     /**
-     * This method is called every time a user joins a server voice channel.
+     * This method is called every time a user leaves a server voice channel.
      *
      * @param event The event
      */
