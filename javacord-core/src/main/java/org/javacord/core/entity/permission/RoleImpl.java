@@ -15,6 +15,7 @@ import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,6 +23,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * The implementation of {@link Role}.
@@ -88,6 +91,11 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     private final Collection<User> users = new HashSet<>();
 
     /**
+     * A read write lock to synchronize access to the users HashSet.
+     */
+    private final ReadWriteLock userHashSetLock = new ReentrantReadWriteLock();
+
+    /**
      * Creates a new role object.
      *
      * @param api The discord api instance.
@@ -113,7 +121,12 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
      * @param user The user to add.
      */
     public void addUserToCache(User user) {
-        users.add(user);
+        userHashSetLock.writeLock().lock();
+        try {
+            users.add(user);
+        } finally {
+            userHashSetLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -122,7 +135,12 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
      * @param user The user to remove.
      */
     public void removeUserFromCache(User user) {
-        users.remove(user);
+        userHashSetLock.writeLock().lock();
+        try {
+            users.remove(user);
+        } finally {
+            userHashSetLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -233,7 +251,27 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
         if (isEveryoneRole()) {
             return getServer().getMembers();
         }
-        return Collections.unmodifiableCollection(users);
+
+        userHashSetLock.readLock().lock();
+        try {
+            return Collections.unmodifiableCollection(new ArrayList<>(users));
+        } finally {
+            userHashSetLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean hasUser(User user) {
+        if (isEveryoneRole()) {
+            return getServer().isMember(user);
+        }
+
+        userHashSetLock.readLock().lock();
+        try {
+            return users.contains(user);
+        } finally {
+            userHashSetLock.readLock().unlock();
+        }
     }
 
     @Override
@@ -271,9 +309,9 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     @Override
     public boolean equals(Object o) {
         return (this == o)
-               || !((o == null)
-                    || (getClass() != o.getClass())
-                    || (getId() != ((DiscordEntity) o).getId()));
+                || !((o == null)
+                || (getClass() != o.getClass())
+                || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override

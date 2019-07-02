@@ -510,7 +510,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default List<Role> getRoles(User user) {
         return Collections.unmodifiableList(
                 getRoles().stream()
-                        .filter(role -> role.getUsers().contains(user))
+                        .filter(role -> role.hasUser(user))
                         .collect(Collectors.toList()));
     }
 
