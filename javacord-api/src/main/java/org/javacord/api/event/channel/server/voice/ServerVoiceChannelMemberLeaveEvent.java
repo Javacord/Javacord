@@ -19,6 +19,7 @@ public interface ServerVoiceChannelMemberLeaveEvent extends ServerVoiceChannelEv
 
     /**
      * Gets whether this event is part of a move.
+     * Note that this will also be {@code TRUE} if a user switches the channel.
      *
      * @return whether this event is part of a move.
      */
