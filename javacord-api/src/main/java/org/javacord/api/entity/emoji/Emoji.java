@@ -11,25 +11,25 @@ import java.util.Optional;
 public interface Emoji extends Mentionable, Specializable<Emoji> {
 
     /**
-     * Gets the emoji as unicode emoji.
+     * Gets the emoji as a unicode emoji.
      *
-     * @return The emoji as unicode emoji.
+     * @return The emoji as a unicode emoji.
      */
     Optional<String> asUnicodeEmoji();
 
     /**
-     * Gets the emoji as custom emoji.
+     * Gets the emoji as a custom emoji.
      *
-     * @return The emoji as custom emoji.
+     * @return The emoji as a custom emoji.
      */
     default Optional<CustomEmoji> asCustomEmoji() {
         return as(CustomEmoji.class);
     }
 
     /**
-     * Gets the emoji as known custom emoji.
+     * Gets the emoji as a known custom emoji.
      *
-     * @return The emoji as known custom emoji.
+     * @return The emoji as a known custom emoji.
      */
     default Optional<KnownCustomEmoji> asKnownCustomEmoji() {
         return as(KnownCustomEmoji.class);
@@ -37,7 +37,7 @@ public interface Emoji extends Mentionable, Specializable<Emoji> {
 
     /**
      * Checks if the emoji is equal to the given emoji.
-     * This can be used to safe some ugly optional checks.
+     * This can be used to save some ugly optional checks.
      *
      * @param otherEmoji The emoji to compare with.
      * @return Whether the emoji is equal to the given emoji.
@@ -58,7 +58,7 @@ public interface Emoji extends Mentionable, Specializable<Emoji> {
 
     /**
      * Checks if the emoji is equal to the given unicode emoji.
-     * This can be used to safe some ugly optional checks.
+     * This can be used to save some ugly optional checks.
      *
      * @param otherEmoji The unicode emoji to compare with.
      * @return Whether the emoji is equal to the given unicode emoji.
