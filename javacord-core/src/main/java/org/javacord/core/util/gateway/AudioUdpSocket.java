@@ -109,6 +109,7 @@ public class AudioUdpSocket {
             try {
                 long nextFrameTimestamp = System.nanoTime();
                 boolean dontSleep = true;
+                boolean speaking = false;
                 long framesOfSilenceToPlay = 5;
                 while (shouldSend) {
                     // Get the current audio source. If none is available, it will block the thread
@@ -141,10 +142,18 @@ public class AudioUdpSocket {
                     }
 
                     if (frame != null || framesOfSilenceToPlay > 0) {
+                        if (!speaking) {
+                            speaking = true;
+                            connection.setSpeaking(true);
+                        }
                         packet = new AudioPacket(frame, ssrc, sequence, ((int) sequence) * 960);
                         // We can stop sending frames of silence after 5 frames
                         if (frame == null) {
                             framesOfSilenceToPlay--;
+                            if (framesOfSilenceToPlay == 0) {
+                                speaking = false;
+                                connection.setSpeaking(false);
+                            }
                         } else {
                             framesOfSilenceToPlay = 5;
                         }
