@@ -210,6 +210,15 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     }
 
     /**
+     * Sets the current speaking mode.
+     *
+     * @param speaking The speaking mode to set
+     */
+    public void setSpeaking(boolean speaking) {
+        websocketAdapter.sendSpeaking(speaking);
+    }
+
+    /**
      * Tries to establish a connection if all required information is available and there's not already a connection.
      *
      * @return Whether it will try to connect or not.

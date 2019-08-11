@@ -118,7 +118,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                 sendSelectProtocol(websocket);
 
                 // TODO remove
-                sendSpeaking(websocket, true);
+                sendSpeaking(websocket, false);
                 Thread.sleep(1000);
                 break;
             case SESSION_DESCRIPTION:
@@ -332,7 +332,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     }
 
     /**
-     * Sends the identify packet.
+     * Sends the speaking packet.
      *
      * @param websocket The websocket the packet should be sent to.
      * @param speaking Whether speaking should be displayed or not.
@@ -342,11 +342,20 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
         speakingPacket
                 .put("op", VoiceGatewayOpcode.SPEAKING.getCode())
                 .putObject("d")
-                .put("speaking", 1)
+                .put("speaking", speaking ? 1 : 0)
                 .put("delay", 0)
                 .put("ssrc", ssrc);
         logger.debug("Sending speaking packet for {} (packet: {})", connection, speakingPacket);
         WebSocketFrame speakingFrame = WebSocketFrame.createTextFrame(speakingPacket.toString());
         websocket.sendFrame(speakingFrame);
+    }
+
+    /**
+     * Sends the speaking packet.
+     *
+     * @param speaking Whether speaking should be displayed or not.
+     */
+    public void sendSpeaking(boolean speaking) {
+        sendSpeaking(websocket.get(), speaking);
     }
 }
