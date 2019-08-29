@@ -22,7 +22,7 @@ public class MessageBuilder {
     /**
      * The message delegate used by this instance.
      */
-    private final MessageBuilderDelegate delegate = DelegateFactory.createMessageBuilderDelegate();
+    protected final MessageBuilderDelegate delegate = DelegateFactory.createMessageBuilderDelegate();
 
     /**
      * Creates a message builder from a message.

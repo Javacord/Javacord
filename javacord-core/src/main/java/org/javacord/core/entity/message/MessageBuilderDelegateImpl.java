@@ -5,8 +5,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
+import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.channel.Channel;
+import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
@@ -14,9 +19,13 @@ import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.entity.webhook.WebhookMessageBuilder;
+import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.util.FileContainer;
+import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
@@ -35,6 +44,16 @@ import java.util.concurrent.CompletableFuture;
  * The implementation of {@link MessageBuilderDelegate}.
  */
 public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(MessageBuilderDelegateImpl.class);
+
+    /**
+     * The webhook sending the message.
+     */
+    private Webhook webhook = null;
 
     /**
      * The receiver of the message.
@@ -57,6 +76,16 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     private boolean tts = false;
 
     /**
+     * The displayName of the webhook message.
+     */
+    private String displayName = null;
+
+    /**
+     * URL to the displayed avatar of the webhook message.
+     */
+    private URL avatarUrl;
+
+    /**
      * The nonce of the message.
      */
     private String nonce = null;
@@ -65,6 +94,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      * A list with all attachments which should be added to the message.
      */
     private final List<FileContainer> attachments = new ArrayList<>();
+
+    @Override
+    public void setWebhook(Webhook webhook) {
+        this.webhook = webhook;
+    }
 
     @Override
     public void appendCode(String language, String code) {
@@ -242,6 +276,16 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public void setDisplayAvatar(URL avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    @Override
     public StringBuilder getStringBuilder() {
         return strBuilder;
     }
@@ -266,6 +310,83 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
     @Override
     public CompletableFuture<Message> send(TextChannel channel) {
+        if (webhook == null) {
+            return sendAsUser(channel);
+        } else {
+            return sendAsWebhook(channel);
+        }
+    }
+
+    public static void main(String[] args) {
+        DiscordApi join = new DiscordApiBuilder()
+                .setToken("NDc3NjEzMjYwMTkxODI1OTMw.XWe7HA.WfyObUqdeRbwQMgYQDyGOBOoJu0")
+                .login()
+                .join();
+
+        ServerTextChannel channel = join.getChannelById(412663733064695832L)
+                .flatMap(Channel::asServerTextChannel)
+                .get();
+
+        join.getServerById(412663733064695829L)
+                .ifPresent(srv -> srv.getWebhooks()
+                        .thenApply(list -> list.get(0))
+                        .thenApply(WebhookMessageBuilder::new)
+                        .thenCompose(msg -> msg.setContent("abc").setDisplayName("def").send(channel))
+                        .thenAccept(System.out::println)
+                        .exceptionally(ExceptionLogger.get())
+                );
+    }
+
+    private CompletableFuture<Message> sendAsWebhook(TextChannel channel) {
+        // cheap implementation
+        // https://discordapp.com/developers/docs/resources/webhook#execute-webhook-jsonform-params
+
+        String str = toString();
+
+        ObjectNode data = JsonNodeFactory.instance.objectNode()
+                .put("tts", this.tts);
+
+        if (displayName != null) {
+            data.put("username", displayName);
+        }
+
+        if (avatarUrl != null) {
+            data.put("avatar_url", avatarUrl.toExternalForm());
+        }
+
+        if (embed != null && strBuilder.length() == 0) {
+            ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(data.putObject("embed"));
+        } else if (embed == null && strBuilder.length() != 0) {
+            data.put("content", strBuilder.toString());
+        } else {
+            logger.warn("Currently, WebHook message implementation only supports " +
+                    "one of textual content OR embed content.");
+        }
+
+        CompletableFuture<Message> future = new CompletableFuture<>();
+        return new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
+                .setUrlParameters(webhook.getIdAsString(), webhook.getToken().orElseThrow(AssertionError::new))
+                .setBody(data)
+                .execute(result -> channel.getMessagesAsStream()
+                        // TODO someone with more time on their hand NEEDS to fix this
+                        .filter(message -> message.getAuthor()
+                        .asWebhook()
+                        .map(futHook -> futHook.thenApply(webhook::equals))
+                        .map(CompletableFuture::join)
+                        .orElse(false))
+                        .findFirst()
+                        .orElseThrow(AssertionError::new)
+                )
+                .whenComplete((message, throwable) -> {
+                    if (throwable != null) {
+                        future.completeExceptionally(throwable);
+                    } else {
+                        future.complete(message);
+                    }
+                });
+    }
+
+    private CompletableFuture<Message> sendAsUser(TextChannel channel) {
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("content", toString() == null ? "" : toString())
                 .put("tts", tts);

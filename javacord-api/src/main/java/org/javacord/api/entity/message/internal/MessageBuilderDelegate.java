@@ -5,10 +5,12 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.MessageBuilderType;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.Webhook;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -21,6 +23,13 @@ import java.util.concurrent.CompletableFuture;
  * You usually don't want to interact with this object.
  */
 public interface MessageBuilderDelegate {
+
+    /**
+     * Sets a Webhook that will send the message.
+     *
+     * @param webhook The webhook to use.
+     */
+    void setWebhook(Webhook webhook);
 
     /**
      * Appends code to the message.
@@ -219,6 +228,20 @@ public interface MessageBuilderDelegate {
      * @param nonce The nonce to set.
      */
     void setNonce(String nonce);
+
+    /**
+     * Sets a display name for a Webhook message.
+     *
+     * @param displayName The display name to set.
+     */
+    void setDisplayName(String displayName);
+
+    /**
+     * Sets a display avatar for a Webhook message.
+     *
+     * @param avatarUrl The URL of the avatar to set.
+     */
+    void setDisplayAvatar(URL avatarUrl);
 
     /**
      * Gets the {@link StringBuilder} which is used to build the message.
