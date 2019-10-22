@@ -10,6 +10,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
+import org.javacord.api.audio.SpeakingFlag;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -116,12 +117,11 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
                 socket = new AudioUdpSocket(connection, new InetSocketAddress(ip, port), ssrc);
                 sendSelectProtocol(websocket);
-
-                // TODO remove
-                sendSpeaking(websocket, false);
                 Thread.sleep(1000);
                 break;
             case SESSION_DESCRIPTION:
+                sendSpeaking(websocket);
+
                 data = packet.get("d");
                 byte[] secretKey = api.getObjectMapper().convertValue(data.get("secret_key"), byte[].class);
                 socket.setSecretKey(secretKey);
@@ -335,14 +335,17 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
      * Sends the speaking packet.
      *
      * @param websocket The websocket the packet should be sent to.
-     * @param speaking Whether speaking should be displayed or not.
      */
-    private void sendSpeaking(WebSocket websocket, boolean speaking) {
+    private void sendSpeaking(WebSocket websocket) {
         ObjectNode speakingPacket = JsonNodeFactory.instance.objectNode();
+        int speakingFlags = 0;
+        for (SpeakingFlag flag : connection.getSpeakingFlags()) {
+            speakingFlags |= flag.asInt();
+        }
         speakingPacket
                 .put("op", VoiceGatewayOpcode.SPEAKING.getCode())
                 .putObject("d")
-                .put("speaking", speaking ? 1 : 0)
+                .put("speaking", speakingFlags)
                 .put("delay", 0)
                 .put("ssrc", ssrc);
         logger.debug("Sending speaking packet for {} (packet: {})", connection, speakingPacket);
@@ -352,10 +355,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
     /**
      * Sends the speaking packet.
-     *
-     * @param speaking Whether speaking should be displayed or not.
      */
-    public void sendSpeaking(boolean speaking) {
-        sendSpeaking(websocket.get(), speaking);
+    public void sendSpeaking() {
+        sendSpeaking(websocket.get());
     }
 }

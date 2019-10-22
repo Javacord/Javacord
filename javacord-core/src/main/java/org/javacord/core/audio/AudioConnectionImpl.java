@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.audio.AudioSource;
+import org.javacord.api.audio.SpeakingFlag;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -11,6 +12,7 @@ import org.javacord.core.listener.audio.InternalAudioConnectionAttachableListene
 import org.javacord.core.util.gateway.AudioWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -102,6 +104,11 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      * The endpoint for the audio websocket.
      */
     private volatile String endpoint;
+
+    /**
+     * The current set of active speaking flags.
+     */
+    private volatile EnumSet<SpeakingFlag> speakingFlags = EnumSet.noneOf(SpeakingFlag.class);
 
     /**
      * Whether the bot is muted or not.
@@ -215,7 +222,58 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      * @param speaking The speaking mode to set
      */
     public void setSpeaking(boolean speaking) {
-        websocketAdapter.sendSpeaking(speaking);
+        EnumSet<SpeakingFlag> newSpeakingFlags = getSpeakingFlags();
+        if (speaking) {
+            newSpeakingFlags.add(SpeakingFlag.SPEAKING);
+        } else {
+            newSpeakingFlags.remove(SpeakingFlag.SPEAKING);
+        }
+        setSpeakingFlags(newSpeakingFlags);
+    }
+
+    /**
+     * Gets whether the connection is currently speaking with priority.
+     *
+     * @return Whether the connection is currently speaking with priority.
+     */
+    public boolean isPrioritySpeaking() {
+        return speakingFlags.contains(SpeakingFlag.PRIORITY_SPEAKER);
+    }
+
+    /**
+     * Sets whether the connection is priority speaking.
+     *
+     * @param prioritySpeaking Whether or not to speak with priority.
+     */
+    public void setPrioritySpeaking(boolean prioritySpeaking) {
+        EnumSet<SpeakingFlag> newSpeakingFlags = getSpeakingFlags();
+        if (prioritySpeaking) {
+            newSpeakingFlags.add(SpeakingFlag.PRIORITY_SPEAKER);
+        } else {
+            newSpeakingFlags.remove(SpeakingFlag.PRIORITY_SPEAKER);
+        }
+        setSpeakingFlags(newSpeakingFlags);
+    }
+
+    /**
+     * Gets the current set of active speaking flags.
+     *
+     * @return The current set of active speaking flags.
+     */
+    public EnumSet<SpeakingFlag> getSpeakingFlags() {
+        return speakingFlags;
+    }
+
+    /**
+     * Sets the current speaking flags and sends a speaking packet if they have changed.
+     *
+     * @param speakingFlags The new speaking flags to set.
+     */
+    public void setSpeakingFlags(EnumSet<SpeakingFlag> speakingFlags) {
+        if (!speakingFlags.equals(this.speakingFlags)) {
+            this.speakingFlags = speakingFlags;
+            websocketAdapter.sendSpeaking();
+        }
     }
 
     /**
