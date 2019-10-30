@@ -120,7 +120,7 @@ public class AudioUdpSocket {
                     }
 
                     if (source.hasFinished()) {
-                        connection.removeCurrentSource();
+                        connection.removeCurrentAudioSource();
                         dontSleep = true;
 
                         // Dispatch AudioSourceFinishedEvent AFTER removing the source.

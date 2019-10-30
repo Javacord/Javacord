@@ -71,7 +71,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     /**
      * A queue with all audio sources for this connection.
      */
-    private final BlockingQueue<AudioSource> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<AudioSource> queue = new LinkedBlockingQueue<>(1);
 
     /**
      * An artificial id for the connection.
@@ -256,8 +256,8 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
                     // Always poll if the current source is null
                     poll.set(true);
                 } else {
-                    // If the current source is not null, only poll if it's still queued
-                    poll.set(queue.peek() == currentSource);
+                    // If the current source is not null, poll if there is a source to replace it with
+                    poll.set(!queue.isEmpty());
                 }
                 return currentSource;
             });
@@ -274,13 +274,6 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         return source;
     }
 
-    /**
-     * Removes the current audio source.
-     */
-    public void removeCurrentSource() {
-        currentSource.set(null);
-    }
-
     @Override
     public DiscordApi getApi() {
         return getChannel().getApi();
@@ -289,21 +282,6 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public void queue(AudioSource source) {
-        queue.add(source);
-    }
-
-    @Override
-    public boolean dequeue(AudioSource source) {
-        if (currentSource.get() == source) {
-            removeCurrentSource();
-            return true;
-        } else {
-            return queue.remove(source);
-        }
     }
 
     @Override
@@ -342,11 +320,26 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     public Optional<AudioSource> getCurrentAudioSource() {
         return Optional.ofNullable(
                 currentSource.updateAndGet(source -> {
-                    if (source != null) {
-                        return source;
+                    if (queue.peek() != null) {
+                        return queue.peek();
                     }
-                    return queue.peek();
+                    return source;
                 }));
+    }
+
+    @Override
+    public void setCurrentAudioSource(AudioSource source) {
+        if (source == null) {
+            currentSource.set(null);
+        } else {
+            queue.clear();
+            queue.add(source);
+        }
+    }
+
+    @Override
+    public void removeCurrentAudioSource() {
+        currentSource.set(null);
     }
 
     @Override
