@@ -53,8 +53,11 @@ public class CustomEmojiImpl implements CustomEmoji {
     public CustomEmojiImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
         id = data.get("id").asLong();
-        name = data.get("name").asText();
-        animated = data.get("animated").asBoolean();
+        JsonNode nameNode = data.get("name");
+        name = nameNode == null ? "" : nameNode.asText();
+        // Animated field may be missing, default to false
+        JsonNode animatedNode = data.get("animated");
+        animated = animatedNode != null && animatedNode.asBoolean();
     }
 
     /**
