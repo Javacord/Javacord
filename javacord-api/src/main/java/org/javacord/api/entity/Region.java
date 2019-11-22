@@ -8,6 +8,7 @@ public enum Region implements Nameable {
     // "Normal" regions
     AMSTERDAM("amsterdam", "Amsterdam", false),
     BRAZIL("brazil", "Brazil", false),
+    EUROPE("europe", "Europe", false),
     EU_WEST("eu-west", "EU West", false),
     EU_CENTRAL("eu-central", "EU Central", false),
     FRANKFURT("frankfurt", "Frankfurt", false),
@@ -15,6 +16,7 @@ public enum Region implements Nameable {
     JAPAN("japan", "Japan", false),
     LONDON("london", "London", false),
     RUSSIA("russia", "Russia", false),
+    INDIA("india", "India", false),
     SINGAPORE("singapore", "Singapore", false),
     SYDNEY("sydney", "Sydney", false),
     US_EAST("us-east", "US East", false),
