@@ -12,11 +12,7 @@ import org.mockserver.configuration.ConfigurationProperties
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.verify.VerificationTimes
-import spock.lang.IgnoreIf
-import spock.lang.PendingFeature
-import spock.lang.Specification
-import spock.lang.Subject
-import spock.lang.Unroll
+import spock.lang.*
 import spock.util.environment.RestoreSystemProperties
 
 import javax.net.ssl.SSLHandshakeException
@@ -26,7 +22,7 @@ import java.util.concurrent.CompletionException
 class DiscordApiImplTest extends Specification {
 
     @Subject
-    def api = new DiscordApiImpl(null, null, null, null, false)
+    def api = new DiscordApiImpl(null, null, null, null, null, false)
 
     def 'getAllServers returns all servers'() {
         given:
@@ -104,7 +100,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', null, null, null, false)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, false)
 
         when:
             api.applicationInfo.join()
@@ -121,7 +117,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -137,7 +133,7 @@ class DiscordApiImplTest extends Specification {
 
     def 'allowing man-in-the-middle attacks logs a warning on api instantiation'() {
         when:
-            new DiscordApiImpl('fakeBotToken', null, null, null, true)
+            new DiscordApiImpl('fakeBotToken', null, null, null, null, true)
 
         then:
             def expectedWarning = 'All SSL certificates are trusted when connecting to the Discord API and websocket.' +
@@ -154,7 +150,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setHttpSystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -175,7 +171,7 @@ class DiscordApiImplTest extends Specification {
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             def defaultProxySelector = ProxySelector.default
             ProxySelector.default = MockProxyManager.proxySelector
-            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -197,7 +193,7 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.mockProxy.when(
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.httpProxy, null, true)
 
         when:
             api.applicationInfo.join()
@@ -213,7 +209,7 @@ class DiscordApiImplTest extends Specification {
 
     def 'configuring proxy and proxySelector throws an IllegalStateException'() {
         when:
-            new DiscordApiImpl('fakeBotToken', Stub(ProxySelector), Proxy.NO_PROXY, null, true)
+            new DiscordApiImpl('fakeBotToken', null, Stub(ProxySelector), Proxy.NO_PROXY, null, true)
 
         then:
             IllegalStateException ise = thrown()
@@ -225,7 +221,7 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.mockProxy.when(
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-            def api = new DiscordApiImpl('fakeBotToken', MockProxyManager.proxySelector, null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxySelector, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -257,7 +253,7 @@ class DiscordApiImplTest extends Specification {
             Authenticator.default = Mock(Authenticator) {
                 (1.._) * getPasswordAuthentication() >> new PasswordAuthentication(username, password as char[])
             }
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.httpProxy, null, true)
 
         when:
             api.applicationInfo.join()
@@ -292,7 +288,7 @@ class DiscordApiImplTest extends Specification {
             org.javacord.api.util.auth.Authenticator authenticator = Mock {
                 (1.._) * authenticate(_, _, _) >> [(HttpHeaderNames.PROXY_AUTHORIZATION as String): [null, credentials]]
             }
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, authenticator, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.httpProxy, authenticator, true)
 
         when:
             api.applicationInfo.join()
@@ -324,8 +320,8 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.setSocks4SystemProperties()
 
         and:
-            def api = new DiscordApiImpl(AccountType.BOT, 'fakeBotToken', 0, 1, false, null, null, null, true, null,
-                    { [InetAddress.getLoopbackAddress()] })
+            def api = new DiscordApiImpl(AccountType.BOT, 'fakeBotToken', 0, 1, false, null, null, null, null, true,
+                    null, { [InetAddress.getLoopbackAddress()] })
 
         when:
             api.applicationInfo.join()
@@ -354,7 +350,7 @@ class DiscordApiImplTest extends Specification {
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
             MockProxyManager.setSocks5SystemProperties()
-            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -382,7 +378,7 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.mockProxy.when(
                     HttpRequest.request()
             ) respond HttpResponse.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.socksProxy, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.socksProxy, null, true)
 
         and:
             def username = UUID.randomUUID().toString()
@@ -432,7 +428,7 @@ class DiscordApiImplTest extends Specification {
                 void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
                 }
             }
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.httpProxy, null, true)
 
         when:
             api.applicationInfo.join()
@@ -470,7 +466,7 @@ class DiscordApiImplTest extends Specification {
                 void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
                 }
             }
-            def api = new DiscordApiImpl('fakeBotToken', MockProxyManager.proxySelector, null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.proxySelector, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -497,7 +493,7 @@ class DiscordApiImplTest extends Specification {
             System.properties.'https.proxyPort' = '1'
             def defaultProxySelector = ProxySelector.default
             ProxySelector.default = MockProxyManager.proxySelector
-            def api = new DiscordApiImpl('fakeBotToken', null, null, null, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, true)
 
         when:
             api.applicationInfo.join()
@@ -536,7 +532,7 @@ class DiscordApiImplTest extends Specification {
             org.javacord.api.util.auth.Authenticator authenticator = Mock {
                 (1.._) * authenticate(_, _, _) >> [(HttpHeaderNames.PROXY_AUTHORIZATION as String): [null, credentials]]
             }
-            def api = new DiscordApiImpl('fakeBotToken', null, MockProxyManager.httpProxy, authenticator, true)
+            def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.httpProxy, authenticator, true)
 
         when:
             api.applicationInfo.join()

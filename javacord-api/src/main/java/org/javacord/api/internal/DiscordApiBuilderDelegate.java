@@ -5,6 +5,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
+import org.javacord.api.util.ratelimit.Ratelimiter;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -19,6 +20,13 @@ import java.util.function.Supplier;
  * You usually don't want to interact with this object.
  */
 public interface DiscordApiBuilderDelegate {
+
+    /**
+     * Sets a ratelimiter that can be used to control global ratelimits.
+     *
+     * @param ratelimiter The ratelimiter used to control global ratelimits.
+     */
+    void setGlobalRatelimiter(Ratelimiter ratelimiter);
 
     /**
      * Sets the proxy selector which should be used to determine the proxies that should be used to connect to the

@@ -27,6 +27,7 @@ import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.concurrent.ThreadPool;
+import org.javacord.api.util.ratelimit.Ratelimiter;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -83,6 +84,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The type of the current account.
      */
     AccountType getAccountType();
+
+    /**
+     * Gets the current global ratelimiter.
+     *
+     * @return The current global ratelimiter.
+     */
+    Optional<Ratelimiter> getGlobalRatelimiter();
 
     /**
      * Creates an invite link for the this bot.

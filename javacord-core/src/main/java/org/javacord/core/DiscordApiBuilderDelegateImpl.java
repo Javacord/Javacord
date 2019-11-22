@@ -5,10 +5,10 @@ import org.apache.logging.log4j.CloseableThreadContext;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
+import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.PrivacyProtectionLogger;
@@ -45,6 +45,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      * The logger of this class.
      */
     private static final Logger logger = LoggerUtil.getLogger(DiscordApiBuilderDelegateImpl.class);
+
+    /**
+     * A ratelimiter that is used for global ratelimits.
+     */
+    private volatile Ratelimiter globalRatelimiter;
 
     /**
      * The proxy selector which should be used to determine the proxies that should be used to connect to the Discord
@@ -161,7 +166,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
             new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup,
-                    proxySelector, proxy, proxyAuthenticator, trustAllCertificates, future, null,
+                    globalRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, future, null,
                     preparedListeners, preparedUnspecifiedListeners);
         }
         return future;
@@ -238,6 +243,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         setCurrentShard(currentShard);
         return result;
+    }
+
+    @Override
+    public void setGlobalRatelimiter(Ratelimiter ratelimiter) {
+        globalRatelimiter = ratelimiter;
     }
 
     @Override
@@ -337,7 +347,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     private void setRecommendedTotalShards(CompletableFuture<Void> future) {
-        DiscordApiImpl api = new DiscordApiImpl(token, proxySelector, proxy, proxyAuthenticator, trustAllCertificates);
+        DiscordApiImpl api = new DiscordApiImpl(
+                token, globalRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates);
         RestRequest<JsonNode> botGatewayRequest = new RestRequest<>(api, RestMethod.GET, RestEndpoint.GATEWAY_BOT);
         botGatewayRequest
                 .execute(RestRequestResult::getJsonBody)

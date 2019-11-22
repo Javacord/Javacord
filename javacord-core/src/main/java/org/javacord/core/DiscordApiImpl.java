@@ -30,6 +30,7 @@ import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.concurrent.ThreadPool;
 import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.activity.ApplicationInfoImpl;
 import org.javacord.core.entity.emoji.CustomEmojiImpl;
@@ -194,6 +195,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final boolean waitForServersOnStartup;
 
     /**
+     * A ratelimiter that is used for global ratelimits.
+     */
+    private final Ratelimiter globalRatelimiter;
+
+    /**
      * The proxy selector which should be used to determine the proxies that should be used to connect to the Discord
      * REST API and websocket.
      */
@@ -319,6 +325,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * but does not connect to the Discord WebSocket.
      *
      * @param token                The token used to connect without any account type specific prefix.
+     * @param globalRatelimiter    The ratelimiter used for global ratelimits.
      * @param proxySelector        The proxy selector which should be used to determine the proxies that should be used
      *                             to connect to the Discord REST API and websocket.
      * @param proxy                The proxy which should be used to connect to the Discord REST API and websocket.
@@ -326,9 +333,10 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      *                             it.
      * @param trustAllCertificates Whether to trust all SSL certificates.
      */
-    public DiscordApiImpl(String token, ProxySelector proxySelector, Proxy proxy, Authenticator proxyAuthenticator,
-                          boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, false, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
+    public DiscordApiImpl(String token, Ratelimiter globalRatelimiter, ProxySelector proxySelector, Proxy proxy,
+                          Authenticator proxyAuthenticator, boolean trustAllCertificates) {
+        this(AccountType.BOT, token, 0, 1, false, globalRatelimiter,
+                proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
     }
 
     /**
@@ -340,6 +348,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param totalShards             The total amount of shards.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
+     * @param globalRatelimiter       The ratelimiter used for global ratelimits.
      * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
      *                                used to connect to the Discord REST API and websocket.
      * @param proxy                   The proxy which should be used to connect to the Discord REST API and websocket.
@@ -354,14 +363,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             int currentShard,
             int totalShards,
             boolean waitForServersOnStartup,
+            Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
             Proxy proxy,
             Authenticator proxyAuthenticator,
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
     ) {
-        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, proxySelector, proxy,
-                proxyAuthenticator, trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList());
+        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, globalRatelimiter,
+                proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, null,
+                Collections.emptyMap(), Collections.emptyList());
     }
 
     /**
@@ -373,6 +384,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param totalShards             The total amount of shards.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
+     * @param globalRatelimiter       The ratelimiter used for global ratelimits.
      * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
      *                                used to connect to the Discord REST API and websocket.
      * @param proxy                   The proxy which should be used to connect to the Discord REST API and websocket.
@@ -388,14 +400,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             int currentShard,
             int totalShards,
             boolean waitForServersOnStartup,
+            Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
             Proxy proxy,
             Authenticator proxyAuthenticator,
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready,
             Dns dns) {
-        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, proxySelector, proxy,
-                proxyAuthenticator, trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList());
+        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, globalRatelimiter,
+                proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, dns, Collections.emptyMap(),
+                Collections.emptyList());
     }
 
     /**
@@ -406,6 +420,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param totalShards             The total amount of shards.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
+     * @param globalRatelimiter       The ratelimiter used for global ratelimits.
      * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
      *                                used to connect to the Discord REST API and websocket.
      * @param proxy                   The proxy which should be used to connect to the Discord REST API and websocket.
@@ -424,6 +439,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             int currentShard,
             int totalShards,
             boolean waitForServersOnStartup,
+            Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
             Proxy proxy,
             Authenticator proxyAuthenticator,
@@ -439,6 +455,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.currentShard = currentShard;
         this.totalShards = totalShards;
         this.waitForServersOnStartup = waitForServersOnStartup;
+        this.globalRatelimiter = globalRatelimiter;
         this.proxySelector = proxySelector;
         this.proxy = proxy;
         this.proxyAuthenticator = proxyAuthenticator;
@@ -1109,6 +1126,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public AccountType getAccountType() {
         return accountType;
+    }
+
+    @Override
+    public Optional<Ratelimiter> getGlobalRatelimiter() {
+        return Optional.ofNullable(globalRatelimiter);
     }
 
     @Override
