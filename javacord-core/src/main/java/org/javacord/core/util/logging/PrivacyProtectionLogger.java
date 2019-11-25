@@ -31,11 +31,14 @@ public class PrivacyProtectionLogger extends AbstractLogger {
 
     /**
      * Adds a private data to be asterisked out in log messages.
+     * A {@code null} argument is simply ignored.
      *
      * @param privateData The private data.
      */
     public static void addPrivateData(String privateData) {
-        privateDataSet.add(privateData);
+        if (privateData != null) {
+            privateDataSet.add(privateData);
+        }
     }
 
     @Override
