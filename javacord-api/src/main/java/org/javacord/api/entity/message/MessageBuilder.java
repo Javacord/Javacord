@@ -5,6 +5,7 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -420,6 +421,17 @@ public class MessageBuilder {
      */
     public MessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName) {
         delegate.addAttachment(stream, "SPOILER_" + fileName);
+        return this;
+    }
+
+    /**
+     * Controls who will be mentioned if mentions exist in the message.
+     *
+     * @param allowedMentions The mention object.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder setAllowedMentions(AllowedMentions allowedMentions) {
+        delegate.setAllowedMentions(allowedMentions);
         return this;
     }
 
