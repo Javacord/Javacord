@@ -10,6 +10,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
 
+import java.awt.Color;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -555,6 +556,17 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
         return asUser()
                 .map(getMessage()::canDelete)
                 .orElse(false);
+    }
+
+    /**
+     * Gets the displayed color if the author was a User on a Server.
+     *
+     * @return The display color, if applicable.
+     */
+    default Optional<Color> getRoleColor() {
+        return getMessage()
+                .getServer()
+                .flatMap(server -> asUser().flatMap(server::getRoleColor));
     }
 
     /**
