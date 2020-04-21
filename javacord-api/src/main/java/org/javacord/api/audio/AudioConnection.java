@@ -4,6 +4,7 @@ import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.listener.audio.AudioConnectionAttachableListenerManager;
 
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -136,6 +137,27 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      * @param deafened Whether or not to self-deafen this connection.
      */
     void setSelfDeafened(boolean deafened);
+
+    /**
+     * Gets the priority speaker status of this connection.
+     *
+     * @return Whether or not the connection is priority speaking.
+     */
+    boolean isPrioritySpeaking();
+
+    /**
+     * Sets the priority speaker status of this connection.
+     *
+     * @param prioritySpeaking Whether or not to become a priority speaker.
+     */
+    void setPrioritySpeaking(boolean prioritySpeaking);
+
+    /**
+     * Gets the speaking flags of this connection.
+     *
+     * @return The current speaking flags of this connection.
+     */
+    EnumSet<SpeakingFlag> getSpeakingFlags();
 
     /**
      * Gets the server of the audio connection.

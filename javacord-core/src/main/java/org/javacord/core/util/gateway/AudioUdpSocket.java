@@ -142,7 +142,7 @@ public class AudioUdpSocket {
                     }
 
                     if (frame != null || framesOfSilenceToPlay > 0) {
-                        if (!speaking) {
+                        if (!speaking && frame != null) {
                             speaking = true;
                             connection.setSpeaking(true);
                         }
