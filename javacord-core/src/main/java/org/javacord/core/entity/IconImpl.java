@@ -5,6 +5,7 @@ import org.javacord.api.entity.Icon;
 import org.javacord.core.util.FileContainer;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -56,7 +57,13 @@ public class IconImpl implements Icon {
 
     @Override
     public CompletableFuture<InputStream> asInputStream() {
-        return new FileContainer(getUrl()).asInputStream((this).getApi());
+        CompletableFuture<InputStream> result = new CompletableFuture<>();
+        try {
+            result.complete(new FileContainer(getUrl()).asInputStream(getApi()));
+        } catch (IOException e) {
+            result.completeExceptionally(e);
+        }
+        return result;
     }
 
     @Override

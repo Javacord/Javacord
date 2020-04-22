@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -241,9 +243,9 @@ public class FileContainer {
                     || fileAsIcon != null
                     || fileAsUrl != null
                     || fileAsInputStream != null) {
-                asInputStream(api).thenApply(stream -> {
+                api.getThreadPool().getExecutorService().submit(() -> {
                     try (
-                            InputStream in = new BufferedInputStream(stream);
+                            InputStream in = new BufferedInputStream(asInputStream(api));
                             ByteArrayOutputStream out = new ByteArrayOutputStream()
                     ) {
                         byte[] buf = new byte[1024];
@@ -251,15 +253,9 @@ public class FileContainer {
                         while (-1 != (n = in.read(buf))) {
                             out.write(buf, 0, n);
                         }
-                        return out.toByteArray();
-                    } catch (IOException e) {
-                        throw new CompletionException(e);
-                    }
-                }).whenComplete((bytes, throwable) -> {
-                    if (throwable != null) {
-                        future.completeExceptionally(throwable);
-                    } else {
-                        future.complete(bytes);
+                        future.complete(out.toByteArray());
+                    } catch (Throwable t) {
+                        future.completeExceptionally(t);
                     }
                 });
                 return future;
@@ -276,50 +272,40 @@ public class FileContainer {
      *
      * @param api The discord api instance.
      * @return The input stream for the file.
+     * @throws IOException If an IO error occurs.
      */
-    public CompletableFuture<InputStream> asInputStream(DiscordApi api) {
-        CompletableFuture<InputStream> future = new CompletableFuture<>();
-        try {
-            if (fileAsBufferedImage != null) {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(fileAsBufferedImage, getFileType(), os);
-                future.complete(new ByteArrayInputStream(os.toByteArray()));
-                return future;
-            }
-            if (fileAsFile != null) {
-                future.complete(new FileInputStream(fileAsFile));
-                return future;
-            }
-            if (fileAsIcon != null || fileAsUrl != null) {
-                URL url = fileAsUrl == null ? fileAsIcon.getUrl() : fileAsUrl;
-                api.getThreadPool().getExecutorService().submit(() -> {
-                    try {
-                        logger.debug("Trying to download file from {}", url);
-                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                        conn.setRequestMethod("GET");
-                        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                        conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
-                        future.complete(conn.getInputStream());
-                        logger.debug("Downloaded file from {} (content length: {})", url, conn.getContentLength());
-                    } catch (Throwable t) {
-                        future.completeExceptionally(t);
-                    }
-                });
-                return future;
-            }
-            if (fileAsByteArray != null) {
-                future.complete(new ByteArrayInputStream(fileAsByteArray));
-                return future;
-            }
-            if (fileAsInputStream != null) {
-                future.complete(fileAsInputStream);
-                return future;
-            }
-            future.completeExceptionally(new IllegalStateException("No file variant is set"));
-        } catch (Throwable t) {
-            future.completeExceptionally(t);
+    public InputStream asInputStream(DiscordApi api) throws IOException {
+        if (fileAsBufferedImage != null) {
+            PipedOutputStream pos = new PipedOutputStream();
+            PipedInputStream pis = new PipedInputStream(pos);
+            api.getThreadPool().getExecutorService().submit(() -> {
+                try {
+                    ImageIO.write(fileAsBufferedImage, getFileType(), pos);
+                    pos.close();
+                } catch (Throwable t) {
+                    logger.error("Failed to process buffered image file!", t);
+                }
+            });
+            return pis;
         }
-        return future;
+        if (fileAsFile != null) {
+            return new FileInputStream(fileAsFile);
+        }
+        if (fileAsIcon != null || fileAsUrl != null) {
+            URL url = fileAsUrl == null ? fileAsIcon.getUrl() : fileAsUrl;
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            conn.setRequestProperty("User-Agent", Javacord.USER_AGENT);
+            return conn.getInputStream();
+        }
+        if (fileAsByteArray != null) {
+            return new ByteArrayInputStream(fileAsByteArray);
+        }
+        if (fileAsInputStream != null) {
+            return fileAsInputStream;
+        }
+        throw new IllegalStateException("No file variant is set");
     }
 
     /**
