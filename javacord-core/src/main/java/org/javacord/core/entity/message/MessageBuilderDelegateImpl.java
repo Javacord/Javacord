@@ -13,9 +13,11 @@ import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
+import org.javacord.core.entity.message.mention.AllowedMentionsImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -65,6 +67,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      * A list with all attachments which should be added to the message.
      */
     private final List<FileContainer> attachments = new ArrayList<>();
+
+    /**
+     * The MentionsBuilder used to control mention behavior.
+     */
+    private AllowedMentions allowedMentions = null;
 
     @Override
     public void appendCode(String language, String code) {
@@ -237,6 +244,14 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
+    public void setAllowedMentions(AllowedMentions allowedMentions) {
+        if (allowedMentions == null) {
+            throw new IllegalArgumentException("mention cannot be null!");
+        }
+        this.allowedMentions = allowedMentions;
+    }
+
+    @Override
     public void setNonce(String nonce) {
         this.nonce = nonce;
     }
@@ -270,6 +285,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 .put("content", toString() == null ? "" : toString())
                 .put("tts", tts);
         body.putArray("mentions");
+
+
+        if (allowedMentions != null) {
+            ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
+        }
         if (embed != null) {
             ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
         }

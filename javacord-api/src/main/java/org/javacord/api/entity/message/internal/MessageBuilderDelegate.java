@@ -8,6 +8,7 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 
 import java.awt.image.BufferedImage;
@@ -134,18 +135,21 @@ public interface MessageBuilderDelegate {
 
     /**
      * Adds a spoiler attachment to the message.
+     *
      * @param file The file to add as an attachment.
      */
     void addFileAsSpoiler(File file);
 
     /**
      * Adds a spoiler attachment to the message.
+     *
      * @param icon The icon to add as an attachment.
      */
     void addFileAsSpoiler(Icon icon);
 
     /**
      * Adds a spoiler attachment to the message.
+     *
      * @param url The url of the attachment.
      */
     void addFileAsSpoiler(URL url);
@@ -197,21 +201,31 @@ public interface MessageBuilderDelegate {
 
     /**
      * Adds a spoiler attachment to the message.
+     *
      * @param file The file to add as an attachment.
      */
     void addAttachmentAsSpoiler(File file);
 
     /**
      * Adds a spoiler attachment to the message.
+     *
      * @param icon The icon to add as an attachment.
      */
     void addAttachmentAsSpoiler(Icon icon);
 
     /**
      * Adds a spoiler attachment to the message.
+     *
      * @param url The url of the attachment.
      */
     void addAttachmentAsSpoiler(URL url);
+
+    /**
+     * Controls the mention behavior.
+     *
+     * @param allowedMentions The mention object to specify which mention should ping.
+     */
+    void setAllowedMentions(AllowedMentions allowedMentions);
 
     /**
      * Sets the nonce of the message.

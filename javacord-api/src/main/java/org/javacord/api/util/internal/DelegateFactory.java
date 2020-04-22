@@ -17,6 +17,7 @@ import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
+import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.internal.PermissionsBuilderDelegate;
@@ -95,6 +96,15 @@ public class DelegateFactory {
      */
     public static EmbedBuilderDelegate createEmbedBuilderDelegate() {
         return delegateFactoryDelegate.createEmbedBuilderDelegate();
+    }
+
+    /**
+     * Creates a new mention builder delegate.
+     *
+     * @return A new mention builder delegate.
+     */
+    public static AllowedMentionsBuilderDelegate createAllowedMentionsBuilderDelegate() {
+        return delegateFactoryDelegate.createAllowedMentionsBuilderDelegate();
     }
 
     /**
