@@ -41,6 +41,12 @@ dependencies { implementation 'org.javacord:javacord:$version' }
 </dependency>
 ```
 
+#### Sbt
+
+```scala
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "$version")
+```
+
 ### Optional Logger Dependency
 
 Any Log4j-2-compatible logging framework can be used to provide a more sophisticated logging experience
