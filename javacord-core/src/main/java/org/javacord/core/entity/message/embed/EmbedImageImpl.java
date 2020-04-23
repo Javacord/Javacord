@@ -2,11 +2,17 @@ package org.javacord.core.entity.message.embed;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedImage;
+import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link EmbedImage}.
@@ -69,6 +75,21 @@ public class EmbedImageImpl implements EmbedImage {
     @Override
     public int getWidth() {
         return width;
+    }
+
+    @Override
+    public CompletableFuture<BufferedImage> downloadAsBufferedImage(DiscordApi api) {
+        return new FileContainer(getUrl()).asBufferedImage(api);
+    }
+
+    @Override
+    public CompletableFuture<byte[]> downloadAsByteArray(DiscordApi api) {
+        return new FileContainer(getUrl()).asByteArray(api);
+    }
+
+    @Override
+    public InputStream downloadAsInputStream(DiscordApi api) throws IOException {
+        return new FileContainer(getUrl()).asInputStream(api);
     }
 
 }
