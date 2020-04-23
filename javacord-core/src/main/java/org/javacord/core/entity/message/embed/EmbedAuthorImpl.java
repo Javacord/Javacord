@@ -2,12 +2,19 @@ package org.javacord.core.entity.message.embed;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedAuthor;
+import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link EmbedAuthor}.
@@ -79,6 +86,25 @@ public class EmbedAuthorImpl implements EmbedAuthor {
             logger.warn("Seems like the embed author's proxy icon url is malformed! Please contact the developer!", e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<CompletableFuture<BufferedImage>> downloadIconAsBufferedImage(DiscordApi api) {
+        return getIconUrl().map(url -> new FileContainer(url).asBufferedImage(api));
+    }
+
+    @Override
+    public Optional<CompletableFuture<byte[]>> downloadIconAsByteArray(DiscordApi api) {
+        return getIconUrl().map(url -> new FileContainer(url).asByteArray(api));
+    }
+
+    @Override
+    public Optional<InputStream> downloadIconAsInputStream(DiscordApi api) throws IOException {
+        URL iconUrl = getIconUrl().orElse(null);
+        if (iconUrl == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new FileContainer(iconUrl).asInputStream(api));
     }
 
 }
