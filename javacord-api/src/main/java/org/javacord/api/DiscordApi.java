@@ -14,6 +14,7 @@ import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.UncachedMessageUtil;
@@ -41,6 +42,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -66,6 +68,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The prefixed, used token.
      */
     String getPrefixedToken();
+
+    /**
+     * Gets the intents used to receive some or all events specified in {@code Intent}.
+     *
+     * @return The intents for the events.
+     */
+    Set<Intent> getIntents();
 
     /**
      * Gets the thread pool which is internally used.

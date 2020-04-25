@@ -17,6 +17,7 @@ import org.javacord.api.Javacord;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.connection.LostConnectionEvent;
@@ -760,6 +761,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("$device", "Javacord")
                 .put("$referrer", "")
                 .put("$referring_domain", "");
+
+        data.put("intents", Intent.calculateBitmask(api.getIntents().toArray(new Intent[0])));
+
         if (api.getTotalShards() > 1) {
             data.putArray("shard").add(api.getCurrentShard()).add(api.getTotalShards());
         }
