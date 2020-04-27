@@ -249,7 +249,7 @@ public class MessageBuilder {
     }
 
     /**
-     * Adds a file to the message.
+     * Adds a file to the message and marks it as a spoiler.
      *
      * @param url The url of the attachment.
      * @return The current instance in order to chain call methods.
