@@ -2265,9 +2265,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return Whether the user can manage the role.
      */
     default boolean canManageRole(User user, Role target) {
-        return canManageRoles(user)
-                && getRoles().contains(target)
-                && getHighestRole(user).orElseGet(this::getEveryoneRole).compareTo(target) >= 0;
+        return target.getServer() == this
+                && (isOwner(user)
+                || (canManageRoles(user)
+                && getHighestRole(user).orElseGet(this::getEveryoneRole).compareTo(target) >= 0));
     }
 
     /**
