@@ -26,6 +26,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
+import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
 import org.javacord.api.util.ratelimit.Ratelimiter;
 
@@ -41,6 +42,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /**
@@ -752,6 +754,42 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default CompletableFuture<Message> getMessageById(String id, TextChannel channel) {
         return channel.getMessageById(id);
+    }
+
+    /**
+     * Gets a message by its link.
+     *
+     * @param link The link of the message.
+     * @return The message with the given link.
+     * @throws IllegalArgumentException If the link isn't valid.
+     */
+    default Optional<CompletableFuture<Message>> getMessageByLink(String link) throws IllegalArgumentException {
+        Matcher matcher = DiscordRegexPattern.MESSAGE_LINK.matcher(link);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("The message link has an invalid format");
+        }
+
+        return getTextChannelById(matcher.group("channel"))
+                .map(textChannel -> textChannel.getMessageById(matcher.group("message")));
+    }
+
+    /**
+     * Gets a cached message by its link.
+     *
+     * @param link The link of the message.
+     * @return The cached message with the given link.
+     * @throws IllegalArgumentException If the link isn't valid.
+     */
+    default Optional<Message> getCachedMessageByLink(String link) throws IllegalArgumentException {
+        Matcher matcher = DiscordRegexPattern.MESSAGE_LINK.matcher(link);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("The message link has an invalid format");
+        }
+
+        return getCachedMessageById(matcher.group("message"))
+                .filter(message -> message.getChannel().getIdAsString().equals(matcher.group("channel")));
     }
 
     /**
