@@ -689,6 +689,20 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     *  Gets the link leading to this message.
+     *
+     * @return The message link.
+     */
+    default String getLink() {
+        return "https://discordapp.com/channels/"
+                + getServer().map(DiscordEntity::getIdAsString).orElse("@me")
+                + "/"
+                + getChannel().getIdAsString()
+                + "/"
+                + getIdAsString();
+    }
+
+    /**
      * Gets a list of all custom emojis in the message.
      *
      * @return The list of custom emojis in the message.

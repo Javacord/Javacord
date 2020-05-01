@@ -89,4 +89,13 @@ public interface CertainMessageEvent extends MessageEvent {
         return getMessage().getReadableContent();
     }
 
+    /**
+     * Gets the link of the event's message.
+     *
+     * @return The link of the event's message.
+     * @see Message#getLink()
+     */
+    default String getMessageLink() {
+        return getMessage().getLink();
+    }
 }

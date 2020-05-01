@@ -59,4 +59,13 @@ public interface OptionalMessageEvent extends MessageEvent {
         return getMessage().map(Message::getReadableContent);
     }
 
+    /**
+     * Gets the link of the event's message.
+     *
+     * @return The link of the event's message.
+     * @see Message#getLink()
+     */
+    default Optional<String> getMessageLink() {
+        return getMessage().map(Message::getLink);
+    }
 }
