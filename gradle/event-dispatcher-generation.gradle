@@ -106,6 +106,8 @@ project(':javacord-core') {
                     typeSolver.solveType('org.javacord.api.listener.user.UserAttachableListener')
             def messageAttachableListener =
                     typeSolver.solveType('org.javacord.api.listener.message.MessageAttachableListener')
+            def webhookAttachableListener =
+                    typeSolver.solveType('org.javacord.api.listener.webhook.WebhookAttachableListener')
 
             javacordApi.sourceSets.main.allJava.matching {
                 include 'org/javacord/api/listener/**/*Listener.java'
@@ -160,18 +162,32 @@ project(':javacord-core') {
                     def objectClass = objectClassByAttachableListenerManager."${it.name}Manager"
                     eventDispatcherFile.addImport objectClass.qualifiedName
                     def objectClassName = objectClass.name
-                    def objectClassVariableName = "${objectClassName.uncapitalize()}"
+                    def objectClassVariableName = objectClassName.uncapitalize()
 
-                    method.addParameter "Collection<${objectClassName}>", "${objectClassVariableName}s"
-                    method.javadocComment = method.javadocComment.orElseThrow { new AssertionError() }.content +
-                            "\n@param ${objectClassVariableName}s The {@code $objectClassName}s."
-                    body.addStatement """
-                        if (${objectClassVariableName}s != null) {
-                            ${objectClassVariableName}s.stream()
-                                .map(${objectClassName}::get${listener.name}s)
-                                .forEach(listeners::addAll);
-                        }
-                    """
+                    if (it == webhookAttachableListener) {
+                        method.addParameter "Collection<Long>", "webhookIds"
+                        method.javadocComment = method.javadocComment.orElseThrow { new AssertionError() }.content +
+                                "\n@param webhookIds The ids of the {@link Webhook}s."
+                        body.addStatement """
+                            if (webhookIds != null) {
+                                webhookIds.stream()
+                                    .map(webhookId -> getApi().getObjectListeners(
+                                            Webhook.class, webhookId, ${listener.name}.class))
+                                    .forEach(listeners::addAll);
+                            }
+                        """
+                    } else {
+                        method.addParameter "Collection<${objectClassName}>", "${objectClassVariableName}s"
+                        method.javadocComment = method.javadocComment.orElseThrow { new AssertionError() }.content +
+                                "\n@param ${objectClassVariableName}s The {@code $objectClassName}s."
+                        body.addStatement """
+                            if (${objectClassVariableName}s != null) {
+                                ${objectClassVariableName}s.stream()
+                                    .map(${objectClassName}::get${listener.name}s)
+                                    .forEach(listeners::addAll);
+                            }
+                        """
+                    }
 
                     def objectMethods = [singletonMethod]
                     def objectBodies = [singletonBody]
@@ -197,6 +213,18 @@ project(':javacord-core') {
                         objectBodies*.addStatement """
                             listeners.addAll(
                                     MessageAttachableListenerManager.get${listener.name}s(getApi(), messageId));
+                        """
+                    } else if (it == webhookAttachableListener) {
+                        objectMethods*.addParameter Long, 'webhookId'
+                        objectMethods.each {
+                            it.javadocComment = it.javadocComment.orElseThrow { new AssertionError() }.content +
+                                    "\n@param webhookId The id of the {@link Webhook}."
+                        }
+                        objectBodies*.addStatement """
+                            if (webhookId != null) {
+                                listeners.addAll(getApi().getObjectListeners(
+                                        Webhook.class, webhookId, ${listener.name}.class));
+                            }
                         """
                     } else {
                         objectMethods*.addParameter objectClassName, objectClassVariableName

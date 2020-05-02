@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.core.event.message.MessageCreateEventImpl;
@@ -33,11 +34,13 @@ public class MessageCreateHandler extends PacketHandler {
             MessageCreateEvent event = new MessageCreateEventImpl(message);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+            MessageAuthor author = message.getAuthor();
             api.getEventDispatcher().dispatchMessageCreateEvent(
                     optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                     optionalServer.orElse(null),
                     channel,
-                    message.getUserAuthor().orElse(null),
+                    author.asUser().orElse(null),
+                    author.isWebhook() ? author.getId() : null,
                     event);
         });
     }

@@ -6,13 +6,14 @@ import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.channel.TextChannelAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
 import org.javacord.api.listener.user.UserAttachableListener;
+import org.javacord.api.listener.webhook.WebhookAttachableListener;
 
 /**
  * This listener listens to message creations.
  */
 @FunctionalInterface
 public interface MessageCreateListener extends ServerAttachableListener, UserAttachableListener,
-        TextChannelAttachableListener, GloballyAttachableListener,
+        WebhookAttachableListener, TextChannelAttachableListener, GloballyAttachableListener,
         ObjectAttachableListener {
 
     /**
