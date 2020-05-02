@@ -12,8 +12,10 @@ import org.javacord.core.listener.audio.InternalAudioConnectionAttachableListene
 import org.javacord.core.util.gateway.AudioWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -222,7 +224,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      * @param speaking The speaking mode to set
      */
     public void setSpeaking(boolean speaking) {
-        EnumSet<SpeakingFlag> newSpeakingFlags = getSpeakingFlags();
+        EnumSet<SpeakingFlag> newSpeakingFlags = speakingFlags.clone();
         if (speaking) {
             newSpeakingFlags.add(SpeakingFlag.SPEAKING);
         } else {
@@ -246,7 +248,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      * @param prioritySpeaking Whether or not to speak with priority.
      */
     public void setPrioritySpeaking(boolean prioritySpeaking) {
-        EnumSet<SpeakingFlag> newSpeakingFlags = getSpeakingFlags();
+        EnumSet<SpeakingFlag> newSpeakingFlags = speakingFlags.clone();
         if (prioritySpeaking) {
             newSpeakingFlags.add(SpeakingFlag.PRIORITY_SPEAKER);
         } else {
@@ -260,11 +262,11 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      *
      * @return The current set of active speaking flags.
      */
-    public EnumSet<SpeakingFlag> getSpeakingFlags() {
-        return speakingFlags;
+    public Set<SpeakingFlag> getSpeakingFlags() {
+        return Collections.unmodifiableSet(speakingFlags);
     }
 
-    /**
+    /**M
      * Sets the current speaking flags and sends a speaking packet if they have changed.
      *
      * @param speakingFlags The new speaking flags to set.
