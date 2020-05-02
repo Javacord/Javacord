@@ -356,7 +356,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<User> getMemberByDiscriminatedName(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return (nameAndDiscriminator.length > 1) 
-            ? getMemberByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]) : Optional.empty();
+            ? getMemberByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1]) 
+            : Optional.empty();
     }
 
     /**
@@ -369,7 +370,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<User> getMemberByDiscriminatedNameIgnoreCase(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return (nameAndDiscriminator.length > 1) 
-            ? getMemberByDiscriminatedNameIgnoreCase(nameAndDiscriminator[0], nameAndDiscriminator[1]) : Optional.empty();
+            ? getMemberByDiscriminatedNameIgnoreCase(nameAndDiscriminator[0], nameAndDiscriminator[1]) 
+            : Optional.empty();
     }
 
     /**
