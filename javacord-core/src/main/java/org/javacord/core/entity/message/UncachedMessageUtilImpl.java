@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.UncachedMessageUtil;
@@ -267,7 +268,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     public CompletableFuture<Void> addReaction(long channelId, long messageId, Emoji emoji) {
         String value = emoji.asUnicodeEmoji().orElseGet(() ->
                 emoji.asCustomEmoji()
-                        .map(e -> e.getName() + ":" + e.getIdAsString())
+                        .map(CustomEmoji::getReactionTag)
                         .orElse("UNKNOWN")
         );
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.REACTION)
@@ -346,7 +347,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
         api.getThreadPool().getExecutorService().submit(() -> {
             try {
                 final String value = emoji.asUnicodeEmoji().orElseGet(() -> emoji.asCustomEmoji()
-                        .map(e -> e.getName() + ":" + e.getIdAsString()).orElse("UNKNOWN"));
+                        .map(CustomEmoji::getReactionTag).orElse("UNKNOWN"));
                 List<User> users = new ArrayList<>();
                 boolean requestMore = true;
                 while (requestMore) {
@@ -390,7 +391,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     @Override
     public CompletableFuture<Void> removeUserReactionByEmoji(long channelId, long messageId, Emoji emoji, User user) {
         String value = emoji.asUnicodeEmoji().orElseGet(() ->
-                emoji.asCustomEmoji().map(e -> e.getName() + ":" + e.getIdAsString()).orElse("UNKNOWN"));
+                emoji.asCustomEmoji().map(CustomEmoji::getReactionTag).orElse("UNKNOWN"));
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
                 .setUrlParameters(
                         Long.toUnsignedString(channelId),

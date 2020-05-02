@@ -21,9 +21,18 @@ public interface CustomEmoji extends DiscordEntity, Nameable,  Emoji, UpdatableF
      */
     Icon getImage();
 
+    /**
+     * Gets the tag used to add a reaction with the emoji.
+     *
+     * @return The tag used to add a reaction with the emoji.
+     */
+    default String getReactionTag() {
+        return getName() + ":" + getIdAsString();
+    }
+
     @Override
     default String getMentionTag() {
-        return "<" + (isAnimated() ? "a" : "") + ":" + getName() + ":" + getIdAsString() + ">";
+        return "<" + (isAnimated() ? "a" : "") + ":" + getReactionTag() + ">";
     }
 
     @Override
