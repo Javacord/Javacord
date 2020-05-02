@@ -64,6 +64,14 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     Collection<User> getUsers();
 
     /**
+     * Checks whether the specified users has this role.
+     *
+     * @param user the user to check
+     * @return true if the user has this role; false otherwise
+     */
+    boolean hasUser(User user);
+
+    /**
      * Gets the permissions of the role.
      *
      * @return The permissions of the role.
