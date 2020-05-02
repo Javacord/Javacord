@@ -4,8 +4,8 @@ import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.listener.audio.AudioConnectionAttachableListenerManager;
 
-import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface AudioConnection extends AudioConnectionAttachableListenerManager {
@@ -157,7 +157,7 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      *
      * @return The current speaking flags of this connection.
      */
-    EnumSet<SpeakingFlag> getSpeakingFlags();
+    Set<SpeakingFlag> getSpeakingFlags();
 
     /**
      * Gets the server of the audio connection.
