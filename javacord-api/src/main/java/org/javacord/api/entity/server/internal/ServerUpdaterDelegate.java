@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -241,6 +242,111 @@ public interface ServerUpdaterDelegate {
      * Queues the splash to be removed.
      */
     void removeSplash();
+
+    /**
+     * Queues the banner to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param banner The new banner of the server.
+     */
+    void setBanner(BufferedImage banner);
+
+    /**
+     * Queues the banner to be updated.
+     *
+     * @param banner The new banner of the server.
+     * @param fileType The type of the banner, e.g. "png" or "jpg".
+     */
+    void setBanner(BufferedImage banner, String fileType);
+
+    /**
+     * Queues the banner to be updated.
+     *
+     * @param banner The new banner of the server.
+     */
+    void setBanner(File banner);
+
+    /**
+     * Queues the banner to be updated.
+     *
+     * @param banner The new banner of the server.
+     */
+    void setBanner(Icon banner);
+
+    /**
+     * Queues the banner to be updated.
+     *
+     * @param banner The new banner of the server.
+     */
+    void setBanner(URL banner);
+
+    /**
+     * Queues the banner to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param banner The new banner of the server.
+     */
+    void setBanner(byte[] banner);
+
+    /**
+     * Queues the banner to be updated.
+     *
+     * @param banner The new banner of the server.
+     * @param fileType The type of the banner, e.g. "png" or "jpg".
+     */
+    void setBanner(byte[] banner, String fileType);
+
+    /**
+     * Queues the banner to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param banner The new banner of the server.
+     */
+    void setBanner(InputStream banner);
+
+    /**
+     * Queues the banner to be updated.
+     *
+     * @param banner The new banner of the server.
+     * @param fileType The type of the banner, e.g. "png" or "jpg".
+     */
+    void setBanner(InputStream banner, String fileType);
+
+    /**
+     * Queues the banner to be removed.
+     */
+    void removeBanner();
+
+    /**
+     * Queues the rules channel to be updated.
+     *
+     * @param rulesChannel The new rules channel of the server.
+     */
+    void setRulesChannel(ServerTextChannel rulesChannel);
+
+    /**
+     * Queues the rules channel to be removed.
+     */
+    void removeRulesChannel();
+
+    /**
+     * Queues the moderators-only channel to be updated.
+     *
+     * @param moderatorsOnlyChannel The new moderators-only channel of the server.
+     */
+    void setModeratorsOnlyChannel(ServerTextChannel moderatorsOnlyChannel);
+
+    /**
+     * Queues the moderators-only channel to be removed.
+     */
+    void removeModeratorsOnlyChannel();
+
+    /**
+     * Queues the locale of a "PUBLIC" server to be updated.
+     *
+     * @param locale The new locale of the public server
+     */
+    void setPreferredLocale(Locale locale);
 
     /**
      * Queues the system channel to be updated.

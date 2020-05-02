@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -154,6 +155,46 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
      * Whether the system channel should be updated or not.
      */
     private boolean updateSystemChannel = false;
+
+    /**
+     * The banner to update.
+     */
+    private FileContainer banner = null;
+
+    /**
+     * Whether the banner should be updated or not.
+     */
+    private boolean updateBanner = false;
+
+    /**
+     * The rules channel to update.
+     */
+    private ServerChannel rulesChannel = null;
+
+    /**
+     * Whether the rules channel should be updated or not.
+     */
+    private boolean updateRulesChannel = false;
+
+    /**
+     * The moderators-only channel to update.
+     */
+    private ServerChannel moderatorsOnlyChannel = null;
+
+    /**
+     * Whether the moderators-only channel should be updated or not.
+     */
+    private boolean updateModeratorsOnlyChannel = false;
+
+    /**
+     * The locale to be updated.
+     */
+    private Locale locale = null;
+
+    /**
+     * Whether the locale should be updated or not.
+     */
+    private boolean updateLocale = false;
 
     /**
      * Creates a new server updater delegate.
@@ -334,6 +375,94 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     public void removeSplash() {
         splash = null;
         updateSplash = true;
+    }
+
+    @Override
+    public void setBanner(BufferedImage banner) {
+        this.banner = (banner == null) ? null : new FileContainer(banner, "png");
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(BufferedImage banner, String fileType) {
+        this.banner = (banner == null) ? null : new FileContainer(banner, fileType);
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(File banner) {
+        this.banner = (banner == null) ? null : new FileContainer(banner);
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(Icon banner) {
+        this.banner = (banner == null) ? null : new FileContainer(banner);
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(URL banner) {
+        this.banner = (banner == null) ? null : new FileContainer(banner);
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(byte[] banner) {
+        this.banner = (banner == null) ? null : new FileContainer(banner, "png");
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(byte[] banner, String fileType) {
+        this.banner = (banner == null) ? null : new FileContainer(banner, fileType);
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(InputStream banner) {
+        this.banner = (banner == null) ? null : new FileContainer(banner, "png");
+        updateBanner = true;
+    }
+
+    @Override
+    public void setBanner(InputStream banner, String fileType) {
+        this.banner = (banner == null) ? null : new FileContainer(banner, fileType);
+        updateBanner = true;
+    }
+
+    @Override
+    public void removeBanner() {
+        banner = null;
+        updateBanner = true;
+    }
+
+    @Override
+    public void setRulesChannel(ServerTextChannel rulesChannel) {
+        this.rulesChannel = rulesChannel;
+        updateRulesChannel = true;
+    }
+
+    @Override
+    public void removeRulesChannel() {
+        setRulesChannel(null);
+    }
+
+    @Override
+    public void setModeratorsOnlyChannel(ServerTextChannel moderatorsOnlyChannel) {
+        this.moderatorsOnlyChannel = moderatorsOnlyChannel;
+        updateModeratorsOnlyChannel = true;
+    }
+
+    @Override
+    public void removeModeratorsOnlyChannel() {
+        setModeratorsOnlyChannel(null);
+    }
+
+    @Override
+    public void setPreferredLocale(Locale locale) {
+        this.locale = locale;
+        updateLocale = true;
     }
 
     @Override
@@ -539,9 +668,39 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
             }
             patchServer = true;
         }
+        if (updateModeratorsOnlyChannel) {
+            if (moderatorsOnlyChannel != null) {
+                body.put("public_updates_channel_id", moderatorsOnlyChannel.getIdAsString());
+            } else {
+                body.putNull("public_updates_channel_id");
+            }
+            patchServer = true;
+        }
+        if (updateRulesChannel) {
+            if (rulesChannel != null) {
+                body.put("rules_channel_id", rulesChannel.getIdAsString());
+            } else {
+                body.putNull("rules_channel_id");
+            }
+            patchServer = true;
+        }
+        if (updateBanner) {
+            if (banner == null) {
+                body.putNull("banner");
+            }
+            patchServer = true;
+        }
+        if (updateLocale) {
+            if (locale == null) {
+                body.putNull("preferred_locale");
+            } else {
+                body.put("preferred_locale", locale.toLanguageTag());
+            }
+            patchServer = true;
+        }
         // Only make a REST call, if we really want to update something
         if (patchServer) {
-            if (icon != null || splash != null) {
+            if (icon != null || splash != null || banner != null) {
                 CompletableFuture<Void> iconFuture = null;
                 if (icon != null) {
                     iconFuture = icon.asByteArray(server.getApi()).thenAccept(bytes -> {
@@ -558,14 +717,27 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
                         body.put("splash", base64Splash);
                     });
                 }
-                CompletableFuture<Void> future;
-                if (iconFuture == null) {
-                    future = splashFuture;
-                } else if (splashFuture == null) {
-                    future = iconFuture;
-                } else {
-                    future = CompletableFuture.allOf(splashFuture, iconFuture);
+                CompletableFuture<Void> bannerFuture = null;
+                if (banner != null) {
+                    bannerFuture = banner.asByteArray(server.getApi()).thenAccept(bytes -> {
+                        String base64Banner = "data:image/" + banner.getFileType() + ";base64,"
+                                + Base64.getEncoder().encodeToString(bytes);
+                        body.put("banner", base64Banner);
+                    });
                 }
+                CompletableFuture<Void> future;
+                List<CompletableFuture<Void>> futureList = new ArrayList<>();
+                if (iconFuture != null) {
+                    futureList.add(iconFuture);
+                }
+                if (splashFuture != null) {
+                    futureList.add(splashFuture);
+                }
+                if (bannerFuture != null) {
+                    futureList.add(bannerFuture);
+                }
+                future = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()]));
+
                 tasks.add(future.thenCompose(
                         aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                         .setUrlParameters(server.getIdAsString())

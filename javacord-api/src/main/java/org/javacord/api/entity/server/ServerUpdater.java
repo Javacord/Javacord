@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -275,7 +276,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      *
      * @param splash The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
@@ -287,7 +288,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      *
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
@@ -298,7 +299,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      *
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
@@ -309,7 +310,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      *
      * @param splash The new splash of the server.
      * @return The current instance in order to chain call methods.
@@ -320,7 +321,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      * This method assumes the file type is "png"!
      *
      * @param splash The new splash of the server.
@@ -332,7 +333,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      *
      * @param splash The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
@@ -344,7 +345,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      * This method assumes the file type is "png"!
      *
      * @param splash The new splash of the server.
@@ -356,7 +357,7 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be updated.
+     * Queues the splash to be updated. Requires {@link ServerFeature#INVITE_SPLASH}.
      *
      * @param splash The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
@@ -368,12 +369,180 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues the splash to be removed.
+     * Queues the splash to be removed. Requires {@link ServerFeature#INVITE_SPLASH}.
      *
      * @return The current instance in order to chain call methods.
      */
     public ServerUpdater removeSplash() {
         delegate.removeSplash();
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     * This method assumes the file type is "png"!
+     *
+     * @param banner The new banner of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(BufferedImage banner) {
+        delegate.setBanner(banner);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     *
+     * @param banner The new banner of the server.
+     * @param fileType The type of the banner, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(BufferedImage banner, String fileType) {
+        delegate.setBanner(banner, fileType);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     *
+     * @param banner The new banner of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(File banner) {
+        delegate.setBanner(banner);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     *
+     * @param banner The new banner of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(Icon banner) {
+        delegate.setBanner(banner);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     *
+     * @param banner The new banner of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(URL banner) {
+        delegate.setBanner(banner);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     * This method assumes the file type is "png"!
+     *
+     * @param banner The new banner of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(byte[] banner) {
+        delegate.setBanner(banner);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     *
+     * @param banner The new banner of the server.
+     * @param fileType The type of the banner, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(byte[] banner, String fileType) {
+        delegate.setBanner(banner, fileType);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     * This method assumes the file type is "png"!
+     *
+     * @param banner The new banner of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(InputStream banner) {
+        delegate.setBanner(banner);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be updated. Requires {@link ServerFeature#BANNER}.
+     *
+     * @param banner The new banner of the server.
+     * @param fileType The type of the banner, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setBanner(InputStream banner, String fileType) {
+        delegate.setBanner(banner, fileType);
+        return this;
+    }
+
+    /**
+     * Queues the banner to be removed. Requires {@link ServerFeature#BANNER}.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeBanner() {
+        delegate.removeBanner();
+        return this;
+    }
+
+    /**
+     * Queues the rules channel to be updated. Server has to be "PUBLIC".
+     *
+     * @param rulesChannel The new rules channel of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setRulesChannel(ServerTextChannel rulesChannel) {
+        delegate.setRulesChannel(rulesChannel);
+        return this;
+    }
+
+    /**
+     * Queues the rules channel to be removed. Server has to be "PUBLIC".
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeRulesChannel() {
+        delegate.removeRulesChannel();
+        return this;
+    }
+
+    /**
+     * Queues the moderators-only channel to be updated. Server has to be "PUBLIC".
+     *
+     * @param moderatorsOnlyChannel The new moderators-only channel of the server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setModeratorsOnlyChannel(ServerTextChannel moderatorsOnlyChannel) {
+        delegate.setModeratorsOnlyChannel(moderatorsOnlyChannel);
+        return this;
+    }
+
+    /**
+     * Queues the moderators-only channel to be removed. Server has to be "PUBLIC".
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeModeratorsOnlyChannel() {
+        delegate.removeModeratorsOnlyChannel();
+        return this;
+    }
+
+    /**
+     * Queues the preferred locale of a public guild to be updated.
+     *
+     * @param locale The preferred locale of the public server.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setPreferredLocale(Locale locale) {
+        delegate.setPreferredLocale(locale);
         return this;
     }
 
