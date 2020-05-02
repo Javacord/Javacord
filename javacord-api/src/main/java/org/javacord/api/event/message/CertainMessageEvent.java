@@ -5,6 +5,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
 
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -89,4 +90,13 @@ public interface CertainMessageEvent extends MessageEvent {
         return getMessage().getReadableContent();
     }
 
+    /**
+     * Gets the link of the event's message.
+     *
+     * @return The link of the event's message.
+     * @see Message#getLink()
+     */
+    default URL getMessageLink() {
+        return getMessage().getLink();
+    }
 }

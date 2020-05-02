@@ -20,6 +20,8 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -686,6 +688,25 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             customEmoji.reset(content);
         }
         return ESCAPED_CHARACTER.matcher(content).replaceAll("${char}");
+    }
+
+    /**
+     *  Gets the link leading to this message.
+     *
+     * @return The message link.
+     * @throws AssertionError If the link is malformed.
+     */
+    default URL getLink() throws AssertionError {
+        try {
+            return new URL("https://discordapp.com/channels/"
+                    + getServer().map(DiscordEntity::getIdAsString).orElse("@me")
+                    + "/"
+                    + getChannel().getIdAsString()
+                    + "/"
+                    + getIdAsString());
+        } catch (MalformedURLException e) {
+            throw new AssertionError("Message link is malformed", e);
+        }
     }
 
     /**
