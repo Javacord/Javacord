@@ -40,7 +40,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     private final boolean requiresColons;
 
     /**
-     * Whether this emojiis managed or not.
+     * Whether this emoji is managed or not.
      */
     private final boolean managed;
 
