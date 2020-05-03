@@ -32,7 +32,7 @@ public class InviteImpl implements RichInvite {
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(IconImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(InviteImpl.class);
 
     /**
      * The discord api instance.
