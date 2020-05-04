@@ -6,6 +6,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.channel.Categorizable;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
@@ -65,6 +66,16 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
      * @return The avatar of the author.
      */
     Icon getAvatar();
+
+    /**
+     * Gets the voice channel this MessageAuthor (if it is an User)
+     * is connected to on the server where the message has been sent.
+     *
+     * @return The server voice channel the MessageAuthor is connected to.
+     */
+    default Optional<ServerVoiceChannel> getConnectedVoiceChannel() {
+        return getMessage().getServer().flatMap(server -> server.getConnectedVoiceChannel(getId()));
+    }
 
     /**
      * Checks if the author of the message is a user.
