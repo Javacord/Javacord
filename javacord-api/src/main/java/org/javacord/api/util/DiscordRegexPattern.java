@@ -78,18 +78,18 @@ public class DiscordRegexPattern {
                             + ">                   # '>' \n");
 
     /**
-     * A pattern which checks for message links (e.g. {@code https://discordapp.com/channels/@me/1234/5678}
+     * A pattern which checks for message links (e.g. {@code https://discord.com/channels/@me/1234/5678}
      */
     public static final Pattern MESSAGE_LINK =
-            Pattern.compile("(?x)                             # enable comment mode \n"
-                            + "(?i)                           # ignore case \n"
-                            + "(?:https?+://)?+               # 'https://' or 'http://' or '' \n"
-                            + "\\Qdiscordapp.com/channels/\\E # 'discordapp.com/channels/' \n"
-                            + "(?:(?<server>[0-9]++)|@me)     # '@me' or the server id as named group \n"
-                            + "/                              # '/' \n"
-                            + "(?<channel>[0-9]++)            # the textchannel id as named group \n"
-                            + "/                              # '/' \n"
-                            + "(?<message>[0-9]++)            # the message id as named group \n");
+            Pattern.compile("(?x)                               # enable comment mode \n"
+                            + "(?i)                             # ignore case \n"
+                            + "(?:https?+://)?+                 # 'https://' or 'http://' or '' \n"
+                            + "discord(?:app)?+\\.com/channels/ # 'discord(app).com/channels/' \n"
+                            + "(?:(?<server>[0-9]++)|@me)       # '@me' or the server id as named group \n"
+                            + "/                                # '/' \n"
+                            + "(?<channel>[0-9]++)              # the textchannel id as named group \n"
+                            + "/                                # '/' \n"
+                            + "(?<message>[0-9]++)              # the message id as named group \n");
 
     /**
      * You are not meant to create instances of this class.

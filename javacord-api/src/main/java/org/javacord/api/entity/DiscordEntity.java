@@ -14,7 +14,7 @@ public interface DiscordEntity {
      *
      * @param entityId The entity it to calculate from.
      * @return The creation date of the Discord entity.
-     * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
+     * @see <a href="https://discord.com/developers/docs/reference#snowflake-ids">Discord docs</a>
      */
     static Instant getCreationTimestamp(long entityId) {
         // The first 42 bits (of the total 64) are the timestamp
@@ -26,7 +26,7 @@ public interface DiscordEntity {
      * Gets the creation date of the Discord entity, calculated from the id.
      *
      * @return The creation date of the Discord entity.
-     * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
+     * @see <a href="https://discord.com/developers/docs/reference#snowflake-ids">Discord docs</a>
      */
     default Instant getCreationTimestamp() {
         return getCreationTimestamp(getId());
@@ -43,7 +43,7 @@ public interface DiscordEntity {
      * Gets the id of Discord entity.
      *
      * @return The id of Discord entity.
-     * @see <a href="https://discordapp.com/developers/docs/reference#snowflake-ids">Discord docs</a>
+     * @see <a href="https://discord.com/developers/docs/reference#snowflake-ids">Discord docs</a>
      */
     long getId();
 

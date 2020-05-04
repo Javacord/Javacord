@@ -3,6 +3,7 @@ package org.javacord.core.entity.server.invite;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -203,7 +204,7 @@ public class InviteImpl implements RichInvite {
         }
         try {
             return Optional.of(new IconImpl(
-                    api, new URL("https://cdn.discordapp.com/icons/"
+                    api, new URL("https://" + Javacord.DISCORD_CDN_DOMAIN + "/icons/"
                                  + Long.toUnsignedString(getServerId()) + "/" + serverIcon + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
@@ -218,7 +219,7 @@ public class InviteImpl implements RichInvite {
         }
         try {
             return Optional.of(new IconImpl(
-                    api, new URL("https://cdn.discordapp.com/splashes/"
+                    api, new URL("https://" + Javacord.DISCORD_CDN_DOMAIN + "/splashes/"
                                  + Long.toUnsignedString(getServerId()) + "/" + serverSplash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);

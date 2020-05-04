@@ -46,7 +46,7 @@ public enum RestEndpoint {
     CUSTOM_EMOJI("/guilds/%s/emojis", 0);
 
     /**
-     * The endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
+     * The endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix".
      */
     private final String endpointUrl;
 
@@ -107,7 +107,7 @@ public enum RestEndpoint {
     }
 
     /**
-     * Gets the endpoint url (only including the base, not the https://discordapp.com/api/vXYZ/ "prefix".
+     * Gets the endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix".
      *
      * @return The gateway url.
      */
@@ -153,7 +153,8 @@ public enum RestEndpoint {
      * @return The full url of the endpoint.
      */
     public String getFullUrl(String... parameters) {
-        StringBuilder url = new StringBuilder("https://discordapp.com/api/v" + Javacord.DISCORD_API_VERSION + getEndpointUrl());
+        StringBuilder url = new StringBuilder(
+                "https://" + Javacord.DISCORD_DOMAIN + "/api/v" + Javacord.DISCORD_API_VERSION + getEndpointUrl());
         url = new StringBuilder(String.format(url.toString(), (Object[]) parameters));
         int parameterAmount = getEndpointUrl().split("%s").length - (getEndpointUrl().endsWith("%s") ? 0 : 1);
         if (parameters.length > parameterAmount) {

@@ -32,6 +32,16 @@ public class Javacord {
     public static final Instant BUILD_TIMESTAMP;
 
     /**
+     * The domain of Discord.
+     */
+    public static final String DISCORD_DOMAIN = "discord.com";
+
+    /**
+     * The domain of Discord's CDN.
+     */
+    public static final String DISCORD_CDN_DOMAIN = "cdn.discordapp.com";
+
+    /**
      * The display version of the current Javacord version.
      * If the current Javacord version is a release version, it is equal to {@link #VERSION}.
      * If the current Javacord version is a snapshot version, it consists of the {@link #VERSION}, the
@@ -98,14 +108,14 @@ public class Javacord {
     /**
      * The gateway version from Discord which we are using.
      * A list with all gateway versions can be found
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#gateways-gateway-versions">here</a>.
+     * <a href="https://discord.com/developers/docs/topics/gateway#gateways-gateway-versions">here</a>.
      */
     public static final String DISCORD_GATEWAY_VERSION = "6";
 
     /**
      * The API version from Discord which we are using.
      * A list with all API versions can be found
-     * <a href="https://discordapp.com/developers/docs/reference#api-versioning-api-versions">here</a>.
+     * <a href="https://discord.com/developers/docs/reference#api-versioning-api-versions">here</a>.
      */
     public static final String DISCORD_API_VERSION = "6";
 

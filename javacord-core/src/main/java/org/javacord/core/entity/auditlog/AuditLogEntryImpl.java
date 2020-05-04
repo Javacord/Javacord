@@ -3,6 +3,7 @@ package org.javacord.core.entity.auditlog;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
@@ -140,10 +141,12 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         break;
                     // Misc
                     case ICON:
-                        change = iconChange("https://cdn.discordapp.com/icons/", type, oldValue, newValue);
+                        change = iconChange(
+                                "https://" + Javacord.DISCORD_CDN_DOMAIN + "/icons/", type, oldValue, newValue);
                         break;
                     case SPLASH:
-                        change = iconChange("https://cdn.discordapp.com/splashes/", type, oldValue, newValue);
+                        change = iconChange(
+                                "https://" + Javacord.DISCORD_CDN_DOMAIN + "/splashes/", type, oldValue, newValue);
                         break;
                     case REGION:
                         Region oldRegion = Region.getRegionByKey(oldValue != null ? oldValue.asText() : "");
@@ -203,7 +206,7 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         change = new AuditLogChangeImpl<>(type, oldPermissions, newPermissions);
                         break;
                     case AVATAR:
-                        baseUrl = "https://cdn.discordapp.com/avatars/"
+                        baseUrl = "https://" + Javacord.DISCORD_CDN_DOMAIN + "/avatars/"
                                 + getTarget().map(DiscordEntity::getIdAsString).orElse("0") + "/";
                         String oldUrl = oldValue != null ? (baseUrl + oldValue.asText()
                                 + (oldValue.asText().startsWith("a_") ? ".gif" : ".png")) : null;

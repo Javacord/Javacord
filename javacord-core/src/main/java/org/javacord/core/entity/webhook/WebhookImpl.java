@@ -3,6 +3,7 @@ package org.javacord.core.entity.webhook;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.TextChannel;
@@ -104,7 +105,7 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
     @Override
     public Optional<Icon> getAvatar() {
         if (avatarId != null) {
-            String url = "https://cdn.discordapp.com/avatars/" + getIdAsString() + "/" + avatarId
+            String url = "https://" + Javacord.DISCORD_CDN_DOMAIN + "/avatars/" + getIdAsString() + "/" + avatarId
                     + (avatarId.startsWith("a_") ? ".gif" : ".png");
             try {
                 return Optional.of(new IconImpl(getApi(), new URL(url)));
