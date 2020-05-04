@@ -3,6 +3,8 @@ package org.javacord.api.entity.message;
 import org.javacord.api.entity.DiscordEntity;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -71,16 +73,24 @@ public interface MessageAttachment extends DiscordEntity {
     Optional<Integer> getWidth();
 
     /**
-     * Gets the attachment as byte array.
+     * Gets the attachment as an input stream.
      *
-     * @return The attachment as byte array.
+     * @return The attachment as an input stream.
+     * @throws IOException If an IO error occurs.
+     */
+    InputStream downloadAsInputStream() throws IOException;
+
+    /**
+     * Gets the attachment as a byte array.
+     *
+     * @return The attachment as a byte array.
      */
     CompletableFuture<byte[]> downloadAsByteArray();
 
     /**
-     * Downloads the attachment as image.
+     * Downloads the attachment as an image.
      *
-     * @return The attachment as image. Only present, if the attachment is an image.
+     * @return The attachment as an image. Only present, if the attachment is an image.
      * @throws IllegalStateException If the attachment is not an image.
      */
     CompletableFuture<BufferedImage> downloadAsImage();
