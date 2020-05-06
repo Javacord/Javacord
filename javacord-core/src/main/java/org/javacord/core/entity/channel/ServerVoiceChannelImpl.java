@@ -53,7 +53,7 @@ public class ServerVoiceChannelImpl extends ServerChannelImpl
         super(api, server, data);
         bitrate = data.get("bitrate").asInt();
         userLimit = data.get("user_limit").asInt();
-        parentId = Long.valueOf(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
+        parentId = Long.parseLong(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
     }
 
     /**

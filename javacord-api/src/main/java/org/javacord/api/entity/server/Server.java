@@ -340,7 +340,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default Optional<User> getMemberById(String id) {
         try {
-            return getMemberById(Long.valueOf(id));
+            return getMemberById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1790,7 +1790,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default Optional<ServerChannel> getChannelById(String id) {
         try {
-            return getChannelById(Long.valueOf(id));
+            return getChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1844,7 +1844,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default Optional<ChannelCategory> getChannelCategoryById(String id) {
         try {
-            return getChannelCategoryById(Long.valueOf(id));
+            return getChannelCategoryById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1898,7 +1898,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default Optional<ServerTextChannel> getTextChannelById(String id) {
         try {
-            return getTextChannelById(Long.valueOf(id));
+            return getTextChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1952,7 +1952,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default Optional<ServerVoiceChannel> getVoiceChannelById(String id) {
         try {
-            return getVoiceChannelById(Long.valueOf(id));
+            return getVoiceChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
