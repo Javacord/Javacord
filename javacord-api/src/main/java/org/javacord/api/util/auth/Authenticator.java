@@ -1,13 +1,8 @@
 package org.javacord.api.util.auth;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 /**
  * This class represents an authenticator that can be used to provide authentication headers for remote servers.
