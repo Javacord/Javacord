@@ -1,7 +1,6 @@
 package org.javacord.core.event.channel.server.voice;
 
 import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
 
 import java.util.Optional;

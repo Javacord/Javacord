@@ -264,7 +264,7 @@ public abstract class EventDispatcherBase {
                     try {
                         taskQueue.poll().run();
                     } catch (Throwable t) {
-                        logger.error("Unhandled exception in {}!", () -> getThreadType(finalQueueSelector), () -> t);
+                        logger.error(() -> "Unhandled exception in " + getThreadType(finalQueueSelector) + "!", t);
                     }
                     activeListeners.remove(activeListener);
                     runningListeners.remove(finalQueueSelector);

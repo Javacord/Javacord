@@ -535,7 +535,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<User> getCachedUserById(String id) {
         try {
-            return getCachedUserById(Long.valueOf(id));
+            return getCachedUserById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -557,7 +557,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default CompletableFuture<User> getUserById(String id) {
         try {
-            return getUserById(Long.valueOf(id));
+            return getUserById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return getUserById(-1);
         }
@@ -726,7 +726,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<Message> getCachedMessageById(String id) {
         try {
-            return getCachedMessageById(Long.valueOf(id));
+            return getCachedMessageById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -819,7 +819,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<Server> getServerById(String id) {
         try {
-            return getServerById(Long.valueOf(id));
+            return getServerById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1106,7 +1106,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<Channel> getChannelById(String id) {
         try {
-            return getChannelById(Long.valueOf(id));
+            return getChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1158,7 +1158,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<TextChannel> getTextChannelById(String id) {
         try {
-            return getTextChannelById(Long.valueOf(id));
+            return getTextChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1210,7 +1210,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<VoiceChannel> getVoiceChannelById(String id) {
         try {
-            return getVoiceChannelById(Long.valueOf(id));
+            return getVoiceChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1262,7 +1262,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<ServerChannel> getServerChannelById(String id) {
         try {
-            return getServerChannelById(Long.valueOf(id));
+            return getServerChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1314,7 +1314,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<ChannelCategory> getChannelCategoryById(String id) {
         try {
-            return getChannelCategoryById(Long.valueOf(id));
+            return getChannelCategoryById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1366,7 +1366,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<ServerTextChannel> getServerTextChannelById(String id) {
         try {
-            return getServerTextChannelById(Long.valueOf(id));
+            return getServerTextChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1418,7 +1418,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<ServerVoiceChannel> getServerVoiceChannelById(String id) {
         try {
-            return getServerVoiceChannelById(Long.valueOf(id));
+            return getServerVoiceChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1470,7 +1470,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<PrivateChannel> getPrivateChannelById(String id) {
         try {
-            return getPrivateChannelById(Long.valueOf(id));
+            return getPrivateChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -1494,7 +1494,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default Optional<GroupChannel> getGroupChannelById(String id) {
         try {
-            return getGroupChannelById(Long.valueOf(id));
+            return getGroupChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }

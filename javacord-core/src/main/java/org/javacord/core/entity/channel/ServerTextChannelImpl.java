@@ -56,7 +56,7 @@ public class ServerTextChannelImpl extends ServerChannelImpl
     public ServerTextChannelImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
         super(api, server, data);
         nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
-        parentId = Long.valueOf(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
+        parentId = Long.parseLong(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
         topic = data.has("topic") && !data.get("topic").isNull() ? data.get("topic").asText() : "";
         delay = data.has("rate_limit_per_user") ? data.get("rate_limit_per_user").asInt(0) : 0;
         messageCache = new MessageCacheImpl(

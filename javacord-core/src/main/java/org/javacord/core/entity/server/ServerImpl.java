@@ -1148,7 +1148,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 boolean requestMore = true;
                 while (requestMore) {
                     int requestAmount = limit - auditLog.getEntries().size();
-                    requestAmount = requestAmount > 100 ? 100 : requestAmount;
+                    requestAmount = Math.min(requestAmount, 100);
                     RestRequest<JsonNode> request =
                             new RestRequest<JsonNode>(getApi(), RestMethod.GET, RestEndpoint.AUDIT_LOG)
                                     .setUrlParameters(getIdAsString())

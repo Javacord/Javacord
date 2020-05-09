@@ -164,7 +164,7 @@ public class RatelimitManager {
         }
         Response response = result.getResponse();
         boolean global = response.header("X-RateLimit-Global", "false").equalsIgnoreCase("true");
-        int remaining = Integer.valueOf(response.header("X-RateLimit-Remaining", "1"));
+        int remaining = Integer.parseInt(response.header("X-RateLimit-Remaining", "1"));
         long reset = request
                 .getEndpoint()
                 .getHardcodedRatelimit()

@@ -192,7 +192,7 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
 
     @Override
     public void setCapacity(int capacity) {
-        this.capacity = capacity >= 0 ? capacity : 0;
+        this.capacity = Math.max(capacity, 0);
     }
 
     @Override
@@ -202,7 +202,7 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
 
     @Override
     public void setStorageTimeInSeconds(int storageTimeInSeconds) {
-        this.storageTimeInSeconds = storageTimeInSeconds >= 0 ? storageTimeInSeconds : 0;
+        this.storageTimeInSeconds = Math.max(storageTimeInSeconds, 0);
     }
 
     @Override

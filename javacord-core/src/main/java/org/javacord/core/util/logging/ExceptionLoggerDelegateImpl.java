@@ -42,8 +42,8 @@ public class ExceptionLoggerDelegateImpl implements ExceptionLoggerDelegate {
     public UncaughtExceptionHandler getUncaughtExceptionHandler() {
         return (thread, throwable) -> logger.error(
                 "Caught unhandled exception on thread '{}'!",
-                thread::getName,
-                () -> ExceptionLoggerDelegate.unwrapThrowable(throwable));
+                thread.getName(),
+                ExceptionLoggerDelegate.unwrapThrowable(throwable));
     }
 
 }

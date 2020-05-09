@@ -546,7 +546,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
                 case String:
                     body.addStatement """
                         try {
-                            return get${listener.name}s(Long.valueOf(messageId));
+                            return get${listener.name}s(Long.parseLong(messageId));
                         } catch (NumberFormatException ignored) {
                             return Collections.emptyList();
                         }
@@ -1027,7 +1027,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
                 case String:
                     method.createBody().addStatement """
                         try {
-                            return addMessageAttachableListener(Long.valueOf(messageId), listener);
+                            return addMessageAttachableListener(Long.parseLong(messageId), listener);
                         } catch (NumberFormatException ignored) {
                             return Collections.emptyList();
                         }
@@ -1134,7 +1134,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
                 case String:
                     method.createBody().addStatement """
                         try {
-                            removeMessageAttachableListener(Long.valueOf(messageId), listener);
+                            removeMessageAttachableListener(Long.parseLong(messageId), listener);
                         } catch (NumberFormatException ignored) { }
                     """
                     break
@@ -1236,7 +1236,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
                 case String:
                     body.addStatement '''
                         try {
-                            return getMessageAttachableListeners(Long.valueOf(messageId));
+                            return getMessageAttachableListeners(Long.parseLong(messageId));
                         } catch (NumberFormatException ignored) {
                             return Collections.emptyMap();
                         }
@@ -1329,7 +1329,7 @@ def addGenericObjectAttachableListenerMethods(typeSolver, attachableInterface, a
                 case String:
                     body.addStatement '''
                         try {
-                            removeListener(Long.valueOf(messageId), listenerClass, listener);
+                            removeListener(Long.parseLong(messageId), listenerClass, listener);
                         } catch (NumberFormatException ignored) { }
                     '''
                     break
