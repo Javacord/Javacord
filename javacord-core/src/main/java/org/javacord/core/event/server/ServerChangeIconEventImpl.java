@@ -1,6 +1,7 @@
 package org.javacord.core.event.server;
 
 import org.apache.logging.log4j.Logger;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.server.ServerChangeIconEvent;
@@ -65,9 +66,9 @@ public class ServerChangeIconEventImpl extends ServerEventImpl implements Server
             return Optional.empty();
         }
         try {
-            return Optional.of(new IconImpl(getApi(),
-                                            new URL("https://cdn.discordapp.com/icons/" + getServer().getIdAsString()
-                                                    + "/" + iconHash + ".png")));
+            return Optional.of(new IconImpl(getApi(), new URL(
+                    "https://" + Javacord.DISCORD_CDN_DOMAIN + "/icons/" + getServer().getIdAsString()
+                            + "/" + iconHash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();

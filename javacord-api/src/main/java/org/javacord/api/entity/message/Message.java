@@ -1,6 +1,7 @@
 package org.javacord.api.entity.message;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.channel.ChannelType;
@@ -698,7 +699,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     default URL getLink() throws AssertionError {
         try {
-            return new URL("https://discordapp.com/channels/"
+            return new URL("https://" + Javacord.DISCORD_DOMAIN + "/channels/"
                     + getServer().map(DiscordEntity::getIdAsString).orElse("@me")
                     + "/"
                     + getChannel().getIdAsString()

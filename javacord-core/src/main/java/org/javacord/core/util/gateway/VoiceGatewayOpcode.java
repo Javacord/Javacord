@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * An enum with all voice gateway opcode as defined by
- * <a href="https://discordapp.com/developers/docs/topics/opcodes-and-status-codes#voice-voice-opcodes">Discord</a>.
+ * <a href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#voice-voice-opcodes">Discord</a>.
  */
 public enum VoiceGatewayOpcode {
 

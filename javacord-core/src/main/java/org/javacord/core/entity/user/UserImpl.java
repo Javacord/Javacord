@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
@@ -243,7 +244,7 @@ public class UserImpl implements User, Cleanupable, InternalUserAttachableListen
      * @return The avatar for the given details.
      */
     public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId) {
-        StringBuilder url = new StringBuilder("https://cdn.discordapp.com/");
+        StringBuilder url = new StringBuilder("https://" + Javacord.DISCORD_CDN_DOMAIN + "/");
         if (avatarHash == null) {
             url.append("embed/avatars/")
                     .append(Integer.parseInt(discriminator) % 5)

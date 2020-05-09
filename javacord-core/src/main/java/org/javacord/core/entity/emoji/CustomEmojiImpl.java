@@ -3,6 +3,7 @@ package org.javacord.core.entity.emoji;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.emoji.CustomEmoji;
@@ -92,7 +93,8 @@ public class CustomEmojiImpl implements CustomEmoji {
 
     @Override
     public Icon getImage() {
-        String urlString = "https://cdn.discordapp.com/emojis/" + getIdAsString() + (isAnimated() ? ".gif" : ".png");
+        String urlString = "https://" + Javacord.DISCORD_CDN_DOMAIN
+                + "/emojis/" + getIdAsString() + (isAnimated() ? ".gif" : ".png");
         try {
             return new IconImpl(getApi(), new URL(urlString));
         } catch (MalformedURLException e) {

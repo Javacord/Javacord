@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * An enum with all web socket close reasons as
  * defined by <a href="https://tools.ietf.org/html/rfc6455#section-7.4">RFC 6455</a> (1000-2999),
  * assigned by <a href="https://www.iana.org/assignments/websocket/websocket.xml">IANA</a> (3000-3999),
- * assigned by <a href="https://discordapp.com/developers/docs/topics/gateway#disconnections">Discord</a> (4000-4998) or
+ * assigned by <a href="https://discord.com/developers/docs/topics/gateway#disconnections">Discord</a> (4000-4998) or
  * self-assigned (4999).
  */
 public enum WebSocketCloseCode {
@@ -143,25 +143,25 @@ public enum WebSocketCloseCode {
 
     /**
      * You sent an invalid
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#payloads-and-opcodesspec.html">Gateway opcode</a>
+     * <a href="https://discord.com/developers/docs/topics/gateway#payloads-and-opcodesspec.html">Gateway opcode</a>
      * or an invalid payload for an opcode. Don't do that!
      */
     UNKNOWN_OPCODE(4001, Usage.BOTH),
 
     /**
-     * You sent an invalid <a href="https://discordapp.com/developers/docs/topics/gateway#sending-payloads">payload</a>
+     * You sent an invalid <a href="https://discord.com/developers/docs/topics/gateway#sending-payloads">payload</a>
      * to us. Don't do that!
      */
     DECODE_ERROR(4002, Usage.NORMAL),
 
     /**
-     * You sent us a payload prior to <a href="https://discordapp.com/developers/docs/topics/gateway#identify">
+     * You sent us a payload prior to <a href="https://discord.com/developers/docs/topics/gateway#identify">
      * identifying</a>.
      */
     NOT_AUTHENTICATED(4003, Usage.BOTH),
 
     /**
-     * The account token sent with your <a href="https://discordapp.com/developers/docs/topics/gateway#identify">
+     * The account token sent with your <a href="https://discord.com/developers/docs/topics/gateway#identify">
      * identify payload</a> is incorrect.
      */
     AUTHENTICATION_FAILED(4004, Usage.BOTH),
@@ -177,7 +177,7 @@ public enum WebSocketCloseCode {
     SESSION_NO_LONGER_VALID(4006, Usage.VOICE),
 
     /**
-     * The sequence sent when <a href="https://discordapp.com/developers/docs/topics/gateway#resume">resuming</a>
+     * The sequence sent when <a href="https://discord.com/developers/docs/topics/gateway#resume">resuming</a>
      * the session was invalid. Reconnect and start a new session.
      */
     INVALID_SEQ(4007, Usage.NORMAL),
@@ -193,49 +193,49 @@ public enum WebSocketCloseCode {
     SESSION_TIMEOUT(4009, Usage.BOTH),
 
     /**
-     * You sent us an invalid <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard when
+     * You sent us an invalid <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard when
      * identifying</a>.
      */
     INVALID_SHARD(4010, Usage.NORMAL),
 
     /**
      * The session would have handled too many guilds - you are required to
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
      * your connection in order to connect.
      */
     SHARDING_REQUIRED(4011, Usage.NORMAL),
 
     /**
      * The session would have handled too many guilds - you are required to
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
      * your connection in order to connect.
      */
     SERVER_NOT_FOUND(4011, Usage.VOICE),
 
     /**
      * The session would have handled too many guilds - you are required to
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
      * your connection in order to connect.
      */
     UNKNOWN_PROTOCOL(4012, Usage.VOICE),
 
     /**
      * The session would have handled too many guilds - you are required to
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
      * your connection in order to connect.
      */
     DISCONNECTED(4014, Usage.VOICE),
 
     /**
      * The session would have handled too many guilds - you are required to
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
      * your connection in order to connect.
      */
     VOICE_SERVER_CRASHED(4015, Usage.VOICE),
 
     /**
      * The session would have handled too many guilds - you are required to
-     * <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">shard</a>
+     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
      * your connection in order to connect.
      */
     UNKNOWN_ENCRYPTION_MODE(4016, Usage.VOICE),

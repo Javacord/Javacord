@@ -12,7 +12,7 @@ public class BotInviteBuilder {
      * The base link of a bot invite.
      */
     public static final String BASE_LINK =
-            "https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=%s";
+            "https://" + Javacord.DISCORD_DOMAIN + "/oauth2/authorize?client_id=%s&scope=bot&permissions=%s";
 
     /**
      * The client id of the bot's application.

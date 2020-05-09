@@ -1,6 +1,7 @@
 package org.javacord.core.entity.activity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.ActivityAssets;
 import org.javacord.core.entity.IconImpl;
@@ -41,9 +42,8 @@ public class ActivityAssetsImpl implements ActivityAssets {
     @Override
     public Optional<Icon> getLargeImage() {
         return Optional.ofNullable(largeImage)
-                .flatMap(imageId -> activity.getApplicationId()
-                        .map(applicationId -> String
-                                .format("https://cdn.discordapp.com/app-assets/%s/%s.png", applicationId, imageId)))
+                .flatMap(imageId -> activity.getApplicationId().map(applicationId -> String.format(
+                        "https://" + Javacord.DISCORD_CDN_DOMAIN + "/app-assets/%s/%s.png", applicationId, imageId)))
                 .map(url -> {
                     try {
                         return new URL(url);
@@ -62,9 +62,8 @@ public class ActivityAssetsImpl implements ActivityAssets {
     @Override
     public Optional<Icon> getSmallImage() {
         return Optional.ofNullable(smallImage)
-                .flatMap(imageId -> activity.getApplicationId()
-                        .map(applicationId -> String
-                                .format("https://cdn.discordapp.com/app-assets/%s/%s.png", applicationId, imageId)))
+                .flatMap(imageId -> activity.getApplicationId().map(applicationId -> String.format(
+                        "https://" + Javacord.DISCORD_CDN_DOMAIN + "/app-assets/%s/%s.png", applicationId, imageId)))
                 .map(url -> {
                     try {
                         return new URL(url);

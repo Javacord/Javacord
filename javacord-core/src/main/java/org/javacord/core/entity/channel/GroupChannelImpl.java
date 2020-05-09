@@ -3,6 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.GroupChannel;
@@ -131,7 +132,8 @@ public class GroupChannelImpl implements GroupChannel, Cleanupable, InternalText
         try {
             return Optional.of(new IconImpl(
                     getApi(),
-                    new URL("https://cdn.discordapp.com/channel-icons/" + getIdAsString() + "/" + iconId + ".png")));
+                    new URL("https://" + Javacord.DISCORD_CDN_DOMAIN
+                            + "/channel-icons/" + getIdAsString() + "/" + iconId + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();

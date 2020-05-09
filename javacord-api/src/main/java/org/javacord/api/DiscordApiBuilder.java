@@ -229,7 +229,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      *
      * @param totalShards The total amount of shards. Sharding will be disabled if set to <code>1</code>.
      * @return The current instance in order to chain call methods.
-     * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public DiscordApiBuilder setTotalShards(int totalShards) {
         delegate.setTotalShards(totalShards);
@@ -254,7 +254,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      *
      * @param currentShard The shard of this connection starting with <code>0</code>!
      * @return The current instance in order to chain call methods.
-     * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public DiscordApiBuilder setCurrentShard(int currentShard) {
         delegate.setCurrentShard(currentShard);
@@ -303,7 +303,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * A shard only handles a subset of a bot's servers.
      *
      * @return A future with the current api builder.
-     * @see <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">API docs</a>
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#sharding">API docs</a>
      */
     public CompletableFuture<DiscordApiBuilder> setRecommendedTotalShards() {
         return delegate.setRecommendedTotalShards().thenCompose(nothing -> CompletableFuture.completedFuture(this));
