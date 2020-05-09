@@ -57,8 +57,7 @@ public class ChannelCategoryImpl extends ServerChannelImpl
                                 .orElse(false))
                         .sorted(Comparator
                                         .<ServerChannel>comparingInt(channel -> channel.getType().getId())
-                                        .thenComparingInt(ServerChannel::getRawPosition)
-                                        .thenComparingLong(ServerChannel::getId))
+                                        .thenComparing(ServerChannelImpl.COMPARE_BY_RAW_POSITION))
                         .collect(Collectors.toList()));
     }
 

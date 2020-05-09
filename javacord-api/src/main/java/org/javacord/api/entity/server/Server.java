@@ -582,7 +582,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<Color> getRoleColor(User user) {
         return user.getRoles(this).stream()
                    .filter(role -> role.getColor().isPresent())
-                   .max(Comparator.comparingInt(Role::getPosition))
+                   .max(Comparator.comparingInt(Role::getRawPosition))
                    .flatMap(Role::getColor);
     }
 

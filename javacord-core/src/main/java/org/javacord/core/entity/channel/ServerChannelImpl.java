@@ -26,6 +26,7 @@ import org.javacord.core.util.rest.RestRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,13 @@ import java.util.stream.Collectors;
  * The implementation of {@link ServerChannel}.
  */
 public abstract class ServerChannelImpl implements ServerChannel, InternalServerChannelAttachableListenerManager {
+
+    /**
+     * Compares channels according to their "position" field and, if those are the same, their id.
+     */
+    public static final Comparator<ServerChannel> COMPARE_BY_RAW_POSITION = Comparator
+            .comparingInt(ServerChannel::getRawPosition)
+            .thenComparingLong(ServerChannel::getId);
 
     /**
      * The discord api instance.
@@ -60,9 +68,9 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
     private final ServerImpl server;
 
     /**
-     * The position of the channel.
+     * The rawPosition of the channel.
      */
-    private volatile int position;
+    private volatile int rawPosition;
 
     /**
      * A map with all overwritten user permissions.
@@ -87,7 +95,7 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
 
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
-        position = data.get("position").asInt();
+        rawPosition = data.get("position").asInt();
 
         if (data.has("permission_overwrites")) {
             for (JsonNode permissionOverwrite : data.get("permission_overwrites")) {
@@ -123,12 +131,12 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
     }
 
     /**
-     * Sets the position of the channel.
+     * Sets the raw position of the channel.
      *
-     * @param position The new position of the channel.
+     * @param position The new raw position of the channel.
      */
-    public void setPosition(int position) {
-        this.position = position;
+    public void setRawPosition(int position) {
+        this.rawPosition = position;
     }
 
     /**
@@ -171,7 +179,7 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
 
     @Override
     public int getRawPosition() {
-        return position;
+        return rawPosition;
     }
 
     @Override
@@ -276,9 +284,9 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
     @Override
     public boolean equals(Object o) {
         return (this == o)
-               || !((o == null)
-                    || (getClass() != o.getClass())
-                    || (getId() != ((DiscordEntity) o).getId()));
+                || !((o == null)
+                || (getClass() != o.getClass())
+                || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override

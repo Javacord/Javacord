@@ -38,7 +38,8 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
 
     /**
      * Gets the raw position of the channel.
-     * This is the positions sent from Discord and might not be unique and have gaps.
+     *
+     * <p>This is the positions sent from Discord and might not be unique and have gaps.
      * Also every channel type (text, voice and category) has its own position counter.
      *
      * @return The raw position of the channel.
@@ -47,7 +48,8 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
 
     /**
      * Gets the real position of the channel.
-     * Returns <code>-1</code> if the channel is deleted.
+     *
+     * <p>Returns <code>-1</code> if the channel is deleted.
      *
      * @return The real position of the channel.
      */

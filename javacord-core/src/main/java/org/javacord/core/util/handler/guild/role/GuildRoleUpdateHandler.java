@@ -116,11 +116,13 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             }
 
             int oldPosition = role.getPosition();
-            int newPosition = roleJson.get("position").asInt();
-            if (oldPosition != newPosition) {
-                role.setPosition(newPosition);
-
-                RoleChangePositionEvent event = new RoleChangePositionEventImpl(role, newPosition, oldPosition);
+            int oldRawPosition = role.getRawPosition();
+            int newRawPosition = roleJson.get("position").asInt();
+            if (oldRawPosition != newRawPosition) {
+                role.setRawPosition(newRawPosition);
+                int newPosition = role.getPosition();
+                RoleChangePositionEvent event = new RoleChangePositionEventImpl(role, newRawPosition, oldRawPosition,
+                                                                                            newPosition, oldPosition);
 
                 api.getEventDispatcher().dispatchRoleChangePositionEvent(
                         (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);

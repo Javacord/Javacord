@@ -143,7 +143,8 @@ public class ChannelUpdateHandler extends PacketHandler {
             } else if (channel instanceof ServerVoiceChannelImpl) {
                 ((ServerVoiceChannelImpl) channel).setParentId(newCategory == null ? -1 : newCategory.getId());
             }
-            channel.setPosition(newRawPosition);
+            channel.setRawPosition(newRawPosition);
+
             int newPosition = channel.getPosition();
 
             ServerChannelChangePositionEvent event = new ServerChannelChangePositionEventImpl(
