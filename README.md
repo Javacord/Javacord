@@ -3,11 +3,11 @@
 
 An easy to use multithreaded library for creating Discord bots in Java.
 
-Javacord is a modern library that focuses on simplicity and speed ????.
+Javacord is a modern library that focuses on simplicity and speed 🚀.
 By reducing itself to standard Java classes and features like [`Optional`](https://javacord.org/wiki/essential-knowledge/working-with-optionals/)s and [`CompletableFuture`](https://javacord.org/wiki/essential-knowledge/working-with-futures/)s, it is extremely easy to use for every Java developer, as it does not require you to learn any new frameworks or complex abstractions. 
 It has rich [documentation](#-documentation) and an [awesome community on Discord](#-support) that loves to help with any specific problems and questions.
 
-## ???? Basic Usage
+## 🎉 Basic Usage
 
 The following example logs the bot in and replies to every "!ping" message with "Pong!". 
 
@@ -39,7 +39,7 @@ public class MyFirstBot {
 More sophisticated examples can be found at the [end of the README](#-more-examples). 
 You can also check out the [example bot](https://github.com/Javacord/Example-Bot) for a fully functional bot.
 
-## ???? Download / Installation
+## 📦 Download / Installation
 
 The recommended way to get Javacord is to use a build manager, like Gradle or Maven.  
 If you are not familiar with build managers, you can follow this [setup guide](#-ide-setup) or download Javacord directly from [GitHub](https://github.com/Javacord/Javacord/releases/latest).
@@ -82,28 +82,28 @@ dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
 ```
 Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-configuration/) wiki article for further information.
 
-## ???? IDE Setup
+## 🔧 IDE Setup
 
 If you have never used Gradle or Maven before, you should take a look at one of the setup tutorials:
 * **[IntelliJ & Gradle](https://javacord.org/wiki/getting-started/intellij-gradle/)** _(recommended)_
 * **[IntelliJ & Maven](https://javacord.org/wiki/getting-started/intellij-maven/)**
 * **[Eclipse & Maven](https://javacord.org/wiki/getting-started/eclipse-maven/)**
 
-## ???? Support
+## 🤝 Support
 
 Javacord's Discord community is an excellent resource if you have questions about the library.  
 * **[The Javacord server](https://discord.gg/0qJ2jjyneLEgG7y3)**
 
-## ???? Documentation
+## 📒 Documentation
 
 * The [Javacord wiki](https://javacord.org/wiki/) is a great place to get started.
 * Additional documentation can be found in the [JavaDoc](https://docs.javacord.org/api/v/latest/).
 
-## ???? How to Create a Bot User and Get Its Token 
+## 💡 How to Create a Bot User and Get Its Token 
 
 * **[Creating a Bot User Account](https://javacord.org/wiki/essential-knowledge/creating-a-bot-account/)**
 
-## ???? Version Numbers
+## 📋 Version Numbers
 
 The version number has a 3-digit format: `major.minor.trivial`
 * `major`: Increased extremely rarely to mark a major release (usually a rewrite affecting very huge parts of the library).
@@ -111,7 +111,7 @@ The version number has a 3-digit format: `major.minor.trivial`
 * `trivial`: A backward compatible change to the **api**. This is usually an important bugfix (or a bunch of smaller ones)
  or a backwards compatible feature addition.
  
-## ???? Deprecation Policy
+## 🔨 Deprecation Policy
 
 A method or class that is marked as deprecated can be removed with the next minor release (but it will usually stay for
 several minor releases). A minor release might remove a class or method without having it deprecated, but we will do our
@@ -119,7 +119,7 @@ best to deprecate it before removing it. We are unable to guarantee this though,
 something due to changes made by Discord, which we are unable to control. Usually you can expect a deprecated method or
 class to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
 
-## ???? Large Bots Using Javacord
+## 🥇 Large Bots Using Javacord
 
 Javacord is used by many large bots. Here are just a few of them:
 * [**Yunite**](https://yunite.xyz/): A bot for Fortnite which runs on over 30,000 servers with over five million users.
@@ -127,9 +127,9 @@ Javacord is used by many large bots. Here are just a few of them:
 
 If you own a large bot that uses Javacord, feel free to add it to the list in a pull request!
 
-## ???? More Examples 
+## 🙌 More Examples 
 
-### Using the MessageBuilder ????
+### Using the MessageBuilder 🛠
 
 <img align="right" src="https://javacord.org/img/javacord-readme/message-builder.png" width="34%">
 
@@ -139,7 +139,7 @@ The following example uses the built-in `MessageBuilder`. It is very useful to c
 new MessageBuilder()
   .append("Look at these ")
   .append("awesome", MessageDecoration.BOLD, MessageDecoration.UNDERLINE)
-  .append(" animal pictures! ????")
+  .append(" animal pictures! 😃")
   .appendCode("java", "System.out.println(\"Sweet!\");")
   .addAttachment(new File("C:/Users/JohnDoe/Pictures/kitten.jpg"))
   .addAttachment(new File("C:/Users/JohnDoe/Pictures/puppy.jpg"))
@@ -150,7 +150,7 @@ new MessageBuilder()
   .send(channel);
 ```
 
-### Listeners in Their Own Class ????
+### Listeners in Their Own Class 🗃
 
 All the examples use inline listeners for simplicity. For better readability it is also possible to have listeners in their own class:
 
@@ -177,11 +177,11 @@ For commands, you have the option of using one of the many existing command fram
 
 or even write your own!
 
-### Attach Listeners to Objects ????
+### Attach Listeners to Objects 📌
 
 You can even attach listeners to objects.
 Let's say you have a very sensitive bot.
-As soon as someone reacts with a ???? within the first 30 minutes of message creation, it deletes its own message. 
+As soon as someone reacts with a 👎 within the first 30 minutes of message creation, it deletes its own message. 
 
 ```java
 api.addMessageCreateListener(event -> {
@@ -189,7 +189,7 @@ api.addMessageCreateListener(event -> {
         event.getChannel().sendMessage("Pong!").thenAccept(message -> {
             // Attach a listener directly to the message
             message.addReactionAddListener(reactionEvent -> {
-                if (reactionEvent.getEmoji().equalsEmoji("????")) {
+                if (reactionEvent.getEmoji().equalsEmoji("👎")) {
                     reactionEvent.deleteMessage();
                 }
             }).removeAfter(30, TimeUnit.MINUTES);
@@ -201,7 +201,7 @@ The result then looks like this:
 
 <img src="https://javacord.org/img/javacord-readme/sensitive-bot-round.gif">
 
-### Creating a Temporary Voice Channel ????????
+### Creating a Temporary Voice Channel 💣🎧
 
 This example creates a temporary voice channel that gets deleted when the last user leaves it or if nobody joins it within the first 30 seconds after creation.
 
@@ -230,6 +230,6 @@ api.getThreadPool().getScheduler().schedule(() -> {
 
 > **Note**: You should also make sure to remove the channels on bot shutdown (or startup)
 
-## ???? License
+## 📃 License
 
 Javacord is distributed under the [Apache license version 2.0](./LICENSE).
