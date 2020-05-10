@@ -1,48 +1,80 @@
 package org.javacord.core.util.handler.guild;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Region;
+import org.javacord.api.entity.VanityUrlCode;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.server.BoostLevel;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
 import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
+import org.javacord.api.entity.server.ServerFeature;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.ServerChangeAfkChannelEvent;
 import org.javacord.api.event.server.ServerChangeAfkTimeoutEvent;
+import org.javacord.api.event.server.ServerChangeBoostCountEvent;
+import org.javacord.api.event.server.ServerChangeBoostLevelEvent;
 import org.javacord.api.event.server.ServerChangeDefaultMessageNotificationLevelEvent;
+import org.javacord.api.event.server.ServerChangeDescriptionEvent;
+import org.javacord.api.event.server.ServerChangeDiscoverySplashEvent;
 import org.javacord.api.event.server.ServerChangeExplicitContentFilterLevelEvent;
 import org.javacord.api.event.server.ServerChangeIconEvent;
+import org.javacord.api.event.server.ServerChangeModeratorsOnlyChannelEvent;
 import org.javacord.api.event.server.ServerChangeMultiFactorAuthenticationLevelEvent;
 import org.javacord.api.event.server.ServerChangeNameEvent;
 import org.javacord.api.event.server.ServerChangeOwnerEvent;
+import org.javacord.api.event.server.ServerChangePreferredLocaleEvent;
 import org.javacord.api.event.server.ServerChangeRegionEvent;
+import org.javacord.api.event.server.ServerChangeRulesChannelEvent;
+import org.javacord.api.event.server.ServerChangeServerFeaturesEvent;
 import org.javacord.api.event.server.ServerChangeSplashEvent;
 import org.javacord.api.event.server.ServerChangeSystemChannelEvent;
+import org.javacord.api.event.server.ServerChangeVanityUrlCodeEvent;
 import org.javacord.api.event.server.ServerChangeVerificationLevelEvent;
+import org.javacord.core.entity.VanityUrlCodeImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.server.ServerChangeAfkChannelEventImpl;
 import org.javacord.core.event.server.ServerChangeAfkTimeoutEventImpl;
+import org.javacord.core.event.server.ServerChangeBoostCountEventImpl;
+import org.javacord.core.event.server.ServerChangeBoostLevelEventImpl;
 import org.javacord.core.event.server.ServerChangeDefaultMessageNotificationLevelEventImpl;
+import org.javacord.core.event.server.ServerChangeDescriptionEventImpl;
+import org.javacord.core.event.server.ServerChangeDiscoverySplashEventImpl;
 import org.javacord.core.event.server.ServerChangeExplicitContentFilterLevelEventImpl;
 import org.javacord.core.event.server.ServerChangeIconEventImpl;
+import org.javacord.core.event.server.ServerChangeModeratorsOnlyChannelEventImpl;
 import org.javacord.core.event.server.ServerChangeMultiFactorAuthenticationLevelEventImpl;
 import org.javacord.core.event.server.ServerChangeNameEventImpl;
 import org.javacord.core.event.server.ServerChangeOwnerEventImpl;
+import org.javacord.core.event.server.ServerChangePreferredLocaleEventImpl;
 import org.javacord.core.event.server.ServerChangeRegionEventImpl;
+import org.javacord.core.event.server.ServerChangeRulesChannelEventImpl;
+import org.javacord.core.event.server.ServerChangeServerFeaturesEventImpl;
 import org.javacord.core.event.server.ServerChangeSplashEventImpl;
 import org.javacord.core.event.server.ServerChangeSystemChannelEventImpl;
+import org.javacord.core.event.server.ServerChangeVanityUrlCodeEventImpl;
 import org.javacord.core.event.server.ServerChangeVerificationLevelEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
+import org.javacord.core.util.logging.LoggerUtil;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
  * Handles the guild update packet.
  */
 public class GuildUpdateHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(GuildUpdateHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -195,6 +227,123 @@ public class GuildUpdateHandler extends PacketHandler {
                                 server, newMultiFactorAuthenticationLevel, oldMultiFactorAuthenticationLevel);
 
                 api.getEventDispatcher().dispatchServerChangeMultiFactorAuthenticationLevelEvent(server, server, event);
+            }
+
+            if (packet.has("rules_channel_id")) {
+                ServerTextChannel newRulesChannel = packet.get("rules_channel_id").isNull()
+                        ? null
+                        : server.getTextChannelById(packet.get("rules_channel_id").asLong()).orElse(null);
+                ServerTextChannel oldRulesChannel = server.getRulesChannel().orElse(null);
+                if (oldRulesChannel != newRulesChannel) {
+                    server.setRulesChannelId(newRulesChannel == null ? -1 : newRulesChannel.getId());
+                    ServerChangeRulesChannelEvent event =
+                            new ServerChangeRulesChannelEventImpl(server, newRulesChannel, oldRulesChannel);
+
+                    api.getEventDispatcher().dispatchServerChangeRulesChannelEvent(server, server, event);
+                }
+            }
+
+            if (packet.has("public_updates_channel_id")) {
+                ServerTextChannel newModeratorsOnlyChannel = packet.get("public_updates_channel_id").isNull()
+                        ? null
+                        : server.getTextChannelById(packet.get("public_updates_channel_id").asLong()).orElse(null);
+                ServerTextChannel oldModeratorsOnlyChannel = server.getModeratorsOnlyChannel().orElse(null);
+                if (oldModeratorsOnlyChannel != newModeratorsOnlyChannel) {
+                    server.setModeratorsOnlyChannelId(
+                            newModeratorsOnlyChannel == null ? -1 : newModeratorsOnlyChannel.getId());
+                    ServerChangeModeratorsOnlyChannelEvent event =
+                            new ServerChangeModeratorsOnlyChannelEventImpl(
+                                    server, newModeratorsOnlyChannel, oldModeratorsOnlyChannel);
+
+                    api.getEventDispatcher().dispatchServerChangeModeratorsOnlyChannelEvent(server, server, event);
+                }
+            }
+
+            BoostLevel oldBoostLevel = server.getBoostLevel();
+            BoostLevel newBoostLevel = BoostLevel.fromId(packet.get("premium_tier").asInt());
+            if (oldBoostLevel != newBoostLevel) {
+                server.setBoostLevel(newBoostLevel);
+                ServerChangeBoostLevelEvent event =
+                        new ServerChangeBoostLevelEventImpl(server, newBoostLevel, oldBoostLevel);
+
+                api.getEventDispatcher().dispatchServerChangeBoostLevelEvent(server, server, event);
+            }
+
+            Locale newPreferredLocale =
+                    new Locale.Builder().setLanguageTag(packet.get("preferred_locale").asText()).build();
+            Locale oldPreferredLocale = server.getPreferredLocale();
+            if (!oldPreferredLocale.equals(newPreferredLocale)) {
+                server.setPreferredLocale(newPreferredLocale);
+                ServerChangePreferredLocaleEvent event =
+                        new ServerChangePreferredLocaleEventImpl(server, newPreferredLocale, oldPreferredLocale);
+
+                api.getEventDispatcher().dispatchServerChangePreferredLocaleEvent(server, server, event);
+            }
+
+            int oldBoostCount = server.getBoostCount();
+            int newBoostCount = packet.has("premium_subscription_count")
+                    ? packet.get("premium_subscription_count").asInt() : 0;
+            if (oldBoostCount != newBoostCount) {
+                server.setServerBoostCount(newBoostCount);
+                ServerChangeBoostCountEvent event =
+                        new ServerChangeBoostCountEventImpl(server, newBoostCount, oldBoostCount);
+
+                api.getEventDispatcher().dispatchServerChangeBoostCountEvent(server, server, event);
+            }
+
+            String oldDescription = server.getDescription().isPresent() ? server.getDescription().get() : null;
+            String newDescription = packet.hasNonNull("description") ? packet.get("description").asText() : null;
+            if (!Objects.deepEquals(oldDescription, newDescription)) {
+                server.setDescription(newDescription);
+                ServerChangeDescriptionEvent event =
+                        new ServerChangeDescriptionEventImpl(server, newDescription, oldDescription);
+
+                api.getEventDispatcher().dispatchServerChangeDescriptionEvent(server, server, event);
+            }
+
+            String newDiscoverySplashHash = packet.get("discovery_splash").asText(null);
+            String oldDiscoverySplashHash = server.getDiscoverySplashHash();
+            if (!Objects.deepEquals(oldDiscoverySplashHash, newDiscoverySplashHash)) {
+                server.setDiscoverySplashHash(newDiscoverySplashHash);
+                ServerChangeDiscoverySplashEvent event = new ServerChangeDiscoverySplashEventImpl(
+                        server, newDiscoverySplashHash, oldDiscoverySplashHash);
+
+                api.getEventDispatcher().dispatchServerChangeDiscoverySplashEvent(server, server, event);
+            }
+
+            String oldVanityCode = server.getVanityUrlCode().map(VanityUrlCode::getCode).orElse(null);
+            String newVanityCode = packet.hasNonNull("vanity_url_code") ? packet.get("vanity_url_code").asText() : null;
+            if (!Objects.deepEquals(oldVanityCode, newVanityCode)) {
+                server.setVanityUrlCode(new VanityUrlCodeImpl(packet.get("vanity_url_code").asText()));
+                ServerChangeVanityUrlCodeEvent event =
+                        new ServerChangeVanityUrlCodeEventImpl(server, newVanityCode, oldVanityCode);
+
+                api.getEventDispatcher().dispatchServerChangeVanityUrlCodeEvent(server, server, event);
+            }
+
+            Collection<ServerFeature> oldServerFeature = server.getFeatures();
+            Collection<ServerFeature> newServerFeature = new ArrayList<>();
+            if (packet.has("features")) {
+                packet.get("features").forEach(jsonNode -> {
+                    try {
+                        newServerFeature.add(ServerFeature.valueOf(jsonNode.asText()));
+                    } catch (Exception ignored) {
+                        logger.debug("Encountered server with unknown feature {}. Please update to the latest "
+                                + "Javacord version or create an issue on the Javacord GitHub page if you are already "
+                                + "on the latest version.", jsonNode.asText());
+                    }
+                });
+            }
+            if (!(oldServerFeature.containsAll(newServerFeature) && newServerFeature.containsAll(oldServerFeature))) {
+                server.setServerFeatures(newServerFeature);
+                ServerChangeServerFeaturesEvent event =
+                        new ServerChangeServerFeaturesEventImpl(server, newServerFeature, oldServerFeature);
+
+                api.getEventDispatcher().dispatchServerChangeServerFeaturesEvent(server, server, event);
+            }
+
+            if (packet.has("system_channel_flags")) {
+                server.setSystemChannelFlag(packet.get("system_channel_flags").asInt());
             }
         });
     }
