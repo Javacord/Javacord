@@ -1,5 +1,6 @@
-import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+
+import static java.nio.charset.StandardCharsets.UTF_8
 
 task verifyReadme {
     inputs.file 'README.md' withPropertyName 'readme'
@@ -35,6 +36,7 @@ task updateReadme(dependsOn: verifyReadme) {
             from '.github/README_template.md'
             into '.'
             rename { 'README.md' }
+            filteringCharset UTF_8.toString()
             expand version: version, log4jVersion: log4jVersion
         }
         file('.github/README.md.sha256').text = calculateReadmeChecksum()
@@ -42,7 +44,8 @@ task updateReadme(dependsOn: verifyReadme) {
 }
 
 private String calculateReadmeChecksum() {
+    def utf8 = UTF_8.toString()
     def sha256 = MessageDigest.getInstance('SHA-256')
-    def checksum = sha256.digest(file('README.md').readLines(StandardCharsets.UTF_8.toString()).join('\n').bytes)
+    def checksum = sha256.digest(file('README.md').readLines(utf8).join('\n').getBytes(utf8))
     new BigInteger(1, checksum).toString(16).padLeft(sha256.digestLength * 2, '0')
 }

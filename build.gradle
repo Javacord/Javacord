@@ -1,6 +1,8 @@
 import java.time.Instant
 import org.ajoberstar.grgit.Grgit
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1
+
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.4' apply false
     id 'net.researchgate.release' version '2.7.0' apply false
@@ -71,6 +73,7 @@ project(':javacord-api') {
         inputs.property 'version', version
         inputs.property 'commitId', commitId
         inputs.property 'buildTimestamp', now
+        filteringCharset ISO_8859_1.toString()
         filesMatching('version.properties') {
             expand version: version, commitId: commitId, buildTimestamp: now
         }
