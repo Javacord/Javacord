@@ -1,12 +1,10 @@
 package org.javacord.core.util;
 
-import java.util.Collections;
 import java.util.Set;
 
 /**
  * Maps the immutable collections to unmodifiable Java collections.
  */
-@SuppressWarnings("unchecked")
 public class ImmutableToJavaMapper {
 
     private ImmutableToJavaMapper() {
@@ -22,8 +20,9 @@ public class ImmutableToJavaMapper {
      * @param <V> The type of the immutable Vavr set.
      * @return The unmodifiable java set.
      */
+    @SuppressWarnings("unchecked")
     public static <J extends V, V> Set<J> mapToJava(io.vavr.collection.Set<V> set) {
-        return Collections.unmodifiableSet((Set<J>) set.toJavaSet());
+        return (Set<J>) new VavrSetView<>(set, true);
     }
 
 }
