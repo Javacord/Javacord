@@ -82,6 +82,31 @@ dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
 ```
 Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-configuration/) wiki article for further information.
 
+### Optional KTX Dependency
+The optional KTX Dependency provides extensions in Kotlin for javacord
+
+In Gradle
+```groovy
+repositories { maven { url 'https://jitpack.io' } }
+dependencies { implementation 'com.github.doomsdayrs:javacord-ktx:v0.1.0' }
+```
+
+In KTS
+```kts
+repositories { maven("https://jitpack.io") }
+dependencies { implementation("com.github.doomsdayrs:javacord-ktx:v0.1.0") }
+```
+
+Example usage
+```kotlin
+channel.sendMessage(
+    embedBuilder{
+        title = "Title"
+        description = "Wubadubdub"
+    }
+)
+```
+
 ## 🔧 IDE Setup
 
 If you have never used Gradle or Maven before, you should take a look at one of the setup tutorials:
