@@ -118,7 +118,6 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
         }
 
         api.addChannelToCache(this);
-        server.addChannelToCache(this);
     }
 
     /**

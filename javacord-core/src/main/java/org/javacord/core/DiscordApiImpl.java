@@ -14,7 +14,15 @@ import org.javacord.api.entity.ApplicationInfo;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
+import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.channel.GroupChannel;
+import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
@@ -44,6 +52,7 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
+import org.javacord.core.util.cache.JavacordEntityCache;
 import org.javacord.core.util.concurrent.ThreadPoolImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.event.EventDispatcher;
@@ -79,6 +88,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -258,9 +268,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final ReferenceQueue<User> usersCleanupQueue = new ReferenceQueue<>();
 
     /**
-     * Allows for a quick lookup for channels by their id.
+     * An immutable cache with all Javacord entities.
      */
-    private final ConcurrentHashMap<Long, Channel> channels = new ConcurrentHashMap<>();
+    private final AtomicReference<JavacordEntityCache> entityCache = new AtomicReference<>(JavacordEntityCache.empty());
 
     /**
      * A map which contains all servers that are ready.
@@ -586,6 +596,15 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
+     * Gets the entity cache.
+     *
+     * @return The entity cache.
+     */
+    public AtomicReference<JavacordEntityCache> getEntityCache() {
+        return entityCache;
+    }
+
+    /**
      * Gets the used {@link OkHttpClient http client} for this api instance.
      *
      * @return The used http client.
@@ -642,11 +661,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);
         servers.clear();
-        channels.values().stream()
+        entityCache.get().getChannelCache().getChannels().stream()
                 .filter(Cleanupable.class::isInstance)
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);
-        channels.clear();
+        entityCache.set(JavacordEntityCache.empty());
         unavailableServers.clear();
         customEmojis.clear();
         messages.clear();
@@ -736,10 +755,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param channel The channel to add.
      */
     public void addChannelToCache(Channel channel) {
-        Channel oldChannel = channels.put(channel.getId(), channel);
-        if (oldChannel != channel && oldChannel instanceof Cleanupable) {
-            ((Cleanupable) oldChannel).cleanup();
-        }
+        entityCache.getAndUpdate(cache -> {
+            Channel oldChannel = cache.getChannelCache().getChannelById(channel.getId()).orElse(null);
+            if (oldChannel != channel && oldChannel instanceof Cleanupable) {
+                ((Cleanupable) oldChannel).cleanup();
+            }
+            return cache.updateChannelCache(channelCache -> channelCache.addChannel(channel));
+        });
     }
 
     /**
@@ -748,11 +770,15 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param channelId The id of the channel to remove.
      */
     public void removeChannelFromCache(long channelId) {
-        channels.computeIfPresent(channelId, (key, channel) -> {
+        entityCache.getAndUpdate(cache -> {
+            Channel channel = cache.getChannelCache().getChannelById(channelId).orElse(null);
+            if (channel == null) {
+                return cache;
+            }
             if (channel instanceof Cleanupable) {
                 ((Cleanupable) channel).cleanup();
             }
-            return null;
+            return cache.updateChannelCache(channelCache -> channelCache.removeChannel(channel));
         });
     }
 
@@ -1466,12 +1492,52 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public Collection<Channel> getChannels() {
-        return Collections.unmodifiableCollection(new ArrayList<>(channels.values()));
+        return entityCache.get().getChannelCache().getChannels();
+    }
+
+    @Override
+    public Collection<GroupChannel> getGroupChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.GROUP_CHANNEL);
+    }
+
+    @Override
+    public Collection<PrivateChannel> getPrivateChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.PRIVATE_CHANNEL);
+    }
+
+    @Override
+    public Collection<ServerChannel> getServerChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getServerChannelTypes());
+    }
+
+    @Override
+    public Collection<ChannelCategory> getChannelCategories() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.CHANNEL_CATEGORY);
+    }
+
+    @Override
+    public Collection<ServerTextChannel> getServerTextChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_TEXT_CHANNEL);
+    }
+
+    @Override
+    public Collection<ServerVoiceChannel> getServerVoiceChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_VOICE_CHANNEL);
+    }
+
+    @Override
+    public Collection<TextChannel> getTextChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getTextChannelTypes());
+    }
+
+    @Override
+    public Collection<VoiceChannel> getVoiceChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getVoiceChannelTypes());
     }
 
     @Override
     public Optional<Channel> getChannelById(long id) {
-        return Optional.ofNullable(channels.get(id));
+        return entityCache.get().getChannelCache().getChannelById(id);
     }
 
     @Override
