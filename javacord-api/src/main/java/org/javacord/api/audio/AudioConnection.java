@@ -11,55 +11,6 @@ import java.util.concurrent.CompletableFuture;
 public interface AudioConnection extends AudioConnectionAttachableListenerManager {
 
     /**
-     * Queues the audio source.
-     *
-     * @param source The audio source to queue.
-     */
-    void queue(AudioSource source);
-
-    /**
-     * Queues the given audio sources.
-     *
-     * @param sources The audio sources to queue.
-     */
-    default void queue(AudioSource... sources) {
-        for (AudioSource source : sources) {
-            queue(source);
-        }
-    }
-
-    /**
-     * Dequeues the given audio source.
-     *
-     * @param source The audio source to dequeue if present.
-     * @return If this queue changed as a result of the call.
-     */
-    boolean dequeue(AudioSource source);
-
-    /**
-     * Dequeues the given audio sources.
-     *
-     * @param sources The audio sources to dequeue if present.
-     * @return If this queue changed as a result of the call.
-     */
-    default boolean dequeue(AudioSource... sources) {
-        boolean changed = false;
-        for (AudioSource source : sources) {
-            changed = changed || dequeue(source);
-        }
-        return changed;
-    }
-
-    /**
-     * Dequeues the current audio source if present.
-     *
-     * @return If this queue changed as a result of the call.
-     */
-    default boolean dequeueCurrentSource() {
-        return getCurrentAudioSource().map(this::dequeue).orElse(false);
-    }
-
-    /**
      * Moves the connection to a different channel.
      * The channel must be in the same server as the current connection.
      *
@@ -94,6 +45,18 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      * @return The current audio source.
      */
     Optional<AudioSource> getCurrentAudioSource();
+
+    /**
+     * Sets the current audio source, replacing any currently playing source.
+     *
+     * @param source The audio source which will become the current source.
+     */
+    void setCurrentAudioSource(AudioSource source);
+
+    /**
+     * Removes the current audio source.
+     */
+    void removeCurrentAudioSource();
 
     /**
      * Gets the voice channel of the audio connection.
