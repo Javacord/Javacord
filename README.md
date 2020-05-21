@@ -88,13 +88,13 @@ The optional KTX Dependency provides extensions in Kotlin for javacord
 In Gradle
 ```groovy
 repositories { maven { url 'https://jitpack.io' } }
-dependencies { implementation 'com.github.doomsdayrs:javacord-ktx:v0.1.0' }
+dependencies { implementation 'com.github.doomsdayrs:javacord-ktx:v0.1.1' }
 ```
 
 In KTS
 ```kts
 repositories { maven("https://jitpack.io") }
-dependencies { implementation("com.github.doomsdayrs:javacord-ktx:v0.1.0") }
+dependencies { implementation("com.github.doomsdayrs:javacord-ktx:v0.1.1") }
 ```
 
 Example usage
