@@ -71,6 +71,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.net.Proxy;
 import java.net.ProxySelector;
+import java.time.Duration;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,6 +90,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -203,6 +206,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * Whether Javacord should wait for all servers to become available on startup or not.
      */
     private final boolean waitForServersOnStartup;
+
+    /**
+     * A lock that makes sure that there are not more than one ping attempt at the same time.
+     * This ensures that the ping does not get affected by other requests that use the same bucket.
+     */
+    private final Lock restLatencyLock = new ReentrantLock();
 
     /**
      * A ratelimiter that is used for global ratelimits.
@@ -1157,6 +1166,20 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Optional<Ratelimiter> getGlobalRatelimiter() {
         return Optional.ofNullable(globalRatelimiter);
+    }
+
+    @Override
+    public CompletableFuture<Duration> measureRestLatency() {
+        return CompletableFuture.supplyAsync(() -> {
+            restLatencyLock.lock();
+            try {
+                RestRequest<Duration> request = new RestRequest<>(this, RestMethod.GET, RestEndpoint.CURRENT_USER);
+                long nanoStart = System.nanoTime();
+                return request.execute(result -> Duration.ofNanos(System.nanoTime() - nanoStart)).join();
+            } finally {
+                restLatencyLock.unlock();
+            }
+        }, getThreadPool().getExecutorService());
     }
 
     @Override
