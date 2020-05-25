@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -991,104 +990,56 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @return A collection with all group channels of the bot.
      */
-    default Collection<GroupChannel> getGroupChannels() {
-        // Not very efficient, but it's a client-only feature and normal users can only be in 100 servers anyway
-        return Collections.unmodifiableList(
-                getChannels().stream()
-                        .filter(GroupChannel.class::isInstance)
-                        .map(GroupChannel.class::cast)
-                        .collect(Collectors.toList()));
-    }
+    Collection<GroupChannel> getGroupChannels();
 
     /**
      * Gets a collection with all private channels of the bot.
      *
      * @return A collection with all private channels of the bot.
      */
-    default Collection<PrivateChannel> getPrivateChannels() {
-        // TODO This can be improved
-        return Collections.unmodifiableList(
-                getChannels().stream()
-                        .filter(PrivateChannel.class::isInstance)
-                        .map(PrivateChannel.class::cast)
-                        .collect(Collectors.toList()));
-    }
+    Collection<PrivateChannel> getPrivateChannels();
 
     /**
      * Gets a collection with all server channels of the bot.
      *
      * @return A collection with all server channels of the bot.
      */
-    default Collection<ServerChannel> getServerChannels() {
-        // TODO This can be improved
-        Collection<ServerChannel> channels = new ArrayList<>();
-        getServers().forEach(server -> channels.addAll(server.getChannels()));
-        return Collections.unmodifiableCollection(channels);
-    }
+    Collection<ServerChannel> getServerChannels();
 
     /**
      * Gets a collection with all channel categories of the bot.
      *
      * @return A collection with all channel categories of the bot.
      */
-    default Collection<ChannelCategory> getChannelCategories() {
-        // TODO This can be improved
-        Collection<ChannelCategory> channels = new ArrayList<>();
-        getServers().forEach(server -> channels.addAll(server.getChannelCategories()));
-        return Collections.unmodifiableCollection(channels);
-    }
+    Collection<ChannelCategory> getChannelCategories();
 
     /**
      * Gets a collection with all server text channels of the bot.
      *
      * @return A collection with all server text channels of the bot.
      */
-    default Collection<ServerTextChannel> getServerTextChannels() {
-        // TODO This can be improved
-        Collection<ServerTextChannel> channels = new ArrayList<>();
-        getServers().forEach(server -> channels.addAll(server.getTextChannels()));
-        return Collections.unmodifiableCollection(channels);
-    }
+    Collection<ServerTextChannel> getServerTextChannels();
 
     /**
      * Gets a collection with all server voice channels of the bot.
      *
      * @return A collection with all server voice channels of the bot.
      */
-    default Collection<ServerVoiceChannel> getServerVoiceChannels() {
-        // TODO This can be improved
-        Collection<ServerVoiceChannel> channels = new ArrayList<>();
-        getServers().forEach(server -> channels.addAll(server.getVoiceChannels()));
-        return Collections.unmodifiableCollection(channels);
-    }
+    Collection<ServerVoiceChannel> getServerVoiceChannels();
 
     /**
      * Gets a collection with all text channels of the bot.
      *
      * @return A collection with all text channels of the bot.
      */
-    default Collection<TextChannel> getTextChannels() {
-        // TODO This can be improved
-        return Collections.unmodifiableList(
-                getChannels().stream()
-                        .filter(TextChannel.class::isInstance)
-                        .map(TextChannel.class::cast)
-                        .collect(Collectors.toList()));
-    }
+    Collection<TextChannel> getTextChannels();
 
     /**
      * Gets a collection with all voice channels of the bot.
      *
      * @return A collection with all voice channels of the bot.
      */
-    default Collection<VoiceChannel> getVoiceChannels() {
-        // TODO This can be improved
-        return Collections.unmodifiableList(
-                getChannels().stream()
-                        .filter(VoiceChannel.class::isInstance)
-                        .map(VoiceChannel.class::cast)
-                        .collect(Collectors.toList()));
-    }
+    Collection<VoiceChannel> getVoiceChannels();
 
     /**
      * Gets a channel by its id.

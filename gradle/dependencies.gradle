@@ -34,6 +34,10 @@ project(':javacord-core') {
         // logging
         implementation 'org.apache.logging.log4j:log4j-api:2.11.0'
 
+        // Vavr, mainly for immutable collections
+        // We are using 0.10.1, because of an issue in 0.10.2: https://github.com/vavr-io/vavr/issues/2573
+        implementation "io.vavr:vavr:0.10.1"
+
         // the Javacord API
         api project(path: ':javacord-api')
 

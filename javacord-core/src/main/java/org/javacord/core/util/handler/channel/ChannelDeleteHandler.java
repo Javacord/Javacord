@@ -16,7 +16,6 @@ import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.event.channel.group.GroupChannelDeleteEvent;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.channel.user.PrivateChannelDeleteEvent;
-import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.group.GroupChannelDeleteEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelDeleteEventImpl;
@@ -85,12 +84,9 @@ public class ChannelDeleteHandler extends PacketHandler {
     private void handleCategory(JsonNode channelJson) {
         long serverId = channelJson.get("guild_id").asLong();
         long channelId = channelJson.get("id").asLong();
-        api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> server.getChannelCategoryById(channelId)
-                .ifPresent(channel -> {
-                            dispatchServerChannelDeleteEvent(channel);
-                            ((ServerImpl) server).removeChannelFromCache(channel.getId());
-                        }
-                ));
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getChannelCategoryById(channelId))
+                .ifPresent(this::dispatchServerChannelDeleteEvent);
         api.removeObjectListeners(ChannelCategory.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(Channel.class, channelId);
@@ -105,14 +101,14 @@ public class ChannelDeleteHandler extends PacketHandler {
         long serverId = channelJson.get("guild_id").asLong();
         long channelId = channelJson.get("id").asLong();
         api.getPossiblyUnreadyServerById(serverId)
-                .ifPresent(server -> server.getTextChannelById(channelId).ifPresent(channel -> {
+                .flatMap(server -> server.getTextChannelById(channelId))
+                .ifPresent(channel -> {
                     dispatchServerChannelDeleteEvent(channel);
-                    ((ServerImpl) server).removeChannelFromCache(channel.getId());
                     api.forEachCachedMessageWhere(
                             msg -> msg.getChannel().getId() == channelId,
                             msg -> api.removeMessageFromCache(msg.getId())
                     );
-                }));
+                });
         api.removeObjectListeners(ServerTextChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(TextChannel.class, channelId);
@@ -128,10 +124,8 @@ public class ChannelDeleteHandler extends PacketHandler {
         long serverId = channelJson.get("guild_id").asLong();
         long channelId = channelJson.get("id").asLong();
         api.getPossiblyUnreadyServerById(serverId)
-                .ifPresent(server -> server.getVoiceChannelById(channelId).ifPresent(channel -> {
-                    dispatchServerChannelDeleteEvent(channel);
-                    ((ServerImpl) server).removeChannelFromCache(channel.getId());
-                }));
+                .flatMap(server -> server.getVoiceChannelById(channelId))
+                .ifPresent(this::dispatchServerChannelDeleteEvent);
         api.removeObjectListeners(ServerVoiceChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(VoiceChannel.class, channelId);

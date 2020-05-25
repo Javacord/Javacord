@@ -189,11 +189,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
 
     /**
-     * A map with all channels of the server.
-     */
-    private final ConcurrentHashMap<Long, ServerChannel> channels = new ConcurrentHashMap<>();
-
-    /**
      * A map with all members of the server.
      */
     private final ConcurrentHashMap<Long, User> members = new ConcurrentHashMap<>();
@@ -634,32 +629,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
-     * Adds a channel to the cache.
-     *
-     * @param channel The channel to add.
-     */
-    public void addChannelToCache(ServerChannel channel) {
-        ServerChannel oldChannel = channels.put(channel.getId(), channel);
-        if ((oldChannel instanceof Cleanupable) && (oldChannel != channel)) {
-            ((Cleanupable) oldChannel).cleanup();
-        }
-    }
-
-    /**
-     * Removes a channel from the cache.
-     *
-     * @param channelId The id of the channel to remove.
-     */
-    public void removeChannelFromCache(long channelId) {
-        channels.computeIfPresent(channelId, (key, channel) -> {
-            if (channel instanceof Cleanupable) {
-                ((Cleanupable) channel).cleanup();
-            }
-            return null;
-        });
-    }
-
-    /**
      * Removes a role from the cache.
      *
      * @param roleId The id of the role to remove.
@@ -1006,7 +975,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * @return An unordered collection with all channels in the server.
      */
     public Collection<ServerChannel> getUnorderedChannels() {
-        return channels.values();
+        return api.getEntityCache().get().getChannelCache().getChannelsOfServer(getId());
     }
 
     @Override
@@ -1458,7 +1427,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public List<ServerChannel> getChannels() {
-        List<ServerChannel> channels = this.channels.values().stream()
+        List<ServerChannel> channels = getUnorderedChannels().stream()
                 .filter(channel -> channel.asCategorizable()
                         .map(categorizable -> !categorizable.getCategory().isPresent())
                         .orElse(false))
@@ -1502,18 +1471,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public Optional<ServerChannel> getChannelById(long id) {
-        return Optional.ofNullable(channels.get(id));
+        return api.getEntityCache().get().getChannelCache().getChannelById(id)
+                .filter(ServerChannel.class::isInstance)
+                .map(ServerChannel.class::cast);
     }
 
     @Override
     public void cleanup() {
-        channels.values().stream()
+        getUnorderedChannels().stream()
                 .map(ServerChannel::getId)
                 .forEach(api::removeChannelFromCache);
-        channels.values().stream()
-                .filter(Cleanupable.class::isInstance)
-                .map(Cleanupable.class::cast)
-                .forEach(Cleanupable::cleanup);
     }
 
     @Override
