@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.audio.InternalAudioConnectionAttachableListenerManager;
+import org.javacord.core.util.concurrent.BlockingReference;
 import org.javacord.core.util.gateway.AudioWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -16,14 +17,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class AudioConnectionImpl implements AudioConnection, InternalAudioConnectionAttachableListenerManager {
 
@@ -48,11 +44,6 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     private volatile ServerVoiceChannel channel;
 
     /**
-     * A lock to ensure we don't accidentally poll two elements from the queue.
-     */
-    private final ReentrantLock currentSourceLock = new ReentrantLock();
-
-    /**
      * A future that finishes once the connection is fully established.
      */
     private final CompletableFuture<AudioConnection> readyFuture;
@@ -68,14 +59,9 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     private CompletableFuture<Void> disconnectFuture;
 
     /**
-     * The source that gets played at the moment.
+     * The source that is currently being played.
      */
-    private volatile AtomicReference<AudioSource> currentSource = new AtomicReference<>();
-
-    /**
-     * A queue with all audio sources for this connection.
-     */
-    private final BlockingQueue<AudioSource> queue = new LinkedBlockingQueue<>();
+    private final BlockingReference<AudioSource> currentSource = new BlockingReference<>();
 
     /**
      * An artificial id for the connection.
@@ -298,47 +284,26 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     }
 
     /**
+     * Gets the current audio source, blocking the thread until it is available.
+     *
+     * @return The current audio source.
+     * @throws InterruptedException If interrupted while waiting.
+     */
+    public AudioSource getCurrentAudioSourceBlocking() throws InterruptedException {
+        return currentSource.get();
+    }
+
+    /**
      * Gets the current audio source, waiting up to the specified wait time
      * if necessary for an audio source to become available.
      *
      * @param timeout How long to wait before giving up.
-     * @param unit A {@code TimeUnit} determining how to interpret the {@code timeout} parameter.
+     * @param unit    A {@code TimeUnit} determining how to interpret the {@code timeout} parameter.
      * @return The current audio source, or {@code null} if the specified waiting time elapsed.
      * @throws InterruptedException If interrupted while waiting.
      */
     public AudioSource getCurrentAudioSourceBlocking(long timeout, TimeUnit unit) throws InterruptedException {
-        AudioSource source;
-        currentSourceLock.lock();
-        try {
-            AtomicBoolean poll = new AtomicBoolean(false);
-            source = currentSource.updateAndGet(currentSource -> {
-                if (currentSource == null) {
-                    // Always poll if the current source is null
-                    poll.set(true);
-                } else {
-                    // If the current source is not null, only poll if it's still queued
-                    poll.set(queue.peek() == currentSource);
-                }
-                return currentSource;
-            });
-            if (poll.get()) {
-                AudioSource sourceToSet = queue.poll(timeout, unit);
-                if (sourceToSet != null) { // If it's null, it timed out
-                    currentSource.set(sourceToSet);
-                    source = sourceToSet;
-                }
-            }
-        } finally {
-            currentSourceLock.unlock();
-        }
-        return source;
-    }
-
-    /**
-     * Removes the current audio source.
-     */
-    public void removeCurrentSource() {
-        currentSource.set(null);
+        return currentSource.get(timeout, unit);
     }
 
     @Override
@@ -349,21 +314,6 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public void queue(AudioSource source) {
-        queue.add(source);
-    }
-
-    @Override
-    public boolean dequeue(AudioSource source) {
-        if (currentSource.get() == source) {
-            removeCurrentSource();
-            return true;
-        } else {
-            return queue.remove(source);
-        }
     }
 
     @Override
@@ -400,13 +350,21 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
 
     @Override
     public Optional<AudioSource> getCurrentAudioSource() {
-        return Optional.ofNullable(
-                currentSource.updateAndGet(source -> {
-                    if (source != null) {
-                        return source;
-                    }
-                    return queue.peek();
-                }));
+        try {
+            return Optional.ofNullable(currentSource.get(0, TimeUnit.MILLISECONDS));
+        } catch (InterruptedException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void setCurrentAudioSource(AudioSource source) {
+        currentSource.set(source);
+    }
+
+    @Override
+    public void removeCurrentAudioSource() {
+        currentSource.set(null);
     }
 
     @Override
