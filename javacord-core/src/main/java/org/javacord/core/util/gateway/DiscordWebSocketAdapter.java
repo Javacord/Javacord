@@ -130,6 +130,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private final AtomicReference<Future<?>> heartbeatTimer = new AtomicReference<>();
     private final AtomicBoolean heartbeatAckReceived = new AtomicBoolean();
 
+    // Used to calculate the gateway latency
+    private volatile long lastHeartbeatSentTimeNanos = -1;
+
     private volatile int lastSeq = -1;
     private volatile String sessionId = null;
 
@@ -591,7 +594,10 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
                 break;
             case HEARTBEAT_ACK:
-                logger.debug("Heartbeat ACK received");
+                long gatewayLatency = System.nanoTime() - lastHeartbeatSentTimeNanos;
+                api.setLatestGatewayLatencyNanos(gatewayLatency);
+                logger.debug("Heartbeat ACK received. "
+                        + "Took " + TimeUnit.NANOSECONDS.toMillis(gatewayLatency) + " ms to receive ACK.");
                 heartbeatAckReceived.set(true);
                 break;
             default:
@@ -665,6 +671,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         heartbeatPacket.put("d", lastSeq);
         WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
         nextHeartbeatFrame.set(heartbeatFrame);
+        lastHeartbeatSentTimeNanos = System.nanoTime();
         websocket.sendFrame(heartbeatFrame);
     }
 
