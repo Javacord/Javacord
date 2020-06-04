@@ -95,6 +95,25 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Optional<Ratelimiter> getGlobalRatelimiter();
 
     /**
+     * Gets the latest gateway latency.
+     *
+     * <p>To calculate the gateway latency, Javacord measures the time it takes for Discord to answer the gateway
+     * heartbeat packet with a heartbeat ack packet. Please notice, that this values does only get updated on every
+     * heartbeat and not on every method call. To calculate an average, you have to collect the latency over a period of
+     * multiple minutes.
+     *
+     * <p>In very rare cases, the latency will be {@code -1 ns} directly after startup, because the initial heartbeat
+     * was not answered yet. Usually, the heartbeat is answered before the bot finished loading.
+     *
+     * <p><b>Expected latency</b>: Usually, you can expect a latency between {@code 30 ms} and {@code 300 ms} with a
+     * good internet connection. This value may vary, depending on your location, time of day, Discord's status, and the
+     * current workload of your system. A value above {@code 1000 ms} is usually an indicator that something is wrong.
+     *
+     * @return The latest measured gateway latency.
+     */
+    Duration getLatestGatewayLatency();
+
+    /**
      * Measures, how long Javacord will need to perform a single REST call.
      *
      * <p>This method does not measure the "true" latency to Discord's REST endpoints because the request is handled by

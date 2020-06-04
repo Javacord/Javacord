@@ -208,6 +208,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final boolean waitForServersOnStartup;
 
     /**
+     * The latest gateway latency.
+     */
+    private volatile long latestGatewayLatencyNanos = -1;
+
+    /**
      * A lock that makes sure that there are not more than one ping attempt at the same time.
      * This ensures that the ping does not get affected by other requests that use the same bucket.
      */
@@ -810,6 +815,24 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
+     * Gets the latest gateway latency in nano seconds.
+     *
+     * @return The latest gateway latency.
+     */
+    public long getLatestGatewayLatencyNanos() {
+        return latestGatewayLatencyNanos;
+    }
+
+    /**
+     * Sets the latest gateway latency in nano seconds.
+     *
+     * @param latestGatewayLatencyNanos The latest gateway latency.
+     */
+    public void setLatestGatewayLatencyNanos(long latestGatewayLatencyNanos) {
+        this.latestGatewayLatencyNanos = latestGatewayLatencyNanos;
+    }
+
+    /**
      * Sets the user of the connected account.
      *
      * @param yourself The user of the connected account.
@@ -1166,6 +1189,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Optional<Ratelimiter> getGlobalRatelimiter() {
         return Optional.ofNullable(globalRatelimiter);
+    }
+
+    @Override
+    public Duration getLatestGatewayLatency() {
+        return Duration.ofNanos(latestGatewayLatencyNanos);
     }
 
     @Override
