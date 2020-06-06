@@ -178,7 +178,7 @@ public interface InternalTextChannel extends TextChannel, InternalTextChannelAtt
                 .execute(result -> {
                     List<Webhook> webhooks = new ArrayList<>();
                     for (JsonNode webhook : result.getJsonBody()) {
-                        webhooks.add(new WebhookImpl(getApi(), webhook));
+                        webhooks.add(WebhookImpl.createWebhook(getApi(), webhook));
                     }
                     return Collections.unmodifiableList(webhooks);
                 });

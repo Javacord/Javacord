@@ -52,6 +52,17 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Returns a {@code WebhookMessageBuilder} according to this {@code Message}.
+     *
+     * @see MessageBuilder#fromMessage(Message)
+     *
+     * @return The {@code WebhookMessageBuilder}.
+     */
+    default WebhookMessageBuilder toWebhookMessageBuilder() {
+        return WebhookMessageBuilder.fromMessage(this);
+    }
+
+    /**
      * Deletes the message.
      *
      * @param api The discord api instance.

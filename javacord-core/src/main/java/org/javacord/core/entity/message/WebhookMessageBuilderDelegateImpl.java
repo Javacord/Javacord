@@ -1,5 +1,6 @@
 package org.javacord.core.entity.message;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.MediaType;
@@ -8,19 +9,15 @@ import okhttp3.RequestBody;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
-import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
+import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
-import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsImpl;
-import org.javacord.core.entity.user.Member;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -33,6 +30,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -40,17 +38,22 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link MessageBuilderDelegate}.
  */
-public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
+public class WebhookMessageBuilderDelegateImpl implements WebhookMessageBuilderDelegate {
 
     /**
      * The logger of this class.
      */
-    private static final Logger logger = LoggerUtil.getLogger(MessageBuilderDelegateImpl.class);
+    private static final Logger logger = LoggerUtil.getLogger(WebhookMessageBuilderDelegateImpl.class);
 
     /**
-     * The receiver of the message.
+     * The avatar the webhook should use.
      */
-    private Messageable messageable = null;
+    private URL avatarUrl = null;
+
+    /**
+     * The display name the webhook should use.
+     */
+    private String displayName = null;
 
     /**
      * The string builder used to create the message.
@@ -58,19 +61,14 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     private final StringBuilder strBuilder = new StringBuilder();
 
     /**
-     * The embed of the message. Might be <code>null</code>.
+     * The list of embed's of the message.
      */
-    private EmbedBuilder embed = null;
+    private List<EmbedBuilder> embeds = new ArrayList<>();
 
     /**
      * If the message should be text to speech or not.
      */
     private boolean tts = false;
-
-    /**
-     * The nonce of the message.
-     */
-    private String nonce = null;
 
     /**
      * A list with all attachments which should be added to the message.
@@ -126,13 +124,43 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
-    public void setEmbed(EmbedBuilder embed) {
-        this.embed = embed;
+    public void addEmbed(EmbedBuilder embed) {
+        embeds.add(embed);
+    }
+
+    @Override
+    public void addEmbeds(EmbedBuilder[] embeds) {
+        this.embeds.addAll(Arrays.asList(embeds));
+    }
+
+    @Override
+    public void removeEmbed(EmbedBuilder embed) {
+        embeds.remove(embed);
+    }
+
+    @Override
+    public void removeEmbeds(EmbedBuilder[] embeds) {
+        this.embeds.removeAll(Arrays.asList(embeds));
     }
 
     @Override
     public void setTts(boolean tts) {
         this.tts = tts;
+    }
+
+    @Override
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public void setDisplayAvatar(URL avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    @Override
+    public void setDisplayAvatar(Icon avatar) {
+        this.avatarUrl = avatar == null ? null : avatar.getUrl();
     }
 
     @Override
@@ -261,54 +289,41 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
-    public void setNonce(String nonce) {
-        this.nonce = nonce;
-    }
-
-    @Override
     public StringBuilder getStringBuilder() {
         return strBuilder;
     }
 
     @Override
-    public CompletableFuture<Message> send(User user) {
-        return send((Messageable) user);
-    }
-
-    @Override
-    public CompletableFuture<Message> send(Messageable messageable) {
-        if (messageable == null) {
-            throw new IllegalStateException("Cannot send message without knowing the receiver");
-        }
-        if (messageable instanceof TextChannel) {
-            return send((TextChannel) messageable);
-        } else if (messageable instanceof User) {
-            return ((User) messageable).openPrivateChannel().thenCompose(this::send);
-        } else if (messageable instanceof Member) {
-            return send(((Member) messageable).getUser());
-        } else if (messageable instanceof IncomingWebhook) {
-            return send((IncomingWebhook) messageable);
-        }
-        throw new IllegalStateException("Messageable of unknown type");
-    }
-
-    @Override
     public CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException {
+
         if (!webhook.getChannel().isPresent()) {
-            throw new IllegalStateException("Cannot use a Webhook without a channel!");
+            throw new IllegalStateException("Cannot use a webhook without a channel!");
         }
 
         ObjectNode body = JsonNodeFactory.instance.objectNode()
-                .put("content", toString() == null ? "" : toString())
                 .put("tts", this.tts);
 
         if (allowedMentions != null) {
             ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
         }
 
-        if (embed != null) {
-            body.set("embeds", JsonNodeFactory.instance.objectNode().arrayNode()
-                    .add((((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode())));
+        if (displayName != null) {
+            body.put("username", displayName);
+        }
+
+        if (avatarUrl != null) {
+            body.put("avatar_url", avatarUrl.toExternalForm());
+        }
+
+
+        if (embeds.size() != 0) {
+            ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
+            for (int i = 0; i < embeds.size() && i < 10; i++) {
+                embedsNode.add(((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).toJsonNode());
+            }
+            body.set("embeds", embedsNode);
+        } else if (strBuilder.length() != 0) {
+            body.put("content", strBuilder.toString());
         }
 
         RestRequest<Message> request =
@@ -323,10 +338,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                         .addFormDataPart("payload_json", body.toString());
                 List<FileContainer> tempAttachments = new ArrayList<>(attachments);
                 // Add the attachments required for the embed
-                if (embed != null) {
+                for (int i = 0; i < embeds.size() && i < 10; i++) {
                     tempAttachments.addAll(
-                            ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
+                            ((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).getRequiredAttachments());
                 }
+
                 Collections.reverse(tempAttachments);
                 for (int i = 0; i < tempAttachments.size(); i++) {
                     byte[] bytes = tempAttachments.get(i).asByteArray(webhook.getApi()).join();
@@ -359,75 +375,6 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             }
         });
         return future;
-    }
-
-    @Override
-    public CompletableFuture<Message> send(TextChannel channel) {
-        ObjectNode body = JsonNodeFactory.instance.objectNode()
-                .put("content", toString() == null ? "" : toString())
-                .put("tts", tts);
-        body.putArray("mentions");
-
-
-        if (allowedMentions != null) {
-            ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
-        }
-        if (embed != null) {
-            ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
-        }
-        if (nonce != null) {
-            body.put("nonce", nonce);
-        }
-
-        RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
-                .setUrlParameters(channel.getIdAsString());
-        if (!attachments.isEmpty() || (embed != null && embed.requiresAttachments())) {
-            CompletableFuture<Message> future = new CompletableFuture<>();
-            // We access files etc. so this should be async
-            channel.getApi().getThreadPool().getExecutorService().submit(() -> {
-                try {
-                    MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart("payload_json", body.toString());
-                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
-                    // Add the attachments required for the embed
-                    if (embed != null) {
-                        tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
-                    }
-                    Collections.reverse(tempAttachments);
-                    for (int i = 0; i < tempAttachments.size(); i++) {
-                        byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();
-
-                        String mediaType = URLConnection
-                                .guessContentTypeFromName(tempAttachments.get(i).getFileTypeOrName());
-                        if (mediaType == null) {
-                            mediaType = "application/octet-stream";
-                        }
-                        multipartBodyBuilder.addFormDataPart("file" + i, tempAttachments.get(i).getFileTypeOrName(),
-                                RequestBody.create(MediaType.parse(mediaType), bytes));
-                    }
-
-                    request.setMultipartBody(multipartBodyBuilder.build());
-                    request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                            .getOrCreateMessage(channel, result.getJsonBody()))
-                            .whenComplete((message, throwable) -> {
-                                if (throwable != null) {
-                                    future.completeExceptionally(throwable);
-                                } else {
-                                    future.complete(message);
-                                }
-                            });
-                } catch (Throwable t) {
-                    future.completeExceptionally(t);
-                }
-            });
-            return future;
-        } else {
-            request.setBody(body);
-            return request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                    .getOrCreateMessage(channel, result.getJsonBody()));
-        }
     }
 
     @Override

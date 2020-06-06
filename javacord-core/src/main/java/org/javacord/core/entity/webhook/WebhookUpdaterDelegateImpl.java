@@ -166,13 +166,13 @@ public class WebhookUpdaterDelegateImpl implements WebhookUpdaterDelegate {
                         .setUrlParameters(webhook.getIdAsString())
                         .setBody(body)
                         .setAuditLogReason(reason)
-                        .execute(result -> new WebhookImpl(webhook.getApi(), result.getJsonBody())));
+                        .execute(result -> WebhookImpl.createWebhook(webhook.getApi(), result.getJsonBody())));
             }
             return new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
                     .setUrlParameters(webhook.getIdAsString())
                     .setBody(body)
                     .setAuditLogReason(reason)
-                    .execute(result -> new WebhookImpl(webhook.getApi(), result.getJsonBody()));
+                    .execute(result -> WebhookImpl.createWebhook(webhook.getApi(), result.getJsonBody()));
         } else {
             return CompletableFuture.completedFuture(webhook);
         }

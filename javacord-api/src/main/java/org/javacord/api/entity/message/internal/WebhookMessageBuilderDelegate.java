@@ -2,14 +2,11 @@ package org.javacord.api.entity.message.internal;
 
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageDecoration;
-import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 
 import java.awt.image.BufferedImage;
@@ -22,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link MessageBuilder} to create messages.
  * You usually don't want to interact with this object.
  */
-public interface MessageBuilderDelegate {
+public interface WebhookMessageBuilderDelegate {
 
     /**
      * Appends code to the message.
@@ -70,11 +67,32 @@ public interface MessageBuilderDelegate {
     void setContent(String content);
 
     /**
-     * Sets the embed of the message.
+     * Adds the embed to the message.
      *
-     * @param embed The embed to set.
+     * @param embed The embed to add.
      */
-    void setEmbed(EmbedBuilder embed);
+    void addEmbed(EmbedBuilder embed);
+
+    /**
+     * Adds the embeds to the message.
+     *
+     * @param embeds The embeds to add.
+     */
+    void addEmbeds(EmbedBuilder[] embeds);
+
+    /**
+     * Removes the embed from the message.
+     *
+     * @param embed The embed to remove.
+     */
+    void removeEmbed(EmbedBuilder embed);
+
+    /**
+     * Removes the embeds from the message.
+     *
+     * @param embeds The embeds to remove.
+     */
+    void removeEmbeds(EmbedBuilder[] embeds);
 
     /**
      * Sets if the message should be text to speech.
@@ -82,6 +100,27 @@ public interface MessageBuilderDelegate {
      * @param tts Whether the message should be text to speech or not.
      */
     void setTts(boolean tts);
+
+    /**
+     * Sets the display name of the webhook.
+     *
+     * @param displayName The display name of the webhook.
+     */
+    void setDisplayName(String displayName);
+
+    /**
+     * Sets the display avatar of the webhook.
+     *
+     * @param avatarUrl The display avatar of the webhook.
+     */
+    void setDisplayAvatar(URL avatarUrl);
+
+    /**
+     * Sets the display avatar of the webhook.
+     *
+     * @param avatar The display avatar of the webhook.
+     */
+    void setDisplayAvatar(Icon avatar);
 
     /**
      * Adds a file to the message.
@@ -229,13 +268,6 @@ public interface MessageBuilderDelegate {
     void setAllowedMentions(AllowedMentions allowedMentions);
 
     /**
-     * Sets the nonce of the message.
-     *
-     * @param nonce The nonce to set.
-     */
-    void setNonce(String nonce);
-
-    /**
      * Gets the {@link StringBuilder} which is used to build the message.
      *
      * @return The StringBuilder which is used to build the message.
@@ -245,33 +277,8 @@ public interface MessageBuilderDelegate {
     /**
      * Sends the message.
      *
-     * @param user The user to which the message should be sent.
-     * @return The sent message.
-     */
-    CompletableFuture<Message> send(User user);
-
-    /**
-     * Sends the message.
-     *
-     * @param channel The channel in which the message should be sent.
-     * @return The sent message.
-     */
-    CompletableFuture<Message> send(TextChannel channel);
-
-    /**
-     * Sends the message.
-     *
      * @param webhook The webhook from which the message should be sent.
      * @return The sent message.
-     * @throws IllegalStateException if the defined Webhook's channel is not present.
      */
-    CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException;
-
-    /**
-     * Sends the message.
-     *
-     * @param messageable The receiver of the message.
-     * @return The sent message.
-     */
-    CompletableFuture<Message> send(Messageable messageable);
+    CompletableFuture<Message> send(IncomingWebhook webhook);
 }

@@ -124,13 +124,13 @@ public class WebhookBuilderDelegateImpl implements WebhookBuilderDelegate {
                             .setUrlParameters(channel.getIdAsString())
                             .setBody(body)
                             .setAuditLogReason(reason)
-                            .execute(result -> new WebhookImpl(channel.getApi(), result.getJsonBody())));
+                            .execute(result -> WebhookImpl.createWebhook(channel.getApi(), result.getJsonBody())));
         }
         return new RestRequest<Webhook>(channel.getApi(), RestMethod.POST, RestEndpoint.CHANNEL_WEBHOOK)
                 .setUrlParameters(channel.getIdAsString())
                 .setBody(body)
                 .setAuditLogReason(reason)
-                .execute(result -> new WebhookImpl(channel.getApi(), result.getJsonBody()));
+                .execute(result -> WebhookImpl.createWebhook(channel.getApi(), result.getJsonBody()));
     }
 
 }

@@ -1399,7 +1399,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .execute(result -> {
                     List<Webhook> webhooks = new ArrayList<>();
                     for (JsonNode webhookJson : result.getJsonBody()) {
-                        webhooks.add(new WebhookImpl(getApi(), webhookJson));
+                        webhooks.add(WebhookImpl.createWebhook(getApi(), webhookJson));
                     }
                     return Collections.unmodifiableList(webhooks);
                 });
