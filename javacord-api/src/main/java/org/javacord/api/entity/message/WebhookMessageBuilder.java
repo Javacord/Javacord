@@ -31,7 +31,9 @@ public class WebhookMessageBuilder {
      * @return A message builder which would produce the same text as the given message.
      */
     public static WebhookMessageBuilder fromMessage(Message message) {
-        WebhookMessageBuilder builder = new WebhookMessageBuilder();
+        WebhookMessageBuilder builder = new WebhookMessageBuilder()
+                .setDisplayAvatar(message.getAuthor().getAvatar())
+                .setDisplayName(message.getAuthor().getDisplayName());
         builder.getStringBuilder().append(message.getContent());
         if (!message.getEmbeds().isEmpty()) {
             message.getEmbeds().forEach(embed -> builder.addEmbed(embed.toBuilder()));
