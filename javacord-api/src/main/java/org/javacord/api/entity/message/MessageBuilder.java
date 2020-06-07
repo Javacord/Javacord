@@ -122,7 +122,8 @@ public class MessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder setEmbed(EmbedBuilder embed) {
-        delegate.setEmbed(embed);
+        delegate.removeAllEmbeds();
+        delegate.addEmbed(embed);
         return this;
     }
 

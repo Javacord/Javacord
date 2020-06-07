@@ -70,11 +70,16 @@ public interface MessageBuilderDelegate {
     void setContent(String content);
 
     /**
-     * Sets the embed of the message.
+     * Adds the embed to the message.
      *
-     * @param embed The embed to set.
+     * @param embed The embed to add.
      */
-    void setEmbed(EmbedBuilder embed);
+    void addEmbed(EmbedBuilder embed);
+
+    /**
+     * Removes all embeds from the message.
+     */
+    void removeAllEmbeds();
 
     /**
      * Sets if the message should be text to speech.
