@@ -55,7 +55,7 @@ public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, Interna
      * @param api The discord api instance.
      * @param data The json data of the webhook.
      */
-    public WebhookImpl(DiscordApi api, JsonNode data) {
+    protected WebhookImpl(DiscordApi api, JsonNode data) {
         this.api = (DiscordApiImpl) api;
 
         this.type = data.get("type").asText().equals("1") ? WebhookType.INCOMING : WebhookType.CHANNEL_FOLLOWER;
