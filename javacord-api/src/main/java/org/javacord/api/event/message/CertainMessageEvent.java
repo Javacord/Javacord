@@ -41,16 +41,6 @@ public interface CertainMessageEvent extends MessageEvent {
     }
 
     /**
-     * Checks if the event's message was sent in a {@link ChannelType#GROUP_CHANNEL group channel}.
-     *
-     * @return Whether the event's message was sent in a group channel.
-     * @see Message#isPrivateMessage()
-     */
-    default boolean isGroupMessage() {
-        return getMessage().isGroupMessage();
-    }
-
-    /**
      * Gets the author of the event's message.
      *
      * @return The author of the event's message.

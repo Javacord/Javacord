@@ -9,7 +9,6 @@ import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.activity.Activity;
-import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.message.Messageable;
@@ -552,17 +551,6 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return The new (or old) private channel with the user.
      */
     CompletableFuture<PrivateChannel> openPrivateChannel();
-
-    /**
-     * Gets the currently existing group channels with the user.
-     *
-     * @return The group channels with the user.
-     */
-    default Collection<GroupChannel> getGroupChannels() {
-        return getApi().getGroupChannels().stream()
-                .filter(groupChannel -> groupChannel.getMembers().contains(this))
-                .collect(Collectors.toList());
-    }
 
     /**
      * Adds the given role to the user.

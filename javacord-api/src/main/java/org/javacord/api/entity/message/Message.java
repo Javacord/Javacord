@@ -7,7 +7,6 @@ import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.channel.AutoArchiveDuration;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelType;
-import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -25,6 +24,7 @@ import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -978,15 +978,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     * Checks if the message was sent in a {@link ChannelType#GROUP_CHANNEL group channel}.
-     *
-     * @return Whether the message was sent in a group channel.
-     */
-    default boolean isGroupMessage() {
-        return getChannel().getType() == ChannelType.GROUP_CHANNEL;
-    }
-
-    /**
      * Gets a reaction by its emoji.
      *
      * @param emoji The emoji of the reaction.
@@ -1176,16 +1167,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     default Optional<PrivateChannel> getPrivateChannel() {
         return getChannel().asPrivateChannel();
-    }
-
-    /**
-     * Gets the group channel of the message.
-     * Only present if the message was sent in a group channel.
-     *
-     * @return The group channel.
-     */
-    default Optional<GroupChannel> getGroupChannel() {
-        return getChannel().asGroupChannel();
     }
 
     /**

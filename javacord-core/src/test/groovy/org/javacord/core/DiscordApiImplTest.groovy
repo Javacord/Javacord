@@ -65,7 +65,6 @@ class DiscordApiImplTest extends Specification {
             'getRolesByName'                         | [null]
             'getRolesByNameIgnoreCase'               | [null]
             'getChannels'                            | []
-            'getGroupChannels'                       | []
             'getPrivateChannels'                     | []
             'getServerChannels'                      | []
             'getChannelCategories'                   | []
@@ -87,8 +86,6 @@ class DiscordApiImplTest extends Specification {
             'getServerTextChannelsByNameIgnoreCase'  | [null]
             'getServerVoiceChannelsByName'           | [null]
             'getServerVoiceChannelsByNameIgnoreCase' | [null]
-            'getGroupChannelsByName'                 | [null]
-            'getGroupChannelsByNameIgnoreCase'       | [null]
             'getAllServers'                          | []
     }
 

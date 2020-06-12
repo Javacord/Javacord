@@ -25,15 +25,6 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     ChannelType getType();
 
     /**
-     * Gets the channel as group channel.
-     *
-     * @return The channel as group channel.
-     */
-    default Optional<GroupChannel> asGroupChannel() {
-        return as(GroupChannel.class);
-    }
-
-    /**
      * Gets the channel as private channel.
      *
      * @return The channel as private channel.
@@ -134,8 +125,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
 
     /**
      * Checks if the given user can see this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is  part of the chat.
      *
      * @param user The user to check.
      * @return Whether the given user can see this channel or not.
@@ -146,10 +136,6 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
             return user.isYourself() || privateChannel.get().getRecipient()
                     .map(recipient -> recipient.equals(user)).orElse(false);
         }
-        Optional<GroupChannel> groupChannel = asGroupChannel();
-        if (groupChannel.isPresent()) {
-            return user.isYourself() || groupChannel.get().getMembers().contains(user);
-        }
         Optional<RegularServerChannel> severChannel = asRegularServerChannel();
         return !severChannel.isPresent()
                 || severChannel.get().hasAnyPermission(user,
@@ -159,8 +145,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
 
     /**
      * Checks if the user of the connected account can see this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can see this channel or not.
      */
