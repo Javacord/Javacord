@@ -1,6 +1,5 @@
 package org.javacord.api.entity.user;
 
-import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
@@ -72,7 +71,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return Whether this user is the owner of the current account.
      */
     default boolean isBotOwner() {
-        return getApi().getAccountType() == AccountType.BOT && getApi().getOwnerId() == getId();
+        return getApi().getOwnerId() == getId();
     }
 
     /**
