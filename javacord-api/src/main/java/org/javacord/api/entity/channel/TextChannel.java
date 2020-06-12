@@ -857,8 +857,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can send messages in this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      *
      * @param user The user to check.
@@ -870,10 +869,6 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
             return user.isYourself() || privateChannel.get().getRecipient()
                     .map(recipient -> recipient.equals(user)).orElse(false);
         }
-        Optional<GroupChannel> groupChannel = asGroupChannel();
-        if (groupChannel.isPresent()) {
-            return user.isYourself() || groupChannel.get().getMembers().contains(user);
-        }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
@@ -883,8 +878,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the user of the connected account can send messages in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      *
      * @return Whether the user of the connected account can write messages or not.
@@ -895,8 +889,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can use external emojis in this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      * It also doesn't check if the user is even able to send any external emojis (twitch subscription or nitro).
      *
@@ -916,8 +909,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the user of the connected account can use external emojis in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      * It also doesn't check if the user is even able to send any external emojis (twitch subscription or nitro).
      *
@@ -929,8 +921,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can use embed links in this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      *
      * @param user The user to check.
@@ -949,8 +940,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the user of the connected account can use embed links in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      *
      * @return Whether the user of the connected account can embed links or not.
@@ -961,8 +951,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can read the message history of this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      *
      * @param user The user to check.
      * @return Whether the given user can read the message history or not.
@@ -980,8 +969,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the user of the connected account can read the message history of this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can read the message history or not.
      */
@@ -991,8 +979,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can use tts (text to speech) in this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      *
      * @param user The user to check.
@@ -1011,8 +998,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the user of the connected account can use tts (text to speech) in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      * Please notice, this does not check if a user has blocked private messages!
      *
      * @return Whether the user of the connected account can use tts or not.
@@ -1032,10 +1018,6 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
         if (privateChannel.isPresent()) {
             return user.isYourself() || privateChannel.get().getRecipient()
                     .map(recipient -> recipient.equals(user)).orElse(false);
-        }
-        Optional<GroupChannel> groupChannel = asGroupChannel();
-        if (groupChannel.isPresent()) {
-            return user.isYourself() || groupChannel.get().getMembers().contains(user);
         }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
@@ -1065,10 +1047,6 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
             return user.isYourself() || privateChannel.get().getRecipient()
                     .map(recipient -> recipient.equals(user)).orElse(false);
         }
-        Optional<GroupChannel> groupChannel = asGroupChannel();
-        if (groupChannel.isPresent()) {
-            return user.isYourself() || groupChannel.get().getMembers().contains(user);
-        }
         Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
         return !severTextChannel.isPresent()
                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
@@ -1090,8 +1068,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can manage messages (delete or pin them or remove reactions of others) in this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      *
      * @param user The user to check.
      * @return Whether the given user can manage messages or not.
@@ -1110,8 +1087,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     /**
      * Checks if the user of the connected account can manage messages (delete or pin them or remove reactions of
      * others) in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can manage messages or not.
      */
@@ -1121,8 +1097,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can remove reactions of other users in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      * This method just forwards to {@link #canManageMessages(User)} as it is the same permission that is needed.
      *
      * @param user The user to check.
@@ -1134,8 +1109,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the user of the connected account can remove reactions of other users in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can remove reactions of others or not.
      */
@@ -1145,8 +1119,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the given user can mention everyone (@everyone) in this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      *
      * @param user The user to check.
      * @return Whether the given user can mention everyone (@everyone) or not.
@@ -1164,8 +1137,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
 
     /**
      * Checks if the user of the connected account can mention everyone (@everyone) in this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can mention everyone (@everyone) or not.
      */

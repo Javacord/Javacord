@@ -3,9 +3,6 @@ package org.javacord.core.util.handler;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.ChannelType;
-import org.javacord.core.entity.channel.GroupChannelImpl;
-import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -40,26 +37,6 @@ public class ReadyHandler extends PacketHandler {
                 continue;
             }
             new ServerImpl(api, guildJson);
-        }
-
-        // Private channels array is empty for bots, see
-        // https://github.com/hammerandchisel/discord-api-docs/issues/184
-        if (packet.has("private_channels")) {
-            JsonNode privateChannels = packet.get("private_channels");
-            for (JsonNode channelJson : privateChannels) {
-                switch (ChannelType.fromId(channelJson.get("type").asInt())) {
-                    case PRIVATE_CHANNEL:
-                        new PrivateChannelImpl(api, channelJson);
-                        break;
-                    case GROUP_CHANNEL:
-                        new GroupChannelImpl(api, channelJson);
-                        break;
-                    default:
-                        logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
-
-                }
-
-            }
         }
 
         api.setYourself(new UserImpl(api, packet.get("user"), (MemberImpl) null, null));

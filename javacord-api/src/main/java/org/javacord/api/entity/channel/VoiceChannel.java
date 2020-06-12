@@ -15,8 +15,7 @@ public interface VoiceChannel extends Channel, VoiceChannelAttachableListenerMan
 
     /**
      * Checks if the given user can connect to the voice channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      *
      * @param user The user to check.
      * @return Whether the given user can connect or not.
@@ -34,8 +33,7 @@ public interface VoiceChannel extends Channel, VoiceChannelAttachableListenerMan
 
     /**
      * Checks if the user of the connected account can connect to the voice channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can connect or not.
      */
@@ -45,13 +43,13 @@ public interface VoiceChannel extends Channel, VoiceChannelAttachableListenerMan
 
     /**
      * Checks if the given user can mute other users in this voice channel.
-     * In private chats (private channel or group channel) this always returns <code>false</code>.
+     * In private channels this always returns <code>false</code>.
      *
      * @param user The user to check.
      * @return Whether the given user can mute other users or not.
      */
     default boolean canMuteUsers(User user) {
-        if (!canConnect(user) || getType() == ChannelType.PRIVATE_CHANNEL || getType() == ChannelType.GROUP_CHANNEL) {
+        if (!canConnect(user) || getType() == ChannelType.PRIVATE_CHANNEL) {
             return false;
         }
         Optional<ServerVoiceChannel> serverVoiceChannel = asServerVoiceChannel();
@@ -63,7 +61,7 @@ public interface VoiceChannel extends Channel, VoiceChannelAttachableListenerMan
 
     /**
      * Checks if the user of the connected account can mute other users in this voice channel.
-     * In private chats (private channel or group channel) this always returns {@code false}.
+     * In private channels this always returns {@code false}.
      *
      * @return Whether the user of the connected account can mute other users or not.
      */

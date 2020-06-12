@@ -3,7 +3,7 @@ package org.javacord.core.util.handler.guild;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.GroupChannel;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
@@ -12,7 +12,6 @@ import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinE
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
 import org.javacord.api.event.server.VoiceStateUpdateEvent;
 import org.javacord.core.audio.AudioConnectionImpl;
-import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -63,8 +62,8 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 VoiceChannel voiceChannel = optionalChannel.get();
                 if (voiceChannel instanceof PrivateChannel) {
                     handlePrivateChannel(userId, ((PrivateChannelImpl) voiceChannel));
-                } else if (voiceChannel instanceof GroupChannel) {
-                    handleGroupChannel(userId, ((GroupChannelImpl) voiceChannel));
+                } else if (voiceChannel.getType() == ChannelType.GROUP_CHANNEL) {
+                    logger.info("Received a VOICE_STATE_UPDATE packet for a group channel. This should be impossible.");
                 }
             } else {
                 LoggerUtil.logMissingChannel(logger, channelId);
@@ -177,11 +176,6 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     private void handlePrivateChannel(long userId, PrivateChannelImpl channel) {
-        //channel.addConnectedUser(user);
-        //dispatchVoiceChannelMemberJoinEvent(user, channel);
-    }
-
-    private void handleGroupChannel(long userId, GroupChannelImpl channel) {
         //channel.addConnectedUser(user);
         //dispatchVoiceChannelMemberJoinEvent(user, channel);
     }
