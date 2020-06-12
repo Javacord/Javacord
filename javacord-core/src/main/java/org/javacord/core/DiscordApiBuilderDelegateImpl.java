@@ -3,7 +3,6 @@ package org.javacord.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.CloseableThreadContext;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
@@ -86,11 +85,6 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      * The token which is used to login. Must be present in order to login!
      */
     private volatile String token = null;
-
-    /**
-     * The account type of the account with the given token.
-     */
-    private volatile AccountType accountType = AccountType.BOT;
 
     /**
      * The current shard starting with <code>0</code>.
@@ -196,7 +190,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
-            new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), intents,
+            new DiscordApiImpl(token, currentShard.get(), totalShards.get(), intents,
                     waitForServersOnStartup, waitForUsersOnStartup, registerShutdownHook, globalRatelimiter,
                     gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates,
                     future, null, preparedListeners, preparedUnspecifiedListeners, userCacheEnabled);
@@ -316,16 +310,6 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public Optional<String> getToken() {
         return Optional.ofNullable(token);
-    }
-
-    @Override
-    public void setAccountType(AccountType type) {
-        this.accountType = type;
-    }
-
-    @Override
-    public AccountType getAccountType() {
-        return accountType;
     }
 
     @Override
