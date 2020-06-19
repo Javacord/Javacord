@@ -38,6 +38,7 @@ import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.concurrent.ThreadPool;
 import org.javacord.api.util.event.ListenerManager;
+import org.javacord.api.util.ratelimit.LocalRatelimiter;
 import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.activity.ApplicationInfoImpl;
@@ -106,6 +107,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * The logger of this class.
      */
     private static final Logger logger = LoggerUtil.getLogger(DiscordApiImpl.class);
+
+    /**
+     * A map with the default global ratelimiter.
+     *
+     * <p>The key is the bot's token (because ratelimits are per account) and the key is the ratelimiter for this token.
+     */
+    private static final Map<String, Ratelimiter> defaultGlobalRatelimiter = new ConcurrentHashMap<>();
 
     /**
      * The thread pool which is used internally.
@@ -1188,7 +1196,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public Optional<Ratelimiter> getGlobalRatelimiter() {
-        return Optional.ofNullable(globalRatelimiter);
+        if (globalRatelimiter == null) {
+            Ratelimiter ratelimiter = defaultGlobalRatelimiter.computeIfAbsent(
+                    getToken(),
+                    (token) -> new LocalRatelimiter(5, Duration.ofMillis((long) Math.ceil(5D / 45D))));
+            return Optional.of(ratelimiter);
+        }
+        return Optional.of(globalRatelimiter);
     }
 
     @Override

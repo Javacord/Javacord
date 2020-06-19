@@ -28,6 +28,7 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
+import org.javacord.api.util.ratelimit.LocalRatelimiter;
 import org.javacord.api.util.ratelimit.Ratelimiter;
 
 import java.awt.image.BufferedImage;
@@ -89,6 +90,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
 
     /**
      * Gets the current global ratelimiter.
+     *
+     * <p>**Note:** This method returns an {@code Optional} for historic reasons.
+     * If you did not provide a ratelimiter by yourself, this method will return a {@link LocalRatelimiter}
+     * which is set to {@code} request per {@code 111.1 ms}. This ratelimiter is shared by every bot with the same token
+     * in the same Java program.
      *
      * @return The current global ratelimiter.
      */
