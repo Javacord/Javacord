@@ -9,6 +9,7 @@ public enum WebhookType {
 
     /**
      * Incoming webhooks can post messages to channels with a generated token.
+     * It extents {@link org.javacord.api.entity.message.Messageable}.
      */
     INCOMING;
 }

@@ -9,6 +9,9 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * This class represents a webhook you can send messages to.
+ */
 public interface IncomingWebhook extends Webhook, Messageable {
 
     @Override

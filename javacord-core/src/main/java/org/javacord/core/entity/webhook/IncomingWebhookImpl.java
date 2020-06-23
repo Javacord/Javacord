@@ -7,6 +7,9 @@ import org.javacord.api.entity.webhook.WebhookType;
 
 import java.util.Optional;
 
+/**
+ * The implementation of {@link IncomingWebhook}.
+ */
 public class IncomingWebhookImpl extends WebhookImpl implements IncomingWebhook {
 
     private final String token;
