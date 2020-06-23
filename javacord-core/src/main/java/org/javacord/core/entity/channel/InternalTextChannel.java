@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.MessageSetImpl;
@@ -184,4 +185,17 @@ public interface InternalTextChannel extends TextChannel, InternalTextChannelAtt
                 });
     }
 
+    @Override
+    default CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks() {
+        return new RestRequest<List<IncomingWebhook>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> {
+                    List<IncomingWebhook> webhooks = new ArrayList<>();
+                    for (JsonNode webhook : result.getJsonBody()) {
+                        WebhookImpl.createWebhook(getApi(), webhook).asIncomingWebhook()
+                                .ifPresent(webhooks::add);
+                    }
+                    return Collections.unmodifiableList(webhooks);
+                });
+    }
 }
