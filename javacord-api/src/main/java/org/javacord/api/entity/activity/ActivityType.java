@@ -25,7 +25,12 @@ public enum ActivityType {
     /**
      * Represents watching an application, represented as "Watching Half-Life 3", for example.
      */
-    WATCHING(3);
+    WATCHING(3),
+
+    /**
+     * Represents a custom status, represented as "{emoji} {state}".
+     */
+    CUSTOM(4);
 
     private final int id;
 
@@ -63,6 +68,8 @@ public enum ActivityType {
                 return LISTENING;
             case 3:
                 return WATCHING;
+            case 4:
+                return CUSTOM;
             default:
                 return PLAYING;
         }

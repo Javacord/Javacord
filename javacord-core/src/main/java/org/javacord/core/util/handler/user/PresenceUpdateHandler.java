@@ -48,7 +48,7 @@ public class PresenceUpdateHandler extends PacketHandler {
             if (packet.has("game")) {
                 Activity newActivity = null;
                 if (!packet.get("game").isNull()) {
-                    newActivity = new ActivityImpl(packet.get("game"));
+                    newActivity = new ActivityImpl(api, packet.get("game"));
                 }
                 Activity oldActivity = user.getActivity().orElse(null);
                 user.setActivity(newActivity);

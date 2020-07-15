@@ -5,6 +5,9 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityAssets;
 import org.javacord.api.entity.activity.ActivityParty;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -25,13 +28,15 @@ public class ActivityImpl implements Activity {
     private final Long applicationId;
     private final Long startTime;
     private final Long endTime;
+    private final Emoji emoji;
 
     /**
      * Creates a new activity object.
      *
+     * @param api The discord api instance.
      * @param data The json data of the activity.
      */
-    public ActivityImpl(JsonNode data) {
+    public ActivityImpl(DiscordApiImpl api, JsonNode data) {
         this.type = ActivityType.getActivityTypeById(data.get("type").asInt());
         this.name = data.get("name").asText();
         this.streamingUrl = data.has("url") ? data.get("url").asText(null) : null;
@@ -47,6 +52,16 @@ public class ActivityImpl implements Activity {
         } else {
             this.startTime = null;
             this.endTime = null;
+        }
+        if (data.has("emoji")) {
+            JsonNode emoji = data.get("emoji");
+            if (emoji.has("id")) {
+                this.emoji = api.getKnownCustomEmojiOrCreateCustomEmoji(emoji);
+            } else {
+                this.emoji = UnicodeEmojiImpl.fromString(emoji.get("name").asText());
+            }
+        } else {
+            this.emoji = null;
         }
     }
 
@@ -68,6 +83,7 @@ public class ActivityImpl implements Activity {
         this.applicationId = null;
         this.startTime = null;
         this.endTime = null;
+        this.emoji = null;
     }
 
     @Override
@@ -121,6 +137,11 @@ public class ActivityImpl implements Activity {
     }
 
     @Override
+    public Optional<Emoji> getEmoji() {
+        return Optional.ofNullable(emoji);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ActivityImpl)) {
             return false;
@@ -151,6 +172,7 @@ public class ActivityImpl implements Activity {
         int applicationIdHash = applicationId == null ? 0 : applicationId.toString().hashCode();
         int startTimeHash = startTime == null ? 0 : startTime.toString().hashCode();
         int endTimeHash = endTime == null ? 0 : endTime.toString().hashCode();
+        int emojiHash = emoji == null ? 0 : emoji.hashCode();
 
         hash = hash * 11 + typeHash;
         hash = hash * 13 + nameHash;
@@ -162,6 +184,7 @@ public class ActivityImpl implements Activity {
         hash = hash * 37 + applicationIdHash;
         hash = hash * 41 + startTimeHash;
         hash = hash * 43 + endTimeHash;
+        hash = hash * 47 + emojiHash;
         return hash;
     }
 }
