@@ -652,7 +652,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
                 String userName = getServer().map(user::getDisplayName).orElseGet(user::getName);
-                content = userMention.replaceFirst("@" + userName);
+                content = userMention.replaceFirst(Matcher.quoteReplacement("@" + userName));
                 userMention.reset(content);
             }
         }
@@ -664,7 +664,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
                             .getRoleById(roleId)
                             .map(Role::getName))
                     .orElse("deleted-role");
-            content = roleMention.replaceFirst("@" + roleName);
+            content = roleMention.replaceFirst(Matcher.quoteReplacement("@" + roleName));
             roleMention.reset(content);
         }
         Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(content);
