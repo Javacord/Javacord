@@ -160,6 +160,16 @@ public class WebhookMessageBuilder {
     }
 
     /**
+     * Removes all embeds from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder removeAllEmbeds() {
+        delegate.removeAllEmbeds();
+        return this;
+    }
+
+    /**
      * Sets if the message should be text to speech.
      *
      * @param tts Whether the message should be text to speech or not.
