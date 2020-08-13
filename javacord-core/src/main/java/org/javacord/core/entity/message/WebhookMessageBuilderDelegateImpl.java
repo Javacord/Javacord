@@ -39,7 +39,7 @@ public class WebhookMessageBuilderDelegateImpl
     }
 
     @Override
-    public void addEmbeds(EmbedBuilder[] embeds) {
+    public void addEmbeds(EmbedBuilder... embeds) {
         this.embeds.addAll(Arrays.asList(embeds));
     }
 
@@ -49,7 +49,7 @@ public class WebhookMessageBuilderDelegateImpl
     }
 
     @Override
-    public void removeEmbeds(EmbedBuilder[] embeds) {
+    public void removeEmbeds(EmbedBuilder... embeds) {
         this.embeds.removeAll(Arrays.asList(embeds));
     }
 

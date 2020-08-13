@@ -313,6 +313,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
         }
         if (embeds.size() > 0) {
+            // As only messages sent by webhooks can contain more than one embed, it is enough to add the first.
             ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).toJsonNode(body.putObject("embed"));
         }
         if (nonce != null) {
@@ -382,7 +383,6 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         if (avatarUrl != null) {
             body.put("avatar_url", avatarUrl.toExternalForm());
         }
-
 
         if (embeds.size() != 0) {
             ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
