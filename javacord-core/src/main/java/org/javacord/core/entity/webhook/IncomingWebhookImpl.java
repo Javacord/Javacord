@@ -20,7 +20,7 @@ public class IncomingWebhookImpl extends WebhookImpl implements IncomingWebhook 
      * @param api  The discord api instance.
      * @param data The json data of the webhook.
      */
-    protected IncomingWebhookImpl(DiscordApi api, JsonNode data) {
+    public IncomingWebhookImpl(DiscordApi api, JsonNode data) {
         super(api, data);
         token = data.get("token").asText();
     }

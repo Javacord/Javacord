@@ -7,6 +7,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -301,6 +302,61 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
+    public CompletableFuture<Message> send(TextChannel channel) {
+        ObjectNode body = JsonNodeFactory.instance.objectNode()
+                .put("content", toString() == null ? "" : toString())
+                .put("tts", tts);
+        body.putArray("mentions");
+
+
+        if (allowedMentions != null) {
+            ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
+        }
+        if (embeds.size() > 0) {
+            ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).toJsonNode(body.putObject("embed"));
+        }
+        if (nonce != null) {
+            body.put("nonce", nonce);
+        }
+
+        RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
+                .setUrlParameters(channel.getIdAsString());
+        if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
+            CompletableFuture<Message> future = new CompletableFuture<>();
+            // We access files etc. so this should be async
+            channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+                try {
+                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                    // Add the attachments required for the embed
+                    if (embeds.size() > 0) {
+                        tempAttachments.addAll(
+                                ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).getRequiredAttachments());
+                    }
+
+                    addMultipartBodyToRequest(request, body, tempAttachments, channel.getApi());
+
+                    request.execute(result -> ((DiscordApiImpl) channel.getApi())
+                            .getOrCreateMessage(channel, result.getJsonBody()))
+                            .whenComplete((message, throwable) -> {
+                                if (throwable != null) {
+                                    future.completeExceptionally(throwable);
+                                } else {
+                                    future.complete(message);
+                                }
+                            });
+                } catch (Throwable t) {
+                    future.completeExceptionally(t);
+                }
+            });
+            return future;
+        } else {
+            request.setBody(body);
+            return request.execute(result -> ((DiscordApiImpl) channel.getApi())
+                    .getOrCreateMessage(channel, result.getJsonBody()));
+        }
+    }
+
+    @Override
     public CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException {
         return send(webhook, null, null);
     }
@@ -344,120 +400,84 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 new RestRequest<Message>(webhook.getApi(), RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
                         .setUrlParameters(webhook.getIdAsString(), webhook.getToken());
         CompletableFuture<Message> future = new CompletableFuture<>();
-
-        webhook.getApi().getThreadPool().getExecutorService().submit(() -> {
-            try {
-                MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("payload_json", body.toString());
-                List<FileContainer> tempAttachments = new ArrayList<>(attachments);
-                // Add the attachments required for the embed
-                for (int i = 0; i < embeds.size() && i < 10; i++) {
-                    tempAttachments.addAll(
-                            ((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).getRequiredAttachments());
-                }
-
-                Collections.reverse(tempAttachments);
-                for (int i = 0; i < tempAttachments.size(); i++) {
-                    byte[] bytes = tempAttachments.get(i).asByteArray(webhook.getApi()).join();
-
-                    String mediaType = URLConnection
-                            .guessContentTypeFromName(tempAttachments.get(i).getFileTypeOrName());
-                    if (mediaType == null) {
-                        mediaType = "application/octet-stream";
-                    }
-                    multipartBodyBuilder.addFormDataPart("file" + i, tempAttachments.get(i).getFileTypeOrName(),
-                            RequestBody.create(MediaType.parse(mediaType), bytes));
-                }
-
-                request.setMultipartBody(multipartBodyBuilder.build());
-                request.execute(result -> webhook.getChannel().get().getMessagesAsStream()
-                        .filter(message -> message.getAuthor().isWebhook()
-                                && message.getAuthor().getId() == webhook.getId())
-                        .findFirst()
-                        .orElseThrow(AssertionError::new)
-                )
-                        .whenComplete((message, throwable) -> {
-                            if (throwable != null) {
-                                future.completeExceptionally(throwable);
-                            } else {
-                                future.complete(message);
-                            }
-                        });
-            } catch (Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-        return future;
-    }
-
-    @Override
-    public CompletableFuture<Message> send(TextChannel channel) {
-        ObjectNode body = JsonNodeFactory.instance.objectNode()
-                .put("content", toString() == null ? "" : toString())
-                .put("tts", tts);
-        body.putArray("mentions");
-
-
-        if (allowedMentions != null) {
-            ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
-        }
-        if (embeds.size() > 0) {
-            ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).toJsonNode(body.putObject("embed"));
-        }
-        if (nonce != null) {
-            body.put("nonce", nonce);
-        }
-
-        RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
-                .setUrlParameters(channel.getIdAsString());
         if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
-            CompletableFuture<Message> future = new CompletableFuture<>();
             // We access files etc. so this should be async
-            channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+            webhook.getApi().getThreadPool().getExecutorService().submit(() -> {
                 try {
-                    MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart("payload_json", body.toString());
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
-                    // Add the attachments required for the embed
-                    if (embeds.size() > 0) {
+                    // Add the attachments required for the embeds
+                    for (int i = 0; i < embeds.size() && i < 10; i++) {
                         tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).getRequiredAttachments());
-                    }
-                    Collections.reverse(tempAttachments);
-                    for (int i = 0; i < tempAttachments.size(); i++) {
-                        byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();
-
-                        String mediaType = URLConnection
-                                .guessContentTypeFromName(tempAttachments.get(i).getFileTypeOrName());
-                        if (mediaType == null) {
-                            mediaType = "application/octet-stream";
-                        }
-                        multipartBodyBuilder.addFormDataPart("file" + i, tempAttachments.get(i).getFileTypeOrName(),
-                                RequestBody.create(MediaType.parse(mediaType), bytes));
+                                ((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).getRequiredAttachments());
                     }
 
-                    request.setMultipartBody(multipartBodyBuilder.build());
-                    request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                            .getOrCreateMessage(channel, result.getJsonBody()))
-                            .whenComplete((message, throwable) -> {
-                                if (throwable != null) {
-                                    future.completeExceptionally(throwable);
-                                } else {
-                                    future.complete(message);
-                                }
-                            });
+                    addMultipartBodyToRequest(request, body, tempAttachments, webhook.getApi());
+
+                    executeWebhookRest(request, webhook, future);
                 } catch (Throwable t) {
                     future.completeExceptionally(t);
                 }
             });
-            return future;
         } else {
             request.setBody(body);
-            return request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                    .getOrCreateMessage(channel, result.getJsonBody()));
+            executeWebhookRest(request, webhook, future);
         }
+        return future;
+    }
+
+    /**
+     * Method which creates and adds a MultipartBody to a RestRequest.
+     *
+     * @param request The RestRequest to add the MultipartBody to
+     * @param body The body to use as base for the MultipartBody
+     * @param attachments The List of FileContainers to add as attachments
+     * @param api the api instance needed to add the attachments
+     */
+    private void addMultipartBodyToRequest(RestRequest<Message> request, ObjectNode body,
+                                           List<FileContainer> attachments, DiscordApi api) {
+        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("payload_json", body.toString());
+
+        Collections.reverse(attachments);
+        for (int i = 0; i < attachments.size(); i++) {
+            byte[] bytes = attachments.get(i).asByteArray(api).join();
+
+            String mediaType = URLConnection
+                    .guessContentTypeFromName(attachments.get(i).getFileTypeOrName());
+            if (mediaType == null) {
+                mediaType = "application/octet-stream";
+            }
+            multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileTypeOrName(),
+                    RequestBody.create(MediaType.parse(mediaType), bytes));
+        }
+
+        request.setMultipartBody(multipartBodyBuilder.build());
+    }
+
+    /**
+     * Method which executes the webhook rest request.
+     * It gets the message from the channel and completes the future.
+     *
+     * @param request The rest request to execute
+     * @param webhook The webhook to send the message to
+     * @param future The future to complete
+     */
+    private static void executeWebhookRest(RestRequest<Message> request, IncomingWebhook webhook,
+                                           CompletableFuture<Message> future) {
+        request.execute(result -> webhook.getChannel().get().getMessagesAsStream()
+                .filter(message -> message.getAuthor().isWebhook()
+                        && message.getAuthor().getId() == webhook.getId())
+                .findFirst()
+                .orElseThrow(AssertionError::new)
+        )
+                .whenComplete((message, throwable) -> {
+                    if (throwable != null) {
+                        future.completeExceptionally(throwable);
+                    } else {
+                        future.complete(message);
+                    }
+                });
     }
 
     @Override

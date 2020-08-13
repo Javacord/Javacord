@@ -35,6 +35,7 @@ import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
@@ -51,6 +52,7 @@ import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
+import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.listener.server.InternalServerAttachableListenerManager;
 import org.javacord.core.util.Cleanupable;
@@ -1400,6 +1402,21 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     List<Webhook> webhooks = new ArrayList<>();
                     for (JsonNode webhookJson : result.getJsonBody()) {
                         webhooks.add(WebhookImpl.createWebhook(getApi(), webhookJson));
+                    }
+                    return Collections.unmodifiableList(webhooks);
+                });
+    }
+
+    @Override
+    public CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks() {
+        return new RestRequest<List<IncomingWebhook>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> {
+                    List<IncomingWebhook> webhooks = new ArrayList<>();
+                    for (JsonNode webhookJson : result.getJsonBody()) {
+                        if (webhookJson.get("type").asText().equals("1")) {
+                            webhooks.add(new IncomingWebhookImpl(getApi(), webhookJson));
+                        }
                     }
                     return Collections.unmodifiableList(webhooks);
                 });

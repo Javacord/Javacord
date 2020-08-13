@@ -23,7 +23,7 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      *
      * @param embeds The embeds to add.
      */
-    void addEmbeds(EmbedBuilder[] embeds);
+    void addEmbeds(EmbedBuilder... embeds);
 
     /**
      * Removes the embed from the message.
@@ -37,7 +37,12 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      *
      * @param embeds The embeds to remove.
      */
-    void removeEmbeds(EmbedBuilder[] embeds);
+    void removeEmbeds(EmbedBuilder... embeds);
+
+    /**
+     * Removes all embeds from the message.
+     */
+    void removeAllEmbeds();
 
     /**
      * Sets the display name of the webhook.

@@ -11,6 +11,7 @@ import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.MessageSetImpl;
+import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.listener.channel.InternalTextChannelAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -178,8 +179,8 @@ public interface InternalTextChannel extends TextChannel, InternalTextChannelAtt
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
                     List<Webhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhook : result.getJsonBody()) {
-                        webhooks.add(WebhookImpl.createWebhook(getApi(), webhook));
+                    for (JsonNode webhookJson : result.getJsonBody()) {
+                        webhooks.add(WebhookImpl.createWebhook(getApi(), webhookJson));
                     }
                     return Collections.unmodifiableList(webhooks);
                 });
@@ -191,9 +192,10 @@ public interface InternalTextChannel extends TextChannel, InternalTextChannelAtt
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
                     List<IncomingWebhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhook : result.getJsonBody()) {
-                        WebhookImpl.createWebhook(getApi(), webhook).asIncomingWebhook()
-                                .ifPresent(webhooks::add);
+                    for (JsonNode webhookJson : result.getJsonBody()) {
+                        if (webhookJson.get("type").asText().equals("1")) {
+                            webhooks.add(new IncomingWebhookImpl(getApi(), webhookJson));
+                        }
                     }
                     return Collections.unmodifiableList(webhooks);
                 });
