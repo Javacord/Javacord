@@ -30,7 +30,7 @@ public abstract class SingleReactionEventImpl extends RequestableMessageEventImp
     /**
      * The user of the event.
      */
-    private final long userId;
+    protected final long userId;
 
     /**
      * Creates a new single reaction event.

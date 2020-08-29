@@ -7,13 +7,12 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link ReactionRemoveEvent}.
  */
 public class ReactionRemoveEventImpl extends SingleReactionEventImpl implements ReactionRemoveEvent {
-
-    private final long userId;
 
     /**
      * Creates a new reaction remove event.
@@ -28,12 +27,16 @@ public class ReactionRemoveEventImpl extends SingleReactionEventImpl implements 
     public ReactionRemoveEventImpl(DiscordApi api, long messageId, TextChannel channel, Emoji emoji, User user,
                                    long userId) {
         super(api, messageId, channel, emoji, user, userId);
-        this.userId = userId;
     }
 
     @Override
     public Optional<User> getUser() {
         return Optional.ofNullable(this.user);
+    }
+
+    @Override
+    public CompletableFuture<User> fetchUser() {
+        return api.getUserById(this.userId);
     }
 
     @Override
