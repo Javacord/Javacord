@@ -4,7 +4,6 @@ import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.RequestableMessageEvent;
-import org.javacord.api.event.user.UserEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * A single reaction event.
  */
-public interface SingleReactionEvent extends ReactionEvent, UserEvent {
+public interface SingleReactionEvent extends ReactionEvent {
 
     /**
      * Gets the emoji of the event.
@@ -60,5 +59,21 @@ public interface SingleReactionEvent extends ReactionEvent, UserEvent {
      * @return A list with all users who used the reaction.
      */
     CompletableFuture<List<User>> getUsers();
+
+    /**
+     * Gets the id of the user who used the reaction.
+     *
+     * @return The user id.
+     */
+    long getUserId();
+
+    /**
+     * Gets the id of the user who used the reaction as a string.
+     *
+     * @return The user id as a string.
+     */
+    default String getUserIdAsString() {
+        return Long.toUnsignedString(getUserId());
+    }
 
 }

@@ -24,12 +24,17 @@ public class ReactionAddEventImpl extends SingleReactionEventImpl implements Rea
      * @param user The user who added the reaction.
      */
     public ReactionAddEventImpl(DiscordApi api, long messageId, TextChannel channel, Emoji emoji, User user) {
-        super(api, messageId, channel, emoji, user);
+        super(api, messageId, channel, emoji, user, user.getId());
     }
 
     @Override
     public CompletableFuture<Void> removeReaction() {
         return Reaction.removeUser(getApi(), getChannel().getId(), getMessageId(), getEmoji(), getUser());
+    }
+
+    @Override
+    public User getUser() {
+        return this.user;
     }
 
 }

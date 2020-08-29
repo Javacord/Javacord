@@ -1,5 +1,7 @@
 package org.javacord.api.event.message.reaction;
 
+import org.javacord.api.entity.user.User;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -13,5 +15,12 @@ public interface ReactionAddEvent extends SingleReactionEvent {
      * @return A future to tell us if the action was successful.
      */
     CompletableFuture<Void> removeReaction();
+
+    /**
+     * Gets the user who added the reaction.
+     *
+     * @return The user.
+     */
+    User getUser();
 
 }
