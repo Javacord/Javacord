@@ -35,8 +35,9 @@ public class ReactionRemoveEventImpl extends SingleReactionEventImpl implements 
     }
 
     @Override
-    public CompletableFuture<User> fetchUser() {
-        return api.getUserById(this.userId);
+    public CompletableFuture<User> requestUser() {
+        return getUser().map(CompletableFuture::completedFuture)
+                .orElseGet(() -> api.getUserById(this.userId));
     }
 
     @Override

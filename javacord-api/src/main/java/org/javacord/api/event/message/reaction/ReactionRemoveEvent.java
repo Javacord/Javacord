@@ -22,5 +22,5 @@ public interface ReactionRemoveEvent extends SingleReactionEvent {
      *
      * @return The user.
      */
-    CompletableFuture<User> fetchUser();
+    CompletableFuture<User> requestUser();
 }
