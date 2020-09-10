@@ -14,6 +14,7 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
+import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
@@ -864,10 +865,20 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("status", api.getStatus().getStatusString())
                 .put("afk", false)
                 .putNull("since");
+
         ObjectNode activityJson = data.putObject("game");
-        activityJson.put("name", activity.isPresent() ? activity.get().getName() : null);
-        activityJson.put("type", activity.map(g -> g.getType().getId()).orElse(0));
-        activity.ifPresent(g -> g.getStreamingUrl().ifPresent(url -> activityJson.put("url", url)));
+        activityJson.put("name", activity.map(Nameable::getName).orElse(null));
+        activityJson.put("type", activity.flatMap(g -> {
+            int type = g.getType().getId();
+            if (type == 4) {
+                logger.warn("Can't set the activity to ActivityType.CUSTOM"
+                        + ", using ActivityType.PLAYING instead");
+                return Optional.empty();
+            } else {
+                return Optional.of(type);
+            }
+        }).orElse(0));
+        activity.flatMap(Activity::getStreamingUrl).ifPresent(url -> activityJson.put("url", url));
         logger.debug("Updating status (content: {})", updateStatus);
         websocket.get().sendText(updateStatus.toString());
     }

@@ -1,6 +1,7 @@
 package org.javacord.api.entity.activity;
 
 import org.javacord.api.entity.Nameable;
+import org.javacord.api.entity.emoji.Emoji;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -72,5 +73,12 @@ public interface Activity extends Nameable {
      * @return The end time of the activity.
      */
     Optional<Instant> getEndTime();
+
+    /**
+     * Gets the emoji of the custom status.
+     *
+     * @return The emoji of the custom status.
+     */
+    Optional<Emoji> getEmoji();
 
 }

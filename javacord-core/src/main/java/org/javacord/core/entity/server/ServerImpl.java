@@ -425,7 +425,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 if (presenceJson.has("game")) {
                     Activity activity = null;
                     if (!presenceJson.get("game").isNull()) {
-                        activity = new ActivityImpl(presenceJson.get("game"));
+                        activity = new ActivityImpl(api, presenceJson.get("game"));
                     }
                     user.setActivity(activity);
                 }
