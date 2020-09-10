@@ -139,7 +139,7 @@ public enum WebSocketCloseCode {
     /**
      * We're not sure what went wrong. Try reconnecting?
      */
-    UNKNOWN_ERROR(4000, Usage.NORMAL),
+    UNKNOWN_ERROR(4000, Usage.BOTH),
 
     /**
      * You sent an invalid
