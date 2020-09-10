@@ -84,6 +84,7 @@ public class DiscordRegexPattern {
             Pattern.compile("(?x)                               # enable comment mode \n"
                             + "(?i)                             # ignore case \n"
                             + "(?:https?+://)?+                 # 'https://' or 'http://' or '' \n"
+                            + "(?:(?:canary|ptb)\\.)?+          # 'canary.' or 'ptb.'\n"
                             + "discord(?:app)?+\\.com/channels/ # 'discord(app).com/channels/' \n"
                             + "(?:(?<server>[0-9]++)|@me)       # '@me' or the server id as named group \n"
                             + "/                                # '/' \n"
