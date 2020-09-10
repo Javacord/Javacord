@@ -60,5 +60,9 @@ public enum ServerFeature {
     /**
      * Server has enabled the welcome screen.
      */
-    WELCOME_SCREEN_ENABLED
+    WELCOME_SCREEN_ENABLED,
+    /**
+     * Server is a community server.
+     */
+    COMMUNITY
 }
