@@ -1,7 +1,37 @@
 package org.javacord.api.util.ratelimit;
 
+import org.javacord.api.DiscordApiBuilder;
+
+import java.time.Duration;
+
 /**
- * An implementation of {@code Ratelimiter} that allows simple local ratelimits.
+ * An implementation of {@code Ratelimiter} that allows for simple local ratelimits.
+ *
+ * <p>To compensate for misalignment with the real global ratelimit bucket, it is recommended to not set the value
+ * to the exact global ratelimit but a lower value. If the global ratelimit for your bot is 50 requests / 1 second
+ * (the default), you should choose a value that prevents overlapping with the real bucket. This can be achieved with
+ * the following rules:
+ * <ul>
+ * <li>Choose an {@code amount} that is between {@code 1} and half of the real amount
+ *     (in this example {@code 1} - {@code 25}).
+ * <li>Calculate the {@code bucketDuration} using {@code (amount * realDuration) / (realAmount - amount)}.
+ * </ul>
+ * For the 50 requests / 1 second ratelimit, these rules allow the following ratelimits (only a subset):
+ * <ul>
+ * <li>About {@code 1} request per {@code 20.5 ms}
+ *     ({@code amount = 1} and {@code bucketDuration = Duration.ofMillis((long) Math.ceil(1D / 49D))})
+ * <li>About {@code 5} request per {@code 111.1 ms}
+ *     ({@code amount = 5} and {@code bucketDuration = Duration.ofMillis((long) Math.ceil(5D / 45D))}).
+ * <li>{@code 10} request per {@code 250 ms}
+ *     ({@code amount = 10} and {@code bucketDuration = Duration.ofMillis((long) Math.ceil(10D / 40D))}).
+ * <li>{@code 25} request per {@code 1 sec}
+ *     ({@code amount = 25} and {@code bucketDuration = Duration.ofMillis((long) Math.ceil(10D / 40D))}).
+ * </ul>
+ * Choosing a lower {@code amount} increases the maximum throughput but can limits your ability to perform actions
+ * in bulk.
+ *
+ * @see <a href="https://javacord.org/r/local-ratelimiter">Related wiki article</a>
+ * @see DiscordApiBuilder#setGlobalRatelimiter(Ratelimiter)
  */
 public class LocalRatelimiter implements Ratelimiter {
 
@@ -9,17 +39,30 @@ public class LocalRatelimiter implements Ratelimiter {
     private volatile int remainingQuota;
 
     private final int amount;
-    private final int seconds;
+    private final Duration bucketDuration;
 
     /**
      * Creates a new local ratelimiter.
      *
      * @param amount The amount available per reset interval.
      * @param seconds The time to wait until the available quota resets.
+     * @deprecated Use {@link #LocalRatelimiter(int, Duration)} instead.
      */
+    @Deprecated
     public LocalRatelimiter(int amount, int seconds) {
         this.amount = amount;
-        this.seconds = seconds;
+        bucketDuration = Duration.ofSeconds(seconds);
+    }
+
+    /**
+     * Creates a new local ratelimiter.
+     *
+     * @param amount The amount available per reset interval.
+     * @param bucketDuration The time to wait until the available quota resets.
+     */
+    public LocalRatelimiter(int amount, Duration bucketDuration) {
+        this.amount = amount;
+        this.bucketDuration = bucketDuration;
     }
 
     /**
@@ -32,12 +75,23 @@ public class LocalRatelimiter implements Ratelimiter {
     }
 
     /**
-     * Gets the time to wait until the available quota resets in seconds.
+     * Gets the time to wait until the available quota resets.
      *
      * @return The time to wait until the available quota resets.
      */
+    public Duration getBucketDuration() {
+        return bucketDuration;
+    }
+
+    /**
+     * Gets the time to wait until the available quota resets in seconds.
+     *
+     * @return The time to wait until the available quota resets.
+     * @deprecated Use {@link #getBucketDuration()} instead.
+     */
+    @Deprecated
     public int getSeconds() {
-        return seconds;
+        return (int) bucketDuration.getSeconds();
     }
 
     /**
@@ -66,20 +120,27 @@ public class LocalRatelimiter implements Ratelimiter {
             // Wait until a new quota becomes available
             long sleepTime;
             while ((sleepTime = calculateSleepTime()) > 0) { // Sleep is unreliable, so we have to loop
-                Thread.sleep(sleepTime);
+                Thread.sleep(sleepTime / 1_000_000, (int) (sleepTime % 1_000_000));
             }
         }
 
         // Reset the limit when the last reset timestamp is past
         if (System.nanoTime() > nextResetNanos) {
             remainingQuota = amount;
-            nextResetNanos = System.nanoTime() + seconds * 1_000_000_000L;
+            try {
+                nextResetNanos = System.nanoTime() + bucketDuration.toNanos();
+            } catch (ArithmeticException e) {
+                // An ArithmeticException means that the duration was too large to be represented
+                // as a long. While such a value is completely non-sense and should not be used, we
+                // still don't want an exception.
+                nextResetNanos = Long.MAX_VALUE;
+            }
         }
 
         remainingQuota--;
     }
 
     private long calculateSleepTime() {
-        return (nextResetNanos - System.nanoTime()) / 1_000_000;
+        return nextResetNanos - System.nanoTime();
     }
 }
