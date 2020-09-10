@@ -21,7 +21,7 @@ public enum BoostLevel {
     /**
      * Server Boost level 3.
      */
-    TIER_3(2),
+    TIER_3(3),
 
     /**
      * An unknown boost level, most likely due to new added boost levels.
