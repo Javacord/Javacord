@@ -130,6 +130,25 @@ public interface DiscordApiBuilderDelegate {
     boolean isWaitingForServersOnStartup();
 
     /**
+     * Sets if Javacord should register a shutdown hook that disconnects the {@link DiscordApi} instance.
+     *
+     * <p>By default, Javacord registers a shutdown hook using {@link Runtime#addShutdownHook(Thread)} that calls
+     * the {@link DiscordApi#disconnect()} method. Setting this flag to {@code false} will disable this behavior.
+     *
+     * @param registerShutdownHook Whether the shutdown hook should be registered or not.
+     */
+    void setShutdownHookRegistrationEnabled(boolean registerShutdownHook);
+
+    /**
+     * Checks if newly created {@link DiscordApi} instances should register a shutdown hook to disconnect the
+     * instance.
+     *
+     * @return Whether the shutdown hook will be registered or not.
+     * @see #setShutdownHookRegistrationEnabled(boolean)
+     */
+    boolean isShutdownHookRegistrationEnabled();
+
+    /**
      * Logs the bot in.
      *
      * @return The discord api instance.
@@ -152,7 +171,6 @@ public interface DiscordApiBuilderDelegate {
      * @return A future to check if the action was successful.
      */
     CompletableFuture<Void> setRecommendedTotalShards();
-
 
     /**
      * Adds a {@code GloballyAttachableListener} to all created {@code DiscordApi} instances.

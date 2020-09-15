@@ -381,7 +381,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public DiscordApiImpl(String token, Ratelimiter globalRatelimiter, ProxySelector proxySelector, Proxy proxy,
                           Authenticator proxyAuthenticator, boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, false, globalRatelimiter,
+        this(AccountType.BOT, token, 0, 1, true, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
     }
 
@@ -416,7 +416,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
     ) {
-        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, globalRatelimiter,
+        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, true, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, null,
                 Collections.emptyMap(), Collections.emptyList());
     }
@@ -453,7 +453,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready,
             Dns dns) {
-        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, globalRatelimiter,
+        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, true, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, dns, Collections.emptyMap(),
                 Collections.emptyList());
     }
@@ -466,6 +466,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param totalShards             The total amount of shards.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
+     * @param registerShutdownHook    Whether the shutdown hook should be registered or not.
      * @param globalRatelimiter       The ratelimiter used for global ratelimits.
      * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
      *                                used to connect to the Discord REST API and websocket.
@@ -485,6 +486,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             int currentShard,
             int totalShards,
             boolean waitForServersOnStartup,
+            boolean registerShutdownHook,
             Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
             Proxy proxy,
@@ -616,18 +618,22 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 }
             }, 30, 30, TimeUnit.SECONDS);
 
-            // Add shutdown hook
-            ready.thenAccept(api -> {
-                WeakReference<DiscordApi> discordApiReference = new WeakReference<>(api);
+            if (registerShutdownHook) {
+                // Add shutdown hook
+                ready.thenAccept(api -> {
+                    WeakReference<DiscordApi> discordApiReference = new WeakReference<>(api);
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get())
+                            .ifPresent(DiscordApi::disconnect),
+                            String.format("Javacord - Shutdown Disconnector (%s)", api)));
+                });
+            }
+        } else {
+            if (registerShutdownHook) {
+                WeakReference<DiscordApi> discordApiReference = new WeakReference<>(this);
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get())
                         .ifPresent(DiscordApi::disconnect),
-                        String.format("Javacord - Shutdown Disconnector (%s)", api)));
-            });
-        } else {
-            WeakReference<DiscordApi> discordApiReference = new WeakReference<>(this);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> Optional.ofNullable(discordApiReference.get())
-                    .ifPresent(DiscordApi::disconnect),
-                    String.format("Javacord - Shutdown Disconnector (%s)", this)));
+                        String.format("Javacord - Shutdown Disconnector (%s)", this)));
+            }
         }
     }
 

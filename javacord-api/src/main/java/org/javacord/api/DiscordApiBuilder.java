@@ -298,6 +298,31 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets if Javacord should register a shutdown hook that disconnects the {@link DiscordApi} instance.
+     *
+     * <p>By default, Javacord registers a shutdown hook using {@link Runtime#addShutdownHook(Thread)} that calls
+     * the {@link DiscordApi#disconnect()} method. Setting this flag to {@code false} will disable this behavior.
+     *
+     * @param registerShutdownHook Whether the shutdown hook should be registered or not.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setShutdownHookRegistrationEnabled(boolean registerShutdownHook) {
+        delegate.setShutdownHookRegistrationEnabled(registerShutdownHook);
+        return this;
+    }
+
+    /**
+     * Checks if newly created {@link DiscordApi} instances should register a shutdown hook to disconnect the
+     * instance.
+     *
+     * @return Whether the shutdown hook will be registered or not.
+     * @see #setShutdownHookRegistrationEnabled(boolean)
+     */
+    public boolean isShutdownHookRegistrationEnabled() {
+        return delegate.isShutdownHookRegistrationEnabled();
+    }
+
+    /**
      * Retrieves the recommended shards count from the Discord API and sets it in this builder.
      * Sharding allows you to split your bot into several independent instances.
      * A shard only handles a subset of a bot's servers.
