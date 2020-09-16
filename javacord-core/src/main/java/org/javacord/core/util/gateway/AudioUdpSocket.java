@@ -188,7 +188,7 @@ public class AudioUdpSocket {
     }
 
     /**
-     * Starts polling frames from the audio connection.
+     * Stops polling frames from the audio connection.
      */
     public void stopSending() {
         shouldSend = false;

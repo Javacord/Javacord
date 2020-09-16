@@ -159,6 +159,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
     public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
         if (resuming) {
             sendResume(websocket);
+            socket.startSending();
         }
     }
 
@@ -186,6 +187,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
         // Squash heart, until it stops beating
         heart.squash();
+        //Pause UDP sending
+        socket.stopSending();
 
         if (resuming) {
             logger.info("Could not resume, reconnecting in {} seconds", api.getReconnectDelay(reconnectAttempt.get()));
@@ -218,6 +221,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                 }
                 connection.close();
                 break;
+            case UNKNOWN_ERROR:
             case UNKNOWN_OPCODE:
             case UNKNOWN_PROTOCOL:
             case UNKNOWN_ENCRYPTION_MODE:
@@ -265,9 +269,8 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
             websocket.addListener(new WebSocketLogger());
             websocket.connect();
         } catch (Throwable t) {
-            logger.warn("An error occurred while connecting to audio websocket for {}", connection, t);
+            logger.warn("An error occurred while connecting to audio websocket for {} ({})", connection, t.getCause());
             if (reconnect) {
-                resuming = false;
                 reconnectAttempt.incrementAndGet();
                 logger.info("Trying to reconnect/resume audio websocket in {} seconds!",
                         api.getReconnectDelay(reconnectAttempt.get()));
