@@ -64,6 +64,11 @@ public enum VoiceGatewayOpcode {
     RESUMED(9),
 
     /**
+     * a client connected to the voice channel.
+     */
+    CLIENT_CONNECT(12),
+
+    /**
      * a client has disconnected from the voice channel.
      */
     CLIENT_DISCONNECT(13);

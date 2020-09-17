@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
+import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
@@ -36,6 +37,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.VanityUrlCodeImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
@@ -75,6 +77,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -177,6 +180,24 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * If the server is ready (all members are cached).
      */
     private volatile boolean ready = false;
+
+    /**
+     * A lock that is used ti prevent lock on {@code audioConnection} and {@code pendingAudioConnection}.
+     */
+    private final ReentrantLock audioConnectionLock = new ReentrantLock();
+
+    /**
+     * The current audio connection of the server.
+     */
+    private volatile AudioConnectionImpl audioConnection;
+
+    /**
+     * A pending audio connection.
+     * A pending connection is a connect that is currently trying to connect to a websocket and establish an udp
+     * connection but has not finished.
+     * The field might still be set, even though the connection is no longer pending!
+     */
+    private volatile AudioConnectionImpl pendingAudioConnection;
 
     /**
      * A list with all consumers who will be informed when the server is ready.
@@ -978,6 +999,65 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         return api.getEntityCache().get().getChannelCache().getChannelsOfServer(getId());
     }
 
+    /**
+     * Sets the audio connection of the server.
+     *
+     * @param audioConnection The audio connection.
+     */
+    public void setAudioConnection(AudioConnectionImpl audioConnection) {
+        audioConnectionLock.lock();
+        try {
+            this.audioConnection = audioConnection;
+        } finally {
+            audioConnectionLock.unlock();
+        }
+    }
+
+    /**
+     * Sets the pending audio connection of the server.
+     *
+     * <p>A pending connection is a connect that is currently trying to connect to a websocket and establish an udp
+     * connection but has not finished.
+     *
+     * @param audioConnection The audio connection.
+     */
+    public void setPendingAudioConnection(AudioConnectionImpl audioConnection) {
+        audioConnectionLock.lock();
+        try {
+            pendingAudioConnection = audioConnection;
+        } finally {
+            audioConnectionLock.unlock();
+        }
+    }
+
+    /**
+     * Removes an audio connection from the server.
+     *
+     * @param audioConnection The audio connection to remove.
+     */
+    public void removeAudioConnection(AudioConnection audioConnection) {
+        audioConnectionLock.lock();
+        try {
+            if (pendingAudioConnection == audioConnection) {
+                pendingAudioConnection = null;
+            }
+            if (this.audioConnection == audioConnection) {
+                this.audioConnection = null;
+            }
+        } finally {
+            audioConnectionLock.unlock();
+        }
+    }
+
+    /**
+     * Gets the pending audio connection of the server.
+     *
+     * @return The pending audio connection of the server.
+     */
+    public Optional<AudioConnectionImpl> getPendingAudioConnection() {
+        return Optional.ofNullable(pendingAudioConnection);
+    }
+
     @Override
     public DiscordApi getApi() {
         return api;
@@ -991,6 +1071,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Optional<AudioConnection> getAudioConnection() {
+        return Optional.ofNullable(audioConnection);
     }
 
     @Override

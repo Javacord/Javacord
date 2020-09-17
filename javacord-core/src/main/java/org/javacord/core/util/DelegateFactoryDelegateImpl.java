@@ -1,6 +1,7 @@
 package org.javacord.core.util;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -38,6 +39,7 @@ import org.javacord.api.util.logging.internal.ExceptionLoggerDelegate;
 import org.javacord.core.AccountUpdaterDelegateImpl;
 import org.javacord.core.DiscordApiBuilderDelegateImpl;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.audio.AudioSourceBaseDelegateImpl;
 import org.javacord.core.entity.channel.ChannelCategoryBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerChannelUpdaterDelegateImpl;
@@ -180,6 +182,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public WebhookUpdaterDelegate createWebhookUpdaterDelegate(Webhook webhook) {
         return new WebhookUpdaterDelegateImpl(webhook);
+    }
+
+    @Override
+    public AudioSourceBaseDelegate createAudioSourceBaseDelegate(DiscordApi api) {
+        return new AudioSourceBaseDelegateImpl(api);
     }
 
     @Override

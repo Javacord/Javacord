@@ -31,6 +31,9 @@ project(':javacord-core') {
         // the web socket
         implementation 'com.neovisionaries:nv-websocket-client:2.6'
 
+        // voice encryption
+        implementation 'com.codahale:xsalsa20poly1305:0.10.1'
+
         // logging
         implementation 'org.apache.logging.log4j:log4j-api:2.11.0'
 
