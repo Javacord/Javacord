@@ -139,7 +139,7 @@ public enum WebSocketCloseCode {
     /**
      * We're not sure what went wrong. Try reconnecting?
      */
-    UNKNOWN_ERROR(4000, Usage.NORMAL),
+    UNKNOWN_ERROR(4000, Usage.BOTH),
 
     /**
      * You sent an invalid
@@ -169,7 +169,7 @@ public enum WebSocketCloseCode {
     /**
      * You sent more than one identify payload. Don't do that!
      */
-    ALREADY_AUTHENTICATED(4005, Usage.NORMAL),
+    ALREADY_AUTHENTICATED(4005, Usage.BOTH),
 
     /**
      * Your session is no longer valid.
@@ -244,7 +244,9 @@ public enum WebSocketCloseCode {
      * Discord asked for a reconnect, and there is no pre-defined matching close reason,
      * thus 4999 is used which is unlikely to get assigned by Discord.
      */
-    COMMANDED_RECONNECT(4999, Usage.NORMAL);
+    COMMANDED_RECONNECT(4999, Usage.NORMAL),
+
+    UNKNOWN(-1, Usage.BOTH);
 
     /**
      * A map for retrieving the enum instances by code.
