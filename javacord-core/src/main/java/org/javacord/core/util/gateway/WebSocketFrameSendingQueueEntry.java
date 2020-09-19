@@ -90,6 +90,15 @@ public class WebSocketFrameSendingQueueEntry implements Comparable<WebSocketFram
         return priority && lifecycle;
     }
 
+    /**
+     * Gets whether this entry is a lifecyle one.
+     *
+     * @return Whether this entry is a lifecyle one.
+     */
+    public boolean isLifecycle() {
+        return lifecycle;
+    }
+
     @Override
     public int compareTo(WebSocketFrameSendingQueueEntry other) {
         return ENTRY_COMPARATOR.compare(this, other);

@@ -98,8 +98,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
@@ -136,6 +138,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private volatile String sessionId = null;
 
     private volatile boolean reconnect;
+
+    private final Lock reconnectingOrResumingLock = new ReentrantLock();
+    private final Condition finishedReconnectingOrResumingCondition = reconnectingOrResumingLock.newCondition();
 
     private final AtomicMarkableReference<WebSocketFrame> lastSentFrameWasIdentify =
             new AtomicMarkableReference<>(null, false);
@@ -294,6 +299,19 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             waitDuration += ONE_SECOND;
                             logger.debug("Waiting {}ns for web socket frame sending cool down", waitDuration);
                             TimeUnit.NANOSECONDS.sleep(waitDuration);
+                        }
+                        // recheck whether the abort condition triggers and prefer lifecycle and priority frames
+                        continue;
+                    }
+
+                    // We don't want to send any non-lifecycle frames to the websocket before we are properly
+                    // reconnected (aka. we received a RESUMED or READY packet)
+                    if (reconnectAttempt.intValue() > 0 && !webSocketFrameSendingQueueEntry.isLifecycle()) {
+                        reconnectingOrResumingLock.lock();
+                        try {
+                            finishedReconnectingOrResumingCondition.await(1, TimeUnit.SECONDS);
+                        } finally {
+                            reconnectingOrResumingLock.unlock();
                         }
                         // recheck whether the abort condition triggers and prefer lifecycle and priority frames
                         continue;
@@ -469,7 +487,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         } catch (Throwable t) {
             logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
-                reconnectAttempt.incrementAndGet();
+                reconnectingOrResumingLock.lock();
+                try {
+                    reconnectAttempt.incrementAndGet();
+                } finally {
+                    reconnectingOrResumingLock.unlock();
+                }
                 logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
                 // Reconnect after a (short?) delay depending on the amount of reconnect attempts
                 api.getThreadPool().getScheduler()
@@ -539,7 +562,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
         // Reconnect
         if (reconnect) {
-            reconnectAttempt.incrementAndGet();
+            reconnectingOrResumingLock.lock();
+            try {
+                reconnectAttempt.incrementAndGet();
+            } finally {
+                reconnectingOrResumingLock.unlock();
+            }
             logger.info("Trying to reconnect/resume in {} seconds!", api.getReconnectDelay(reconnectAttempt.get()));
             // Reconnect after a (short?) delay depending on the amount of reconnect attempts
             api.getThreadPool().getScheduler()
@@ -576,14 +604,26 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     lastGuildMembersChunkReceived = System.currentTimeMillis();
                 }
                 if (type.equals("RESUMED")) {
-                    reconnectAttempt.set(0);
+                    reconnectingOrResumingLock.lock();
+                    try {
+                        reconnectAttempt.set(0);
+                        finishedReconnectingOrResumingCondition.signalAll();
+                    } finally {
+                        reconnectingOrResumingLock.unlock();
+                    }
                     logger.debug("Received RESUMED packet");
 
                     ResumeEvent resumeEvent = new ResumeEventImpl(api);
                     api.getEventDispatcher().dispatchResumeEvent(null, resumeEvent);
                 }
                 if (type.equals("READY")) {
-                    reconnectAttempt.set(0);
+                    reconnectingOrResumingLock.lock();
+                    try {
+                        reconnectAttempt.set(0);
+                        finishedReconnectingOrResumingCondition.signalAll();
+                    } finally {
+                        reconnectingOrResumingLock.unlock();
+                    }
                     sessionId = packet.get("d").get("session_id").asText();
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("Startup Servers Wait Thread").submit(() -> {
