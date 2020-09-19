@@ -40,23 +40,23 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
     CompletableFuture<Void> close();
 
     /**
-     * Gets the current audio source.
+     * Gets the audio source.
      *
-     * @return The current audio source.
+     * @return The audio source.
      */
-    Optional<AudioSource> getCurrentAudioSource();
+    Optional<AudioSource> getAudioSource();
 
     /**
-     * Sets the current audio source, replacing any currently playing source.
+     * Sets the audio source, replacing any currently playing source.
      *
-     * @param source The audio source which will become the current source.
+     * @param source The audio source which will become the source.
      */
-    void setCurrentAudioSource(AudioSource source);
+    void setAudioSource(AudioSource source);
 
     /**
-     * Removes the current audio source.
+     * Removes the audio source.
      */
-    void removeCurrentAudioSource();
+    void removeAudioSource();
 
     /**
      * Gets the voice channel of the audio connection.
