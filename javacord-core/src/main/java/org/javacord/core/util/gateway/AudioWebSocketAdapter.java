@@ -13,7 +13,6 @@ import org.javacord.api.Javacord;
 import org.javacord.api.audio.SpeakingFlag;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
-import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.WebSocketLogger;
 
