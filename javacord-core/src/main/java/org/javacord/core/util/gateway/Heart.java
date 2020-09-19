@@ -69,13 +69,12 @@ public class Heart {
         }
         int heartbeatAckOp = voice ? VoiceGatewayOpcode.HEARTBEAT_ACK.getCode() : GatewayOpcode.HEARTBEAT_ACK.getCode();
         if (packet.get("op").asInt() == heartbeatAckOp) {
-            stethoscope.debug("Heartbeat ACK received (voice: {}, packet: {})", voice, packet);
             long gatewayLatency = System.nanoTime() - lastHeartbeatSentTimeNanos;
             if (!voice) {
                 api.setLatestGatewayLatencyNanos(gatewayLatency);
             }
-            stethoscope.debug("Heartbeat ACK received. "
-                    + "Took " + TimeUnit.NANOSECONDS.toMillis(gatewayLatency) + " ms to receive ACK.");
+            stethoscope.debug("Heartbeat ACK received (voice: {}, packet: {}). Took {} ms to receive ACK",
+                    voice, packet, TimeUnit.NANOSECONDS.toMillis(gatewayLatency));
             heartbeatAckReceived.set(true);
         }
     }
