@@ -46,6 +46,15 @@ public class RatelimitManager {
     }
 
     /**
+     * Gets a set with all ratelimit buckets.
+     *
+     * @return A set with all ratelimit buckets.
+     */
+    public Set<RatelimitBucket> getBuckets() {
+        return buckets;
+    }
+
+    /**
      * Queues the given request.
      * This method is automatically called when using {@link RestRequest#execute(Function)}!
      *
