@@ -132,9 +132,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private final Heart heart;
 
-    // Used to calculate the gateway latency
-    private volatile long lastHeartbeatSentTimeNanos = -1;
-
     private volatile int lastSeq = -1;
     private volatile String sessionId = null;
 

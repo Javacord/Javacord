@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.DiscordApi;
+import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.concurrent.Future;
@@ -26,7 +26,7 @@ public class Heart {
      */
     private static final Logger stethoscope = LoggerUtil.getLogger(Heart.class);
 
-    private final DiscordApi api;
+    private final DiscordApiImpl api;
     private final Consumer<WebSocketFrame> heartbeatFrameSender;
     private final BiConsumer<Integer, String> closeFrameSender;
     private final boolean voice;
@@ -34,6 +34,9 @@ public class Heart {
     private final AtomicReference<Future<?>> heartbeatTimer = new AtomicReference<>();
     private final AtomicBoolean heartbeatAckReceived = new AtomicBoolean();
     private int lastSeq = 0;
+
+    // Used to calculate the gateway latency
+    private volatile long lastHeartbeatSentTimeNanos = -1;
 
     /**
      * Ba boom, ba boom, ba boom, ba boom, ...
@@ -43,7 +46,7 @@ public class Heart {
      * @param closeFrameSender     A bi consumer that sends a close frame with the given code and reason.
      * @param voice                Voice websocket hearts beat differently.
      */
-    public Heart(DiscordApi api, Consumer<WebSocketFrame> heartbeatFrameSender,
+    public Heart(DiscordApiImpl api, Consumer<WebSocketFrame> heartbeatFrameSender,
                  BiConsumer<Integer, String> closeFrameSender, boolean voice) {
         this.api = api;
         this.heartbeatFrameSender = heartbeatFrameSender;
@@ -67,6 +70,12 @@ public class Heart {
         int heartbeatAckOp = voice ? VoiceGatewayOpcode.HEARTBEAT_ACK.getCode() : GatewayOpcode.HEARTBEAT_ACK.getCode();
         if (packet.get("op").asInt() == heartbeatAckOp) {
             stethoscope.debug("Heartbeat ACK received (voice: {}, packet: {})", voice, packet);
+            long gatewayLatency = System.nanoTime() - lastHeartbeatSentTimeNanos;
+            if (!voice) {
+                api.setLatestGatewayLatencyNanos(gatewayLatency);
+            }
+            stethoscope.debug("Heartbeat ACK received. "
+                    + "Took " + TimeUnit.NANOSECONDS.toMillis(gatewayLatency) + " ms to receive ACK.");
             heartbeatAckReceived.set(true);
         }
     }
@@ -110,6 +119,7 @@ public class Heart {
                 .put("d", voice ? (int) (Math.random() * Integer.MAX_VALUE) : lastSeq);
         WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
         heartbeatFrameSender.accept(heartbeatFrame);
+        lastHeartbeatSentTimeNanos = System.nanoTime();
         // Ba boom, ba boom, ba boom, ba boom, ...
         stethoscope.debug("Sent heartbeat (voice: {}, packet: {})", voice, heartbeatPacket);
     }
