@@ -349,7 +349,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     }
 
     @Override
-    public Optional<AudioSource> getCurrentAudioSource() {
+    public Optional<AudioSource> getAudioSource() {
         try {
             return Optional.ofNullable(currentSource.get(0, TimeUnit.MILLISECONDS));
         } catch (InterruptedException e) {
@@ -358,12 +358,12 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     }
 
     @Override
-    public void setCurrentAudioSource(AudioSource source) {
+    public void setAudioSource(AudioSource source) {
         currentSource.set(source);
     }
 
     @Override
-    public void removeCurrentAudioSource() {
+    public void removeAudioSource() {
         currentSource.set(null);
     }
 

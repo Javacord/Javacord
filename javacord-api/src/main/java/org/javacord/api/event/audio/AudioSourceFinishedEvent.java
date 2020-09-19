@@ -17,7 +17,7 @@ public interface AudioSourceFinishedEvent extends AudioSourceEvent {
      * @return The next source of the audio connection.
      */
     default Optional<AudioSource> getNextSource() {
-        return getConnection().getCurrentAudioSource();
+        return getConnection().getAudioSource();
     }
 
 }
