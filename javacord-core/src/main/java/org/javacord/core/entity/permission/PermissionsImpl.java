@@ -4,6 +4,8 @@ import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 
+import java.util.Objects;
+
 /**
  * The implementation of the permissions interface.
  */
@@ -14,16 +16,16 @@ public class PermissionsImpl implements Permissions {
      */
     public static final Permissions EMPTY_PERMISSIONS = new PermissionsImpl(0, 0);
 
-    private final int allowed;
-    private final int denied;
+    private final long allowed;
+    private final long denied;
 
     /**
      * Creates a new instance of this class.
      *
-     * @param allow An int containing all allowed permission types.
-     * @param deny An int containing all denied permission types.
+     * @param allow A long containing all allowed permission types.
+     * @param deny  A long containing all denied permission types.
      */
-    public PermissionsImpl(int allow, int deny) {
+    public PermissionsImpl(long allow, long deny) {
         this.allowed = allow;
         this.denied = deny;
     }
@@ -31,12 +33,12 @@ public class PermissionsImpl implements Permissions {
     /**
      * Creates a new instance of this class.
      *
-     * @param allow An int containing all allowed permission types.
+     * @param allow A long containing all allowed permission types.
      *              Every other type will be set to denied.
      */
-    public PermissionsImpl(int allow) {
+    public PermissionsImpl(long allow) {
         this.allowed = allow;
-        int tempDenied = 0;
+        long tempDenied = 0;
         for (PermissionType type : PermissionType.values()) {
             if (!type.isSet(allow)) {
                 // set everything which is not allowed to denied.
@@ -47,12 +49,12 @@ public class PermissionsImpl implements Permissions {
     }
 
     @Override
-    public int getAllowedBitmask() {
+    public long getAllowedBitmask() {
         return allowed;
     }
 
     @Override
-    public int getDeniedBitmask() {
+    public long getDeniedBitmask() {
         return denied;
     }
 
@@ -74,11 +76,7 @@ public class PermissionsImpl implements Permissions {
 
     @Override
     public int hashCode() {
-        int hash = 42;
-
-        hash = hash * 11 + allowed;
-        hash = hash * 17 + denied;
-        return hash;
+        return Objects.hash(allowed, denied);
     }
 
     @Override

@@ -93,7 +93,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
             }
 
             Permissions oldPermissions = role.getPermissions();
-            PermissionsImpl newPermissions = new PermissionsImpl(roleJson.get("permissions").asInt(), 0);
+            PermissionsImpl newPermissions = new PermissionsImpl(roleJson.get("permissions").asLong(), 0);
             if (!oldPermissions.equals(newPermissions)) {
                 role.setPermissions(newPermissions);
 

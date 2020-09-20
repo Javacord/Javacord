@@ -67,23 +67,23 @@ public enum PermissionType {
     }
 
     /**
-     * Checks if the permission is "included" in the given integer.
+     * Checks if the permission is "included" in the given long.
      *
-     * @param i The integer to check.
+     * @param i The long to check.
      * @return Whether the permission is "included" or not.
      */
-    public boolean isSet(int i) {
+    public boolean isSet(long i) {
         return (i & getValue()) != 0;
     }
 
     /**
-     * Sets or unsets the type for the given integer.
+     * Sets or unsets the type for the given long.
      *
-     * @param i The integer to change.
+     * @param i The long to change.
      * @param set Whether the type should be set or not.
-     * @return The changed integer.
+     * @return The changed long.
      */
-    public int set(int i, boolean set) {
+    public long set(long i, boolean set) {
         if (set && !isSet(i)) {
             return i + getValue();
         }
