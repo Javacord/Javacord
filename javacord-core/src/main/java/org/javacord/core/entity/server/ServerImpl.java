@@ -187,19 +187,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private final ReentrantLock audioConnectionLock = new ReentrantLock();
 
     /**
-     * The current audio connection of the server.
-     */
-    private volatile AudioConnectionImpl audioConnection;
-
-    /**
-     * A pending audio connection.
-     * A pending connection is a connect that is currently trying to connect to a websocket and establish an udp
-     * connection but has not finished.
-     * The field might still be set, even though the connection is no longer pending!
-     */
-    private volatile AudioConnectionImpl pendingAudioConnection;
-
-    /**
      * A list with all consumers who will be informed when the server is ready.
      */
     private final List<Consumer<Server>> readyConsumers = new ArrayList<>();
@@ -1007,7 +994,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public void setAudioConnection(AudioConnectionImpl audioConnection) {
         audioConnectionLock.lock();
         try {
-            this.audioConnection = audioConnection;
+            api.setAudioConnection(getId(), audioConnection);
         } finally {
             audioConnectionLock.unlock();
         }
@@ -1024,7 +1011,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public void setPendingAudioConnection(AudioConnectionImpl audioConnection) {
         audioConnectionLock.lock();
         try {
-            pendingAudioConnection = audioConnection;
+            api.setPendingAudioConnection(getId(), audioConnection);
         } finally {
             audioConnectionLock.unlock();
         }
@@ -1038,24 +1025,15 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public void removeAudioConnection(AudioConnection audioConnection) {
         audioConnectionLock.lock();
         try {
-            if (pendingAudioConnection == audioConnection) {
-                pendingAudioConnection = null;
+            if (api.getPendingAudioConnectionByServerId(getId()) == audioConnection) {
+                api.removePendingAudioConnection(getId());
             }
-            if (this.audioConnection == audioConnection) {
-                this.audioConnection = null;
+            if (api.getAudioConnectionByServerId(getId()) == audioConnection) {
+                api.removeAudioConnection(getId());
             }
         } finally {
             audioConnectionLock.unlock();
         }
-    }
-
-    /**
-     * Gets the pending audio connection of the server.
-     *
-     * @return The pending audio connection of the server.
-     */
-    public Optional<AudioConnectionImpl> getPendingAudioConnection() {
-        return Optional.ofNullable(pendingAudioConnection);
     }
 
     @Override
@@ -1075,7 +1053,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public Optional<AudioConnection> getAudioConnection() {
-        return Optional.ofNullable(audioConnection);
+        return Optional.ofNullable(api.getAudioConnectionByServerId(getId()));
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.javacord.api.event.user.UserChangeDeafenedEvent;
 import org.javacord.api.event.user.UserChangeMutedEvent;
 import org.javacord.api.event.user.UserChangeSelfDeafenedEvent;
 import org.javacord.api.event.user.UserChangeSelfMutedEvent;
+import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
@@ -76,9 +77,16 @@ public class VoiceStateUpdateHandler extends PacketHandler {
             dispatchVoiceStateUpdateEvent(
                     channel, channel.getServer(), packet.get("session_id").asText());
 
-            ((ServerImpl) channel.getServer()).getPendingAudioConnection().ifPresent(connection -> {
-                connection.setSessionId(sessionId);
-                connection.tryConnect();
+            AudioConnectionImpl pendingAudioConnection =
+                    api.getPendingAudioConnectionByServerId(channel.getServer().getId());
+            if (pendingAudioConnection != null) {
+                pendingAudioConnection.setSessionId(sessionId);
+                pendingAudioConnection.tryConnect();
+            }
+
+            channel.getServer().getAudioConnection().ifPresent(connection -> {
+                ((AudioConnectionImpl) connection).setSessionId(sessionId);
+                ((AudioConnectionImpl) connection).tryConnect();
             });
         });
     }
