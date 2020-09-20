@@ -313,7 +313,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * @return The owner of the server.
      */
-    User getOwner();
+    Optional<User> getOwner();
+
+    /**
+     * Gets the id of the server's owner.
+     *
+     * @return The owner's id.
+     */
+    long getOwnerId();
 
     /**
      * Gets the application id of the server's owner.
@@ -459,8 +466,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<User> getMemberByDiscriminatedName(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return (nameAndDiscriminator.length > 1)
-            ? getMemberByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1])
-            : Optional.empty();
+                ? getMemberByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1])
+                : Optional.empty();
     }
 
     /**
@@ -473,8 +480,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<User> getMemberByDiscriminatedNameIgnoreCase(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return (nameAndDiscriminator.length > 1)
-            ? getMemberByNameAndDiscriminatorIgnoreCase(nameAndDiscriminator[0], nameAndDiscriminator[1])
-            : Optional.empty();
+                ? getMemberByNameAndDiscriminatorIgnoreCase(nameAndDiscriminator[0], nameAndDiscriminator[1])
+                : Optional.empty();
     }
 
     /**
@@ -610,12 +617,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return A sorted list (by position) with all roles of the user in the server.
      */
-    default List<Role> getRoles(User user) {
-        return Collections.unmodifiableList(
-                getRoles().stream()
-                        .filter(role -> role.hasUser(user))
-                        .collect(Collectors.toList()));
-    }
+    List<Role> getRoles(User user);
 
     /**
      * Gets a role by its id.
@@ -684,9 +686,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default Optional<Color> getRoleColor(User user) {
         return user.getRoles(this).stream()
-                   .filter(role -> role.getColor().isPresent())
-                   .max(Comparator.comparingInt(Role::getRawPosition))
-                   .flatMap(Role::getColor);
+                .filter(role -> role.getColor().isPresent())
+                .max(Comparator.comparingInt(Role::getRawPosition))
+                .flatMap(Role::getColor);
     }
 
     /**
@@ -712,7 +714,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default Collection<PermissionType> getAllowedPermissions(User user) {
         Collection<PermissionType> allowed = new HashSet<>();
-        if (getOwner() == user) {
+        if (isOwner(user)) {
             allowed.addAll(Arrays.asList(PermissionType.values()));
         } else {
             getRoles(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
@@ -727,7 +729,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return The unset permissions of the given user.
      */
     default Collection<PermissionType> getUnsetPermissions(User user) {
-        if (getOwner() == user) {
+        if (isOwner(user)) {
             return Collections.emptySet();
         }
         Collection<PermissionType> unset = new HashSet<>();
@@ -2345,7 +2347,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return Whether the given user is the owner of the server or not.
      */
     default boolean isOwner(User user) {
-        return getOwner() == user;
+        return getOwnerId() == user.getId();
     }
 
     /**
@@ -2366,8 +2368,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canCreateChannels(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.MANAGE_CHANNELS);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MANAGE_CHANNELS);
     }
 
     /**
@@ -2387,8 +2389,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canViewAuditLog(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.VIEW_AUDIT_LOG);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.VIEW_AUDIT_LOG);
     }
 
     /**
@@ -2408,9 +2410,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canChangeOwnNickname(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.CHANGE_NICKNAME,
-                                PermissionType.MANAGE_NICKNAMES);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.CHANGE_NICKNAME,
+                PermissionType.MANAGE_NICKNAMES);
     }
 
     /**
@@ -2430,8 +2432,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canManageNicknames(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.MANAGE_NICKNAMES);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MANAGE_NICKNAMES);
     }
 
     /**
@@ -2451,8 +2453,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canMuteMembers(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.MUTE_MEMBERS);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MUTE_MEMBERS);
     }
 
     /**
@@ -2472,8 +2474,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canDeafenMembers(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.DEAFEN_MEMBERS);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.DEAFEN_MEMBERS);
     }
 
     /**
@@ -2493,8 +2495,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canMoveMembers(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.MOVE_MEMBERS);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MOVE_MEMBERS);
     }
 
     /**
@@ -2514,8 +2516,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canManageEmojis(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.MANAGE_EMOJIS);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MANAGE_EMOJIS);
     }
 
     /**
@@ -2581,8 +2583,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canManage(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.MANAGE_SERVER);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MANAGE_SERVER);
     }
 
     /**
@@ -2602,8 +2604,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canKickUsers(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.KICK_MEMBERS);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.KICK_MEMBERS);
     }
 
     /**
@@ -2661,8 +2663,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canBanUsers(User user) {
         return hasAnyPermission(user,
-                                PermissionType.ADMINISTRATOR,
-                                PermissionType.BAN_MEMBERS);
+                PermissionType.ADMINISTRATOR,
+                PermissionType.BAN_MEMBERS);
     }
 
     /**

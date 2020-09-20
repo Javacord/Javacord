@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a Discord role, e.g. "moderator".
  */
 public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionable, Comparable<Role>,
-                              UpdatableFromCache<Role>, RoleAttachableListenerManager {
+        UpdatableFromCache<Role>, RoleAttachableListenerManager {
 
     /**
      * Gets the server of the role.

@@ -13,6 +13,9 @@ import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -155,8 +158,10 @@ public class InviteImpl implements RichInvite {
                 : null;
 
         // Rich data (may not be present)
+        MemberImpl member = null;
         this.inviter = data.has("inviter")
-                ? ((DiscordApiImpl) api).getOrCreateUser(data.get("inviter"))
+                ? new UserImpl((DiscordApiImpl) api, data.get("inviter"), member,
+                getServer().map(ServerImpl.class::cast).orElse(null))
                 : null;
         this.uses = data.has("uses") ? data.get("uses").asInt() : -1;
         this.maxUses = data.has("max_uses") ? data.get("max_uses").asInt() : -1;

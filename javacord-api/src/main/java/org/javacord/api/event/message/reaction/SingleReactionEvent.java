@@ -4,7 +4,7 @@ import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.RequestableMessageEvent;
-import org.javacord.api.event.user.UserEvent;
+import org.javacord.api.event.user.OptionalUserEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * A single reaction event.
  */
-public interface SingleReactionEvent extends ReactionEvent, UserEvent {
+public interface SingleReactionEvent extends ReactionEvent, OptionalUserEvent {
 
     /**
      * Gets the emoji of the event.

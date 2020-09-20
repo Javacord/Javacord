@@ -6,7 +6,7 @@ import org.javacord.api.entity.user.UserStatus;
 /**
  * A user change status event.
  */
-public interface UserChangeStatusEvent extends UserEvent {
+public interface UserChangeStatusEvent extends OptionalUserEvent {
 
     /**
      * Gets the old connection status of the user.

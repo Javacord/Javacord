@@ -1,6 +1,8 @@
 package org.javacord.core.util.handler.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.activity.Activity;
@@ -12,7 +14,9 @@ import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeStatusEvent;
 import org.javacord.core.entity.activity.ActivityImpl;
+import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
+import org.javacord.core.entity.user.UserPresence;
 import org.javacord.core.event.user.UserChangeActivityEventImpl;
 import org.javacord.core.event.user.UserChangeAvatarEventImpl;
 import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
@@ -20,9 +24,9 @@ import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -44,79 +48,126 @@ public class PresenceUpdateHandler extends PacketHandler {
         // ignore the guild_id and send to all mutual servers instead or we must track the properties per server
         // or all packets after the first do not detect a change and will not send around an event for the server
         long userId = packet.get("user").get("id").asLong();
-        api.getCachedUserById(userId).map(UserImpl.class::cast).ifPresent(user -> {
-            if (packet.has("game")) {
-                Activity newActivity = null;
-                if (!packet.get("game").isNull()) {
-                    newActivity = new ActivityImpl(api, packet.get("game"));
-                }
-                Activity oldActivity = user.getActivity().orElse(null);
-                user.setActivity(newActivity);
-                if (!Objects.deepEquals(newActivity, oldActivity)) {
-                    dispatchUserActivityChangeEvent(user, newActivity, oldActivity);
-                }
+        UserImpl oldUser = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
+        long serverId = packet.get("guild_id").asLong();
+        api.getEntityCache().get().getMemberCache().getMemberByIdAndServer(userId, serverId).ifPresent(oldMember -> {
+            MemberImpl newMember = ((MemberImpl) oldMember).setPartialUser(packet.get("user"));
+            if (packet.has("nick")) {
+                newMember = newMember.setNickname(packet.get("nick").asText());
             }
-            UserStatus oldStatus = user.getStatus();
-            UserStatus newStatus = oldStatus;
-            if (packet.has("status")) {
-                newStatus = UserStatus.fromString(packet.get("status").asText(null));
-                user.setStatus(newStatus);
-            }
-            Map<DiscordClient, UserStatus> newClientStatus = new HashMap<>();
-            Map<DiscordClient, UserStatus> oldClientStatus = new HashMap<>();
-            for (DiscordClient client : DiscordClient.values()) {
-                oldClientStatus.put(client, user.getStatusOnClient(client));
-                if (packet.has("client_status")) {
-                    JsonNode clientStatus = packet.get("client_status");
-                    if (clientStatus.hasNonNull(client.getName())) {
-                        UserStatus status = UserStatus.fromString(clientStatus.get(client.getName()).asText());
-                        user.setClientStatus(client, status);
-                    } else {
-                        user.setClientStatus(client, UserStatus.OFFLINE);
-                    }
+            if (packet.has("roles")) {
+                List<Long> roleIds = new ArrayList<>();
+                for (JsonNode roleIdJson : packet.get("roles")) {
+                    roleIds.add(roleIdJson.asLong());
                 }
-                newClientStatus.put(client, user.getStatusOnClient(client));
+                newMember = newMember.setRoleIds(roleIds);
             }
-
-            dispatchUserStatusChangeEventIfChangeDetected(user, newStatus, oldStatus, newClientStatus, oldClientStatus);
-
-            if (packet.get("user").has("username")) {
-                String newName = packet.get("user").get("username").asText();
-                String oldName = user.getName();
-                if (!oldName.equals(newName)) {
-                    user.setName(newName);
-                    dispatchUserChangeNameEvent(user, newName, oldName);
-                }
+            if (packet.has("premium_since")) {
+                newMember = newMember.setServerBoostingSince(packet.get("premium_since").asText());
             }
-            if (packet.get("user").has("discriminator")) {
-                String newDiscriminator = packet.get("user").get("discriminator").asText();
-                String oldDiscriminator = user.getDiscriminator();
-                if (!oldDiscriminator.equals(newDiscriminator)) {
-                    user.setDiscriminator(newDiscriminator);
-                    dispatchUserChangeDiscriminatorEvent(user, newDiscriminator, oldDiscriminator);
-                }
-            }
-            if (packet.get("user").has("avatar")) {
-                String newAvatarHash = packet.get("user").get("avatar").asText(null);
-                String oldAvatarHash = user.getAvatarHash();
-                if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
-                    user.setAvatarHash(newAvatarHash);
-                    dispatchUserChangeAvatarEvent(user, newAvatarHash, oldAvatarHash);
-                }
-            }
+            api.addMemberToCacheOrReplaceExisting(newMember);
         });
+
+        if (packet.has("game")) {
+            Activity newActivity;
+            if (!packet.get("game").isNull()) {
+                newActivity = new ActivityImpl(api, packet.get("game"));
+            } else {
+                newActivity = null;
+            }
+            Activity oldActivity = api.getEntityCache().get().getUserPresenceCache().getPresenceByUserId(userId)
+                    .map(UserPresence::getActivity)
+                    .orElse(null);
+            api.updateUserPresence(userId, presence -> presence.setActivity(newActivity));
+            if (!Objects.deepEquals(newActivity, oldActivity)) {
+                dispatchUserActivityChangeEvent(userId, newActivity, oldActivity);
+            }
+        }
+
+        UserStatus oldStatus = api.getEntityCache().get().getUserPresenceCache().getPresenceByUserId(userId)
+                .map(UserPresence::getStatus)
+                .orElse(UserStatus.OFFLINE);
+        UserStatus newStatus;
+        if (packet.has("status")) {
+            newStatus = UserStatus.fromString(packet.get("status").asText(null));
+            api.updateUserPresence(userId, presence -> presence.setStatus(newStatus));
+        } else {
+            newStatus = oldStatus;
+        }
+        Map<DiscordClient, UserStatus> oldClientStatus = api.getEntityCache().get().getUserPresenceCache()
+                .getPresenceByUserId(userId)
+                .map(UserPresence::getClientStatus)
+                .orElse(HashMap.empty());
+        for (DiscordClient client : DiscordClient.values()) {
+            if (packet.has("client_status")) {
+                JsonNode clientStatus = packet.get("client_status");
+                if (clientStatus.hasNonNull(client.getName())) {
+                    UserStatus status = UserStatus.fromString(clientStatus.get(client.getName()).asText());
+                    api.updateUserPresence(userId, presence -> presence
+                            .setClientStatus(presence.getClientStatus().put(client, status)));
+                } else {
+                    api.updateUserPresence(userId, presence -> presence
+                            .setClientStatus(presence.getClientStatus().put(client, UserStatus.OFFLINE)));
+                }
+            }
+        }
+        Map<DiscordClient, UserStatus> newClientStatus = api.getEntityCache().get().getUserPresenceCache()
+                .getPresenceByUserId(userId)
+                .map(UserPresence::getClientStatus)
+                .orElse(HashMap.empty());
+
+        dispatchUserStatusChangeEventIfChangeDetected(userId, newStatus, oldStatus, newClientStatus, oldClientStatus);
+
+        boolean userChanged = false;
+        UserImpl updatedUser = null;
+        if (oldUser != null) {
+            updatedUser = oldUser.replacePartialUserData(packet.get("user"));
+        }
+        if (oldUser != null && packet.get("user").has("username")) {
+            String newName = packet.get("user").get("username").asText();
+            String oldName = oldUser.getName();
+            if (!oldName.equals(newName)) {
+                dispatchUserChangeNameEvent(updatedUser, newName, oldName);
+                userChanged = true;
+            }
+        }
+        if (oldUser != null && packet.get("user").has("discriminator")) {
+            String newDiscriminator = packet.get("user").get("discriminator").asText();
+            String oldDiscriminator = oldUser.getDiscriminator();
+            if (!oldDiscriminator.equals(newDiscriminator)) {
+                dispatchUserChangeDiscriminatorEvent(updatedUser, newDiscriminator, oldDiscriminator);
+                userChanged = true;
+            }
+        }
+        if (oldUser != null && packet.get("user").has("avatar")) {
+            String newAvatarHash = packet.get("user").get("avatar").asText(null);
+            String oldAvatarHash = oldUser.getAvatarHash();
+            if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
+                dispatchUserChangeAvatarEvent(updatedUser, newAvatarHash, oldAvatarHash);
+                userChanged = true;
+            }
+        }
+        if (oldUser != null && userChanged) {
+            api.updateUserOfAllMembers(updatedUser);
+        }
     }
 
-    private void dispatchUserActivityChangeEvent(User user, Activity newActivity, Activity oldActivity) {
-        UserChangeActivityEvent event = new UserChangeActivityEventImpl(user, newActivity, oldActivity);
+    private void dispatchUserActivityChangeEvent(long userId, Activity newActivity, Activity oldActivity) {
+        UserImpl user = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
+        UserChangeActivityEvent event = new UserChangeActivityEventImpl(api, userId, newActivity, oldActivity);
 
         api.getEventDispatcher().dispatchUserChangeActivityEvent(
-                api, user.getMutualServers(), Collections.singleton(user), event);
+                api,
+                user == null ? Collections.emptySet() : user.getMutualServers(),
+                user == null ? Collections.emptySet() : Collections.singleton(user),
+                event
+        );
     }
 
-    private void dispatchUserStatusChangeEventIfChangeDetected(User user, UserStatus newStatus, UserStatus oldStatus,
+    private void dispatchUserStatusChangeEventIfChangeDetected(long userId, UserStatus newStatus, UserStatus oldStatus,
                                                                Map<DiscordClient, UserStatus> newClientStatus,
                                                                Map<DiscordClient, UserStatus> oldClientStatus) {
+        UserImpl user = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
         // Only dispatch the event if something changed
         boolean shouldDispatch = false;
         if (newClientStatus != oldClientStatus) {
@@ -132,17 +183,25 @@ public class PresenceUpdateHandler extends PacketHandler {
         }
 
         UserChangeStatusEvent event =
-                new UserChangeStatusEventImpl(user, newStatus, oldStatus, newClientStatus, oldClientStatus);
+                new UserChangeStatusEventImpl(api, userId, newStatus, oldStatus, newClientStatus, oldClientStatus);
 
         api.getEventDispatcher().dispatchUserChangeStatusEvent(
-                api, user.getMutualServers(), Collections.singleton(user), event);
+                api,
+                user == null ? Collections.emptySet() : user.getMutualServers(),
+                user == null ? Collections.emptySet() : Collections.singleton(user),
+                event
+        );
     }
 
     private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
         UserChangeNameEvent event = new UserChangeNameEventImpl(user, newName, oldName);
 
         api.getEventDispatcher().dispatchUserChangeNameEvent(
-                api, user.getMutualServers(), Collections.singleton(user), event);
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
     }
 
     private void dispatchUserChangeDiscriminatorEvent(User user, String newDiscriminator, String oldDiscriminator) {
@@ -150,14 +209,22 @@ public class PresenceUpdateHandler extends PacketHandler {
                 new UserChangeDiscriminatorEventImpl(user, newDiscriminator, oldDiscriminator);
 
         api.getEventDispatcher().dispatchUserChangeDiscriminatorEvent(
-                api, user.getMutualServers(), Collections.singleton(user), event);
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
     }
 
     private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
         UserChangeAvatarEvent event = new UserChangeAvatarEventImpl(user, newAvatarHash, oldAvatarHash);
 
         api.getEventDispatcher().dispatchUserChangeAvatarEvent(
-                api, user.getMutualServers(), Collections.singleton(user), event);
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
     }
 
 }

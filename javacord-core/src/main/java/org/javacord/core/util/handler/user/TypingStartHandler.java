@@ -2,14 +2,12 @@ package org.javacord.core.util.handler.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.event.user.UserStartTypingEvent;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.event.user.UserStartTypingEventImpl;
-import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
-
-import java.util.Optional;
 
 /**
  * Handles the typing start packet.
@@ -29,17 +27,24 @@ public class TypingStartHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         long userId = packet.get("user_id").asLong();
         long channelId = packet.get("channel_id").asLong();
-        api.getTextChannelById(channelId).ifPresent(channel -> api.getCachedUserById(userId).ifPresent(user -> {
-            UserStartTypingEvent event = new UserStartTypingEventImpl(user, channel);
+        TextChannel channel = api.getTextChannelById(channelId).orElse(null);
+        long serverId = packet.get("guild_id").asLong();
+        ServerImpl server = (ServerImpl) api.getPossiblyUnreadyServerById(serverId).orElseThrow(AssertionError::new);
 
-            Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
+        MemberImpl member = null;
+        if (packet.hasNonNull("member") && server != null) {
+            member = new MemberImpl(api, server, packet.get("member"), null);
+        }
+
+        if (channel != null) {
+            UserStartTypingEvent event = new UserStartTypingEventImpl(channel, userId, member);
             api.getEventDispatcher().dispatchUserStartTypingEvent(
-                    optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
-                    optionalServer.orElse(null),
+                    server != null ? server : api,
+                    server,
                     channel,
-                    user,
+                    userId,
                     event);
-        }));
+        }
     }
 
 }

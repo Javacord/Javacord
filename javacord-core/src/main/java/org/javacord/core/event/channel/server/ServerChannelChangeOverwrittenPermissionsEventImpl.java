@@ -26,6 +26,11 @@ public class ServerChannelChangeOverwrittenPermissionsEventImpl extends ServerCh
     private final Permissions oldPermissions;
 
     /**
+     * The id of the entity.
+     */
+    private final long entityId;
+
+    /**
      * The entity which permissions got changed.
      */
     private final DiscordEntity entity;
@@ -36,13 +41,16 @@ public class ServerChannelChangeOverwrittenPermissionsEventImpl extends ServerCh
      * @param channel The channel of the event.
      * @param newPermissions The new overwritten permissions.
      * @param oldPermissions The old overwritten permissions.
+     * @param entityId The id of the entity.
      * @param entity The entity which permissions got changed.
      */
     public ServerChannelChangeOverwrittenPermissionsEventImpl(
-            ServerChannel channel, Permissions newPermissions, Permissions oldPermissions, DiscordEntity entity) {
+            ServerChannel channel, Permissions newPermissions, Permissions oldPermissions, long entityId,
+            DiscordEntity entity) {
         super(channel);
         this.newPermissions = newPermissions;
         this.oldPermissions = oldPermissions;
+        this.entityId = entityId;
         this.entity = entity;
     }
 
@@ -57,8 +65,13 @@ public class ServerChannelChangeOverwrittenPermissionsEventImpl extends ServerCh
     }
 
     @Override
-    public DiscordEntity getEntity() {
-        return entity;
+    public long getEntityId() {
+        return entityId;
+    }
+
+    @Override
+    public Optional<DiscordEntity> getEntity() {
+        return Optional.ofNullable(entity);
     }
 
     @Override

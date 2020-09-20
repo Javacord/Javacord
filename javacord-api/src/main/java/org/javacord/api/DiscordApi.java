@@ -571,6 +571,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
+     * Checks if the user cache is enabled.
+     *
+     * @return Whether or not the user cache is enabled;
+     */
+    boolean isUserCacheEnabled();
+
+    /**
      * Gets a collection with all currently cached users.
      *
      * @return A collection with all currently cached users.

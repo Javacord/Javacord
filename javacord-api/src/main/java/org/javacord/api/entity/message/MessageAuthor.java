@@ -598,12 +598,7 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
      *
      * @return The author as user.
      */
-    default Optional<User> asUser() {
-        if (isUser()) {
-            return getApi().getCachedUserById(getId());
-        }
-        return Optional.empty();
-    }
+    Optional<User> asUser();
 
     /**
      * Checks if the author is a webhook.

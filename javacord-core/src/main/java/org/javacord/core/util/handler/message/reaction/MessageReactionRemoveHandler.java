@@ -6,7 +6,6 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
@@ -34,7 +33,7 @@ public class MessageReactionRemoveHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         api.getTextChannelById(packet.get("channel_id").asText()).ifPresent(channel -> {
             long messageId = packet.get("message_id").asLong();
-            User user = api.getCachedUserById(packet.get("user_id").asText()).orElseThrow(AssertionError::new);
+            long userId = packet.get("user_id").asLong();
             Optional<Message> message = api.getCachedMessageById(messageId);
 
             Emoji emoji;
@@ -45,9 +44,9 @@ public class MessageReactionRemoveHandler extends PacketHandler {
                 emoji = api.getKnownCustomEmojiOrCreateCustomEmoji(emojiJson);
             }
 
-            message.ifPresent(msg -> ((MessageImpl) msg).removeReaction(emoji, user.isYourself()));
+            message.ifPresent(msg -> ((MessageImpl) msg).removeReaction(emoji, userId == api.getYourself().getId()));
 
-            ReactionRemoveEvent event = new ReactionRemoveEventImpl(api, messageId, channel, emoji, user);
+            ReactionRemoveEvent event = new ReactionRemoveEventImpl(api, messageId, channel, emoji, userId);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
             api.getEventDispatcher().dispatchReactionRemoveEvent(
@@ -55,7 +54,7 @@ public class MessageReactionRemoveHandler extends PacketHandler {
                     messageId,
                     optionalServer.orElse(null),
                     channel,
-                    user,
+                    userId,
                     event);
         });
     }

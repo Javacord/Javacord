@@ -51,7 +51,10 @@ import org.javacord.core.entity.message.MessageSetImpl;
 import org.javacord.core.entity.message.UncachedMessageUtilImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
+import org.javacord.core.entity.user.Member;
+import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
+import org.javacord.core.entity.user.UserPresence;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
@@ -98,6 +101,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -280,26 +284,14 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private volatile Long timeOffset = null;
 
     /**
-     * A map which contains all users.
-     */
-    private final Map<Long, WeakReference<User>> users = Collections.synchronizedMap(new ConcurrentHashMap<>());
-
-    /**
-     * A map to retrieve user IDs by the weak ref that point to the respective
-     * user or used to point to it for usage in the users cleanup,
-     * as at cleanup time the weak ref is already emptied.
-     */
-    private final Map<Reference<? extends User>, Long> userIdByRef = Collections.synchronizedMap(new WeakHashMap<>());
-
-    /**
-     * The queue that is notified if a user became weakly-reachable.
-     */
-    private final ReferenceQueue<User> usersCleanupQueue = new ReferenceQueue<>();
-
-    /**
      * An immutable cache with all Javacord entities.
      */
     private final AtomicReference<JavacordEntityCache> entityCache = new AtomicReference<>(JavacordEntityCache.empty());
+
+    /**
+     * Whether the user cache is enabled or not.
+     */
+    private final boolean userCacheEnabled;
 
     /**
      * A map which contains all servers that are ready.
@@ -387,7 +379,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public DiscordApiImpl(String token, Ratelimiter globalRatelimiter, ProxySelector proxySelector, Proxy proxy,
                           Authenticator proxyAuthenticator, boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, null, true, globalRatelimiter,
+        this(AccountType.BOT, token, 0, 1, Collections.emptySet(), true, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
     }
 
@@ -521,6 +513,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.proxyAuthenticator = proxyAuthenticator;
         this.trustAllCertificates = trustAllCertificates;
         this.intents = intents;
+        userCacheEnabled = intents.contains(Intent.GUILD_MEMBERS);
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
 
@@ -602,22 +595,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             // After minimum JDK 9 is required this can be switched to use a Cleaner
             getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
                 try {
-                    for (Reference<? extends User> userRef = usersCleanupQueue.poll();
-                            userRef != null;
-                            userRef = usersCleanupQueue.poll()) {
-                        Long userId = userIdByRef.remove(userRef);
-                        if (userId != null) {
-                            users.remove(userId, userRef);
-                        }
-                    }
-                } catch (Throwable t) {
-                    logger.error("Failed to process users cleanup queue!", t);
-                }
-            }, 30, 30, TimeUnit.SECONDS);
-
-            // After minimum JDK 9 is required this can be switched to use a Cleaner
-            getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
-                try {
                     for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
                             messageRef != null;
                             messageRef = messagesCleanupQueue.poll()) {
@@ -657,6 +634,15 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public AtomicReference<JavacordEntityCache> getEntityCache() {
         return entityCache;
+    }
+
+    /**
+     * Checks if the user cache is enabled.
+     *
+     * @return Whetehr or not teh user cache is enabled.
+     */
+    public boolean hasUserCacheEnabled() {
+        return userCacheEnabled;
     }
 
     /**
@@ -703,15 +689,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * This method is only meant to be called after receiving a READY packet.
      */
     public void purgeCache() {
-        synchronized (users) {
-            users.values().stream()
-                    .map(Reference::get)
-                    .filter(Objects::nonNull)
-                    .map(Cleanupable.class::cast)
-                    .forEach(Cleanupable::cleanup);
-            users.clear();
-        }
-        userIdByRef.clear();
         servers.values().stream()
                 .map(Cleanupable.class::cast)
                 .forEach(Cleanupable::cleanup);
@@ -844,25 +821,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
-     * Adds the given user to the cache.
-     *
-     * @param user The user to add.
-     */
-    public void addUserToCache(User user) {
-        users.compute(user.getId(), (key, value) -> {
-            Optional.ofNullable(value)
-                    .map(Reference::get)
-                    .filter(oldUser -> oldUser != user)
-                    .map(Cleanupable.class::cast)
-                    .ifPresent(Cleanupable::cleanup);
-
-            WeakReference<User> result = new WeakReference<>(user, usersCleanupQueue);
-            userIdByRef.put(result, key);
-            return result;
-        });
-    }
-
-    /**
      * Adds a channel to the cache.
      *
      * @param channel The channel to add.
@@ -874,6 +832,21 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 ((Cleanupable) oldChannel).cleanup();
             }
             return cache.updateChannelCache(channelCache -> channelCache.addChannel(channel));
+        });
+    }
+
+    /**
+     * Updates a user presence in the cache.
+     *
+     * @param userId The id of the user.
+     * @param mapper A function that takes the old user presence (or null) and returns the new user presence.
+     */
+    public void updateUserPresence(long userId, UnaryOperator<UserPresence> mapper) {
+        entityCache.getAndUpdate(cache -> {
+            UserPresence presence = cache.getUserPresenceCache().getPresenceByUserId(userId)
+                    .orElseGet(() -> new UserPresence(userId, null, null, io.vavr.collection.HashMap.empty()));
+            return cache.updateUserPresenceCache(userPresenceCache ->
+                    userPresenceCache.removeUserPresence(presence).addUserPresence(mapper.apply(presence)));
         });
     }
 
@@ -892,6 +865,54 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 ((Cleanupable) channel).cleanup();
             }
             return cache.updateChannelCache(channelCache -> channelCache.removeChannel(channel));
+        });
+    }
+
+    /**
+     * Adds a member to the cache.
+     *
+     * @param member The member to add.
+     */
+    public void addMemberToCacheOrReplaceExisting(Member member) {
+        entityCache.getAndUpdate(cache -> {
+            Member oldMember = cache.getMemberCache()
+                    .getMemberByIdAndServer(member.getId(), member.getServer().getId())
+                    .orElse(null);
+            return cache.updateMemberCache(memberCache -> memberCache.removeMember(oldMember).addMember(member));
+        });
+    }
+
+    /**
+     * Updates the user object for all members in the cache.
+     *
+     * @param user The new user object.
+     */
+    public void updateUserOfAllMembers(User user) {
+        entityCache.getAndUpdate(cache ->  {
+            JavacordEntityCache newCache = cache;
+            for (Member member : cache.getMemberCache().getMembersById(user.getId())) {
+                newCache = newCache.updateMemberCache(memberCache -> memberCache
+                        .removeMember(member)
+                        .addMember(((MemberImpl) member).setUser((UserImpl) user))
+                );
+            }
+            return newCache;
+        });
+    }
+
+    /**
+     * Removes a member from the cache.
+     *
+     * @param memberId The id of the member to remove.
+     * @param serverId The id of the member's server.
+     */
+    public void removeMemberFromCache(long memberId, long serverId) {
+        entityCache.getAndUpdate(cache -> {
+            Member member = cache.getMemberCache().getMemberByIdAndServer(memberId, serverId).orElse(null);
+            if (member == null) {
+                return cache;
+            }
+            return cache.updateMemberCache(memberCache -> memberCache.removeMember(member));
         });
     }
 
@@ -957,24 +978,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public void setTimeOffset(Long timeOffset) {
         this.timeOffset = timeOffset;
-    }
-
-    /**
-     * Gets a user or creates a new one from the given data.
-     *
-     * @param data The json data of the user.
-     * @return The user.
-     */
-    public User getOrCreateUser(JsonNode data) {
-        long id = Long.parseLong(data.get("id").asText());
-        synchronized (users) {
-            return getCachedUserById(id).orElseGet(() -> {
-                if (!data.has("username")) {
-                    throw new IllegalStateException("Couldn't get or created user. Please inform the developer!");
-                }
-                return new UserImpl(this, data);
-            });
-        }
     }
 
     /**
@@ -1561,18 +1564,18 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
+    public boolean isUserCacheEnabled() {
+        return userCacheEnabled;
+    }
+
+    @Override
     public Collection<User> getCachedUsers() {
-        synchronized (users) {
-            return Collections.unmodifiableCollection(users.values().stream()
-                    .map(Reference::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList()));
-        }
+        return getEntityCache().get().getMemberCache().getUserCache().getUsers();
     }
 
     @Override
     public Optional<User> getCachedUserById(long id) {
-        return Optional.ofNullable(users.get(id)).map(Reference::get);
+        return getEntityCache().get().getMemberCache().getUserCache().getUserById(id);
     }
 
     @Override
@@ -1581,7 +1584,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> new RestRequest<User>(this, RestMethod.GET, RestEndpoint.USER)
                 .setUrlParameters(Long.toUnsignedString(id))
-                .execute(result -> this.getOrCreateUser(result.getJsonBody())));
+                .execute(result -> new UserImpl(this, result.getJsonBody(), (MemberImpl) null, null)));
     }
 
     @Override

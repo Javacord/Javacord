@@ -125,7 +125,7 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
 
     @Override
     public CompletableFuture<Void> removeReactionByEmojiFromMessage(User user, Emoji emoji) {
-        return Reaction.removeUser(getApi(), getChannel().getId(), getMessageId(), emoji, user);
+        return Reaction.removeUser(getApi(), getChannel().getId(), getMessageId(), emoji, user.getId());
     }
 
     @Override
@@ -139,7 +139,7 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
                 .thenCompose(users -> CompletableFuture.allOf(
                         users.stream()
                                 .map(user -> Reaction.removeUser(getApi(), getChannel().getId(),
-                                        getMessageId(), emoji, user))
+                                        getMessageId(), emoji, user.getId()))
                                 .toArray(CompletableFuture[]::new)));
     }
 

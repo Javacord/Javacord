@@ -1,45 +1,35 @@
 package org.javacord.core.event.user;
 
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.user.UserChangeSelfMutedEvent;
+import org.javacord.core.entity.user.Member;
 
 /**
  * The implementation of {@link UserChangeSelfMutedEvent}.
  */
 public class UserChangeSelfMutedEventImpl extends ServerUserEventImpl implements UserChangeSelfMutedEvent {
 
-    /**
-     * The new self-muted state of the user.
-     */
-    private final boolean newSelfMuted;
+    private final Member newMember;
+    private final Member oldMember;
 
     /**
-     * The old self-muted state of the user.
-     */
-    private final boolean oldSelfMuted;
-
-    /**
-     * Creates a new user change self-muted event.
+     * Creates a new user change self muted event.
      *
-     * @param userId The id of the user of the event.
-     * @param server The server in which the self-muted state of the user was changed.
-     * @param newSelfMuted The new self-muted state of the user.
-     * @param oldSelfMuted The old self-muted state of the user.
+     * @param newMember The new member.
+     * @param oldMember The old member.
      */
-    public UserChangeSelfMutedEventImpl(long userId, Server server, boolean newSelfMuted, boolean oldSelfMuted) {
-        super(userId, server);
-        this.newSelfMuted = newSelfMuted;
-        this.oldSelfMuted = oldSelfMuted;
+    public UserChangeSelfMutedEventImpl(Member newMember, Member oldMember) {
+        super(newMember.getUser(), newMember.getServer());
+        this.newMember = newMember;
+        this.oldMember = oldMember;
     }
 
     @Override
     public boolean isNewSelfMuted() {
-        return newSelfMuted;
+        return newMember.isSelfMuted();
     }
 
     @Override
     public boolean isOldSelfMuted() {
-        return oldSelfMuted;
+        return oldMember.isSelfMuted();
     }
-
 }

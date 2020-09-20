@@ -6,10 +6,12 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.Member;
+import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.event.message.reaction.ReactionAddEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
@@ -34,7 +36,12 @@ public class MessageReactionAddHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         api.getTextChannelById(packet.get("channel_id").asText()).ifPresent(channel -> {
             long messageId = packet.get("message_id").asLong();
-            User user = api.getCachedUserById(packet.get("user_id").asText()).orElseThrow(AssertionError::new);
+            long userId = packet.get("user_id").asLong();
+            Server server = channel.asServerChannel().map(ServerChannel::getServer).orElse(null);
+            Member member = null;
+            if (packet.hasNonNull("member")) {
+                member = new MemberImpl(api, (ServerImpl) server, packet.get("member"), null);
+            }
             Optional<Message> message = api.getCachedMessageById(messageId);
 
             Emoji emoji;
@@ -45,9 +52,9 @@ public class MessageReactionAddHandler extends PacketHandler {
                 emoji = api.getKnownCustomEmojiOrCreateCustomEmoji(emojiJson);
             }
 
-            message.ifPresent(msg -> ((MessageImpl) msg).addReaction(emoji, user.isYourself()));
+            message.ifPresent(msg -> ((MessageImpl) msg).addReaction(emoji, userId == api.getYourself().getId()));
 
-            ReactionAddEvent event = new ReactionAddEventImpl(api, messageId, channel, emoji, user);
+            ReactionAddEvent event = new ReactionAddEventImpl(api, messageId, channel, emoji, userId, member);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
             api.getEventDispatcher().dispatchReactionAddEvent(
@@ -55,7 +62,7 @@ public class MessageReactionAddHandler extends PacketHandler {
                     messageId,
                     optionalServer.orElse(null),
                     channel,
-                    user,
+                    userId,
                     event);
         });
     }

@@ -48,6 +48,8 @@ import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
+import org.javacord.core.entity.user.Member;
+import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.listener.server.InternalServerAttachableListenerManager;
@@ -62,7 +64,6 @@ import org.javacord.core.util.rest.RestRequestResult;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -179,7 +180,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     /**
      * If the server is ready (all members are cached).
      */
-    private volatile boolean ready = false;
+    private volatile boolean ready;
 
     /**
      * A lock that is used ti prevent lock on {@code audioConnection} and {@code pendingAudioConnection}.
@@ -197,26 +198,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
 
     /**
-     * A map with all members of the server.
-     */
-    private final ConcurrentHashMap<Long, User> members = new ConcurrentHashMap<>();
-
-    /**
-     * A map with all nicknames. The key is the user id.
-     */
-    private final ConcurrentHashMap<Long, String> nicknames = new ConcurrentHashMap<>();
-
-    /**
-     * A set with all members that are self-muted.
-     */
-    private final Set<Long> selfMuted = new ConcurrentSkipListSet<>();
-
-    /**
-     * A set with all members that are self-deafened.
-     */
-    private final Set<Long> selfDeafened = new ConcurrentSkipListSet<>();
-
-    /**
      * A set with all members that are muted.
      */
     private final Set<Long> muted = new ConcurrentSkipListSet<>();
@@ -225,11 +206,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * A set with all members that are deafened.
      */
     private final Set<Long> deafened = new ConcurrentSkipListSet<>();
-
-    /**
-     * A map with all joinedAt instants. The key is the user id.
-     */
-    private final ConcurrentHashMap<Long, Instant> joinedAtTimestamps = new ConcurrentHashMap<>();
 
     /**
      * A list with all custom emojis from this server.
@@ -298,6 +274,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public ServerImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
+        ready = !api.hasUserCacheEnabled();
 
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
@@ -404,7 +381,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             }
         }
 
-        if ((isLarge() || api.getAccountType() == AccountType.CLIENT) && getMembers().size() < getMemberCount()) {
+        if (
+                (isLarge() || api.getAccountType() == AccountType.CLIENT)
+                && getMembers().size() < getMemberCount()
+                && api.hasUserCacheEnabled()
+        ) {
             api.getWebSocketAdapter().queueRequestGuildMembers(this);
         }
 
@@ -431,25 +412,29 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 }
 
                 if (presenceJson.has("game")) {
-                    Activity activity = null;
+                    Activity activity;
                     if (!presenceJson.get("game").isNull()) {
                         activity = new ActivityImpl(api, presenceJson.get("game"));
+                    } else {
+                        activity = null;
                     }
-                    user.setActivity(activity);
+                    api.updateUserPresence(userId, presence -> presence.setActivity(activity));
                 }
                 if (presenceJson.has("status")) {
                     UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());
-                    user.setStatus(status);
+                    api.updateUserPresence(userId, presence -> presence.setStatus(status));
                 }
 
                 if (presenceJson.has("client_status")) {
                     JsonNode clientStatus = presenceJson.get("client_status");
                     for (DiscordClient client : DiscordClient.values()) {
                         if (clientStatus.hasNonNull(client.getName())) {
-                            user.setClientStatus(
-                                    client, UserStatus.fromString(clientStatus.get(client.getName()).asText()));
+                            UserStatus status = UserStatus.fromString(clientStatus.get(client.getName()).asText());
+                            api.updateUserPresence(userId, presence -> presence
+                                    .setClientStatus(presence.getClientStatus().put(client, status)));
                         } else {
-                            user.setClientStatus(client, UserStatus.OFFLINE);
+                            api.updateUserPresence(userId, presence -> presence
+                                    .setClientStatus(presence.getClientStatus().put(client, UserStatus.OFFLINE)));
                         }
                     }
                 }
@@ -738,18 +723,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     /**
      * Removes a member from the server.
      *
-     * @param user The user to remove.
+     * @param userId The id of the user to remove.
      */
-    public void removeMember(User user) {
-        long userId = user.getId();
-        members.remove(userId);
-        nicknames.remove(userId);
-        selfMuted.remove(userId);
-        selfDeafened.remove(userId);
+    public void removeMember(long userId) {
         muted.remove(userId);
         deafened.remove(userId);
-        getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(user));
-        joinedAtTimestamps.remove(userId);
+        getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(userId));
+        api.removeMemberFromCache(userId, getId());
     }
 
     /**
@@ -762,35 +742,26 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     /**
      * Adds a member to the server.
      *
-     * @param member The user to add.
+     * @param memberJson The user to add.
+     * @return The member.
      */
-    public void addMember(JsonNode member) {
-        User user = api.getOrCreateUser(member.get("user"));
-        members.put(user.getId(), user);
-        if (member.hasNonNull("nick")) {
-            nicknames.put(user.getId(), member.get("nick").asText());
-        }
-        if (member.hasNonNull("mute")) {
-            setMuted(user.getId(), member.get("mute").asBoolean());
-        }
-        if (member.hasNonNull("deaf")) {
-            setDeafened(user.getId(), member.get("deaf").asBoolean());
-        }
+    public MemberImpl addMember(JsonNode memberJson) {
+        MemberImpl member = new MemberImpl(api, this, memberJson, null);
+        api.addMemberToCacheOrReplaceExisting(member);
 
-        for (JsonNode roleIds : member.get("roles")) {
+        for (JsonNode roleIds : memberJson.get("roles")) {
             long roleId = Long.parseLong(roleIds.asText());
-            getRoleById(roleId).map(role -> ((RoleImpl) role)).ifPresent(role -> role.addUserToCache(user));
+            getRoleById(roleId).map(role -> ((RoleImpl) role)).ifPresent(role -> role.addUserToCache(member.getId()));
         }
-
-        joinedAtTimestamps.put(user.getId(), OffsetDateTime.parse(member.get("joined_at").asText()).toInstant());
 
         synchronized (readyConsumers) {
-            if (!ready && members.size() == getMemberCount()) {
+            if (!ready && getMembers().size() == getMemberCount()) {
                 ready = true;
                 readyConsumers.forEach(consumer -> consumer.accept(this));
                 readyConsumers.clear();
             }
         }
+        return member;
     }
 
     /**
@@ -798,44 +769,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public void incrementMemberCount() {
         memberCount.incrementAndGet();
-    }
-
-    /**
-     * Sets the nickname of the user.
-     *
-     * @param user     The user.
-     * @param nickname The nickname to set.
-     */
-    public void setNickname(User user, String nickname) {
-        nicknames.compute(user.getId(), (key, value) -> nickname);
-    }
-
-    /**
-     * Sets the self-muted state of the user with the given id.
-     *
-     * @param userId The id of the user.
-     * @param muted  Whether the user with the given id is self-muted or not.
-     */
-    public void setSelfMuted(long userId, boolean muted) {
-        if (muted) {
-            selfMuted.add(userId);
-        } else {
-            selfMuted.remove(userId);
-        }
-    }
-
-    /**
-     * Sets the self-deafened state of the user with the given id.
-     *
-     * @param userId   The id of the user.
-     * @param deafened Whether the user with the given id is self-deafened or not.
-     */
-    public void setSelfDeafened(long userId, boolean deafened) {
-        if (deafened) {
-            selfDeafened.add(userId);
-        } else {
-            selfDeafened.remove(userId);
-        }
     }
 
     /**
@@ -1127,17 +1060,22 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public Optional<String> getNickname(User user) {
-        return Optional.ofNullable(nicknames.get(user.getId()));
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getNickname);
     }
 
     @Override
     public boolean isSelfMuted(long userId) {
-        return selfMuted.contains(userId);
+        return getRealMemberById(userId)
+                .map(Member::isSelfMuted)
+                .orElse(false);
     }
 
     @Override
     public boolean isSelfDeafened(long userId) {
-        return selfDeafened.contains(userId);
+        return getRealMemberById(userId)
+                .map(Member::isSelfDeafened)
+                .orElse(false);
     }
 
     @Override
@@ -1152,7 +1090,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public Optional<Instant> getJoinedAtTimestamp(User user) {
-        return Optional.ofNullable(joinedAtTimestamps.get(user.getId()));
+        return getRealMemberById(user.getId())
+                .map(Member::getJoinedAtTimestamp);
     }
 
     @Override
@@ -1166,9 +1105,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public User getOwner() {
-        return api.getCachedUserById(ownerId)
-                .orElseThrow(() -> new IllegalStateException("Owner of server " + toString() + " is not cached!"));
+    public Optional<User> getOwner() {
+        return api.getCachedUserById(ownerId);
+    }
+
+    @Override
+    public long getOwnerId() {
+        return ownerId;
     }
 
     @Override
@@ -1274,18 +1217,45 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public Collection<User> getMembers() {
-        return Collections.unmodifiableList(new ArrayList<>(members.values()));
+    public Set<User> getMembers() {
+        return api.getEntityCache().get().getMemberCache()
+                .getMembersByServer(getId())
+                .stream()
+                .map(Member::getUser)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets a set with the real member objects of the server.
+     *
+     * @return The real members.
+     */
+    public Set<Member> getRealMembers() {
+        return api.getEntityCache().get().getMemberCache()
+                .getMembersByServer(getId());
     }
 
     @Override
     public Optional<User> getMemberById(long id) {
-        return Optional.ofNullable(members.get(id));
+        return api.getEntityCache().get().getMemberCache()
+                .getMemberByIdAndServer(id, getId())
+                .map(Member::getUser);
+    }
+
+    /**
+     * Gets the real member object for the user with the given id.
+     *
+     * @param userId The id of the user.
+     * @return The real member.
+     */
+    public Optional<Member> getRealMemberById(long userId) {
+        return api.getEntityCache().get().getMemberCache()
+                .getMemberByIdAndServer(userId, getId());
     }
 
     @Override
     public boolean isMember(User user) {
-        return members.containsKey(user.getId());
+        return getMemberById(user.getId()).isPresent();
     }
 
     @Override
@@ -1293,6 +1263,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         return Collections.unmodifiableList(roles.values().stream()
                 .sorted()
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<Role> getRoles(User user) {
+        return getRealMemberById(user.getId())
+                .map(Member::getRoles).orElseGet(() -> {
+                    ArrayList<Role> list = new ArrayList<>();
+                    list.add(getEveryoneRole());
+                    return list;
+                });
     }
 
     @Override

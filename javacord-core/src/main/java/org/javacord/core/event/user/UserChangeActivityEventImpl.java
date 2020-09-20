@@ -1,7 +1,7 @@
 package org.javacord.core.event.user;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.Activity;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.user.UserChangeActivityEvent;
 
 import java.util.Optional;
@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * The implementation of {@link UserChangeActivityEvent}.
  */
-public class UserChangeActivityEventImpl extends UserEventImpl implements UserChangeActivityEvent {
+public class UserChangeActivityEventImpl extends OptionalUserEventImpl implements UserChangeActivityEvent {
 
     /**
      * The new activity of the user.
@@ -24,12 +24,13 @@ public class UserChangeActivityEventImpl extends UserEventImpl implements UserCh
     /**
      * Creates a new user change activity event.
      *
-     * @param user The user of the event.
+     * @param api The discord api instance.
+     * @param userId The id of the user of the event.
      * @param newActivity The new activity of the user.
      * @param oldActivity The old activity of the user.
      */
-    public UserChangeActivityEventImpl(User user, Activity newActivity, Activity oldActivity) {
-        super(user);
+    public UserChangeActivityEventImpl(DiscordApi api, long userId, Activity newActivity, Activity oldActivity) {
+        super(api, userId);
         this.newActivity = newActivity;
         this.oldActivity = oldActivity;
     }

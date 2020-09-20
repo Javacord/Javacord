@@ -12,6 +12,8 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.webhook.InternalWebhookAttachableListenerManager;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -56,7 +58,8 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
         this.id = Long.parseLong(data.get("id").asText());
         this.serverId = data.has("guild_id") ? Long.parseLong(data.get("guild_id").asText()) : null;
         this.channelId = Long.parseLong(data.get("channel_id").asText());
-        this.user = data.has("user") ? this.api.getOrCreateUser(data.get("user")) : null;
+        this.user = data.has("user")
+                ? new UserImpl((DiscordApiImpl) api, data.get("user"), (MemberImpl) null, null) : null;
         this.name = data.has("name") && !data.get("name").isNull() ? data.get("name").asText() : null;
         this.avatarId = data.has("avatar") && !data.get("avatar").isNull() ? data.get("avatar").asText() : null;
         this.token = data.has("token") ? data.get("token").asText() : null;

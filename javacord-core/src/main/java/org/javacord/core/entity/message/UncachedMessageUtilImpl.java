@@ -14,6 +14,8 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.message.InternalUncachedMessageAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -362,7 +364,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                     List<User> incompleteUsers = request.execute(result -> {
                         List<User> paginatedUsers = new ArrayList<>();
                         for (JsonNode userJson : result.getJsonBody()) {
-                            paginatedUsers.add(api.getOrCreateUser(userJson));
+                            paginatedUsers.add(new UserImpl(api, userJson, (MemberImpl) null, null));
                         }
                         return Collections.unmodifiableList(paginatedUsers);
                     }).join();
@@ -389,7 +391,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<Void> removeUserReactionByEmoji(long channelId, long messageId, Emoji emoji, User user) {
+    public CompletableFuture<Void> removeUserReactionByEmoji(long channelId, long messageId, Emoji emoji, long userId) {
         String value = emoji.asUnicodeEmoji().orElseGet(() ->
                 emoji.asCustomEmoji().map(CustomEmoji::getReactionTag).orElse("UNKNOWN"));
         return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
@@ -397,15 +399,16 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                         Long.toUnsignedString(channelId),
                         Long.toUnsignedString(messageId),
                         value,
-                        user.isYourself() ? "@me" : user.getIdAsString())
+                        api.getYourself().getId() == userId ? "@me" : String.valueOf(userId))
                 .execute(result -> null);
     }
 
     @Override
     public CompletableFuture<Void> removeUserReactionByEmoji(String channelId, String messageId, Emoji emoji,
-                                                             User user) {
+                                                             String userId) {
         try {
-            return removeUserReactionByEmoji(Long.parseLong(channelId), Long.parseLong(messageId), emoji, user);
+            return removeUserReactionByEmoji(
+                    Long.parseLong(channelId), Long.parseLong(messageId), emoji, Long.parseLong(userId));
         } catch (NumberFormatException e) {
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);

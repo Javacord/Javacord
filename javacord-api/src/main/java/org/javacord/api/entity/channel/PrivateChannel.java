@@ -28,9 +28,7 @@ public interface PrivateChannel extends TextChannel, VoiceChannel, PrivateChanne
 
     @Override
     default Optional<PrivateChannel> getCurrentCachedInstance() {
-        return getApi().getCachedUserById(getRecipient().getId())
-                .flatMap(User::getPrivateChannel)
-                .filter(privateChannel -> privateChannel.getId() == getId());
+        return getApi().getPrivateChannelById(getId());
     }
 
     @Override
