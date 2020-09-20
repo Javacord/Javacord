@@ -120,7 +120,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         id = idCounter.getAndIncrement();
         api = (DiscordApiImpl) channel.getApi();
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), channel, false, false);
+                .sendVoiceStateUpdate(channel.getServer(), getChannel(), false, false);
     }
 
     /**
@@ -278,9 +278,23 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
             return false;
         }
         connectingOrConnected = true;
-        logger.debug("Received all information required to connect to voice channel {}", channel);
+        logger.debug("Received all information required to connect to voice channel {}", getChannel());
         websocketAdapter = new AudioWebSocketAdapter(this);
+        channel = channel.getCurrentCachedInstance().orElse(channel);
         return true;
+    }
+
+    /**
+     * Performs a full reconnect of the audio connection by sending a new voice state update.
+     */
+    public void reconnect() {
+        websocketAdapter = null;
+        sessionId = null;
+        token = null;
+        endpoint = null;
+        connectingOrConnected = false;
+        api.getWebSocketAdapter()
+                .sendVoiceStateUpdate(getChannel().getServer(), getChannel(), isSelfMuted(), isSelfDeafened());
     }
 
     /**
@@ -324,17 +338,17 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     @Override
     public CompletableFuture<Void> moveTo(ServerVoiceChannel destChannel, boolean selfMute, boolean selfDeafen) {
         movingFuture = new CompletableFuture<>();
-        if (!destChannel.getServer().equals(channel.getServer())) {
+        if (!destChannel.getServer().equals(getChannel().getServer())) {
             movingFuture.completeExceptionally(
                     new IllegalArgumentException("Cannot move to a voice channel not in the same server!"));
             return movingFuture;
         }
-        if (destChannel.equals(channel)) {
+        if (destChannel.equals(getChannel())) {
             movingFuture.complete(null);
             return movingFuture;
         }
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), destChannel, selfMute, selfDeafen);
+                .sendVoiceStateUpdate(getChannel().getServer(), destChannel, selfMute, selfDeafen);
         return movingFuture.thenRun(() -> setChannel(destChannel));
     }
 
@@ -343,8 +357,8 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         disconnectFuture = new CompletableFuture<>();
         websocketAdapter.disconnect();
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), null, muted, deafened);
-        ((ServerImpl) channel.getServer()).removeAudioConnection(this);
+                .sendVoiceStateUpdate(getChannel().getServer(), null, muted, deafened);
+        ((ServerImpl) getChannel().getServer()).removeAudioConnection(this);
         return disconnectFuture;
     }
 
@@ -369,7 +383,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
 
     @Override
     public ServerVoiceChannel getChannel() {
-        return channel;
+        return channel.getCurrentCachedInstance().orElse(channel);
     }
 
     @Override
@@ -381,7 +395,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     public void setSelfMuted(boolean muted) {
         this.muted = muted;
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), channel, muted, deafened);
+                .sendVoiceStateUpdate(getChannel().getServer(), getChannel(), muted, deafened);
     }
 
     @Override
@@ -393,12 +407,12 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     public void setSelfDeafened(boolean deafened) {
         this.deafened = deafened;
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), channel, muted, deafened);
+                .sendVoiceStateUpdate(getChannel().getServer(), getChannel(), muted, deafened);
     }
 
     @Override
     public String toString() {
-        return String
-                .format("AudioConnection (channel: %#s, sessionId: %s, endpoint: %s)", channel, sessionId, endpoint);
+        return String.format(
+                "AudioConnection (channel: %#s, sessionId: %s, endpoint: %s)", getChannel(), sessionId, endpoint);
     }
 }

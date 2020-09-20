@@ -200,8 +200,10 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
         switch (closeCode) {
             case AUTHENTICATION_FAILED:
-            case SESSION_NO_LONGER_VALID:
             case SERVER_NOT_FOUND:
+                connection.close();
+                break;
+            case SESSION_NO_LONGER_VALID:
             case DISCONNECTED:
                 if (!connection.getReadyFuture().isDone()) {
                     connection.getReadyFuture().completeExceptionally(
@@ -218,7 +220,10 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                             )
                     );
                 }
-                connection.close();
+                disconnect();
+                // TODO There are multiple reasons for a disconnect close code and we do not want to reconnect
+                //  for all of them (e.g., when the channel was deleted).
+                connection.reconnect();
                 break;
             case UNKNOWN_ERROR:
             case UNKNOWN_OPCODE:

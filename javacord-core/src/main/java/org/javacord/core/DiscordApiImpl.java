@@ -40,6 +40,7 @@ import org.javacord.api.util.concurrent.ThreadPool;
 import org.javacord.api.util.event.ListenerManager;
 import org.javacord.api.util.ratelimit.LocalRatelimiter;
 import org.javacord.api.util.ratelimit.Ratelimiter;
+import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.activity.ApplicationInfoImpl;
 import org.javacord.core.entity.emoji.CustomEmojiImpl;
@@ -298,6 +299,19 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * A map which contains all servers that are ready.
      */
     private final ConcurrentHashMap<Long, Server> servers = new ConcurrentHashMap<>();
+
+    /**
+     * A map with audio connections. The key is the server id.
+     */
+    private final ConcurrentHashMap<Long, AudioConnectionImpl> audioConnections = new ConcurrentHashMap<>();
+
+    /**
+     * A map with pending audio connections. The key is the server id.
+     * A pending connection is a connect that is currently trying to connect to a websocket and establish an udp
+     * connection but has not finished.
+     * The field might still be set, even though the connection is no longer pending!
+     */
+    private final ConcurrentHashMap<Long, AudioConnectionImpl> pendingAudioConnections = new ConcurrentHashMap<>();
 
     /**
      * A map which contains all servers that are not ready.
@@ -693,6 +707,64 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         messages.clear();
         messageIdByRef.clear();
         timeOffset = null;
+    }
+
+    /**
+     * Gets the audio connection for the server with the given id.
+     *
+     * @param serverId The server id.
+     * @return The audio connection.
+     */
+    public AudioConnectionImpl getAudioConnectionByServerId(long serverId) {
+        return audioConnections.get(serverId);
+    }
+
+    /**
+     * Sets the audio connection for the server with the given id.
+     *
+     * @param serverId The server id.
+     * @param connection The audio connection.
+     */
+    public void setAudioConnection(long serverId, AudioConnectionImpl connection) {
+        audioConnections.put(serverId, connection);
+    }
+
+    /**
+     * Removes the audio connection for the server with the given id.
+     *
+     * @param serverId The server id.
+     */
+    public void removeAudioConnection(long serverId) {
+        audioConnections.remove(serverId);
+    }
+
+    /**
+     * Gets the pending audio connection for the server with the given id.
+     *
+     * @param serverId The server id.
+     * @return The pending audio connection.
+     */
+    public AudioConnectionImpl getPendingAudioConnectionByServerId(long serverId) {
+        return pendingAudioConnections.get(serverId);
+    }
+
+    /**
+     * Sets the audio pending connection for the server with the given id.
+     *
+     * @param serverId The server id.
+     * @param connection The pending audio connection.
+     */
+    public void setPendingAudioConnection(long serverId, AudioConnectionImpl connection) {
+        pendingAudioConnections.put(serverId, connection);
+    }
+
+    /**
+     * Removes the pending audio connection for the server with the given id.
+     *
+     * @param serverId The server id.
+     */
+    public void removePendingAudioConnection(long serverId) {
+        pendingAudioConnections.remove(serverId);
     }
 
     /**
