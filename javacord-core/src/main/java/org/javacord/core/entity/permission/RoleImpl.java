@@ -86,9 +86,9 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     /**
      * Creates a new role object.
      *
-     * @param api The discord api instance.
+     * @param api    The discord api instance.
      * @param server The server of the role.
-     * @param data The json data of the role.
+     * @param data   The json data of the role.
      */
     public RoleImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
         this.api = api;
@@ -99,7 +99,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
         this.color = data.get("color").asInt(0);
         this.hoist = data.get("hoist").asBoolean(false);
         this.mentionable = data.get("mentionable").asBoolean(false);
-        this.permissions = new PermissionsImpl(data.get("permissions").asInt(), 0);
+        this.permissions = new PermissionsImpl(data.get("permissions").asLong(), 0);
         this.managed = data.get("managed").asBoolean(false);
     }
 

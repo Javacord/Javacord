@@ -185,8 +185,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                         throw new IllegalStateException("Permission overwrite object with unknown type: "
                                 + permissionOverwriteJson);
                 }
-                int allow = permissionOverwriteJson.get("allow").asInt(0);
-                int deny = permissionOverwriteJson.get("deny").asInt(0);
+                long allow = permissionOverwriteJson.get("allow").asLong(0);
+                long deny = permissionOverwriteJson.get("deny").asLong(0);
                 Permissions newOverwrittenPermissions = new PermissionsImpl(allow, deny);
                 if (!newOverwrittenPermissions.equals(oldOverwrittenPermissions)) {
                     overwrittenPermissions.put(entityId, newOverwrittenPermissions);

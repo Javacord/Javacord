@@ -11,18 +11,18 @@ import java.util.stream.Collectors;
 public interface Permissions {
 
     /**
-     * Gets the integer containing all allowed permission types.
+     * Gets the long containing all allowed permission types.
      *
-     * @return The integer containing all allowed permission types.
+     * @return The long containing all allowed permission types.
      */
-    int getAllowedBitmask();
+    long getAllowedBitmask();
 
     /**
-     * Gets the integer containing all denied permission types.
+     * Gets the long containing all denied permission types.
      *
-     * @return The integer containing all denied permission types.
+     * @return The long containing all denied permission types.
      */
-    int getDeniedBitmask();
+    long getDeniedBitmask();
 
     /**
      * Gets the state of the given type.
@@ -101,7 +101,7 @@ public interface Permissions {
      * it is marked as {@link PermissionState#UNSET}.
      *
      * @param allowedBitmask The bitmask of allowed permissions.
-     * @param deniedBitmask The bitmask of denied permissions.
+     * @param deniedBitmask  The bitmask of denied permissions.
      * @return A {@code Permissions} object created from the given bitmasks.
      */
     static Permissions fromBitmask(int allowedBitmask, int deniedBitmask) {

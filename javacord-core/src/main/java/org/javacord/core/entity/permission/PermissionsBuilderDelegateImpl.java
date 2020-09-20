@@ -11,14 +11,14 @@ import org.javacord.api.entity.permission.internal.PermissionsBuilderDelegate;
 public class PermissionsBuilderDelegateImpl implements PermissionsBuilderDelegate {
 
     /**
-     * The integer containing all allowed permission types.
+     * The long containing all allowed permission types.
      */
-    private int allowed = 0;
+    private long allowed = 0;
 
     /**
-     * The integer containing all denied permission types.
+     * The long containing all denied permission types.
      */
-    private int denied = 0;
+    private long denied = 0;
 
     /**
      * Creates a new permissions factory.
