@@ -1,5 +1,6 @@
 package org.javacord.api;
 
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.ChainableGloballyAttachableListenerManager;
@@ -11,11 +12,13 @@ import org.javacord.api.util.ratelimit.Ratelimiter;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -320,6 +323,72 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      */
     public boolean isShutdownHookRegistrationEnabled() {
         return delegate.isShutdownHookRegistrationEnabled();
+    }
+
+    /**
+     * Sets intent for the events which should be received.
+     *
+     * @param intents One or more intents from {@link Intent}.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setIntents(Intent... intents) {
+        setAllIntentsWhere(intent -> Arrays.asList(intents).contains(intent));
+        return this;
+    }
+
+    /**
+     * Sets all intents.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllIntents() {
+        setAllIntentsWhere(intent -> true);
+        return this;
+    }
+
+    /**
+     * Sets all non privileged intents.
+     *
+     * <p>This is the default behavior if no intents are set in the builder.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllNonPrivilegedIntents() {
+        setAllIntentsWhere(intent -> !intent.isPrivileged());
+        return this;
+    }
+
+    /**
+     * Sets all intents except the given intents.
+     *
+     * @param intentsToOmit One or more {@code Intent}s which should be omitted.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllIntentsExcept(Intent... intentsToOmit) {
+        setAllIntentsWhere(intent -> !Arrays.asList(intentsToOmit).contains(intent));
+        return this;
+    }
+
+    /**
+     * Sets all non privileged intents except the given intents.
+     *
+     * @param intentsToOmit One or more {@code Intent}s which should be omitted.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllNonPrivilegedIntentsExcept(Intent... intentsToOmit) {
+        setAllIntentsWhere(intent -> !intent.isPrivileged() && !Arrays.asList(intentsToOmit).contains(intent));
+        return this;
+    }
+
+    /**
+     * Sets the intents where the given predicate matches.
+     *
+     * @param condition Whether the intent should be added or not.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllIntentsWhere(Predicate<Intent> condition) {
+        delegate.setAllIntentsWhere(condition);
+        return this;
     }
 
     /**

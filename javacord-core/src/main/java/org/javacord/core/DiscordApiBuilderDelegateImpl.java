@@ -5,6 +5,7 @@ import org.apache.logging.log4j.CloseableThreadContext;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -23,17 +24,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -109,6 +114,12 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private volatile boolean registerShutdownHook = true;
 
     /**
+     * The intents. Default are all intents except the privileged
+     */
+    private Set<Intent> intents = Arrays.stream(Intent.values())
+            .filter(intent -> !intent.isPrivileged()).collect(Collectors.toCollection(HashSet::new));
+
+    /**
      * The globally attachable listeners to register for every created DiscordApi instance.
      */
     private final Map<Class<? extends GloballyAttachableListener>,
@@ -170,9 +181,10 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
-            new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup,
-                    registerShutdownHook, globalRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                    trustAllCertificates, future, null, preparedListeners, preparedUnspecifiedListeners);
+            new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), intents,
+                    waitForServersOnStartup, registerShutdownHook, globalRatelimiter, proxySelector, proxy,
+                    proxyAuthenticator, trustAllCertificates, future, null, preparedListeners,
+                    preparedUnspecifiedListeners);
         }
         return future;
     }
@@ -349,6 +361,16 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
+    public void setAllIntentsWhere(Predicate<Intent> condition) {
+        intents = new HashSet<>();
+        for (Intent value : Intent.values()) {
+            if (condition.test(value)) {
+                intents.add(value);
+            }
+        }
+    }
+
+    @Override
     public CompletableFuture<Void> setRecommendedTotalShards() {
         CompletableFuture<Void> future = new CompletableFuture<>();
         if (token == null) {
@@ -402,7 +424,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public <T extends GloballyAttachableListener> void addListener(
-                                            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+            Class<T> listenerClass, Supplier<T> listenerSupplier) {
         this.listenerSuppliers.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<Supplier<? extends GloballyAttachableListener>> listeners = this.listenerSuppliers.get(listenerClass);
         if (!listeners.contains(listenerSupplier)) {
@@ -412,14 +434,14 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public void addListener(Supplier<GloballyAttachableListener> listenerSupplier) {
-        if (!this.unspecifiedListenerSuppliers.contains(listenerSupplier))  {
+        if (!this.unspecifiedListenerSuppliers.contains(listenerSupplier)) {
             this.unspecifiedListenerSuppliers.add(listenerSupplier);
         }
     }
 
     @Override
     public <T extends GloballyAttachableListener> void addListener(
-                                                Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
         this.listenerFunctions.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<Function<DiscordApi, ? extends GloballyAttachableListener>> functions =
                 this.listenerFunctions.get(listenerClass);
@@ -455,7 +477,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public <T extends GloballyAttachableListener> void removeListenerSupplier(
-                                                Class<T> listenerClass, Supplier<T> listenerSupplier) {
+            Class<T> listenerClass, Supplier<T> listenerSupplier) {
         this.listenerSuppliers.computeIfPresent(listenerClass, (clazz, suppliers) -> {
             suppliers.remove(listenerSupplier);
             return suppliers.isEmpty() ? null : suppliers;
@@ -469,7 +491,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public <T extends GloballyAttachableListener> void removeListenerFunction(
-                                                Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
         this.listenerFunctions.computeIfPresent(listenerClass, (clazz, functions) -> {
             functions.remove(listenerFunction);
             return functions.isEmpty() ? null : functions;
