@@ -104,6 +104,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private volatile boolean waitForServersOnStartup = true;
 
     /**
+     * Whether the shutdown hook should be registered or not.
+     */
+    private volatile boolean registerShutdownHook = true;
+
+    /**
      * The globally attachable listeners to register for every created DiscordApi instance.
      */
     private final Map<Class<? extends GloballyAttachableListener>,
@@ -166,8 +171,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
             new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), waitForServersOnStartup,
-                    globalRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, future, null,
-                    preparedListeners, preparedUnspecifiedListeners);
+                    registerShutdownHook, globalRatelimiter, proxySelector, proxy, proxyAuthenticator,
+                    trustAllCertificates, future, null, preparedListeners, preparedUnspecifiedListeners);
         }
         return future;
     }
@@ -331,6 +336,16 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public boolean isWaitingForServersOnStartup() {
         return waitForServersOnStartup;
+    }
+
+    @Override
+    public void setShutdownHookRegistrationEnabled(boolean registerShutdownHook) {
+        this.registerShutdownHook = registerShutdownHook;
+    }
+
+    @Override
+    public boolean isShutdownHookRegistrationEnabled() {
+        return registerShutdownHook;
     }
 
     @Override
