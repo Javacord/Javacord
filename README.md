@@ -4,7 +4,7 @@
 An easy to use multithreaded library for creating Discord bots in Java.
 
 Javacord is a modern library that focuses on simplicity and speed 🚀.
-By reducing itself to standard Java classes and features like [`Optional`](https://javacord.org/wiki/essential-knowledge/working-with-optionals/)s and [`CompletableFuture`](https://javacord.org/wiki/essential-knowledge/working-with-futures/)s, it is extremely easy to use for every Java developer, as it does not require you to learn any new frameworks or complex abstractions. 
+By reducing itself to standard Java classes and features like [`Optional`](https://javacord.org/wiki/essential-knowledge/optionals.html)s and [`CompletableFuture`](https://javacord.org/wiki/essential-knowledge/completable-futures.html)s, it is extremely easy to use for every Java developer, as it does not require you to learn any new frameworks or complex abstractions. 
 It has rich [documentation](#-documentation) and an [awesome community on Discord](#-support) that loves to help with any specific problems and questions.
 
 ## 🎉 Basic Usage
@@ -80,14 +80,14 @@ For example, Log4j Core in Gradle
 ```groovy
 dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
 ```
-Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-configuration/) wiki article for further information.
+Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-config.html) wiki article for further information.
 
 ## 🔧 IDE Setup
 
 If you have never used Gradle or Maven before, you should take a look at one of the setup tutorials:
-* **[IntelliJ & Gradle](https://javacord.org/wiki/getting-started/intellij-gradle/)** _(recommended)_
-* **[IntelliJ & Maven](https://javacord.org/wiki/getting-started/intellij-maven/)**
-* **[Eclipse & Maven](https://javacord.org/wiki/getting-started/eclipse-maven/)**
+* **[IntelliJ & Gradle](https://javacord.org/wiki/getting-started/setup/intellij-gradle.html)** _(recommended)_
+* **[IntelliJ & Maven](https://javacord.org/wiki/getting-started/setup/intellij-maven.html)**
+* **[Eclipse & Maven](https://javacord.org/wiki/getting-started/setup/eclipse-maven.html)**
 
 ## 🤝 Support
 
@@ -101,7 +101,7 @@ Javacord's Discord community is an excellent resource if you have questions abou
 
 ## 💡 How to Create a Bot User and Get Its Token 
 
-* **[Creating a Bot User Account](https://javacord.org/wiki/essential-knowledge/creating-a-bot-account/)**
+* **[Creating a Bot User Account](https://javacord.org/wiki/getting-started/creating-a-bot-account.html)**
 
 ## 📋 Version Numbers
 
