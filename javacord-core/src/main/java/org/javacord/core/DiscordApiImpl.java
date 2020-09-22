@@ -25,6 +25,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.UncachedMessageUtil;
@@ -212,6 +213,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final int totalShards;
 
     /**
+     * The intents to be set.
+     */
+    private final Set<Intent> intents;
+
+    /**
      * Whether Javacord should wait for all servers to become available on startup or not.
      */
     private final boolean waitForServersOnStartup;
@@ -381,7 +387,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public DiscordApiImpl(String token, Ratelimiter globalRatelimiter, ProxySelector proxySelector, Proxy proxy,
                           Authenticator proxyAuthenticator, boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, true, globalRatelimiter,
+        this(AccountType.BOT, token, 0, 1, null, true, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
     }
 
@@ -392,6 +398,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param token                   The token used to connect without any account type specific prefix.
      * @param currentShard            The current shard the bot should connect to.
      * @param totalShards             The total amount of shards.
+     * @param intents                  The intents for the events which should be received.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
      * @param globalRatelimiter       The ratelimiter used for global ratelimits.
@@ -408,6 +415,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             String token,
             int currentShard,
             int totalShards,
+            Set<Intent> intents,
             boolean waitForServersOnStartup,
             Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
@@ -416,7 +424,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
     ) {
-        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, true, globalRatelimiter,
+        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, true, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, null,
                 Collections.emptyMap(), Collections.emptyList());
     }
@@ -428,6 +436,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param token                   The token used to connect without any account type specific prefix.
      * @param currentShard            The current shard the bot should connect to.
      * @param totalShards             The total amount of shards.
+     * @param intents                  The intents for the events which should be received.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
      * @param globalRatelimiter       The ratelimiter used for global ratelimits.
@@ -445,6 +454,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             String token,
             int currentShard,
             int totalShards,
+            Set<Intent> intents,
             boolean waitForServersOnStartup,
             Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
@@ -453,7 +463,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready,
             Dns dns) {
-        this(accountType, token, currentShard, totalShards, waitForServersOnStartup, true, globalRatelimiter,
+        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, true, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, dns, Collections.emptyMap(),
                 Collections.emptyList());
     }
@@ -464,6 +474,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param token                   The token used to connect without any account type specific prefix.
      * @param currentShard            The current shard the bot should connect to.
      * @param totalShards             The total amount of shards.
+     * @param intents                  The intents for the events which should be received.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
      *                                to become available on startup or not.
      * @param registerShutdownHook    Whether the shutdown hook should be registered or not.
@@ -485,6 +496,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             String token,
             int currentShard,
             int totalShards,
+            Set<Intent> intents,
             boolean waitForServersOnStartup,
             boolean registerShutdownHook,
             Ratelimiter globalRatelimiter,
@@ -508,6 +520,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.proxy = proxy;
         this.proxyAuthenticator = proxyAuthenticator;
         this.trustAllCertificates = trustAllCertificates;
+        this.intents = intents;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
 
@@ -1236,6 +1249,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public String getPrefixedToken() {
         return accountType.getTokenPrefix() + token;
+    }
+
+    @Override
+    public Set<Intent> getIntents() {
+        return Collections.unmodifiableSet(intents);
     }
 
     @Override

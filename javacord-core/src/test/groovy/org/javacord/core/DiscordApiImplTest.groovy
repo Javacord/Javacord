@@ -320,7 +320,7 @@ class DiscordApiImplTest extends Specification {
             MockProxyManager.setSocks4SystemProperties()
 
         and:
-            def api = new DiscordApiImpl(AccountType.BOT, 'fakeBotToken', 0, 1, false, null, null, null, null, true,
+            def api = new DiscordApiImpl(AccountType.BOT, 'fakeBotToken', 0, 1, null, false, null, null, null, null, true,
                     null, { [InetAddress.getLoopbackAddress()] })
 
         when:

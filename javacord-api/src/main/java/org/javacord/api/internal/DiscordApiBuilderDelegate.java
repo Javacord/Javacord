@@ -3,6 +3,7 @@ package org.javacord.api.internal;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.ratelimit.Ratelimiter;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -109,7 +111,7 @@ public interface DiscordApiBuilderDelegate {
     void setCurrentShard(int currentShard);
 
     /**
-     * Sets the current shard.
+     * Gets the current shard.
      *
      * @return The current shard.
      */
@@ -147,6 +149,13 @@ public interface DiscordApiBuilderDelegate {
      * @see #setShutdownHookRegistrationEnabled(boolean)
      */
     boolean isShutdownHookRegistrationEnabled();
+
+    /**
+     * Sets the intents where the given predicate matches.
+     *
+     * @param condition Whether the intent should be added or not.
+     */
+    void setAllIntentsWhere(Predicate<Intent> condition);
 
     /**
      * Logs the bot in.
@@ -314,5 +323,4 @@ public interface DiscordApiBuilderDelegate {
      */
     <T extends GloballyAttachableListener> void removeListenerFunction(Class<T> listenerClass,
                                                                        Function<DiscordApi, T> listenerFunction);
-    
 }
