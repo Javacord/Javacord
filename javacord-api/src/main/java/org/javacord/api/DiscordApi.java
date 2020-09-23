@@ -24,6 +24,7 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerBuilder;
 import org.javacord.api.entity.server.invite.Invite;
+import org.javacord.api.entity.team.Team;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.Webhook;
@@ -330,6 +331,22 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     default CompletableFuture<User> getOwner() {
         return getUserById(getOwnerId());
+    }
+
+    /**
+     * Gets the team of the application.
+     *
+     * @return The team of the application.
+     */
+    Optional<Team> getCachedTeam();
+
+    /**
+     * Requests the team of the application.
+     *
+     * @return The team of the application.
+     */
+    default CompletableFuture<Optional<Team>> requestTeam() {
+        return getApplicationInfo().thenApply(ApplicationInfo::getTeam);
     }
 
     /**
