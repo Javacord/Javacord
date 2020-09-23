@@ -73,6 +73,18 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     }
 
     /**
+     * Checks if this user is a member of the team of the current account.
+     * Always returns <code>false</code> if logged in to a user account.
+     *
+     * @return Whether this user is a member of the team of the current account.
+     */
+    default boolean isTeamMember() {
+        return getApi().getAccountType() == AccountType.BOT
+                && getApi().getCachedTeam().map(team -> team.getOwnerId() == getId()
+                || team.getTeamMembers().stream().anyMatch(teamMember -> teamMember.getId() == getId())).orElse(false);
+    }
+
+    /**
      * Gets the activities of the user.
      *
      * @return The activities of the user.
