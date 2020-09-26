@@ -14,7 +14,6 @@ import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeStatusEvent;
 import org.javacord.core.entity.activity.ActivityImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.user.UserPresence;
 import org.javacord.core.event.user.UserChangeActivityEventImpl;
@@ -24,10 +23,9 @@ import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Handles the presence update packet.
@@ -49,24 +47,11 @@ public class PresenceUpdateHandler extends PacketHandler {
         // or all packets after the first do not detect a change and will not send around an event for the server
         long userId = packet.get("user").get("id").asLong();
         UserImpl oldUser = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
-        long serverId = packet.get("guild_id").asLong();
-        api.getEntityCache().get().getMemberCache().getMemberByIdAndServer(userId, serverId).ifPresent(oldMember -> {
-            MemberImpl newMember = ((MemberImpl) oldMember).setPartialUser(packet.get("user"));
-            if (packet.has("nick")) {
-                newMember = newMember.setNickname(packet.get("nick").asText());
-            }
-            if (packet.has("roles")) {
-                List<Long> roleIds = new ArrayList<>();
-                for (JsonNode roleIdJson : packet.get("roles")) {
-                    roleIds.add(roleIdJson.asLong());
-                }
-                newMember = newMember.setRoleIds(roleIds);
-            }
-            if (packet.has("premium_since")) {
-                newMember = newMember.setServerBoostingSince(packet.get("premium_since").asText());
-            }
-            api.addMemberToCacheOrReplaceExisting(newMember);
-        });
+
+        AtomicReference<UserPresence> presence = new AtomicReference<>(
+                api.getEntityCache().get().getUserPresenceCache().getPresenceByUserId(userId)
+                        .orElseGet(() -> new UserPresence(userId, null, null, io.vavr.collection.HashMap.empty()))
+        );
 
         if (packet.has("game")) {
             Activity newActivity;
@@ -78,7 +63,7 @@ public class PresenceUpdateHandler extends PacketHandler {
             Activity oldActivity = api.getEntityCache().get().getUserPresenceCache().getPresenceByUserId(userId)
                     .map(UserPresence::getActivity)
                     .orElse(null);
-            api.updateUserPresence(userId, presence -> presence.setActivity(newActivity));
+            presence.set(presence.get().setActivity(newActivity));
             if (!Objects.deepEquals(newActivity, oldActivity)) {
                 dispatchUserActivityChangeEvent(userId, newActivity, oldActivity);
             }
@@ -90,7 +75,7 @@ public class PresenceUpdateHandler extends PacketHandler {
         UserStatus newStatus;
         if (packet.has("status")) {
             newStatus = UserStatus.fromString(packet.get("status").asText(null));
-            api.updateUserPresence(userId, presence -> presence.setStatus(newStatus));
+            presence.set(presence.get().setStatus(newStatus));
         } else {
             newStatus = oldStatus;
         }
@@ -103,11 +88,10 @@ public class PresenceUpdateHandler extends PacketHandler {
                 JsonNode clientStatus = packet.get("client_status");
                 if (clientStatus.hasNonNull(client.getName())) {
                     UserStatus status = UserStatus.fromString(clientStatus.get(client.getName()).asText());
-                    api.updateUserPresence(userId, presence -> presence
-                            .setClientStatus(presence.getClientStatus().put(client, status)));
+                    presence.set(presence.get().setClientStatus(presence.get().getClientStatus().put(client, status)));
                 } else {
-                    api.updateUserPresence(userId, presence -> presence
-                            .setClientStatus(presence.getClientStatus().put(client, UserStatus.OFFLINE)));
+                    presence.set(presence.get()
+                            .setClientStatus(presence.get().getClientStatus().put(client, UserStatus.OFFLINE)));
                 }
             }
         }
@@ -115,6 +99,8 @@ public class PresenceUpdateHandler extends PacketHandler {
                 .getPresenceByUserId(userId)
                 .map(UserPresence::getClientStatus)
                 .orElse(HashMap.empty());
+
+        api.updateUserPresence(userId, p -> presence.get());
 
         dispatchUserStatusChangeEventIfChangeDetected(userId, newStatus, oldStatus, newClientStatus, oldClientStatus);
 

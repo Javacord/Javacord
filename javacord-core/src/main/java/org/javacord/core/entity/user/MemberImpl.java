@@ -72,8 +72,16 @@ public final class MemberImpl implements Member {
             serverBoostingSince = null;
         }
 
-        selfDeafened = data.get("deaf").asBoolean();
-        selfMuted = data.get("mute").asBoolean();
+        if (data.hasNonNull("deaf")) {
+            selfDeafened = data.get("deaf").asBoolean();
+        } else {
+            selfDeafened = false;
+        }
+        if (data.hasNonNull("mute")) {
+            selfMuted = data.get("mute").asBoolean();
+        } else {
+            selfMuted = false;
+        }
     }
 
     private MemberImpl(DiscordApiImpl api, ServerImpl server, UserImpl user, String nickname, List<Long> roleIds,
@@ -124,6 +132,15 @@ public final class MemberImpl implements Member {
     }
 
     /**
+     * Gets a list with the member's role ids.
+     *
+     * @return A list with the member's role ids.
+     */
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    /**
      * Creates a new member object with the new nickname.
      *
      * @param nickname The new nickname.
@@ -143,6 +160,15 @@ public final class MemberImpl implements Member {
     public MemberImpl setServerBoostingSince(String serverBoostingSince) {
         return new MemberImpl(
                 api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted);
+    }
+
+    /**
+     * Gets the string value of the server boosting since field.
+     *
+     * @return The server boosting since field.
+     */
+    public String getServerBoostingSince() {
+        return serverBoostingSince;
     }
 
     @Override

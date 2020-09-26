@@ -755,7 +755,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         synchronized (readyConsumers) {
-            if (!ready && getMembers().size() == getMemberCount()) {
+            if (!ready && getRealMembers().size() == getMemberCount()) {
                 ready = true;
                 readyConsumers.forEach(consumer -> consumer.accept(this));
                 readyConsumers.clear();
@@ -1255,7 +1255,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public boolean isMember(User user) {
-        return getMemberById(user.getId()).isPresent();
+        return api.getEntityCache().get().getMemberCache()
+                .getMemberByIdAndServer(id, getId())
+                .isPresent();
     }
 
     @Override
