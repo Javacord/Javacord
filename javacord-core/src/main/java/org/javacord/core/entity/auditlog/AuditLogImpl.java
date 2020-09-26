@@ -8,6 +8,9 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 
 import java.util.ArrayList;
@@ -72,7 +75,7 @@ public class AuditLogImpl implements AuditLog {
             boolean alreadyAdded = involvedUsers.stream()
                     .anyMatch(user -> user.getId() == userJson.get("id").asLong());
             if (!alreadyAdded) {
-                involvedUsers.add(((DiscordApiImpl) api).getOrCreateUser(userJson));
+                involvedUsers.add(new UserImpl((DiscordApiImpl) api, userJson, (MemberImpl) null, (ServerImpl) server));
             }
         }
         for (JsonNode entry : data.get("audit_log_entries")) {

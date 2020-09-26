@@ -13,7 +13,9 @@ import org.javacord.api.event.channel.group.GroupChannelCreateEvent;
 import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
 import org.javacord.api.event.channel.user.PrivateChannelCreateEvent;
 import org.javacord.core.entity.channel.GroupChannelImpl;
+import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.group.GroupChannelCreateEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelCreateEventImpl;
@@ -124,9 +126,10 @@ public class ChannelCreateHandler extends PacketHandler {
     private void handlePrivateChannel(JsonNode channel) {
         // A CHANNEL_CREATE packet is sent every time a bot account receives a message, see
         // https://github.com/hammerandchisel/discord-api-docs/issues/184
-        UserImpl recipient = (UserImpl) api.getOrCreateUser(channel.get("recipients").get(0));
+
+        UserImpl recipient = new UserImpl(api, channel.get("recipients").get(0), (MemberImpl) null, null);
         if (!recipient.getPrivateChannel().isPresent()) {
-            PrivateChannel privateChannel = recipient.getOrCreateChannel(channel);
+            PrivateChannel privateChannel = new PrivateChannelImpl(api, channel);
             PrivateChannelCreateEvent event = new PrivateChannelCreateEventImpl(privateChannel);
 
             api.getEventDispatcher().dispatchPrivateChannelCreateEvent(api, recipient, event);

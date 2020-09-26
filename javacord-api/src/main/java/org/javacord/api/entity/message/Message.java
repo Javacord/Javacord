@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  * This class represents a Discord message.
  */
 public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFromCache<Message>,
-                                 MessageAttachableListenerManager {
+        MessageAttachableListenerManager {
 
     Pattern ESCAPED_CHARACTER =
             Pattern.compile("\\\\(?<char>[^a-zA-Z0-9\\p{javaWhitespace}\\xa0\\u2007\\u202E\\u202F])");
@@ -923,7 +923,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     default CompletableFuture<Void> removeReactionByEmoji(User user, Emoji emoji) {
-        return Reaction.removeUser(getApi(), getChannel().getId(), getId(), emoji, user);
+        return Reaction.removeUser(getApi(), getChannel().getId(), getId(), emoji, user.getId());
     }
 
     /**
@@ -1376,9 +1376,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
         return !channel.isPresent()
                 || channel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || channel.get().hasPermissions(user,
-                    PermissionType.READ_MESSAGES,
-                    PermissionType.READ_MESSAGE_HISTORY,
-                    PermissionType.ADD_REACTIONS);
+                PermissionType.READ_MESSAGES,
+                PermissionType.READ_MESSAGE_HISTORY,
+                PermissionType.ADD_REACTIONS);
     }
 
     /**

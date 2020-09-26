@@ -3,12 +3,14 @@ package org.javacord.core.util.cache;
 import io.vavr.Tuple;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.core.util.ImmutableToJavaMapper;
 
 import java.util.Optional;
@@ -23,6 +25,7 @@ public class ChannelCache {
     private static final String TYPE_INDEX_NAME = "type";
     private static final String SERVER_ID_INDEX_NAME = "server-id";
     private static final String SERVER_ID_AND_TYPE_INDEX_NAME = "server-id | type";
+    private static final String PRIVATE_CHANNEL_USER_ID_INDEX_NAME = "user-id";
 
     private static final ChannelCache EMPTY_CACHE = new ChannelCache(Cache.<Channel>empty()
             .addIndex(ID_INDEX_NAME, Channel::getId)
@@ -37,6 +40,11 @@ public class ChannelCache {
                     .map(ServerChannel::getServer)
                     .map(Server::getId)
                     .map(serverId -> Tuple.of(serverId, channel.getType()))
+                    .orElse(null))
+            .addIndex(PRIVATE_CHANNEL_USER_ID_INDEX_NAME, channel -> channel
+                    .asPrivateChannel()
+                    .map(PrivateChannel::getRecipient)
+                    .map(User::getId)
                     .orElse(null))
     );
 
@@ -138,5 +146,16 @@ public class ChannelCache {
      */
     public Optional<Channel> getChannelById(long id) {
         return cache.findAnyByIndex(ID_INDEX_NAME, id);
+    }
+
+    /**
+     * Gets a private channel by the user's id.
+     *
+     * @param userId The id of the user.
+     * @return The private channel.
+     */
+    public Optional<PrivateChannel> getPrivateChannelByUserId(long userId) {
+        return cache.findAnyByIndex(PRIVATE_CHANNEL_USER_ID_INDEX_NAME, userId)
+                .flatMap(Channel::asPrivateChannel);
     }
 }

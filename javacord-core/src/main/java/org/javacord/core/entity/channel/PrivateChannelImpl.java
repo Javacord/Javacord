@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.channel.user.InternalPrivateChannelAttachableListenerManager;
 import org.javacord.core.util.Cleanupable;
@@ -48,13 +49,12 @@ public class PrivateChannelImpl implements PrivateChannel, Cleanupable, Internal
      */
     public PrivateChannelImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
-        this.recipient = (UserImpl) api.getOrCreateUser(data.get("recipients").get(0));
-        this.messageCache = new MessageCacheImpl(
+        recipient = new UserImpl(api, data.get("recipients").get(0), (MemberImpl) null, null);
+        messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
 
         id = Long.parseLong(data.get("id").asText());
-        recipient.setChannel(this);
 
         api.addChannelToCache(this);
     }

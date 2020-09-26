@@ -2,7 +2,6 @@ package org.javacord.core.util.gateway;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neovisionaries.ws.client.ProxySettings;
@@ -104,7 +103,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
 /**
@@ -225,26 +223,16 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     }
                     // put the element back to the queue
                     requestGuildMembersQueue.add(nextServerId);
-                    // send requests in up-to 50 guilds batches
-                    AtomicInteger batchCounter = new AtomicInteger();
+                    // send requests
                     requestGuildMembersQueue.stream().distinct()
-                            .collect(Collectors.groupingBy(serverId -> batchCounter.getAndIncrement() / 50))
-                            .values()
-                            .forEach(serverIdBatch -> {
-                                requestGuildMembersQueue.removeAll(serverIdBatch);
+                            .forEach(serverId -> {
+                                requestGuildMembersQueue.remove(serverId);
                                 ObjectNode requestGuildMembersPacket = JsonNodeFactory.instance.objectNode()
                                         .put("op", GatewayOpcode.REQUEST_GUILD_MEMBERS.getCode());
                                 ObjectNode data = requestGuildMembersPacket.putObject("d")
                                         .put("query", "")
                                         .put("limit", 0);
-                                if (serverIdBatch.size() == 1) {
-                                    data.put("guild_id", Long.toUnsignedString(serverIdBatch.get(0)));
-                                } else {
-                                    ArrayNode guildIds = data.putArray("guild_id");
-                                    serverIdBatch.stream()
-                                            .map(Long::toUnsignedString)
-                                            .forEach(guildIds::add);
-                                }
+                                data.put("guild_id", Long.toUnsignedString(serverId));
                                 logger.debug("Sending request guild members packet {}",
                                              requestGuildMembersPacket);
                                 sendTextFrame(requestGuildMembersPacket.toString());
@@ -641,7 +629,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             }
                             allServersLoaded = api.getUnavailableServers().isEmpty();
                             if (allServersLoaded) {
-                                allUsersLoaded = api.getAllServers().stream()
+                                allUsersLoaded = !api.hasUserCacheEnabled() || api.getAllServers().stream()
                                         .noneMatch(server -> server.getMemberCount() != server.getMembers().size());
                             }
                             if (sameUnavailableServerCounter > 1000

@@ -6,6 +6,9 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.server.emoji.InternalKnownCustomEmojiAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -129,7 +132,8 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
                             return Optional.empty();
                         } else {
                             creatorId = userJson.get("id").asLong();
-                            return Optional.of(((DiscordApiImpl) getApi()).getOrCreateUser(userJson));
+                            return Optional.of(new UserImpl(
+                                    (DiscordApiImpl) getApi(), userJson, (MemberImpl) null, (ServerImpl) server));
                         }
                     });
         } else {

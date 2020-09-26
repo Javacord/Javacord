@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * This class represents a user.
  */
 public interface User extends DiscordEntity, Messageable, Nameable, Mentionable, Permissionable,
-                              UpdatableFromCache<User>, UserAttachableListenerManager {
+        UpdatableFromCache<User>, UserAttachableListenerManager {
 
     @Override
     default String getMentionTag() {
@@ -98,8 +98,8 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      */
     default Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
         return Collections.unmodifiableCollection(getApi().getServerVoiceChannels().stream()
-                                                          .filter(this::isConnected)
-                                                          .collect(Collectors.toList()));
+                .filter(this::isConnected)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -227,9 +227,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @param server The server.
      * @return The display name of the user.
      */
-    default String getDisplayName(Server server) {
-        return server.getNickname(this).orElseGet(this::getName);
-    }
+    String getDisplayName(Server server);
 
     /**
      * Gets the discriminated name of the user, e. g. {@code Bastian#8222}.
@@ -302,9 +300,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @param server The server to check.
      * @return The nickname of the user.
      */
-    default Optional<String> getNickname(Server server) {
-        return server.getNickname(this);
-    }
+    Optional<String> getNickname(Server server);
 
     /**
      * Moves this user to the given channel.
@@ -322,9 +318,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @param server The server to check.
      * @return Whether the user is self-muted in the given server.
      */
-    default boolean isSelfMuted(Server server) {
-        return server.isSelfMuted(getId());
-    }
+    boolean isSelfMuted(Server server);
 
     /**
      * Gets the self-deafened state of the user in the given server.
@@ -332,9 +326,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @param server The server to check.
      * @return Whether the user is self-deafened in the given server.
      */
-    default boolean isSelfDeafened(Server server) {
-        return server.isSelfDeafened(getId());
-    }
+    boolean isSelfDeafened(Server server);
 
     /**
      * Mutes this user on the given server.
@@ -446,9 +438,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @param server The server to check.
      * @return The timestamp of when the user joined the server.
      */
-    default Optional<Instant> getJoinedAtTimestamp(Server server) {
-        return server.getJoinedAtTimestamp(this);
-    }
+    Optional<Instant> getJoinedAtTimestamp(Server server);
 
     /**
      * Gets a sorted list (by position) with all roles of the user in the given server.
@@ -457,9 +447,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return A sorted list (by position) with all roles of the user in the given server.
      * @see Server#getRoles(User)
      */
-    default List<Role> getRoles(Server server) {
-        return server.getRoles(this);
-    }
+    List<Role> getRoles(Server server);
 
     /**
      * Gets the displayed color of the user based on his roles in the given server.
@@ -468,9 +456,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return The color.
      * @see Server#getRoleColor(User)
      */
-    default Optional<Color> getRoleColor(Server server) {
-        return server.getRoleColor(this);
-    }
+    Optional<Color> getRoleColor(Server server);
 
     /**
      * Gets if this user is the user of the connected account.

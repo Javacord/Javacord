@@ -7,7 +7,6 @@ import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
-import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -15,11 +14,8 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.event.channel.group.GroupChannelDeleteEvent;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
-import org.javacord.api.event.channel.user.PrivateChannelDeleteEvent;
-import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.group.GroupChannelDeleteEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelDeleteEventImpl;
-import org.javacord.core.event.channel.user.PrivateChannelDeleteEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -138,22 +134,23 @@ public class ChannelDeleteHandler extends PacketHandler {
      * @param channel The channel data.
      */
     private void handlePrivateChannel(JsonNode channel) {
-        UserImpl recipient = (UserImpl) api.getOrCreateUser(channel.get("recipients").get(0));
-        recipient.getPrivateChannel().ifPresent(privateChannel -> {
-            PrivateChannelDeleteEvent event = new PrivateChannelDeleteEventImpl(privateChannel);
-
-            api.getEventDispatcher().dispatchPrivateChannelDeleteEvent(api, privateChannel, recipient, event);
-            long channelId = privateChannel.getId();
-            api.removeObjectListeners(PrivateChannel.class, channelId);
-            api.removeObjectListeners(VoiceChannel.class, channelId);
-            api.removeObjectListeners(TextChannel.class, channelId);
-            api.removeObjectListeners(Channel.class, channelId);
-            api.forEachCachedMessageWhere(
-                    msg -> msg.getChannel().getId() == privateChannel.getId(),
-                    msg -> api.removeMessageFromCache(msg.getId())
-            );
-            recipient.setChannel(null);
-        });
+        // TODO Do we even have to handle private channel deletes?
+        // UserImpl recipient = new UserImpl(api, channel.get("recipients").get(0));
+        // recipient.getPrivateChannel().ifPresent(privateChannel -> {
+        //     PrivateChannelDeleteEvent event = new PrivateChannelDeleteEventImpl(privateChannel);
+        //
+        //     api.getEventDispatcher().dispatchPrivateChannelDeleteEvent(api, privateChannel, recipient, event);
+        //     long channelId = privateChannel.getId();
+        //     api.removeObjectListeners(PrivateChannel.class, channelId);
+        //     api.removeObjectListeners(VoiceChannel.class, channelId);
+        //     api.removeObjectListeners(TextChannel.class, channelId);
+        //     api.removeObjectListeners(Channel.class, channelId);
+        //     api.forEachCachedMessageWhere(
+        //             msg -> msg.getChannel().getId() == privateChannel.getId(),
+        //             msg -> api.removeMessageFromCache(msg.getId())
+        //     );
+        //     recipient.setChannel(null);
+        // });
     }
 
     /**

@@ -27,12 +27,37 @@ public interface ServerChannelChangeOverwrittenPermissionsEvent extends ServerCh
     Permissions getOldPermissions();
 
     /**
+     * Gets the if of the affected entity.
+     *
+     * @return The id of the affected entity.
+     */
+    long getEntityId();
+
+    /**
+     * Checks if the affected entity is a user.
+     *
+     * @return Whether or not the affected entity is a user.
+     */
+    default boolean isUserEntity() {
+        return !getRole().isPresent();
+    }
+
+    /**
+     * Checks if the affected entity is a role.
+     *
+     * @return Whether or not the affected entity is a role.
+     */
+    default boolean isRoleEntity() {
+        return getRole().isPresent();
+    }
+
+    /**
      * Gets the entity which permissions were changed.
      * The entity is a user or a role.
      *
      * @return The entity which permissions were changed.
      */
-    DiscordEntity getEntity();
+    Optional<DiscordEntity> getEntity();
 
     /**
      * Gets the user which permissions were changed.

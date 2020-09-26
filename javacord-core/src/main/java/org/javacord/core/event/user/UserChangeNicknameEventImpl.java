@@ -1,8 +1,7 @@
 package org.javacord.core.event.user;
 
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
+import org.javacord.core.entity.user.Member;
 
 import java.util.Optional;
 
@@ -11,38 +10,28 @@ import java.util.Optional;
  */
 public class UserChangeNicknameEventImpl extends ServerUserEventImpl implements UserChangeNicknameEvent {
 
-    /**
-     * The new nickname of the user.
-     */
-    private final String newNickname;
-
-    /**
-     * The old nickname of the user.
-     */
-    private final String oldNickname;
+    private final Member newMember;
+    private final Member oldMember;
 
     /**
      * Creates a new user change nickname event.
      *
-     * @param user The user of the event.
-     * @param server The server in which the user changed its nickname.
-     * @param newNickname The new nickname of the user.
-     * @param oldNickname The old nickname of the user.
+     * @param newMember The new member.
+     * @param oldMember The old member.
      */
-    public UserChangeNicknameEventImpl(User user, Server server, String newNickname, String oldNickname) {
-        super(user, server);
-        this.newNickname = newNickname;
-        this.oldNickname = oldNickname;
+    public UserChangeNicknameEventImpl(Member newMember, Member oldMember) {
+        super(newMember.getUser(), newMember.getServer());
+        this.newMember = newMember;
+        this.oldMember = oldMember;
     }
 
     @Override
     public Optional<String> getNewNickname() {
-        return Optional.ofNullable(newNickname);
+        return newMember.getNickname();
     }
 
     @Override
     public Optional<String> getOldNickname() {
-        return Optional.ofNullable(oldNickname);
+        return oldMember.getNickname();
     }
-
 }

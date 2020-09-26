@@ -7,7 +7,7 @@ import java.util.Optional;
 /**
  * A user change activity event.
  */
-public interface UserChangeActivityEvent extends UserEvent {
+public interface UserChangeActivityEvent extends OptionalUserEvent {
 
     /**
      * Gets the old activity of the user.

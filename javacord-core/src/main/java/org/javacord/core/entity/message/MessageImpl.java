@@ -19,6 +19,9 @@ import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.embed.EmbedImpl;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.message.InternalMessageAttachableListenerManager;
 import org.javacord.core.util.cache.MessageCacheImpl;
 
@@ -148,7 +151,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         type = MessageType.byType(data.get("type").asInt(), data.has("webhook_id"));
 
         Long webhookId = data.has("webhook_id") ? data.get("webhook_id").asLong() : null;
-        author = new MessageAuthorImpl(this, webhookId, data.get("author"));
+        author = new MessageAuthorImpl(this, webhookId, data);
 
         MessageCacheImpl cache = (MessageCacheImpl) channel.getMessageCache();
         cache.addMessage(this);
@@ -176,7 +179,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
         if (data.has("mentions")) {
             for (JsonNode mentionJson : data.get("mentions")) {
-                User user = api.getOrCreateUser(mentionJson);
+                User user = new UserImpl(api, mentionJson, (MemberImpl) null,
+                        getServer().map(ServerImpl.class::cast).orElse(null));
                 mentions.add(user);
             }
         }
