@@ -97,9 +97,10 @@ public class Heart {
                     if (heartbeatAckReceived.getAndSet(false)) {
                         beat();
                     } else {
-                        closeFrameSender.accept(
-                                WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
-                                WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
+                        stethoscope.debug("Heartbeat not answered properly. This might be because of a busy websocket");
+                        // closeFrameSender.accept(
+                        //         WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getNumericCloseCode(),
+                        //         WebSocketCloseReason.HEARTBEAT_NOT_PROPERLY_ANSWERED.getCloseReason());
                     }
                 } catch (Throwable t) {
                     // R.I.P.
