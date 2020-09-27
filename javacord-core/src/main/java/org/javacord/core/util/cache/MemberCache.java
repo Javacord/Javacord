@@ -1,6 +1,8 @@
 package org.javacord.core.util.cache;
 
 import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import org.javacord.api.entity.server.Server;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.util.ImmutableToJavaMapper;
 
@@ -16,21 +18,30 @@ public class MemberCache {
     private static final String SERVER_ID_INDEX_NAME = "server-id";
     private static final String ID_AND_SERVER_ID_INDEX_NAME = "server-id | type";
 
+    private static final String MEMBER_SERVER_MEMBER_ID_INDEX_NAME = "ms > member-id";
+    private static final String MEMBER_SERVER_MEMBER_ID_SERVER_ID_INDEX_NAME = "ms > member-id | server-id";
+
     private static final MemberCache EMPTY_CACHE = new MemberCache(
             Cache.<Member>empty()
                     .addIndex(ID_INDEX_NAME, Member::getId)
                     .addIndex(SERVER_ID_INDEX_NAME, member -> member.getServer().getId())
                     .addIndex(ID_AND_SERVER_ID_INDEX_NAME,
                             member -> Tuple.of(member.getId(), member.getServer().getId())),
-            UserCache.empty()
+            UserCache.empty(),
+            Cache.<Tuple2<Member, Server>>empty()
+                    .addIndex(MEMBER_SERVER_MEMBER_ID_INDEX_NAME, tuple -> tuple._1().getId())
+                    .addIndex(MEMBER_SERVER_MEMBER_ID_SERVER_ID_INDEX_NAME,
+                            tuple -> Tuple.of(tuple._1.getId(), tuple._2.getId()))
     );
 
+    private final Cache<Tuple2<Member, Server>> memberServerCache;
     private final Cache<Member> cache;
     private final UserCache userCache;
 
-    private MemberCache(Cache<Member> cache, UserCache userCache) {
+    private MemberCache(Cache<Member> cache, UserCache userCache, Cache<Tuple2<Member, Server>> memberServerCache) {
         this.cache = cache;
         this.userCache = userCache;
+        this.memberServerCache = memberServerCache;
     }
 
     /**
@@ -56,7 +67,8 @@ public class MemberCache {
                 userCache.getUserById(member.getId())
                         .map(userCache::removeUser)
                         .orElse(userCache)
-                        .addUser(member.getUser())
+                        .addUser(member.getUser()),
+                memberServerCache.addElement(Tuple.of(member, member.getServer()))
         );
     }
 
@@ -72,11 +84,32 @@ public class MemberCache {
         if (member == null) {
             return this;
         }
+        Tuple2<Member, Server> memberServerTuple = memberServerCache
+                .findAnyByIndex(
+                        MEMBER_SERVER_MEMBER_ID_SERVER_ID_INDEX_NAME,
+                        Tuple.of(member.getId(), member.getServer().getId())
+                )
+                .orElse(null);
+
         return new MemberCache(
                 cache.removeElement(member),
                 userCache.getUserById(member.getId())
                         .map(userCache::removeUser)
-                        .orElse(userCache)
+                        .orElse(userCache),
+                memberServerTuple == null ? memberServerCache : memberServerCache.removeElement(memberServerTuple)
+        );
+    }
+
+    /**
+     * Gets a list with all servers that the user with the given id is a member of.
+     *
+     * @param userId The id of the user.
+     * @return A list with all servers that the user with the given id is a member of.
+     */
+    public Set<Server> getServers(long userId) {
+        return ImmutableToJavaMapper.mapToJava(
+                memberServerCache.findByIndex(MEMBER_SERVER_MEMBER_ID_INDEX_NAME, userId)
+                        .map(tuple -> tuple._2)
         );
     }
 
