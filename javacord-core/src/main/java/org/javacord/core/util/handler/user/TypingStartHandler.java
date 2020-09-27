@@ -28,8 +28,12 @@ public class TypingStartHandler extends PacketHandler {
         long userId = packet.get("user_id").asLong();
         long channelId = packet.get("channel_id").asLong();
         TextChannel channel = api.getTextChannelById(channelId).orElse(null);
-        long serverId = packet.get("guild_id").asLong();
-        ServerImpl server = (ServerImpl) api.getPossiblyUnreadyServerById(serverId).orElseThrow(AssertionError::new);
+
+        ServerImpl server = null;
+        if (packet.hasNonNull("guild_id")) {
+            long serverId = packet.get("guild_id").asLong();
+            server = (ServerImpl) api.getPossiblyUnreadyServerById(serverId).orElseThrow(AssertionError::new);
+        }
 
         MemberImpl member = null;
         if (packet.hasNonNull("member") && server != null) {
