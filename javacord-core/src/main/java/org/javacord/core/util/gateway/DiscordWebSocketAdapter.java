@@ -25,6 +25,7 @@ import org.javacord.api.event.connection.ResumeEvent;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.auth.Request;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.connection.LostConnectionEventImpl;
 import org.javacord.core.event.connection.ReconnectEventImpl;
 import org.javacord.core.event.connection.ResumeEventImpl;
@@ -630,7 +631,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             allServersLoaded = api.getUnavailableServers().isEmpty();
                             if (allServersLoaded) {
                                 allUsersLoaded = !api.hasUserCacheEnabled() || api.getAllServers().stream()
-                                        .noneMatch(server -> server.getMemberCount() != server.getMembers().size());
+                                        .map(ServerImpl.class::cast)
+                                        .noneMatch(server -> server.getMemberCount() != server.getRealMembers().size());
                             }
                             if (sameUnavailableServerCounter > 1000
                                     && lastGuildMembersChunkReceived + 5000 < System.currentTimeMillis()) {
