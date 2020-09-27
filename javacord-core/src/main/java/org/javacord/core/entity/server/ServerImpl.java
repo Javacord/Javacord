@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
 import org.javacord.api.audio.AudioConnection;
@@ -23,6 +22,7 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Ban;
 import org.javacord.api.entity.server.BoostLevel;
@@ -274,7 +274,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public ServerImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
-        ready = !api.hasUserCacheEnabled();
+        ready = !api.hasUserCacheEnabled() || !api.getIntents().contains(Intent.GUILD_PRESENCES);
 
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
@@ -382,7 +382,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         if (
-                (isLarge() || api.getAccountType() == AccountType.CLIENT)
+                (isLarge() || !api.getIntents().contains(Intent.GUILD_PRESENCES))
                 && getMembers().size() < getMemberCount()
                 && api.hasUserCacheEnabled()
         ) {

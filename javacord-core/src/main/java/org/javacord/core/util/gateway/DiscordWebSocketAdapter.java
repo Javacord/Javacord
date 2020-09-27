@@ -630,7 +630,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             }
                             allServersLoaded = api.getUnavailableServers().isEmpty();
                             if (allServersLoaded) {
-                                allUsersLoaded = !api.hasUserCacheEnabled() || api.getAllServers().stream()
+                                allUsersLoaded = !api.hasUserCacheEnabled()
+                                        || !api.getIntents().contains(Intent.GUILD_PRESENCES)
+                                        || api.getAllServers().stream()
                                         .map(ServerImpl.class::cast)
                                         .noneMatch(server -> server.getMemberCount() != server.getRealMembers().size());
                             }
