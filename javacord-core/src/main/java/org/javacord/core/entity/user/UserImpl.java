@@ -25,6 +25,8 @@ import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -207,6 +209,18 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     @Override
     public boolean hasDefaultAvatar() {
         return avatarHash == null;
+    }
+
+    @Override
+    public Collection<Server> getMutualServers() {
+        if (api.isUserCacheEnabled()) {
+            HashSet<Server> servers = new HashSet<>();
+            if (member != null) {
+                servers.add(member.getServer());
+            }
+            return servers;
+        }
+        return api.getEntityCache().get().getMemberCache().getServers(getId());
     }
 
     @Override

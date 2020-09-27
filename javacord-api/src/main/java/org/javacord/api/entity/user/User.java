@@ -214,11 +214,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * @return All mutual servers with this user.
      */
-    default Collection<Server> getMutualServers() {
-        return getApi().getServers().stream()
-                .filter(server -> server.isMember(this))
-                .collect(Collectors.toList());
-    }
+    Collection<Server> getMutualServers();
 
     /**
      * Gets the display name of the user.
