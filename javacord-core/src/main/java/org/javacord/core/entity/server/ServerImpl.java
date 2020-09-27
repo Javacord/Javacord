@@ -1256,7 +1256,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public boolean isMember(User user) {
         return api.getEntityCache().get().getMemberCache()
-                .getMemberByIdAndServer(id, getId())
+                .getMemberByIdAndServer(user.getId(), getId())
                 .isPresent();
     }
 
