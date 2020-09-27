@@ -51,8 +51,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     api.addMemberToCacheOrReplaceExisting(newMember);
 
                     if (oldMember == null) {
-                        // This should not happen
-                        logger.warn("Failed to get old member in GUILD_MEMBER_UPDATE packet");
+                        // Should only happen shortly after startup and is unproblematic
                         return;
                     }
 
