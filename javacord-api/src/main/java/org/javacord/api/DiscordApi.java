@@ -578,6 +578,15 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     boolean isUserCacheEnabled();
 
     /**
+     * Checks if all users of available servers are in the cache.
+     *
+     * @return Whether or not all users of available servers are in the cache.
+     */
+    default boolean hasAllUsersInCache() {
+        return !getServers().stream().anyMatch(Server::hasAllMembersInCache);
+    }
+
+    /**
      * Gets a collection with all currently cached users.
      *
      * @return A collection with all currently cached users.

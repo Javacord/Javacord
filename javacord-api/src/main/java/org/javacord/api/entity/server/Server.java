@@ -428,6 +428,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     CompletableFuture<Collection<RichInvite>> getInvites();
 
     /**
+     * Checks if all members of the server are in the cache.
+     *
+     * @return Whether or not all members of the server are in the cache.
+     */
+    boolean hasAllMembersInCache();
+
+    /**
      * Gets a collection with all members of the server.
      *
      * @return A collection with all members of the server.

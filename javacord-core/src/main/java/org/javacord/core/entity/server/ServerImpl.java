@@ -1217,6 +1217,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public boolean hasAllMembersInCache() {
+        return getRealMembers().size() >= getMemberCount();
+    }
+
+    @Override
     public Set<User> getMembers() {
         return api.getEntityCache().get().getMemberCache()
                 .getMembersByServer(getId())
