@@ -50,7 +50,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 ```groovy
 repositories { mavenCentral() }
-dependencies { implementation 'org.javacord:javacord:3.0.7' }
+dependencies { implementation 'org.javacord:javacord:3.1.0' }
 ```
 
 #### Maven
@@ -59,7 +59,7 @@ dependencies { implementation 'org.javacord:javacord:3.0.7' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.0.7</version>
+    <version>3.1.0</version>
     <type>pom</type>
 </dependency>
 ```
@@ -67,7 +67,7 @@ dependencies { implementation 'org.javacord:javacord:3.0.7' }
 #### Sbt
 
 ```scala
-libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.0.7")
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.1.0")
 ```
 
 ### Optional Logger Dependency
