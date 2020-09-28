@@ -109,6 +109,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private volatile boolean waitForServersOnStartup = true;
 
     /**
+     * Whether Javacord should wait for all user to get cached on startup or not.
+     */
+    private volatile boolean waitForUsersOnStartup = false;
+
+    /**
      * Whether the shutdown hook should be registered or not.
      */
     private volatile boolean registerShutdownHook = true;
@@ -182,8 +187,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
             new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), intents,
-                    waitForServersOnStartup, registerShutdownHook, globalRatelimiter, proxySelector, proxy,
-                    proxyAuthenticator, trustAllCertificates, future, null, preparedListeners,
+                    waitForServersOnStartup, waitForUsersOnStartup, registerShutdownHook, globalRatelimiter,
+                    proxySelector, proxy, proxyAuthenticator, trustAllCertificates, future, null, preparedListeners,
                     preparedUnspecifiedListeners);
         }
         return future;
@@ -348,6 +353,16 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public boolean isWaitingForServersOnStartup() {
         return waitForServersOnStartup;
+    }
+
+    @Override
+    public void setWaitForUsersOnStartup(boolean waitForUsersOnStartup) {
+        this.waitForUsersOnStartup = waitForUsersOnStartup;
+    }
+
+    @Override
+    public boolean isWaitingForUsersOnStartup() {
+        return waitForUsersOnStartup;
     }
 
     @Override

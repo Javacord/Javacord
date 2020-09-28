@@ -132,6 +132,20 @@ public interface DiscordApiBuilderDelegate {
     boolean isWaitingForServersOnStartup();
 
     /**
+     * Sets the wait for users on startup flag.
+     *
+     * @param waitForUsersOnStartup The wait for users on startup flag to set.
+     */
+    void setWaitForUsersOnStartup(boolean waitForUsersOnStartup);
+
+    /**
+     * Checks if Javacord should wait for all users to get cached on startup.
+     *
+     * @return If Javacord should wait.
+     */
+    boolean isWaitingForUsersOnStartup();
+
+    /**
      * Sets if Javacord should register a shutdown hook that disconnects the {@link DiscordApi} instance.
      *
      * <p>By default, Javacord registers a shutdown hook using {@link Runtime#addShutdownHook(Thread)} that calls

@@ -22,7 +22,6 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
-import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Ban;
 import org.javacord.api.entity.server.BoostLevel;
@@ -274,7 +273,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public ServerImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
-        ready = !api.hasUserCacheEnabled() || !api.getIntents().contains(Intent.GUILD_PRESENCES);
+        ready = !api.hasUserCacheEnabled() || !api.isWaitingForUsersOnStartup();
 
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
@@ -382,7 +381,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         if (
-                (isLarge() || !api.getIntents().contains(Intent.GUILD_PRESENCES))
+                (isLarge() || !api.isWaitingForUsersOnStartup())
                 && getMembers().size() < getMemberCount()
                 && api.hasUserCacheEnabled()
         ) {
@@ -1214,6 +1213,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     }
                     return Collections.unmodifiableCollection(invites);
                 });
+    }
+
+    @Override
+    public boolean hasAllMembersInCache() {
+        return getRealMembers().size() >= getMemberCount();
     }
 
     @Override
