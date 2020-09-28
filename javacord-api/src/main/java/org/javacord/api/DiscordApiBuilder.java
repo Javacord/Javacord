@@ -301,6 +301,30 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets if Javacord should wait for all users to be cached.
+     * If this is set to {@code true}, Javacord will consider Servers with uncached users as unavailable.
+     *
+     * <p>Requires the {@link Intent#GUILD_MEMBERS} intent to be set.
+     *
+     * @param waitForUsersOnStartup Whether Javacord should wait for all users to be cached or not.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setWaitForUsersOnStartup(boolean waitForUsersOnStartup) {
+        delegate.setWaitForUsersOnStartup(waitForUsersOnStartup);
+        return this;
+    }
+
+    /**
+     * Checks if Javacord should wait for all users to be cached.
+     *
+     * @return If Javacord should wait.
+     * @see #setWaitForUsersOnStartup(boolean)
+     */
+    public boolean isWaitingForUsersOnStartup() {
+        return delegate.isWaitingForUsersOnStartup();
+    }
+
+    /**
      * Sets if Javacord should register a shutdown hook that disconnects the {@link DiscordApi} instance.
      *
      * <p>By default, Javacord registers a shutdown hook using {@link Runtime#addShutdownHook(Thread)} that calls

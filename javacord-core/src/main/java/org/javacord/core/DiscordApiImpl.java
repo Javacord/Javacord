@@ -227,6 +227,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final boolean waitForServersOnStartup;
 
     /**
+     * Whether Javacord should wait for all users to get cached on startup or not.
+     */
+    private final boolean waitForUsersOnStartup;
+
+    /**
      * The latest gateway latency.
      */
     private volatile long latestGatewayLatencyNanos = -1;
@@ -379,7 +384,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public DiscordApiImpl(String token, Ratelimiter globalRatelimiter, ProxySelector proxySelector, Proxy proxy,
                           Authenticator proxyAuthenticator, boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, Collections.emptySet(), true, globalRatelimiter,
+        this(AccountType.BOT, token, 0, 1, Collections.emptySet(), true, false, globalRatelimiter,
                 proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
     }
 
@@ -392,6 +397,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param totalShards             The total amount of shards.
      * @param intents                  The intents for the events which should be received.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
+     *                                to become available on startup or not.
+     * @param waitForUsersOnStartup   Whether Javacord should wait for all users
      *                                to become available on startup or not.
      * @param globalRatelimiter       The ratelimiter used for global ratelimits.
      * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
@@ -409,6 +416,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             int totalShards,
             Set<Intent> intents,
             boolean waitForServersOnStartup,
+            boolean waitForUsersOnStartup,
             Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
             Proxy proxy,
@@ -416,8 +424,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
     ) {
-        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, true, globalRatelimiter,
-                proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, null,
+        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
+                true, globalRatelimiter,  proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, null,
                 Collections.emptyMap(), Collections.emptyList());
     }
 
@@ -430,6 +438,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param totalShards             The total amount of shards.
      * @param intents                  The intents for the events which should be received.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
+     *                                to become available on startup or not.
+     * @param waitForUsersOnStartup   Whether Javacord should wait for all users
      *                                to become available on startup or not.
      * @param globalRatelimiter       The ratelimiter used for global ratelimits.
      * @param proxySelector           The proxy selector which should be used to determine the proxies that should be
@@ -448,6 +458,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             int totalShards,
             Set<Intent> intents,
             boolean waitForServersOnStartup,
+            boolean waitForUsersOnStartup,
             Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
             Proxy proxy,
@@ -455,9 +466,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready,
             Dns dns) {
-        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, true, globalRatelimiter,
-                proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, dns, Collections.emptyMap(),
-                Collections.emptyList());
+        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
+                true, globalRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, ready, dns,
+                Collections.emptyMap(), Collections.emptyList());
     }
 
     /**
@@ -466,8 +477,10 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param token                   The token used to connect without any account type specific prefix.
      * @param currentShard            The current shard the bot should connect to.
      * @param totalShards             The total amount of shards.
-     * @param intents                  The intents for the events which should be received.
+     * @param intents                 The intents for the events which should be received.
      * @param waitForServersOnStartup Whether Javacord should wait for all servers
+     *                                to become available on startup or not.
+     * @param waitForUsersOnStartup   Whether Javacord should wait for all users
      *                                to become available on startup or not.
      * @param registerShutdownHook    Whether the shutdown hook should be registered or not.
      * @param globalRatelimiter       The ratelimiter used for global ratelimits.
@@ -490,6 +503,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             int totalShards,
             Set<Intent> intents,
             boolean waitForServersOnStartup,
+            boolean waitForUsersOnStartup,
             boolean registerShutdownHook,
             Ratelimiter globalRatelimiter,
             ProxySelector proxySelector,
@@ -507,6 +521,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.currentShard = currentShard;
         this.totalShards = totalShards;
         this.waitForServersOnStartup = waitForServersOnStartup;
+        this.waitForUsersOnStartup = waitForUsersOnStartup;
         this.globalRatelimiter = globalRatelimiter;
         this.proxySelector = proxySelector;
         this.proxy = proxy;
@@ -519,6 +534,10 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
         if ((proxySelector != null) && (proxy != null)) {
             throw new IllegalStateException("proxy and proxySelector must not be configured both");
+        }
+
+        if (!intents.contains(Intent.GUILD_MEMBERS) && isWaitingForUsersOnStartup()) {
+            throw new IllegalArgumentException("Cannot wait for users when GUILD_MEMBERS intent is not set!");
         }
 
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
@@ -1374,6 +1393,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public boolean isWaitingForServersOnStartup() {
         return waitForServersOnStartup;
+    }
+
+    @Override
+    public boolean isWaitingForUsersOnStartup() {
+        return waitForUsersOnStartup;
     }
 
     /**

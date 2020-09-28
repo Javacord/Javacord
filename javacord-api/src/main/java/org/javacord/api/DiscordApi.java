@@ -238,6 +238,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     boolean isWaitingForServersOnStartup();
 
     /**
+     * Checks if Javacord is waiting for all servers to get cached on startup.
+     *
+     * @return Whether Javacord is waiting for all users to get cached on startup or not.
+     */
+    boolean isWaitingForUsersOnStartup();
+
+    /**
      * Updates the status of this bot.
      * The update might not be visible immediately as it's through the websocket and only a limited amount of
      * status changes is allowed per minute.
