@@ -22,6 +22,7 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Ban;
 import org.javacord.api.entity.server.BoostLevel;
@@ -381,7 +382,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         if (
-                (isLarge() || !api.isWaitingForUsersOnStartup())
+                (isLarge() || !api.getIntents().contains(Intent.GUILD_PRESENCES))
                 && getMembers().size() < getMemberCount()
                 && api.hasUserCacheEnabled()
         ) {
