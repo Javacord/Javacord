@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordClient;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.PrivateChannel;
@@ -326,6 +327,14 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
                                 .setBody(JsonNodeFactory.instance.objectNode().put("recipient_id", getIdAsString()))
                                 .execute(result -> new PrivateChannelImpl(api, result.getJsonBody()))
                 );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (this == o)
+                || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override
