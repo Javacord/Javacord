@@ -17,7 +17,7 @@ public class ReactionRemoveEventImpl extends SingleReactionEventImpl implements 
      * @param messageId The id of the message.
      * @param channel The text channel in which the message was sent.
      * @param emoji The emoji.
-     * @param userId The if of the user whose reaction got removed.
+     * @param userId The id of the user whose reaction got removed.
      */
     public ReactionRemoveEventImpl(DiscordApi api, long messageId, TextChannel channel, Emoji emoji, long userId) {
         super(api, messageId, channel, emoji, userId);

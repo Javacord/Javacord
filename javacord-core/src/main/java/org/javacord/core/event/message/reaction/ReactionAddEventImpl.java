@@ -21,7 +21,7 @@ public class ReactionAddEventImpl extends SingleReactionEventImpl implements Rea
      * @param messageId The id of the message.
      * @param channel The text channel in which the message was sent.
      * @param emoji The emoji.
-     * @param userId The if of the user who added the reaction.
+     * @param userId The id of the user who added the reaction.
      * @param member The member if it happened in a server.
      */
     public ReactionAddEventImpl(

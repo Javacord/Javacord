@@ -131,7 +131,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     /**
      * Removes a user from the role.
      *
-     * @param userId The if of the user to remove.
+     * @param userId The id of the user to remove.
      */
     public void removeUserFromCache(long userId) {
         userHashSetLock.writeLock().lock();
