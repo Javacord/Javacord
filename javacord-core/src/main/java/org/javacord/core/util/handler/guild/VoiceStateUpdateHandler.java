@@ -96,6 +96,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     private void handleServerVoiceChannel(JsonNode packet, long userId) {
         api.getPossiblyUnreadyServerById(packet.get("guild_id").asLong())
                 .map(ServerImpl.class::cast).ifPresent(server -> {
+                    Member member = new MemberImpl(api, server, packet.get("member"), null);
                     Optional<ServerVoiceChannelImpl> oldChannel = server
                             .getConnectedVoiceChannel(userId)
                             .map(ServerVoiceChannelImpl.class::cast);
@@ -113,12 +114,12 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                         oldChannel.ifPresent(channel -> {
                             channel.removeConnectedUser(userId);
                             dispatchServerVoiceChannelMemberLeaveEvent(
-                                    userId, newChannel.orElse(null), channel, server);
+                                    member, newChannel.orElse(null), channel, server);
                         });
 
                         newChannel.ifPresent(channel -> {
                             channel.addConnectedUser(userId);
-                            dispatchServerVoiceChannelMemberJoinEvent(userId, channel, oldChannel.orElse(null), server);
+                            dispatchServerVoiceChannelMemberJoinEvent(member, channel, oldChannel.orElse(null), server);
                         });
                     }
 
@@ -183,21 +184,21 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     private void dispatchServerVoiceChannelMemberJoinEvent(
-            Long userId, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
+            Member member, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
         ServerVoiceChannelMemberJoinEvent event = new ServerVoiceChannelMemberJoinEventImpl(
-                userId, newChannel, oldChannel);
+                member, newChannel, oldChannel);
 
         api.getEventDispatcher().dispatchServerVoiceChannelMemberJoinEvent(
-                (DispatchQueueSelector) server, server, newChannel, userId, event);
+                (DispatchQueueSelector) server, server, newChannel, member.getUser(), event);
     }
 
     private void dispatchServerVoiceChannelMemberLeaveEvent(
-            Long userId, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
+            Member member, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel, Server server) {
         ServerVoiceChannelMemberLeaveEvent event = new ServerVoiceChannelMemberLeaveEventImpl(
-                userId, newChannel, oldChannel);
+                member, newChannel, oldChannel);
 
         api.getEventDispatcher().dispatchServerVoiceChannelMemberLeaveEvent(
-                (DispatchQueueSelector) server, server, oldChannel, userId, event);
+                (DispatchQueueSelector) server, server, oldChannel, member.getUser(), event);
     }
 
 }
