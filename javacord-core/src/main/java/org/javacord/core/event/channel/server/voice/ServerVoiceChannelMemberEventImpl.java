@@ -2,6 +2,7 @@ package org.javacord.core.event.channel.server.voice;
 
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
+import org.javacord.core.entity.user.Member;
 
 /**
  * The implementation of {@link ServerVoiceChannelEventImpl}.
@@ -9,19 +10,19 @@ import org.javacord.api.entity.user.User;
 public abstract class ServerVoiceChannelMemberEventImpl extends ServerVoiceChannelEventImpl {
 
     /**
-     * The id of the user of the event.
+     * The member of the event.
      */
-    private final Long userId;
+    private final Member member;
 
     /**
      * Creates a new voice channel member event.
      *
-     * @param userId The id of the user of the event.
+     * @param member The member of the event.
      * @param channel The channel of the event.
      */
-    public ServerVoiceChannelMemberEventImpl(Long userId, ServerVoiceChannel channel) {
+    public ServerVoiceChannelMemberEventImpl(Member member, ServerVoiceChannel channel) {
         super(channel);
-        this.userId = userId;
+        this.member = member;
     }
 
     /**
@@ -30,8 +31,7 @@ public abstract class ServerVoiceChannelMemberEventImpl extends ServerVoiceChann
      * @return The user of the event.
      */
     public User getUser() {
-        // server related events should only get dispatched after all members are cached
-        return getApi().getCachedUserById(userId).orElseThrow(AssertionError::new);
+        return member.getUser();
     }
 
 }

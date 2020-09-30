@@ -2,6 +2,7 @@ package org.javacord.core.event.channel.server.voice;
 
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
+import org.javacord.core.entity.user.Member;
 
 import java.util.Optional;
 
@@ -19,13 +20,13 @@ public class ServerVoiceChannelMemberJoinEventImpl extends ServerVoiceChannelMem
     /**
      * Creates a new server voice channel member join event.
      *
-     * @param userId The id of the user of the event.
+     * @param member The member of the event.
      * @param newChannel The new channel of the event.
      * @param oldChannel The old channel of the event.
      */
     public ServerVoiceChannelMemberJoinEventImpl(
-            Long userId, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel) {
-        super(userId, newChannel);
+            Member member, ServerVoiceChannel newChannel, ServerVoiceChannel oldChannel) {
+        super(member, newChannel);
         this.oldChannel = oldChannel;
     }
 
