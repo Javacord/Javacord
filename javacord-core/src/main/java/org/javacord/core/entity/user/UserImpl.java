@@ -12,6 +12,7 @@ import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.user.UserFlag;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
@@ -27,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +47,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     private final String name;
     private final String discriminator;
     private final String avatarHash;
+    private EnumSet<UserFlag> userFlags = EnumSet.noneOf(UserFlag.class);
     private final boolean bot;
     private final MemberImpl member;
 
@@ -67,6 +70,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         } else {
             avatarHash = null;
         }
+        if (data.has("public_flags")) {
+            int flags = data.get("public_flags").asInt();
+            for (UserFlag flag : UserFlag.values()) {
+                if ((flag.asInt() & flags) == flag.asInt()) {
+                    userFlags.add(flag);
+                }
+            }
+        }
+
         bot = data.hasNonNull("bot") && data.get("bot").asBoolean();
         if (member == null && data.hasNonNull("member") && server != null) {
             this.member = new MemberImpl(api, server, data.get("member"), this);
@@ -93,6 +105,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         } else {
             avatarHash = null;
         }
+        if (data.has("public_flags")) {
+            int flags = data.get("public_flags").asInt();
+            for (UserFlag flag : UserFlag.values()) {
+                if ((flag.asInt() & flags) == flag.asInt()) {
+                    userFlags.add(flag);
+                }
+            }
+        }
+
         bot = data.hasNonNull("bot") && data.get("bot").asBoolean();
         member = new MemberImpl(api, server, memberJson, this);
     }
@@ -172,6 +193,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     @Override
     public String getDiscriminator() {
         return discriminator;
+    }
+
+    @Override
+    public EnumSet<UserFlag> getUserFlags() {
+        return userFlags;
     }
 
     /**

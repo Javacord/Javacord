@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -194,6 +195,13 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
                 .collect(Collectors.toSet());
         return Collections.unmodifiableSet(connectedClients);
     }
+
+    /**
+     * Gets the public flags (badges) present on this account.
+     *
+     * @return The public flags for this account.
+     */
+    EnumSet<UserFlag> getUserFlags();
 
     /**
      * Gets the avatar of the user.
