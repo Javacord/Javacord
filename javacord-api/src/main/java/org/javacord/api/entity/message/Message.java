@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -40,9 +39,6 @@ import java.util.stream.Stream;
  */
 public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFromCache<Message>,
         MessageAttachableListenerManager {
-
-    Pattern ESCAPED_CHARACTER =
-            Pattern.compile("\\\\(?<char>[^a-zA-Z0-9\\p{javaWhitespace}\\xa0\\u2007\\u202E\\u202F])");
 
     /**
      * Returns a {@code MessageBuilder} according to this {@code Message}.
@@ -644,51 +640,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The readable content of the message.
      */
     default String getReadableContent() {
-        String content = getContent();
-        Matcher userMention = DiscordRegexPattern.USER_MENTION.matcher(content);
-        while (userMention.find()) {
-            String userId = userMention.group("id");
-            Optional<User> userOptional = getApi().getCachedUserById(userId);
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                String userName = getServer().map(user::getDisplayName).orElseGet(user::getName);
-                content = userMention.replaceFirst(Matcher.quoteReplacement("@" + userName));
-                userMention.reset(content);
-            }
-        }
-        Matcher roleMention = DiscordRegexPattern.ROLE_MENTION.matcher(content);
-        while (roleMention.find()) {
-            String roleId = roleMention.group("id");
-            String roleName = getServer()
-                    .flatMap(server -> server
-                            .getRoleById(roleId)
-                            .map(Role::getName))
-                    .orElse("deleted-role");
-            content = roleMention.replaceFirst(Matcher.quoteReplacement("@" + roleName));
-            roleMention.reset(content);
-        }
-        Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(content);
-        while (channelMention.find()) {
-            String channelId = channelMention.group("id");
-            String channelName = getServer()
-                    .flatMap(server -> server
-                            .getTextChannelById(channelId)
-                            .map(ServerChannel::getName))
-                    .orElse("deleted-channel");
-            content = channelMention.replaceFirst("#" + channelName);
-            channelMention.reset(content);
-        }
-        Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
-        while (customEmoji.find()) {
-            String emojiId = customEmoji.group("id");
-            String name = getApi()
-                    .getCustomEmojiById(emojiId)
-                    .map(CustomEmoji::getName)
-                    .orElseGet(() -> customEmoji.group("name"));
-            content = customEmoji.replaceFirst(":" + name + ":");
-            customEmoji.reset(content);
-        }
-        return ESCAPED_CHARACTER.matcher(content).replaceAll("${char}");
+        return getApi().makeMentionsReadable(getContent(), getServer().orElse(null));
     }
 
     /**
