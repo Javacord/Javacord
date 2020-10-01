@@ -73,19 +73,54 @@ public interface Attachment extends DiscordEntity {
     Optional<Boolean> isEphemeral();
 
     /**
-     * Gets the attachment as an input stream.
+     * Downloads the attachment as an input stream.
+     *
+     * @return The attachment as an input stream.
+     * @throws IOException If an IO error occurs.
+     * @deprecated Use {@link #asInputStream()} instead.
+     */
+    @Deprecated
+    default InputStream downloadAsInputStream() throws IOException {
+        return asInputStream();
+    }
+
+    /**
+     * Downloads the attachment as a byte array.
+     *
+     * @return The attachment as a byte array.
+     * @deprecated Use {@link #asByteArray()} instead.
+     */
+    @Deprecated
+    default CompletableFuture<byte[]> downloadAsByteArray() {
+        return asByteArray();
+    }
+
+    /**
+     * Downloads the attachment as an image.
+     *
+     * @return The attachment as an image. Only present, if the attachment is an image.
+     * @throws IllegalStateException If the attachment is not an image.
+     * @deprecated Use {@link #asImage()} instead.
+     */
+    @Deprecated
+    default CompletableFuture<BufferedImage> downloadAsImage() {
+        return asImage();
+    }
+
+    /**
+     * Downloads the attachment as an input stream.
      *
      * @return The attachment as an input stream.
      * @throws IOException If an IO error occurs.
      */
-    InputStream downloadAsInputStream() throws IOException;
+    InputStream asInputStream() throws IOException;
 
     /**
-     * Gets the attachment as a byte array.
+     * Downloads the attachment as a byte array.
      *
      * @return The attachment as a byte array.
      */
-    CompletableFuture<byte[]> downloadAsByteArray();
+    CompletableFuture<byte[]> asByteArray();
 
     /**
      * Downloads the attachment as an image.
@@ -93,7 +128,7 @@ public interface Attachment extends DiscordEntity {
      * @return The attachment as an image. Only present, if the attachment is an image.
      * @throws IllegalStateException If the attachment is not an image.
      */
-    CompletableFuture<BufferedImage> downloadAsImage();
+    CompletableFuture<BufferedImage> asImage();
 
     /**
      * Checks whether the attachment is marked as a spoiler.

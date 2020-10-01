@@ -88,17 +88,17 @@ public class EmbedAuthorImpl implements EmbedAuthor {
     }
 
     @Override
-    public Optional<CompletableFuture<BufferedImage>> downloadIconAsBufferedImage(DiscordApi api) {
+    public Optional<CompletableFuture<BufferedImage>> iconAsBufferedImage(DiscordApi api) {
         return getIconUrl().map(url -> new FileContainer(url).asBufferedImage(api));
     }
 
     @Override
-    public Optional<CompletableFuture<byte[]>> downloadIconAsByteArray(DiscordApi api) {
+    public Optional<CompletableFuture<byte[]>> iconAsByteArray(DiscordApi api) {
         return getIconUrl().map(url -> new FileContainer(url).asByteArray(api));
     }
 
     @Override
-    public Optional<InputStream> downloadIconAsInputStream(DiscordApi api) throws IOException {
+    public Optional<InputStream> iconAsInputStream(DiscordApi api) throws IOException {
         URL iconUrl = getIconUrl().orElse(null);
         if (iconUrl == null) {
             return Optional.empty();
