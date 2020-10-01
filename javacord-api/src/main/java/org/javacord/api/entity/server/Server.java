@@ -316,6 +316,17 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<User> getOwner();
 
     /**
+     * Gets the owner of the server.
+     *
+     * <p>If the owner is in the cache, the owner is served from the cache.
+     *
+     * @return The owner of the server.
+     */
+    default CompletableFuture<User> requestOwner() {
+        return getApi().getUserById(getOwnerId());
+    }
+
+    /**
      * Gets the id of the server's owner.
      *
      * @return The owner's id.
