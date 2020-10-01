@@ -13,6 +13,7 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
+import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
@@ -46,12 +47,16 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * This class is the most important class for your bot, containing all important methods, like registering listener.
  */
 public interface DiscordApi extends GloballyAttachableListenerManager {
+
+    Pattern ESCAPED_CHARACTER =
+            Pattern.compile("\\\\(?<char>[^a-zA-Z0-9\\p{javaWhitespace}\\xa0\\u2007\\u202E\\u202F])");
 
     /**
      * Gets the used token.
@@ -642,6 +647,86 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
         } catch (NumberFormatException e) {
             return getUserById(-1);
         }
+    }
+
+    /**
+     * Gets the readable content of the string, which replaces all mentions etc. with the actual name.
+     * The replacement happens as following:
+     * <ul>
+     * <li><b>User mentions</b>:
+     * <code>@nickname</code> if the user has a nickname, <code>@name</code> if the user has no nickname, unchanged if
+     * the user is not in the cache.
+     * <li><b>Role mentions</b>:
+     * <code>@name</code> if the role exists in the server, otherwise <code>#deleted-role</code>
+     * <li><b>Channel mentions</b>:
+     * <code>#name</code> if the text channel exists in the server, otherwise <code>#deleted-channel</code>
+     * <li><b>Custom emoji</b>:
+     * <code>:name:</code>. If the emoji is known, the real name is used, otherwise the name from the mention tag.
+     * </ul>
+     *
+     * @param content The string to strip the mentions away.
+     * @param server The server to get the display name of users from.
+     *
+     * @return The readable content of the string.
+     */
+    default String makeMentionsReadable(String content, Server server) {
+        Matcher userMention = DiscordRegexPattern.USER_MENTION.matcher(content);
+        while (userMention.find()) {
+            String userId = userMention.group("id");
+            Optional<User> userOptional = getCachedUserById(userId);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                String userName = server == null ? user.getName() : server.getDisplayName(user);
+                content = userMention.replaceFirst(Matcher.quoteReplacement("@" + userName));
+                userMention.reset(content);
+            }
+        }
+        Matcher roleMention = DiscordRegexPattern.ROLE_MENTION.matcher(content);
+        while (roleMention.find()) {
+            String roleName = getRoleById(roleMention.group("id")).map(Role::getName).orElse("deleted-role");
+            content = roleMention.replaceFirst(Matcher.quoteReplacement("@" + roleName));
+            roleMention.reset(content);
+        }
+        Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(content);
+        while (channelMention.find()) {
+            String channelId = channelMention.group("id");
+            String channelName = getServerChannelById(channelId).map(ServerChannel::getName).orElse("deleted-channel");
+            content = channelMention.replaceFirst("#" + channelName);
+            channelMention.reset(content);
+        }
+        Matcher customEmoji = DiscordRegexPattern.CUSTOM_EMOJI.matcher(content);
+        while (customEmoji.find()) {
+            String emojiId = customEmoji.group("id");
+            String name = getCustomEmojiById(emojiId)
+                    .map(CustomEmoji::getName)
+                    .orElseGet(() -> customEmoji.group("name"));
+            content = customEmoji.replaceFirst(":" + name + ":");
+            customEmoji.reset(content);
+        }
+        return ESCAPED_CHARACTER.matcher(content).replaceAll("${char}");
+    }
+
+    /**
+     * Gets the readable content of the string, which replaces all mentions etc. with the actual name.
+     * The replacement happens as following:
+     * <ul>
+     * <li><b>User mentions</b>:
+     * <code>@nickname</code> if the user has a nickname, <code>@name</code> if the user has no nickname, unchanged if
+     * the user is not in the cache.
+     * <li><b>Role mentions</b>:
+     * <code>@name</code> if the role exists in the server, otherwise <code>#deleted-role</code>
+     * <li><b>Channel mentions</b>:
+     * <code>#name</code> if the text channel exists in the server, otherwise <code>#deleted-channel</code>
+     * <li><b>Custom emoji</b>:
+     * <code>:name:</code>. If the emoji is known, the real name is used, otherwise the name from the mention tag.
+     * </ul>
+     *
+     * @param content The string to strip the mentions away.
+     *
+     * @return The readable content of the string.
+     */
+    default String makeMentionsReadable(String content) {
+        return makeMentionsReadable(content, null);
     }
 
     /**
