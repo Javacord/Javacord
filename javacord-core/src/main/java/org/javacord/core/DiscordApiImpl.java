@@ -33,6 +33,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
@@ -55,6 +56,7 @@ import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.user.UserPresence;
+import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
@@ -1607,6 +1609,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         return new RestRequest<Webhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
                 .setUrlParameters(Long.toUnsignedString(id))
                 .execute(result -> WebhookImpl.createWebhook(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(long id, String token) {
+        return new RestRequest<IncomingWebhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
+                .setUrlParameters(Long.toUnsignedString(id), token)
+                .execute(result -> new IncomingWebhookImpl(this, result.getJsonBody()));
     }
 
     @Override
