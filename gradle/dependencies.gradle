@@ -26,7 +26,11 @@ project(':javacord-core') {
         implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
 
         // the JSON-lib because Discord returns in JSON format
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.3'
+        implementation 'com.fasterxml.jackson:jackson-bom:2.11.0'
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
         // the web socket
         implementation 'com.neovisionaries:nv-websocket-client:2.6'
@@ -40,6 +44,9 @@ project(':javacord-core') {
         // Vavr, mainly for immutable collections
         // We are using 0.10.1, because of an issue in 0.10.2: https://github.com/vavr-io/vavr/issues/2573
         implementation "io.vavr:vavr:0.10.1"
+
+        // For @Nullable annotation in DTOs
+        implementation 'org.jetbrains:annotations:16.0.2'
 
         // the Javacord API
         api project(path: ':javacord-api')

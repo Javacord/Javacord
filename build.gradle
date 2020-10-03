@@ -7,6 +7,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.4' apply false
     id 'net.researchgate.release' version '2.7.0' apply false
     id 'org.ajoberstar.grgit' version '2.3.0' apply false
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.9"
 }
 
 if (project.hasProperty('teamcity')) {
@@ -18,6 +19,14 @@ def rootBuildDir = buildDir
 
 ext {
     releaseVersion = !version.toString().endsWith('-SNAPSHOT')
+}
+
+idea.project.settings {
+    compiler {
+        javac {
+            javacAdditionalOptions "-parameters"
+        }
+    }
 }
 
 allprojects {
@@ -33,6 +42,7 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.encoding 'UTF-8'
         options.incremental true
+        options.compilerArgs << '-parameters'
         if (JavaVersion.current().java9Compatible) {
             afterEvaluate {
                 options.compilerArgs << '--release' << platform.targetCompatibility.majorVersion

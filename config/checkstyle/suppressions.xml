@@ -6,6 +6,8 @@
 
 <suppressions>
     <suppress id="finalizer" files=".*[\\/]DiscordApiImpl.java$" />
+    <suppress checks="JavadocMethod" files="[/\\]dto[/\\]" />
+    <suppress checks="LineLength" files="[/\\]dto[/\\]" />
     <suppress checks="LineLength|CustomImportOrder|OverloadMethodsDeclarationOrder|Indentation"
               files="[\\/]build[\\/][^\\/]+[\\/]generated[\\/]" />
 </suppressions>
