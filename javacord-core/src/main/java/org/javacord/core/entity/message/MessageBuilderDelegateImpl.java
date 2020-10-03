@@ -365,10 +365,6 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     protected CompletableFuture<Message> send(IncomingWebhook webhook, String displayName, URL avatarUrl)
             throws IllegalStateException {
 
-        if (!webhook.getChannel().isPresent()) {
-            throw new IllegalStateException("Cannot use a webhook without a channel!");
-        }
-
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("tts", this.tts);
 
@@ -465,7 +461,9 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      */
     private static void executeWebhookRest(RestRequest<Message> request, IncomingWebhook webhook,
                                            CompletableFuture<Message> future) {
-        request.execute(result -> webhook.getChannel().get().getMessagesAsStream()
+        request.execute(result -> webhook.getChannel().orElseThrow(() ->
+                        new IllegalStateException("Cannot return a message when the channel isn't cached!")
+                ).getMessagesAsStream()
                 .filter(message -> message.getAuthor().isWebhook()
                         && message.getAuthor().getId() == webhook.getId())
                 .findFirst()
