@@ -100,7 +100,7 @@ public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, Interna
 
     @Override
     public Optional<Server> getServer() {
-        return getServerId().map(api::getServerById).filter(Optional::isPresent).map(Optional::get);
+        return getServerId().flatMap(api::getServerById);
     }
 
     @Override
