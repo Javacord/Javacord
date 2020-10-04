@@ -30,7 +30,12 @@ public enum ActivityType {
     /**
      * Represents a custom status, represented as "{emoji} {state}".
      */
-    CUSTOM(4);
+    CUSTOM(4),
+
+    /**
+     * Represents competing in something, represented as "Competing in Half-Life 3", for example.
+     */
+    COMPETING(5);
 
     private final int id;
 
@@ -60,8 +65,6 @@ public enum ActivityType {
      */
     public static ActivityType getActivityTypeById(int id) {
         switch (id) {
-            case 0:
-                return PLAYING;
             case 1:
                 return STREAMING;
             case 2:
@@ -70,6 +73,8 @@ public enum ActivityType {
                 return WATCHING;
             case 4:
                 return CUSTOM;
+            case 5:
+                return COMPETING;
             default:
                 return PLAYING;
         }
