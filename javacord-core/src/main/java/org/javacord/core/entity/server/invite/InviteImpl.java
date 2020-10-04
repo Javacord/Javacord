@@ -137,17 +137,47 @@ public class InviteImpl implements RichInvite {
     public InviteImpl(DiscordApi api, JsonNode data) {
         this.api = api;
         this.code = data.get("code").asText();
-        this.serverId = Long.parseLong(data.get("guild").get("id").asText());
-        this.serverName = data.get("guild").get("name").asText();
-        this.serverIcon = data.get("guild").has("icon") && !data.get("guild").get("icon").isNull()
-                ? data.get("guild").get("icon").asText()
-                : null;
-        this.serverSplash = data.get("guild").has("splash") && !data.get("guild").get("splash").isNull()
-                ? data.get("guild").get("splash").asText()
-                : null;
-        this.channelId = Long.parseLong(data.get("channel").get("id").asText());
-        this.channelName = data.get("channel").get("name").asText();
-        this.channelType = ChannelType.fromId(data.get("channel").get("type").asInt());
+        if (data.has("guild")) {
+            this.serverId = Long.parseLong(data.get("guild").get("id").asText());
+            this.serverName = data.get("guild").get("name").asText();
+            this.serverIcon = data.get("guild").has("icon") && !data.get("guild").get("icon").isNull()
+                    ? data.get("guild").get("icon").asText()
+                    : null;
+            this.serverSplash = data.get("guild").has("splash") && !data.get("guild").get("splash").isNull()
+                    ? data.get("guild").get("splash").asText()
+                    : null;
+        } else if (data.has("guild_id")) {
+            this.serverId = Long.parseLong(data.get("guild_id").asText());
+            Optional<Server> serverOptional = api.getServerById(serverId);
+            if (serverOptional.isPresent()) {
+                ServerImpl server = (ServerImpl) serverOptional.get();
+                this.serverName = server.getName();
+                this.serverIcon = server.getIconHash();
+                this.serverSplash = server.getSplashHash();
+            } else {
+                throw new AssertionError("Received invite for unknown server!");
+            }
+        } else {
+            throw new AssertionError("Invite has no guild_id or guild object!");
+        }
+
+        if (data.has("channel")) {
+            this.channelId = Long.parseLong(data.get("channel").get("id").asText());
+            this.channelName = data.get("channel").get("name").asText();
+            this.channelType = ChannelType.fromId(data.get("channel").get("type").asInt());
+        } else if (data.has("channel_id")) {
+            this.channelId = Long.parseLong(data.get("channel_id").asText());
+            Optional<ServerChannel> channelOptional = api.getServerChannelById(channelId);
+            if (channelOptional.isPresent()) {
+                ServerChannel channel = channelOptional.get();
+                this.channelName = channel.getName();
+                this.channelType = channel.getType();
+            } else {
+                throw new AssertionError("Received invite for unknown channel!");
+            }
+        } else {
+            throw new AssertionError("Invite has no channel_id or channel object!");
+        }
 
         // May not be present / only present if requested
         this.approximateMemberCount = (data.has("approximate_member_count"))
