@@ -1612,9 +1612,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(long id, String token) {
+    public CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(String id, String token) {
         return new RestRequest<IncomingWebhook>(this, RestMethod.GET, RestEndpoint.WEBHOOK)
-                .setUrlParameters(Long.toUnsignedString(id), token)
+                .setUrlParameters(id, token)
                 .execute(result -> new IncomingWebhookImpl(this, result.getJsonBody()));
     }
 

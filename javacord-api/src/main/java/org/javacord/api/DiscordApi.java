@@ -424,7 +424,35 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @param token The token of the incoming webhook.
      * @return The incoming webhook with the given id.
      */
-    CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(long id, String token);
+    CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(String id, String token);
+
+    /**
+     * Gets an incoming webhook by its id and its token.
+     *
+     * @param id The id of the incoming webhook.
+     * @param token The token of the incoming webhook.
+     * @return The incoming webhook with the given id.
+     */
+    default CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(long id, String token) {
+        return getIncomingWebhookByIdAndToken(Long.toUnsignedString(id), token);
+    }
+
+    /**
+     * Gets a webhook by its url.
+     *
+     * @param url The url of the message.
+     * @return The incoming webhook with the given url.
+     * @throws IllegalArgumentException If the link isn't valid.
+     */
+    default CompletableFuture<IncomingWebhook> getIncomingWebhookByUrl(String url) throws IllegalArgumentException {
+        Matcher matcher = DiscordRegexPattern.WEBHOOK_URL.matcher(url);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("The webhook url has an invalid format");
+        }
+
+        return getIncomingWebhookByIdAndToken(matcher.group("id"), matcher.group("token"));
+    }
 
     /**
      * Gets a collection with the ids of all unavailable servers.

@@ -6,6 +6,7 @@ import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
@@ -30,6 +31,20 @@ public interface IncomingWebhook extends Webhook, Messageable {
      * @return The secure token of the webhook.
      */
     String getToken();
+
+    /**
+     * Gets the secure url of the webhook.
+     *
+     * @return The secure url of the webhook.
+     */
+    default URL getUrl() {
+        try {
+            return new URL(String.format("https://discord.com/api/webhooks/%s/%s", getIdAsString(), getToken()));
+        } catch (MalformedURLException e) {
+            // This should never ever happen
+            return null;
+        }
+    }
 
     @Override
     default CompletableFuture<Webhook> getLatestInstance() {
