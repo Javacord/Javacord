@@ -31,6 +31,23 @@ public interface IncomingWebhook extends Webhook, Messageable {
      */
     String getToken();
 
+    @Override
+    default CompletableFuture<Webhook> getLatestInstance() {
+        return getLatestInstanceAsIncomingWebhook()
+                .thenApply(incomingWebhook -> incomingWebhook);
+    }
+
+    /**
+     * Gets an updated instance of this entity from Discord directly.
+     *
+     * @see IncomingWebhook#getLatestInstance()
+     *
+     * @return The current instance.
+     */
+    default CompletableFuture<IncomingWebhook> getLatestInstanceAsIncomingWebhook() {
+        return getApi().getIncomingWebhookByIdAndToken(getId(), getToken());
+    }
+
     /**
      * Sends a message.
      *
