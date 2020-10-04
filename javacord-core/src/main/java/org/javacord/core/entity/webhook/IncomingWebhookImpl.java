@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.WebhookType;
+import org.javacord.core.util.rest.RestEndpoint;
+import org.javacord.core.util.rest.RestMethod;
+import org.javacord.core.util.rest.RestRequest;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link IncomingWebhook}.
@@ -43,6 +47,14 @@ public class IncomingWebhookImpl extends WebhookImpl implements IncomingWebhook 
     @Override
     public boolean isChannelFollowerWebhook() {
         return false;
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(String reason) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.WEBHOOK)
+                .setUrlParameters(getIdAsString(), getToken())
+                .setAuditLogReason(reason)
+                .execute(result -> null);
     }
 
     /**
