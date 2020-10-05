@@ -206,37 +206,47 @@ public enum WebSocketCloseCode {
     SHARDING_REQUIRED(4011, Usage.NORMAL),
 
     /**
-     * The session would have handled too many guilds - you are required to
-     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
-     * your connection in order to connect.
+     * Couldn't find the server you're trying to connect to.
      */
     SERVER_NOT_FOUND(4011, Usage.VOICE),
 
     /**
-     * The session would have handled too many guilds - you are required to
-     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
-     * your connection in order to connect.
+     * You sent an invalid version for the gateway.
+     */
+    INVALID_API_VERSION(4012, Usage.NORMAL),
+
+    /**
+     * We didn't recognize the protocol you sent.
      */
     UNKNOWN_PROTOCOL(4012, Usage.VOICE),
 
     /**
-     * The session would have handled too many guilds - you are required to
-     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
-     * your connection in order to connect.
+     * You are using one or more invalid intents.
+     * See <a href="https://discord.com/developers/docs/topics/gateway#list-of-intents">intent</a>
+     * for all valid intents.
+     */
+    INVALID_INTENTS(4013, Usage.NORMAL),
+
+    /**
+     * You sent a disallowed intent for a Gateway Intent.
+     * You may have tried to specify an intent that you
+     * <a href="https://discord.com/developers/docs/topics/gateway#list-of-intents">have not enabled</a>
+     * or are <a href="https://discord.com/developers/applications">not whitelisted for</a>.
+     */
+    DISALLOWED_INTENTS(4014, Usage.NORMAL),
+
+    /**
+     * Either the channel was deleted or you were kicked. Should not reconnect.
      */
     DISCONNECTED(4014, Usage.VOICE),
 
     /**
-     * The session would have handled too many guilds - you are required to
-     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
-     * your connection in order to connect.
+     * The server crashed. Our bad! Try resuming.
      */
     VOICE_SERVER_CRASHED(4015, Usage.VOICE),
 
     /**
-     * The session would have handled too many guilds - you are required to
-     * <a href="https://discord.com/developers/docs/topics/gateway#sharding">shard</a>
-     * your connection in order to connect.
+     * We didn't recognize your encryption.
      */
     UNKNOWN_ENCRYPTION_MODE(4016, Usage.VOICE),
 
