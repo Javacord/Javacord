@@ -41,6 +41,10 @@ public class ActivityAssetsImpl implements ActivityAssets {
 
     @Override
     public Optional<Icon> getLargeImage() {
+        return getIcon(largeImage);
+    }
+
+    private Optional<Icon> getIcon(String largeImage) {
         return Optional.ofNullable(largeImage)
                 .flatMap(imageId -> activity.getApplicationId().map(applicationId -> String.format(
                         "https://" + Javacord.DISCORD_CDN_DOMAIN + "/app-assets/%s/%s.png", applicationId, imageId)))
@@ -61,17 +65,7 @@ public class ActivityAssetsImpl implements ActivityAssets {
 
     @Override
     public Optional<Icon> getSmallImage() {
-        return Optional.ofNullable(smallImage)
-                .flatMap(imageId -> activity.getApplicationId().map(applicationId -> String.format(
-                        "https://" + Javacord.DISCORD_CDN_DOMAIN + "/app-assets/%s/%s.png", applicationId, imageId)))
-                .map(url -> {
-                    try {
-                        return new URL(url);
-                    } catch (MalformedURLException e) {
-                        throw new CompletionException(e);
-                    }
-                })
-                .map(url -> new IconImpl(null, url));
+        return getIcon(smallImage);
     }
 
     @Override
