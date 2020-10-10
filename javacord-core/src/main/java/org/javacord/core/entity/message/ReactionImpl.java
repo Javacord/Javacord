@@ -8,6 +8,7 @@ import org.javacord.api.entity.message.Reaction;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -116,6 +117,12 @@ public class ReactionImpl implements Reaction {
     @Override
     public boolean containsYou() {
         return containsYou;
+    }
+
+    @Override
+    public CompletableFuture<Void> remove() {
+        return message.getApi().getUncachedMessageUtil()
+                .removeAllReactionsForEmoji(message.getChannel().getId(), message.getId(), emoji);
     }
 
     @Override

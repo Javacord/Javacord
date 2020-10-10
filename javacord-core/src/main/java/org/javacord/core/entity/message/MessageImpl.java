@@ -256,7 +256,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     /**
-     * Adds an emoji to the list of reactions.
+     * Adds an emoji to the list of reactions or increments the count of the reactions.
      *
      * @param emoji The emoji.
      * @param you Whether this reaction is used by you or not.
@@ -270,7 +270,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     /**
-     * Removes an emoji from the list of reactions.
+     * Removes one reaction for an emoji on a message.
      *
      * @param emoji The emoji.
      * @param you Whether this reaction is used by you or not.
@@ -279,6 +279,16 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         Optional<Reaction> reaction = reactions.stream().filter(r -> emoji.equalsEmoji(r.getEmoji())).findAny();
         reaction.ifPresent(r -> ((ReactionImpl) r).decrementCount(you));
         reactions.removeIf(r -> r.getCount() <= 0);
+    }
+
+    /**
+     * Removes all the reactions for a given emoji on a message.
+     *
+     * @param emoji The emoji.
+     */
+    public void removeAllReactionsForEmoji(Emoji emoji) {
+        Optional<Reaction> reaction = reactions.stream().filter(r -> emoji.equalsEmoji(r.getEmoji())).findAny();
+        reaction.ifPresent(reactions::remove);
     }
 
     /**

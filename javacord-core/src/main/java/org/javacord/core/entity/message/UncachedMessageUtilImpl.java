@@ -308,6 +308,29 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
+    public CompletableFuture<Void> removeAllReactionsForEmoji(long channelId, long messageId, Emoji emoji) {
+        String value = emoji.asUnicodeEmoji().orElseGet(() ->
+                emoji.asCustomEmoji().map(CustomEmoji::getReactionTag).orElse("UNKNOWN"));
+        return new RestRequest<Void>(api, RestMethod.DELETE, RestEndpoint.REACTION)
+                .setUrlParameters(
+                        Long.toUnsignedString(channelId),
+                        Long.toUnsignedString(messageId),
+                        value)
+                .execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> removeAllReactionsForEmoji(String channelId, String messageId, Emoji emoji) {
+        try {
+            return removeAllReactionsForEmoji(Long.parseLong(channelId), Long.parseLong(messageId), emoji);
+        } catch (NumberFormatException e) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    @Override
     public CompletableFuture<Void> pin(long channelId, long messageId) {
         return new RestRequest<Void>(api, RestMethod.PUT, RestEndpoint.PINS)
                 .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
