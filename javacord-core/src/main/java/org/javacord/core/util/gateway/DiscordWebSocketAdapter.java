@@ -60,6 +60,7 @@ import org.javacord.core.util.handler.message.MessageDeleteHandler;
 import org.javacord.core.util.handler.message.MessageUpdateHandler;
 import org.javacord.core.util.handler.message.reaction.MessageReactionAddHandler;
 import org.javacord.core.util.handler.message.reaction.MessageReactionRemoveAllHandler;
+import org.javacord.core.util.handler.message.reaction.MessageReactionRemoveEmojiHandler;
 import org.javacord.core.util.handler.message.reaction.MessageReactionRemoveHandler;
 import org.javacord.core.util.handler.user.PresenceUpdateHandler;
 import org.javacord.core.util.handler.user.PresencesReplaceHandler;
@@ -871,6 +872,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         addHandler(new MessageReactionAddHandler(api));
         addHandler(new MessageReactionRemoveAllHandler(api));
         addHandler(new MessageReactionRemoveHandler(api));
+        addHandler(new MessageReactionRemoveEmojiHandler(api));
     }
 
     /**
