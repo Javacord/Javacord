@@ -14,6 +14,26 @@ import java.util.concurrent.CompletableFuture;
 public interface UncachedMessageUtil extends UncachedMessageAttachableListenerManager {
 
     /**
+     * Cross posts the message if it is in a announcement channel.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return The new message object.
+     */
+    default CompletableFuture<Message> crossPost(long channelId, long messageId) {
+        return crossPost(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId));
+    }
+
+    /**
+     * Cross posts the message if it is in a announcement channel.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return The new message object.
+     */
+    CompletableFuture<Message> crossPost(String channelId, String messageId);
+
+    /**
      * Deletes the message.
      *
      * @param channelId The id of the message's channel.
@@ -105,7 +125,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param content The new content of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(long channelId, long messageId, String content);
+    CompletableFuture<Message> edit(long channelId, long messageId, String content);
 
     /**
      * Updates the content of the message.
@@ -115,7 +135,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param content The new content of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(String channelId, String messageId, String content);
+    CompletableFuture<Message> edit(String channelId, String messageId, String content);
 
     /**
      * Updates the embed of the message.
@@ -125,7 +145,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(long channelId, long messageId, EmbedBuilder embed);
+    CompletableFuture<Message> edit(long channelId, long messageId, EmbedBuilder embed);
 
     /**
      * Updates the embed of the message.
@@ -135,7 +155,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(String channelId, String messageId, EmbedBuilder embed);
+    CompletableFuture<Message> edit(String channelId, String messageId, EmbedBuilder embed);
 
     /**
      * Updates the content and the embed of the message.
@@ -146,7 +166,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(long channelId, long messageId, String content, EmbedBuilder embed);
+    CompletableFuture<Message> edit(long channelId, long messageId, String content, EmbedBuilder embed);
 
     /**
      * Updates the content and the embed of the message.
@@ -157,7 +177,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(String channelId, String messageId, String content, EmbedBuilder embed);
+    CompletableFuture<Message> edit(String channelId, String messageId, String content, EmbedBuilder embed);
 
     /**
      * Updates the content and the embed of the message.
@@ -170,7 +190,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param updateEmbed Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(long channelId, long messageId, String content, boolean updateContent,
+    CompletableFuture<Message> edit(long channelId, long messageId, String content, boolean updateContent,
                                  EmbedBuilder embed, boolean updateEmbed);
 
     /**
@@ -184,7 +204,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param updateEmbed Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Void> edit(String channelId, String messageId, String content, boolean updateContent,
+    CompletableFuture<Message> edit(String channelId, String messageId, String content, boolean updateContent,
                                  EmbedBuilder embed, boolean updateEmbed);
 
     /**
@@ -194,7 +214,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    CompletableFuture<Void> removeContent(long channelId, long messageId);
+    CompletableFuture<Message> removeContent(long channelId, long messageId);
 
     /**
      * Removes the content of the message.
@@ -203,7 +223,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    CompletableFuture<Void> removeContent(String channelId, String messageId);
+    CompletableFuture<Message> removeContent(String channelId, String messageId);
 
     /**
      * Removes the embed of the message.
@@ -212,7 +232,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    CompletableFuture<Void> removeEmbed(long channelId, long messageId);
+    CompletableFuture<Message> removeEmbed(long channelId, long messageId);
 
     /**
      * Removes the embed of the message.
@@ -221,7 +241,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    CompletableFuture<Void> removeEmbed(String channelId, String messageId);
+    CompletableFuture<Message> removeEmbed(String channelId, String messageId);
 
     /**
      * Removes the content and embed of the message.
@@ -230,7 +250,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    CompletableFuture<Void> removeContentAndEmbed(long channelId, long messageId);
+    CompletableFuture<Message> removeContentAndEmbed(long channelId, long messageId);
 
     /**
      * Removes the content and embed of the message.
@@ -239,7 +259,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    CompletableFuture<Void> removeContentAndEmbed(String channelId, String messageId);
+    CompletableFuture<Message> removeContentAndEmbed(String channelId, String messageId);
 
     /**
      * Adds a unicode reaction to the message.
