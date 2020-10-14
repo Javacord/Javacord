@@ -483,9 +483,8 @@ public class MessageBuilder {
      *
      * @param webhook The webhook from which the message should be sent.
      * @return The sent message.
-     * @throws IllegalStateException if the defined Webhook's channel is not present.
      */
-    public CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException {
+    public CompletableFuture<Message> send(IncomingWebhook webhook) {
         return delegate.send(webhook);
     }
 

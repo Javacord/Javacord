@@ -32,15 +32,10 @@ public class WebhookMessageBuilderDelegateImpl
      */
     private String displayName = null;
 
-    /**
-     * If discord should wait for server confirmation and throw an error if the message hasn't been send.
-     */
-    private boolean wait = true;
-
 
     @Override
-    public CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException {
-        return send(webhook, displayName, avatarUrl, wait);
+    public CompletableFuture<Message> send(IncomingWebhook webhook) {
+        return send(webhook, displayName, avatarUrl, true);
     }
 
     @Override
@@ -74,7 +69,7 @@ public class WebhookMessageBuilderDelegateImpl
     }
 
     @Override
-    public void setWait(boolean wait) {
-        this.wait = wait;
+    public void sendSilently(IncomingWebhook webhook) {
+        send(webhook, displayName, avatarUrl, false);
     }
 }

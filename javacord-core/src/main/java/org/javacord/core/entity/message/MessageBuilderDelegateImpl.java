@@ -358,13 +358,22 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
-    public CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException {
+    public CompletableFuture<Message> send(IncomingWebhook webhook) {
         return send(webhook, null, null, true);
     }
 
-    protected CompletableFuture<Message> send(IncomingWebhook webhook, String displayName, URL avatarUrl, boolean wait)
-            throws IllegalStateException {
-
+    /**
+     * Send a message to an incoming webhook.
+     *
+     *
+     * @param webhook The webhook to send the message to
+     * @param displayName The display name the webhook should use
+     * @param avatarUrl The avatar the webhook should use
+     * @param wait If the completable future will be completed
+     * @return The sent message
+     */
+    protected CompletableFuture<Message> send(IncomingWebhook webhook, String displayName, URL avatarUrl,
+                                              boolean wait) {
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("tts", this.tts);
 
@@ -454,35 +463,34 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
     /**
      * Method which executes the webhook rest request.
-     * It gets the message from the channel and completes the future.
      *
      * @param request The rest request to execute
      * @param webhook The webhook to send the message to
-     * @param wait If the wait param has been set
+     * @param wait If discord sends us a response
      * @param future The future to complete
      */
     private static void executeWebhookRest(RestRequest<Message> request, IncomingWebhook webhook, boolean wait,
                                            CompletableFuture<Message> future) {
-        request.execute(result -> {
-            TextChannel channel = webhook.getChannel().orElseThrow(() ->
-                            new IllegalStateException("Cannot return a message when the channel isn't cached!")
-                    );
-            if (wait) {
+        if (wait) {
+            request.execute(result -> {
+                TextChannel channel = webhook.getChannel().orElseThrow(() ->
+                        new IllegalStateException("Cannot return a message when the channel isn't cached!")
+                );
                 return ((DiscordApiImpl) webhook.getApi()).getOrCreateMessage(channel, result.getJsonBody());
-            } else {
-                return channel.getMessagesAsStream()
-                        .filter(message -> message.getAuthor().isWebhook()
-                                && message.getAuthor().getId() == webhook.getId())
-                        .findFirst()
-                        .orElseThrow(AssertionError::new);
-            }
-        }).whenComplete((message, throwable) -> {
-            if (throwable != null) {
-                future.completeExceptionally(throwable);
-            } else {
-                future.complete(message);
-            }
-        });
+            }).whenComplete((message, throwable) -> {
+                if (throwable != null) {
+                    future.completeExceptionally(throwable);
+                } else {
+                    future.complete(message);
+                }
+            });
+        } else {
+            //if wait is false we don't get a result from discord, this future shouldn't be returned.
+            request.execute(result -> null)
+                    .whenComplete((message, throwable) -> {
+                        future.completeExceptionally(throwable == null ? new AssertionError() : throwable);
+                    });
+        }
     }
 
     @Override

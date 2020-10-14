@@ -3,6 +3,8 @@ package org.javacord.api.entity.message.internal;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.webhook.IncomingWebhook;
+
 import java.net.URL;
 
 /**
@@ -66,9 +68,9 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
     void setDisplayAvatar(Icon avatar);
 
     /**
-     * Sets if discord should wait for server confirmation and throw an error if the message hasn't been send.
+     * Sends the message without waiting for a response.
      *
-     * @param wait If discord should wait for server confirmation and throw an error if the message hasn't been send.
+     * @param webhook The webhook from which the message should be sent.
      */
-    void setWait(boolean wait);
+    void sendSilently(IncomingWebhook webhook);
 }

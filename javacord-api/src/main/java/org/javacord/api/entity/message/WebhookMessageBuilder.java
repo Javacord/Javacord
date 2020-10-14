@@ -513,17 +513,6 @@ public class WebhookMessageBuilder {
     }
 
     /**
-     * Sets if discord should wait for server confirmation and throw an error if the message hasn't been send.
-     *
-     * @param wait If discord should wait for server confirmation and throw an error if the message hasn't been send.
-     * @return The current instance in order to chain call methods.
-     */
-    public WebhookMessageBuilder setWait(boolean wait) {
-        delegate.setWait(wait);
-        return this;
-    }
-
-    /**
      * Gets the {@link StringBuilder} which is used to build the message.
      *
      * @return The StringBuilder which is used to build the message.
@@ -538,9 +527,17 @@ public class WebhookMessageBuilder {
      *
      * @param webhook The webhook from which the message should be sent.
      * @return The sent message.
-     * @throws IllegalStateException if the defined Webhook's channel is not present.
      */
-    public CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException {
+    public CompletableFuture<Message> send(IncomingWebhook webhook) {
         return delegate.send(webhook);
+    }
+
+    /**
+     * Sends the message without waiting for a response.
+     *
+     * @param webhook The webhook from which the message should be sent.
+     */
+    public void sendSilently(IncomingWebhook webhook) {
+        delegate.sendSilently(webhook);
     }
 }
