@@ -25,10 +25,10 @@ public class WebhookMessageBuilder {
     protected final WebhookMessageBuilderDelegate delegate = DelegateFactory.createWebhookMessageBuilderDelegate();
 
     /**
-     * Creates a message builder from a message.
+     * Creates a webhook message builder from a message.
      *
      * @param message The message to copy.
-     * @return A message builder which would produce the same text as the given message.
+     * @return A webhook message builder which would produce the same text as the given message.
      */
     public static WebhookMessageBuilder fromMessage(Message message) {
         WebhookMessageBuilder builder = new WebhookMessageBuilder()
@@ -509,6 +509,17 @@ public class WebhookMessageBuilder {
      */
     public WebhookMessageBuilder setDisplayAvatar(Icon avatar) {
         delegate.setDisplayAvatar(avatar);
+        return this;
+    }
+
+    /**
+     * Sets if discord should wait for server confirmation and throw an error if the message hasn't been send.
+     *
+     * @param wait If discord should wait for server confirmation and throw an error if the message hasn't been send.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder setWait(boolean wait) {
+        delegate.setWait(wait);
         return this;
     }
 

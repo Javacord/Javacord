@@ -64,4 +64,11 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      * @param avatar The display avatar of the webhook.
      */
     void setDisplayAvatar(Icon avatar);
+
+    /**
+     * Sets if discord should wait for server confirmation and throw an error if the message hasn't been send.
+     *
+     * @param wait If discord should wait for server confirmation and throw an error if the message hasn't been send.
+     */
+    void setWait(boolean wait);
 }

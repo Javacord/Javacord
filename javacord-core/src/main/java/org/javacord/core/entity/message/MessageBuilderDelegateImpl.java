@@ -359,10 +359,10 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
     @Override
     public CompletableFuture<Message> send(IncomingWebhook webhook) throws IllegalStateException {
-        return send(webhook, null, null);
+        return send(webhook, null, null, true);
     }
 
-    protected CompletableFuture<Message> send(IncomingWebhook webhook, String displayName, URL avatarUrl)
+    protected CompletableFuture<Message> send(IncomingWebhook webhook, String displayName, URL avatarUrl, boolean wait)
             throws IllegalStateException {
 
         ObjectNode body = JsonNodeFactory.instance.objectNode()
@@ -394,6 +394,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
         RestRequest<Message> request =
                 new RestRequest<Message>(webhook.getApi(), RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
+                        .addQueryParameter("wait", Boolean.toString(wait))
                         .setUrlParameters(webhook.getIdAsString(), webhook.getToken());
         CompletableFuture<Message> future = new CompletableFuture<>();
         if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
@@ -409,14 +410,14 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
                     addMultipartBodyToRequest(request, body, tempAttachments, webhook.getApi());
 
-                    executeWebhookRest(request, webhook, future);
+                    executeWebhookRest(request, webhook, wait, future);
                 } catch (Throwable t) {
                     future.completeExceptionally(t);
                 }
             });
         } else {
             request.setBody(body);
-            executeWebhookRest(request, webhook, future);
+            executeWebhookRest(request, webhook, wait, future);
         }
         return future;
     }
@@ -457,25 +458,31 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      *
      * @param request The rest request to execute
      * @param webhook The webhook to send the message to
+     * @param wait If the wait param has been set
      * @param future The future to complete
      */
-    private static void executeWebhookRest(RestRequest<Message> request, IncomingWebhook webhook,
+    private static void executeWebhookRest(RestRequest<Message> request, IncomingWebhook webhook, boolean wait,
                                            CompletableFuture<Message> future) {
-        request.execute(result -> webhook.getChannel().orElseThrow(() ->
-                        new IllegalStateException("Cannot return a message when the channel isn't cached!")
-                ).getMessagesAsStream()
-                .filter(message -> message.getAuthor().isWebhook()
-                        && message.getAuthor().getId() == webhook.getId())
-                .findFirst()
-                .orElseThrow(AssertionError::new)
-        )
-                .whenComplete((message, throwable) -> {
-                    if (throwable != null) {
-                        future.completeExceptionally(throwable);
-                    } else {
-                        future.complete(message);
-                    }
-                });
+        request.execute(result -> {
+            TextChannel channel = webhook.getChannel().orElseThrow(() ->
+                            new IllegalStateException("Cannot return a message when the channel isn't cached!")
+                    );
+            if (wait) {
+                return ((DiscordApiImpl) webhook.getApi()).getOrCreateMessage(channel, result.getJsonBody());
+            } else {
+                return channel.getMessagesAsStream()
+                        .filter(message -> message.getAuthor().isWebhook()
+                                && message.getAuthor().getId() == webhook.getId())
+                        .findFirst()
+                        .orElseThrow(AssertionError::new);
+            }
+        }).whenComplete((message, throwable) -> {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+            } else {
+                future.complete(message);
+            }
+        });
     }
 
     @Override
