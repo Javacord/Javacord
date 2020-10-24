@@ -36,7 +36,7 @@ public class PrivacyProtectionLogger extends AbstractLogger {
      * @param privateData The private data.
      */
     public static void addPrivateData(String privateData) {
-        if (privateData != null) {
+        if (privateData != null && !privateData.trim().isEmpty()) {
             privateDataSet.add(privateData);
         }
     }
