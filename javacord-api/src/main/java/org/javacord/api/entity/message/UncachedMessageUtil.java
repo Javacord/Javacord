@@ -300,6 +300,26 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     CompletableFuture<Void> removeAllReactions(String channelId, String messageId);
 
     /**
+     * Deletes all the reactions for a given emoji on a message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji to remove.
+     * @return A future to tell us if the deletion was successful.
+     */
+    CompletableFuture<Void> removeAllReactionsForEmoji(long channelId, long messageId, Emoji emoji);
+
+    /**
+     * Deletes all the reactions for a given emoji on a message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param emoji The emoji to remove.
+     * @return A future to tell us if the deletion was successful.
+     */
+    CompletableFuture<Void> removeAllReactionsForEmoji(String channelId, String messageId, Emoji emoji);
+
+    /**
      * Pins this message.
      *
      * @param channelId The id of the message's channel.
