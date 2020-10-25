@@ -115,6 +115,17 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Optional<Ratelimiter> getGlobalRatelimiter();
 
     /**
+     * Gets the current gateway identify ratelimiter.
+     *
+     * <p>If you did not provide a ratelimiter yourself, this method will return a {@link LocalRatelimiter}
+     * which is set to allow one gateway identify request per 5500ms and is shared with every bot with the same token
+     * in the same Java program.
+     *
+     * @return The current gateway identify ratelimiter.
+     */
+    Ratelimiter getGatewayIdentifyRatelimiter();
+
+    /**
      * Gets the latest gateway latency.
      *
      * <p>To calculate the gateway latency, Javacord measures the time it takes for Discord to answer the gateway

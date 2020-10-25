@@ -31,6 +31,13 @@ public interface DiscordApiBuilderDelegate {
     void setGlobalRatelimiter(Ratelimiter ratelimiter);
 
     /**
+     * Sets a ratelimiter that can be used to respect the 5 second gateway identify ratelimit.
+     *
+     * @param ratelimiter The ratelimiter used to respect the 5 second gateway identify ratelimit.
+     */
+    void setGatewayIdentifyRatelimiter(Ratelimiter ratelimiter);
+
+    /**
      * Sets the proxy selector which should be used to determine the proxies that should be used to connect to the
      * Discord REST API and websocket.
      *

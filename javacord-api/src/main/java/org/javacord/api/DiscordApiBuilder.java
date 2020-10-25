@@ -93,6 +93,26 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets a ratelimiter that can be used to control the 5 seconds gateway identify ratelimit.
+     *
+     * <p>By default, Javacord automatically provides a default {@link LocalRatelimiter}
+     * which is set to allow one gateway identify request per 5500ms and is shared with every bot with the same token
+     * in the same Java program.
+     *
+     * <p>**DO NOT** set a custom gateway identify ratelimiter unless you have to synchronize the ratelimit across
+     * multiple Java programs (running on different JVMs, VMs, phyiscal servers etc.) that run Javacord on the same
+     * bot token. The default ratelimiter will handle the ratelimit for you as long as your whole bot runs in the same
+     * Java program.
+     *
+     * @param ratelimiter The ratelimiter used to control the 5 seconds gateway identify ratelimit.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setGatewayIdentifyRatelimiter(Ratelimiter ratelimiter) {
+        delegate.setGatewayIdentifyRatelimiter(ratelimiter);
+        return this;
+    }
+
+    /**
      * Sets the proxy selector which should be used to determine the proxies that should be used to connect to the
      * Discord REST API and web socket.
      * If no explicit proxy is configured using {@link #setProxy(Proxy)} and no proxy selector is configured using this
