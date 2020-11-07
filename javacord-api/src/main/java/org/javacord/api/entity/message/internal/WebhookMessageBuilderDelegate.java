@@ -1,11 +1,14 @@
 package org.javacord.api.entity.message.internal;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is internally used by the {@link WebhookMessageBuilder} to create messages.
@@ -70,7 +73,27 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
     /**
      * Sends the message without waiting for a response.
      *
+     * @param api The api instance needed to send and return the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     *
+     * @return The sent message.
+     */
+    CompletableFuture<Message> send(DiscordApi api, String webhookId, String webhookToken);
+
+    /**
+     * Sends the message without waiting for a response.
+     *
      * @param webhook The webhook from which the message should be sent.
      */
     void sendSilently(IncomingWebhook webhook);
+
+    /**
+     * Sends the message without waiting for a response.
+     *
+     * @param api The api instance needed to send the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     */
+    void sendSilently(DiscordApi api, String webhookId, String webhookToken);
 }

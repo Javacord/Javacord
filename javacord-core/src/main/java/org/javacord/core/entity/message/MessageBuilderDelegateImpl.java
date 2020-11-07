@@ -1,5 +1,6 @@
 package org.javacord.core.entity.message;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -359,21 +360,23 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
     @Override
     public CompletableFuture<Message> send(IncomingWebhook webhook) {
-        return send(webhook, null, null, true);
+        return send(webhook.getIdAsString(), webhook.getToken(), null, null, true, webhook.getApi());
     }
 
     /**
      * Send a message to an incoming webhook.
      *
      *
-     * @param webhook The webhook to send the message to
+     * @param webhookId The id of the webhook to send the message to
+     * @param webhookToken The token of the webhook to send the message to
      * @param displayName The display name the webhook should use
      * @param avatarUrl The avatar the webhook should use
      * @param wait If the completable future will be completed
+     * @param api The api instance needed to send and return the message
      * @return The sent message
      */
-    protected CompletableFuture<Message> send(IncomingWebhook webhook, String displayName, URL avatarUrl,
-                                              boolean wait) {
+    protected CompletableFuture<Message> send(String webhookId, String webhookToken, String displayName, URL avatarUrl,
+                                              boolean wait, DiscordApi api) {
         ObjectNode body = JsonNodeFactory.instance.objectNode()
                 .put("tts", this.tts);
 
@@ -402,13 +405,13 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         }
 
         RestRequest<Message> request =
-                new RestRequest<Message>(webhook.getApi(), RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
+                new RestRequest<Message>(api, RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
                         .addQueryParameter("wait", Boolean.toString(wait))
-                        .setUrlParameters(webhook.getIdAsString(), webhook.getToken());
+                        .setUrlParameters(webhookId, webhookToken);
         CompletableFuture<Message> future = new CompletableFuture<>();
         if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
             // We access files etc. so this should be async
-            webhook.getApi().getThreadPool().getExecutorService().submit(() -> {
+            api.getThreadPool().getExecutorService().submit(() -> {
                 try {
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
                     // Add the attachments required for the embeds
@@ -417,18 +420,23 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                                 ((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).getRequiredAttachments());
                     }
 
-                    addMultipartBodyToRequest(request, body, tempAttachments, webhook.getApi());
+                    addMultipartBodyToRequest(request, body, tempAttachments, api);
 
-                    executeWebhookRest(request, webhook, wait, future);
+                    executeWebhookRest(request, wait, future, api);
                 } catch (Throwable t) {
                     future.completeExceptionally(t);
                 }
             });
         } else {
             request.setBody(body);
-            executeWebhookRest(request, webhook, wait, future);
+            executeWebhookRest(request, wait, future, api);
         }
         return future;
+    }
+
+    @Override
+    public CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken) {
+        return send(webhookId, webhookToken, null, null, true, api);
     }
 
     /**
@@ -437,7 +445,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      * @param request The RestRequest to add the MultipartBody to
      * @param body The body to use as base for the MultipartBody
      * @param attachments The List of FileContainers to add as attachments
-     * @param api the api instance needed to add the attachments
+     * @param api The api instance needed to add the attachments
      */
     private void addMultipartBodyToRequest(RestRequest<Message> request, ObjectNode body,
                                            List<FileContainer> attachments, DiscordApi api) {
@@ -465,18 +473,19 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      * Method which executes the webhook rest request.
      *
      * @param request The rest request to execute
-     * @param webhook The webhook to send the message to
      * @param wait If discord sends us a response
      * @param future The future to complete
+     * @param api The api instance needed to create the message
      */
-    private static void executeWebhookRest(RestRequest<Message> request, IncomingWebhook webhook, boolean wait,
-                                           CompletableFuture<Message> future) {
+    private static void executeWebhookRest(RestRequest<Message> request, boolean wait,
+                                           CompletableFuture<Message> future, DiscordApi api) {
         if (wait) {
             request.execute(result -> {
-                TextChannel channel = webhook.getChannel().orElseThrow(() ->
+                JsonNode body = result.getJsonBody();
+                TextChannel channel = api.getTextChannelById(body.get("channel_id").asText()).orElseThrow(() ->
                         new IllegalStateException("Cannot return a message when the channel isn't cached!")
                 );
-                return ((DiscordApiImpl) webhook.getApi()).getOrCreateMessage(channel, result.getJsonBody());
+                return ((DiscordApiImpl) api).getOrCreateMessage(channel, body);
             }).whenComplete((message, throwable) -> {
                 if (throwable != null) {
                     future.completeExceptionally(throwable);

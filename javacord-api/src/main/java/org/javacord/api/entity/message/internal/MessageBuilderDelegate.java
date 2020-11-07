@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message.internal;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -278,4 +279,14 @@ public interface MessageBuilderDelegate {
      * @return The sent message.
      */
     CompletableFuture<Message> send(Messageable messageable);
+
+    /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send and return the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     * @return The sent message.
+     */
+    CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken);
 }

@@ -1,11 +1,13 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.webhook.IncomingWebhook;
+import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.image.BufferedImage;
@@ -13,6 +15,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
 
 /**
  * This class can help you to create webhook messages.
@@ -533,11 +536,95 @@ public class WebhookMessageBuilder {
     }
 
     /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send and return the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     *
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> send(DiscordApi api, long webhookId, String webhookToken) {
+        return delegate.send(api, Long.toUnsignedString(webhookId), webhookToken);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send and return the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     *
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> send(DiscordApi api, String webhookId, String webhookToken) {
+        return delegate.send(api, webhookId, webhookToken);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send the message.
+     * @param webhookUrl The url of the webhook from which the message should be sent.
+     *
+     * @return The sent message.
+     * @throws IllegalArgumentException If the link isn't valid.
+     */
+    public CompletableFuture<Message> send(DiscordApi api, String webhookUrl) throws IllegalArgumentException {
+        Matcher matcher = DiscordRegexPattern.WEBHOOK_URL.matcher(webhookUrl);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("The webhook url has an invalid format");
+        }
+
+        return send(api, matcher.group("id"), matcher.group("token"));
+    }
+
+    /**
      * Sends the message without waiting for a response.
      *
      * @param webhook The webhook from which the message should be sent.
      */
     public void sendSilently(IncomingWebhook webhook) {
         delegate.sendSilently(webhook);
+    }
+
+    /**
+     * Sends the message without waiting for a response.
+     *
+     * @param api The api instance needed to send the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     */
+    public void sendSilently(DiscordApi api, long webhookId, String webhookToken) {
+        delegate.send(api, Long.toUnsignedString(webhookId), webhookToken);
+    }
+
+    /**
+     * Sends the message without waiting for a response.
+     *
+     * @param api The api instance needed to send the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     */
+    public void sendSilently(DiscordApi api, String webhookId, String webhookToken) {
+        delegate.send(api, webhookId, webhookToken);
+    }
+
+    /**
+     * Sends the message without waiting for a response.
+     *
+     * @param api The api instance needed to send the message.
+     * @param webhookUrl The url of the webhook from which the message should be sent.
+     * @throws IllegalArgumentException If the link isn't valid.
+     */
+    public void sendSilently(DiscordApi api, String webhookUrl) throws IllegalArgumentException {
+        Matcher matcher = DiscordRegexPattern.WEBHOOK_URL.matcher(webhookUrl);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("The webhook url has an invalid format");
+        }
+
+        sendSilently(api, matcher.group("id"), matcher.group("token"));
     }
 }

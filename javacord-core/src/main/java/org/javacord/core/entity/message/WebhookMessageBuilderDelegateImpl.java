@@ -1,6 +1,7 @@
 package org.javacord.core.entity.message;
 
 import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -31,12 +32,6 @@ public class WebhookMessageBuilderDelegateImpl
      * The display name the webhook should use.
      */
     private String displayName = null;
-
-
-    @Override
-    public CompletableFuture<Message> send(IncomingWebhook webhook) {
-        return send(webhook, displayName, avatarUrl, true);
-    }
 
     @Override
     public void addEmbeds(EmbedBuilder... embeds) {
@@ -69,7 +64,22 @@ public class WebhookMessageBuilderDelegateImpl
     }
 
     @Override
+    public CompletableFuture<Message> send(IncomingWebhook webhook) {
+        return send(webhook.getIdAsString(), webhook.getToken(), displayName, avatarUrl, true, webhook.getApi());
+    }
+
+    @Override
+    public CompletableFuture<Message> send(DiscordApi api, String webhookId, String webhookToken) {
+        return send(webhookId, webhookToken, displayName, avatarUrl, true, api);
+    }
+
+    @Override
     public void sendSilently(IncomingWebhook webhook) {
-        send(webhook, displayName, avatarUrl, false);
+        send(webhook.getIdAsString(), webhook.getToken(), displayName, avatarUrl, false, webhook.getApi());
+    }
+
+    @Override
+    public void sendSilently(DiscordApi api, String webhookId, String webhookToken) {
+        send(webhookId, webhookToken, displayName, avatarUrl, false, api);
     }
 }

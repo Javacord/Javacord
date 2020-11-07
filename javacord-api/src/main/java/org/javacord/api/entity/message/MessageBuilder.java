@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -8,6 +9,7 @@ import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
+import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.image.BufferedImage;
@@ -15,6 +17,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
 
 /**
  * This class can help you to create messages.
@@ -496,6 +499,50 @@ public class MessageBuilder {
      */
     public CompletableFuture<Message> send(Messageable messageable) {
         return delegate.send(messageable);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send and return the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> sendWithWebhook(DiscordApi api, long webhookId, String webhookToken) {
+        return delegate.sendWithWebhook(api, Long.toUnsignedString(webhookId), webhookToken);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send and return the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     * @return The sent message.
+     */
+    public CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken) {
+        return delegate.sendWithWebhook(api, webhookId, webhookToken);
+    }
+
+    /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send the message.
+     * @param webhookUrl The url of the webhook from which the message should be sent.
+     *
+     * @return The sent message.
+     * @throws IllegalArgumentException If the link isn't valid.
+     */
+    public CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookUrl)
+                                                        throws IllegalArgumentException {
+        Matcher matcher = DiscordRegexPattern.WEBHOOK_URL.matcher(webhookUrl);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("The webhook url has an invalid format");
+        }
+
+        return sendWithWebhook(api, matcher.group("id"), matcher.group("token"));
     }
 
 }
