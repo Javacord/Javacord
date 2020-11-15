@@ -728,7 +728,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public void removeMember(long userId) {
         muted.remove(userId);
         deafened.remove(userId);
-        getRoles().forEach(role -> ((RoleImpl) role).removeUserFromCache(userId));
         api.removeMemberFromCache(userId, getId());
     }
 
@@ -748,11 +747,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public MemberImpl addMember(JsonNode memberJson) {
         MemberImpl member = new MemberImpl(api, this, memberJson, null);
         api.addMemberToCacheOrReplaceExisting(member);
-
-        for (JsonNode roleIds : memberJson.get("roles")) {
-            long roleId = Long.parseLong(roleIds.asText());
-            getRoleById(roleId).map(role -> ((RoleImpl) role)).ifPresent(role -> role.addUserToCache(member.getId()));
-        }
 
         synchronized (readyConsumers) {
             if (!ready && getRealMembers().size() == getMemberCount()) {
@@ -1274,12 +1268,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public List<Role> getRoles(User user) {
-        return getRealMemberById(user.getId())
-                .map(Member::getRoles).orElseGet(() -> {
-                    ArrayList<Role> list = new ArrayList<>();
-                    list.add(getEveryoneRole());
-                    return list;
-                });
+        return ((UserImpl) user).getMember()
+                .filter(member -> member.getServer().equals(this))
+                .map(Member::getRoles)
+                .orElseGet(() ->
+                        getRealMemberById(user.getId())
+                                .map(Member::getRoles).orElseGet(Collections::emptyList));
     }
 
     @Override

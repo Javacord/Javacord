@@ -207,6 +207,11 @@ public final class MemberImpl implements Member {
     }
 
     @Override
+    public boolean hasRole(Role role) {
+        return roleIds.contains(role.getId());
+    }
+
+    @Override
     public Optional<Color> getRoleColor() {
         return getRoles().stream()
                 .filter(role -> role.getColor().isPresent())
