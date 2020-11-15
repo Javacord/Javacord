@@ -61,6 +61,14 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
     List<Role> getRoles();
 
     /**
+     * Checks if this member has the given role.
+     *
+     * @param role The role to check.
+     * @return Whether the member has the role or not.
+     */
+    boolean hasRole(Role role);
+
+    /**
      * Gets the displayed color of this member based on his roles.
      *
      * @return The color.
