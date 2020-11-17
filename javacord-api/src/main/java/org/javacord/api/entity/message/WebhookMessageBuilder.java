@@ -6,6 +6,7 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.internal.DelegateFactory;
@@ -512,6 +513,28 @@ public class WebhookMessageBuilder {
      */
     public WebhookMessageBuilder setDisplayAvatar(Icon avatar) {
         delegate.setDisplayAvatar(avatar);
+        return this;
+    }
+
+    /**
+     * Sets the display avatar of the webhook.
+     *
+     * @param author The author to take display name and display avatar of.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder setDisplayAuthor(MessageAuthor author) {
+        delegate.setDisplayAuthor(author);
+        return this;
+    }
+
+    /**
+     * Sets the display avatar of the webhook.
+     *
+     * @param author The author to take display name and display avatar of.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder setDisplayAuthor(User author) {
+        delegate.setDisplayAuthor(author);
         return this;
     }
 

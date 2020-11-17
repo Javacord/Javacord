@@ -3,8 +3,10 @@ package org.javacord.api.entity.message.internal;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 
 import java.net.URL;
@@ -69,6 +71,26 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      * @param avatar The display avatar of the webhook.
      */
     void setDisplayAvatar(Icon avatar);
+
+    /**
+     * Sets the display avatar of the webhook.
+     *
+     * @param author The author to take display name and display avatar of.
+     */
+    default void setDisplayAuthor(MessageAuthor author) {
+        setDisplayAvatar(author.getAvatar());
+        setDisplayName(author.getDisplayName());
+    }
+
+    /**
+     * Sets the display avatar of the webhook.
+     *
+     * @param author The author to take display name and display avatar of.
+     */
+    default void setDisplayAuthor(User author) {
+        setDisplayAvatar(author.getAvatar());
+        setDisplayName(author.getName());
+    }
 
     /**
      * Sends the message without waiting for a response.
