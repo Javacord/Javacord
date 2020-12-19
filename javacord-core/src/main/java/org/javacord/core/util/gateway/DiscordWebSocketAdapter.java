@@ -40,6 +40,7 @@ import org.javacord.core.util.handler.channel.ChannelUpdateHandler;
 import org.javacord.core.util.handler.channel.WebhooksUpdateHandler;
 import org.javacord.core.util.handler.channel.invite.InviteCreateHandler;
 import org.javacord.core.util.handler.channel.invite.InviteDeleteHandler;
+import org.javacord.core.util.handler.command.InteractionCreateHandler;
 import org.javacord.core.util.handler.guild.GuildBanAddHandler;
 import org.javacord.core.util.handler.guild.GuildBanRemoveHandler;
 import org.javacord.core.util.handler.guild.GuildCreateHandler;
@@ -831,6 +832,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         //invite
         addHandler(new InviteCreateHandler(api));
         addHandler(new InviteDeleteHandler(api));
+
+        // command
+        addHandler(new InteractionCreateHandler(api));
     }
 
     /**

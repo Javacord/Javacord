@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
+import org.javacord.api.command.ApplicationCommand;
 import org.javacord.api.entity.ApplicationInfo;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
@@ -44,6 +45,7 @@ import org.javacord.api.util.event.ListenerManager;
 import org.javacord.api.util.ratelimit.LocalRatelimiter;
 import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.audio.AudioConnectionImpl;
+import org.javacord.core.command.ApplicationCommandImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.activity.ApplicationInfoImpl;
 import org.javacord.core.entity.emoji.CustomEmojiImpl;
@@ -1321,6 +1323,26 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public ThreadPool getThreadPool() {
         return threadPool;
+    }
+
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> getGlobalApplicationCommands() {
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+            .setUrlParameters(String.valueOf(clientId))
+            .execute(result -> {
+                List<ApplicationCommand> applicationCommands = new ArrayList<>();
+                for (JsonNode applicationCommandJson : result.getJsonBody()) {
+                    applicationCommands.add(new ApplicationCommandImpl(this, applicationCommandJson));
+                }
+                return Collections.unmodifiableList(applicationCommands);
+            });
+    }
+
+    @Override
+    public CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId) {
+        return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+            .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+            .execute(result -> new ApplicationCommandImpl(this, result.getJsonBody()));
     }
 
     @Override

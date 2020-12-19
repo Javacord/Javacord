@@ -2,6 +2,9 @@ package org.javacord.api.util.internal;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
+import org.javacord.api.command.internal.ApplicationCommandBuilderDelegate;
+import org.javacord.api.command.internal.ApplicationCommandOptionBuilderDelegate;
+import org.javacord.api.command.internal.ApplicationCommandOptionChoiceBuilderDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -250,5 +253,26 @@ public interface DelegateFactoryDelegate {
      * @return A new discord exception validator.
      */
     DiscordExceptionValidator createDiscordExceptionValidator();
+
+    /**
+     * Creates a new application command builder delegate.
+     *
+     * @return The application command builder delegate.
+     */
+    ApplicationCommandBuilderDelegate createApplicationCommandBuilderDelegate();
+
+    /**
+     * Creates a new application command option builder delegate.
+     *
+     * @return The application command option builder delegate.
+     */
+    ApplicationCommandOptionBuilderDelegate createApplicationCommandOptionBuilderDelegate();
+
+    /**
+     * Creates a new application command option choice builder delegate.
+     *
+     * @return The application command option choice builder delegate.
+     */
+    ApplicationCommandOptionChoiceBuilderDelegate createApplicationCommandOptionChoiceBuilderDelegate();
 
 }

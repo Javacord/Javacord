@@ -2,6 +2,9 @@ package org.javacord.api.util.internal;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
+import org.javacord.api.command.internal.ApplicationCommandBuilderDelegate;
+import org.javacord.api.command.internal.ApplicationCommandOptionBuilderDelegate;
+import org.javacord.api.command.internal.ApplicationCommandOptionChoiceBuilderDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -325,6 +328,33 @@ public class DelegateFactory {
      */
     public static AudioSourceBaseDelegate createAudioSourceBaseDelegate(DiscordApi api) {
         return delegateFactoryDelegate.createAudioSourceBaseDelegate(api);
+    }
+
+    /**
+     * Creates a new application command builder delegate.
+     *
+     * @return The application command builder delegate.
+     */
+    public static ApplicationCommandBuilderDelegate createApplicationCommandBuilderDelegate() {
+        return delegateFactoryDelegate.createApplicationCommandBuilderDelegate();
+    }
+
+    /**
+     * Creates a new application command option builder delegate.
+     *
+     * @return The application command option builder delegate.
+     */
+    public static ApplicationCommandOptionBuilderDelegate createApplicationCommandOptionBuilderDelegate() {
+        return delegateFactoryDelegate.createApplicationCommandOptionBuilderDelegate();
+    }
+
+    /**
+     * Creates a new application command option choice builder delegate.
+     *
+     * @return The application command option choice builder delegate.
+     */
+    public static ApplicationCommandOptionChoiceBuilderDelegate createApplicationCommandOptionChoiceBuilderDelegate() {
+        return delegateFactoryDelegate.createApplicationCommandOptionChoiceBuilderDelegate();
     }
 
     /**
