@@ -1,5 +1,6 @@
 package org.javacord.api;
 
+import org.javacord.api.command.ApplicationCommand;
 import org.javacord.api.entity.ApplicationInfo;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
@@ -43,6 +44,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -89,6 +91,21 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The internally used thread pool.
      */
     ThreadPool getThreadPool();
+
+    /**
+     * Gets a list with all global commands for the application.
+     *
+     * @return A list with all global commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> getGlobalApplicationCommands();
+
+    /**
+     * Gets an application command by its id.
+     *
+     * @param commandId The id of the application command.
+     * @return The application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId);
 
     /**
      * Gets a utility class to interact with uncached messages.

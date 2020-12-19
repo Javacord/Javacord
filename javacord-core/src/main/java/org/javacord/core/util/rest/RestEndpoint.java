@@ -44,7 +44,10 @@ public enum RestEndpoint {
     BAN("/guilds/%s/bans", 0),
     CURRENT_USER("/users/@me"),
     AUDIT_LOG("/guilds/%s/audit-logs", 0),
-    CUSTOM_EMOJI("/guilds/%s/emojis", 0);
+    CUSTOM_EMOJI("/guilds/%s/emojis", 0),
+    INTERACTION_RESPONSE("/interactions/%s/%s/callback", 0),
+    APPLICATION_COMMANDS("/applications/%s/commands", 0),
+    GUILD_APPLICATION_COMMANDS("/applications/%s/guilds/%s/commands", 1);
 
     /**
      * The endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix".
