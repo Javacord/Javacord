@@ -236,5 +236,4 @@ public interface Messageable {
                 .addAttachment(stream, fileName)
                 .send(this);
     }
-
 }

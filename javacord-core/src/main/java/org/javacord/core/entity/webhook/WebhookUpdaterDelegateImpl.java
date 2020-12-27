@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.core.util.FileContainer;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -137,6 +139,17 @@ public class WebhookUpdaterDelegateImpl implements WebhookUpdaterDelegate {
         updateAvatar = true;
     }
 
+    private RestRequest<Webhook> setUrlParameters(RestRequest<Webhook> request) {
+        //see: https://discord.com/developers/docs/resources/webhook#execute-webhook-querystring-params
+        if (channel == null) { //changing channel doesn't work when using token.
+            Optional<String> token = webhook.asIncomingWebhook().map(IncomingWebhook::getToken);
+            if (token.isPresent()) {
+                return request.setUrlParameters(webhook.getIdAsString(), token.get());
+            }
+        }
+        return request.setUrlParameters(webhook.getIdAsString());
+    }
+
     @Override
     public CompletableFuture<Webhook> update() {
         boolean patchWebhook = false;
@@ -162,17 +175,15 @@ public class WebhookUpdaterDelegateImpl implements WebhookUpdaterDelegate {
                             + Base64.getEncoder().encodeToString(bytes);
                     body.put("avatar", base64Avatar);
                 }).thenCompose(aVoid ->
-                        new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
-                        .setUrlParameters(webhook.getIdAsString())
+                        setUrlParameters(new RestRequest<>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK))
                         .setBody(body)
                         .setAuditLogReason(reason)
-                        .execute(result -> new WebhookImpl(webhook.getApi(), result.getJsonBody())));
+                        .execute(result -> WebhookImpl.createWebhook(webhook.getApi(), result.getJsonBody())));
             }
-            return new RestRequest<Webhook>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK)
-                    .setUrlParameters(webhook.getIdAsString())
+            return setUrlParameters(new RestRequest<>(webhook.getApi(), RestMethod.PATCH, RestEndpoint.WEBHOOK))
                     .setBody(body)
                     .setAuditLogReason(reason)
-                    .execute(result -> new WebhookImpl(webhook.getApi(), result.getJsonBody()));
+                    .execute(result -> WebhookImpl.createWebhook(webhook.getApi(), result.getJsonBody()));
         } else {
             return CompletableFuture.completedFuture(webhook);
         }

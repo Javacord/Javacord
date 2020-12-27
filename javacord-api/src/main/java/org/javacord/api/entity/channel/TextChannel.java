@@ -6,6 +6,7 @@ import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.channel.TextChannelAttachableListenerManager;
 import org.javacord.api.listener.message.MessageCreateListener;
@@ -838,6 +839,13 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @return A list of all webhooks in this channel.
      */
     CompletableFuture<List<Webhook>> getWebhooks();
+
+    /**
+     * Gets a list of all incoming webhooks in this channel.
+     *
+     * @return A list of all incoming webhooks in this channel.
+     */
+    CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks();
 
     /**
      * Checks if the given user can send messages in this channel.

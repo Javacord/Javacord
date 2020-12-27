@@ -72,11 +72,36 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
     Optional<Icon> getAvatar();
 
     /**
-     * Gets the secure token of the webhook.
+     * Gets the type of the webhook.
      *
-     * @return The secure token of the webhook.
+     * @return The type of the webhook.
      */
-    Optional<String> getToken();
+    WebhookType getType();
+
+    /**
+     * Checks if the webhook is an incoming webhook.
+     *
+     * @return Whether the webhook an incoming webhook.
+     */
+    default boolean isIncomingWebhook() {
+        return getType() == WebhookType.INCOMING;
+    }
+
+    /**
+     * Checks if the webhook is an channel follower webhook.
+     *
+     * @return Whether the webhook an channel following webhook.
+     */
+    default boolean isChannelFollowerWebhook() {
+        return getType() == WebhookType.CHANNEL_FOLLOWER;
+    }
+
+    /**
+     * Gets the webhook as incoming webhook.
+     *
+     * @return The webhook as incoming webhook.
+     */
+    Optional<IncomingWebhook> asIncomingWebhook();
 
     /**
      * Deletes the webhook.

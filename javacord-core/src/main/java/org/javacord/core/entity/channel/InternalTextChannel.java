@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.MessageSetImpl;
+import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.listener.channel.InternalTextChannelAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -177,11 +179,25 @@ public interface InternalTextChannel extends TextChannel, InternalTextChannelAtt
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
                     List<Webhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhook : result.getJsonBody()) {
-                        webhooks.add(new WebhookImpl(getApi(), webhook));
+                    for (JsonNode webhookJson : result.getJsonBody()) {
+                        webhooks.add(WebhookImpl.createWebhook(getApi(), webhookJson));
                     }
                     return Collections.unmodifiableList(webhooks);
                 });
     }
 
+    @Override
+    default CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks() {
+        return new RestRequest<List<IncomingWebhook>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> {
+                    List<IncomingWebhook> webhooks = new ArrayList<>();
+                    for (JsonNode webhookJson : result.getJsonBody()) {
+                        if (webhookJson.get("type").asText().equals("1")) {
+                            webhooks.add(new IncomingWebhookImpl(getApi(), webhookJson));
+                        }
+                    }
+                    return Collections.unmodifiableList(webhooks);
+                });
+    }
 }
