@@ -607,9 +607,11 @@ public class WebhookMessageBuilder {
      * Sends the message without waiting for a response.
      *
      * @param webhook The webhook from which the message should be sent.
+     *
+     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
-    public void sendSilently(IncomingWebhook webhook) {
-        delegate.sendSilently(webhook);
+    public CompletableFuture<Void> sendSilently(IncomingWebhook webhook) {
+        return delegate.sendSilently(webhook);
     }
 
     /**
@@ -618,9 +620,11 @@ public class WebhookMessageBuilder {
      * @param api The api instance needed to send the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
+     *
+     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
-    public void sendSilently(DiscordApi api, long webhookId, String webhookToken) {
-        delegate.send(api, Long.toUnsignedString(webhookId), webhookToken);
+    public CompletableFuture<Void> sendSilently(DiscordApi api, long webhookId, String webhookToken) {
+        return delegate.sendSilently(api, Long.toUnsignedString(webhookId), webhookToken);
     }
 
     /**
@@ -629,9 +633,11 @@ public class WebhookMessageBuilder {
      * @param api The api instance needed to send the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
+     *
+     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
-    public void sendSilently(DiscordApi api, String webhookId, String webhookToken) {
-        delegate.send(api, webhookId, webhookToken);
+    public CompletableFuture<Void> sendSilently(DiscordApi api, String webhookId, String webhookToken) {
+        return delegate.sendSilently(api, webhookId, webhookToken);
     }
 
     /**
@@ -639,15 +645,17 @@ public class WebhookMessageBuilder {
      *
      * @param api The api instance needed to send the message.
      * @param webhookUrl The url of the webhook from which the message should be sent.
+     *
+     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      * @throws IllegalArgumentException If the link isn't valid.
      */
-    public void sendSilently(DiscordApi api, String webhookUrl) throws IllegalArgumentException {
+    public CompletableFuture<Void> sendSilently(DiscordApi api, String webhookUrl) throws IllegalArgumentException {
         Matcher matcher = DiscordRegexPattern.WEBHOOK_URL.matcher(webhookUrl);
 
         if (!matcher.matches()) {
             throw new IllegalArgumentException("The webhook url has an invalid format");
         }
 
-        sendSilently(api, matcher.group("id"), matcher.group("token"));
+        return sendSilently(api, matcher.group("id"), matcher.group("token"));
     }
 }

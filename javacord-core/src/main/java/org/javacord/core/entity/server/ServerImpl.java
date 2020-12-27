@@ -37,6 +37,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.entity.webhook.WebhookType;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.IconImpl;
@@ -1414,7 +1415,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .execute(result -> {
                     List<IncomingWebhook> webhooks = new ArrayList<>();
                     for (JsonNode webhookJson : result.getJsonBody()) {
-                        if (webhookJson.get("type").asText().equals("1")) {
+                        if (WebhookType.fromValue(webhookJson.get("type").asInt()) == WebhookType.INCOMING) {
                             webhooks.add(new IncomingWebhookImpl(getApi(), webhookJson));
                         }
                     }

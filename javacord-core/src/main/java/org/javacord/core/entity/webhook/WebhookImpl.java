@@ -58,7 +58,7 @@ public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, Interna
     protected WebhookImpl(DiscordApi api, JsonNode data) {
         this.api = (DiscordApiImpl) api;
 
-        this.type = data.get("type").asText().equals("1") ? WebhookType.INCOMING : WebhookType.CHANNEL_FOLLOWER;
+        this.type = WebhookType.fromValue(data.get("type").asInt());
         this.id = Long.parseLong(data.get("id").asText());
         this.serverId = data.has("guild_id") ? Long.parseLong(data.get("guild_id").asText()) : null;
         this.channelId = Long.parseLong(data.get("channel_id").asText());
@@ -76,7 +76,7 @@ public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, Interna
      * @return The new webhook.
      */
     public static WebhookImpl createWebhook(DiscordApi api, JsonNode data) {
-        if (data.has("token")) {
+        if (WebhookType.fromValue(data.get("type").asInt()) == WebhookType.INCOMING) {
             return new IncomingWebhookImpl(api, data);
         } else {
             return new WebhookImpl(api, data);

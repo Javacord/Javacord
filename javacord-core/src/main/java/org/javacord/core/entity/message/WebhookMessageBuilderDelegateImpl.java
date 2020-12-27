@@ -74,12 +74,12 @@ public class WebhookMessageBuilderDelegateImpl
     }
 
     @Override
-    public void sendSilently(IncomingWebhook webhook) {
-        send(webhook.getIdAsString(), webhook.getToken(), displayName, avatarUrl, false, webhook.getApi());
+    public CompletableFuture<Void> sendSilently(IncomingWebhook webhook) {
+        return sendSilently(webhook.getApi(), webhook.getIdAsString(), webhook.getToken());
     }
 
     @Override
-    public void sendSilently(DiscordApi api, String webhookId, String webhookToken) {
-        send(webhookId, webhookToken, displayName, avatarUrl, false, api);
+    public CompletableFuture<Void> sendSilently(DiscordApi api, String webhookId, String webhookToken) {
+        return send(webhookId, webhookToken, displayName, avatarUrl, false, api).thenApply(m -> null);
     }
 }

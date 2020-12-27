@@ -54,7 +54,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Returns a {@code WebhookMessageBuilder} according to this {@code Message}.
      *
-     * @see MessageBuilder#fromMessage(Message)
+     * @see WebhookMessageBuilder#fromMessage(Message)
      *
      * @return The {@code WebhookMessageBuilder}.
      */

@@ -61,7 +61,7 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     private final StringBuilder strBuilder = new StringBuilder();
 
     /**
-     * The list of embed's of the message.
+     * The list of embeds of the message.
      */
     protected List<EmbedBuilder> embeds = new ArrayList<>();
 
@@ -479,27 +479,25 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      */
     private static void executeWebhookRest(RestRequest<Message> request, boolean wait,
                                            CompletableFuture<Message> future, DiscordApi api) {
+        CompletableFuture<Message> tmpFuture;
         if (wait) {
-            request.execute(result -> {
+            tmpFuture = request.execute(result -> {
                 JsonNode body = result.getJsonBody();
                 TextChannel channel = api.getTextChannelById(body.get("channel_id").asText()).orElseThrow(() ->
                         new IllegalStateException("Cannot return a message when the channel isn't cached!")
                 );
                 return ((DiscordApiImpl) api).getOrCreateMessage(channel, body);
-            }).whenComplete((message, throwable) -> {
-                if (throwable != null) {
-                    future.completeExceptionally(throwable);
-                } else {
-                    future.complete(message);
-                }
             });
         } else {
-            //if wait is false we don't get a result from discord, this future shouldn't be returned.
-            request.execute(result -> null)
-                    .whenComplete((message, throwable) -> {
-                        future.completeExceptionally(throwable == null ? new AssertionError() : throwable);
-                    });
+            tmpFuture = request.execute(result -> null);
         }
+        tmpFuture.whenComplete((message, throwable) -> {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+            } else {
+                future.complete(message);
+            }
+        });
     }
 
     @Override

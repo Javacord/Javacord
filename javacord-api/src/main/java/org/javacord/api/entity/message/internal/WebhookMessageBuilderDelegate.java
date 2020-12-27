@@ -107,8 +107,10 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      * Sends the message without waiting for a response.
      *
      * @param webhook The webhook from which the message should be sent.
+     *
+     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
-    void sendSilently(IncomingWebhook webhook);
+    CompletableFuture<Void> sendSilently(IncomingWebhook webhook);
 
     /**
      * Sends the message without waiting for a response.
@@ -116,6 +118,8 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      * @param api The api instance needed to send the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
+     *
+     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
-    void sendSilently(DiscordApi api, String webhookId, String webhookToken);
+    CompletableFuture<Void> sendSilently(DiscordApi api, String webhookId, String webhookToken);
 }
