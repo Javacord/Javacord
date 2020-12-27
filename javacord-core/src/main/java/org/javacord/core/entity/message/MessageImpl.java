@@ -97,6 +97,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private final MessageActivityImpl activity;
 
     /**
+     * The nonce of the message.
+     */
+    private final String nonce;
+
+    /**
      * If the message should be cached forever or not.
      */
     private volatile boolean cacheForever = false;
@@ -185,7 +190,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             }
         }
 
-        if (data.has("mention_roles") && !data.get("mention_roles").isNull()) {
+        if (data.hasNonNull("mention_roles")) {
             getServer().ifPresent(server -> {
                 for (JsonNode roleMentionJson : data.get("mention_roles")) {
                     server.getRoleById(roleMentionJson.asText()).ifPresent(roleMentions::add);
@@ -193,10 +198,16 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             });
         }
 
-        if (data.has("activity") && !data.get("activity").isNull()) {
+        if (data.hasNonNull("activity")) {
             activity = new MessageActivityImpl(this, data.get("activity"));
         } else {
             activity = null;
+        }
+
+        if (data.hasNonNull("nonce")) {
+            nonce = data.get("nonce").asText();
+        } else {
+            nonce = null;
         }
     }
 
@@ -404,6 +415,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public List<Role> getMentionedRoles() {
         return Collections.unmodifiableList(new ArrayList<>(roleMentions));
+    }
+
+    @Override
+    public Optional<String> getNonce() {
+        return Optional.ofNullable(nonce);
     }
 
     @Override

@@ -781,6 +781,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     List<Role> getMentionedRoles();
 
     /**
+     * Gets the nonce of the message.
+     *
+     * @return The nonce of the message.
+     */
+    Optional<String> getNonce();
+
+    /**
      * Gets a list with all channels mentioned in this message.
      *
      * @return A list with all channels mentioned in this message.
