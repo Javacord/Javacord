@@ -102,6 +102,15 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private final String nonce;
 
     /**
+     * The id of the message referenced via message reply.
+     */
+    private final Long referencedMessageId;
+    /**
+     * The message referenced via message reply.
+     */
+    private final Message referencedMessage;
+
+    /**
      * If the message should be cached forever or not.
      */
     private volatile boolean cacheForever = false;
@@ -208,6 +217,18 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             nonce = data.get("nonce").asText();
         } else {
             nonce = null;
+        }
+
+        if (data.hasNonNull("message_reference")) {
+            referencedMessageId = data.get("message_reference").get("message_id").asLong();
+        } else {
+            referencedMessageId = null;
+        }
+
+        if (data.hasNonNull("referenced_message")) {
+            referencedMessage = api.getOrCreateMessage(channel, data.get("referenced_message"));
+        } else {
+            referencedMessage = null;
         }
     }
 
@@ -386,6 +407,16 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     @Override
+    public Optional<Long> getReferencedMessageId() {
+        return Optional.ofNullable(referencedMessageId);
+    }
+
+    @Override
+    public Optional<Message> getReferencedMessage() {
+        return Optional.ofNullable(referencedMessage);
+    }
+
+    @Override
     public boolean isCachedForever() {
         return cacheForever;
     }
@@ -482,5 +513,4 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     public String toString() {
         return String.format("Message (id: %s, content: %s)", getIdAsString(), getContent());
     }
-
 }

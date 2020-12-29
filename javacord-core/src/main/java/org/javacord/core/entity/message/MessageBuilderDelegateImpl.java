@@ -85,6 +85,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      */
     private AllowedMentions allowedMentions = null;
 
+    /**
+     * The message to reply to.
+     */
+    private Long replyingTo = null;
+
     @Override
     public void appendCode(String language, String code) {
         strBuilder
@@ -271,6 +276,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
+    public void replyTo(long messageId) {
+        replyingTo = messageId;
+    }
+
+    @Override
     public void setNonce(String nonce) {
         this.nonce = nonce;
     }
@@ -319,6 +329,10 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         }
         if (nonce != null) {
             body.put("nonce", nonce);
+        }
+
+        if (replyingTo != null) {
+            body.putObject("message_reference").put("message_id", replyingTo);
         }
 
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
