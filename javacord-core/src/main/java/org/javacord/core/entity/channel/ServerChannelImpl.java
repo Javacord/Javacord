@@ -104,11 +104,11 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
                 int allow = permissionOverwrite.has("allow") ? permissionOverwrite.get("allow").asInt() : 0;
                 int deny = permissionOverwrite.has("deny") ? permissionOverwrite.get("deny").asInt() : 0;
                 Permissions permissions = new PermissionsImpl(allow, deny);
-                switch (permissionOverwrite.get("type").asText()) {
-                    case "role":
+                switch (permissionOverwrite.get("type").asInt()) {
+                    case 0:
                         overwrittenRolePermissions.put(id, permissions);
                         break;
-                    case "member":
+                    case 1:
                         overwrittenUserPermissions.put(id, permissions);
                         break;
                     default:

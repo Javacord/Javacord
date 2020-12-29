@@ -235,6 +235,13 @@ public interface MessageBuilderDelegate {
     void setAllowedMentions(AllowedMentions allowedMentions);
 
     /**
+     * Sets the message to reply to.
+     *
+     * @param messageId The id of the message to reply to.
+     */
+    void replyTo(long messageId);
+
+    /**
      * Sets the nonce of the message.
      *
      * @param nonce The nonce to set.
