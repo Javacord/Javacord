@@ -5,14 +5,22 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.event.server.role.UserRoleRemoveEvent;
+import org.javacord.api.event.user.UserChangeAvatarEvent;
+import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
+import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.server.role.UserRoleAddEventImpl;
 import org.javacord.core.event.server.role.UserRoleRemoveEventImpl;
+import org.javacord.core.event.user.UserChangeAvatarEventImpl;
+import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
+import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
@@ -20,7 +28,9 @@ import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -117,7 +127,78 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                         );
                     }
 
+                    // Update base user as well; GUILD_MEMBER_UDPATE is fired for user changes
+                    // to allow disabling presences, see
+                    // https://github.com/discord/discord-api-docs/pull/1307#issuecomment-581561519
+                    UserImpl oldUser = api.getCachedUserById(newMember.getId())
+                            .map(UserImpl.class::cast)
+                            .orElse(null);
+                    boolean userChanged = false;
+                    UserImpl updatedUser = null;
+                    if (oldUser != null) {
+                        updatedUser = oldUser.replacePartialUserData(packet.get("user"));
+                    }
+                    if (oldUser != null && packet.get("user").has("username")) {
+                        String newName = packet.get("user").get("username").asText();
+                        String oldName = oldUser.getName();
+                        if (!oldName.equals(newName)) {
+                            dispatchUserChangeNameEvent(updatedUser, newName, oldName);
+                            userChanged = true;
+                        }
+                    }
+                    if (oldUser != null && packet.get("user").has("discriminator")) {
+                        String newDiscriminator = packet.get("user").get("discriminator").asText();
+                        String oldDiscriminator = oldUser.getDiscriminator();
+                        if (!oldDiscriminator.equals(newDiscriminator)) {
+                            dispatchUserChangeDiscriminatorEvent(updatedUser, newDiscriminator, oldDiscriminator);
+                            userChanged = true;
+                        }
+                    }
+                    if (oldUser != null && packet.get("user").has("avatar")) {
+                        String newAvatarHash = packet.get("user").get("avatar").asText(null);
+                        String oldAvatarHash = oldUser.getAvatarHash();
+                        if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
+                            dispatchUserChangeAvatarEvent(updatedUser, newAvatarHash, oldAvatarHash);
+                            userChanged = true;
+                        }
+                    }
+                    if (oldUser != null && userChanged) {
+                        api.updateUserOfAllMembers(updatedUser);
+                    }
                 });
     }
 
+    private void dispatchUserChangeNameEvent(User user, String newName, String oldName) {
+        UserChangeNameEvent event = new UserChangeNameEventImpl(user, newName, oldName);
+
+        api.getEventDispatcher().dispatchUserChangeNameEvent(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
+    }
+
+    private void dispatchUserChangeDiscriminatorEvent(User user, String newDiscriminator, String oldDiscriminator) {
+        UserChangeDiscriminatorEvent event =
+                new UserChangeDiscriminatorEventImpl(user, newDiscriminator, oldDiscriminator);
+
+        api.getEventDispatcher().dispatchUserChangeDiscriminatorEvent(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
+    }
+
+    private void dispatchUserChangeAvatarEvent(User user, String newAvatarHash, String oldAvatarHash) {
+        UserChangeAvatarEvent event = new UserChangeAvatarEventImpl(user, newAvatarHash, oldAvatarHash);
+
+        api.getEventDispatcher().dispatchUserChangeAvatarEvent(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
+    }
 }
