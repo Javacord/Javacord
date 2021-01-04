@@ -573,7 +573,8 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     private <T> void internalFiller(Field field, T object) throws IllegalAccessException, NoSuchFieldException {
         if (object instanceof List<?>) {
             fields.addAll((Collection<? extends EmbedFieldImpl>) object);
-        } else
+        } else {
             getClass().getDeclaredField(field.getName()).set(this, object);
+        }
     }
 }
