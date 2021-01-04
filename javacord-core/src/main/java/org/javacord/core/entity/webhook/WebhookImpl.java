@@ -9,7 +9,10 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.entity.webhook.WebhookType;
+import org.javacord.api.util.Specializable;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.user.MemberImpl;
@@ -29,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link Webhook}.
  */
-public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerManager {
+public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, InternalWebhookAttachableListenerManager {
 
     /**
      * The logger of this class.
@@ -44,7 +47,7 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
     private final User user;
     private final String name;
     private final String avatarId;
-    private final String token;
+    private final WebhookType type;
 
     /**
      * Creates a new webhook.
@@ -52,9 +55,10 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
      * @param api The discord api instance.
      * @param data The json data of the webhook.
      */
-    public WebhookImpl(DiscordApi api, JsonNode data) {
+    protected WebhookImpl(DiscordApi api, JsonNode data) {
         this.api = (DiscordApiImpl) api;
 
+        this.type = WebhookType.fromValue(data.get("type").asInt());
         this.id = Long.parseLong(data.get("id").asText());
         this.serverId = data.has("guild_id") ? Long.parseLong(data.get("guild_id").asText()) : null;
         this.channelId = Long.parseLong(data.get("channel_id").asText());
@@ -62,7 +66,21 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
                 ? new UserImpl((DiscordApiImpl) api, data.get("user"), (MemberImpl) null, null) : null;
         this.name = data.has("name") && !data.get("name").isNull() ? data.get("name").asText() : null;
         this.avatarId = data.has("avatar") && !data.get("avatar").isNull() ? data.get("avatar").asText() : null;
-        this.token = data.has("token") ? data.get("token").asText() : null;
+    }
+
+    /**
+     * Creates a new webhook.
+     *
+     * @param api The discord api instance.
+     * @param data The json data of the webhook.
+     * @return The new webhook.
+     */
+    public static WebhookImpl createWebhook(DiscordApi api, JsonNode data) {
+        if (WebhookType.fromValue(data.get("type").asInt()) == WebhookType.INCOMING) {
+            return new IncomingWebhookImpl(api, data);
+        } else {
+            return new WebhookImpl(api, data);
+        }
     }
 
     @Override
@@ -82,7 +100,7 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
 
     @Override
     public Optional<Server> getServer() {
-        return getServerId().map(api::getServerById).filter(Optional::isPresent).map(Optional::get);
+        return getServerId().flatMap(api::getServerById);
     }
 
     @Override
@@ -93,6 +111,16 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
     @Override
     public long getChannelId() {
         return channelId;
+    }
+
+    @Override
+    public WebhookType getType() {
+        return type;
+    }
+
+    @Override
+    public Optional<IncomingWebhook> asIncomingWebhook() {
+        return isIncomingWebhook() ? Optional.of((IncomingWebhookImpl) this) : Optional.empty();
     }
 
     @Override
@@ -117,11 +145,6 @@ public class WebhookImpl implements Webhook, InternalWebhookAttachableListenerMa
             }
         }
         return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> getToken() {
-        return Optional.ofNullable(token);
     }
 
     @Override

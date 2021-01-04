@@ -27,6 +27,7 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
 
@@ -1921,6 +1922,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return A list of all webhooks in this server.
      */
     CompletableFuture<List<Webhook>> getWebhooks();
+
+    /**
+     * Gets a list of all incoming webhooks in this server.
+     *
+     * @return A list of all incoming webhooks in this server.
+     */
+    CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks();
 
     /**
      * Gets the audit log of this server.

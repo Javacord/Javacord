@@ -52,6 +52,17 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Returns a {@code WebhookMessageBuilder} according to this {@code Message}.
+     *
+     * @see WebhookMessageBuilder#fromMessage(Message)
+     *
+     * @return The {@code WebhookMessageBuilder}.
+     */
+    default WebhookMessageBuilder toWebhookMessageBuilder() {
+        return WebhookMessageBuilder.fromMessage(this);
+    }
+
+    /**
      * Deletes the message.
      *
      * @param api The discord api instance.
@@ -768,6 +779,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all roles mentioned in this message.
      */
     List<Role> getMentionedRoles();
+
+    /**
+     * Gets the nonce of the message.
+     *
+     * @return The nonce of the message.
+     */
+    Optional<String> getNonce();
 
     /**
      * Gets a list with all channels mentioned in this message.

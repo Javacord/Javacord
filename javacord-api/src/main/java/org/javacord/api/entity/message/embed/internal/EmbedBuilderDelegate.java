@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -424,6 +425,13 @@ public interface EmbedBuilderDelegate {
      * @return Whether the embed requires attachments or not.
      */
     boolean requiresAttachments();
+
+    /**
+     * Gives all fields the EmbedBuilder
+     *
+     * @return all fields as field array
+     */
+    Field[] getFields();
 
     /**
      * Clones all fields from an existing embed.
