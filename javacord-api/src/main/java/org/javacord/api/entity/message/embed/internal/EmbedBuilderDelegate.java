@@ -427,16 +427,16 @@ public interface EmbedBuilderDelegate {
     boolean requiresAttachments();
 
     /**
-     * Gives all fields the EmbedBuilder
+     * Gives all fields the EmbedBuilder.
      *
-     * @return all fields as field array
+     * @return all fields as field array.
      */
     Field[] getFields();
 
     /**
      * Clones all fields from an existing embed.
      *
-     * @param embed An existing embed.
+     * @param embed An existing embed to clone this instance.
      */
     void fillAll(EmbedBuilder embed);
 }
