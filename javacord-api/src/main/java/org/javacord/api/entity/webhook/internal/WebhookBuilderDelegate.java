@@ -1,7 +1,7 @@
 package org.javacord.api.entity.webhook.internal;
 
 import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.WebhookBuilder;
 
 import java.awt.image.BufferedImage;
@@ -104,6 +104,5 @@ public interface WebhookBuilderDelegate {
      *
      * @return The created webhook.
      */
-    CompletableFuture<Webhook> create();
-
+    CompletableFuture<IncomingWebhook> create();
 }

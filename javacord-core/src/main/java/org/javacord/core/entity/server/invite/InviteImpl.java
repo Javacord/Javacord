@@ -10,6 +10,7 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.server.invite.RichInvite;
+import org.javacord.api.entity.server.invite.TargetUserType;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
@@ -87,6 +88,16 @@ public class InviteImpl implements RichInvite {
      * The creator of the invite. May be <code>null</code>.
      */
     private final User inviter;
+
+    /**
+     * The target user of the invite. May be <code>null</code>.
+     */
+    private final User targetUser;
+
+    /**
+     * The target user type of the invite. May be <code>null</code>.
+     */
+    private final TargetUserType targetUserType;
 
     /**
      * The number of times this invite has been used.
@@ -185,6 +196,14 @@ public class InviteImpl implements RichInvite {
                 : null;
         this.approximatePresenceCount = (data.has("approximate_presence_count"))
                 ? data.get("approximate_presence_count").asInt()
+                : null;
+        MemberImpl targetMember = null;
+        this.targetUser = data.has("target_user")
+                ? new UserImpl((DiscordApiImpl) api, data.get("inviter"), targetMember,
+                getServer().map(ServerImpl.class::cast).orElse(null))
+                : null;
+        this.targetUserType = data.has("target_user_type")
+                ? TargetUserType.fromId(data.get("target_user_type").asInt())
                 : null;
 
         // Rich data (may not be present)
@@ -291,8 +310,18 @@ public class InviteImpl implements RichInvite {
     }
 
     @Override
-    public User getInviter() {
-        return inviter;
+    public Optional<User> getInviter() {
+        return Optional.ofNullable(inviter);
+    }
+
+    @Override
+    public Optional<User> getTargetUser() {
+        return Optional.ofNullable(targetUser);
+    }
+
+    @Override
+    public Optional<TargetUserType> getTargetUserType() {
+        return Optional.ofNullable(targetUserType);
     }
 
     @Override

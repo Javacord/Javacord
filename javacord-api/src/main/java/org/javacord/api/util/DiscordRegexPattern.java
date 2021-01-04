@@ -93,6 +93,19 @@ public class DiscordRegexPattern {
                             + "(?<message>[0-9]++)              # the message id as named group \n");
 
     /**
+     * A pattern which checks for webhook urls (e.g. {@code https://discord.com/api/webhooks/1234/abcd}
+     */
+    public static final Pattern WEBHOOK_URL =
+            Pattern.compile("(?x)                                   # enable comment mode \n"
+                            + "(?i)                                 # ignore case \n"
+                            + "(?:https?+://)?+                     # 'https://' or 'http://' or '' \n"
+                            + "(?:(?:canary|ptb)\\.)?+              # 'canary.' or 'ptb.'\n"
+                            + "discord(?:app)?+\\.com/api/webhooks/ # 'discord(app).com/api/webhooks' \n"
+                            + "(?<id>[0-9]++)                       # the webhook id as named group \n"
+                            + "/                                    # '/' \n"
+                            + "(?<token>[^/\\s]++)                  # the webhook token as named group \n");
+
+    /**
      * You are not meant to create instances of this class.
      */
     private DiscordRegexPattern() {
