@@ -557,11 +557,6 @@ public class EmbedBuilderDelegateImpl implements EmbedBuilderDelegate {
     }
 
     @Override
-    public Field[] getFields() {
-        return this.getClass().getDeclaredFields();
-    }
-
-    @Override
     public void fillAll(EmbedBuilder embed) {
         Field[] fields = getClass().getDeclaredFields();
 
