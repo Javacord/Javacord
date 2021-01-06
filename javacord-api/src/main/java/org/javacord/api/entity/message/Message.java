@@ -746,6 +746,37 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     MessageAuthor getAuthor();
 
     /**
+     * Gets the id of the message referenced with a reply.
+     * Only present if this message is type {@code MessageType.REPLY}.
+     *
+     * @return The id of the referenced message.
+     */
+    Optional<Long> getReferencedMessageId();
+
+    /**
+     * Gets the message referenced with a reply.
+     * Only present if this message is type {@code MessageType.REPLY},
+     * discord decided to send it and the message hasn't been deleted.
+     *
+     * @return The referenced message.
+     */
+    Optional<Message> getReferencedMessage();
+
+    /**
+     * Requests the message referenced with a reply.
+     *
+     * <p>If the message is in the cache, the message is served from the cache.
+     *
+     * @return The referenced message.
+     */
+    default Optional<CompletableFuture<Message>> requestReferencedMessage() {
+        return getReferencedMessageId().map(id ->
+                        getReferencedMessage().map(CompletableFuture::completedFuture)
+                .orElseGet(() -> getApi().getMessageById(id, getChannel())));
+    }
+
+
+    /**
      * Checks if the message is kept in cache forever.
      *
      * @return Whether the message is kept in cache forever or not.
@@ -1376,6 +1407,26 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             return true;
         }
         return getServerTextChannel().map(channel -> channel.canManageMessages(user)).orElse(false);
+    }
+
+    /**
+     * Replies to this message with the given text.
+     *
+     * @param messageContent The text to reply with.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> reply(String messageContent) {
+        return new MessageBuilder().replyTo(getId()).setContent(messageContent).send(getChannel());
+    }
+
+    /**
+     * Replies to this message with the given embed.
+     *
+     * @param embed The EmbedBuilder to reply with.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> reply(EmbedBuilder embed) {
+        return new MessageBuilder().replyTo(getId()).setEmbed(embed).send(getChannel());
     }
 
     /**

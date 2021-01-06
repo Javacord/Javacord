@@ -441,6 +441,28 @@ public class MessageBuilder {
     }
 
     /**
+     * Sets the message to reply to.
+     *
+     * @param message The the message to reply to.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder replyTo(Message message) {
+        delegate.replyTo(message.getId());
+        return this;
+    }
+
+    /**
+     * Sets the message to reply to.
+     *
+     * @param messageId The id of the message to reply to.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder replyTo(long messageId) {
+        delegate.replyTo(messageId);
+        return this;
+    }
+
+    /**
      * Sets the nonce of the message.
      *
      * @param nonce The nonce to set.
