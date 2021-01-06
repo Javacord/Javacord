@@ -5,8 +5,8 @@ import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.user.UserStatus;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * Internal class for easy caching of user presences.
@@ -14,7 +14,7 @@ import java.util.Collections;
 public class UserPresence {
 
     private final long userId;
-    private final Collection<Activity> activities;
+    private final Set<Activity> activities;
     private final UserStatus status;
     private final Map<DiscordClient, UserStatus> clientStatus;
 
@@ -26,7 +26,7 @@ public class UserPresence {
      * @param status The status.
      * @param clientStatus The client status.
      */
-    public UserPresence(long userId, Collection<Activity> activities, UserStatus status, Map<DiscordClient,
+    public UserPresence(long userId, Set<Activity> activities, UserStatus status, Map<DiscordClient,
             UserStatus> clientStatus) {
         this.userId = userId;
         this.activities = activities;
@@ -49,7 +49,7 @@ public class UserPresence {
      * @param activities The activities to set.
      * @return The new user presence with the updated activities.
      */
-    public UserPresence setActivities(Collection<Activity> activities) {
+    public UserPresence setActivities(Set<Activity> activities) {
         return new UserPresence(userId, activities, status, clientStatus);
     }
 
@@ -58,8 +58,8 @@ public class UserPresence {
      *
      * @return The presence's activities.
      */
-    public Collection<Activity> getActivities() {
-        return Collections.unmodifiableCollection(activities);
+    public Set<Activity> getActivities() {
+        return Collections.unmodifiableSet(activities);
     }
 
     /**

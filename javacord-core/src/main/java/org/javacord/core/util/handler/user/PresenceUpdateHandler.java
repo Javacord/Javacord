@@ -25,9 +25,9 @@ import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -57,7 +57,7 @@ public class PresenceUpdateHandler extends PacketHandler {
         );
 
         if (packet.hasNonNull("activities")) {
-            List<Activity> newActivities = new LinkedList<>();
+            Set<Activity> newActivities = new HashSet<>();
             for (JsonNode activityJson : packet.get("activities")) {
                 if (!activityJson.isNull()) {
                     newActivities.add(new ActivityImpl(api, activityJson));
