@@ -74,6 +74,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -420,14 +421,14 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     continue;
                 }
 
-                if (presenceJson.has("game")) {
-                    Activity activity;
-                    if (!presenceJson.get("game").isNull()) {
-                        activity = new ActivityImpl(api, presenceJson.get("game"));
-                    } else {
-                        activity = null;
+                if (presenceJson.hasNonNull("activities")) {
+                    List<Activity> activities = new LinkedList<>();
+                    for (JsonNode activityJson : presenceJson.get("activities")) {
+                        if (!activityJson.isNull()) {
+                            activities.add(new ActivityImpl(api, activityJson));
+                        }
                     }
-                    api.updateUserPresence(userId, presence -> presence.setActivity(activity));
+                    api.updateUserPresence(userId, presence -> presence.setActivities(activities));
                 }
                 if (presenceJson.has("status")) {
                     UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());

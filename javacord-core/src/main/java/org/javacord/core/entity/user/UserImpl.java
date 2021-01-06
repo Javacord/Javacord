@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -319,9 +320,9 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
-    public Optional<Activity> getActivity() {
+    public Collection<Activity> getActivities() {
         return api.getEntityCache().get().getUserPresenceCache().getPresenceByUserId(getId())
-                .map(UserPresence::getActivity);
+                .map(UserPresence::getActivities).orElse(Collections.emptySet());
     }
 
     @Override
