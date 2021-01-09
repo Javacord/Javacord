@@ -447,7 +447,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             websocket.addListener(this);
             websocket.addListener(new WebSocketLogger());
 
-            api.getGatewayIdentifyRatelimiter().requestQuota();
+            if (sessionId == null) {
+                api.getGatewayIdentifyRatelimiter().requestQuota();
+            }
             websocket.connect();
         } catch (Throwable t) {
             logger.warn("An error occurred while connecting to websocket", t);
