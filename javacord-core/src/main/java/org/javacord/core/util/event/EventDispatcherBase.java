@@ -6,15 +6,14 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -32,19 +31,24 @@ public abstract class EventDispatcherBase {
     private static final Logger logger = LoggerUtil.getLogger(EventDispatcherBase.class);
 
     /**
-     * The time which a listener task is allowed to take until it get's interrupted.
+     * The time which a listener task is allowed to take until it gets interrupted.
      */
-    private static final int MAX_EXECUTION_TIME_IN_SECONDS = 2 * 60; // 2 minutes
+    private static final long MAX_EXECUTION_TIME = TimeUnit.MINUTES.toNanos(2);
 
     /**
      * The time which a listener task is allowed to take until a warning appears on INFO log level.
      */
-    private static final int INFO_WARNING_DELAY_IN_SECONDS = 10; // 10 seconds
+    private static final long INFO_WARNING_DELAY = TimeUnit.SECONDS.toNanos(10);
 
     /**
      * The time which a listener task is allowed to take until a warning appears on DEBUG log level.
      */
-    private static final int DEBUG_WARNING_DELAY_IN_MILLIS = 500; // 500 milliseconds
+    private static final long DEBUG_WARNING_DELAY = TimeUnit.MILLISECONDS.toNanos(500);
+
+    /**
+     * The interval used to check for execution time.
+     */
+    private static final long EXECUTION_TIME_CHECKING_INTERVAL = TimeUnit.MILLISECONDS.toNanos(200);
 
     /**
      * Whether execution time checking should be enabled or not.
@@ -68,12 +72,18 @@ public abstract class EventDispatcherBase {
     private final Set<DispatchQueueSelector> runningListeners = Collections.synchronizedSet(new HashSet<>());
 
     /**
-     * A map with all running listeners as it's key. The value contains an array where the first element is a long
+     * A map with all running listeners as its key. The value contains an array where the first element is a long
      * with the start time of the listener (using {@link System#nanoTime()} and the second element is the object
      * of the listener (usually a server).
      */
     private final Map<AtomicReference<Future<?>>, Object[]> activeListeners =
             Collections.synchronizedMap(new HashMap<>());
+
+    /**
+     * A map with all running listeners that already were canceled as its key. The value is the nano time when there
+     * was a warning logged last for the respective listener.
+     */
+    private final Map<AtomicReference<Future<?>>, Long> alreadyCanceledListeners = new ConcurrentHashMap<>();
 
     /**
      * Creates a new event dispatcher.
@@ -88,53 +98,55 @@ public abstract class EventDispatcherBase {
                 if (!executionTimeCheckingEnabled) {
                     return;
                 }
-                List<DispatchQueueSelector> canceledObjects = new ArrayList<>();
                 synchronized (activeListeners) {
                     long currentNanoTime = System.nanoTime();
-                    Iterator<Map.Entry<AtomicReference<Future<?>>, Object[]>> iterator =
-                            activeListeners.entrySet().iterator();
-                    while (iterator.hasNext()) {
-                        Map.Entry<AtomicReference<Future<?>>, Object[]> entry = iterator.next();
+                    for (Map.Entry<AtomicReference<Future<?>>, Object[]> entry : activeListeners.entrySet()) {
                         long difference = currentNanoTime - ((long) entry.getValue()[0]);
                         DispatchQueueSelector queueSelector = (DispatchQueueSelector) entry.getValue()[1];
-                        if (difference > DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L
-                                && difference < DEBUG_WARNING_DELAY_IN_MILLIS * 1_000_000L + 201_000_000L) {
-                            logger.debug("Detected a {} which is now running for over {}ms ({}ms). This is"
+                        if ((difference > DEBUG_WARNING_DELAY)
+                                && (difference <= (DEBUG_WARNING_DELAY + EXECUTION_TIME_CHECKING_INTERVAL))) {
+                            logger.debug("Detected {} which is now running for over {} ms ({} ms). This is"
                                             + " an unusually long execution time for a listener task. Make"
                                             + " sure to not do any heavy computations in listener threads!",
                                     () -> getThreadType(queueSelector),
-                                    () -> DEBUG_WARNING_DELAY_IN_MILLIS,
-                                    () -> (int) (difference / 1_000_000L));
+                                    () -> TimeUnit.NANOSECONDS.toMillis(DEBUG_WARNING_DELAY),
+                                    () -> TimeUnit.NANOSECONDS.toMillis(difference));
                         }
-                        if (difference > INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L
-                                && difference < INFO_WARNING_DELAY_IN_SECONDS * 1_000_000_000L + 201_000_000L) {
-                            logger.warn("Detected a {} which is now running for over {} seconds ({}ms)."
+                        if ((difference > INFO_WARNING_DELAY)
+                                && (difference <= (INFO_WARNING_DELAY + EXECUTION_TIME_CHECKING_INTERVAL))) {
+                            logger.warn("Detected {} which is now running for over {} seconds ({} ms)."
                                             + " This is a very unusually long execution time for a listener task. Make"
                                             + " sure to not do any heavy computations in listener threads!",
                                     () -> getThreadType(queueSelector),
-                                    () -> INFO_WARNING_DELAY_IN_SECONDS,
-                                    () -> (int) (difference / 1_000_000L));
+                                    () -> TimeUnit.NANOSECONDS.toSeconds(INFO_WARNING_DELAY),
+                                    () -> TimeUnit.NANOSECONDS.toMillis(difference));
                         }
-                        if (difference > MAX_EXECUTION_TIME_IN_SECONDS * 1_000_000_000L) {
-                            entry.getKey().get().cancel(true);
-                            logger.error("Interrupted a {}, because it was running over {} seconds! This was most "
-                                            + "likely caused by a deadlock or very heavy computation/blocking "
-                                            + "operations in the listener thread. "
-                                            + "Make sure to not block listener threads!",
-                                    () -> getThreadType(queueSelector), () -> MAX_EXECUTION_TIME_IN_SECONDS);
-                            runningListeners.remove(queueSelector);
-                            iterator.remove();
-                            canceledObjects.add(queueSelector);
+                        if (difference > MAX_EXECUTION_TIME) {
+                            AtomicReference<Future<?>> listener = entry.getKey();
+                            alreadyCanceledListeners.compute(listener, (l, lastWarning) -> {
+                                if (lastWarning == null) {
+                                    listener.get().cancel(true);
+                                    logger.error("Interrupted {}, because it was running over {} seconds! "
+                                                    + "This was most likely caused by a deadlock or very heavy "
+                                                    + "computation/blocking operations in the listener thread. "
+                                                    + "Make sure to not block listener threads!",
+                                            () -> getThreadType(queueSelector),
+                                            () -> TimeUnit.NANOSECONDS.toSeconds(MAX_EXECUTION_TIME));
+                                    return currentNanoTime;
+                                } else if (currentNanoTime - lastWarning > INFO_WARNING_DELAY) {
+                                    logger.error("Interrupted {} previously but the listener did not react "
+                                                    + "to being interrupted! This is most likely caused by a deadlock "
+                                                    + "or very heavy computation in the listener thread. "
+                                                    + "Make sure to not block listener threads!",
+                                            () -> getThreadType(queueSelector));
+                                    return currentNanoTime;
+                                } else {
+                                    return lastWarning;
+                                }
+                            });
                         }
                     }
                 }
-                if (canceledObjects.isEmpty()) {
-                    // Inform the dispatchEvent method that it maybe can queue new listeners now
-                    synchronized (queuedListenerTasks) {
-                        queuedListenerTasks.notifyAll();
-                    }
-                }
-                canceledObjects.forEach(this::checkRunningListenersAndStartIfPossible);
             } catch (Throwable t) {
                 logger.error("Failed to check execution times!", t);
             }
@@ -267,6 +279,7 @@ public abstract class EventDispatcherBase {
                         logger.error("Unhandled exception in {}!", () -> getThreadType(finalQueueSelector), () -> t);
                     }
                     activeListeners.remove(activeListener);
+                    alreadyCanceledListeners.remove(activeListener);
                     runningListeners.remove(finalQueueSelector);
                     // Inform the dispatchEvent method that it maybe can queue new listeners now
                     synchronized (queuedListenerTasks) {
