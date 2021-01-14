@@ -156,7 +156,7 @@ public class FileContainer {
         fileAsUrl = file;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + file.getFile();
+        fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + new File(file.getFile()).getName();
     }
 
     /**
