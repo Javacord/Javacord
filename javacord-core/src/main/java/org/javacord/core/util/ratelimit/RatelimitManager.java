@@ -183,18 +183,18 @@ public class RatelimitManager {
         // Check if we received a 429 response
         if (result.getResponse().code() == 429) {
             int retryAfter = 0;
+            if (!result.getJsonBody().isNull()) {
+                if (result.getJsonBody().hasNonNull("retry_after")) {
+                    retryAfter = result.getJsonBody().get("retry_after").asInt();
+                } else {
+                    // The response code was 429, but "retry_after" is missing in the JSON response.
+                    // This means we hit a Cloudflare imposed global rate limit instead of Discord's usual rate limits.
+                    // Cloudflare puts the retry after value in a header instead of the JSON response.
+                    retryAfter = Integer.parseInt(response.header("Retry-After", "0"));
 
-            try {
-                retryAfter =
-                        result.getJsonBody().isNull() ? 0 : result.getJsonBody().get("retry_after").asInt();
-            } catch (NullPointerException exception) {
-                // The response code was 429, but "retry_after" is missing in the response body.
-                // This means we hit a Cloudflare imposed global rate limit instead of Discord's usual rate limits.
-                // Cloudflare puts the retry after value in a header instead of the JSON response.
-                retryAfter = Integer.parseInt(response.header("Retry-After", "0"));
-
-                // Cloudflare does not add the "X-RateLimit-Global" header like Discord does.
-                global = true;
+                    // Cloudflare does not add the "X-RateLimit-Global" header like Discord does.
+                    global = true;
+                }
             }
 
             if (global) {
