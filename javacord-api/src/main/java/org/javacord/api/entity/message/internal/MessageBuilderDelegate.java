@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message.internal;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -10,6 +11,7 @@ import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -69,11 +71,16 @@ public interface MessageBuilderDelegate {
     void setContent(String content);
 
     /**
-     * Sets the embed of the message.
+     * Adds the embed to the message.
      *
-     * @param embed The embed to set.
+     * @param embed The embed to add.
      */
-    void setEmbed(EmbedBuilder embed);
+    void addEmbed(EmbedBuilder embed);
+
+    /**
+     * Removes all embeds from the message.
+     */
+    void removeAllEmbeds();
 
     /**
      * Sets if the message should be text to speech.
@@ -228,6 +235,13 @@ public interface MessageBuilderDelegate {
     void setAllowedMentions(AllowedMentions allowedMentions);
 
     /**
+     * Sets the message to reply to.
+     *
+     * @param messageId The id of the message to reply to.
+     */
+    void replyTo(long messageId);
+
+    /**
      * Sets the nonce of the message.
      *
      * @param nonce The nonce to set.
@@ -260,8 +274,26 @@ public interface MessageBuilderDelegate {
     /**
      * Sends the message.
      *
+     * @param webhook The webhook from which the message should be sent.
+     * @return The sent message.
+     */
+    CompletableFuture<Message> send(IncomingWebhook webhook);
+
+    /**
+     * Sends the message.
+     *
      * @param messageable The receiver of the message.
      * @return The sent message.
      */
     CompletableFuture<Message> send(Messageable messageable);
+
+    /**
+     * Sends the message.
+     *
+     * @param api The api instance needed to send and return the message.
+     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param webhookToken The token of the webhook from which the message should be sent.
+     * @return The sent message.
+     */
+    CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken);
 }

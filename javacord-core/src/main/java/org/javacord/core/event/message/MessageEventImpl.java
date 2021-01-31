@@ -80,17 +80,17 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
     }
 
     @Override
-    public CompletableFuture<Void> editMessage(String content) {
+    public CompletableFuture<Message> editMessage(String content) {
         return Message.edit(getApi(), getChannel().getId(), getMessageId(), content, null);
     }
 
     @Override
-    public CompletableFuture<Void> editMessage(EmbedBuilder embed) {
+    public CompletableFuture<Message> editMessage(EmbedBuilder embed) {
         return Message.edit(getApi(), getChannel().getId(), getMessageId(), null, embed);
     }
 
     @Override
-    public CompletableFuture<Void> editMessage(String content, EmbedBuilder embed) {
+    public CompletableFuture<Message> editMessage(String content, EmbedBuilder embed) {
         return Message.edit(getApi(), getChannel().getId(), getMessageId(), content, embed);
     }
 

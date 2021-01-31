@@ -1,7 +1,7 @@
 package org.javacord.api.entity.message.mention;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This interface represents a mention.
@@ -9,24 +9,28 @@ import java.util.Optional;
 public interface AllowedMentions {
 
     /**
-     * Gets the allowed user mentions from the message.
+     * Gets the explicitly allowed user mentions from the message.
+     * This could differ from the actual mentioned roles if {@link AllowedMentionsBuilder#setMentionRoles(boolean)} has
+     * been set to true.
      *
-     * @return The allowed mentions for users of the message.
+     * @return The explicitly allowed mentions for users of the message.
      */
-    Optional<List<Long>> getAllowedRoleMentions();
+    List<Long> getAllowedRoleMentions();
 
     /**
-     * Gets the allowed role mentions from the message.
+     * Gets the explicitly allowed role mentions from the message.
+     * This could differ from the actual mentioned users if {@link AllowedMentionsBuilder#setMentionUsers(boolean)} has
+     * been set to true.
      *
-     * @return The allowed mentions for roles of the message.
+     * @return The explicitly allowed mentions for roles of the message.
      */
-    Optional<List<Long>> getAllowedUserMentions();
+    List<Long> getAllowedUserMentions();
 
     /**
-     * Gets the allowed general mentions from the message.
+     * Gets the explicitly allowed mention types from the message.
      *
-     * @return The general allowed mentions of the message.
+     * @return The allowed mention types of the message.
      */
-    Optional<List<String>> getGeneralMentions();
+    EnumSet<AllowedMentionType> getMentionTypes();
 
 }

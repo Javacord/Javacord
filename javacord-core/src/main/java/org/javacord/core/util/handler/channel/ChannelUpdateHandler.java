@@ -164,9 +164,9 @@ public class ChannelUpdateHandler extends PacketHandler {
                 Permissions oldOverwrittenPermissions;
                 ConcurrentHashMap<Long, Permissions> overwrittenPermissions;
                 long entityId = permissionOverwriteJson.get("id").asLong();
-                Optional<DiscordEntity> entity = Optional.empty();
-                switch (permissionOverwriteJson.get("type").asText()) {
-                    case "role":
+                Optional<DiscordEntity> entity;
+                switch (permissionOverwriteJson.get("type").asInt()) {
+                    case 0:
                         Role role = server.getRoleById(entityId).orElseThrow(() ->
                                 new IllegalStateException("Received channel update event with unknown role!"));
                         entity = Optional.of(role);
@@ -174,7 +174,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         overwrittenPermissions = channel.getInternalOverwrittenRolePermissions();
                         rolesWithOverwrittenPermissions.add(entityId);
                         break;
-                    case "member":
+                    case 1:
                         oldOverwrittenPermissions = channel.getOverwrittenUserPermissions()
                                 .getOrDefault(entityId, PermissionsImpl.EMPTY_PERMISSIONS);
                         entity = api.getCachedUserById(entityId).map(DiscordEntity.class::cast);

@@ -52,6 +52,38 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Returns a {@code WebhookMessageBuilder} according to this {@code Message}.
+     *
+     * @see WebhookMessageBuilder#fromMessage(Message)
+     *
+     * @return The {@code WebhookMessageBuilder}.
+     */
+    default WebhookMessageBuilder toWebhookMessageBuilder() {
+        return WebhookMessageBuilder.fromMessage(this);
+    }
+
+    /**
+     * Cross posts the message if it is in a announcement channel.
+     *
+     * @param api The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @return The new message object.
+     */
+    static CompletableFuture<Message> crossPost(DiscordApi api, long channelId, long messageId) {
+        return api.getUncachedMessageUtil().crossPost(channelId, messageId);
+    }
+
+    /**
+     * Cross posts the message if it is in a announcement channel.
+     *
+     * @return The new message object.
+     */
+    default CompletableFuture<Message> crossPost() {
+        return crossPost(getApi(), getChannel().getId(), getId());
+    }
+
+    /**
      * Deletes the message.
      *
      * @param api The discord api instance.
@@ -187,7 +219,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param content The new content of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, String content) {
+    static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, String content) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, null, false);
     }
 
@@ -200,7 +232,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param content The new content of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, String content) {
+    static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, String content) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, null, false);
     }
 
@@ -213,7 +245,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder embed) {
+    static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder embed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embed, true);
     }
 
@@ -226,7 +258,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, EmbedBuilder embed) {
+    static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, EmbedBuilder embed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embed, true);
     }
 
@@ -240,7 +272,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(
+    static CompletableFuture<Message> edit(
             DiscordApi api, long channelId, long messageId, String content, EmbedBuilder embed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embed, true);
     }
@@ -255,7 +287,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(
+    static CompletableFuture<Message> edit(
             DiscordApi api, String channelId, String messageId, String content, EmbedBuilder embed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embed, true);
     }
@@ -272,7 +304,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param updateEmbed Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(DiscordApi api, long channelId, long messageId, String content,
+    static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, String content,
                                         boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
     }
@@ -289,7 +321,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param updateEmbed Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Void> edit(DiscordApi api, String channelId, String messageId, String content,
+    static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, String content,
                                         boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
     }
@@ -300,7 +332,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param content The new content of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> edit(String content) {
+    default CompletableFuture<Message> edit(String content) {
         return Message.edit(getApi(), getChannel().getId(), getId(), content, true, null, false);
     }
 
@@ -310,7 +342,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> edit(EmbedBuilder embed) {
+    default CompletableFuture<Message> edit(EmbedBuilder embed) {
         return Message.edit(getApi(), getChannel().getId(), getId(), null, false, embed, true);
     }
 
@@ -321,7 +353,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param embed The new embed of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> edit(String content, EmbedBuilder embed) {
+    default CompletableFuture<Message> edit(String content, EmbedBuilder embed) {
         return Message.edit(getApi(), getChannel().getId(), getId(), content, true, embed, true);
     }
 
@@ -333,7 +365,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    static CompletableFuture<Void> removeContent(DiscordApi api, long channelId, long messageId) {
+    static CompletableFuture<Message> removeContent(DiscordApi api, long channelId, long messageId) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, false);
     }
 
@@ -345,7 +377,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    static CompletableFuture<Void> removeContent(DiscordApi api, String channelId, String messageId) {
+    static CompletableFuture<Message> removeContent(DiscordApi api, String channelId, String messageId) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, false);
     }
 
@@ -354,7 +386,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *
      * @return A future to check if the removal was successful.
      */
-    default CompletableFuture<Void> removeContent() {
+    default CompletableFuture<Message> removeContent() {
         return Message.edit(getApi(), getChannel().getId(), getId(), null, true, null, false);
     }
 
@@ -367,7 +399,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    static CompletableFuture<Void> removeEmbed(DiscordApi api, long channelId, long messageId) {
+    static CompletableFuture<Message> removeEmbed(DiscordApi api, long channelId, long messageId) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, null, true);
     }
 
@@ -379,7 +411,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    static CompletableFuture<Void> removeEmbed(DiscordApi api, String channelId, String messageId) {
+    static CompletableFuture<Message> removeEmbed(DiscordApi api, String channelId, String messageId) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, null, true);
     }
 
@@ -388,7 +420,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *
      * @return A future to check if the removal was successful.
      */
-    default CompletableFuture<Void> removeEmbed() {
+    default CompletableFuture<Message> removeEmbed() {
         return Message.edit(getApi(), getChannel().getId(), getId(), null, false, null, true);
     }
 
@@ -400,7 +432,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    static CompletableFuture<Void> removeContentAndEmbed(DiscordApi api, long channelId, long messageId) {
+    static CompletableFuture<Message> removeContentAndEmbed(DiscordApi api, long channelId, long messageId) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, true);
     }
 
@@ -412,7 +444,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
-    static CompletableFuture<Void> removeContentAndEmbed(DiscordApi api, String channelId, String messageId) {
+    static CompletableFuture<Message> removeContentAndEmbed(DiscordApi api, String channelId, String messageId) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, true);
     }
 
@@ -421,7 +453,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *
      * @return A future to check if the removal was successful.
      */
-    default CompletableFuture<Void> removeContentAndEmbed() {
+    default CompletableFuture<Message> removeContentAndEmbed() {
         return Message.edit(getApi(), getChannel().getId(), getId(), null, true, null, true);
     }
 
@@ -735,6 +767,37 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     MessageAuthor getAuthor();
 
     /**
+     * Gets the id of the message referenced with a reply.
+     * Only present if this message is type {@code MessageType.REPLY}.
+     *
+     * @return The id of the referenced message.
+     */
+    Optional<Long> getReferencedMessageId();
+
+    /**
+     * Gets the message referenced with a reply.
+     * Only present if this message is type {@code MessageType.REPLY},
+     * discord decided to send it and the message hasn't been deleted.
+     *
+     * @return The referenced message.
+     */
+    Optional<Message> getReferencedMessage();
+
+    /**
+     * Requests the message referenced with a reply.
+     *
+     * <p>If the message is in the cache, the message is served from the cache.
+     *
+     * @return The referenced message.
+     */
+    default Optional<CompletableFuture<Message>> requestReferencedMessage() {
+        return getReferencedMessageId().map(id ->
+                        getReferencedMessage().map(CompletableFuture::completedFuture)
+                .orElseGet(() -> getApi().getMessageById(id, getChannel())));
+    }
+
+
+    /**
      * Checks if the message is kept in cache forever.
      *
      * @return Whether the message is kept in cache forever or not.
@@ -768,6 +831,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list with all roles mentioned in this message.
      */
     List<Role> getMentionedRoles();
+
+    /**
+     * Gets the nonce of the message.
+     *
+     * @return The nonce of the message.
+     */
+    Optional<String> getNonce();
 
     /**
      * Gets a list with all channels mentioned in this message.
@@ -1358,6 +1428,26 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
             return true;
         }
         return getServerTextChannel().map(channel -> channel.canManageMessages(user)).orElse(false);
+    }
+
+    /**
+     * Replies to this message with the given text.
+     *
+     * @param messageContent The text to reply with.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> reply(String messageContent) {
+        return new MessageBuilder().replyTo(getId()).setContent(messageContent).send(getChannel());
+    }
+
+    /**
+     * Replies to this message with the given embed.
+     *
+     * @param embed The EmbedBuilder to reply with.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> reply(EmbedBuilder embed) {
+        return new MessageBuilder().replyTo(getId()).setEmbed(embed).send(getChannel());
     }
 
     /**

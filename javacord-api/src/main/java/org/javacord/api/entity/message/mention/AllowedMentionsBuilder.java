@@ -27,6 +27,7 @@ public class AllowedMentionsBuilder {
 
     /**
      * Mentions all mentioned roles.
+     * This will override any explicit role mentions added via {@link #addRole(long)} or {@link #addRoles(Collection)}
      *
      * @param value If roles should be mentioned or not.
      * @return The current instance in order to chain call methods.
@@ -38,6 +39,7 @@ public class AllowedMentionsBuilder {
 
     /**
      * Mentions all mentioned users.
+     * This will override any explicit user mentions added via {@link #addUser(long)} or {@link #addUsers(Collection)}
      *
      * @param value If users should be mentioned or not.
      * @return The current instance in order to chain call methods.
@@ -57,7 +59,6 @@ public class AllowedMentionsBuilder {
         delegate.setMentionEveryoneAndHere(value);
         return this;
     }
-
 
     /**
      * Adds a role to the list which will be mentioned.

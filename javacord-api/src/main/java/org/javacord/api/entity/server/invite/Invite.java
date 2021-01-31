@@ -4,6 +4,7 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -131,4 +132,24 @@ public interface Invite {
      */
     Optional<Integer> getApproximatePresenceCount();
 
+    /**
+     * Gets the user who created the invite.
+     *
+     * @return The user who created the invite, if available.
+     */
+    Optional<User> getInviter();
+
+    /**
+     * Gets the user which the invite was created for.
+     *
+     * @return The user which the invite was created for, if available.
+     */
+    Optional<User> getTargetUser();
+
+    /**
+     * Gets the user type which the invite was created for.
+     *
+     * @return The user type which the invite was created for, if available.
+     */
+    Optional<TargetUserType> getTargetUserType();
 }
