@@ -21,6 +21,15 @@ public enum MessageType {
     CHANNEL_ICON_CHANGE(5),
     CHANNEL_PINNED_MESSAGE(6),
     SERVER_MEMBER_JOIN(7),
+    USER_PREMIUM_SERVER_SUBSCRIPTION(8),
+    USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_1(9),
+    USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_2(10),
+    USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_3(11),
+    CHANNEL_FOLLOW_ADD(12),
+    SERVER_DISCOVERY_DISQUALIFIED(14),
+    SERVER_DISCOVERY_REQUALIFIED(15),
+    REPLY(19),
+    APPLICATION_COMMAND(20),
 
     /**
      * An unknown message type.
@@ -66,6 +75,24 @@ public enum MessageType {
                 return CHANNEL_PINNED_MESSAGE;
             case 7:
                 return SERVER_MEMBER_JOIN;
+            case 8:
+                return USER_PREMIUM_SERVER_SUBSCRIPTION;
+            case 9:
+                return USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_1;
+            case 10:
+                return USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_2;
+            case 11:
+                return USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_3;
+            case 12:
+                return CHANNEL_FOLLOW_ADD;
+            case 14:
+                return SERVER_DISCOVERY_DISQUALIFIED;
+            case 15:
+                return SERVER_DISCOVERY_REQUALIFIED;
+            case 19:
+                return REPLY;
+            case 20:
+                return APPLICATION_COMMAND;
             default:
                 return UNKNOWN;
         }

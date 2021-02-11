@@ -51,6 +51,15 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
+    public CompletableFuture<Message> crossPost(String channelId, String messageId) {
+        return new RestRequest<Message>(api, RestMethod.POST, RestEndpoint.MESSAGE)
+                .setUrlParameters(channelId, messageId, "crosspost")
+                .execute(result ->
+                        new MessageImpl(api, api.getTextChannelById(channelId).orElseThrow(() ->
+                                new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
+    }
+
+    @Override
     public CompletableFuture<Void> delete(long channelId, long messageId) {
         return delete(channelId, messageId, null);
     }
@@ -149,39 +158,39 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<Void> edit(long channelId, long messageId, String content) {
+    public CompletableFuture<Message> edit(long channelId, long messageId, String content) {
         return edit(channelId, messageId, content, true, null, false);
     }
 
     @Override
-    public CompletableFuture<Void> edit(String channelId, String messageId, String content) {
+    public CompletableFuture<Message> edit(String channelId, String messageId, String content) {
         return edit(channelId, messageId, content, true, null, false);
     }
 
     @Override
-    public CompletableFuture<Void> edit(long channelId, long messageId, EmbedBuilder embed) {
+    public CompletableFuture<Message> edit(long channelId, long messageId, EmbedBuilder embed) {
         return edit(channelId, messageId, null, false, embed, true);
     }
 
     @Override
-    public CompletableFuture<Void> edit(String channelId, String messageId, EmbedBuilder embed) {
+    public CompletableFuture<Message> edit(String channelId, String messageId, EmbedBuilder embed) {
         return edit(channelId, messageId, null, false, embed, true);
     }
 
     @Override
-    public CompletableFuture<Void> edit(
+    public CompletableFuture<Message> edit(
             long channelId, long messageId, String content, EmbedBuilder embed) {
         return edit(channelId, messageId, content, true, embed, true);
     }
 
     @Override
-    public CompletableFuture<Void> edit(
+    public CompletableFuture<Message> edit(
             String channelId, String messageId, String content, EmbedBuilder embed) {
         return edit(channelId, messageId, content, true, embed, true);
     }
 
     @Override
-    public CompletableFuture<Void> edit(long channelId, long messageId, String content,
+    public CompletableFuture<Message> edit(long channelId, long messageId, String content,
                                         boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         if (updateContent) {
@@ -198,51 +207,52 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                 ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
             }
         }
-        return new RestRequest<Void>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
+        return new RestRequest<Message>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
                 .setBody(body)
-                .execute(result -> null);
+                .execute(result -> new MessageImpl(api, api.getTextChannelById(channelId).orElseThrow(() ->
+                                new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<Void> edit(String channelId, String messageId, String content,
+    public CompletableFuture<Message> edit(String channelId, String messageId, String content,
                                         boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
         try {
             return edit(Long.parseLong(channelId), Long.parseLong(messageId), content, true, embed, true);
         } catch (NumberFormatException e) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
+            CompletableFuture<Message> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;
         }
     }
 
     @Override
-    public CompletableFuture<Void> removeContent(long channelId, long messageId) {
+    public CompletableFuture<Message> removeContent(long channelId, long messageId) {
         return edit(channelId, messageId, null, true, null, false);
     }
 
     @Override
-    public CompletableFuture<Void> removeContent(String channelId, String messageId) {
+    public CompletableFuture<Message> removeContent(String channelId, String messageId) {
         return edit(channelId, messageId, null, true, null, false);
     }
 
     @Override
-    public CompletableFuture<Void> removeEmbed(long channelId, long messageId) {
+    public CompletableFuture<Message> removeEmbed(long channelId, long messageId) {
         return edit(channelId, messageId, null, false, null, true);
     }
 
     @Override
-    public CompletableFuture<Void> removeEmbed(String channelId, String messageId) {
+    public CompletableFuture<Message> removeEmbed(String channelId, String messageId) {
         return edit(channelId, messageId, null, false, null, true);
     }
 
     @Override
-    public CompletableFuture<Void> removeContentAndEmbed(long channelId, long messageId) {
+    public CompletableFuture<Message> removeContentAndEmbed(long channelId, long messageId) {
         return edit(channelId, messageId, null, true, null, true);
     }
 
     @Override
-    public CompletableFuture<Void> removeContentAndEmbed(String channelId, String messageId) {
+    public CompletableFuture<Message> removeContentAndEmbed(String channelId, String messageId) {
         return edit(channelId, messageId, null, true, null, true);
     }
 

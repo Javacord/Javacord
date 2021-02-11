@@ -88,14 +88,14 @@ public class ServerChannelBuilderDelegateImpl implements ServerChannelBuilderDel
         for (Map.Entry<Long, Permissions> entry : overwrittenUserPermissions.entrySet()) {
             permissionOverwrites.addObject()
                     .put("id", Long.toUnsignedString(entry.getKey()))
-                    .put("type", "member")
+                    .put("type", 1)
                     .put("allow", entry.getValue().getAllowedBitmask())
                     .put("deny", entry.getValue().getDeniedBitmask());
         }
         for (Map.Entry<Long, Permissions> entry : overwrittenRolePermissions.entrySet()) {
             permissionOverwrites.addObject()
                     .put("id", Long.toUnsignedString(entry.getKey()))
-                    .put("type", "role")
+                    .put("type", 0)
                     .put("allow", entry.getValue().getAllowedBitmask())
                     .put("deny", entry.getValue().getDeniedBitmask());
         }

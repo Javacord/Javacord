@@ -162,7 +162,7 @@ public class WebhookBuilder {
      *
      * @return The created webhook.
      */
-    public CompletableFuture<Webhook> create() {
+    public CompletableFuture<IncomingWebhook> create() {
         return delegate.create();
     }
 

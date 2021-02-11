@@ -26,6 +26,7 @@ import org.javacord.api.entity.server.ServerBuilder;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
@@ -415,6 +416,43 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The webhook with the given id.
      */
     CompletableFuture<Webhook> getWebhookById(long id);
+
+    /**
+     * Gets an incoming webhook by its id and its token.
+     *
+     * @param id The id of the incoming webhook.
+     * @param token The token of the incoming webhook.
+     * @return The incoming webhook with the given id.
+     */
+    CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(String id, String token);
+
+    /**
+     * Gets an incoming webhook by its id and its token.
+     *
+     * @param id The id of the incoming webhook.
+     * @param token The token of the incoming webhook.
+     * @return The incoming webhook with the given id.
+     */
+    default CompletableFuture<IncomingWebhook> getIncomingWebhookByIdAndToken(long id, String token) {
+        return getIncomingWebhookByIdAndToken(Long.toUnsignedString(id), token);
+    }
+
+    /**
+     * Gets a webhook by its url.
+     *
+     * @param url The url of the message.
+     * @return The incoming webhook with the given url.
+     * @throws IllegalArgumentException If the link isn't valid.
+     */
+    default CompletableFuture<IncomingWebhook> getIncomingWebhookByUrl(String url) throws IllegalArgumentException {
+        Matcher matcher = DiscordRegexPattern.WEBHOOK_URL.matcher(url);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("The webhook url has an invalid format");
+        }
+
+        return getIncomingWebhookByIdAndToken(matcher.group("id"), matcher.group("token"));
+    }
 
     /**
      * Gets a collection with the ids of all unavailable servers.

@@ -1,20 +1,11 @@
 package org.javacord.api.entity.server.invite;
 
-import org.javacord.api.entity.user.User;
-
 import java.time.Instant;
 
 /**
  * This class represents an invite with additional information like expire date, creator, etc.
  */
 public interface RichInvite extends Invite {
-
-    /**
-     * Gets the user who created the invite.
-     *
-     * @return The user who created the invite.
-     */
-    User getInviter();
 
     /**
      * Gets the number of times this invite has been used.
