@@ -214,7 +214,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param userId The id of the user to check.
      * @return Whether the user with the given id is self-deafened.
      */
-    default boolean isSelfDeafened(long userId){
+    default boolean isSelfDeafened(long userId) {
         return getConnectedVoiceChannel(userId)
                 .map(voiceChannel -> voiceChannel.isSelfDeafened(userId))
                 .orElse(false);
