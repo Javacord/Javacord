@@ -164,9 +164,9 @@ public class ChannelUpdateHandler extends PacketHandler {
                 Permissions oldOverwrittenPermissions;
                 ConcurrentHashMap<Long, Permissions> overwrittenPermissions;
                 long entityId = permissionOverwriteJson.get("id").asLong();
-                Optional<DiscordEntity> entity = Optional.empty();
-                switch (permissionOverwriteJson.get("type").asText()) {
-                    case "role":
+                Optional<DiscordEntity> entity;
+                switch (permissionOverwriteJson.get("type").asInt()) {
+                    case 0:
                         Role role = server.getRoleById(entityId).orElseThrow(() ->
                                 new IllegalStateException("Received channel update event with unknown role!"));
                         entity = Optional.of(role);
@@ -174,7 +174,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         overwrittenPermissions = channel.getInternalOverwrittenRolePermissions();
                         rolesWithOverwrittenPermissions.add(entityId);
                         break;
-                    case "member":
+                    case 1:
                         oldOverwrittenPermissions = channel.getOverwrittenUserPermissions()
                                 .getOrDefault(entityId, PermissionsImpl.EMPTY_PERMISSIONS);
                         entity = api.getCachedUserById(entityId).map(DiscordEntity.class::cast);
@@ -185,8 +185,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                         throw new IllegalStateException("Permission overwrite object with unknown type: "
                                 + permissionOverwriteJson);
                 }
-                int allow = permissionOverwriteJson.get("allow").asInt(0);
-                int deny = permissionOverwriteJson.get("deny").asInt(0);
+                long allow = permissionOverwriteJson.get("allow").asLong(0);
+                long deny = permissionOverwriteJson.get("deny").asLong(0);
                 Permissions newOverwrittenPermissions = new PermissionsImpl(allow, deny);
                 if (!newOverwrittenPermissions.equals(oldOverwrittenPermissions)) {
                     overwrittenPermissions.put(entityId, newOverwrittenPermissions);

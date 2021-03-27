@@ -3,6 +3,7 @@ package org.javacord.api.entity;
 import org.javacord.api.entity.message.Messageable;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -40,8 +41,9 @@ public interface Icon {
      * This can be used for {@link Messageable#sendMessage(InputStream, String)}
      *
      * @return The input stream for the icon.
+     * @throws IOException If an IO error occurs.
      */
-    CompletableFuture<InputStream> asInputStream();
+    InputStream asInputStream() throws IOException;
 
     /**
      * Gets the icon as {@link BufferedImage}.

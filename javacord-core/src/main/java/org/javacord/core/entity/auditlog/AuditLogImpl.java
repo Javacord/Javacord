@@ -68,7 +68,7 @@ public class AuditLogImpl implements AuditLog {
             boolean alreadyAdded = involvedWebhooks.stream()
                     .anyMatch(webhook -> webhook.getId() == webhookJson.get("id").asLong());
             if (!alreadyAdded) {
-                involvedWebhooks.add(new WebhookImpl(api, webhookJson));
+                involvedWebhooks.add(WebhookImpl.createWebhook(api, webhookJson));
             }
         }
         for (JsonNode userJson : data.get("users")) {

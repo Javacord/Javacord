@@ -86,9 +86,9 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
     /**
      * Creates a new server channel object.
      *
-     * @param api The discord api instance.
+     * @param api    The discord api instance.
      * @param server The server of the channel.
-     * @param data The json data of the channel.
+     * @param data   The json data of the channel.
      */
     public ServerChannelImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
         this.api = api;
@@ -101,14 +101,14 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
         if (data.has("permission_overwrites")) {
             for (JsonNode permissionOverwrite : data.get("permission_overwrites")) {
                 long id = Long.parseLong(permissionOverwrite.has("id") ? permissionOverwrite.get("id").asText() : "-1");
-                int allow = permissionOverwrite.has("allow") ? permissionOverwrite.get("allow").asInt() : 0;
-                int deny = permissionOverwrite.has("deny") ? permissionOverwrite.get("deny").asInt() : 0;
+                long allow = permissionOverwrite.has("allow") ? permissionOverwrite.get("allow").asLong() : 0;
+                long deny = permissionOverwrite.has("deny") ? permissionOverwrite.get("deny").asLong() : 0;
                 Permissions permissions = new PermissionsImpl(allow, deny);
-                switch (permissionOverwrite.get("type").asText()) {
-                    case "role":
+                switch (permissionOverwrite.get("type").asInt()) {
+                    case 0:
                         overwrittenRolePermissions.put(id, permissions);
                         break;
-                    case "member":
+                    case 1:
                         overwrittenUserPermissions.put(id, permissions);
                         break;
                     default:

@@ -3,22 +3,20 @@ package org.javacord.core.entity.message.mention;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.message.mention.AllowedMentionType;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
 public class AllowedMentionsImpl implements AllowedMentions {
 
 
     private final List<Long> allowedRoleMentions;
     private final List<Long> allowedUserMentions;
-    private final List<String> generalMentions;
 
-    private final boolean mentionAllRoles;
-    private final boolean mentionAllUsers;
-    private final boolean mentionEveryoneAndHere;
+    private final EnumSet<AllowedMentionType> allowedMentionTypes = EnumSet.noneOf(AllowedMentionType.class);
 
     /**
      * Creates a new mention.
@@ -31,52 +29,32 @@ public class AllowedMentionsImpl implements AllowedMentions {
      */
     public AllowedMentionsImpl(boolean mentionAllRoles, boolean mentionAllUsers, boolean mentionEveryoneAndHere,
                                ArrayList<Long> allowedRoleMentions, ArrayList<Long> allowedUserMentions) {
-        this.mentionAllRoles = mentionAllRoles;
-        this.mentionAllUsers = mentionAllUsers;
-        this.mentionEveryoneAndHere = mentionEveryoneAndHere;
-
-
-        if (allowedRoleMentions == null || allowedRoleMentions.isEmpty()) {
-            this.allowedRoleMentions = null;
-        } else {
-            this.allowedRoleMentions = allowedRoleMentions;
+        this.allowedRoleMentions = allowedRoleMentions;
+        this.allowedUserMentions = allowedUserMentions;
+        if (mentionAllRoles) {
+            allowedMentionTypes.add(AllowedMentionType.ROLES);
         }
-
-        if (allowedUserMentions == null || allowedUserMentions.isEmpty()) {
-            this.allowedUserMentions = null;
-        } else {
-            this.allowedUserMentions = allowedUserMentions;
+        if (mentionAllUsers) {
+            allowedMentionTypes.add(AllowedMentionType.USERS);
         }
-
-        if (mentionAllRoles || mentionAllUsers || mentionEveryoneAndHere) {
-            generalMentions = new ArrayList<>();
-            if (mentionAllRoles) {
-                generalMentions.add("roles");
-            }
-            if (mentionAllUsers) {
-                generalMentions.add("users");
-            }
-            if (mentionEveryoneAndHere) {
-                generalMentions.add("everyone");
-            }
-        } else {
-            generalMentions = null;
+        if (mentionEveryoneAndHere) {
+            allowedMentionTypes.add(AllowedMentionType.EVERYONE);
         }
     }
 
     @Override
-    public Optional<List<Long>> getAllowedRoleMentions() {
-        return Optional.ofNullable(allowedRoleMentions);
+    public List<Long> getAllowedRoleMentions() {
+        return allowedRoleMentions;
     }
 
     @Override
-    public Optional<List<Long>> getAllowedUserMentions() {
-        return Optional.ofNullable(allowedUserMentions);
+    public List<Long> getAllowedUserMentions() {
+        return allowedUserMentions;
     }
 
     @Override
-    public Optional<List<String>> getGeneralMentions() {
-        return Optional.ofNullable(generalMentions);
+    public EnumSet<AllowedMentionType> getMentionTypes() {
+        return allowedMentionTypes;
     }
 
     /**
@@ -97,32 +75,27 @@ public class AllowedMentionsImpl implements AllowedMentions {
      */
     public ObjectNode toJsonNode(ObjectNode object) {
         ArrayNode parse = object.putArray("parse");
-        ArrayNode users = object.putArray("users");
-        ArrayNode roles = object.putArray("roles");
 
-        if (mentionAllRoles) {
+        if (allowedMentionTypes.contains(AllowedMentionType.ROLES)) {
             parse.add("roles");
         } else {
-            if (allowedRoleMentions.size() > 100) {
-                allowedRoleMentions.subList(0, 99).forEach(aLong -> roles.add(aLong.toString()));
-            } else {
-                allowedRoleMentions.forEach(aLong -> roles.add(aLong.toString()));
-            }
+            ArrayNode roles = object.putArray("roles");
+            allowedRoleMentions
+                    .forEach(id -> roles.add(id.toString()));
         }
 
-        if (mentionAllUsers) {
+        if (allowedMentionTypes.contains(AllowedMentionType.USERS)) {
             parse.add("users");
         } else {
-            if (allowedUserMentions.size() > 100) {
-                allowedUserMentions.subList(0, 99).forEach(aLong -> users.add(aLong.toString()));
-            } else {
-                allowedUserMentions.forEach(aLong -> users.add(aLong.toString()));
-            }
+            ArrayNode users = object.putArray("users");
+            allowedUserMentions
+                    .forEach(id -> users.add(id.toString()));
         }
 
-        if (mentionEveryoneAndHere) {
+        if (allowedMentionTypes.contains(AllowedMentionType.EVERYONE)) {
             parse.add("everyone");
         }
+
         return object;
     }
 }

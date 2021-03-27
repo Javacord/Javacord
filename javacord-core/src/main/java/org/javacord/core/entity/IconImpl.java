@@ -56,14 +56,8 @@ public class IconImpl implements Icon {
     }
 
     @Override
-    public CompletableFuture<InputStream> asInputStream() {
-        CompletableFuture<InputStream> result = new CompletableFuture<>();
-        try {
-            result.complete(new FileContainer(getUrl()).asInputStream(getApi()));
-        } catch (IOException e) {
-            result.completeExceptionally(e);
-        }
-        return result;
+    public InputStream asInputStream() throws IOException {
+        return new FileContainer(getUrl()).asInputStream(getApi());
     }
 
     @Override

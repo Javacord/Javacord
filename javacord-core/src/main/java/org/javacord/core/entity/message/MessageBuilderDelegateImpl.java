@@ -1,10 +1,14 @@
 package org.javacord.core.entity.message;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.apache.logging.log4j.Logger;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -15,11 +19,13 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.util.FileContainer;
+import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
@@ -40,6 +46,11 @@ import java.util.concurrent.CompletableFuture;
 public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
 
     /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(MessageBuilderDelegateImpl.class);
+
+    /**
      * The receiver of the message.
      */
     private Messageable messageable = null;
@@ -50,9 +61,9 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     private final StringBuilder strBuilder = new StringBuilder();
 
     /**
-     * The embed of the message. Might be <code>null</code>.
+     * The list of embeds of the message.
      */
-    private EmbedBuilder embed = null;
+    protected List<EmbedBuilder> embeds = new ArrayList<>();
 
     /**
      * If the message should be text to speech or not.
@@ -73,6 +84,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      * The MentionsBuilder used to control mention behavior.
      */
     private AllowedMentions allowedMentions = null;
+
+    /**
+     * The message to reply to.
+     */
+    private Long replyingTo = null;
 
     @Override
     public void appendCode(String language, String code) {
@@ -118,8 +134,15 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
-    public void setEmbed(EmbedBuilder embed) {
-        this.embed = embed;
+    public void addEmbed(EmbedBuilder embed) {
+        if (embed != null) {
+            embeds.add(embed);
+        }
+    }
+
+    @Override
+    public void removeAllEmbeds() {
+        embeds.clear();
     }
 
     @Override
@@ -253,6 +276,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
+    public void replyTo(long messageId) {
+        replyingTo = messageId;
+    }
+
+    @Override
     public void setNonce(String nonce) {
         this.nonce = nonce;
     }
@@ -278,6 +306,8 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             return ((User) messageable).openPrivateChannel().thenCompose(this::send);
         } else if (messageable instanceof Member) {
             return send(((Member) messageable).getUser());
+        } else if (messageable instanceof IncomingWebhook) {
+            return send((IncomingWebhook) messageable);
         }
         throw new IllegalStateException("Messageable of unknown type");
     }
@@ -293,43 +323,34 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         if (allowedMentions != null) {
             ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
         }
-        if (embed != null) {
-            ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
+        if (embeds.size() > 0) {
+            // As only messages sent by webhooks can contain more than one embed, it is enough to add the first.
+            ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).toJsonNode(body.putObject("embed"));
         }
         if (nonce != null) {
             body.put("nonce", nonce);
         }
 
+        if (replyingTo != null) {
+            body.putObject("message_reference").put("message_id", replyingTo);
+        }
+
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(channel.getIdAsString());
-        if (!attachments.isEmpty() || (embed != null && embed.requiresAttachments())) {
+        if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             // We access files etc. so this should be async
             channel.getApi().getThreadPool().getExecutorService().submit(() -> {
                 try {
-                    MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart("payload_json", body.toString());
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
                     // Add the attachments required for the embed
-                    if (embed != null) {
+                    if (embeds.size() > 0) {
                         tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
-                    }
-                    Collections.reverse(tempAttachments);
-                    for (int i = 0; i < tempAttachments.size(); i++) {
-                        byte[] bytes = tempAttachments.get(i).asByteArray(channel.getApi()).join();
-
-                        String mediaType = URLConnection
-                                .guessContentTypeFromName(tempAttachments.get(i).getFileTypeOrName());
-                        if (mediaType == null) {
-                            mediaType = "application/octet-stream";
-                        }
-                        multipartBodyBuilder.addFormDataPart("file" + i, tempAttachments.get(i).getFileTypeOrName(),
-                                RequestBody.create(MediaType.parse(mediaType), bytes));
+                                ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).getRequiredAttachments());
                     }
 
-                    request.setMultipartBody(multipartBodyBuilder.build());
+                    addMultipartBodyToRequest(request, body, tempAttachments, channel.getApi());
+
                     request.execute(result -> ((DiscordApiImpl) channel.getApi())
                             .getOrCreateMessage(channel, result.getJsonBody()))
                             .whenComplete((message, throwable) -> {
@@ -349,6 +370,148 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             return request.execute(result -> ((DiscordApiImpl) channel.getApi())
                     .getOrCreateMessage(channel, result.getJsonBody()));
         }
+    }
+
+    @Override
+    public CompletableFuture<Message> send(IncomingWebhook webhook) {
+        return send(webhook.getIdAsString(), webhook.getToken(), null, null, true, webhook.getApi());
+    }
+
+    /**
+     * Send a message to an incoming webhook.
+     *
+     *
+     * @param webhookId The id of the webhook to send the message to
+     * @param webhookToken The token of the webhook to send the message to
+     * @param displayName The display name the webhook should use
+     * @param avatarUrl The avatar the webhook should use
+     * @param wait If the completable future will be completed
+     * @param api The api instance needed to send and return the message
+     * @return The sent message
+     */
+    protected CompletableFuture<Message> send(String webhookId, String webhookToken, String displayName, URL avatarUrl,
+                                              boolean wait, DiscordApi api) {
+        ObjectNode body = JsonNodeFactory.instance.objectNode()
+                .put("tts", this.tts);
+
+        if (allowedMentions != null) {
+            ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
+        }
+
+        if (displayName != null) {
+            body.put("username", displayName);
+        }
+
+        if (avatarUrl != null) {
+            body.put("avatar_url", avatarUrl.toExternalForm());
+        }
+
+        if (embeds.size() != 0) {
+            ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
+            for (int i = 0; i < embeds.size() && i < 10; i++) {
+                embedsNode.add(((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).toJsonNode());
+            }
+            body.set("embeds", embedsNode);
+        }
+
+        if (strBuilder.length() != 0) {
+            body.put("content", strBuilder.toString());
+        }
+
+        RestRequest<Message> request =
+                new RestRequest<Message>(api, RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
+                        .addQueryParameter("wait", Boolean.toString(wait))
+                        .setUrlParameters(webhookId, webhookToken);
+        CompletableFuture<Message> future = new CompletableFuture<>();
+        if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
+            // We access files etc. so this should be async
+            api.getThreadPool().getExecutorService().submit(() -> {
+                try {
+                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                    // Add the attachments required for the embeds
+                    for (int i = 0; i < embeds.size() && i < 10; i++) {
+                        tempAttachments.addAll(
+                                ((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).getRequiredAttachments());
+                    }
+
+                    addMultipartBodyToRequest(request, body, tempAttachments, api);
+
+                    executeWebhookRest(request, wait, future, api);
+                } catch (Throwable t) {
+                    future.completeExceptionally(t);
+                }
+            });
+        } else {
+            request.setBody(body);
+            executeWebhookRest(request, wait, future, api);
+        }
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken) {
+        return send(webhookId, webhookToken, null, null, true, api);
+    }
+
+    /**
+     * Method which creates and adds a MultipartBody to a RestRequest.
+     *
+     * @param request The RestRequest to add the MultipartBody to
+     * @param body The body to use as base for the MultipartBody
+     * @param attachments The List of FileContainers to add as attachments
+     * @param api The api instance needed to add the attachments
+     */
+    private void addMultipartBodyToRequest(RestRequest<Message> request, ObjectNode body,
+                                           List<FileContainer> attachments, DiscordApi api) {
+        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("payload_json", body.toString());
+
+        Collections.reverse(attachments);
+        for (int i = 0; i < attachments.size(); i++) {
+            byte[] bytes = attachments.get(i).asByteArray(api).join();
+
+            String mediaType = URLConnection
+                    .guessContentTypeFromName(attachments.get(i).getFileTypeOrName());
+            if (mediaType == null) {
+                mediaType = "application/octet-stream";
+            }
+            multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileTypeOrName(),
+                    RequestBody.create(MediaType.parse(mediaType), bytes));
+        }
+
+        request.setMultipartBody(multipartBodyBuilder.build());
+    }
+
+    /**
+     * Method which executes the webhook rest request.
+     *
+     * @param request The rest request to execute
+     * @param wait If discord sends us a response
+     * @param future The future to complete
+     * @param api The api instance needed to create the message
+     */
+    private static void executeWebhookRest(RestRequest<Message> request, boolean wait,
+                                           CompletableFuture<Message> future, DiscordApi api) {
+        CompletableFuture<Message> tmpFuture;
+        if (wait) {
+            tmpFuture = request.execute(result -> {
+                JsonNode body = result.getJsonBody();
+                TextChannel channel = api.getTextChannelById(body.get("channel_id").asText()).orElseThrow(() ->
+                        new IllegalStateException("Cannot return a message when the channel isn't cached!")
+                );
+                return ((DiscordApiImpl) api).getOrCreateMessage(channel, body);
+            });
+        } else {
+            tmpFuture = request.execute(result -> null);
+        }
+        tmpFuture.whenComplete((message, throwable) -> {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+            } else {
+                future.complete(message);
+            }
+        });
     }
 
     @Override
