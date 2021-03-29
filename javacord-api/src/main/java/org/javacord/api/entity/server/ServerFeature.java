@@ -26,9 +26,9 @@ public enum ServerFeature {
      */
     PARTNERED,
     /**
-     * Server is public.
+     * Server is a community server.
      */
-    PUBLIC,
+    COMMUNITY,
     /**
      * Server has access to use commerce features (i.e. create store channels).
      */
@@ -54,15 +54,15 @@ public enum ServerFeature {
      */
     BANNER,
     /**
-     * Server cannot be public.
-     */
-    PUBLIC_DISABLED,
-    /**
      * Server has enabled the welcome screen.
      */
     WELCOME_SCREEN_ENABLED,
     /**
-     * Server is a community server.
+     * Server has enabled <a href="https://discord.com/developers/docs/resources/guild#membership-screening-object">Membership Screening</a>.
      */
-    COMMUNITY
+    MEMBER_VERIFICATION_GATE_ENABLED,
+    /**
+     * Server can be previewed before joining via Membership Screening or the directory.
+     */
+    PREVIEW_ENABLED
 }
