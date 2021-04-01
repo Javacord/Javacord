@@ -48,4 +48,9 @@ public class ServerStageVoiceChannelImpl extends ServerVoiceChannelImpl
         this.topic = topic;
     }
 
+    @Override
+    public String toString() {
+        return String.format("ServerStageVoiceChannel (id: %s, name: %s)", getIdAsString(), getName());
+    }
+
 }

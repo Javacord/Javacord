@@ -144,7 +144,7 @@ public class ChannelCreateHandler extends PacketHandler {
      */
     private void handlePrivateChannel(JsonNode channel) {
         // A CHANNEL_CREATE packet is sent every time a bot account receives a message, see
-        // https://github.com/hammerandchisel/discord-api-docs/issues/184Messa
+        // https://github.com/hammerandchisel/discord-api-docs/issues/184
 
         UserImpl recipient = new UserImpl(api, channel.get("recipients").get(0), (MemberImpl) null, null);
         if (!recipient.getPrivateChannel().isPresent()) {

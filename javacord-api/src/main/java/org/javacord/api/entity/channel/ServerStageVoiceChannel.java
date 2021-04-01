@@ -6,6 +6,11 @@ import java.util.Optional;
 
 public interface ServerStageVoiceChannel extends ServerVoiceChannel, ServerStageVoiceChannelAttachableListenerManager {
 
+    @Override
+    default ChannelType getType() {
+        return ChannelType.SERVER_STAGE_VOICE_CHANNEL;
+    }
+
     /**
      * Gets the topic of this.
      *

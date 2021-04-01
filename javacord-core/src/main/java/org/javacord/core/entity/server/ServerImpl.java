@@ -348,7 +348,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         getOrCreateServerVoiceChannel(channel);
                         break;
                     case SERVER_STAGE_VOICE_CHANNEL:
-                        // TODO Handle them different from voice channel:
                         getOrCreateServerStageVoiceChannel(channel);
                         break;
                     case CHANNEL_CATEGORY:
