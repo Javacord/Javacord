@@ -8,6 +8,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
@@ -50,6 +51,9 @@ public class ChannelDeleteHandler extends PacketHandler {
                 break;
             case SERVER_VOICE_CHANNEL:
                 handleServerVoiceChannel(packet);
+                break;
+            case SERVER_STAGE_VOICE_CHANNEL:
+                handleServerStageVoiceChannel(packet);
                 break;
             case GROUP_CHANNEL:
                 handleGroupChannel(packet);
@@ -122,6 +126,24 @@ public class ChannelDeleteHandler extends PacketHandler {
         api.getPossiblyUnreadyServerById(serverId)
                 .flatMap(server -> server.getVoiceChannelById(channelId))
                 .ifPresent(this::dispatchServerChannelDeleteEvent);
+        api.removeObjectListeners(ServerVoiceChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(VoiceChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
+    }
+
+    /**
+     * Handles server stage voice channel deletion.
+     *
+     * @param channelJson The channel data.
+     */
+    private void handleServerStageVoiceChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getStageVoiceChannelById(channelId))
+                .ifPresent(this::dispatchServerChannelDeleteEvent);
+        api.removeObjectListeners(ServerStageVoiceChannel.class, channelId);
         api.removeObjectListeners(ServerVoiceChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(VoiceChannel.class, channelId);

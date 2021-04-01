@@ -19,6 +19,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
@@ -1763,6 +1764,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Collection<ServerVoiceChannel> getServerVoiceChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_VOICE_CHANNEL);
+    }
+
+    @Override
+    public Collection<ServerStageVoiceChannel> getServerStageVoiceChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_STAGE_VOICE_CHANNEL);
     }
 
     @Override

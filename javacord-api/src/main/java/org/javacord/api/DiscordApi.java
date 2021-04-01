@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
@@ -1244,6 +1245,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Collection<ServerVoiceChannel> getServerVoiceChannels();
 
     /**
+     * Gets a collection with all server stage voice channels of the bot.
+     *
+     * @return A collection with all server stage voice channels of the bot.
+     */
+    Collection<ServerStageVoiceChannel> getServerStageVoiceChannels();
+
+    /**
      * Gets a collection with all text channels of the bot.
      *
      * @return A collection with all text channels of the bot.
@@ -1615,6 +1623,58 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     default Collection<ServerVoiceChannel> getServerVoiceChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
                 getServerVoiceChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a server stage voice channel by its id.
+     *
+     * @param id The id of the server stage voice channel.
+     * @return The server stage voice channel with the given id.
+     */
+    default Optional<ServerStageVoiceChannel> getServerStageVoiceChannelById(long id) {
+        return getChannelById(id).flatMap(Channel::asServerStageVoiceChannel);
+    }
+
+    /**
+     * Gets a server stage voice channel by its id.
+     *
+     * @param id The id of the server stage voice channel.
+     * @return The server stage voice channel with the given id.
+     */
+    default Optional<ServerStageVoiceChannel> getServerStageVoiceChannelById(String id) {
+        try {
+            return getServerStageVoiceChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a collection with all server stage voice channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the server stage voice channels.
+     * @return A collection with all server stage voice channels with the given name.
+     */
+    default Collection<ServerStageVoiceChannel> getServerStageVoiceChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getServerStageVoiceChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a collection with all server stage voice channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the server stage voice channels.
+     * @return A collection with all server stage voice channels with the given name.
+     */
+    default Collection<ServerStageVoiceChannel> getServerStageVoiceChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getServerStageVoiceChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }
