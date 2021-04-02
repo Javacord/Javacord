@@ -5,35 +5,38 @@ import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.user.UserStatus;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * Internal class for easy caching of user presences.
  */
 public class UserPresence {
 
     private final long userId;
-    private final Activity activity;
+    private final Set<Activity> activities;
     private final UserStatus status;
     private final Map<DiscordClient, UserStatus> clientStatus;
 
     /**
      * Creates a new user presence instance.
-     * 
+     *
      * @param userId The id of the user.
-     * @param activity The activity.
+     * @param activities The activities.
      * @param status The status.
      * @param clientStatus The client status.
      */
-    public UserPresence(
-            long userId, Activity activity, UserStatus status, Map<DiscordClient, UserStatus> clientStatus) {
+    public UserPresence(long userId, Set<Activity> activities, UserStatus status, Map<DiscordClient,
+            UserStatus> clientStatus) {
         this.userId = userId;
-        this.activity = activity;
+        this.activities = activities;
         this.status = status;
         this.clientStatus = clientStatus;
     }
 
     /**
      * Gets the id of the user that this presence "belongs" to.
-     * 
+     *
      * @return The id of the user.
      */
     public long getUserId() {
@@ -42,21 +45,21 @@ public class UserPresence {
 
     /**
      * Sets the activity.
-     * 
-     * @param activity The activity to set.
-     * @return The new user presence with the updated activity.
+     *
+     * @param activities The activities to set.
+     * @return The new user presence with the updated activities.
      */
-    public UserPresence setActivity(Activity activity) {
-        return new UserPresence(userId, activity, status, clientStatus);
+    public UserPresence setActivities(Set<Activity> activities) {
+        return new UserPresence(userId, activities, status, clientStatus);
     }
 
     /**
-     * Gets the presence's activity.
-     * 
-     * @return The presence's activity.
+     * Gets the presence's activities.
+     *
+     * @return The presence's activities.
      */
-    public Activity getActivity() {
-        return activity;
+    public Set<Activity> getActivities() {
+        return Collections.unmodifiableSet(activities);
     }
 
     /**
@@ -66,7 +69,7 @@ public class UserPresence {
      * @return The new user presence with the updated status.
      */
     public UserPresence setStatus(UserStatus status) {
-        return new UserPresence(userId, activity, status, clientStatus);
+        return new UserPresence(userId, activities, status, clientStatus);
     }
 
     /**
@@ -85,7 +88,7 @@ public class UserPresence {
      * @return The new user presence with the updated client status.
      */
     public UserPresence setClientStatus(Map<DiscordClient, UserStatus> clientStatus) {
-        return new UserPresence(userId, activity, status, clientStatus);
+        return new UserPresence(userId, activities, status, clientStatus);
     }
 
     /**

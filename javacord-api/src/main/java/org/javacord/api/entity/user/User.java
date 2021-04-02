@@ -76,11 +76,11 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     }
 
     /**
-     * Gets the activity of the user.
+     * Gets the activities of the user.
      *
-     * @return The activity of the user.
+     * @return The activities of the user.
      */
-    Optional<Activity> getActivity();
+    Set<Activity> getActivities();
 
     /**
      * Checks if the user can manage the target role.

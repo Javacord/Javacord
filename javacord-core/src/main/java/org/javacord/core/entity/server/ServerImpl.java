@@ -420,14 +420,14 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     continue;
                 }
 
-                if (presenceJson.has("game")) {
-                    Activity activity;
-                    if (!presenceJson.get("game").isNull()) {
-                        activity = new ActivityImpl(api, presenceJson.get("game"));
-                    } else {
-                        activity = null;
+                if (presenceJson.hasNonNull("activities")) {
+                    Set<Activity> activities = new HashSet<>();
+                    for (JsonNode activityJson : presenceJson.get("activities")) {
+                        if (!activityJson.isNull()) {
+                            activities.add(new ActivityImpl(api, activityJson));
+                        }
                     }
-                    api.updateUserPresence(userId, presence -> presence.setActivity(activity));
+                    api.updateUserPresence(userId, presence -> presence.setActivities(activities));
                 }
                 if (presenceJson.has("status")) {
                     UserStatus status = UserStatus.fromString(presenceJson.get("status").asText());

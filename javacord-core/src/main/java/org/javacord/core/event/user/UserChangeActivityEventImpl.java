@@ -4,7 +4,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.event.user.UserChangeActivityEvent;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * The implementation of {@link UserChangeActivityEvent}.
@@ -12,37 +13,38 @@ import java.util.Optional;
 public class UserChangeActivityEventImpl extends OptionalUserEventImpl implements UserChangeActivityEvent {
 
     /**
-     * The new activity of the user.
+     * The new activities of the user.
      */
-    private final Activity newActivity;
+    private final Set<Activity> newActivities;
 
     /**
-     * The old activity of the user.
+     * The old activities of the user.
      */
-    private final Activity oldActivity;
+    private final Set<Activity> oldActivities;
 
     /**
      * Creates a new user change activity event.
      *
      * @param api The discord api instance.
      * @param userId The id of the user of the event.
-     * @param newActivity The new activity of the user.
-     * @param oldActivity The old activity of the user.
+     * @param newActivities The new activities of the user.
+     * @param oldActivities The old activities of the user.
      */
-    public UserChangeActivityEventImpl(DiscordApi api, long userId, Activity newActivity, Activity oldActivity) {
+    public UserChangeActivityEventImpl(DiscordApi api, long userId, Set<Activity> newActivities,
+                                       Set<Activity> oldActivities) {
         super(api, userId);
-        this.newActivity = newActivity;
-        this.oldActivity = oldActivity;
+        this.newActivities = newActivities;
+        this.oldActivities = oldActivities;
     }
 
     @Override
-    public Optional<Activity> getOldActivity() {
-        return Optional.ofNullable(oldActivity);
+    public Set<Activity> getOldActivities() {
+        return Collections.unmodifiableSet(oldActivities);
     }
 
     @Override
-    public Optional<Activity> getNewActivity() {
-        return Optional.ofNullable(newActivity);
+    public Set<Activity> getNewActivities() {
+        return Collections.unmodifiableSet(newActivities);
     }
 
 }

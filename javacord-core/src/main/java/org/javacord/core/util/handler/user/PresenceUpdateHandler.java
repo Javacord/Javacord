@@ -24,7 +24,9 @@ import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -53,19 +55,22 @@ public class PresenceUpdateHandler extends PacketHandler {
                         .orElseGet(() -> new UserPresence(userId, null, null, io.vavr.collection.HashMap.empty()))
         );
 
-        if (packet.has("game")) {
-            Activity newActivity;
-            if (!packet.get("game").isNull()) {
-                newActivity = new ActivityImpl(api, packet.get("game"));
-            } else {
-                newActivity = null;
+        if (packet.hasNonNull("activities")) {
+            Set<Activity> newActivities = new HashSet<>();
+            for (JsonNode activityJson : packet.get("activities")) {
+                if (!activityJson.isNull()) {
+                    newActivities.add(new ActivityImpl(api, activityJson));
+                }
             }
-            Activity oldActivity = api.getEntityCache().get().getUserPresenceCache().getPresenceByUserId(userId)
-                    .map(UserPresence::getActivity)
-                    .orElse(null);
-            presence.set(presence.get().setActivity(newActivity));
-            if (!Objects.deepEquals(newActivity, oldActivity)) {
-                dispatchUserActivityChangeEvent(userId, newActivity, oldActivity);
+            Set<Activity> oldActivities = api.getEntityCache().get()
+                    .getUserPresenceCache()
+                    .getPresenceByUserId(userId)
+                    .map(UserPresence::getActivities)
+                    .orElse(Collections.emptySet());
+            presence.set(presence.get().setActivities(newActivities));
+
+            if (!Objects.deepEquals(newActivities.toArray(), oldActivities.toArray())) {
+                dispatchUserActivityChangeEvent(userId, newActivities, oldActivities);
             }
         }
 
@@ -138,9 +143,10 @@ public class PresenceUpdateHandler extends PacketHandler {
         }
     }
 
-    private void dispatchUserActivityChangeEvent(long userId, Activity newActivity, Activity oldActivity) {
+    private void dispatchUserActivityChangeEvent(long userId, Set<Activity> newActivities,
+                                                 Set<Activity> oldActivities) {
         UserImpl user = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
-        UserChangeActivityEvent event = new UserChangeActivityEventImpl(api, userId, newActivity, oldActivity);
+        UserChangeActivityEvent event = new UserChangeActivityEventImpl(api, userId, newActivities, oldActivities);
 
         api.getEventDispatcher().dispatchUserChangeActivityEvent(
                 api,
