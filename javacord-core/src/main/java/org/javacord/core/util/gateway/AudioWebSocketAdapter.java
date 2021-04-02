@@ -220,10 +220,12 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                             )
                     );
                 }
-                // Websocket Code 4014 is thrown after a DISCONNECT through stuff like a kick or a voice channel got deleted.
+                // Websocket Code 4014 is thrown after a DISCONNECT
+                // through stuff like a kick or a voice channel got deleted.
                 // It should never try to reconnect if this is thrown instead of a move.
 
-                //TODO There are multiple reasons if a bot got disconnected. We have to filter that and if the bot got moved we reconnect.
+                //TODO There are multiple reasons if a bot got disconnected.
+                //We have to filter that and if the bot got moved we reconnect.
 
                 //Stay disconnected , and close the audio connection.
                 disconnect();
