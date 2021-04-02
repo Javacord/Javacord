@@ -23,7 +23,6 @@ import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -63,7 +62,7 @@ public class PresenceUpdateHandler extends PacketHandler {
                     newActivities.add(new ActivityImpl(api, activityJson));
                 }
             }
-            Collection<Activity> oldActivities = api.getEntityCache().get()
+            Set<Activity> oldActivities = api.getEntityCache().get()
                     .getUserPresenceCache()
                     .getPresenceByUserId(userId)
                     .map(UserPresence::getActivities)
@@ -144,8 +143,8 @@ public class PresenceUpdateHandler extends PacketHandler {
         }
     }
 
-    private void dispatchUserActivityChangeEvent(long userId, Collection<Activity> newActivities,
-                                                 Collection<Activity> oldActivities) {
+    private void dispatchUserActivityChangeEvent(long userId, Set<Activity> newActivities,
+                                                 Set<Activity> oldActivities) {
         UserImpl user = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
         UserChangeActivityEvent event = new UserChangeActivityEventImpl(api, userId, newActivities, oldActivities);
 

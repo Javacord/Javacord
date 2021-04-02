@@ -4,8 +4,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.event.user.UserChangeActivityEvent;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * The implementation of {@link UserChangeActivityEvent}.
@@ -15,12 +15,12 @@ public class UserChangeActivityEventImpl extends OptionalUserEventImpl implement
     /**
      * The new activities of the user.
      */
-    private final Collection<Activity> newActivities;
+    private final Set<Activity> newActivities;
 
     /**
      * The old activities of the user.
      */
-    private final Collection<Activity> oldActivities;
+    private final Set<Activity> oldActivities;
 
     /**
      * Creates a new user change activity event.
@@ -30,21 +30,21 @@ public class UserChangeActivityEventImpl extends OptionalUserEventImpl implement
      * @param newActivities The new activities of the user.
      * @param oldActivities The old activities of the user.
      */
-    public UserChangeActivityEventImpl(DiscordApi api, long userId, Collection<Activity> newActivities,
-                                       Collection<Activity> oldActivities) {
+    public UserChangeActivityEventImpl(DiscordApi api, long userId, Set<Activity> newActivities,
+                                       Set<Activity> oldActivities) {
         super(api, userId);
         this.newActivities = newActivities;
         this.oldActivities = oldActivities;
     }
 
     @Override
-    public Collection<Activity> getOldActivities() {
-        return Collections.unmodifiableCollection(oldActivities);
+    public Set<Activity> getOldActivities() {
+        return Collections.unmodifiableSet(oldActivities);
     }
 
     @Override
-    public Collection<Activity> getNewActivities() {
-        return Collections.unmodifiableCollection(newActivities);
+    public Set<Activity> getNewActivities() {
+        return Collections.unmodifiableSet(newActivities);
     }
 
 }
