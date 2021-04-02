@@ -19,6 +19,7 @@ import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
@@ -46,6 +47,7 @@ import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.auditlog.AuditLogImpl;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.ServerChannelImpl;
+import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
@@ -337,12 +339,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
         if (data.has("channels")) {
             for (JsonNode channel : data.get("channels")) {
+
                 switch (ChannelType.fromId(channel.get("type").asInt())) {
                     case SERVER_TEXT_CHANNEL:
                         getOrCreateServerTextChannel(channel);
                         break;
                     case SERVER_VOICE_CHANNEL:
                         getOrCreateServerVoiceChannel(channel);
+                        break;
+                    case SERVER_STAGE_VOICE_CHANNEL:
+                        getOrCreateServerStageVoiceChannel(channel);
                         break;
                     case CHANNEL_CATEGORY:
                         getOrCreateChannelCategory(channel);
@@ -717,6 +723,24 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         synchronized (this) {
             if (type == ChannelType.SERVER_VOICE_CHANNEL) {
                 return getVoiceChannelById(id).orElseGet(() -> new ServerVoiceChannelImpl(api, this, data));
+            }
+        }
+        // Invalid channel type
+        return null;
+    }
+
+    /**
+     * Gets or creates a server stage voice channel.
+     *
+     * @param data The json data of the channel.
+     * @return The server stage voice channel.
+     */
+    public ServerStageVoiceChannel getOrCreateServerStageVoiceChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            if (type == ChannelType.SERVER_STAGE_VOICE_CHANNEL) {
+                return getStageVoiceChannelById(id).orElseGet(() -> new ServerStageVoiceChannelImpl(api, this, data));
             }
         }
         // Invalid channel type

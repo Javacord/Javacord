@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.event.channel.group.GroupChannelCreateEvent;
@@ -52,6 +53,9 @@ public class ChannelCreateHandler extends PacketHandler {
                 break;
             case SERVER_VOICE_CHANNEL:
                 handleServerVoiceChannel(packet);
+                break;
+            case SERVER_STAGE_VOICE_CHANNEL:
+                handleServerStageVoiceChannel(packet);
                 break;
             case GROUP_CHANNEL:
                 handleGroupChannel(packet);
@@ -112,6 +116,21 @@ public class ChannelCreateHandler extends PacketHandler {
         long serverId = channel.get("guild_id").asLong();
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             ServerVoiceChannel voiceChannel = ((ServerImpl) server).getOrCreateServerVoiceChannel(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(voiceChannel);
+
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
+        });
+    }
+
+    /**
+     * Handles server stage voice channel creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleServerStageVoiceChannel(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
+        api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
+            ServerStageVoiceChannel voiceChannel = ((ServerImpl) server).getOrCreateServerStageVoiceChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(voiceChannel);
 
             api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);

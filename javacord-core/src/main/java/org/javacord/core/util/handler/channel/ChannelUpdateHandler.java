@@ -18,11 +18,13 @@ import org.javacord.api.event.channel.server.ServerChannelChangeOverwrittenPermi
 import org.javacord.api.event.channel.server.ServerChannelChangePositionEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeSlowmodeEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeTopicEvent;
+import org.javacord.api.event.channel.server.voice.ServerStageVoiceChannelChangeTopicEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeBitrateEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEvent;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.ServerChannelImpl;
+import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.permission.PermissionsImpl;
@@ -34,6 +36,7 @@ import org.javacord.core.event.channel.server.ServerChannelChangeOverwrittenPerm
 import org.javacord.core.event.channel.server.ServerChannelChangePositionEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeSlowmodeEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
+import org.javacord.core.event.channel.server.voice.ServerStageVoiceChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeBitrateEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
@@ -81,6 +84,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                 handleServerChannel(packet);
                 handleServerVoiceChannel(packet);
                 break;
+            case SERVER_STAGE_VOICE_CHANNEL:
+                handleServerChannel(packet);
+                handleServerVoiceChannel(packet);
+                handleServerStageVoiceChannel(packet);
+                break;
             case GROUP_CHANNEL:
                 handleGroupChannel(packet);
                 break;
@@ -89,7 +97,10 @@ public class ChannelUpdateHandler extends PacketHandler {
                 handleChannelCategory(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
+                logger.debug("Received CHANNEL_UPDATE packet for a news channel. In this Javacord version it is "
+                        + "treated as a normal text channel!");
                 handleServerChannel(packet);
+                handleServerTextChannel(packet);
                 break;
             case SERVER_STORE_CHANNEL:
                 // TODO Handle store channels
@@ -343,9 +354,34 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerVoiceChannelChangeUserLimitEventImpl(channel, newUserLimit, oldUserLimit);
 
                 api.getEventDispatcher().dispatchServerVoiceChannelChangeUserLimitEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
+                );
             }
         });
+    }
+
+    /**
+     * Handles a server stage voice channel update.
+     *
+     * @param jsonChannel The channel data.
+     */
+    private void handleServerStageVoiceChannel(JsonNode jsonChannel) {
+        long channelId = jsonChannel.get("id").asLong();
+        api.getServerStageVoiceChannelById(channelId)
+                .map(ServerStageVoiceChannelImpl.class::cast).ifPresent(channel -> {
+                    String oldTopic = channel.getTopic().orElse(null);
+                    String newTopic = jsonChannel.hasNonNull("topic")
+                            ? jsonChannel.get("topic").asText()
+                            : null;
+                    if (!Objects.equals(oldTopic, newTopic)) {
+                        channel.setTopic(newTopic);
+                        ServerStageVoiceChannelChangeTopicEvent event =
+                                new ServerStageVoiceChannelChangeTopicEventImpl(channel, newTopic, oldTopic);
+                        api.getEventDispatcher().dispatchServerStageVoiceChannelChangeTopicEvent(
+                                (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
+                        );
+                    }
+                });
     }
 
     /**

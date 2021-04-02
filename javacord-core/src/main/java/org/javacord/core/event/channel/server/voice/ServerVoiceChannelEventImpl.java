@@ -12,7 +12,7 @@ public abstract class ServerVoiceChannelEventImpl extends ServerEventImpl implem
     /**
      * The channel of the event.
      */
-    private final ServerVoiceChannel channel;
+    protected final ServerVoiceChannel channel;
 
     /**
      * Creates a new voice channel event.

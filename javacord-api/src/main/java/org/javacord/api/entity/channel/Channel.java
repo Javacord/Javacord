@@ -88,6 +88,15 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     }
 
     /**
+     * Gets the channel as server stage voice channel.
+     *
+     * @return The channel as server stage voice channel.
+     */
+    default Optional<ServerStageVoiceChannel> asServerStageVoiceChannel() {
+        return as(ServerStageVoiceChannel.class);
+    }
+
+    /**
      * Gets the channel as text channel.
      *
      * @return The channel as text channel.

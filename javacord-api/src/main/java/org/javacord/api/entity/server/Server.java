@@ -13,6 +13,7 @@ import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -2349,6 +2350,32 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<ServerVoiceChannel> getVoiceChannelById(String id) {
         try {
             return getVoiceChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a stage voice channel by its id.
+     *
+     * @param id The id of the stage voice channel.
+     * @return The stage voice channel with the given id.
+     */
+    default Optional<ServerStageVoiceChannel> getStageVoiceChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ServerStageVoiceChannel)
+                .map(channel -> (ServerStageVoiceChannel) channel);
+    }
+
+    /**
+     * Gets a voice channel by its id.
+     *
+     * @param id The id of the voice channel.
+     * @return The voice channel with the given id.
+     */
+    default Optional<ServerStageVoiceChannel> getStageVoiceChannelById(String id) {
+        try {
+            return getStageVoiceChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
