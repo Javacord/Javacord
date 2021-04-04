@@ -118,7 +118,7 @@ public interface ServerTextChannel extends RegularServerChannel, TextChannel, Me
      * @return Whether this channel enforces a slowmode.
      */
     default boolean hasSlowmode() {
-        return getSlowmodeDelayInSeconds() == 0;
+        return getSlowmodeDelayInSeconds() != 0;
     }
 
     /**
