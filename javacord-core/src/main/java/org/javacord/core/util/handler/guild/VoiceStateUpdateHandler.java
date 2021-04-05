@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
@@ -57,13 +58,17 @@ public class VoiceStateUpdateHandler extends PacketHandler {
             handleServerVoiceChannel(packet, userId);
         } else if (packet.hasNonNull("channel_id")) {
             long channelId = packet.get("channel_id").asLong();
-            api.getVoiceChannelById(channelId).ifPresent(voiceChannel -> {
+            Optional<VoiceChannel> optionalChannel = api.getVoiceChannelById(channelId);
+            if (optionalChannel.isPresent()) {
+                VoiceChannel voiceChannel = optionalChannel.get();
                 if (voiceChannel instanceof PrivateChannel) {
                     handlePrivateChannel(userId, ((PrivateChannelImpl) voiceChannel));
                 } else if (voiceChannel instanceof GroupChannel) {
                     handleGroupChannel(userId, ((GroupChannelImpl) voiceChannel));
                 }
-            });
+            } else {
+                LoggerUtil.logMissingChannel(logger, channelId);
+            }
         }
 
         if (api.getYourself().getId() == userId) {
@@ -75,7 +80,9 @@ public class VoiceStateUpdateHandler extends PacketHandler {
         // We need the session id to connect to an audio websocket
         String sessionId = packet.get("session_id").asText();
         long channelId = packet.get("channel_id").asLong();
-        api.getServerVoiceChannelById(channelId).ifPresent(channel -> {
+        Optional<ServerVoiceChannel> optionalChannel = api.getServerVoiceChannelById(channelId);
+        if (optionalChannel.isPresent()) {
+            ServerVoiceChannel channel = optionalChannel.get();
             dispatchVoiceStateUpdateEvent(
                     channel, channel.getServer(), packet.get("session_id").asText());
 
@@ -90,7 +97,9 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 ((AudioConnectionImpl) connection).setSessionId(sessionId);
                 ((AudioConnectionImpl) connection).tryConnect();
             });
-        });
+        } else {
+            LoggerUtil.logMissingChannel(logger, channelId);
+        }
     }
 
     private void handleServerVoiceChannel(JsonNode packet, long userId) {

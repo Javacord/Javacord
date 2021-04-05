@@ -8,6 +8,8 @@ import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
@@ -288,43 +290,49 @@ public class ChannelUpdateHandler extends PacketHandler {
      */
     private void handleServerTextChannel(JsonNode jsonChannel) {
         long channelId = jsonChannel.get("id").asLong();
-        api.getTextChannelById(channelId).map(c -> ((ServerTextChannelImpl) c)).ifPresent(channel -> {
-            String oldTopic = channel.getTopic();
-            String newTopic = jsonChannel.has("topic") && !jsonChannel.get("topic").isNull()
-                    ? jsonChannel.get("topic").asText() : "";
-            if (!oldTopic.equals(newTopic)) {
-                channel.setTopic(newTopic);
+        Optional<ServerTextChannel> optionalChannel = api.getServerTextChannelById(channelId);
+        if (!optionalChannel.isPresent()) {
+            LoggerUtil.logMissingChannel(logger, channelId);
+            return;
+        }
 
-                ServerTextChannelChangeTopicEvent event =
-                        new ServerTextChannelChangeTopicEventImpl(channel, newTopic, oldTopic);
+        ServerTextChannelImpl channel = (ServerTextChannelImpl) optionalChannel.get();
 
-                api.getEventDispatcher().dispatchServerTextChannelChangeTopicEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
-            }
+        String oldTopic = channel.getTopic();
+        String newTopic = jsonChannel.has("topic") && !jsonChannel.get("topic").isNull()
+                ? jsonChannel.get("topic").asText() : "";
+        if (!oldTopic.equals(newTopic)) {
+            channel.setTopic(newTopic);
 
-            boolean oldNsfwFlag = channel.isNsfw();
-            boolean newNsfwFlag = jsonChannel.get("nsfw").asBoolean();
-            if (oldNsfwFlag != newNsfwFlag) {
-                channel.setNsfwFlag(newNsfwFlag);
-                ServerChannelChangeNsfwFlagEvent event =
-                        new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
+            ServerTextChannelChangeTopicEvent event =
+                    new ServerTextChannelChangeTopicEventImpl(channel, newTopic, oldTopic);
 
-                api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
-                        (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel, event);
-            }
+            api.getEventDispatcher().dispatchServerTextChannelChangeTopicEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
 
-            int oldSlowmodeDelay = channel.getSlowmodeDelayInSeconds();
-            int newSlowmodeDelay = jsonChannel.get("rate_limit_per_user").asInt(0);
-            if (oldSlowmodeDelay != newSlowmodeDelay) {
-                channel.setSlowmodeDelayInSeconds(newSlowmodeDelay);
-                ServerTextChannelChangeSlowmodeEvent event =
-                        new ServerTextChannelChangeSlowmodeEventImpl(channel, oldSlowmodeDelay, newSlowmodeDelay);
+        boolean oldNsfwFlag = channel.isNsfw();
+        boolean newNsfwFlag = jsonChannel.get("nsfw").asBoolean();
+        if (oldNsfwFlag != newNsfwFlag) {
+            channel.setNsfwFlag(newNsfwFlag);
+            ServerChannelChangeNsfwFlagEvent event =
+                    new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
-                api.getEventDispatcher().dispatchServerTextChannelChangeSlowmodeEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
-                );
-            }
-        });
+            api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
+                    (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel, event);
+        }
+
+        int oldSlowmodeDelay = channel.getSlowmodeDelayInSeconds();
+        int newSlowmodeDelay = jsonChannel.get("rate_limit_per_user").asInt(0);
+        if (oldSlowmodeDelay != newSlowmodeDelay) {
+            channel.setSlowmodeDelayInSeconds(newSlowmodeDelay);
+            ServerTextChannelChangeSlowmodeEvent event =
+                    new ServerTextChannelChangeSlowmodeEventImpl(channel, oldSlowmodeDelay, newSlowmodeDelay);
+
+            api.getEventDispatcher().dispatchServerTextChannelChangeSlowmodeEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
+            );
+        }
     }
 
     /**
@@ -334,30 +342,36 @@ public class ChannelUpdateHandler extends PacketHandler {
      */
     private void handleServerVoiceChannel(JsonNode jsonChannel) {
         long channelId = jsonChannel.get("id").asLong();
-        api.getServerVoiceChannelById(channelId).map(ServerVoiceChannelImpl.class::cast).ifPresent(channel -> {
-            int oldBitrate = channel.getBitrate();
-            int newBitrate = jsonChannel.get("bitrate").asInt();
-            if (oldBitrate != newBitrate) {
-                channel.setBitrate(newBitrate);
-                ServerVoiceChannelChangeBitrateEvent event =
-                        new ServerVoiceChannelChangeBitrateEventImpl(channel, newBitrate, oldBitrate);
+        Optional<ServerVoiceChannel> optionalChannel = api.getServerVoiceChannelById(channelId);
+        if (!optionalChannel.isPresent()) {
+            LoggerUtil.logMissingChannel(logger, channelId);
+            return;
+        }
 
-                api.getEventDispatcher().dispatchServerVoiceChannelChangeBitrateEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
-            }
+        ServerVoiceChannelImpl channel = (ServerVoiceChannelImpl) optionalChannel.get();
 
-            int oldUserLimit = channel.getUserLimit().orElse(0);
-            int newUserLimit = jsonChannel.get("user_limit").asInt();
-            if (oldUserLimit != newUserLimit) {
-                channel.setUserLimit(newUserLimit);
-                ServerVoiceChannelChangeUserLimitEvent event =
-                        new ServerVoiceChannelChangeUserLimitEventImpl(channel, newUserLimit, oldUserLimit);
+        int oldBitrate = channel.getBitrate();
+        int newBitrate = jsonChannel.get("bitrate").asInt();
+        if (oldBitrate != newBitrate) {
+            channel.setBitrate(newBitrate);
+            ServerVoiceChannelChangeBitrateEvent event =
+                    new ServerVoiceChannelChangeBitrateEventImpl(channel, newBitrate, oldBitrate);
 
-                api.getEventDispatcher().dispatchServerVoiceChannelChangeUserLimitEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
-                );
-            }
-        });
+            api.getEventDispatcher().dispatchServerVoiceChannelChangeBitrateEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        int oldUserLimit = channel.getUserLimit().orElse(0);
+        int newUserLimit = jsonChannel.get("user_limit").asInt();
+        if (oldUserLimit != newUserLimit) {
+            channel.setUserLimit(newUserLimit);
+            ServerVoiceChannelChangeUserLimitEvent event =
+                    new ServerVoiceChannelChangeUserLimitEventImpl(channel, newUserLimit, oldUserLimit);
+
+            api.getEventDispatcher().dispatchServerVoiceChannelChangeUserLimitEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
     }
 
     /**

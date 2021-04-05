@@ -21,10 +21,20 @@ public interface PrivateChannel extends TextChannel, VoiceChannel, PrivateChanne
     /**
      * Gets the recipient of the private channel.
      * A private channel always consists of yourself and one other user.
+     * The user may be missing as discord doesn't always send the required information.
      *
      * @return The recipient of the private channel.
      */
-    User getRecipient();
+    Optional<User> getRecipient();
+
+    /**
+     * Gets the id of the recipient of the private channel.
+     * A private channel always consists of yourself and one other user.
+     * The id may be missing as discord doesn't always send the required information.
+     *
+     * @return The id of the recipient of the private channel.
+     */
+    Optional<Long> getRecipientId();
 
     @Override
     default Optional<PrivateChannel> getCurrentCachedInstance() {

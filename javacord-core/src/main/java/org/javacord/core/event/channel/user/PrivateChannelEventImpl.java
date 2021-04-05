@@ -1,13 +1,13 @@
 package org.javacord.core.event.channel.user;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.event.channel.user.PrivateChannelEvent;
-import org.javacord.core.event.user.UserEventImpl;
 
 /**
  * The implementation of {@link PrivateChannelEvent}.
  */
-public abstract class PrivateChannelEventImpl extends UserEventImpl implements PrivateChannelEvent {
+public abstract class PrivateChannelEventImpl implements PrivateChannelEvent {
 
     /**
      * The channel of the event.
@@ -20,13 +20,17 @@ public abstract class PrivateChannelEventImpl extends UserEventImpl implements P
      * @param channel The channel of the event.
      */
     public PrivateChannelEventImpl(PrivateChannel channel) {
-        super(channel.getRecipient());
         this.channel = channel;
     }
 
     @Override
     public PrivateChannel getChannel() {
         return channel;
+    }
+
+    @Override
+    public DiscordApi getApi() {
+        return getChannel().getApi();
     }
 
 }

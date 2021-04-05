@@ -126,7 +126,8 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     default boolean canSee(User user) {
         Optional<PrivateChannel> privateChannel = asPrivateChannel();
         if (privateChannel.isPresent()) {
-            return user.isYourself() || privateChannel.get().getRecipient() == user;
+            return user.isYourself() || privateChannel.get().getRecipient()
+                    .map(recipient -> recipient.equals(user)).orElse(false);
         }
         Optional<GroupChannel> groupChannel = asGroupChannel();
         if (groupChannel.isPresent()) {

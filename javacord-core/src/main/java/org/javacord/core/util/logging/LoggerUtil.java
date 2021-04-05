@@ -66,4 +66,16 @@ public class LoggerUtil {
         return getLogger(clazz.getName());
     }
 
+    /**
+     * Logs if a channel is missing for a specific event.
+     *
+     * @param logger The logger of the event.
+     * @param channelId The id of the missing channel.
+     */
+    public static void logMissingChannel(Logger logger, long channelId) {
+        logger.warn("Couldn't get the Channel with the id {} for a {}. Please update to the latest "
+                + "Javacord version or create an issue on the Javacord GitHub page if you are already "
+                + "on the latest version.", channelId, logger.getName());
+    }
+
 }

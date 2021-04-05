@@ -1,14 +1,17 @@
 package org.javacord.core.util.handler.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageDeleteEvent;
 import org.javacord.core.event.message.MessageDeleteEventImpl;
 import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
+import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.Optional;
 
@@ -16,6 +19,11 @@ import java.util.Optional;
  * Handles the message delete bulk packet.
  */
 public class MessageDeleteBulkHandler extends PacketHandler {
+
+    /**
+     * The logger of this class.
+     */
+    private static final Logger logger = LoggerUtil.getLogger(MessageDeleteBulkHandler.class);
 
     /**
      * Creates a new instance of this class.
@@ -30,7 +38,9 @@ public class MessageDeleteBulkHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         long channelId = Long.parseLong(packet.get("channel_id").asText());
 
-        api.getTextChannelById(channelId).ifPresent(channel -> {
+        Optional<TextChannel> optionalChannel = api.getTextChannelById(channelId);
+        if (optionalChannel.isPresent()) {
+            TextChannel channel = optionalChannel.get();
             for (JsonNode messageIdJson : packet.get("ids")) {
                 long messageId = messageIdJson.asLong();
                 MessageDeleteEvent event = new MessageDeleteEventImpl(api, messageId, channel);
@@ -47,6 +57,8 @@ public class MessageDeleteBulkHandler extends PacketHandler {
                         channel,
                         event);
             }
-        });
+        } else {
+            LoggerUtil.logMissingChannel(logger, channelId);
+        }
     }
 }

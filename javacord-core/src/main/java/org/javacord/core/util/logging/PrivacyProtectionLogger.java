@@ -142,4 +142,9 @@ public class PrivacyProtectionLogger extends AbstractLogger {
     public Level getLevel() {
         return delegate.getLevel();
     }
+
+    @Override
+    public String getName() {
+        return delegate.getName();
+    }
 }

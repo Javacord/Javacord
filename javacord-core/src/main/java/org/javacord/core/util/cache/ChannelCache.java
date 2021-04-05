@@ -43,7 +43,7 @@ public class ChannelCache {
                     .orElse(null))
             .addIndex(PRIVATE_CHANNEL_USER_ID_INDEX_NAME, channel -> channel
                     .asPrivateChannel()
-                    .map(PrivateChannel::getRecipient)
+                    .flatMap(PrivateChannel::getRecipient)
                     .map(User::getId)
                     .orElse(null))
     );
