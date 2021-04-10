@@ -2665,6 +2665,27 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Checks if the given user can use slash commands on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can use slash commands or not.
+     */
+    default boolean canUseSlashCommands(User user) {
+        return hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.USE_SLASH_COMMANDS);
+    }
+
+    /**
+     * Checks if the user of the connected account can use slash commands on the server.
+     *
+     * @return Whether the user of the connected account can use slash commands or not.
+     */
+    default boolean canYouUseSlashCommands() {
+        return canUseSlashCommands(getApi().getYourself());
+    }
+
+    /**
      * Checks if the given user can manage roles on the server.
      *
      * @param user The user to check.
