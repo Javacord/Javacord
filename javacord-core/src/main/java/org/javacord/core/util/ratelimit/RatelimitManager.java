@@ -182,8 +182,9 @@ public class RatelimitManager {
 
         // Check if we received a 429 response
         if (result.getResponse().code() == 429) {
-            int retryAfter =
-                    result.getJsonBody().isNull() ? 0 : result.getJsonBody().get("retry_after").asInt();
+            long retryAfter =
+                    result.getJsonBody().isNull()
+                            ? 0 : (long) (result.getJsonBody().get("retry_after").asDouble() * 1000);
 
             if (global) {
                 // We hit a global ratelimit. Time to panic!
