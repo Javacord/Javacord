@@ -118,7 +118,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
 
                     if (newMember.getUser().isYourself()) {
                         Set<Long> unreadableChannels = server.getTextChannels().stream()
-                                .filter(((Predicate<ServerTextChannel>)ServerTextChannel::canYouSee).negate())
+                                .filter(((Predicate<ServerTextChannel>) ServerTextChannel::canYouSee).negate())
                                 .map(ServerTextChannel::getId)
                                 .collect(Collectors.toSet());
                         api.forEachCachedMessageWhere(
@@ -127,43 +127,42 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                         );
                     }
 
-                    // Update base user as well; GUILD_MEMBER_UDPATE is fired for user changes
+                    // Update base user as well; GUILD_MEMBER_UPDATE is fired for user changes
                     // to allow disabling presences, see
                     // https://github.com/discord/discord-api-docs/pull/1307#issuecomment-581561519
-                    UserImpl oldUser = api.getCachedUserById(newMember.getId())
-                            .map(UserImpl.class::cast)
-                            .orElse(null);
-                    boolean userChanged = false;
-                    UserImpl updatedUser = null;
-                    if (oldUser != null) {
-                        updatedUser = oldUser.replacePartialUserData(packet.get("user"));
-                    }
-                    if (oldUser != null && packet.get("user").has("username")) {
-                        String newName = packet.get("user").get("username").asText();
-                        String oldName = oldUser.getName();
-                        if (!oldName.equals(newName)) {
-                            dispatchUserChangeNameEvent(updatedUser, newName, oldName);
-                            userChanged = true;
+                    if (oldMember.getUser() != null) {
+                        UserImpl oldUser = (UserImpl) oldMember.getUser();
+
+                        boolean userChanged = false;
+                        UserImpl updatedUser = oldUser.replacePartialUserData(packet.get("user"));
+
+                        if (packet.get("user").has("username")) {
+                            String newName = packet.get("user").get("username").asText();
+                            String oldName = oldUser.getName();
+                            if (!oldName.equals(newName)) {
+                                dispatchUserChangeNameEvent(updatedUser, newName, oldName);
+                                userChanged = true;
+                            }
                         }
-                    }
-                    if (oldUser != null && packet.get("user").has("discriminator")) {
-                        String newDiscriminator = packet.get("user").get("discriminator").asText();
-                        String oldDiscriminator = oldUser.getDiscriminator();
-                        if (!oldDiscriminator.equals(newDiscriminator)) {
-                            dispatchUserChangeDiscriminatorEvent(updatedUser, newDiscriminator, oldDiscriminator);
-                            userChanged = true;
+                        if (packet.get("user").has("discriminator")) {
+                            String newDiscriminator = packet.get("user").get("discriminator").asText();
+                            String oldDiscriminator = oldUser.getDiscriminator();
+                            if (!oldDiscriminator.equals(newDiscriminator)) {
+                                dispatchUserChangeDiscriminatorEvent(updatedUser, newDiscriminator, oldDiscriminator);
+                                userChanged = true;
+                            }
                         }
-                    }
-                    if (oldUser != null && packet.get("user").has("avatar")) {
-                        String newAvatarHash = packet.get("user").get("avatar").asText(null);
-                        String oldAvatarHash = oldUser.getAvatarHash();
-                        if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
-                            dispatchUserChangeAvatarEvent(updatedUser, newAvatarHash, oldAvatarHash);
-                            userChanged = true;
+                        if (packet.get("user").has("avatar")) {
+                            String newAvatarHash = packet.get("user").get("avatar").asText(null);
+                            String oldAvatarHash = oldUser.getAvatarHash();
+                            if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
+                                dispatchUserChangeAvatarEvent(updatedUser, newAvatarHash, oldAvatarHash);
+                                userChanged = true;
+                            }
                         }
-                    }
-                    if (oldUser != null && userChanged) {
-                        api.updateUserOfAllMembers(updatedUser);
+                        if (userChanged) {
+                            api.updateUserOfAllMembers(updatedUser);
+                        }
                     }
                 });
     }
