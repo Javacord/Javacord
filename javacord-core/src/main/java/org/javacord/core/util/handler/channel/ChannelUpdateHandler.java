@@ -323,7 +323,9 @@ public class ChannelUpdateHandler extends PacketHandler {
         }
 
         int oldSlowmodeDelay = channel.getSlowmodeDelayInSeconds();
-        int newSlowmodeDelay = jsonChannel.get("rate_limit_per_user").asInt(0);
+        //Check if "rate_limit_per_user" exists as a temporary fix until SERVER_NEWS_CHANNEL is handled separately.
+        int newSlowmodeDelay = jsonChannel.has("rate_limit_per_user")
+                ? jsonChannel.get("rate_limit_per_user").asInt(0) : 0;
         if (oldSlowmodeDelay != newSlowmodeDelay) {
             channel.setSlowmodeDelayInSeconds(newSlowmodeDelay);
             ServerTextChannelChangeSlowmodeEvent event =
