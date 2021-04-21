@@ -10,6 +10,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageActivity;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.entity.message.MessageReference;
 import org.javacord.api.entity.message.MessageType;
 import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.Embed;
@@ -102,9 +103,9 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private final String nonce;
 
     /**
-     * The id of the message referenced via message reply.
+     * The reference to another message.
      */
-    private final Long referencedMessageId;
+    private final MessageReferenceImpl messageReference;
     /**
      * The message referenced via message reply.
      */
@@ -219,17 +220,13 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             nonce = null;
         }
 
-        if (data.hasNonNull("message_reference")) {
-            referencedMessageId = data.get("message_reference").get("message_id").asLong();
-        } else {
-            referencedMessageId = null;
-        }
+        messageReference = data.hasNonNull("message_reference")
+                ? new MessageReferenceImpl(data)
+                : null;
 
-        if (data.hasNonNull("referenced_message")) {
-            referencedMessage = api.getOrCreateMessage(channel, data.get("referenced_message"));
-        } else {
-            referencedMessage = null;
-        }
+        referencedMessage = data.hasNonNull("referenced_message")
+                ? api.getOrCreateMessage(channel, data.get("referenced_message"))
+                : null;
     }
 
     /**
@@ -407,8 +404,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     @Override
-    public Optional<Long> getReferencedMessageId() {
-        return Optional.ofNullable(referencedMessageId);
+    public Optional<MessageReference> getMessageReference() {
+        return Optional.ofNullable(messageReference);
     }
 
     @Override

@@ -43,9 +43,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Returns a {@code MessageBuilder} according to this {@code Message}.
      *
-     * @see MessageBuilder#fromMessage(Message)
-     *
      * @return The {@code MessageBuilder}.
+     * @see MessageBuilder#fromMessage(Message)
      */
     default MessageBuilder toMessageBuilder() {
         return MessageBuilder.fromMessage(this);
@@ -54,9 +53,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Returns a {@code WebhookMessageBuilder} according to this {@code Message}.
      *
-     * @see WebhookMessageBuilder#fromMessage(Message)
-     *
      * @return The {@code WebhookMessageBuilder}.
+     * @see WebhookMessageBuilder#fromMessage(Message)
      */
     default WebhookMessageBuilder toWebhookMessageBuilder() {
         return WebhookMessageBuilder.fromMessage(this);
@@ -305,7 +303,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
+                                           boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
     }
 
@@ -322,7 +320,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
+                                           boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
     }
 
@@ -676,7 +674,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     *  Gets the link leading to this message.
+     * Gets the link leading to this message.
      *
      * @return The message link.
      * @throws AssertionError If the link is malformed.
@@ -767,12 +765,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     MessageAuthor getAuthor();
 
     /**
-     * Gets the id of the message referenced with a reply.
-     * Only present if this message is type {@code MessageType.REPLY}.
+     * Gets the message reference.
+     * The reference to another message for instance a cross-posted / channel follow / pin / reply message.
      *
-     * @return The id of the referenced message.
+     * @return The message reference.
+     * @see <a href="https://discord.com/developers/docs/resources/channel#message-reference-object">Discord docs for message reference</a>
      */
-    Optional<Long> getReferencedMessageId();
+    Optional<MessageReference> getMessageReference();
 
     /**
      * Gets the message referenced with a reply.
@@ -791,9 +790,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The referenced message.
      */
     default Optional<CompletableFuture<Message>> requestReferencedMessage() {
-        return getReferencedMessageId().map(id ->
-                        getReferencedMessage().map(CompletableFuture::completedFuture)
-                .orElseGet(() -> getApi().getMessageById(id, getChannel())));
+        return getMessageReference().map(MessageReference::getMessageId).filter(Optional::isPresent).map(Optional::get)
+                .map(id -> getReferencedMessage().map(CompletableFuture::completedFuture)
+                        .orElseGet(() -> getApi().getMessageById(id, getChannel())));
     }
 
 
@@ -807,7 +806,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Sets if the the message is kept in cache forever.
      *
-     * @param cachedForever  Whether the message should be kept in cache forever or not.
+     * @param cachedForever Whether the message should be kept in cache forever or not.
      */
     void setCachedForever(boolean cachedForever);
 
