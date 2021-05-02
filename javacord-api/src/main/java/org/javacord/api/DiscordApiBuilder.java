@@ -79,8 +79,12 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     /**
      * Sets a ratelimiter that can be used to control global ratelimits.
      *
-     * <p>By default, no ratelimiter is set, but for large bots or special use-cases, it can be useful to provide
-     * a ratelimiter with a hardcoded ratelimit to prevent hitting the global ratelimit.
+     * <p>If you don't provide a ratelimiter by yourself, Javacord will use a default ratelimiter
+     * which is set to {@code 5} requests per {@code 112 ms}, resulting in about 45 requests per second.
+     * The default ratelimiter will be shared by every bot with the same token in the same Java program.
+     *
+     * <p>If you provide a custom ratelimiter, you have to make sure to use the exact same ratelimiter instance
+     * with all Javacord instances, or otherwise synchronize the global ratelimit across shards.
      *
      * <p>An easy implementation is available with the {@link LocalRatelimiter}.
      *

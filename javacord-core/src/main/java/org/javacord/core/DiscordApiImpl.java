@@ -1374,7 +1374,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         if (globalRatelimiter == null) {
             Ratelimiter ratelimiter = defaultGlobalRatelimiter.computeIfAbsent(
                     getToken(),
-                    (token) -> new LocalRatelimiter(5, Duration.ofMillis((long) Math.ceil(5D / 45D))));
+                    (token) -> new LocalRatelimiter(5, Duration.ofMillis(112L)));
             return Optional.of(ratelimiter);
         }
         return Optional.of(globalRatelimiter);
