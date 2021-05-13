@@ -62,7 +62,7 @@ public class InteractionImpl implements Interaction {
             );
             user = (UserImpl) member.getUser();
         } else if (jsonData.hasNonNull("user")) {
-            user = new UserImpl(api, jsonData.get("user"), (JsonNode) null, null);
+            user = new UserImpl(api, jsonData.get("user"), (MemberImpl) null, null);
             member = null;
         } else {
             user = null;

@@ -20,6 +20,7 @@ import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
+import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
@@ -73,6 +74,13 @@ public interface DelegateFactoryDelegate {
      * @return A new message builder delegate.
      */
     MessageBuilderDelegate createMessageBuilderDelegate();
+
+    /**
+     * Creates a new interaction message builder delegate.
+     *
+     * @return A new interaction message builder delegate.
+     */
+    InteractionMessageBuilderDelegate createInteractionMessageBuilderDelegate();
 
     /**
      * Creates a new webhook message builder delegate.

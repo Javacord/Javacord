@@ -51,14 +51,9 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     private static final Logger logger = LoggerUtil.getLogger(MessageBuilderDelegateImpl.class);
 
     /**
-     * The receiver of the message.
-     */
-    private Messageable messageable = null;
-
-    /**
      * The string builder used to create the message.
      */
-    private final StringBuilder strBuilder = new StringBuilder();
+    protected final StringBuilder strBuilder = new StringBuilder();
 
     /**
      * The list of embeds of the message.
@@ -68,27 +63,27 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     /**
      * If the message should be text to speech or not.
      */
-    private boolean tts = false;
+    protected boolean tts = false;
 
     /**
      * The nonce of the message.
      */
-    private String nonce = null;
+    protected String nonce = null;
 
     /**
      * A list with all attachments which should be added to the message.
      */
-    private final List<FileContainer> attachments = new ArrayList<>();
+    protected final List<FileContainer> attachments = new ArrayList<>();
 
     /**
      * The MentionsBuilder used to control mention behavior.
      */
-    private AllowedMentions allowedMentions = null;
+    protected AllowedMentions allowedMentions = null;
 
     /**
      * The message to reply to.
      */
-    private Long replyingTo = null;
+    protected Long replyingTo = null;
 
     @Override
     public void appendCode(String language, String code) {
@@ -290,6 +285,10 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         return strBuilder;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Send methods
+    ////////////////////////////////////////////////////////////////////////////////
+
     @Override
     public CompletableFuture<Message> send(User user) {
         return send((Messageable) user);
@@ -318,7 +317,6 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 .put("content", toString() == null ? "" : toString())
                 .put("tts", tts);
         body.putArray("mentions");
-
 
         if (allowedMentions != null) {
             ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
@@ -380,7 +378,6 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     /**
      * Send a message to an incoming webhook.
      *
-     *
      * @param webhookId The id of the webhook to send the message to
      * @param webhookToken The token of the webhook to send the message to
      * @param displayName The display name the webhook should use
@@ -391,31 +388,14 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      */
     protected CompletableFuture<Message> send(String webhookId, String webhookToken, String displayName, URL avatarUrl,
                                               boolean wait, DiscordApi api) {
-        ObjectNode body = JsonNodeFactory.instance.objectNode()
-                .put("tts", this.tts);
-
-        if (allowedMentions != null) {
-            ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
-        }
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        prepareCommonWebhookMessageBodyParts(body);
 
         if (displayName != null) {
             body.put("username", displayName);
         }
-
         if (avatarUrl != null) {
             body.put("avatar_url", avatarUrl.toExternalForm());
-        }
-
-        if (embeds.size() != 0) {
-            ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
-            for (int i = 0; i < embeds.size() && i < 10; i++) {
-                embedsNode.add(((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).toJsonNode());
-            }
-            body.set("embeds", embedsNode);
-        }
-
-        if (strBuilder.length() != 0) {
-            body.put("content", strBuilder.toString());
         }
 
         RestRequest<Message> request =
@@ -429,9 +409,9 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 try {
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
                     // Add the attachments required for the embeds
-                    for (int i = 0; i < embeds.size() && i < 10; i++) {
+                    for (EmbedBuilder embed : embeds) {
                         tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).getRequiredAttachments());
+                                ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
                     }
 
                     addMultipartBodyToRequest(request, body, tempAttachments, api);
@@ -451,36 +431,6 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     @Override
     public CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken) {
         return send(webhookId, webhookToken, null, null, true, api);
-    }
-
-    /**
-     * Method which creates and adds a MultipartBody to a RestRequest.
-     *
-     * @param request The RestRequest to add the MultipartBody to
-     * @param body The body to use as base for the MultipartBody
-     * @param attachments The List of FileContainers to add as attachments
-     * @param api The api instance needed to add the attachments
-     */
-    private void addMultipartBodyToRequest(RestRequest<Message> request, ObjectNode body,
-                                           List<FileContainer> attachments, DiscordApi api) {
-        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("payload_json", body.toString());
-
-        Collections.reverse(attachments);
-        for (int i = 0; i < attachments.size(); i++) {
-            byte[] bytes = attachments.get(i).asByteArray(api).join();
-
-            String mediaType = URLConnection
-                    .guessContentTypeFromName(attachments.get(i).getFileTypeOrName());
-            if (mediaType == null) {
-                mediaType = "application/octet-stream";
-            }
-            multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileTypeOrName(),
-                    RequestBody.create(MediaType.parse(mediaType), bytes));
-        }
-
-        request.setMultipartBody(multipartBodyBuilder.build());
     }
 
     /**
@@ -512,6 +462,57 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
                 future.complete(message);
             }
         });
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Internal MessageBuilder utility methods
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Method which creates and adds a MultipartBody to a RestRequest.
+     *
+     * @param request The RestRequest to add the MultipartBody to
+     * @param body The body to use as base for the MultipartBody
+     * @param attachments The List of FileContainers to add as attachments
+     * @param api The api instance needed to add the attachments
+     */
+    protected void addMultipartBodyToRequest(RestRequest<?> request, ObjectNode body,
+                                           List<FileContainer> attachments, DiscordApi api) {
+        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("payload_json", body.toString());
+
+        Collections.reverse(attachments);
+        for (int i = 0; i < attachments.size(); i++) {
+            byte[] bytes = attachments.get(i).asByteArray(api).join();
+
+            String mediaType = URLConnection
+                    .guessContentTypeFromName(attachments.get(i).getFileTypeOrName());
+            if (mediaType == null) {
+                mediaType = "application/octet-stream";
+            }
+            multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileTypeOrName(),
+                    RequestBody.create(MediaType.parse(mediaType), bytes));
+        }
+
+        request.setMultipartBody(multipartBodyBuilder.build());
+    }
+
+    protected void prepareCommonWebhookMessageBodyParts(ObjectNode body) {
+        body.put("tts", this.tts);
+        if (strBuilder.length() != 0) {
+            body.put("content", strBuilder.toString());
+        }
+        if (allowedMentions != null) {
+            ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
+        }
+        if (embeds.size() != 0) {
+            ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
+            for (EmbedBuilder embed : embeds) {
+                embedsNode.add(((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode());
+            }
+            body.set("embeds", embedsNode);
+        }
     }
 
     @Override
