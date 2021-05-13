@@ -4,19 +4,18 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.core.util.logging.LoggerUtil;
+
 import java.net.URL;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link WebhookMessageBuilderDelegate}.
  */
-public class WebhookMessageBuilderDelegateImpl
-        extends MessageBuilderDelegateImpl implements WebhookMessageBuilderDelegate {
+public class WebhookMessageBuilderDelegateImpl extends WebhookMessageBuilderBaseDelegateImpl
+        implements WebhookMessageBuilderDelegate {
 
     /**
      * The logger of this class.
@@ -32,21 +31,6 @@ public class WebhookMessageBuilderDelegateImpl
      * The display name the webhook should use.
      */
     private String displayName = null;
-
-    @Override
-    public void addEmbeds(EmbedBuilder... embeds) {
-        this.embeds.addAll(Arrays.asList(embeds));
-    }
-
-    @Override
-    public void removeEmbed(EmbedBuilder embed) {
-        this.embeds.remove(embed);
-    }
-
-    @Override
-    public void removeEmbeds(EmbedBuilder... embeds) {
-        this.embeds.removeAll(Arrays.asList(embeds));
-    }
 
     @Override
     public void setDisplayName(String displayName) {

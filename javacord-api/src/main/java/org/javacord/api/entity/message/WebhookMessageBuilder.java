@@ -564,7 +564,6 @@ public class WebhookMessageBuilder {
      * @param api The api instance needed to send and return the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
-     *
      * @return The sent message.
      */
     public CompletableFuture<Message> send(DiscordApi api, long webhookId, String webhookToken) {
@@ -577,7 +576,6 @@ public class WebhookMessageBuilder {
      * @param api The api instance needed to send and return the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
-     *
      * @return The sent message.
      */
     public CompletableFuture<Message> send(DiscordApi api, String webhookId, String webhookToken) {
@@ -589,7 +587,6 @@ public class WebhookMessageBuilder {
      *
      * @param api The api instance needed to send the message.
      * @param webhookUrl The url of the webhook from which the message should be sent.
-     *
      * @return The sent message.
      * @throws IllegalArgumentException If the link isn't valid.
      */
@@ -607,7 +604,6 @@ public class WebhookMessageBuilder {
      * Sends the message without waiting for a response.
      *
      * @param webhook The webhook from which the message should be sent.
-     *
      * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
     public CompletableFuture<Void> sendSilently(IncomingWebhook webhook) {
@@ -620,7 +616,6 @@ public class WebhookMessageBuilder {
      * @param api The api instance needed to send the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
-     *
      * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
     public CompletableFuture<Void> sendSilently(DiscordApi api, long webhookId, String webhookToken) {
@@ -633,7 +628,6 @@ public class WebhookMessageBuilder {
      * @param api The api instance needed to send the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
-     *
      * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      */
     public CompletableFuture<Void> sendSilently(DiscordApi api, String webhookId, String webhookToken) {
@@ -645,7 +639,6 @@ public class WebhookMessageBuilder {
      *
      * @param api The api instance needed to send the message.
      * @param webhookUrl The url of the webhook from which the message should be sent.
-     *
      * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
      * @throws IllegalArgumentException If the link isn't valid.
      */

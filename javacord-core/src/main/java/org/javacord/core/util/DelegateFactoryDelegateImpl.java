@@ -20,6 +20,7 @@ import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
+import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
@@ -56,6 +57,7 @@ import org.javacord.core.entity.channel.ServerVoiceChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiBuilderDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiUpdaterDelegateImpl;
+import org.javacord.core.entity.message.InteractionMessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.MessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.WebhookMessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
@@ -95,6 +97,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public MessageBuilderDelegate createMessageBuilderDelegate() {
         return new MessageBuilderDelegateImpl();
+    }
+
+    @Override
+    public InteractionMessageBuilderDelegate createInteractionMessageBuilderDelegate() {
+        return new InteractionMessageBuilderDelegateImpl();
     }
 
     @Override
