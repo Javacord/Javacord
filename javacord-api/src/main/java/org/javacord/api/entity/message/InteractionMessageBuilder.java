@@ -13,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 public class InteractionMessageBuilder {
@@ -455,13 +457,24 @@ public class InteractionMessageBuilder {
     }
 
     /**
-     * Sets the flag of the message.
+     * Sets the message flags of the message.
      *
-     * @param flag The flag enum type.
+     * @param messageFlags The message flags enum type.
      * @return The current instance in order to chain call methods.
      */
-    public InteractionMessageBuilder setFlag(Flag flag) {
-        delegate.setFlag(flag);
+    public InteractionMessageBuilder setFlags(MessageFlag... messageFlags) {
+        setFlags(EnumSet.copyOf(Arrays.asList(messageFlags)));
+        return this;
+    }
+
+    /**
+     * Sets the message flags of the message.
+     *
+     * @param messageFlags An EnumSet of message flag enum type.
+     * @return The current instance in order to chain call methods.
+     */
+    public InteractionMessageBuilder setFlags(EnumSet<MessageFlag> messageFlags) {
+        delegate.setFlags(messageFlags);
         return this;
     }
 
