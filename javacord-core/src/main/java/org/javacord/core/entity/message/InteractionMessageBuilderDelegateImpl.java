@@ -3,8 +3,8 @@ package org.javacord.core.entity.message;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.command.Interaction;
-import org.javacord.api.entity.message.Flag;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.util.FileContainer;
@@ -13,6 +13,7 @@ import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
@@ -21,19 +22,19 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
         implements InteractionMessageBuilderDelegate {
 
     /**
-     * The flag of the message.
+     * The message flags of the message.
      */
-    private Flag flag = null;
+    private EnumSet<MessageFlag> messageFlags = null;
 
     @Override
-    public void setFlag(Flag flag) {
-        this.flag = flag;
+    public void setFlags(EnumSet<MessageFlag> messageFlags) {
+        this.messageFlags = messageFlags;
     }
 
     @Override
     public CompletableFuture<Void> sendInitialResponse(Interaction interaction) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
-        topBody.put("type", 4);
+        topBody.put("type", InteractionCallbackType.ChannelMessageWithSource.getId());
         ObjectNode body = topBody.putObject("data");
         prepareInteractionWebhookBodyParts(body);
 
@@ -81,8 +82,8 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
 
     private void prepareInteractionWebhookBodyParts(ObjectNode body) {
         prepareCommonWebhookMessageBodyParts(body);
-        if (null != flag) {
-            body.put("flags", flag.getId());
+        if (null != messageFlags) {
+            body.put("flags", messageFlags.stream().mapToInt(MessageFlag::getId).sum());
         }
     }
 

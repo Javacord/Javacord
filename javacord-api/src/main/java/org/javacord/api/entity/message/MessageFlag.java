@@ -3,7 +3,7 @@ package org.javacord.api.entity.message;
 /**
  * Represents a message flag type.
  */
-public enum Flag {
+public enum MessageFlag {
 
     /**
      * An ephemeral message (only visible for the user).
@@ -25,7 +25,7 @@ public enum Flag {
      *
      * @param id The id of the type.
      */
-    Flag(int id) {
+    MessageFlag(int id) {
         this.id = id;
     }
 
@@ -42,9 +42,9 @@ public enum Flag {
      * Gets the message flag type by its id.
      *
      * @param id The id of the message flag type.
-     * @return The message flag type with the given id or {@link Flag#UNKNOWN} if unknown id.
+     * @return The message flag type with the given id or {@link MessageFlag#UNKNOWN} if unknown id.
      */
-    public static Flag getFlagTypeById(int id) {
+    public static MessageFlag getFlagTypeById(int id) {
         switch (id) {
             case 64:
                 return EPHEMERAL;

@@ -3,6 +3,7 @@ package org.javacord.core.event.command;
 import org.javacord.api.command.Interaction;
 import org.javacord.api.entity.message.InteractionMessageBuilder;
 import org.javacord.api.event.command.InteractionCreateEvent;
+import org.javacord.core.entity.message.InteractionCallbackType;
 import org.javacord.core.event.EventImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -15,7 +16,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class InteractionCreateEventImpl extends EventImpl implements InteractionCreateEvent {
 
-    private static final String RESPOND_LATER_BODY = "{\"type\": 5}";
+    private static final String RESPOND_LATER_BODY =
+            "{\"type\": " + InteractionCallbackType.DeferredChannelMessageWithSource.getId() + "}";
 
     private final Interaction interaction;
 

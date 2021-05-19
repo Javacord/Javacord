@@ -1,19 +1,20 @@
 package org.javacord.api.entity.message.internal;
 
 import org.javacord.api.command.Interaction;
-import org.javacord.api.entity.message.Flag;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageFlag;
 
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 public interface InteractionMessageBuilderDelegate extends WebhookMessageBuilderBaseDelegate {
 
     /**
-     * Sets the flag of the message.
+     * Sets the message flags of the message.
      *
-     * @param flag The flag of the message.
+     * @param messageFlags The message flag of the message.
      */
-    void setFlag(Flag flag);
+    void setFlags(EnumSet<MessageFlag> messageFlags);
 
     /**
      * Sends the message.
