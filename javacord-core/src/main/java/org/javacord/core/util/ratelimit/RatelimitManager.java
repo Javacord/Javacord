@@ -182,6 +182,13 @@ public class RatelimitManager {
 
         // Check if we received a 429 response
         if (result.getResponse().code() == 429) {
+            if (response.header("Via") == null) {
+                logger.warn("Hit a CloudFlare API ban! This means you were sending a very large "
+                        + "amount of invalid requests.");
+                long retryAfter = Long.parseLong(response.header("Retry-after")) * 1000;
+                RatelimitBucket.setGlobalRatelimitResetTimestamp(api, responseTimestamp + retryAfter);
+                return;
+            }
             long retryAfter =
                     result.getJsonBody().isNull()
                             ? 0 : (long) (result.getJsonBody().get("retry_after").asDouble() * 1000);
