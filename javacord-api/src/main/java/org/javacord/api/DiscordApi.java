@@ -1,6 +1,5 @@
 package org.javacord.api;
 
-import org.javacord.api.command.ApplicationCommand;
 import org.javacord.api.entity.ApplicationInfo;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
@@ -30,6 +29,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;

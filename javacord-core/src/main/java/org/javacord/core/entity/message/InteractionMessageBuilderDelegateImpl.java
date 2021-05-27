@@ -2,10 +2,10 @@ package org.javacord.core.entity.message;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.api.command.Interaction;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
+import org.javacord.api.interaction.Interaction;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -46,6 +46,14 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
+    public CompletableFuture<Void> deleteInitialResponse(Interaction interaction) {
+        return new RestRequest<Void>(interaction.getApi(),
+                RestMethod.DELETE, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
+                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .execute(result -> null);
+    }
+
+    @Override
     public CompletableFuture<Message> editOriginalResponse(Interaction interaction) {
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(),
                 RestMethod.PATCH, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
@@ -61,6 +69,31 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken());
 
         return executeResponse(request);
+    }
+
+    @Override
+    public CompletableFuture<Void> update(Interaction interaction) {
+        ObjectNode topBody = JsonNodeFactory.instance.objectNode();
+        ObjectNode data = JsonNodeFactory.instance.objectNode();
+        prepareCommonWebhookMessageBodyParts(data);
+        prepareComponents(data);
+        topBody.put("type", InteractionCallbackType.UpdateMessage.getId());
+        topBody.set("data", data);
+
+        return new RestRequest<Void>(interaction.getApi(),
+                RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
+                .setUrlParameters(interaction.getIdAsString(), interaction.getToken())
+                .setBody(topBody)
+                .execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> deleteFollowupMessage(Interaction interaction, String messageId) {
+        return new RestRequest<Void>(interaction.getApi(), RestMethod.DELETE,
+                RestEndpoint.WEBHOOK_MESSAGE)
+                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()),
+                        interaction.getToken(), messageId)
+                .execute(result -> null);
     }
 
     @Override
@@ -82,6 +115,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
 
     private void prepareInteractionWebhookBodyParts(ObjectNode body) {
         prepareCommonWebhookMessageBodyParts(body);
+        prepareComponents(body);
         if (null != messageFlags) {
             body.put("flags", messageFlags.stream().mapToInt(MessageFlag::getId).sum());
         }
@@ -105,7 +139,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
 
                     request.execute(result -> request.getApi().getOrCreateMessage(
                             request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
-                                    .orElseThrow(() -> new NoSuchElementException("Textchannel is not cached")),
+                                    .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
                             result.getJsonBody()))
                             .whenComplete((message, throwable) -> {
                                 if (throwable != null) {
@@ -123,9 +157,8 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
             request.setBody(body);
             return request.execute(result -> request.getApi().getOrCreateMessage(
                     request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
-                            .orElseThrow(() -> new NoSuchElementException("Textchannel is not cached")),
+                            .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
                     result.getJsonBody()));
         }
     }
-
 }

@@ -2,9 +2,6 @@ package org.javacord.core.util;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
-import org.javacord.api.command.internal.ApplicationCommandBuilderDelegate;
-import org.javacord.api.command.internal.ApplicationCommandOptionBuilderDelegate;
-import org.javacord.api.command.internal.ApplicationCommandOptionChoiceBuilderDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -19,6 +16,8 @@ import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegat
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
+import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
@@ -36,6 +35,9 @@ import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
@@ -45,9 +47,6 @@ import org.javacord.core.AccountUpdaterDelegateImpl;
 import org.javacord.core.DiscordApiBuilderDelegateImpl;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioSourceBaseDelegateImpl;
-import org.javacord.core.command.ApplicationCommandBuilderDelegateImpl;
-import org.javacord.core.command.ApplicationCommandOptionBuilderDelegateImpl;
-import org.javacord.core.command.ApplicationCommandOptionChoiceBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ChannelCategoryBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerChannelUpdaterDelegateImpl;
@@ -60,6 +59,8 @@ import org.javacord.core.entity.emoji.CustomEmojiUpdaterDelegateImpl;
 import org.javacord.core.entity.message.InteractionMessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.MessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.WebhookMessageBuilderDelegateImpl;
+import org.javacord.core.entity.message.component.internal.ActionRowBuilderDelegateImpl;
+import org.javacord.core.entity.message.component.internal.ButtonBuilderDelegateImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsBuilderDelegateImpl;
 import org.javacord.core.entity.permission.PermissionsBuilderDelegateImpl;
@@ -71,6 +72,9 @@ import org.javacord.core.entity.server.ServerUpdaterDelegateImpl;
 import org.javacord.core.entity.server.invite.InviteBuilderDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookBuilderDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookUpdaterDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandOptionBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandOptionChoiceBuilderDelegateImpl;
 import org.javacord.core.util.exception.DiscordExceptionValidatorImpl;
 import org.javacord.core.util.logging.ExceptionLoggerDelegateImpl;
 
@@ -222,6 +226,16 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ApplicationCommandOptionChoiceBuilderDelegate createApplicationCommandOptionChoiceBuilderDelegate() {
         return new ApplicationCommandOptionChoiceBuilderDelegateImpl();
+    }
+
+    @Override
+    public ActionRowBuilderDelegate createActionRowBuilderDelegate() {
+        return new ActionRowBuilderDelegateImpl();
+    }
+
+    @Override
+    public ButtonBuilderDelegate createButtonBuilderDelegate() {
+        return new ButtonBuilderDelegateImpl();
     }
 
     @Override

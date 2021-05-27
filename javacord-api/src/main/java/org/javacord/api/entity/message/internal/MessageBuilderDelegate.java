@@ -8,6 +8,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
+import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
@@ -24,6 +25,13 @@ import java.util.concurrent.CompletableFuture;
  * You usually don't want to interact with this object.
  */
 public interface MessageBuilderDelegate {
+
+    /**
+     * Add high-level components to the message.
+     *
+     * @param builders The ActionRow builders.
+     */
+    void addComponents(HighLevelComponentBuilder... builders);
 
     /**
      * Appends code to the message.
@@ -62,6 +70,13 @@ public interface MessageBuilderDelegate {
     void appendNewLine();
 
     /**
+     * Fill the builder's values with a given message.
+     *
+     * @param message The message to copy from.
+     */
+    void copy(Message message);
+
+    /**
      * Sets the content of the message.
      * This method overwrites all previous content changes
      * (using {@link #append(String, MessageDecoration...)} for example).
@@ -81,6 +96,25 @@ public interface MessageBuilderDelegate {
      * Removes all embeds from the message.
      */
     void removeAllEmbeds();
+
+    /**
+     * Remove a high-level component from the message.
+     *
+     * @param index The index placement.
+     */
+    void removeComponent(int index);
+
+    /**
+     * Remove a high-level component from the message.
+     *
+     * @param component The high-level component being removed.
+     */
+    void removeComponent(HighLevelComponentBuilder component);
+
+    /**
+     * Remove all high-level components from the message.
+     */
+    void removeAllComponents();
 
     /**
      * Sets if the message should be text to speech.

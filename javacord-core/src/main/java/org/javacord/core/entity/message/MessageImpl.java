@@ -12,12 +12,14 @@ import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageType;
 import org.javacord.api.entity.message.Reaction;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
+import org.javacord.core.entity.message.component.ActionRowImpl;
 import org.javacord.core.entity.message.embed.EmbedImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
@@ -40,7 +42,6 @@ import java.util.regex.Matcher;
  * The implementation of {@link Message}.
  */
 public class MessageImpl implements Message, InternalMessageAttachableListenerManager {
-
     /**
      * The discord api instance.
      */
@@ -60,6 +61,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * The content of the message.
      */
     private volatile String content;
+
+    /**
+     * The components of the message.
+     */
+    private final List<HighLevelComponent> components = new ArrayList<>();
 
     /**
      * The type of the message.
@@ -174,6 +180,13 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             for (JsonNode embedJson : data.get("embeds")) {
                 Embed embed = new EmbedImpl(embedJson);
                 embeds.add(embed);
+            }
+        }
+
+        if (data.has("components")) {
+            for (JsonNode componentJson : data.get("components")) {
+                ActionRowImpl actionRow = new ActionRowImpl(componentJson);
+                components.add(actionRow);
             }
         }
 
@@ -436,6 +449,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public List<Reaction> getReactions() {
         return Collections.unmodifiableList(new ArrayList<>(reactions));
+    }
+
+    @Override
+    public List<HighLevelComponent> getComponents() {
+        return Collections.unmodifiableList(new ArrayList<>(this.components));
     }
 
     @Override

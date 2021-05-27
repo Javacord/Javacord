@@ -1,12 +1,13 @@
 package org.javacord.api.entity.message;
 
-import org.javacord.api.command.Interaction;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
-import org.javacord.api.event.command.InteractionCreateEvent;
+import org.javacord.api.event.interaction.InteractionCreateEvent;
+import org.javacord.api.interaction.Interaction;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.image.BufferedImage;
@@ -26,7 +27,7 @@ public class InteractionMessageBuilder {
      * Appends code to the message.
      *
      * @param language The language, e.g. "java".
-     * @param code The code.
+     * @param code     The code.
      * @return The current instance in order to chain call methods.
      */
     public InteractionMessageBuilder appendCode(String language, String code) {
@@ -111,6 +112,71 @@ public class InteractionMessageBuilder {
      */
     public InteractionMessageBuilder addEmbeds(EmbedBuilder... embeds) {
         delegate.addEmbeds(embeds);
+        return this;
+    }
+
+    /**
+     * Adds multiple components to the message.
+     *
+     * @param builders The component builders.
+     * @return The current instance in order to chain call methods.
+     */
+    public InteractionMessageBuilder addComponents(HighLevelComponentBuilder... builders) {
+        delegate.addComponents(builders);
+        return this;
+    }
+
+    /**
+     * Copy a message's values into this build instance.
+     *
+     * @param message The message to copy.
+     * @return The current instance in order to chain call methods.
+     */
+    public InteractionMessageBuilder copy(Message message) {
+        delegate.copy(message);
+        return this;
+    }
+
+    /**
+     * Copy an interaction's message.
+     *
+     * @param interaction The interaction to copy.
+     * @return The current instance in order to chain call methods/
+     */
+    public InteractionMessageBuilder copy(Interaction interaction) {
+        interaction.getMessage().ifPresent(delegate::copy);
+        return this;
+    }
+
+    /**
+     * Removes all components from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public InteractionMessageBuilder removeAllComponents() {
+        delegate.removeAllComponents();
+        return this;
+    }
+
+    /**
+     * Remove a component from the message.
+     *
+     * @param index The index placement to remove from.
+     * @return The current instance in order to chain call methods.
+     */
+    public InteractionMessageBuilder removeComponent(int index) {
+        delegate.removeComponent(index);
+        return this;
+    }
+
+    /**
+     * Remove a component from the message.
+     *
+     * @param builder The component.
+     * @return The current instance in order to chain call methods.
+     */
+    public InteractionMessageBuilder removeComponent(HighLevelComponentBuilder builder) {
+        delegate.removeComponent(builder);
         return this;
     }
 
@@ -495,11 +561,21 @@ public class InteractionMessageBuilder {
      * for attachments like {@link EmbedBuilder#setFooter(String, String)} if available.
      * If you want to upload attachments use {@link #editOriginalResponse(Interaction)} instead.
      *
-     * @param interaction The interaction to send the response.
+     * @param interaction The interaction.
      * @return The CompletableFuture when your message was sent.
      */
-    public CompletableFuture<Void> sendInitialResponse(Interaction interaction) {
-        return delegate.sendInitialResponse(interaction);
+    public CompletableFuture<InteractionMessageBuilder> sendInitialResponse(Interaction interaction) {
+        CompletableFuture<InteractionMessageBuilder> future = new CompletableFuture<>();
+
+        CompletableFuture<Void> job = delegate.sendInitialResponse(interaction)
+                .thenRun(() -> {
+                    future.complete(this);
+                })
+                .exceptionally(e -> {
+                    future.completeExceptionally(e);
+                    return null;
+                });
+        return future;
     }
 
     /**
@@ -510,8 +586,8 @@ public class InteractionMessageBuilder {
      * In comparison to {@link #sendInitialResponse(Interaction)} this method allows you to upload attachments
      * with your message.
      *
-     * @param interaction The interaction to send the response.
-     * @return The sent message.
+     * @param interaction The interaction.
+     * @return The edited message.
      */
     public CompletableFuture<Message> editOriginalResponse(Interaction interaction) {
         return delegate.editOriginalResponse(interaction);
@@ -520,7 +596,7 @@ public class InteractionMessageBuilder {
     /**
      * Sends a followup message to an interaction.
      *
-     * @param interaction The interaction to send the followup message to.
+     * @param interaction The interaction.
      * @return The sent message.
      */
     public CompletableFuture<Message> sendFollowupMessage(Interaction interaction) {
@@ -530,7 +606,7 @@ public class InteractionMessageBuilder {
     /**
      * Edits a followup message from an interaction.
      *
-     * @param interaction The interaction where the edited message belongs to.
+      @param interaction The interaction.
      * @param messageId The message id of the followup message which should be edited.
      * @return The edited message.
      */
@@ -541,7 +617,7 @@ public class InteractionMessageBuilder {
     /**
      * Edits a followup message from an interaction.
      *
-     * @param interaction The interaction where the edited message belongs to.
+     * @param interaction The interaction.
      * @param messageId The message id of the followup message which should be edited.
      * @return The edited message.
      */
@@ -549,4 +625,34 @@ public class InteractionMessageBuilder {
         return delegate.editFollowupMessage(interaction, messageId);
     }
 
+    /**
+     * Update the message the components were attached to.
+     *
+     * @param interaction The original interaction.
+     * @return The completable future to determine if the message was updated.
+     */
+    public CompletableFuture<Void> update(Interaction interaction) {
+        return delegate.update(interaction);
+    }
+
+    /**
+     * Delete the original response.
+     *
+     * @param interaction The interaction.
+     * @return The completable future when the message has been deleted.
+     */
+    public CompletableFuture<Void> deleteInitialResponse(Interaction interaction) {
+        return delegate.deleteInitialResponse(interaction);
+    }
+    
+    /**
+     * Delete a followup message from an interaction.
+     *
+     * @param interaction The interaction.
+     * @param messageId   The message id of the followup message which should be deleted.
+     * @return The deleted message.
+     */
+    public CompletableFuture<Void> deleteFollowupMessage(Interaction interaction, String messageId) {
+        return delegate.deleteFollowupMessage(interaction, messageId);
+    }
 }

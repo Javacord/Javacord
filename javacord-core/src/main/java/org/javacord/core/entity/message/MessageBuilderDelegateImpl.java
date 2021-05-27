@@ -13,14 +13,21 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
+import org.javacord.api.entity.message.component.ActionRow;
+import org.javacord.api.entity.message.component.ActionRowBuilder;
+import org.javacord.api.entity.message.component.ComponentType;
+import org.javacord.api.entity.message.component.HighLevelComponent;
+import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.message.component.internal.ActionRowBuilderDelegateImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsImpl;
 import org.javacord.core.entity.user.Member;
@@ -36,6 +43,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -76,6 +84,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     protected final List<FileContainer> attachments = new ArrayList<>();
 
     /**
+     * A list with all the components which should be added to the message.
+     */
+    protected final List<HighLevelComponentBuilder> components = new ArrayList<>();
+
+    /**
      * The MentionsBuilder used to control mention behavior.
      */
     protected AllowedMentions allowedMentions = null;
@@ -84,6 +97,12 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
      * The message to reply to.
      */
     protected Long replyingTo = null;
+
+
+    @Override
+    public void addComponents(HighLevelComponentBuilder... builders) {
+        this.components.addAll(Arrays.asList(builders));
+    }
 
     @Override
     public void appendCode(String language, String code) {
@@ -135,9 +154,51 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         }
     }
 
+    /**
+     * Fill the builder's values with a message.
+     *
+     * @param message The message to copy.
+     */
+    @Override
+    public void copy(Message message) {
+        this.getStringBuilder().append(message.getContent());
+
+        if (!message.getEmbeds().isEmpty()) {
+            this.addEmbed(message.getEmbeds().get(0).toBuilder());
+        }
+
+        for (MessageAttachment attachment : message.getAttachments()) {
+            // Since spoiler status is encoded in the file name, it is copied automatically.
+            this.addAttachment(attachment.getUrl());
+        }
+
+        for (HighLevelComponent component : message.getComponents()) {
+            if (component.getType() == ComponentType.ACTION_ROW) {
+                ActionRowBuilder builder = new ActionRowBuilder();
+                builder.copy((ActionRow) component);
+                this.addComponents(builder);
+            }
+        }
+    }
+
     @Override
     public void removeAllEmbeds() {
         embeds.clear();
+    }
+
+    @Override
+    public void removeComponent(int index) {
+        components.remove(index);
+    }
+
+    @Override
+    public void removeComponent(HighLevelComponentBuilder component) {
+        components.remove(component);
+    }
+
+    @Override
+    public void removeAllComponents() {
+        components.clear();
     }
 
     @Override
@@ -325,6 +386,9 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             // As only messages sent by webhooks can contain more than one embed, it is enough to add the first.
             ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).toJsonNode(body.putObject("embed"));
         }
+
+        prepareComponents(body);
+
         if (nonce != null) {
             body.put("nonce", nonce);
         }
@@ -396,6 +460,20 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         }
         if (avatarUrl != null) {
             body.put("avatar_url", avatarUrl.toExternalForm());
+        }
+
+        if (embeds.size() != 0) {
+            ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
+            for (int i = 0; i < embeds.size() && i < 10; i++) {
+                embedsNode.add(((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).toJsonNode());
+            }
+            body.set("embeds", embedsNode);
+        }
+
+        prepareComponents(body);
+
+        if (strBuilder.length() != 0) {
+            body.put("content", strBuilder.toString());
         }
 
         RestRequest<Message> request =
@@ -520,4 +598,14 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         return strBuilder.toString();
     }
 
+    protected void prepareComponents(ObjectNode body) {
+        if (components.size() != 0) {
+            ArrayNode componentsNode = JsonNodeFactory.instance.objectNode().arrayNode();
+            for (int i = 0; i < components.size() && i < 5; i++) {
+                ActionRowBuilderDelegateImpl component = (ActionRowBuilderDelegateImpl) components.get(i).getDelegate();
+                componentsNode.add(component.toJsonNode());
+            }
+            body.set("components", componentsNode);
+        }
+    }
 }

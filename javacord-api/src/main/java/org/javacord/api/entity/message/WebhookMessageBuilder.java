@@ -3,6 +3,7 @@ package org.javacord.api.entity.message;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -103,6 +104,49 @@ public class WebhookMessageBuilder {
      */
     public WebhookMessageBuilder appendNewLine() {
         delegate.appendNewLine();
+        return this;
+    }
+
+    /**
+     * Adds multiple components to the message.
+     *
+     * @param components The component builders.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addComponents(HighLevelComponentBuilder... components) {
+        delegate.addComponents(components);
+        return this;
+    }
+
+    /**
+     * Removes all components from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder removeAllComponents() {
+        delegate.removeAllComponents();
+        return this;
+    }
+
+    /**
+     * Remove a component from the message.
+     *
+     * @param index The index placement to remove from.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder removeComponent(int index) {
+        delegate.removeComponent(index);
+        return this;
+    }
+
+    /**
+     * Remove a component from the message.
+     *
+     * @param builder The component.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder removeComponent(HighLevelComponentBuilder builder) {
+        delegate.removeComponent(builder);
         return this;
     }
 

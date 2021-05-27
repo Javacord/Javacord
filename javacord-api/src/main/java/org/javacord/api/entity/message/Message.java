@@ -12,6 +12,7 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
@@ -817,6 +818,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A list which contains all reactions of the message.
      */
     List<Reaction> getReactions();
+
+    /**
+     * Gets a list with all components of the message.
+     *
+     * @return A list which contains all components of the message.
+     */
+    List<HighLevelComponent> getComponents();
 
     /**
      * Gets a list with all users mentioned in this message.

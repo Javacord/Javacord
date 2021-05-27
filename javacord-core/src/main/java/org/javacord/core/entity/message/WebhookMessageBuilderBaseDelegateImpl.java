@@ -32,5 +32,4 @@ public class WebhookMessageBuilderBaseDelegateImpl extends MessageBuilderDelegat
     public void removeEmbeds(EmbedBuilder... embeds) {
         this.embeds.removeAll(Arrays.asList(embeds));
     }
-
 }
