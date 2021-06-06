@@ -1,0 +1,29 @@
+name: Codestyle
+on: pull_request
+
+jobs:
+  checkstyle_job:
+    runs-on: ubuntu-latest
+    name: Create checkstyle report
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Run check style (core)
+        run: ./gradlew javacord-core:checkstyleMain
+        continue-on-error: true
+      - name: Run check style (api)
+        run: ./gradlew javacord-api:checkstyleMain
+        continue-on-error: true
+      - name: Setup Reviewdog
+        uses: reviewdog/action-setup@v1
+      - name: Run reviewdog
+        run: cat build/javacord-core/reports/checkstyle/main.xml \
+          | reviewdog -f=checkstyle -name="Check style (core)" -reporter=github-pr-check -filter-mode="nofilter" \
+          && cat build/javacord-api/reports/checkstyle/main.xml \
+          | reviewdog -f=checkstyle -name="Check style (api)" -reporter=github-pr-check -filter-mode="nofilter"
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
