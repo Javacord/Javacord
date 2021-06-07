@@ -54,6 +54,8 @@ public enum RestRequestResultErrorCode {
             "This message cannot be edited due to announcement rate limits"),
     THE_CHANNEL_YOU_ARE_WRITING_HAS_HIT_THE_WRITE_RATE_LIMIT(20028,
             "The channel you are writing has hit the write rate limit"),
+    YOUR_STAGE_TOPIC_CONTAINS_WORDS_THAT_ARE_NOT_ALLOWED_FOR_PUBLIC_STAGES(20031,
+            "Your Stage topic contains words that are not allowed for public Stages"),
     MAXIMUM_NUMBER_OF_GUILDS_REACHED(30001, "Maximum number of guilds reached (100)"),
     MAXIMUM_NUMBER_OF_FRIENDS_REACHED(30002, "Maximum number of friends reached (1000)"),
     MAXIMUM_NUMBER_OF_PINS_REACHED(30003, "Maximum number of pins reached (50)"),
