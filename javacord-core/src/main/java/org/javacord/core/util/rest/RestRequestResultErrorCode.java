@@ -66,6 +66,8 @@ public enum RestRequestResultErrorCode {
     MAXIMUM_NUMBER_OF_ATTACHMENTS_IN_A_MESSAGE_REACHED(30015,
             "Maximum number of attachments in a message reached (10)"),
     MAXIMUM_NUMBER_OF_INVITES_REACHED(30016, "Maximum number of invites reached (1000)"),
+    MAXIMUM_NUMBER_OF_ANIMATED_EMOJIS_REACHED(30018, "Maximum number of animated emojis reached"),
+    MAXIMUM_NUMBER_OF_SERVER_MEMBERS_REACHED(30019, "Maximum number of server members reached"),
     SERVER_ALREADY_HAS_A_TEMPLATE(30031, "Server already has a template"),
     UNAUTHORIZED(40001, "Unauthorized"),
     YOU_NEED_TO_VERIFY_YOUR_ACCOUNT_IN_ORDER_TO_PERFORM_THIS_ACTION(40002,
