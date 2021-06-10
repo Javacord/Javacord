@@ -30,6 +30,7 @@ import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
 
 import java.awt.Color;
@@ -2106,6 +2107,21 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
                         .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }
+
+    /**
+     * Gets a list with all application commands for the given server.
+     *
+     * @return A list with all application commands from the server.
+     */
+    CompletableFuture<List<ApplicationCommand>> getApplicationCommands();
+
+    /**
+     * Gets a server application command by its id.
+     *
+     * @param commandId The id of the server application command.
+     * @return The server application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getApplicationCommandById(long commandId);
 
     /**
      * Creates a new channel category builder.
