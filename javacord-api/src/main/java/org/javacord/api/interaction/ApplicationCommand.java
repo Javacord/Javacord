@@ -48,4 +48,14 @@ public interface ApplicationCommand extends DiscordEntity {
      * @return A future to check if the deletion was successful.
      */
     CompletableFuture<Void> delete();
+
+    /**
+     * Creates an application command updater from this ApplicationCommand instance.
+     *
+     * @return The application command updater for this ApplicationCommand instance.
+     */
+    default ApplicationCommandUpdater createApplicationCommandUpdater() {
+        return new ApplicationCommandUpdater(this.getId());
+    }
+
 }
