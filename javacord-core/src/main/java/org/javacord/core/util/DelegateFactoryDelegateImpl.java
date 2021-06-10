@@ -38,6 +38,7 @@ import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
@@ -75,6 +76,7 @@ import org.javacord.core.entity.webhook.WebhookUpdaterDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandOptionBuilderDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandOptionChoiceBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandUpdaterDelegateImpl;
 import org.javacord.core.util.exception.DiscordExceptionValidatorImpl;
 import org.javacord.core.util.logging.ExceptionLoggerDelegateImpl;
 
@@ -166,6 +168,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api) {
         return new AccountUpdaterDelegateImpl(((DiscordApiImpl) api));
+    }
+
+    @Override
+    public ApplicationCommandUpdaterDelegate createApplicationCommandUpdaterDelegate(long commandId) {
+        return new ApplicationCommandUpdaterDelegateImpl(commandId);
     }
 
     @Override

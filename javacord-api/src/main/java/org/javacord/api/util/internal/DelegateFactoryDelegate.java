@@ -38,6 +38,7 @@ import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
@@ -177,6 +178,14 @@ public interface DelegateFactoryDelegate {
      * @return A new account updater delegate.
      */
     AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api);
+
+    /**
+     * Creates a new application command updater delegate.
+     *
+     * @param commandId The application command id.
+     * @return A new application command updater delegate.
+     */
+    ApplicationCommandUpdaterDelegate createApplicationCommandUpdaterDelegate(long commandId);
 
     /**
      * Creates a new group channel updater delegate.
