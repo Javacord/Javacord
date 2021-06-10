@@ -49,7 +49,7 @@ public enum RestEndpoint {
     INTERACTION_RESPONSE("/interactions/%s/%s/callback", 0),
     ORIGINAL_INTERACTION_RESPONSE("/webhooks/%s/%s/messages/@original",0),
     APPLICATION_COMMANDS("/applications/%s/commands", 0),
-    GUILD_APPLICATION_COMMANDS("/applications/%s/guilds/%s/commands", 1);
+    SERVER_APPLICATION_COMMANDS("/applications/%s/guilds/%s/commands",1);
 
     /**
      * The endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix".

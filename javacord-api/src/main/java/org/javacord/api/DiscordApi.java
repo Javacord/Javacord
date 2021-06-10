@@ -108,6 +108,23 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId);
 
     /**
+     * Gets a list with all application commands for the given server.
+     *
+     * @param server The server to get the application commands from.
+     * @return A list with all application commands from the server.
+     */
+    CompletableFuture<List<ApplicationCommand>> getServerApplicationCommands(Server server);
+
+    /**
+     * Gets a server application command by its id.
+     *
+     * @param server The server to get the application commands from.
+     * @param commandId The id of the server application command.
+     * @return The server application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server,long commandId);
+
+    /**
      * Gets a utility class to interact with uncached messages.
      *
      * @return A utility class to interact with uncached messages.

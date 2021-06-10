@@ -1328,21 +1328,37 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public CompletableFuture<List<ApplicationCommand>> getGlobalApplicationCommands() {
         return new RestRequest<List<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-            .setUrlParameters(String.valueOf(clientId))
-            .execute(result -> {
-                List<ApplicationCommand> applicationCommands = new ArrayList<>();
-                for (JsonNode applicationCommandJson : result.getJsonBody()) {
-                    applicationCommands.add(new ApplicationCommandImpl(this, applicationCommandJson));
-                }
-                return Collections.unmodifiableList(applicationCommands);
-            });
+                .setUrlParameters(String.valueOf(clientId))
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId) {
         return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-            .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
-            .execute(result -> new ApplicationCommandImpl(this, result.getJsonBody()));
+                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .execute(result -> new ApplicationCommandImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> getServerApplicationCommands(Server server) {
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long commandId) {
+        return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> new ApplicationCommandImpl(this, result.getJsonBody()));
+    }
+
+    private List<ApplicationCommand> jsonToApplicationCommandList(JsonNode resultJson) {
+        List<ApplicationCommand> applicationCommands = new ArrayList<>();
+        for (JsonNode applicationCommandJson : resultJson) {
+            applicationCommands.add(new ApplicationCommandImpl(this, applicationCommandJson));
+        }
+        return Collections.unmodifiableList(applicationCommands);
     }
 
     @Override

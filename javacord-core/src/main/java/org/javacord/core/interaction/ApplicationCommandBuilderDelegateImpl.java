@@ -58,7 +58,7 @@ public class ApplicationCommandBuilderDelegateImpl implements ApplicationCommand
     @Override
     public CompletableFuture<ApplicationCommand> createForServer(Server server) {
         return new RestRequest<ApplicationCommand>(
-            server.getApi(), RestMethod.POST, RestEndpoint.GUILD_APPLICATION_COMMANDS)
+            server.getApi(), RestMethod.POST, RestEndpoint.SERVER_APPLICATION_COMMANDS)
             .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
             .setBody(getJsonBodyForApplicationCommand())
             .execute(result -> new ApplicationCommandImpl((DiscordApiImpl) server.getApi(), result.getJsonBody()));

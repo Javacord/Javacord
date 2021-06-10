@@ -39,6 +39,7 @@ import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.WebhookType;
+import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.IconImpl;
@@ -1509,6 +1510,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public Collection<KnownCustomEmoji> getCustomEmojis() {
         return Collections.unmodifiableCollection(new ArrayList<>(customEmojis));
+    }
+
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> getApplicationCommands() {
+        return api.getServerApplicationCommands(this);
+    }
+
+    @Override
+    public CompletableFuture<ApplicationCommand> getApplicationCommandById(long commandId) {
+        return api.getServerApplicationCommandById(this, commandId);
     }
 
     @Override
