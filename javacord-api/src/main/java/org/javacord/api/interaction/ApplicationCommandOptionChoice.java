@@ -45,4 +45,30 @@ public interface ApplicationCommandOptionChoice {
                 .orElseThrow(() ->
                         new AssertionError("Application command option choice value that's neither a string nor int")));
     }
+
+    /**
+     * Create a new option choice builder to be used with a command option builder.
+     *
+     * @param name  The name of the choice.
+     * @param value The value of the choice.
+     * @return The new choice builder.
+     */
+    static ApplicationCommandOptionChoiceBuilder with(String name, String value) {
+        return new ApplicationCommandOptionChoiceBuilder()
+                .setName(name)
+                .setValue(value);
+    }
+
+    /**
+     * Create a new option choice builder to be used with a command option builder.
+     *
+     * @param name  The name of the choice.
+     * @param value The value of the choice.
+     * @return The new choice builder.
+     */
+    static ApplicationCommandOptionChoiceBuilder with(String name, int value) {
+        return new ApplicationCommandOptionChoiceBuilder()
+                .setName(name)
+                .setValue(value);
+    }
 }

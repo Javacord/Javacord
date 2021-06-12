@@ -1,9 +1,13 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.server.Server;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public interface ApplicationCommand extends DiscordEntity {
 
@@ -50,6 +54,51 @@ public interface ApplicationCommand extends DiscordEntity {
     CompletableFuture<Void> delete();
 
     /**
+     * Create a new application command builder with the given name and description.
+     * Call {@link ApplicationCommandBuilder#createForServer(Server)} or
+     *     {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param name The name of the new application command.
+     * @param description The description of the new application command.
+     * @return The new application command builder
+     */
+    static ApplicationCommandBuilder with(String name, String description) {
+        return new ApplicationCommandBuilder()
+                .setName(name)
+                .setDescription(description);
+    }
+
+    /**
+     * Create a new application command builder with the given name, description and options.
+     * Call {@link ApplicationCommandBuilder#createForServer(Server)} or
+     *     {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param name The name of the new application command.
+     * @param description The description of the new application command.
+     * @param options The options to add to the command
+     * @return The new application command builder
+     */
+    static ApplicationCommandBuilder with(String name, String description, ApplicationCommandOptionBuilder... options) {
+        return with(name, description, Arrays.stream(options)
+                .map(ApplicationCommandOptionBuilder::build)
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * Create a new application command builder with the given name, description and options.
+     * Call {@link ApplicationCommandBuilder#createForServer(Server)} or
+     *     {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param name The name of the new application command.
+     * @param description The description of the new application command.
+     * @param options The options to add to the command
+     * @return The new application command builder
+     */
+    static ApplicationCommandBuilder with(String name, String description, List<ApplicationCommandOption> options) {
+        return with(name, description).setOptions(options);
+    }
+
+    /**
      * Creates an application command updater from this ApplicationCommand instance.
      *
      * @return The application command updater for this ApplicationCommand instance.
@@ -57,5 +106,4 @@ public interface ApplicationCommand extends DiscordEntity {
     default ApplicationCommandUpdater createApplicationCommandUpdater() {
         return new ApplicationCommandUpdater(this.getId());
     }
-
 }

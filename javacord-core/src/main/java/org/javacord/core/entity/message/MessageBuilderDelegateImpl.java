@@ -21,6 +21,7 @@ import org.javacord.api.entity.message.component.ActionRowBuilder;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
+import org.javacord.api.entity.message.component.LowLevelComponentBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -102,6 +103,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     @Override
     public void addComponents(HighLevelComponentBuilder... builders) {
         this.components.addAll(Arrays.asList(builders));
+    }
+
+    @Override
+    public void addActionRow(LowLevelComponentBuilder... builders) {
+        this.addComponents(ActionRow.of(builders));
     }
 
     @Override

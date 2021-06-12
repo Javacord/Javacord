@@ -29,6 +29,17 @@ public class ButtonBuilder implements LowLevelComponentBuilder {
     }
 
     /**
+     * Add this button to a new action row and return the new action row.
+     * This is useful if you only want one button and quickly wrap it into an ActionRow to be used with a message.
+     * @return The new ActionRowBuilder with this button added to it.
+     *
+     */
+    public ActionRowBuilder inActionRow() {
+        return new ActionRowBuilder()
+                .addComponents(this);
+    }
+
+    /**
      * Set the button's style.
      *
      * @param style A new button style.
