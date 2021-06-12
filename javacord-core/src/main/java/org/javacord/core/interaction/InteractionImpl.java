@@ -5,44 +5,47 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.interaction.ApplicationCommandInteractionData;
 import org.javacord.api.interaction.Interaction;
-import org.javacord.api.interaction.InteractionComponentData;
-import org.javacord.api.interaction.InteractionData;
 import org.javacord.api.interaction.InteractionType;
+import org.javacord.api.interaction.callback.InteractionFollowupMessageBuilder;
+import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.message.MessageImpl;
+import org.javacord.core.entity.message.InteractionCallbackType;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.logging.LoggerUtil;
+import org.javacord.core.util.rest.RestEndpoint;
+import org.javacord.core.util.rest.RestMethod;
+import org.javacord.core.util.rest.RestRequest;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
-public class InteractionImpl implements Interaction {
+public abstract class InteractionImpl implements Interaction {
 
     private static final Logger logger = LoggerUtil.getLogger(InteractionImpl.class);
+
+    private static final String RESPOND_LATER_BODY =
+            "{\"type\": " + InteractionCallbackType.DeferredChannelMessageWithSource.getId() + "}";
 
     private final DiscordApiImpl api;
     private final TextChannel channel;
 
     private final long id;
     private final long applicationId;
-    private final InteractionType type;
-    private final InteractionData data;
     private final UserImpl user;
-    private final Message message;
     private final String token;
     private final int version;
 
     /**
      * Class constructor.
      *
-     * @param api The api instance.
-     * @param channel The channel in which the interaction happened. Can be {@code null}.
+     * @param api      The api instance.
+     * @param channel  The channel in which the interaction happened. Can be {@code null}.
      * @param jsonData The json data of the interaction.
      */
     public InteractionImpl(DiscordApiImpl api, TextChannel channel, JsonNode jsonData) {
@@ -51,19 +54,6 @@ public class InteractionImpl implements Interaction {
 
         id = jsonData.get("id").asLong();
         applicationId = jsonData.get("application_id").asLong();
-        type = InteractionType.fromValue(jsonData.get("type").asInt());
-        message = jsonData.has("message") ? new MessageImpl(api, channel, jsonData.get("message")) : null;
-        if (jsonData.has("data")) {
-            if (type == InteractionType.APPLICATION_COMMAND) {
-                data = new ApplicationCommandInteractionDataImpl(api, jsonData.get("data"));
-            } else if (type == InteractionType.MESSAGE_COMPONENT) {
-                data = new InteractionComponentDataImpl(jsonData.get("data"));
-            } else {
-                data = null;
-            }
-        } else {
-            data = null;
-        }
         if (jsonData.hasNonNull("member")) {
             MemberImpl member = new MemberImpl(
                     api,
@@ -98,50 +88,35 @@ public class InteractionImpl implements Interaction {
     }
 
     @Override
-    public InteractionType getType() {
-        return type;
+    public abstract InteractionType getType();
+
+    @Override
+    public InteractionImmediateResponseBuilder createImmediateResponder() {
+        return new InteractionImmediateResponseBuilderImpl(this);
     }
 
     @Override
-    public Optional<InteractionData> getData() {
-        return Optional.ofNullable(data);
+    public CompletableFuture<InteractionOriginalResponseUpdater> respondLater() {
+        return new RestRequest<InteractionOriginalResponseUpdater>(this.api,
+                RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
+                .setUrlParameters(getIdAsString(), token)
+                .setBody(RESPOND_LATER_BODY)
+                .execute(result -> new InteractionOriginalResponseUpdaterImpl(this));
     }
 
     @Override
-    public Optional<ApplicationCommandInteractionData> getCommandData() {
-        ApplicationCommandInteractionData res = null;
-        if (this.type == InteractionType.APPLICATION_COMMAND) {
-            res = (ApplicationCommandInteractionDataImpl) this.data;
-        }
-        return Optional.ofNullable(res);
-    }
-
-    @Override
-    public Optional<InteractionComponentData> getComponentData() {
-        InteractionComponentData res = null;
-        if (this.type == InteractionType.MESSAGE_COMPONENT) {
-            res = (InteractionComponentDataImpl) this.data;
-        }
-        return Optional.ofNullable(res);
+    public InteractionFollowupMessageBuilder createFollowupMessageBuilder() {
+        return new InteractionFollowupMessageBuilderImpl(this);
     }
 
     @Override
     public Optional<Server> getServer() {
-        if (channel instanceof ServerChannel) {
-            return Optional.of(((ServerChannel) channel).getServer());
-        } else {
-            return Optional.empty();
-        }
+        return channel.asServerChannel().map(ServerChannel::getServer);
     }
 
     @Override
     public Optional<TextChannel> getChannel() {
         return Optional.ofNullable(channel);
-    }
-
-    @Override
-    public Optional<Message> getMessage() {
-        return Optional.ofNullable(message);
     }
 
     @Override

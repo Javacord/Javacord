@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
-import org.javacord.api.interaction.Interaction;
+import org.javacord.api.interaction.InteractionBase;
+import org.javacord.api.interaction.MessageComponentInteraction;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
+import org.javacord.core.interaction.InteractionImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -32,7 +34,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
-    public CompletableFuture<Void> sendInitialResponse(Interaction interaction) {
+    public CompletableFuture<Void> sendInitialResponse(InteractionBase interaction) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         topBody.put("type", InteractionCallbackType.ChannelMessageWithSource.getId());
         ObjectNode body = topBody.putObject("data");
@@ -46,7 +48,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
-    public CompletableFuture<Void> deleteInitialResponse(Interaction interaction) {
+    public CompletableFuture<Void> deleteInitialResponse(InteractionBase interaction) {
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.DELETE, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
@@ -54,7 +56,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
-    public CompletableFuture<Message> editOriginalResponse(Interaction interaction) {
+    public CompletableFuture<Message> editOriginalResponse(InteractionBase interaction) {
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(),
                 RestMethod.PATCH, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken());
@@ -63,7 +65,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
-    public CompletableFuture<Message> sendFollowupMessage(Interaction interaction) {
+    public CompletableFuture<Message> sendFollowupMessage(InteractionBase interaction) {
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken());
@@ -72,11 +74,11 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
-    public CompletableFuture<Void> update(Interaction interaction) {
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         ObjectNode data = JsonNodeFactory.instance.objectNode();
         prepareCommonWebhookMessageBodyParts(data);
-        prepareComponents(data);
+        prepareComponents(data, true);
         topBody.put("type", InteractionCallbackType.UpdateMessage.getId());
         topBody.set("data", data);
 
@@ -88,7 +90,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
-    public CompletableFuture<Void> deleteFollowupMessage(Interaction interaction, String messageId) {
+    public CompletableFuture<Void> deleteFollowupMessage(InteractionBase interaction, String messageId) {
         return new RestRequest<Void>(interaction.getApi(), RestMethod.DELETE,
                 RestEndpoint.WEBHOOK_MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()),
@@ -97,13 +99,20 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     }
 
     @Override
-    public CompletableFuture<Message> editFollowupMessage(Interaction interaction, String messageId) {
-        RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(), RestMethod.POST,
+    public CompletableFuture<Message> editFollowupMessage(InteractionBase interaction, String messageId) {
+        RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(), RestMethod.PATCH,
                 RestEndpoint.WEBHOOK_MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()),
                         interaction.getToken(), messageId);
 
         return executeResponse(request);
+    }
+
+    @Override
+    public void copy(InteractionBase interaction) {
+        ((InteractionImpl) interaction).asMessageComponentInteraction()
+                .map(MessageComponentInteraction::getMessage)
+                .ifPresent(this::copy);
     }
 
     private CompletableFuture<Message> executeResponse(RestRequest<Message> request) {
@@ -115,7 +124,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
 
     private void prepareInteractionWebhookBodyParts(ObjectNode body) {
         prepareCommonWebhookMessageBodyParts(body);
-        prepareComponents(body);
+        prepareComponents(body, true);
         if (null != messageFlags) {
             body.put("flags", messageFlags.stream().mapToInt(MessageFlag::getId).sum());
         }

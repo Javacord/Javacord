@@ -605,7 +605,11 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     protected void prepareComponents(ObjectNode body) {
-        if (components.size() != 0) {
+        prepareComponents(body, false);
+    }
+
+    protected void prepareComponents(ObjectNode body, boolean evenIfEmpty) {
+        if (evenIfEmpty || components.size() != 0) {
             ArrayNode componentsNode = JsonNodeFactory.instance.objectNode().arrayNode();
             for (int i = 0; i < components.size() && i < 5; i++) {
                 ActionRowBuilderDelegateImpl component = (ActionRowBuilderDelegateImpl) components.get(i).getDelegate();

@@ -3,7 +3,7 @@ package org.javacord.api.interaction;
 import java.util.List;
 import java.util.Optional;
 
-public interface ApplicationCommandInteractionDataOption {
+public interface ApplicationCommandInteractionOption {
 
     /**
      * Gets the name of the option.
@@ -53,7 +53,7 @@ public interface ApplicationCommandInteractionDataOption {
      * @return The value of the choice as a string.
      */
     default Optional<String> getValueAsString() {
-        if (getStringValue().isPresent())  {
+        if (getStringValue().isPresent()) {
             return getStringValue();
         } else {
             return getIntValue().map(String::valueOf);
@@ -67,6 +67,6 @@ public interface ApplicationCommandInteractionDataOption {
      *
      * @return A list with all options.
      */
-    List<ApplicationCommandInteractionDataOption> getOptions();
+    List<ApplicationCommandInteractionOption> getOptions();
 
 }

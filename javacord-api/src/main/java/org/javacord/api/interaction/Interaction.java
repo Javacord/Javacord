@@ -1,89 +1,45 @@
 package org.javacord.api.interaction;
 
-import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
+import org.javacord.api.util.SafeSpecializable;
 
 import java.util.Optional;
 
-public interface Interaction extends DiscordEntity {
+public interface Interaction extends InteractionBase, SafeSpecializable<InteractionBase> {
+    /**
+     * Get this interaction as slash command interaction if the type matches.
+     *
+     * @return the interaction as slash command interaction if the type matches; an empty optional otherwise
+     */
+    default Optional<ApplicationCommandInteraction> asApplicationCommandInteraction() {
+        return as(ApplicationCommandInteraction.class);
+    }
 
     /**
-     * Gets the id of the application that this interaction is for.
+     * Get this interaction as slash command interaction if the type and the command id match.
      *
-     * @return The id of the application.
+     * @param commandId The command id to match.
+     * @return the interaction as slash command interaction if the properties match; an empty optional otherwise
      */
-    long getApplicationId();
+    default Optional<ApplicationCommandInteraction> asApplicationCommandInteractionWithCommandId(long commandId) {
+        return asApplicationCommandInteraction().filter(interaction -> interaction.getCommandId() == commandId);
+    }
 
     /**
-     * Gets the type of the interaction.
+     * Get this interaction as message component interaction if the type matches.
      *
-     * @return The type of the interaction.
+     * @return the interaction as message component interaction if the type matches; an empty optional otherwise
      */
-    InteractionType getType();
+    default Optional<MessageComponentInteraction> asMessageComponentInteraction() {
+        return as(MessageComponentInteraction.class);
+    }
 
     /**
-     * Gets the data of the interaction.
+     * Get this interaction as message component interaction if the type and the given custom id match.
      *
-     * @return The data of the interaction.
+     * @param customId The custom id to match.
+     * @return the interaction as message component interaction if the properties match; an empty optional otherwise
      */
-    Optional<InteractionData> getData();
-
-    /**
-     * Get command data.
-     *
-     * @return The application data.
-     */
-    Optional<ApplicationCommandInteractionData> getCommandData();
-
-    /**
-     * Get message component data.
-     *
-     * @return The message component data.
-     */
-    Optional<InteractionComponentData> getComponentData();
-
-    /**
-     * Gets the server that this interaction was sent from.
-     *
-     * @return The server.
-     */
-    Optional<Server> getServer();
-
-    /**
-     * Gets the channel that this interaction was sent from.
-     *
-     * @return The channel.
-     */
-    Optional<TextChannel> getChannel();
-
-    /**
-     * Gets the message that this interaction is related to.
-     *
-     * @return The message.
-     */
-    Optional<Message> getMessage();
-
-    /**
-     * Gets the invoking user.
-     *
-     * @return The invoking user.
-     */
-    User getUser();
-
-    /**
-     * Gets the continuation token for responding to the interaction.
-     *
-     * @return The token.
-     */
-    String getToken();
-
-    /**
-     * Gets the version.
-     *
-     * @return The version.
-     */
-    int getVersion();
+    default Optional<MessageComponentInteraction> asMessageComponentInteractionWithCustomId(String customId) {
+        return asMessageComponentInteraction().filter(interaction -> interaction.getCustomId().equals(customId));
+    }
 }

@@ -1,10 +1,12 @@
 package org.javacord.api.event.interaction;
 
-import org.javacord.api.entity.message.InteractionMessageBuilder;
 import org.javacord.api.event.Event;
+import org.javacord.api.interaction.ApplicationCommandInteraction;
 import org.javacord.api.interaction.Interaction;
+import org.javacord.api.interaction.InteractionBase;
+import org.javacord.api.interaction.MessageComponentInteraction;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.Optional;
 
 /**
  * An interaction create event.
@@ -19,39 +21,58 @@ public interface InteractionCreateEvent extends Event {
     Interaction getInteraction();
 
     /**
-     * Send a response to a slash command. Must be executed withing 3 seconds or the token will be invalidated.
-     * If it may take longer to respond, use {@link #respondLater()}.
+     * Gets the created interaction as ApplicationCommandInteraction, if the interaction is of this type.
      *
-     * @return The InteractionMessageBuilder to respond to the interaction.
+     * @return The interaction.
      */
-    InteractionMessageBuilder respond();
+    default Optional<ApplicationCommandInteraction> getApplicationCommandInteraction() {
+        return getInteraction().asApplicationCommandInteraction();
+    }
 
     /**
-     * Send a "loading state" as your first response. You can edit and send followup messages withing 15 minutes.
+     * Gets the created interaction as ApplicationCommandInteraction, if the interaction is of this type and the
+     * command id equals the given command id.
      *
-     * @return A Completable future when the "loading state" response has been sent.
+     * @param commandId The command it to match.
+     * @return The interaction.
      */
-    CompletableFuture<Void> respondLater();
+    default Optional<ApplicationCommandInteraction> getApplicationCommandInteractionWithCommandId(long commandId) {
+        return getInteraction().asApplicationCommandInteractionWithCommandId(commandId);
+    }
 
     /**
-     * Edit the message the component was attached to.
+     * Gets the created interaction as MessageComponentInteraction, if the interaction is of this type.
      *
-     * @return An interaction message builder.
+     * @return The interaction.
      */
-    InteractionMessageBuilder updateComponentMessage();
+    default Optional<MessageComponentInteraction> getMessageComponentInteraction() {
+        return getInteraction().asMessageComponentInteraction();
+    }
 
     /**
-     * Edit the message the component was attached to later.
+     * Gets the created interaction as MessageComponentInteraction, if the interaction is of this type, and the
+     * custom id equals the given custom id.
      *
-     * @return A completable future which lets Discord know the message will be updated later.
+     * @param customId The custom id to match.
+     * @return The interaction.
      */
-    CompletableFuture<Void> updateComponentMessageLater();
+    default Optional<MessageComponentInteraction> getMessageComponentInteractionWithCustomId(String customId) {
+        return getInteraction().asMessageComponentInteractionWithCustomId(customId);
+    }
 
     /**
-     * Deletes the initial response.
+     * For advanced users: Get the interaction as a desired subtype of interaction.
+     * Use this as a shortcut if you know which type of deeply nested interaction type you're expecting.
+     * For regular users, we recommend to use the different {@code getXXX()} methods to walk down the interaction
+     * inheritance tree.
      *
-     * @return The completable future when the message has been deleted.
+     * <p>If the interaction is not castable to the specified type, the {@code Optional} will be empty.
+     *
+     * @param type The type as which to obtain this interaction.
+     * @param <T>  The desired type.
+     * @return Returns an {@code Optional} of this interaction if it could be cast, otherwise an empty result.
      */
-    CompletableFuture<Void> deleteInitialResponse();
-
+    default <T extends InteractionBase> Optional<T> getInteractionAs(Class<T> type) {
+        return getInteraction().as(type);
+    }
 }
