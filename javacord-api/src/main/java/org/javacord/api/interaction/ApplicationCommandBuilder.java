@@ -67,6 +67,8 @@ public class ApplicationCommandBuilder {
 
     /**
      * Creates a global application command.
+     * When used to update multiple global application commands at once
+     * {@link DiscordApi#bulkOverwriteGlobalApplicationCommands(List)} should be used instead.
      *
      * @param api The discord api instance.
      * @return The built application command.
@@ -77,11 +79,22 @@ public class ApplicationCommandBuilder {
 
     /**
      * Creates an application command for a specific server.
+     * When used to create multiple server application commands at once
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(List, Server)} (List)} should be used instead.
      *
      * @param server The server.
      * @return The built application command.
      */
     public CompletableFuture<ApplicationCommand> createForServer(Server server) {
         return delegate.createForServer(server);
+    }
+
+    /**
+     * Gets the delegate used by the application command builder internally.
+     *
+     * @return The delegate used by this application command builder internally.
+     */
+    public ApplicationCommandBuilderDelegate getDelegate() {
+        return delegate;
     }
 }

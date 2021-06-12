@@ -56,7 +56,7 @@ public interface ApplicationCommand extends DiscordEntity {
     /**
      * Create a new application command builder with the given name and description.
      * Call {@link ApplicationCommandBuilder#createForServer(Server)} or
-     *     {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     * {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name The name of the new application command.
      * @param description The description of the new application command.
@@ -71,7 +71,7 @@ public interface ApplicationCommand extends DiscordEntity {
     /**
      * Create a new application command builder with the given name, description and options.
      * Call {@link ApplicationCommandBuilder#createForServer(Server)} or
-     *     {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     * {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name The name of the new application command.
      * @param description The description of the new application command.
@@ -87,7 +87,7 @@ public interface ApplicationCommand extends DiscordEntity {
     /**
      * Create a new application command builder with the given name, description and options.
      * Call {@link ApplicationCommandBuilder#createForServer(Server)} or
-     *     {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     * {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name The name of the new application command.
      * @param description The description of the new application command.
@@ -96,6 +96,19 @@ public interface ApplicationCommand extends DiscordEntity {
      */
     static ApplicationCommandBuilder with(String name, String description, List<ApplicationCommandOption> options) {
         return with(name, description).setOptions(options);
+    }
+
+    /**
+     * Create a new prefilled application command builder from the given application command.
+     * Call {@link ApplicationCommandBuilder#createForServer(Server)} or
+     * {@link ApplicationCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param applicationCommand The application command which the application command builder should be prefilled with.
+     * @return The new prefilled application command builder.
+     */
+    static ApplicationCommandBuilder createPrefilledApplicationCommandBuilder(ApplicationCommand applicationCommand) {
+        return with(applicationCommand.getName(), applicationCommand.getDescription())
+                .setOptions(applicationCommand.getOptions());
     }
 
     /**

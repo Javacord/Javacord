@@ -2,6 +2,8 @@ package org.javacord.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -37,6 +39,7 @@ import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.ApplicationCommandBuilder;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -60,6 +63,7 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.user.UserPresence;
 import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
+import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
@@ -1359,6 +1363,37 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             applicationCommands.add(new ApplicationCommandImpl(this, applicationCommandJson));
         }
         return Collections.unmodifiableList(applicationCommands);
+    }
+
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            List<ApplicationCommandBuilder> applicationCommandBuilderList) {
+        ArrayNode body = JsonNodeFactory.instance.arrayNode();
+        for (ApplicationCommandBuilder applicationCommandBuilder : applicationCommandBuilderList) {
+            body.add(((ApplicationCommandBuilderDelegateImpl) applicationCommandBuilder.getDelegate())
+                    .getJsonBodyForApplicationCommand());
+        }
+
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId))
+                .setBody(body)
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            List<ApplicationCommandBuilder> applicationCommandBuilderList, Server server) {
+        ArrayNode body = JsonNodeFactory.instance.arrayNode();
+        for (ApplicationCommandBuilder applicationCommandBuilder : applicationCommandBuilderList) {
+            body.add(((ApplicationCommandBuilderDelegateImpl) applicationCommandBuilder.getDelegate())
+                    .getJsonBodyForApplicationCommand());
+        }
+
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT,
+                RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setBody(body)
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
 
     @Override
