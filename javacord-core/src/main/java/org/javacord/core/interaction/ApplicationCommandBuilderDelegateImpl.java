@@ -64,7 +64,12 @@ public class ApplicationCommandBuilderDelegateImpl implements ApplicationCommand
             .execute(result -> new ApplicationCommandImpl((DiscordApiImpl) server.getApi(), result.getJsonBody()));
     }
 
-    private ObjectNode getJsonBodyForApplicationCommand() {
+    /**
+     * Gets the JSON body for this application command.
+
+     * @return The JSON of this application command.
+     */
+    public ObjectNode getJsonBodyForApplicationCommand() {
         ObjectNode jsonBody = JsonNodeFactory.instance.objectNode()
                 .put("name", name)
                 .put("description", description);

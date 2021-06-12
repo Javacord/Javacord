@@ -30,6 +30,8 @@ import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.ApplicationCommandBuilder;
+import org.javacord.api.interaction.ApplicationCommandUpdater;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
@@ -123,6 +125,33 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return The server application command with the given id.
      */
     CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server,long commandId);
+
+    /**
+     * Bulk overwrites the global Application Commands.
+     * This should be preferably used when updating and/or creating multiple
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateGlobal(DiscordApi)} (DiscordApi)}
+     * and {@link ApplicationCommandBuilder#createGlobal(DiscordApi)}
+     *
+     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders
+     *     which should should be used to perform the bulk overwrite.
+     * @return A list containing all Application Commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            List<ApplicationCommandBuilder> applicationCommandBuilderList);
+
+    /**
+     * Bulk overwrites the servers Application Commands.
+     * This should be preferably used when updating and/or creating multiple
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateForServer(Server)} (Server)}
+     * and {@link ApplicationCommandBuilder#createForServer(Server)}
+     *
+     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders.
+     * @param server The server where the bulk overwrite should be performed on
+     *     which should should be used to perform the bulk overwrite.
+     * @return A list containing all Application Commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            List<ApplicationCommandBuilder> applicationCommandBuilderList, Server server);
 
     /**
      * Gets a utility class to interact with uncached messages.
