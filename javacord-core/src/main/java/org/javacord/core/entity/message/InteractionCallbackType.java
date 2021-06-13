@@ -12,19 +12,19 @@ public enum InteractionCallbackType {
     /**
      * Respond to an interaction with a message.
      */
-    ChannelMessageWithSource(4),
+    CHANNEL_MESSAGE_WITH_SOURCE(4),
     /**
      * ACK an interaction and edit a response later, the user sees a loading state.
      */
-    DeferredChannelMessageWithSource(5),
+    DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE(5),
     /**
      * For components, ACK an interaction and edit the original message later; the user does not see a loading state.
      */
-    DeferredUpdateMessage(6),
+    DEFERRED_UPDATE_MESSAGE(6),
     /**
      * For components, edit the message the component was attached to.
      */
-    UpdateMessage(7),
+    UPDATE_MESSAGE(7),
 
     /**
      * An unknown interaction callback type.
@@ -65,13 +65,13 @@ public enum InteractionCallbackType {
             case 1:
                 return PONG;
             case 4:
-                return ChannelMessageWithSource;
+                return CHANNEL_MESSAGE_WITH_SOURCE;
             case 5:
-                return DeferredChannelMessageWithSource;
+                return DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
             case 6:
-                return DeferredUpdateMessage;
+                return DEFERRED_UPDATE_MESSAGE;
             case 7:
-                return UpdateMessage;
+                return UPDATE_MESSAGE;
             default:
                 return UNKNOWN;
         }

@@ -30,7 +30,7 @@ public abstract class InteractionImpl implements Interaction {
     private static final Logger logger = LoggerUtil.getLogger(InteractionImpl.class);
 
     private static final String RESPOND_LATER_BODY =
-            "{\"type\": " + InteractionCallbackType.DeferredChannelMessageWithSource.getId() + "}";
+            "{\"type\": " + InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE.getId() + "}";
 
     private final DiscordApiImpl api;
     private final TextChannel channel;
