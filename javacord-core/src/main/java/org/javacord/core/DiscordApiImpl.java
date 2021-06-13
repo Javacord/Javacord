@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -40,6 +41,9 @@ import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.ApplicationCommandBuilder;
+import org.javacord.api.interaction.ApplicationCommandPermissions;
+import org.javacord.api.interaction.ServerApplicationCommandPermissions;
+import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -65,6 +69,8 @@ import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandImpl;
+import org.javacord.core.interaction.ApplicationCommandPermissionsImpl;
+import org.javacord.core.interaction.ServerApplicationCommandPermissionsImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.cache.JavacordEntityCache;
@@ -1355,6 +1361,54 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> new ApplicationCommandImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(
+            Server server) {
+        return new RestRequest<List<ServerApplicationCommandPermissions>>(this, RestMethod.GET,
+                RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .execute(result -> jsonToServerApplicationCommandPermissionsList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
+            Server server, long commandId) {
+        return new RestRequest<ServerApplicationCommandPermissions>(this, RestMethod.GET,
+                RestEndpoint.APPLICATION_COMMAND_PERMISSIONS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> new ServerApplicationCommandPermissionsImpl(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
+            Server server, List<ServerApplicationCommandPermissionsBuilder> applicationCommandPermissionsBuilders) {
+        ArrayNode body = JsonNodeFactory.instance.arrayNode();
+        for (ServerApplicationCommandPermissionsBuilder permission : applicationCommandPermissionsBuilders) {
+            ObjectNode node = JsonNodeFactory.instance.objectNode();
+            node.put("id", permission.getCommandId());
+            ArrayNode array = node.putArray("permissions");
+            for (ApplicationCommandPermissions permissionPermission : permission.getPermissions()) {
+                array.add(((ApplicationCommandPermissionsImpl) permissionPermission).toJsonNode());
+            }
+            body.add(node);
+        }
+
+        return new RestRequest<List<ServerApplicationCommandPermissions>>(server.getApi(), RestMethod.PUT,
+                RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
+                .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
+                .setBody(body)
+                .execute(result -> jsonToServerApplicationCommandPermissionsList(result.getJsonBody()));
+    }
+
+    private List<ServerApplicationCommandPermissions> jsonToServerApplicationCommandPermissionsList(
+            JsonNode resultJson) {
+        List<ServerApplicationCommandPermissions> permissions = new ArrayList<>();
+        for (JsonNode jsonNode : resultJson) {
+            permissions.add(new ServerApplicationCommandPermissionsImpl(jsonNode));
+        }
+        return permissions;
     }
 
     private List<ApplicationCommand> jsonToApplicationCommandList(JsonNode resultJson) {

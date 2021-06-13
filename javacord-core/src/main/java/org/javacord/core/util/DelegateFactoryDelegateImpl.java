@@ -38,6 +38,8 @@ import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
@@ -76,6 +78,8 @@ import org.javacord.core.entity.webhook.WebhookUpdaterDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandOptionBuilderDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandOptionChoiceBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandPermissionsBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandPermissionsUpdaterDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandUpdaterDelegateImpl;
 import org.javacord.core.util.exception.DiscordExceptionValidatorImpl;
 import org.javacord.core.util.logging.ExceptionLoggerDelegateImpl;
@@ -228,6 +232,17 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ApplicationCommandOptionBuilderDelegate createApplicationCommandOptionBuilderDelegate() {
         return new ApplicationCommandOptionBuilderDelegateImpl();
+    }
+
+    @Override
+    public ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
+            Server server) {
+        return new ApplicationCommandPermissionsUpdaterDelegateImpl(server);
+    }
+
+    @Override
+    public ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
+        return new ApplicationCommandPermissionsBuilderDelegateImpl();
     }
 
     @Override

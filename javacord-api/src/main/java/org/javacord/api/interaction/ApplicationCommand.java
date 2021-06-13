@@ -47,6 +47,13 @@ public interface ApplicationCommand extends DiscordEntity {
     List<ApplicationCommandOption> getOptions();
 
     /**
+     * Gets the default permission of this command.
+     *
+     * @return The default permission of this command.
+     */
+    boolean getDefaultPermission();
+
+    /**
      * Deletes this application command.
      *
      * @return A future to check if the deletion was successful.

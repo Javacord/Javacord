@@ -22,6 +22,7 @@ public class ApplicationCommandImpl implements ApplicationCommand {
     private final String name;
     private final String description;
     private final List<ApplicationCommandOption> options;
+    private final boolean defaultPermission;
 
     /**
      * Class constructor.
@@ -41,6 +42,7 @@ public class ApplicationCommandImpl implements ApplicationCommand {
                 options.add(new ApplicationCommandOptionImpl(optionJson));
             }
         }
+        defaultPermission = !data.hasNonNull("default_permission") || data.get("default_permission").asBoolean();
     }
 
     @Override
@@ -71,6 +73,11 @@ public class ApplicationCommandImpl implements ApplicationCommand {
     @Override
     public List<ApplicationCommandOption> getOptions() {
         return Collections.unmodifiableList(options);
+    }
+
+    @Override
+    public boolean getDefaultPermission() {
+        return defaultPermission;
     }
 
     @Override

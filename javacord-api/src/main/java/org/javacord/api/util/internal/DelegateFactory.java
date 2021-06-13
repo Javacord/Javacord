@@ -38,6 +38,8 @@ import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
@@ -387,6 +389,26 @@ public class DelegateFactory {
      */
     public static ApplicationCommandOptionBuilderDelegate createApplicationCommandOptionBuilderDelegate() {
         return delegateFactoryDelegate.createApplicationCommandOptionBuilderDelegate();
+    }
+
+    /**
+     * Creates a new application command permissions updater delegate.
+     *
+     * @param server The server.
+     * @return The application command permissions updater delegate.
+     */
+    public static ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
+            Server server) {
+        return delegateFactoryDelegate.createApplicationCommandPermissionsUpdaterDelegate(server);
+    }
+
+    /**
+     * Creates a new application command permissions builder delegate.
+     *
+     * @return The application command permissions builder delegate.
+     */
+    public static ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
+        return delegateFactoryDelegate.createApplicationCommandPermissionsBuilderDelegate();
     }
 
     /**

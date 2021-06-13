@@ -43,6 +43,14 @@ public interface ApplicationCommandBuilderDelegate {
     void setOptions(List<ApplicationCommandOption> options);
 
     /**
+     * Sets the default permission for the application command
+     * whether the command is enabled by default when the app is added to a server.
+     *
+     * @param defaultPermission The default permission.
+     */
+    void setDefaultPermission(Boolean defaultPermission);
+
+    /**
      * Creates a global application command.
      *
      * @param api The discord api instance.
