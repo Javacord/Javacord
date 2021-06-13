@@ -22,6 +22,7 @@ public class ApplicationCommandBuilderDelegateImpl implements ApplicationCommand
     private String name;
     private String description;
     private List<ApplicationCommandOption> options = new ArrayList<>();
+    private Boolean defaultPermission;
 
     @Override
     public void setName(String name) {
@@ -48,20 +49,25 @@ public class ApplicationCommandBuilderDelegateImpl implements ApplicationCommand
     }
 
     @Override
+    public void setDefaultPermission(Boolean defaultPermission) {
+        this.defaultPermission = defaultPermission;
+    }
+
+    @Override
     public CompletableFuture<ApplicationCommand> createGlobal(DiscordApi api) {
         return new RestRequest<ApplicationCommand>(api, RestMethod.POST, RestEndpoint.APPLICATION_COMMANDS)
-            .setUrlParameters(String.valueOf(api.getClientId()))
-            .setBody(getJsonBodyForApplicationCommand())
-            .execute(result -> new ApplicationCommandImpl((DiscordApiImpl) api, result.getJsonBody()));
+                .setUrlParameters(String.valueOf(api.getClientId()))
+                .setBody(getJsonBodyForApplicationCommand())
+                .execute(result -> new ApplicationCommandImpl((DiscordApiImpl) api, result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<ApplicationCommand> createForServer(Server server) {
         return new RestRequest<ApplicationCommand>(
-            server.getApi(), RestMethod.POST, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-            .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
-            .setBody(getJsonBodyForApplicationCommand())
-            .execute(result -> new ApplicationCommandImpl((DiscordApiImpl) server.getApi(), result.getJsonBody()));
+                server.getApi(), RestMethod.POST, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
+                .setBody(getJsonBodyForApplicationCommand())
+                .execute(result -> new ApplicationCommandImpl((DiscordApiImpl) server.getApi(), result.getJsonBody()));
     }
 
     /**
@@ -77,9 +83,13 @@ public class ApplicationCommandBuilderDelegateImpl implements ApplicationCommand
         if (!options.isEmpty()) {
             ArrayNode jsonOptions = jsonBody.putArray("options");
             options.stream()
-                .map(ApplicationCommandOptionImpl.class::cast)
-                .map(ApplicationCommandOptionImpl::toJsonNode)
-                .forEach(jsonOptions::add);
+                    .map(ApplicationCommandOptionImpl.class::cast)
+                    .map(ApplicationCommandOptionImpl::toJsonNode)
+                    .forEach(jsonOptions::add);
+        }
+
+        if (defaultPermission != null) {
+            jsonBody.put("default_permission", defaultPermission.booleanValue());
         }
 
         return jsonBody;

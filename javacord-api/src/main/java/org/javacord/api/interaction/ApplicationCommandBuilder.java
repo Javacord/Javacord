@@ -66,6 +66,18 @@ public class ApplicationCommandBuilder {
     }
 
     /**
+     * Sets the default permission for the application command
+     * whether the command is enabled by default when the app is added to a server.
+     *
+     * @param defaultPermission The default permission.
+     * @return The current instance in order to chain call methods.
+     */
+    public ApplicationCommandBuilder setDefaultPermission(Boolean defaultPermission) {
+        delegate.setDefaultPermission(defaultPermission);
+        return this;
+    }
+
+    /**
      * Creates a global application command.
      * When used to update multiple global application commands at once
      * {@link DiscordApi#bulkOverwriteGlobalApplicationCommands(List)} should be used instead.

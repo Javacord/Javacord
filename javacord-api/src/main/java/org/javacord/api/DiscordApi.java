@@ -32,6 +32,8 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.ApplicationCommandBuilder;
 import org.javacord.api.interaction.ApplicationCommandUpdater;
+import org.javacord.api.interaction.ServerApplicationCommandPermissions;
+import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
@@ -124,7 +126,36 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @param commandId The id of the server application command.
      * @return The server application command with the given id.
      */
-    CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server,long commandId);
+    CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long commandId);
+
+    /**
+     * Gets a list of all server application command permissions from the given server.
+     *
+     * @param server The server.
+     * @return A list containing the server application command permissions.
+     */
+    CompletableFuture<List<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(Server server);
+
+    /**
+     * Gets a server application command permissions by it ID from the given server.
+     *
+     * @param server The server.
+     * @param commandId The command ID.
+     * @return The server application command permissions for the given ID.
+     */
+    CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
+            Server server, long commandId);
+
+    /**
+     * Updates multiple server application command permissions at once.
+     *
+     * @param server The server where the application command permissions should be updated on.
+     * @param applicationCommandPermissionsBuilders The application command permissions builders,
+     *     which should be updated.
+     * @return A list of the updated server application command permissions.
+     */
+    CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
+            Server server, List<ServerApplicationCommandPermissionsBuilder> applicationCommandPermissionsBuilders);
 
     /**
      * Bulk overwrites the global Application Commands.

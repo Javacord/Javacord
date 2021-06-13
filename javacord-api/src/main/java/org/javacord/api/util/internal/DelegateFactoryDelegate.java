@@ -38,6 +38,8 @@ import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
@@ -286,6 +288,21 @@ public interface DelegateFactoryDelegate {
      * @return The application command option builder delegate.
      */
     ApplicationCommandOptionBuilderDelegate createApplicationCommandOptionBuilderDelegate();
+
+    /**
+     * Creates a new application command permissions updater delegate.
+     *
+     * @param server The server where the update should be performed on.
+     * @return The application command permissions updater delegate.
+     */
+    ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(Server server);
+
+    /**
+     * Creates a new application command permissions builder delegate.
+     *
+     * @return The application command permissions builder delegate.
+     */
+    ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate();
 
     /**
      * Creates a new application command option choice builder delegate.
