@@ -1,8 +1,7 @@
 package org.javacord.api.interaction;
 
-import java.util.List;
-
-public interface ApplicationCommandInteraction extends InteractionBase {
+public interface ApplicationCommandInteraction
+        extends InteractionBase, ApplicationCommandInteractionOptionsProvider {
     /**
      * Gets the id of the invoked application command.
      *
@@ -23,11 +22,4 @@ public interface ApplicationCommandInteraction extends InteractionBase {
      * @return The name of the invoked command.
      */
     String getCommandName();
-
-    /**
-     * Gets a list with the params and values from the user.
-     *
-     * @return A list with the params and values from the user.
-     */
-    List<ApplicationCommandInteractionOption> getOptions();
 }

@@ -10,6 +10,7 @@ public enum ApplicationCommandOptionType {
     USER(6),
     CHANNEL(7),
     ROLE(8),
+    MENTIONABLE(9),
     UNKNOWN(-1);
 
     private final int value;

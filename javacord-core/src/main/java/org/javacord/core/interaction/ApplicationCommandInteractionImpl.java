@@ -33,7 +33,7 @@ public class ApplicationCommandInteractionImpl extends InteractionImpl implement
         options = new ArrayList<>();
         if (data.has("options") && data.get("options").isArray()) {
             for (JsonNode optionJson : data.get("options")) {
-                options.add(new ApplicationCommandInteractionOptionImpl(optionJson));
+                options.add(new ApplicationCommandInteractionOptionImpl(api, optionJson));
             }
         }
     }
