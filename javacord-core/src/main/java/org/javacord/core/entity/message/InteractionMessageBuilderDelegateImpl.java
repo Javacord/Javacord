@@ -36,7 +36,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
     @Override
     public CompletableFuture<Void> sendInitialResponse(InteractionBase interaction) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
-        topBody.put("type", InteractionCallbackType.ChannelMessageWithSource.getId());
+        topBody.put("type", InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE.getId());
         ObjectNode body = topBody.putObject("data");
         prepareInteractionWebhookBodyParts(body);
 
@@ -79,7 +79,7 @@ public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilder
         ObjectNode data = JsonNodeFactory.instance.objectNode();
         prepareCommonWebhookMessageBodyParts(data);
         prepareComponents(data, true);
-        topBody.put("type", InteractionCallbackType.UpdateMessage.getId());
+        topBody.put("type", InteractionCallbackType.UPDATE_MESSAGE.getId());
         topBody.set("data", data);
 
         return new RestRequest<Void>(interaction.getApi(),

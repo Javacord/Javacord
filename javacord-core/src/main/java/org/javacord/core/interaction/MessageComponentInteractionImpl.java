@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 public abstract class MessageComponentInteractionImpl extends InteractionImpl implements MessageComponentInteraction {
 
     private static final String UPDATE_LATER_BODY =
-            "{\"type\": " + InteractionCallbackType.DeferredUpdateMessage.getId() + "}";
+            "{\"type\": " + InteractionCallbackType.DEFERRED_UPDATE_MESSAGE.getId() + "}";
 
     private final Message message;
     private final String customId;
