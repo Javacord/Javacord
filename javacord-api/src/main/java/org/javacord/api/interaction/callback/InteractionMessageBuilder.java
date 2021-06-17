@@ -5,7 +5,7 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.MessageFlag;
-import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -181,8 +181,8 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
     }
 
     @Override
-    public InteractionMessageBuilder addComponents(HighLevelComponentBuilder... builders) {
-        delegate.addComponents(builders);
+    public InteractionMessageBuilder addComponents(HighLevelComponent... components) {
+        delegate.addComponents(components);
         return this;
     }
 
@@ -199,8 +199,8 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
     }
 
     @Override
-    public InteractionMessageBuilder removeComponent(HighLevelComponentBuilder builder) {
-        delegate.removeComponent(builder);
+    public InteractionMessageBuilder removeComponent(HighLevelComponent component) {
+        delegate.removeComponent(component);
         return this;
     }
 

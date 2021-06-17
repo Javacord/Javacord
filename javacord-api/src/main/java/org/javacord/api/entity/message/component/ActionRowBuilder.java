@@ -3,6 +3,7 @@ package org.javacord.api.entity.message.component;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ActionRowBuilder implements HighLevelComponentBuilder {
@@ -11,10 +12,20 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
     /**
      * Add multiple low-level component builders.
      *
-     * @param components The low-level component builder.
+     * @param components The low-level components.
      * @return The builder instance to chain methods.
      */
-    public ActionRowBuilder addComponents(LowLevelComponentBuilder... components) {
+    public ActionRowBuilder addComponents(LowLevelComponent... components) {
+        return addComponents(Arrays.asList(components));
+    }
+
+    /**
+     * Add a list containing low-level components builders.
+     *
+     * @param components The list containing low-level components.
+     * @return The builder instance to chain methods.
+     */
+    public ActionRowBuilder addComponents(List<LowLevelComponent> components) {
         delegate.addComponents(components);
         return this;
     }
@@ -36,7 +47,7 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
      * @param component The low-level component being removed.
      * @return The builder instance to chain methods.
      */
-    public ActionRowBuilder removeComponent(LowLevelComponentBuilder component) {
+    public ActionRowBuilder removeComponent(LowLevelComponent component) {
         delegate.removeComponent(component);
         return this;
     }
@@ -68,7 +79,7 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
      *
      * @return A list of components.
      */
-    public List<LowLevelComponentBuilder> getComponents() {
+    public List<LowLevelComponent> getComponents() {
         return delegate.getComponents();
     }
 
@@ -79,6 +90,15 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
      */
     public ComponentType getType() {
         return delegate.getType();
+    }
+
+    /**
+     * Creates a {@link ActionRow} instance with the given values.
+     *
+     * @return The created action row instance.
+     */
+    public ActionRow build() {
+        return delegate.build();
     }
 
     /**

@@ -1,7 +1,5 @@
 package org.javacord.core.entity.message.component.internal;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.component.Button;
@@ -9,6 +7,7 @@ import org.javacord.api.entity.message.component.ButtonStyle;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
+import org.javacord.core.entity.message.component.ButtonImpl;
 
 import java.util.Optional;
 
@@ -75,6 +74,11 @@ public class ButtonBuilderDelegateImpl implements ButtonBuilderDelegate {
     }
 
     @Override
+    public Button build() {
+        return new ButtonImpl(style, label, customId, url, disabled, emoji);
+    }
+
+    @Override
     public void setEmoji(Emoji emoji) {
         this.emoji = emoji;
     }
@@ -119,72 +123,4 @@ public class ButtonBuilderDelegateImpl implements ButtonBuilderDelegate {
         return emoji;
     }
 
-    /**
-     * Gets the button as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @return The button as a ObjectNode.
-     */
-    public ObjectNode toJsonNode() {
-        ObjectNode object = JsonNodeFactory.instance.objectNode();
-        return toJsonNode(object);
-    }
-
-    /**
-     * Gets the button as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @param object The object, the data should be added to.
-     * @return The button as a ObjectNode.
-     */
-    public ObjectNode toJsonNode(ObjectNode object) {
-        object.put("type", type.value());
-
-        // 1. Style is not optional; Buttons without a style are not accepted
-        if (style == null) {
-            throw new IllegalStateException("Button style is null.");
-        }
-        object.put("style", style.getValue());
-
-        if (label != null && !label.equals("")) {
-            object.put("label", label);
-        }
-
-        // 2. Non-link buttons must have a custom_id, and cannot have a url
-        if (style != ButtonStyle.LINK) {
-            if (customId == null || customId.equals("")) {
-                throw new IllegalStateException("Button is missing a custom identifier.");
-            } else if (url != null) {
-                throw new IllegalStateException("A non-button link must not have a URL.");
-            }
-            object.put("custom_id", customId);
-        }
-
-        // 3. Link buttons must have a url, and cannot have a custom_id
-        if (style == ButtonStyle.LINK) {
-            if (url == null || url.equals("")) {
-                throw new IllegalStateException("Button link is missing a URL.");
-            }
-            if (customId != null) {
-                throw new IllegalStateException("Button link must not have a custom identifier");
-            }
-            object.put("url", url);
-        }
-
-        if (disabled != null) {
-            object.put("disabled", disabled);
-        }
-
-        if (emoji != null) {
-            ObjectNode emojiObj = JsonNodeFactory.instance.objectNode();
-            if (emoji.isUnicodeEmoji()) {
-                Optional<String> unicodeEmojiOptional = emoji.asUnicodeEmoji();
-                unicodeEmojiOptional.ifPresent(emojiName -> emojiObj.put("name", emojiName));
-            } else if (emoji.isCustomEmoji()) {
-                Optional<CustomEmoji> customEmojiOptional = emoji.asCustomEmoji();
-                customEmojiOptional.ifPresent(customEmoji -> emojiObj.put("id", customEmoji.getId()));
-            }
-            object.set("emoji", emojiObj);
-        }
-
-        return object;
-    }
 }

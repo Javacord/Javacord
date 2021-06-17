@@ -27,7 +27,7 @@ public interface ApplicationCommandPermissions {
     boolean getPermission();
 
     /**
-     * Creates and application command permissions which can be used by {@link ApplicationCommandPermissionsUpdater}
+     * Creates an application command permissions which can be used by {@link ApplicationCommandPermissionsUpdater}
      * to update the permission.
      *
      * @param id The id of the role or user which should be updated.
@@ -35,8 +35,7 @@ public interface ApplicationCommandPermissions {
      * @param permission True if the command should be enabled.
      * @return The built ApplicationCommandPermissions.
      */
-    static ApplicationCommandPermissions with(
-            long id, ApplicationCommandPermissionType type, boolean permission) {
+    static ApplicationCommandPermissions create(long id, ApplicationCommandPermissionType type, boolean permission) {
         return new ApplicationCommandPermissionsBuilder()
                 .setId(id)
                 .setType(type)

@@ -54,11 +54,19 @@ public interface ApplicationCommand extends DiscordEntity {
     boolean getDefaultPermission();
 
     /**
-     * Deletes this application command.
+     * Deletes this application command globally.
      *
      * @return A future to check if the deletion was successful.
      */
-    CompletableFuture<Void> delete();
+    CompletableFuture<Void> deleteGlobal();
+
+    /**
+     * Deletes this application command globally.
+     *
+     * @param server The server where the command should be deleted from.
+     * @return A future to check if the deletion was successful.
+     */
+    CompletableFuture<Void> deleteForServer(Server server);
 
     /**
      * Create a new application command builder with the given name and description.

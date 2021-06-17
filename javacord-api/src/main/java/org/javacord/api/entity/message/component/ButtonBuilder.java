@@ -31,12 +31,12 @@ public class ButtonBuilder implements LowLevelComponentBuilder {
     /**
      * Add this button to a new action row and return the new action row.
      * This is useful if you only want one button and quickly wrap it into an ActionRow to be used with a message.
-     * @return The new ActionRowBuilder with this button added to it.
      *
+     * @return The new ActionRowBuilder with this button added to it.
      */
     public ActionRowBuilder inActionRow() {
         return new ActionRowBuilder()
-                .addComponents(this);
+            .addComponents(build());
     }
 
     /**
@@ -161,6 +161,15 @@ public class ButtonBuilder implements LowLevelComponentBuilder {
         ButtonStyle parsed = ButtonStyle.fromName(styleName.toLowerCase());
         delegate.setStyle(parsed);
         return this;
+    }
+
+    /**
+     * Creates a {@link Button} instance with the given values.
+     *
+     * @return The created button instance.
+     */
+    public Button build() {
+        return delegate.build();
     }
 
     /**
