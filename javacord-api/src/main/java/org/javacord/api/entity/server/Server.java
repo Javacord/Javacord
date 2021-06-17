@@ -114,6 +114,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<String> getDescription();
 
     /**
+     * Gets the NSFW level of the server.
+     *
+     * @return The NSFW level of the server.
+     */
+    NsfwLevel getNsfwLevel();
+
+    /**
      * Gets the moderators-only channel (sometimes also called "public updates channel").
      *
      * <p>This is the channel where Discord will send announcements and updates relevant
