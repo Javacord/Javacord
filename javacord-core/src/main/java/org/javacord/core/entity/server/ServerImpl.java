@@ -30,6 +30,7 @@ import org.javacord.api.entity.server.BoostLevel;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
 import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
+import org.javacord.api.entity.server.NsfwLevel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerFeature;
 import org.javacord.api.entity.server.VerificationLevel;
@@ -229,6 +230,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private volatile BoostLevel boostLevel;
 
     /**
+     * The NSFW Level of the server.
+     */
+    private volatile NsfwLevel nsfwLevel;
+
+    /**
      * The server's premium subscription count.
      */
     private volatile int serverBoostCount = 0;
@@ -294,6 +300,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 DefaultMessageNotificationLevel.fromId(data.get("default_message_notifications").asInt());
         multiFactorAuthenticationLevel = MultiFactorAuthenticationLevel.fromId(data.get("mfa_level").asInt());
         boostLevel = BoostLevel.fromId(data.get("premium_tier").asInt());
+        nsfwLevel = NsfwLevel.fromId(data.get("nsfw_level").asInt());
         preferredLocale = new Locale.Builder().setLanguageTag(data.get("preferred_locale").asText()).build();
         if (data.has("icon") && !data.get("icon").isNull()) {
             iconHash = data.get("icon").asText();
@@ -869,6 +876,15 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
+     * Sets the NSFW level of the server.
+     *
+     * @param nsfwLevel The NSFW level of the server.
+     */
+    public void setNsfwLevel(NsfwLevel nsfwLevel) {
+        this.nsfwLevel = nsfwLevel;
+    }
+
+    /**
      * Sets the preferred locale of the server.
      *
      * @param preferredLocale The preferred locale of the server.
@@ -1044,6 +1060,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public Optional<String> getDescription() {
         return Optional.ofNullable(description);
+    }
+
+    @Override
+    public NsfwLevel getNsfwLevel() {
+        return nsfwLevel;
     }
 
     @Override
