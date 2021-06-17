@@ -11,6 +11,7 @@ import org.javacord.api.entity.server.BoostLevel;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
 import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
+import org.javacord.api.entity.server.NsfwLevel;
 import org.javacord.api.entity.server.ServerFeature;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.event.server.ServerChangeAfkChannelEvent;
@@ -25,6 +26,7 @@ import org.javacord.api.event.server.ServerChangeIconEvent;
 import org.javacord.api.event.server.ServerChangeModeratorsOnlyChannelEvent;
 import org.javacord.api.event.server.ServerChangeMultiFactorAuthenticationLevelEvent;
 import org.javacord.api.event.server.ServerChangeNameEvent;
+import org.javacord.api.event.server.ServerChangeNsfwLevelEvent;
 import org.javacord.api.event.server.ServerChangeOwnerEvent;
 import org.javacord.api.event.server.ServerChangePreferredLocaleEvent;
 import org.javacord.api.event.server.ServerChangeRegionEvent;
@@ -48,6 +50,7 @@ import org.javacord.core.event.server.ServerChangeIconEventImpl;
 import org.javacord.core.event.server.ServerChangeModeratorsOnlyChannelEventImpl;
 import org.javacord.core.event.server.ServerChangeMultiFactorAuthenticationLevelEventImpl;
 import org.javacord.core.event.server.ServerChangeNameEventImpl;
+import org.javacord.core.event.server.ServerChangeNsfwLevelEventImpl;
 import org.javacord.core.event.server.ServerChangeOwnerEventImpl;
 import org.javacord.core.event.server.ServerChangePreferredLocaleEventImpl;
 import org.javacord.core.event.server.ServerChangeRegionEventImpl;
@@ -266,6 +269,16 @@ public class GuildUpdateHandler extends PacketHandler {
                         new ServerChangeBoostLevelEventImpl(server, newBoostLevel, oldBoostLevel);
 
                 api.getEventDispatcher().dispatchServerChangeBoostLevelEvent(server, server, event);
+            }
+
+            NsfwLevel oldNsfwLevel = server.getNsfwLevel();
+            NsfwLevel newNsfwLevel = NsfwLevel.fromId(packet.get("nsfw_level").asInt());
+            if (oldNsfwLevel != newNsfwLevel) {
+                server.setNsfwLevel(newNsfwLevel);
+                ServerChangeNsfwLevelEvent event =
+                        new ServerChangeNsfwLevelEventImpl(server, newNsfwLevel, oldNsfwLevel);
+
+                api.getEventDispatcher().dispatchServerChangeNsfwLevelEvent(server, server, event);
             }
 
             Locale newPreferredLocale =
