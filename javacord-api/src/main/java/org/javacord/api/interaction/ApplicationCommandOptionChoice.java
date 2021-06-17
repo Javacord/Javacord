@@ -41,34 +41,36 @@ public interface ApplicationCommandOptionChoice {
      */
     default String getValueAsString() {
         return getStringValue().orElseGet(() -> getIntValue()
-                .map(String::valueOf)
-                .orElseThrow(() ->
-                        new AssertionError("Application command option choice value that's neither a string nor int")));
+            .map(String::valueOf)
+            .orElseThrow(() ->
+                new AssertionError("Application command option choice value that's neither a string nor int")));
     }
 
     /**
      * Create a new option choice builder to be used with a command option builder.
      *
-     * @param name  The name of the choice.
+     * @param name The name of the choice.
      * @param value The value of the choice.
      * @return The new choice builder.
      */
-    static ApplicationCommandOptionChoiceBuilder with(String name, String value) {
+    static ApplicationCommandOptionChoice create(String name, String value) {
         return new ApplicationCommandOptionChoiceBuilder()
-                .setName(name)
-                .setValue(value);
+            .setName(name)
+            .setValue(value)
+            .build();
     }
 
     /**
      * Create a new option choice builder to be used with a command option builder.
      *
-     * @param name  The name of the choice.
+     * @param name The name of the choice.
      * @param value The value of the choice.
      * @return The new choice builder.
      */
-    static ApplicationCommandOptionChoiceBuilder with(String name, int value) {
+    static ApplicationCommandOptionChoice create(String name, int value) {
         return new ApplicationCommandOptionChoiceBuilder()
-                .setName(name)
-                .setValue(value);
+            .setName(name)
+            .setValue(value)
+            .build();
     }
 }

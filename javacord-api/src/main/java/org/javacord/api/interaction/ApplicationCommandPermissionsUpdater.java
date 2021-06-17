@@ -52,7 +52,7 @@ public class ApplicationCommandPermissionsUpdater {
      */
     public ApplicationCommandPermissionsUpdater addPermission(
             long id, ApplicationCommandPermissionType type, boolean permission) {
-        delegate.addPermission(ApplicationCommandPermissions.with(id, type, permission));
+        delegate.addPermission(ApplicationCommandPermissions.create(id, type, permission));
         return this;
     }
 

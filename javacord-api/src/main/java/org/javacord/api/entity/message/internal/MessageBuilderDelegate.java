@@ -8,8 +8,8 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.Messageable;
-import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
-import org.javacord.api.entity.message.component.LowLevelComponentBuilder;
+import org.javacord.api.entity.message.component.HighLevelComponent;
+import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
@@ -30,16 +30,16 @@ public interface MessageBuilderDelegate {
     /**
      * Add high-level components to the message.
      *
-     * @param builders The high-level component builders.
+     * @param highLevelComponents The high-level components.
      */
-    void addComponents(HighLevelComponentBuilder... builders);
+    void addComponents(HighLevelComponent... highLevelComponents);
 
     /**
      * Add low-level components to the message, wrapped in an ActionRow.
      *
-     * @param builders The low level component builders.
+     * @param lowLevelComponents The low level components.
      */
-    void addActionRow(LowLevelComponentBuilder... builders);
+    void addActionRow(LowLevelComponent... lowLevelComponents);
 
     /**
      * Appends code to the message.
@@ -117,7 +117,7 @@ public interface MessageBuilderDelegate {
      *
      * @param component The high-level component being removed.
      */
-    void removeComponent(HighLevelComponentBuilder component);
+    void removeComponent(HighLevelComponent component);
 
     /**
      * Remove all high-level components from the message.

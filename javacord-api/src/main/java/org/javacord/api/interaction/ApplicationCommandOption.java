@@ -57,115 +57,126 @@ public interface ApplicationCommandOption {
      * Create a new application command option to be used with an application command builder.
      * This is a convenience method.
      *
-     * @param type        The type of the option.
-     * @param name        The name of the option.
+     * @param type The type of the option.
+     * @param name The name of the option.
      * @param description The description of the option.
-     * @param required    Wether this option is required.
+     * @param required Whether this option is required.
      * @return The new application command option builder.
      */
-    static ApplicationCommandOptionBuilder with(ApplicationCommandOptionType type,
-                                                String name,
-                                                String description,
-                                                boolean required) {
+    static ApplicationCommandOption create(ApplicationCommandOptionType type,
+                                           String name,
+                                           String description,
+                                           boolean required) {
         return new ApplicationCommandOptionBuilder()
-                .setType(type)
-                .setName(name)
-                .setDescription(description)
-                .setRequired(required);
+            .setType(type)
+            .setName(name)
+            .setDescription(description)
+            .setRequired(required)
+            .build();
     }
 
     /**
      * Create a new application command option to be used with an application command builder.
      * This is a convenience method.
      *
-     * @param type        The type of the option.
-     * @param name        The name of the option.
+     * @param type The type of the option.
+     * @param name The name of the option.
      * @param description The description of the option.
      * @return The new application command option builder.
      */
-    static ApplicationCommandOptionBuilder with(ApplicationCommandOptionType type, String name, String description) {
+    static ApplicationCommandOption create(ApplicationCommandOptionType type, String name, String description) {
         return new ApplicationCommandOptionBuilder()
-                .setType(type)
-                .setName(name)
-                .setDescription(description);
+            .setType(type)
+            .setName(name)
+            .setDescription(description)
+            .build();
     }
 
     /**
      * Create a new subcommand or subcommand group to be used with an application command builder.
      * This is a convenience method.
      *
-     * @param type        The type of the option. Must be either SUBCOMMAND or SUBCOMMAND_GROUP.
-     * @param name        The name of the option.
+     * @param type The type of the option. Must be either SUBCOMMAND or SUBCOMMAND_GROUP.
+     * @param name The name of the option.
      * @param description The description of the option.
-     * @param options     The options of this subcommand or subcommand group.
+     * @param options The options of this subcommand or subcommand group.
      * @return The new application command option builder.
      */
-    static ApplicationCommandOptionBuilder withOptions(ApplicationCommandOptionType type,
-                                                String name,
-                                                String description,
-                                                ApplicationCommandOptionBuilder... options) {
-        return withOptions(type, name, description,
-                Arrays.stream(options).map(ApplicationCommandOptionBuilder::build).collect(Collectors.toList()));
+    static ApplicationCommandOption createWithOptions(ApplicationCommandOptionType type,
+                                                      String name,
+                                                      String description,
+                                                      ApplicationCommandOptionBuilder... options) {
+        return createWithOptions(type, name, description,
+            Arrays.stream(options)
+                .map(ApplicationCommandOptionBuilder::build)
+                .collect(Collectors.toList()));
     }
 
     /**
      * Create a new subcommand or subcommand group to be used with an application command builder.
      * This is a convenience method.
      *
-     * @param type        The type of the option. Must be either SUBCOMMAND or SUBCOMMAND_GROUP.
-     * @param name        The name of the option.
+     * @param type The type of the option. Must be either SUBCOMMAND or SUBCOMMAND_GROUP.
+     * @param name The name of the option.
      * @param description The description of the option.
-     * @param options     The options of this subcommand or subcommand group.
+     * @param options The options of this subcommand or subcommand group.
      * @return The new application command option builder.
      */
-    static ApplicationCommandOptionBuilder withOptions(ApplicationCommandOptionType type,
-                                                String name,
-                                                String description,
-                                                List<ApplicationCommandOption> options) {
+    static ApplicationCommandOption createWithOptions(ApplicationCommandOptionType type,
+                                                      String name,
+                                                      String description,
+                                                      List<ApplicationCommandOption> options) {
         return new ApplicationCommandOptionBuilder()
-                .setType(type)
-                .setName(name)
-                .setDescription(description)
-                .setOptions(options);
+            .setType(type)
+            .setName(name)
+            .setDescription(description)
+            .setOptions(options)
+            .build();
     }
 
     /**
      * Create a new application command option to be used with an application command builder.
      * This is a convenience method.
      *
-     * @param type        The type of the option.
-     * @param name        The name of the option.
+     * @param type The type of the option.
+     * @param name The name of the option.
      * @param description The description of the option.
-     * @param choices     The choices of the option.
+     * @param required Whether this option is required.
+     * @param choices The choices of the option.
      * @return The new application command option builder.
      */
-    static ApplicationCommandOptionBuilder withChoices(ApplicationCommandOptionType type,
-                                                String name,
-                                                String description,
-                                                ApplicationCommandOptionChoiceBuilder... choices) {
-        return withChoices(type, name, description, Arrays.stream(choices)
-                        .map(ApplicationCommandOptionChoiceBuilder::build)
-                        .collect(Collectors.toList()));
+    static ApplicationCommandOption createWithChoices(ApplicationCommandOptionType type,
+                                                      String name,
+                                                      String description,
+                                                      boolean required,
+                                                      ApplicationCommandOptionChoiceBuilder... choices) {
+        return createWithChoices(type, name, description, required, Arrays.stream(choices)
+            .map(ApplicationCommandOptionChoiceBuilder::build)
+            .collect(Collectors.toList()));
     }
 
     /**
      * Create a new application command option to be used with an application command builder.
      * This is a convenience method.
      *
-     * @param type        The type of the option.
-     * @param name        The name of the option.
+     * @param type The type of the option.
+     * @param name The name of the option.
      * @param description The description of the option.
-     * @param choices     The choices of the option.
+     * @param required Whether this option is required.
+     * @param choices The choices of the option.
      * @return The new application command option builder.
      */
-    static ApplicationCommandOptionBuilder withChoices(ApplicationCommandOptionType type,
-                                                String name,
-                                                String description,
-                                                List<ApplicationCommandOptionChoice> choices) {
+    static ApplicationCommandOption createWithChoices(ApplicationCommandOptionType type,
+                                                      String name,
+                                                      String description,
+                                                      boolean required,
+                                                      List<ApplicationCommandOptionChoice> choices) {
         return new ApplicationCommandOptionBuilder()
-                .setType(type)
-                .setName(name)
-                .setDescription(description)
-                .setChoices(choices);
+            .setType(type)
+            .setName(name)
+            .setDescription(description)
+            .setRequired(required)
+            .setChoices(choices)
+            .build();
     }
 }

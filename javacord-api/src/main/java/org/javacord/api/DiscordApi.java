@@ -182,7 +182,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A list containing all Application Commands.
      */
     CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            List<ApplicationCommandBuilder> applicationCommandBuilderList, Server server);
+            Server server, List<ApplicationCommandBuilder> applicationCommandBuilderList);
 
     /**
      * Gets a utility class to interact with uncached messages.

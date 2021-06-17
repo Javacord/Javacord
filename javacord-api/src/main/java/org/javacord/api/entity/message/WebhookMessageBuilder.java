@@ -3,7 +3,7 @@ package org.javacord.api.entity.message;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
-import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -113,7 +113,7 @@ public class WebhookMessageBuilder {
      * @param components The component builders.
      * @return The current instance in order to chain call methods.
      */
-    public WebhookMessageBuilder addComponents(HighLevelComponentBuilder... components) {
+    public WebhookMessageBuilder addComponents(HighLevelComponent... components) {
         delegate.addComponents(components);
         return this;
     }
@@ -145,7 +145,7 @@ public class WebhookMessageBuilder {
      * @param builder The component.
      * @return The current instance in order to chain call methods.
      */
-    public WebhookMessageBuilder removeComponent(HighLevelComponentBuilder builder) {
+    public WebhookMessageBuilder removeComponent(HighLevelComponent builder) {
         delegate.removeComponent(builder);
         return this;
     }

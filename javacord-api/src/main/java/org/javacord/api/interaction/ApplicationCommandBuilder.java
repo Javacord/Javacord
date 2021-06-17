@@ -92,7 +92,7 @@ public class ApplicationCommandBuilder {
     /**
      * Creates an application command for a specific server.
      * When used to create multiple server application commands at once
-     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(List, Server)} (List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} (List)} should be used instead.
      *
      * @param server The server.
      * @return The built application command.

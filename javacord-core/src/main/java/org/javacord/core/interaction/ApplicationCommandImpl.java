@@ -2,6 +2,7 @@ package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.ApplicationCommandOption;
 import org.javacord.core.DiscordApiImpl;
@@ -81,9 +82,16 @@ public class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
-    public CompletableFuture<Void> delete() {
+    public CompletableFuture<Void> deleteGlobal() {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.APPLICATION_COMMANDS)
             .setUrlParameters(String.valueOf(getApplicationId()), getIdAsString())
+            .execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> deleteForServer(Server server) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+            .setUrlParameters(String.valueOf(getApplicationId()), server.getIdAsString(), getIdAsString())
             .execute(result -> null);
     }
 }

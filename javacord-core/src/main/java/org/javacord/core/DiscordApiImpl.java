@@ -1436,7 +1436,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            List<ApplicationCommandBuilder> applicationCommandBuilderList, Server server) {
+            Server server, List<ApplicationCommandBuilder> applicationCommandBuilderList) {
         ArrayNode body = JsonNodeFactory.instance.arrayNode();
         for (ApplicationCommandBuilder applicationCommandBuilder : applicationCommandBuilderList) {
             body.add(((ApplicationCommandBuilderDelegateImpl) applicationCommandBuilder.getDelegate())

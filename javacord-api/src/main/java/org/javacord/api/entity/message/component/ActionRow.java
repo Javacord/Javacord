@@ -19,8 +19,21 @@ public interface ActionRow extends HighLevelComponent {
      * @param lowLevelComponents The low level components to add to the row.
      * @return the new action row builder to be used with a message
      */
-    static ActionRowBuilder of(LowLevelComponentBuilder... lowLevelComponents) {
+    static ActionRow of(LowLevelComponent... lowLevelComponents) {
         return new ActionRowBuilder()
-                .addComponents(lowLevelComponents);
+            .addComponents(lowLevelComponents)
+            .build();
+    }
+
+    /**
+     * Create a new action row containing the given list with low level components, e.g. buttons.
+     *
+     * @param lowLevelComponents The low level components to add to the row.
+     * @return the new action row builder to be used with a message
+     */
+    static ActionRow of(List<LowLevelComponent> lowLevelComponents) {
+        return new ActionRowBuilder()
+            .addComponents(lowLevelComponents)
+            .build();
     }
 }

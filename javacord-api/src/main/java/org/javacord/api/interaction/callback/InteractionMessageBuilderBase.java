@@ -3,7 +3,7 @@ package org.javacord.api.interaction.callback;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.MessageFlag;
-import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 
@@ -81,10 +81,10 @@ public interface InteractionMessageBuilderBase<T> {
     /**
      * Adds multiple components to the message.
      *
-     * @param builders The component builders.
+     * @param components The components.
      * @return The current instance in order to chain call methods.
      */
-    T addComponents(HighLevelComponentBuilder... builders);
+    T addComponents(HighLevelComponent... components);
 
     /**
      * Removes all components from the message.
@@ -104,10 +104,10 @@ public interface InteractionMessageBuilderBase<T> {
     /**
      * Remove a component from the message.
      *
-     * @param builder The component.
+     * @param component The component.
      * @return The current instance in order to chain call methods.
      */
-    T removeComponent(HighLevelComponentBuilder builder);
+    T removeComponent(HighLevelComponent component);
 
     /**
      * Removes the embed from the message.

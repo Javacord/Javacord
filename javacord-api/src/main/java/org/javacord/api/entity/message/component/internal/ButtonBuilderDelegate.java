@@ -118,4 +118,11 @@ public interface ButtonBuilderDelegate extends ComponentBuilderDelegate {
      * @param isDisabled Whether the button is disabled or not.
      */
     void setDisabled(Boolean isDisabled);
+
+    /**
+     * Creates a {@link Button} instance with the given values.
+     *
+     * @return The created button instance.
+     */
+    Button build();
 }

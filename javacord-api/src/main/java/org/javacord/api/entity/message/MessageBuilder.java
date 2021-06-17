@@ -4,8 +4,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
-import org.javacord.api.entity.message.component.LowLevelComponentBuilder;
+import org.javacord.api.entity.message.component.HighLevelComponent;
+import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -60,7 +60,7 @@ public class MessageBuilder {
      * @param components The high level components.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder addComponents(HighLevelComponentBuilder... components) {
+    public MessageBuilder addComponents(HighLevelComponent... components) {
         delegate.addComponents(components);
         return this;
     }
@@ -71,7 +71,7 @@ public class MessageBuilder {
      * @param components The low level components.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder addActionRow(LowLevelComponentBuilder... components) {
+    public MessageBuilder addActionRow(LowLevelComponent... components) {
         delegate.addActionRow(components);
         return this;
     }

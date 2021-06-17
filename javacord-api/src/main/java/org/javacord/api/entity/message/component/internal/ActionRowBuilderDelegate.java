@@ -2,17 +2,17 @@ package org.javacord.api.entity.message.component.internal;
 
 import org.javacord.api.entity.message.component.ActionRow;
 import org.javacord.api.entity.message.component.ComponentType;
-import org.javacord.api.entity.message.component.LowLevelComponentBuilder;
+import org.javacord.api.entity.message.component.LowLevelComponent;
 
 import java.util.List;
 
 public interface ActionRowBuilderDelegate extends ComponentBuilderDelegate {
     /**
-     * Add multiple low-level component builders to the ActionRow.
+     * Add multiple low-level components to the ActionRow.
      *
-     * @param components Any low-level ComponentBuilder.
+     * @param components A list containing low-level components.
      */
-    void addComponents(LowLevelComponentBuilder... components);
+    void addComponents(List<LowLevelComponent> components);
 
     /**
      * Copy an action row's values into the builder.
@@ -26,7 +26,7 @@ public interface ActionRowBuilderDelegate extends ComponentBuilderDelegate {
      *
      * @param component The low-level component being removed.
      */
-    void removeComponent(LowLevelComponentBuilder component);
+    void removeComponent(LowLevelComponent component);
 
     /**
      * Remove a low-level component from the ActionRow.
@@ -47,7 +47,14 @@ public interface ActionRowBuilderDelegate extends ComponentBuilderDelegate {
      *
      * @return The current low-level components.
      */
-    List<LowLevelComponentBuilder> getComponents();
+    List<LowLevelComponent> getComponents();
+
+    /**
+     * Creates an {@link ActionRow} instance with the given values.
+     *
+     * @return The created action row instance.
+     */
+    ActionRow build();
 
     /**
      * Get the component's type (always {@link ComponentType#ACTION_ROW}.

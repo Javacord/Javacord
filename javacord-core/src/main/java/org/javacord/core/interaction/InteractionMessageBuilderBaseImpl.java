@@ -3,7 +3,7 @@ package org.javacord.core.interaction;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.MessageFlag;
-import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -85,8 +85,8 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     }
 
     @Override
-    public T addComponents(HighLevelComponentBuilder... builders) {
-        delegate.addComponents(builders);
+    public T addComponents(HighLevelComponent... components) {
+        delegate.addComponents(components);
         return myClass.cast(this);
     }
 
@@ -103,7 +103,7 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     }
 
     @Override
-    public T removeComponent(HighLevelComponentBuilder builder) {
+    public T removeComponent(HighLevelComponent builder) {
         delegate.removeComponent(builder);
         return myClass.cast(this);
     }

@@ -87,7 +87,7 @@ public class ApplicationCommandUpdater {
     /**
      * Updates an application command on the given server.
      * When used to update multiple server application commands at once
-     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(List, Server)} (List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} (List)} should be used instead.
      *
      * @param server The server where the command should be updated.
      * @return The updated Application command.
