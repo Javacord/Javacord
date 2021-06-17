@@ -16,7 +16,10 @@ import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegat
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
+import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
+import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
@@ -32,6 +35,12 @@ import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
@@ -70,6 +79,13 @@ public interface DelegateFactoryDelegate {
      * @return A new message builder delegate.
      */
     MessageBuilderDelegate createMessageBuilderDelegate();
+
+    /**
+     * Creates a new interaction message builder delegate.
+     *
+     * @return A new interaction message builder delegate.
+     */
+    InteractionMessageBuilderDelegate createInteractionMessageBuilderDelegate();
 
     /**
      * Creates a new webhook message builder delegate.
@@ -166,6 +182,14 @@ public interface DelegateFactoryDelegate {
     AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api);
 
     /**
+     * Creates a new application command updater delegate.
+     *
+     * @param commandId The application command id.
+     * @return A new application command updater delegate.
+     */
+    ApplicationCommandUpdaterDelegate createApplicationCommandUpdaterDelegate(long commandId);
+
+    /**
      * Creates a new group channel updater delegate.
      *
      * @param channel The channel to update.
@@ -251,4 +275,54 @@ public interface DelegateFactoryDelegate {
      */
     DiscordExceptionValidator createDiscordExceptionValidator();
 
+    /**
+     * Creates a new application command builder delegate.
+     *
+     * @return The application command builder delegate.
+     */
+    ApplicationCommandBuilderDelegate createApplicationCommandBuilderDelegate();
+
+    /**
+     * Creates a new application command option builder delegate.
+     *
+     * @return The application command option builder delegate.
+     */
+    ApplicationCommandOptionBuilderDelegate createApplicationCommandOptionBuilderDelegate();
+
+    /**
+     * Creates a new application command permissions updater delegate.
+     *
+     * @param server The server where the update should be performed on.
+     * @return The application command permissions updater delegate.
+     */
+    ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(Server server);
+
+    /**
+     * Creates a new application command permissions builder delegate.
+     *
+     * @return The application command permissions builder delegate.
+     */
+    ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate();
+
+    /**
+     * Creates a new application command option choice builder delegate.
+     *
+     * @return The application command option choice builder delegate.
+     */
+    ApplicationCommandOptionChoiceBuilderDelegate createApplicationCommandOptionChoiceBuilderDelegate();
+
+
+    /**
+     * Creates a new ActionRow builder delegate.
+     *
+     * @return A new ActionRow builder delegate.
+     */
+    ActionRowBuilderDelegate createActionRowBuilderDelegate();
+
+    /**
+     * Creates a new Button builder delegate.
+     *
+     * @return A new Button builder delegate.
+     */
+    ButtonBuilderDelegate createButtonBuilderDelegate();
 }

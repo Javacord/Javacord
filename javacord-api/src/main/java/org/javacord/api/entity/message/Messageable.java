@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.io.File;
@@ -79,6 +80,24 @@ public interface Messageable {
      *
      * @param content The content of the message.
      * @param embed The embed which should be displayed.
+     * @param components High level components to add to the message, most probably of type ActionRow.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(String content,
+                                                   EmbedBuilder embed,
+                                                   HighLevelComponentBuilder... components) {
+        return new MessageBuilder()
+                .append(content == null ? "" : content)
+                .setEmbed(embed)
+                .addComponents(components)
+                .send(this);
+    }
+
+    /**
+     * Sends a message.
+     *
+     * @param content The content of the message.
+     * @param embed The embed which should be displayed.
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed) {
@@ -92,11 +111,39 @@ public interface Messageable {
      * Sends a message.
      *
      * @param content The content of the message.
+     * @param components High level components to add to the message, most probably of type ActionRow.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(String content, HighLevelComponentBuilder... components) {
+        return new MessageBuilder()
+                .append(content == null ? "" : content)
+                .addComponents(components)
+                .send(this);
+    }
+
+    /**
+     * Sends a message.
+     *
+     * @param content The content of the message.
      * @return The sent message.
      */
     default CompletableFuture<Message> sendMessage(String content) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
+                .send(this);
+    }
+
+    /**
+     * Sends a message.
+     *
+     * @param embed The embed which should be displayed.
+     * @param components High level components to add to the message, most probably of type ActionRow.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(EmbedBuilder embed, HighLevelComponentBuilder... components) {
+        return new MessageBuilder()
+                .setEmbed(embed)
+                .addComponents(components)
                 .send(this);
     }
 

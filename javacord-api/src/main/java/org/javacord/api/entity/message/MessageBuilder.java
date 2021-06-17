@@ -4,6 +4,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.component.HighLevelComponentBuilder;
+import org.javacord.api.entity.message.component.LowLevelComponentBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -37,22 +39,48 @@ public class MessageBuilder {
      */
     public static MessageBuilder fromMessage(Message message) {
         MessageBuilder builder = new MessageBuilder();
-        builder.getStringBuilder().append(message.getContent());
-        if (!message.getEmbeds().isEmpty()) {
-            builder.setEmbed(message.getEmbeds().get(0).toBuilder());
-        }
-        for (MessageAttachment attachment : message.getAttachments()) {
-            // Since spoiler status is encoded in the file name, it is copied automatically.
-            builder.addAttachment(attachment.getUrl());
-        }
-        return builder;
+
+        return builder.copy(message);
+    }
+
+    /**
+     * Fill the builder's values with a message.
+     *
+     * @param message The message to copy.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder copy(Message message) {
+        delegate.copy(message);
+        return this;
+    }
+
+    /**
+     * Add multiple high level components to the message.
+     *
+     * @param components The high level components.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addComponents(HighLevelComponentBuilder... components) {
+        delegate.addComponents(components);
+        return this;
+    }
+
+    /**
+     * Add multiple low level components, wrapped in an ActionRow, to the message.
+     *
+     * @param components The low level components.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addActionRow(LowLevelComponentBuilder... components) {
+        delegate.addActionRow(components);
+        return this;
     }
 
     /**
      * Appends code to the message.
      *
      * @param language The language, e.g. "java".
-     * @param code The code.
+     * @param code     The code.
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder appendCode(String language, String code) {
@@ -463,6 +491,16 @@ public class MessageBuilder {
     }
 
     /**
+     * Remove all high-level components from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder removeAllComponents() {
+        delegate.removeAllComponents();
+        return this;
+    }
+
+    /**
      * Sets the nonce of the message.
      *
      * @param nonce The nonce to set.
@@ -501,7 +539,6 @@ public class MessageBuilder {
     public CompletableFuture<Message> send(TextChannel channel) {
         return delegate.send(channel);
     }
-
 
     /**
      * Sends the message.

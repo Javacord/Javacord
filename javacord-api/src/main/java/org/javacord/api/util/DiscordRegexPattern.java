@@ -106,6 +106,12 @@ public class DiscordRegexPattern {
                             + "(?<token>[^/\\s]++)                  # the webhook token as named group \n");
 
     /**
+     * A pattern to match snowflakes.
+     */
+    public static final Pattern SNOWFLAKE =
+            Pattern.compile("(?<id>[0-9]{15,25})");
+
+    /**
      * You are not meant to create instances of this class.
      */
     private DiscordRegexPattern() {

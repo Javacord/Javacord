@@ -11,5 +11,4 @@ public interface ServerTextChannelEvent extends ServerChannelEvent, TextChannelE
 
     @Override
     ServerTextChannel getChannel();
-
 }

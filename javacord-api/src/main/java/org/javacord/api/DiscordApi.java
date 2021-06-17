@@ -29,6 +29,11 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.ApplicationCommandBuilder;
+import org.javacord.api.interaction.ApplicationCommandUpdater;
+import org.javacord.api.interaction.ServerApplicationCommandPermissions;
+import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
@@ -43,6 +48,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -91,6 +97,94 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     ThreadPool getThreadPool();
 
     /**
+     * Gets a list with all global commands for the application.
+     *
+     * @return A list with all global commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> getGlobalApplicationCommands();
+
+    /**
+     * Gets an application command by its id.
+     *
+     * @param commandId The id of the application command.
+     * @return The application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId);
+
+    /**
+     * Gets a list with all application commands for the given server.
+     *
+     * @param server The server to get the application commands from.
+     * @return A list with all application commands from the server.
+     */
+    CompletableFuture<List<ApplicationCommand>> getServerApplicationCommands(Server server);
+
+    /**
+     * Gets a server application command by its id.
+     *
+     * @param server The server to get the application commands from.
+     * @param commandId The id of the server application command.
+     * @return The server application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long commandId);
+
+    /**
+     * Gets a list of all server application command permissions from the given server.
+     *
+     * @param server The server.
+     * @return A list containing the server application command permissions.
+     */
+    CompletableFuture<List<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(Server server);
+
+    /**
+     * Gets a server application command permissions by it ID from the given server.
+     *
+     * @param server The server.
+     * @param commandId The command ID.
+     * @return The server application command permissions for the given ID.
+     */
+    CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
+            Server server, long commandId);
+
+    /**
+     * Updates multiple server application command permissions at once.
+     *
+     * @param server The server where the application command permissions should be updated on.
+     * @param applicationCommandPermissionsBuilders The application command permissions builders,
+     *     which should be updated.
+     * @return A list of the updated server application command permissions.
+     */
+    CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
+            Server server, List<ServerApplicationCommandPermissionsBuilder> applicationCommandPermissionsBuilders);
+
+    /**
+     * Bulk overwrites the global Application Commands.
+     * This should be preferably used when updating and/or creating multiple
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateGlobal(DiscordApi)} (DiscordApi)}
+     * and {@link ApplicationCommandBuilder#createGlobal(DiscordApi)}
+     *
+     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders
+     *     which should should be used to perform the bulk overwrite.
+     * @return A list containing all Application Commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            List<ApplicationCommandBuilder> applicationCommandBuilderList);
+
+    /**
+     * Bulk overwrites the servers Application Commands.
+     * This should be preferably used when updating and/or creating multiple
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateForServer(Server)} (Server)}
+     * and {@link ApplicationCommandBuilder#createForServer(Server)}
+     *
+     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders.
+     * @param server The server where the bulk overwrite should be performed on
+     *     which should should be used to perform the bulk overwrite.
+     * @return A list containing all Application Commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            List<ApplicationCommandBuilder> applicationCommandBuilderList, Server server);
+
+    /**
      * Gets a utility class to interact with uncached messages.
      *
      * @return A utility class to interact with uncached messages.
@@ -109,8 +203,8 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * <p>**Note:** This method returns an {@code Optional} for historic reasons.
      * If you did not provide a ratelimiter by yourself, this method will return a {@link LocalRatelimiter}
-     * which is set to {@code} request per {@code 111.1 ms}. This ratelimiter is shared by every bot with the same token
-     * in the same Java program.
+     * which is set to {@code 5} requests per {@code 112 ms}, resulting in about 45 requests per second.
+     * This ratelimiter is shared by every bot with the same token in the same Java program.
      *
      * @return The current global ratelimiter.
      */

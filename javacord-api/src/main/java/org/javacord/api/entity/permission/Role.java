@@ -29,6 +29,13 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     Server getServer();
 
     /**
+     * Gets the role tags of the role.
+     *
+     * @return The role tags of the role.
+     */
+    Optional<RoleTags> getRoleTags();
+
+    /**
      * Gets the real position of the role.
      *
      * <p>Will return <code>-1</code> if the Role got deleted.

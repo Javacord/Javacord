@@ -41,7 +41,8 @@ public enum PermissionType {
     MANAGE_NICKNAMES(0x08000000),
     MANAGE_ROLES(0x10000000),
     MANAGE_WEBHOOKS(0x20000000),
-    MANAGE_EMOJIS(0x40000000);
+    MANAGE_EMOJIS(0x40000000),
+    USE_SLASH_COMMANDS(0x80000000);
 
     /**
      * The value of the permission. An integer where only one bit is set (e.g. <code>0b1000</code>).

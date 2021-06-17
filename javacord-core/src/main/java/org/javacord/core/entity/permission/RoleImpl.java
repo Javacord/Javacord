@@ -5,6 +5,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.permission.RoleTags;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
@@ -42,6 +43,11 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
      * The server of the role.
      */
     private final ServerImpl server;
+
+    /**
+     * The role tags of the role.
+     */
+    private final RoleTagsImpl roleTags;
 
     /**
      * The id of the role.
@@ -101,6 +107,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
         this.mentionable = data.get("mentionable").asBoolean(false);
         this.permissions = new PermissionsImpl(data.get("permissions").asLong(), 0);
         this.managed = data.get("managed").asBoolean(false);
+        this.roleTags = data.has("tags") ? new RoleTagsImpl(data.get("tags")) : null;
     }
 
     /**
@@ -179,6 +186,11 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     @Override
     public Server getServer() {
         return server;
+    }
+
+    @Override
+    public Optional<RoleTags> getRoleTags() {
+        return Optional.ofNullable(roleTags);
     }
 
     @Override

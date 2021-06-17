@@ -30,6 +30,7 @@ import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
 
 import java.awt.Color;
@@ -2115,6 +2116,21 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Gets a list with all application commands for the given server.
+     *
+     * @return A list with all application commands from the server.
+     */
+    CompletableFuture<List<ApplicationCommand>> getApplicationCommands();
+
+    /**
+     * Gets a server application command by its id.
+     *
+     * @param commandId The id of the server application command.
+     * @return The server application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getApplicationCommandById(long commandId);
+
+    /**
      * Creates a new channel category builder.
      *
      * @return A builder to create a new channel category.
@@ -2653,6 +2669,27 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default boolean canYouManageEmojis() {
         return canManageEmojis(getApi().getYourself());
+    }
+
+    /**
+     * Checks if the given user can use slash commands on the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can use slash commands or not.
+     */
+    default boolean canUseSlashCommands(User user) {
+        return hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.USE_SLASH_COMMANDS);
+    }
+
+    /**
+     * Checks if the user of the connected account can use slash commands on the server.
+     *
+     * @return Whether the user of the connected account can use slash commands or not.
+     */
+    default boolean canYouUseSlashCommands() {
+        return canUseSlashCommands(getApi().getYourself());
     }
 
     /**
