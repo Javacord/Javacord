@@ -7,7 +7,7 @@ import org.javacord.api.interaction.InteractionBase;
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
-public interface InteractionMessageBuilderDelegate extends WebhookMessageBuilderBaseDelegate {
+public interface InteractionMessageBuilderDelegate extends MessageBuilderDelegate {
 
     /**
      * Sets the message flags of the message.

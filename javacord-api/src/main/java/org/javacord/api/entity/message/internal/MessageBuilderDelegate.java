@@ -106,6 +106,27 @@ public interface MessageBuilderDelegate {
     void removeAllEmbeds();
 
     /**
+     * Adds the embeds to the message.
+     *
+     * @param embeds The embeds to add.
+     */
+    void addEmbeds(EmbedBuilder... embeds);
+
+    /**
+     * Removes the embed from the message.
+     *
+     * @param embed The embed to remove.
+     */
+    void removeEmbed(EmbedBuilder embed);
+
+    /**
+     * Removes the embeds from the message.
+     *
+     * @param embeds The embeds to remove.
+     */
+    void removeEmbeds(EmbedBuilder... embeds);
+
+    /**
      * Remove a high-level component from the message.
      *
      * @param index The index placement.

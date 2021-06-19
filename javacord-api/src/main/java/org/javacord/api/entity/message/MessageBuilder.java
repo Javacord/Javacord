@@ -147,13 +147,36 @@ public class MessageBuilder {
     }
 
     /**
-     * Sets the embed of the message.
+     * Sets the embed of the message (overrides all existing embeds).
      *
      * @param embed The embed to set.
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder setEmbed(EmbedBuilder embed) {
         delegate.removeAllEmbeds();
+        delegate.addEmbed(embed);
+        return this;
+    }
+
+    /**
+     * Sets multiple embeds of the message (overrides all existing embeds).
+     *
+     * @param embeds The embed to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder setEmbeds(EmbedBuilder... embeds) {
+        delegate.removeAllEmbeds();
+        delegate.addEmbeds(embeds);
+        return this;
+    }
+
+    /**
+     * Adds an embed to the message.
+     *
+     * @param embed The embed to add.
+     * @return The current isntance in order to chain call methods.
+     */
+    public MessageBuilder addEmbed(EmbedBuilder embed) {
         delegate.addEmbed(embed);
         return this;
     }
@@ -497,6 +520,49 @@ public class MessageBuilder {
      */
     public MessageBuilder removeAllComponents() {
         delegate.removeAllComponents();
+        return this;
+    }
+
+    /**
+     * Adds the embeds to the message.
+     *
+     * @param embeds The embeds to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addEmbeds(EmbedBuilder... embeds) {
+        delegate.addEmbeds(embeds);
+        return this;
+    }
+
+    /**
+     * Removes the embed from the message.
+     *
+     * @param embed The embed to remove.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder removeEmbed(EmbedBuilder embed) {
+        delegate.removeEmbed(embed);
+        return this;
+    }
+
+    /**
+     * Removes the embeds from the message.
+     *
+     * @param embeds The embeds to remove.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder removeEmbeds(EmbedBuilder... embeds) {
+        delegate.removeEmbeds(embeds);
+        return this;
+    }
+
+    /**
+     * Removes all embeds from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder removeAllEmbeds() {
+        delegate.removeAllEmbeds();
         return this;
     }
 

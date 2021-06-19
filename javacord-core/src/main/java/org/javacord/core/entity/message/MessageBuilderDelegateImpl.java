@@ -192,6 +192,21 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
     }
 
     @Override
+    public void addEmbeds(EmbedBuilder... embeds) {
+        this.embeds.addAll(Arrays.asList(embeds));
+    }
+
+    @Override
+    public void removeEmbed(EmbedBuilder embed) {
+        this.embeds.remove(embed);
+    }
+
+    @Override
+    public void removeEmbeds(EmbedBuilder... embeds) {
+        this.embeds.removeAll(Arrays.asList(embeds));
+    }
+
+    @Override
     public void removeComponent(int index) {
         components.remove(index);
     }
@@ -387,9 +402,14 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
         if (allowedMentions != null) {
             ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
         }
-        if (embeds.size() > 0) {
-            // As only messages sent by webhooks can contain more than one embed, it is enough to add the first.
-            ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).toJsonNode(body.putObject("embed"));
+
+        if (embeds.size() != 0) {
+            // Discord now supports multiple embeds for Discord bots.
+            ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
+            for (int i = 0; i < embeds.size() && i < 10; i++) {
+                embedsNode.add(((EmbedBuilderDelegateImpl) embeds.get(i).getDelegate()).toJsonNode());
+            }
+            body.set("embeds", embedsNode);
         }
 
         prepareComponents(body);
@@ -410,10 +430,10 @@ public class MessageBuilderDelegateImpl implements MessageBuilderDelegate {
             channel.getApi().getThreadPool().getExecutorService().submit(() -> {
                 try {
                     List<FileContainer> tempAttachments = new ArrayList<>(attachments);
-                    // Add the attachments required for the embed
-                    if (embeds.size() > 0) {
+                    // Add the attachments required for the embeds
+                    for (EmbedBuilder embed : embeds) {
                         tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).getRequiredAttachments());
+                                ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
                     }
 
                     addMultipartBodyToRequest(request, body, tempAttachments, channel.getApi());
