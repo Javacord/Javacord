@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link WebhookMessageBuilder} to create messages.
  * You usually don't want to interact with this object.
  */
-public interface WebhookMessageBuilderDelegate extends WebhookMessageBuilderBaseDelegate {
+public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
 
     /**
      * Sets the display name of the webhook.

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
-public class InteractionMessageBuilderDelegateImpl extends WebhookMessageBuilderBaseDelegateImpl
+public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegateImpl
         implements InteractionMessageBuilderDelegate {
 
     /**
