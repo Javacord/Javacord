@@ -1108,6 +1108,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public boolean isPending(long userId) {
+        return getRealMemberById(userId)
+                .map(Member::isPending)
+                .orElse(false);
+    }
+
+    @Override
     public boolean isSelfMuted(long userId) {
         return getRealMemberById(userId)
                 .map(Member::isSelfMuted)

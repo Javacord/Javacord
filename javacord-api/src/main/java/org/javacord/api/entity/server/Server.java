@@ -178,6 +178,20 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<String> getNickname(User user);
 
     /**
+     * Gets the pending state of the user.
+     *
+     * <p>Membership screening pending state is only available for servers that have
+     * verification gate enabled, this will default to false if it isn't.
+     * You can check if a server has membership verification gate enabled
+     * using the {@link #getFeatures()} method if it has
+     * {@link org.javacord.api.entity.server.ServerFeature#MEMBER_VERIFICATION_GATE_ENABLED}.
+     *
+     * @param userId The id of the user to check.
+     * @return Whether the user has passed membership screening
+     */
+    boolean isPending(long userId);
+
+    /**
      * Gets your self-muted state.
      *
      * @return Whether you are self-muted.

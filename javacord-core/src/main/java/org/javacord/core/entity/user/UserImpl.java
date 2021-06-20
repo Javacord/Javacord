@@ -271,6 +271,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
+    public boolean isPending(Server server) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.isPending(getId());
+        } else {
+            return member.isPending();
+        }
+    }
+
+    @Override
     public boolean isSelfMuted(Server server) {
         if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.isSelfMuted(getId());
