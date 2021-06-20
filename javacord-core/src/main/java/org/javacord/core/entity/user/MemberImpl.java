@@ -27,6 +27,7 @@ public final class MemberImpl implements Member {
     private final DiscordApiImpl api;
     private final ServerImpl server;
     private final UserImpl user;
+    private final boolean pending;
     private final String nickname;
     private final List<Long> roleIds;
     private final String joinedAt;
@@ -72,6 +73,12 @@ public final class MemberImpl implements Member {
             serverBoostingSince = null;
         }
 
+        if (data.hasNonNull("pending")) {
+            pending = data.get("pending").asBoolean();
+        } else {
+            pending = false;
+        }
+
         if (data.hasNonNull("deaf")) {
             selfDeafened = data.get("deaf").asBoolean();
         } else {
@@ -85,7 +92,8 @@ public final class MemberImpl implements Member {
     }
 
     private MemberImpl(DiscordApiImpl api, ServerImpl server, UserImpl user, String nickname, List<Long> roleIds,
-                       String joinedAt, String serverBoostingSince, boolean selfDeafened, boolean selfMuted) {
+                       String joinedAt, String serverBoostingSince, boolean selfDeafened,
+                       boolean selfMuted, boolean pending) {
         this.api = api;
         this.server = server;
         this.user = user;
@@ -95,6 +103,7 @@ public final class MemberImpl implements Member {
         this.serverBoostingSince = serverBoostingSince;
         this.selfDeafened = selfDeafened;
         this.selfMuted = selfMuted;
+        this.pending = pending;
     }
 
     /**
@@ -105,7 +114,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setUser(UserImpl user) {
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted);
+                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -116,7 +125,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setPartialUser(JsonNode partialUserJson) {
         return new MemberImpl(api, server, user.replacePartialUserData(partialUserJson), nickname, roleIds, joinedAt,
-                serverBoostingSince, selfDeafened, selfMuted);
+                serverBoostingSince, selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -128,7 +137,7 @@ public final class MemberImpl implements Member {
     public MemberImpl setRoleIds(List<Long> roleIds) {
         roleIds.add(server.getEveryoneRole().getId());
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted);
+                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -148,7 +157,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setNickname(String nickname) {
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted);
+                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -159,7 +168,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setServerBoostingSince(String serverBoostingSince) {
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted);
+                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -239,6 +248,11 @@ public final class MemberImpl implements Member {
     @Override
     public boolean isSelfDeafened() {
         return selfDeafened;
+    }
+
+    @Override
+    public boolean isPending() {
+        return pending;
     }
 
     @Override

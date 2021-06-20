@@ -12,6 +12,7 @@ import org.javacord.api.event.user.UserChangeAvatarEvent;
 import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
+import org.javacord.api.event.user.UserChangePendingEvent;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
@@ -22,6 +23,7 @@ import org.javacord.core.event.user.UserChangeAvatarEventImpl;
 import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
 import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
+import org.javacord.core.event.user.UserChangePendingEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -70,6 +72,14 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                 new UserChangeNicknameEventImpl(newMember, oldMember);
 
                         api.getEventDispatcher().dispatchUserChangeNicknameEvent(
+                                server, server, newMember.getUser(), event);
+                    }
+
+                    if (newMember.isPending() != oldMember.isPending()) {
+                        UserChangePendingEvent event =
+                                new UserChangePendingEventImpl(oldMember, newMember);
+
+                        api.getEventDispatcher().dispatchUserChangePendingEvent(
                                 server, server, newMember.getUser(), event);
                     }
 
@@ -160,6 +170,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                 userChanged = true;
                             }
                         }
+
                         if (userChanged) {
                             api.updateUserOfAllMembers(updatedUser);
                         }

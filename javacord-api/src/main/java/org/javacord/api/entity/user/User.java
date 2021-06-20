@@ -307,6 +307,18 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     Optional<String> getNickname(Server server);
 
     /**
+     * Gets the pending state of the user in the given server.
+     *
+     * <p>This will always return false if the server doesn't have membership screening enable.
+     * You can check through {@link Server#getFeatures()} if it has
+     * {@link org.javacord.api.entity.server.ServerFeature#MEMBER_VERIFICATION_GATE_ENABLED}.
+     *
+     * @param server The server to check.
+     * @return Whether the user has passed the Membership screening.
+     */
+    boolean isPending(Server server);
+
+    /**
      * Moves this user to the given channel.
      *
      * @param channel The channel to move the user to.

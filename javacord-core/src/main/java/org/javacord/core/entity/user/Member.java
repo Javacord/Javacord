@@ -103,4 +103,11 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
      */
     boolean isSelfDeafened();
 
+    /**
+     * Gets the pending state of this member.
+     *
+     * @return Whether this user has passed the membership screening.
+     */
+    boolean isPending();
+
 }
