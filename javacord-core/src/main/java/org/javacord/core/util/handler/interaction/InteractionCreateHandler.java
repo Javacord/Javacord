@@ -5,10 +5,16 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.component.ComponentType;
+import org.javacord.api.event.interaction.ApplicationCommandCreateEvent;
+import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
+import org.javacord.api.event.interaction.MessageComponentCreateEvent;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.event.interaction.ApplicationCommandCreateEventImpl;
+import org.javacord.core.event.interaction.ButtonClickEventImpl;
 import org.javacord.core.event.interaction.InteractionCreateEventImpl;
+import org.javacord.core.event.interaction.MessageComponentCreateEventImpl;
 import org.javacord.core.interaction.ApplicationCommandInteractionImpl;
 import org.javacord.core.interaction.ButtonInteractionImpl;
 import org.javacord.core.interaction.InteractionImpl;
@@ -37,15 +43,20 @@ public class InteractionCreateHandler extends PacketHandler {
         if (packet.hasNonNull("channel_id")) {
             channel = api.getTextChannelById(packet.get("channel_id").asLong()).orElse(null);
         }
+
+        int typeId = packet.get("type").asInt();
+        final InteractionType interactionType = InteractionType.fromValue(typeId);
+        ComponentType componentType = null;
+
         InteractionImpl interaction;
-        int type = packet.get("type").asInt();
-        switch (InteractionType.fromValue(type)) {
+        switch (interactionType) {
             case APPLICATION_COMMAND:
                 interaction = new ApplicationCommandInteractionImpl(api, channel, packet);
                 break;
             case MESSAGE_COMPONENT:
-                int componentType = packet.get("data").get("component_type").asInt();
-                switch (ComponentType.fromId(componentType)) {
+                int componentTypeId = packet.get("data").get("component_type").asInt();
+                componentType = ComponentType.fromId(componentTypeId);
+                switch (componentType) {
                     case BUTTON:
                         interaction = new ButtonInteractionImpl(api, channel, packet);
                         break;
@@ -54,14 +65,14 @@ public class InteractionCreateHandler extends PacketHandler {
                                 + " be possible.");
                         return;
                     default:
-                        logger.warn(String.format("Received message component interaction of unknown type %s. "
-                                + "Please contact the developer!", componentType));
+                        logger.warn("Received message component interaction of unknown type <{}>. "
+                                + "Please contact the developer!", componentTypeId);
                         return;
                 }
                 break;
             default:
-                logger.warn(String.format("Received interaction of unknown type %s. "
-                        + "Please contact the developer!", type));
+                logger.warn("Received interaction of unknown type <{}>. "
+                        + "Please contact the developer!", typeId);
                 return;
         }
         InteractionCreateEvent event = new InteractionCreateEventImpl(interaction);
@@ -75,6 +86,46 @@ public class InteractionCreateHandler extends PacketHandler {
                 interaction.getUser(),
                 event
         );
+
+        switch (interactionType) {
+            case APPLICATION_COMMAND:
+                ApplicationCommandCreateEvent applicationCommandCreateEvent =
+                        new ApplicationCommandCreateEventImpl(interaction);
+                api.getEventDispatcher().dispatchApplicationCommandCreateEvent(
+                        server == null ? api : server,
+                        server,
+                        interaction.getChannel().orElse(null),
+                        interaction.getUser(),
+                        applicationCommandCreateEvent
+                );
+                break;
+            case MESSAGE_COMPONENT:
+                MessageComponentCreateEvent messageComponentCreateEvent =
+                        new MessageComponentCreateEventImpl(interaction);
+                api.getEventDispatcher().dispatchMessageComponentCreateEvent(
+                        server == null ? api : server,
+                        server,
+                        interaction.getChannel().orElse(null),
+                        interaction.getUser(),
+                        messageComponentCreateEvent);
+                switch (componentType) {
+                    case BUTTON:
+                        ButtonClickEvent buttonClickEvent = new ButtonClickEventImpl(interaction);
+                        api.getEventDispatcher().dispatchButtonClickEvent(
+                                server == null ? api : server,
+                                server,
+                                interaction.getChannel().orElse(null),
+                                interaction.getUser(),
+                                buttonClickEvent);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+
     }
 
 }
