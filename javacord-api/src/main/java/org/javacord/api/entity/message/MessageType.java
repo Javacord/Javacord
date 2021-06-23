@@ -31,7 +31,7 @@ public enum MessageType {
     SERVER_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING(16),
     SERVER_DISCOVERY_GRACE_PERIOD_FINAL_WARNING(17),
     REPLY(19),
-    APPLICATION_COMMAND(20),
+    SLASH_COMMAND(20),
 
     /**
      * An unknown message type.
@@ -98,7 +98,7 @@ public enum MessageType {
             case 19:
                 return REPLY;
             case 20:
-                return APPLICATION_COMMAND;
+                return SLASH_COMMAND;
             default:
                 return UNKNOWN;
         }

@@ -51,7 +51,7 @@ public class MyFirstBot {
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
-        ApplicationCommand.with("ping", "A simple ping pong command!").createGlobal(api).join();
+        SlashCommand.with("ping", "A simple ping pong command!").createGlobal(api).join();
     }
 }
 ```
@@ -69,14 +69,15 @@ public class MyFirstBot {
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
-        api.addInteractionCreateListener(event -> event.getApplicationCommandInteraction().ifPresent(applicationCommand -> {
-            if (applicationCommand.getCommandName().equals("ping")) {
-                applicationCommand.createImmediateResponder()
+        api.addSlashCommandCreateListener(event -> {
+            SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
+            if (slashCommandInteraction.getCommandName().equals("ping")) {
+                slashCommandInteraction.createImmediateResponder()
                     .setContent("Pong!")
                     .setFlags(MessageFlag.EPHEMERAL) // Only visible for the user which invoked the command
                     .respond();
             }
-        }));
+        });
     }
 }
 ```

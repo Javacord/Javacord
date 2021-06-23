@@ -1,9 +1,9 @@
 package org.javacord.core.event.interaction;
 
 import org.javacord.api.event.interaction.InteractionCreateEvent;
-import org.javacord.api.interaction.ApplicationCommandInteraction;
 import org.javacord.api.interaction.Interaction;
 import org.javacord.api.interaction.MessageComponentInteraction;
+import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.core.event.EventImpl;
 
 import java.util.Optional;
@@ -31,8 +31,8 @@ public class InteractionCreateEventImpl extends EventImpl implements Interaction
     }
 
     @Override
-    public Optional<ApplicationCommandInteraction> getApplicationCommandInteraction() {
-        return interaction.asApplicationCommandInteraction();
+    public Optional<SlashCommandInteraction> getSlashCommandInteraction() {
+        return interaction.asSlashCommandInteraction();
     }
 
     @Override
