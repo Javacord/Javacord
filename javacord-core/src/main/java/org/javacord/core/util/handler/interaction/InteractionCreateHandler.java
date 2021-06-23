@@ -5,19 +5,19 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.component.ComponentType;
-import org.javacord.api.event.interaction.ApplicationCommandCreateEvent;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
 import org.javacord.api.event.interaction.MessageComponentCreateEvent;
+import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.event.interaction.ApplicationCommandCreateEventImpl;
 import org.javacord.core.event.interaction.ButtonClickEventImpl;
 import org.javacord.core.event.interaction.InteractionCreateEventImpl;
 import org.javacord.core.event.interaction.MessageComponentCreateEventImpl;
-import org.javacord.core.interaction.ApplicationCommandInteractionImpl;
+import org.javacord.core.event.interaction.SlashCommandCreateEventImpl;
 import org.javacord.core.interaction.ButtonInteractionImpl;
 import org.javacord.core.interaction.InteractionImpl;
+import org.javacord.core.interaction.SlashCommandInteractionImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -50,8 +50,8 @@ public class InteractionCreateHandler extends PacketHandler {
 
         InteractionImpl interaction;
         switch (interactionType) {
-            case APPLICATION_COMMAND:
-                interaction = new ApplicationCommandInteractionImpl(api, channel, packet);
+            case SLASH_COMMAND:
+                interaction = new SlashCommandInteractionImpl(api, channel, packet);
                 break;
             case MESSAGE_COMPONENT:
                 int componentTypeId = packet.get("data").get("component_type").asInt();
@@ -88,15 +88,15 @@ public class InteractionCreateHandler extends PacketHandler {
         );
 
         switch (interactionType) {
-            case APPLICATION_COMMAND:
-                ApplicationCommandCreateEvent applicationCommandCreateEvent =
-                        new ApplicationCommandCreateEventImpl(interaction);
-                api.getEventDispatcher().dispatchApplicationCommandCreateEvent(
+            case SLASH_COMMAND:
+                SlashCommandCreateEvent slashCommandCreateEvent =
+                        new SlashCommandCreateEventImpl(interaction);
+                api.getEventDispatcher().dispatchSlashCommandCreateEvent(
                         server == null ? api : server,
                         server,
                         interaction.getChannel().orElse(null),
                         interaction.getUser(),
-                        applicationCommandCreateEvent
+                        slashCommandCreateEvent
                 );
                 break;
             case MESSAGE_COMPONENT:

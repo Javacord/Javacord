@@ -29,11 +29,11 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.interaction.ApplicationCommand;
-import org.javacord.api.interaction.ApplicationCommandBuilder;
-import org.javacord.api.interaction.ApplicationCommandUpdater;
-import org.javacord.api.interaction.ServerApplicationCommandPermissions;
-import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
+import org.javacord.api.interaction.ServerSlashCommandPermissions;
+import org.javacord.api.interaction.ServerSlashCommandPermissionsBuilder;
+import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandBuilder;
+import org.javacord.api.interaction.SlashCommandUpdater;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
@@ -101,88 +101,88 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @return A list with all global commands.
      */
-    CompletableFuture<List<ApplicationCommand>> getGlobalApplicationCommands();
+    CompletableFuture<List<SlashCommand>> getGlobalSlashCommands();
 
     /**
-     * Gets an application command by its id.
+     * Gets an slash command by its id.
      *
-     * @param commandId The id of the application command.
-     * @return The application command with the given id.
+     * @param commandId The id of the slash command.
+     * @return The slash command with the given id.
      */
-    CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId);
+    CompletableFuture<SlashCommand> getGlobalSlashCommandById(long commandId);
 
     /**
-     * Gets a list with all application commands for the given server.
+     * Gets a list with all slash commands for the given server.
      *
-     * @param server The server to get the application commands from.
-     * @return A list with all application commands from the server.
+     * @param server The server to get the slash commands from.
+     * @return A list with all slash commands from the server.
      */
-    CompletableFuture<List<ApplicationCommand>> getServerApplicationCommands(Server server);
+    CompletableFuture<List<SlashCommand>> getServerSlashCommands(Server server);
 
     /**
-     * Gets a server application command by its id.
+     * Gets a server slash command by its id.
      *
-     * @param server The server to get the application commands from.
-     * @param commandId The id of the server application command.
-     * @return The server application command with the given id.
+     * @param server The server to get the slash commands from.
+     * @param commandId The id of the server slash command.
+     * @return The server slash command with the given id.
      */
-    CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long commandId);
+    CompletableFuture<SlashCommand> getServerSlashCommandById(Server server, long commandId);
 
     /**
-     * Gets a list of all server application command permissions from the given server.
+     * Gets a list of all server slash command permissions from the given server.
      *
      * @param server The server.
-     * @return A list containing the server application command permissions.
+     * @return A list containing the server slash command permissions.
      */
-    CompletableFuture<List<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(Server server);
+    CompletableFuture<List<ServerSlashCommandPermissions>> getServerSlashCommandPermissions(Server server);
 
     /**
-     * Gets a server application command permissions by it ID from the given server.
+     * Gets a server slash command permissions by it ID from the given server.
      *
      * @param server The server.
      * @param commandId The command ID.
-     * @return The server application command permissions for the given ID.
+     * @return The server slash command permissions for the given ID.
      */
-    CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
+    CompletableFuture<ServerSlashCommandPermissions> getServerSlashCommandPermissionsById(
             Server server, long commandId);
 
     /**
-     * Updates multiple server application command permissions at once.
+     * Updates multiple server slash command permissions at once.
      *
-     * @param server The server where the application command permissions should be updated on.
-     * @param applicationCommandPermissionsBuilders The application command permissions builders,
+     * @param server The server where the slash command permissions should be updated on.
+     * @param slashCommandPermissionsBuilders The slash command permissions builders,
      *     which should be updated.
-     * @return A list of the updated server application command permissions.
+     * @return A list of the updated server slash command permissions.
      */
-    CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
-            Server server, List<ServerApplicationCommandPermissionsBuilder> applicationCommandPermissionsBuilders);
+    CompletableFuture<List<ServerSlashCommandPermissions>> batchUpdateSlashCommandPermissions(
+            Server server, List<ServerSlashCommandPermissionsBuilder> slashCommandPermissionsBuilders);
 
     /**
-     * Bulk overwrites the global Application Commands.
+     * Bulk overwrites the global slash commands.
      * This should be preferably used when updating and/or creating multiple
-     * application commands at once instead of {@link ApplicationCommandUpdater#updateGlobal(DiscordApi)} (DiscordApi)}
-     * and {@link ApplicationCommandBuilder#createGlobal(DiscordApi)}
+     * slash commands at once instead of {@link SlashCommandUpdater#updateGlobal(DiscordApi)} (DiscordApi)}
+     * and {@link SlashCommandBuilder#createGlobal(DiscordApi)}
      *
-     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders
+     * @param slashCommandBuilderList A list containing the SlashCommandBuilders
      *     which should should be used to perform the bulk overwrite.
-     * @return A list containing all Application Commands.
+     * @return A list containing all slash commands.
      */
-    CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
-            List<ApplicationCommandBuilder> applicationCommandBuilderList);
+    CompletableFuture<List<SlashCommand>> bulkOverwriteGlobalSlashCommands(
+            List<SlashCommandBuilder> slashCommandBuilderList);
 
     /**
-     * Bulk overwrites the servers Application Commands.
+     * Bulk overwrites the servers slash commands.
      * This should be preferably used when updating and/or creating multiple
-     * application commands at once instead of {@link ApplicationCommandUpdater#updateForServer(Server)} (Server)}
-     * and {@link ApplicationCommandBuilder#createForServer(Server)}
+     * slash commands at once instead of {@link SlashCommandUpdater#updateForServer(Server)} (Server)}
+     * and {@link SlashCommandBuilder#createForServer(Server)}
      *
-     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders.
+     * @param slashCommandBuilderList A list containing the SlashCommandBuilders.
      * @param server The server where the bulk overwrite should be performed on
      *     which should should be used to perform the bulk overwrite.
-     * @return A list containing all Application Commands.
+     * @return A list containing all slash commands.
      */
-    CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            Server server, List<ApplicationCommandBuilder> applicationCommandBuilderList);
+    CompletableFuture<List<SlashCommand>> bulkOverwriteServerSlashCommands(
+            Server server, List<SlashCommandBuilder> slashCommandBuilderList);
 
     /**
      * Gets a utility class to interact with uncached messages.

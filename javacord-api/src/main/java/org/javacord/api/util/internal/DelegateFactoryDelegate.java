@@ -35,12 +35,12 @@ import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandOptionBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandOptionChoiceBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
+import org.javacord.api.interaction.internal.SlashCommandBuilderDelegate;
+import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
+import org.javacord.api.interaction.internal.SlashCommandOptionChoiceBuilderDelegate;
+import org.javacord.api.interaction.internal.SlashCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.SlashCommandPermissionsUpdaterDelegate;
+import org.javacord.api.interaction.internal.SlashCommandUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
@@ -182,12 +182,12 @@ public interface DelegateFactoryDelegate {
     AccountUpdaterDelegate createAccountUpdaterDelegate(DiscordApi api);
 
     /**
-     * Creates a new application command updater delegate.
+     * Creates a new slash command updater delegate.
      *
-     * @param commandId The application command id.
-     * @return A new application command updater delegate.
+     * @param commandId The slash command id.
+     * @return A new slash command updater delegate.
      */
-    ApplicationCommandUpdaterDelegate createApplicationCommandUpdaterDelegate(long commandId);
+    SlashCommandUpdaterDelegate createSlashCommandUpdaterDelegate(long commandId);
 
     /**
      * Creates a new group channel updater delegate.
@@ -276,40 +276,40 @@ public interface DelegateFactoryDelegate {
     DiscordExceptionValidator createDiscordExceptionValidator();
 
     /**
-     * Creates a new application command builder delegate.
+     * Creates a new slash command builder delegate.
      *
-     * @return The application command builder delegate.
+     * @return The slash command builder delegate.
      */
-    ApplicationCommandBuilderDelegate createApplicationCommandBuilderDelegate();
+    SlashCommandBuilderDelegate createSlashCommandBuilderDelegate();
 
     /**
-     * Creates a new application command option builder delegate.
+     * Creates a new slash command option builder delegate.
      *
-     * @return The application command option builder delegate.
+     * @return The slash command option builder delegate.
      */
-    ApplicationCommandOptionBuilderDelegate createApplicationCommandOptionBuilderDelegate();
+    SlashCommandOptionBuilderDelegate createSlashCommandOptionBuilderDelegate();
 
     /**
-     * Creates a new application command permissions updater delegate.
+     * Creates a new slash command permissions updater delegate.
      *
      * @param server The server where the update should be performed on.
-     * @return The application command permissions updater delegate.
+     * @return The slash command permissions updater delegate.
      */
-    ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(Server server);
+    SlashCommandPermissionsUpdaterDelegate createSlashCommandPermissionsUpdaterDelegate(Server server);
 
     /**
-     * Creates a new application command permissions builder delegate.
+     * Creates a new slash command permissions builder delegate.
      *
-     * @return The application command permissions builder delegate.
+     * @return The slash command permissions builder delegate.
      */
-    ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate();
+    SlashCommandPermissionsBuilderDelegate createSlashCommandPermissionsBuilderDelegate();
 
     /**
-     * Creates a new application command option choice builder delegate.
+     * Creates a new slash command option choice builder delegate.
      *
-     * @return The application command option choice builder delegate.
+     * @return The slash command option choice builder delegate.
      */
-    ApplicationCommandOptionChoiceBuilderDelegate createApplicationCommandOptionChoiceBuilderDelegate();
+    SlashCommandOptionChoiceBuilderDelegate createSlashCommandOptionChoiceBuilderDelegate();
 
 
     /**

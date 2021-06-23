@@ -1,10 +1,10 @@
 package org.javacord.api.event.interaction;
 
 import org.javacord.api.event.Event;
-import org.javacord.api.interaction.ApplicationCommandInteraction;
 import org.javacord.api.interaction.Interaction;
 import org.javacord.api.interaction.InteractionBase;
 import org.javacord.api.interaction.MessageComponentInteraction;
+import org.javacord.api.interaction.SlashCommandInteraction;
 
 import java.util.Optional;
 
@@ -21,23 +21,23 @@ public interface InteractionCreateEvent extends Event {
     Interaction getInteraction();
 
     /**
-     * Gets the created interaction as ApplicationCommandInteraction, if the interaction is of this type.
+     * Gets the created interaction as SlashCommandInteraction, if the interaction is of this type.
      *
      * @return The interaction.
      */
-    default Optional<ApplicationCommandInteraction> getApplicationCommandInteraction() {
-        return getInteraction().asApplicationCommandInteraction();
+    default Optional<SlashCommandInteraction> getSlashCommandInteraction() {
+        return getInteraction().asSlashCommandInteraction();
     }
 
     /**
-     * Gets the created interaction as ApplicationCommandInteraction, if the interaction is of this type and the
+     * Gets the created interaction as SlashCommandInteraction, if the interaction is of this type and the
      * command id equals the given command id.
      *
      * @param commandId The command it to match.
      * @return The interaction.
      */
-    default Optional<ApplicationCommandInteraction> getApplicationCommandInteractionWithCommandId(long commandId) {
-        return getInteraction().asApplicationCommandInteractionWithCommandId(commandId);
+    default Optional<SlashCommandInteraction> getSlashCommandInteractionWithCommandId(long commandId) {
+        return getInteraction().asSlashCommandInteractionWithCommandId(commandId);
     }
 
     /**
