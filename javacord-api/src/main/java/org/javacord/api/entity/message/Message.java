@@ -768,12 +768,22 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     MessageAuthor getAuthor();
 
     /**
-     * Gets the id of the message referenced with a reply.
-     * Only present if this message is type {@code MessageType.REPLY}.
+     * Gets the message reference of the message.
+     *
+     * @return The message reference.
+     */
+    Optional<MessageReference> getMessageReference();
+
+    /**
+     * Gets the id of the referenced message.
      *
      * @return The id of the referenced message.
+     * @deprecated Use {@link #getMessageReference()} instead.
      */
-    Optional<Long> getReferencedMessageId();
+    @Deprecated
+    default Optional<Long> getReferencedMessageId() {
+        return getMessageReference().flatMap(MessageReference::getMessageId);
+    }
 
     /**
      * Gets the message referenced with a reply.
