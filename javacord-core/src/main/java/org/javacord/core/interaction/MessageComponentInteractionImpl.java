@@ -3,6 +3,7 @@ package org.javacord.core.interaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.MessageComponentInteraction;
@@ -13,6 +14,7 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class MessageComponentInteractionImpl extends InteractionImpl implements MessageComponentInteraction {
@@ -22,18 +24,27 @@ public abstract class MessageComponentInteractionImpl extends InteractionImpl im
 
     private final Message message;
     private final String customId;
+    private final long messageId;
 
     /**
      * Class constructor.
      *
-     * @param api      The api instance.
-     * @param channel  The channel in which the interaction happened. Can be {@code null}.
+     * @param api The api instance.
+     * @param channel The channel in which the interaction happened. Can be {@code null}.
      * @param jsonData The json data of the interaction.
      */
     public MessageComponentInteractionImpl(DiscordApiImpl api, TextChannel channel, JsonNode jsonData) {
         super(api, channel, jsonData);
 
-        message = new MessageImpl(api, channel, jsonData.get("message"));
+        JsonNode messageNode = jsonData.get("message");
+        messageId = messageNode.get("id").asLong();
+
+        //Check is needed due to the message not being completely provided if it's ephemeral.
+        if (messageNode.has("flags") && (messageNode.get("flags").asInt() & MessageFlag.EPHEMERAL.getId()) != 0) {
+            message = null;
+        } else {
+            message = new MessageImpl(api, channel, jsonData.get("message"));
+        }
 
         JsonNode data = jsonData.get("data");
         this.customId = data.get("custom_id").asText();
@@ -59,8 +70,13 @@ public abstract class MessageComponentInteractionImpl extends InteractionImpl im
     }
 
     @Override
-    public Message getMessage() {
-        return message;
+    public Optional<Message> getMessage() {
+        return Optional.ofNullable(message);
+    }
+
+    @Override
+    public long getMessageId() {
+        return messageId;
     }
 
     @Override
