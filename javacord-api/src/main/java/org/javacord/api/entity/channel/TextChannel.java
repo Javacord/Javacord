@@ -841,7 +841,15 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     CompletableFuture<List<Webhook>> getWebhooks();
 
     /**
-     * Gets a list of all incoming webhooks in this channel.
+     * Gets a list of all incoming webhooks in this channel, they are not guaranteed to have an accessible token.
+     *
+     * @return A list of all incoming webhooks in this channel.
+     */
+    CompletableFuture<List<Webhook>> getAllIncomingWebhooks();
+
+    /**
+     * Gets a list of incoming webhooks in this channel.
+     * This method only returns webhooks with a token, that the bot can access.
      *
      * @return A list of all incoming webhooks in this channel.
      */

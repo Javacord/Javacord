@@ -39,7 +39,6 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.entity.webhook.WebhookType;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
@@ -1462,18 +1461,18 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public CompletableFuture<List<Webhook>> getAllIncomingWebhooks() {
+        return new RestRequest<List<Webhook>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> WebhookImpl.createAllIncomingWebhooksFromJsonArray(getApi(), result.getJsonBody()));
+    }
+
+    @Override
     public CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks() {
         return new RestRequest<List<IncomingWebhook>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    List<IncomingWebhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhookJson : result.getJsonBody()) {
-                        if (WebhookType.fromValue(webhookJson.get("type").asInt()) == WebhookType.INCOMING) {
-                            webhooks.add(new IncomingWebhookImpl(getApi(), webhookJson));
-                        }
-                    }
-                    return Collections.unmodifiableList(webhooks);
-                });
+                .execute(result ->
+                        IncomingWebhookImpl.createIncomingWebhooksFromJsonArray(getApi(), result.getJsonBody()));
     }
 
     @Override
