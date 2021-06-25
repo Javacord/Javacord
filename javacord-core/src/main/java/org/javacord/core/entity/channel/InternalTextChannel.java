@@ -187,17 +187,17 @@ public interface InternalTextChannel extends TextChannel, InternalTextChannelAtt
     }
 
     @Override
+    default CompletableFuture<List<Webhook>> getAllIncomingWebhooks() {
+        return new RestRequest<List<Webhook>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> WebhookImpl.createAllIncomingWebhooksFromJsonArray(getApi(), result.getJsonBody()));
+    }
+
+    @Override
     default CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks() {
         return new RestRequest<List<IncomingWebhook>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_WEBHOOK)
                 .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    List<IncomingWebhook> webhooks = new ArrayList<>();
-                    for (JsonNode webhookJson : result.getJsonBody()) {
-                        if (webhookJson.get("type").asText().equals("1")) {
-                            webhooks.add(new IncomingWebhookImpl(getApi(), webhookJson));
-                        }
-                    }
-                    return Collections.unmodifiableList(webhooks);
-                });
+                .execute(result ->
+                        IncomingWebhookImpl.createIncomingWebhooksFromJsonArray(getApi(), result.getJsonBody()));
     }
 }

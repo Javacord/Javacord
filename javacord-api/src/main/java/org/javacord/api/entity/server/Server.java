@@ -2013,7 +2013,15 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     CompletableFuture<List<Webhook>> getWebhooks();
 
     /**
-     * Gets a list of all incoming webhooks in this server.
+     * Gets a list of all incoming webhooks in this server, they are not guaranteed to have an accessible token.
+     *
+     * @return A list of all incoming webhooks in this server.
+     */
+    CompletableFuture<List<Webhook>> getAllIncomingWebhooks();
+
+    /**
+     * Gets a list of incoming webhooks in this server.
+     * This method only returns webhooks with a token, that the bot can access.
      *
      * @return A list of all incoming webhooks in this server.
      */

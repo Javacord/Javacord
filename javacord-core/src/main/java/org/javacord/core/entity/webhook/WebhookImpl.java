@@ -25,6 +25,9 @@ import org.javacord.core.util.rest.RestRequest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -76,11 +79,28 @@ public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, Interna
      * @return The new webhook.
      */
     public static WebhookImpl createWebhook(DiscordApi api, JsonNode data) {
-        if (WebhookType.fromValue(data.get("type").asInt()) == WebhookType.INCOMING) {
+        if (data.hasNonNull("token")) {
             return new IncomingWebhookImpl(api, data);
         } else {
             return new WebhookImpl(api, data);
         }
+    }
+
+    /**
+     * Gets all the incoming webhooks that may or may not have a token from a json array.
+     *
+     * @param api The discord api instance.
+     * @param jsonArray The json array of the webhooks.
+     * @return A list of all the incoming webhooks from the array.
+     */
+    public static List<Webhook> createAllIncomingWebhooksFromJsonArray(DiscordApi api, JsonNode jsonArray) {
+        List<Webhook> webhooks = new ArrayList<>();
+        for (JsonNode webhookJson : jsonArray) {
+            if (WebhookType.fromValue(webhookJson.get("type").asInt()) == WebhookType.INCOMING) {
+                webhooks.add(createWebhook(api, webhookJson));
+            }
+        }
+        return Collections.unmodifiableList(webhooks);
     }
 
     @Override
@@ -120,7 +140,8 @@ public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, Interna
 
     @Override
     public Optional<IncomingWebhook> asIncomingWebhook() {
-        return isIncomingWebhook() ? Optional.of((IncomingWebhookImpl) this) : Optional.empty();
+        // this gets overridden in IncomingWebhookImpl to make it work
+        return Optional.empty();
     }
 
     @Override

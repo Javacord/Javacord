@@ -8,6 +8,9 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,24 +32,28 @@ public class IncomingWebhookImpl extends WebhookImpl implements IncomingWebhook 
         token = data.get("token").asText();
     }
 
+    /**
+     * Gets the incoming webhooks with a token from a json array.
+     *
+     * @param api The discord api instance.
+     * @param jsonArray The json array of the webhooks.
+     * @return A list of all the incoming webhooks from the array.
+     */
+    public static List<IncomingWebhook> createIncomingWebhooksFromJsonArray(DiscordApi api, JsonNode jsonArray) {
+        List<IncomingWebhook> webhooks = new ArrayList<>();
+        for (JsonNode webhookJson : jsonArray) {
+            if (WebhookType.fromValue(webhookJson.get("type").asInt()) == WebhookType.INCOMING
+                    && webhookJson.hasNonNull("token")) { // check if it has a token to create IncomingWebhook
+                webhooks.add(new IncomingWebhookImpl(api, webhookJson));
+            }
+        }
+        return Collections.unmodifiableList(webhooks);
+    }
+
     @Override
     public Optional<IncomingWebhook> asIncomingWebhook() {
+        // important, as this is only possible with incoming webhooks with token
         return Optional.of(this);
-    }
-
-    @Override
-    public WebhookType getType() {
-        return WebhookType.INCOMING;
-    }
-
-    @Override
-    public boolean isIncomingWebhook() {
-        return true;
-    }
-
-    @Override
-    public boolean isChannelFollowerWebhook() {
-        return false;
     }
 
     @Override
