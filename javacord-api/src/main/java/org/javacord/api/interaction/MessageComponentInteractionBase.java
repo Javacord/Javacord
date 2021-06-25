@@ -3,16 +3,24 @@ package org.javacord.api.interaction;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.interaction.callback.ComponentInteractionOriginalMessageUpdater;
-
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public interface MessageComponentInteractionBase extends InteractionBase {
     /**
      * Gets the message that this interaction is related to.
+     * This may not be available if the sent message is EPHEMERAL.
      *
      * @return The message.
      */
-    Message getMessage();
+    Optional<Message> getMessage();
+
+    /**
+     * Gets the message ID that this interaction is related to.
+     *
+     * @return The message ID.
+     */
+    long getMessageId();
 
     /**
      * Get the identifier of the clicked component.

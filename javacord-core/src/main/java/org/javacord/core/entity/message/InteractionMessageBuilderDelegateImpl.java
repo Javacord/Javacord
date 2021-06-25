@@ -111,7 +111,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
     @Override
     public void copy(InteractionBase interaction) {
         ((InteractionImpl) interaction).asMessageComponentInteraction()
-                .map(MessageComponentInteraction::getMessage)
+                .flatMap(MessageComponentInteraction::getMessage)
                 .ifPresent(this::copy);
     }
 
