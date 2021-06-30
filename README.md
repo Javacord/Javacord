@@ -39,6 +39,49 @@ public class MyFirstBot {
 More sophisticated examples can be found at the [end of the README](#-more-examples). 
 You can also check out the [example bot](https://github.com/Javacord/Example-Bot) for a fully functional bot.
 
+### */* Slash commands
+First, you need to create the ping pong slash command. Run this code **one single time** to create the command:
+
+```java
+public class MyFirstBot {
+
+    public static void main(String[] args) {
+        // Insert your bot's token here
+        String token = "your token";
+
+        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+
+        SlashCommand.with("ping", "A simple ping pong command!").createGlobal(api).join();
+    }
+}
+```
+
+Discord now knows about your command and will offer it in your text channels if you type ``/``.
+*Note: Creating a global command may take up to 1 hour to become usable* 
+
+Next, let's see how we can let the bot send answers to this simple slash command:
+```java
+public class MyFirstBot {
+
+    public static void main(String[] args) {
+        // Insert your bot's token here
+        String token = "your token";
+
+        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+
+        api.addSlashCommandCreateListener(event -> {
+            SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
+            if (slashCommandInteraction.getCommandName().equals("ping")) {
+                slashCommandInteraction.createImmediateResponder()
+                    .setContent("Pong!")
+                    .setFlags(MessageFlag.EPHEMERAL) // Only visible for the user which invoked the command
+                    .respond();
+            }
+        });
+    }
+}
+```
+A more detailed version of how to use slash commands can be found in the [wiki](https://javacord.org/wiki/basic-tutorials/interactions/commands.html) 
 ## 📦 Download / Installation
 
 The recommended way to get Javacord is to use a build manager, like Gradle or Maven.  
@@ -50,7 +93,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 ```groovy
 repositories { mavenCentral() }
-dependencies { implementation 'org.javacord:javacord:3.3.0' }
+dependencies { implementation 'org.javacord:javacord:3.3.1' }
 ```
 
 #### Maven
@@ -59,7 +102,7 @@ dependencies { implementation 'org.javacord:javacord:3.3.0' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.3.0</version>
+    <version>3.3.1</version>
     <type>pom</type>
 </dependency>
 ```
@@ -67,7 +110,7 @@ dependencies { implementation 'org.javacord:javacord:3.3.0' }
 #### Sbt
 
 ```scala
-libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.3.0")
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.3.1")
 ```
 
 ### Optional Logger Dependency
