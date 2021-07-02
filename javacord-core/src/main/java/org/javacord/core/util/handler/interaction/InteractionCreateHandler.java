@@ -8,15 +8,18 @@ import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
 import org.javacord.api.event.interaction.MessageComponentCreateEvent;
+import org.javacord.api.event.interaction.SelectMenuChooseEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.interaction.ButtonClickEventImpl;
 import org.javacord.core.event.interaction.InteractionCreateEventImpl;
 import org.javacord.core.event.interaction.MessageComponentCreateEventImpl;
+import org.javacord.core.event.interaction.SelectMenuChooseEventImpl;
 import org.javacord.core.event.interaction.SlashCommandCreateEventImpl;
 import org.javacord.core.interaction.ButtonInteractionImpl;
 import org.javacord.core.interaction.InteractionImpl;
+import org.javacord.core.interaction.SelectMenuInteractionImpl;
 import org.javacord.core.interaction.SlashCommandInteractionImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -64,6 +67,9 @@ public class InteractionCreateHandler extends PacketHandler {
                         logger.warn("Received a message component interaction of type ACTION_ROW. This should not"
                                 + " be possible.");
                         return;
+                    case SELECT_MENU:
+                        interaction = new SelectMenuInteractionImpl(api, channel, packet);
+                        break;
                     default:
                         logger.warn("Received message component interaction of unknown type <{}>. "
                                 + "Please contact the developer!", componentTypeId);
@@ -117,6 +123,16 @@ public class InteractionCreateHandler extends PacketHandler {
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
                                 buttonClickEvent);
+                        break;
+                    case SELECT_MENU:
+                        SelectMenuChooseEvent selectMenuChooseEvent = new SelectMenuChooseEventImpl(interaction);
+                        api.getEventDispatcher().dispatchSelectMenuChooseEvent(
+                                server == null ? api : server,
+                                server,
+                                interaction.getChannel().orElse(null),
+                                interaction.getUser(),
+                                selectMenuChooseEvent
+                        );
                         break;
                     default:
                         break;

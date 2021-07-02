@@ -5,6 +5,8 @@ import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.component.ButtonBuilder;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.LowLevelComponent;
+import org.javacord.api.entity.message.component.SelectMenu;
+import org.javacord.api.entity.message.component.SelectMenuBuilder;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.core.entity.message.component.ActionRowImpl;
 import java.util.ArrayList;
@@ -27,6 +29,10 @@ public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
                 ButtonBuilder builder = new ButtonBuilder();
                 builder.copy((Button) component);
                 components.add(builder.build());
+            } else if (component.getType() == ComponentType.SELECT_MENU) {
+                SelectMenuBuilder builder = new SelectMenuBuilder();
+                builder.copy((SelectMenu) component);
+                components.add(builder.build());
             }
         });
     }
@@ -47,6 +53,9 @@ public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
             if (componentBuilder.getType() == ComponentType.BUTTON) {
                 ButtonBuilder buttonBuilder = (ButtonBuilder) componentBuilder;
                 return buttonBuilder.getDelegate().getCustomId().equals(customId);
+            } else if (componentBuilder.getType() == ComponentType.SELECT_MENU) {
+                SelectMenuBuilder selectMenuBuilder = (SelectMenuBuilder) componentBuilder;
+                return selectMenuBuilder.getDelegate().getCustomId().equals(customId);
             }
             return false;
         });
