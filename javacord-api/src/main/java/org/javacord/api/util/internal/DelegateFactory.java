@@ -18,6 +18,8 @@ import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
@@ -125,6 +127,24 @@ public class DelegateFactory {
      */
     public static ButtonBuilderDelegate createButtonBuilderDelegate() {
         return delegateFactoryDelegate.createButtonBuilderDelegate();
+    }
+
+    /**
+     * Creates a new select menu builder delegate.
+     *
+     * @return A new select menu builder delegate.
+     */
+    public static SelectMenuBuilderDelegate createSelectMenuBuilderDelegate() {
+        return delegateFactoryDelegate.createSelectMenuBuilderDelegate();
+    }
+
+    /**
+     * Creates a new select menu option builder delegate.
+     *
+     * @return A new select menu option builder delegate.
+     */
+    public static SelectMenuOptionBuilderDelegate createSelectMenuOptionBuilderDelegate() {
+        return delegateFactoryDelegate.createSelectMenuOptionBuilderDelegate();
     }
 
     /**

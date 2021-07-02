@@ -15,4 +15,13 @@ public interface MessageComponentInteraction
     default Optional<ButtonInteraction> asButtonInteraction() {
         return as(ButtonInteraction.class);
     }
+
+    /**
+     * Get this interaction as select menu interaction if the type matches.
+     *
+     * @return the interaction as select menu interaction if the type matches; an empty optional otherwise
+     */
+    default Optional<SelectMenuInteraction> asSelectMenuInteraction() {
+        return as(SelectMenuInteraction.class);
+    }
 }

@@ -3,7 +3,8 @@ package org.javacord.api.entity.message.component;
 public enum ComponentType {
     UNKNOWN(-1),
     ACTION_ROW(1),
-    BUTTON(2);
+    BUTTON(2),
+    SELECT_MENU(3);
 
     private final int data;
 
@@ -36,6 +37,8 @@ public enum ComponentType {
             return ACTION_ROW;
         } else if (identifier == 2) {
             return BUTTON;
+        } else if (identifier == 3) {
+            return SELECT_MENU;
         }
         return UNKNOWN;
     }
