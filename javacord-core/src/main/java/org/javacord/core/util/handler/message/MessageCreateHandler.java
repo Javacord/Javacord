@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
@@ -42,9 +44,18 @@ public class MessageCreateHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         long channelId = packet.get("channel_id").asLong();
 
-        // if the message isn't from a server
+        // if the message isn't from a server (or ephemeral)
         // See https://github.com/discord/discord-api-docs/issues/2248
         if (!packet.hasNonNull("guild_id")) {
+            // Check for EPHEMERAL messages as they do NOT include a guild_id when the EPHEMERAL flag is set.
+            if (packet.hasNonNull("flags") && (packet.get("flags").asInt() & MessageFlag.EPHEMERAL.getId()) > 0) {
+                Optional<ServerTextChannel> serverTextChannel = api.getServerTextChannelById(channelId);
+                if (serverTextChannel.isPresent()) {
+                    handle(serverTextChannel.get(), packet);
+                    return;
+                }
+            }
+
             UserImpl author = new UserImpl(api, packet.get("author"), (MemberImpl) null, null);
 
             PrivateChannelImpl privateChannel = PrivateChannelImpl
