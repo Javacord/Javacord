@@ -3,6 +3,7 @@ package org.javacord.core.interaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
@@ -111,7 +112,7 @@ public abstract class InteractionImpl implements Interaction {
 
     @Override
     public Optional<Server> getServer() {
-        return channel.asServerChannel().map(ServerChannel::getServer);
+        return getChannel().flatMap(Channel::asServerChannel).map(ServerChannel::getServer);
     }
 
     @Override
