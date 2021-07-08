@@ -93,7 +93,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 ```groovy
 repositories { mavenCentral() }
-dependencies { implementation 'org.javacord:javacord:3.3.1' }
+dependencies { implementation 'org.javacord:javacord:3.3.2' }
 ```
 
 #### Maven
@@ -102,7 +102,7 @@ dependencies { implementation 'org.javacord:javacord:3.3.1' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.3.1</version>
+    <version>3.3.2</version>
     <type>pom</type>
 </dependency>
 ```
@@ -110,7 +110,7 @@ dependencies { implementation 'org.javacord:javacord:3.3.1' }
 #### Sbt
 
 ```scala
-libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.3.1")
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.3.2")
 ```
 
 ### Optional Logger Dependency
