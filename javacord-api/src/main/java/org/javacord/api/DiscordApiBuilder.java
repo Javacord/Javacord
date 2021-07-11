@@ -429,6 +429,29 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets all non privileged intents and the given intents.
+     *
+     * @param intentsToInclude One or more {@code Intent}s which should be included.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllNonPrivilegedIntentsAnd(Intent... intentsToInclude) {
+        setAllIntentsWhere(intent -> !intent.isPrivileged());
+        addIntents(intentsToInclude);
+        return this;
+    }
+
+    /**
+     * Adds the given intents to the already set.
+     *
+     * @param intents The intents to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder addIntents(Intent... intents) {
+        delegate.addIntents(intents);
+        return this;
+    }
+
+    /**
      * Sets the intents where the given predicate matches.
      *
      * @param condition Whether the intent should be added or not.

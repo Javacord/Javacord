@@ -172,6 +172,13 @@ public interface DiscordApiBuilderDelegate {
     boolean isShutdownHookRegistrationEnabled();
 
     /**
+     * Adds the given intents to the already set.
+     *
+     * @param intents The intents to add.
+     */
+    void addIntents(Intent... intents);
+
+    /**
      * Sets the intents where the given predicate matches.
      *
      * @param condition Whether the intent should be added or not.
