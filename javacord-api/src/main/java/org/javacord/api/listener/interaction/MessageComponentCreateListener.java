@@ -4,6 +4,7 @@ import org.javacord.api.event.interaction.MessageComponentCreateEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.channel.TextChannelAttachableListener;
+import org.javacord.api.listener.message.MessageAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
 import org.javacord.api.listener.user.UserAttachableListener;
 
@@ -12,7 +13,7 @@ import org.javacord.api.listener.user.UserAttachableListener;
  */
 @FunctionalInterface
 public interface MessageComponentCreateListener extends ServerAttachableListener, UserAttachableListener,
-        TextChannelAttachableListener, GloballyAttachableListener, ObjectAttachableListener {
+        TextChannelAttachableListener, MessageAttachableListener, GloballyAttachableListener, ObjectAttachableListener {
 
     /**
      * This method is called every time a message component interaction is created.

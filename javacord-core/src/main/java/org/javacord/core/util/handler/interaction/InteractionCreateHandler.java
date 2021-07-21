@@ -108,8 +108,10 @@ public class InteractionCreateHandler extends PacketHandler {
             case MESSAGE_COMPONENT:
                 MessageComponentCreateEvent messageComponentCreateEvent =
                         new MessageComponentCreateEventImpl(interaction);
+                long messageId = messageComponentCreateEvent.getMessageComponentInteraction().getMessageId();
                 api.getEventDispatcher().dispatchMessageComponentCreateEvent(
                         server == null ? api : server,
+                        messageId,
                         server,
                         interaction.getChannel().orElse(null),
                         interaction.getUser(),
@@ -119,6 +121,7 @@ public class InteractionCreateHandler extends PacketHandler {
                         ButtonClickEvent buttonClickEvent = new ButtonClickEventImpl(interaction);
                         api.getEventDispatcher().dispatchButtonClickEvent(
                                 server == null ? api : server,
+                                messageId,
                                 server,
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
@@ -128,6 +131,7 @@ public class InteractionCreateHandler extends PacketHandler {
                         SelectMenuChooseEvent selectMenuChooseEvent = new SelectMenuChooseEventImpl(interaction);
                         api.getEventDispatcher().dispatchSelectMenuChooseEvent(
                                 server == null ? api : server,
+                                messageId,
                                 server,
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
