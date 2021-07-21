@@ -15,6 +15,11 @@ dependencies {
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 /*
  * Generate a "git.properties" file with additional information about the current
  * version and the build timestamp. Used by the Javacord class to provide static
