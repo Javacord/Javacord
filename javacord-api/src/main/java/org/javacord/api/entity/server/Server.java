@@ -32,6 +32,7 @@ import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.event.server.member.ServerMembersChunkEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
 import java.awt.Color;
@@ -488,6 +489,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return Whether all members of the server are in the cache.
      */
     boolean hasAllMembersInCache();
+
+    /**
+     * Requests Discord to send the members for this server.
+     *
+     * <p>After calling this method, your bot will receive {@link ServerMembersChunkEvent}s.
+     */
+    void requestMembersChunks();
 
     /**
      * Gets a collection with all members of the server.
