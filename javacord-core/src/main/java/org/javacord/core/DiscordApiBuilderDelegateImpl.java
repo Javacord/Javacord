@@ -391,6 +391,13 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
+    public void addIntents(Intent... intents) {
+        this.intents.addAll(Arrays.stream(intents)
+                .filter(intent -> !this.intents.contains(intent))
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public void setAllIntentsWhere(Predicate<Intent> condition) {
         intents = new HashSet<>();
         for (Intent value : Intent.values()) {
