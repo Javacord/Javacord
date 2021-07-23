@@ -222,7 +222,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * @return All mutual servers with this user.
      */
-    Collection<Server> getMutualServers();
+    Set<Server> getMutualServers();
 
     /**
      * Gets the display name of the user.

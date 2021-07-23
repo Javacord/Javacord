@@ -27,10 +27,8 @@ import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -241,15 +239,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
-    public Collection<Server> getMutualServers() {
+    public Set<Server> getMutualServers() {
         if (api.isUserCacheEnabled()) {
-            HashSet<Server> servers = new HashSet<>();
-            if (member != null) {
-                servers.add(member.getServer());
-            }
-            return servers;
+            return api.getEntityCache().get().getMemberCache().getServers(getId());
         }
-        return api.getEntityCache().get().getMemberCache().getServers(getId());
+        return member == null ? Collections.emptySet() : Collections.singleton(member.getServer());
     }
 
     @Override
