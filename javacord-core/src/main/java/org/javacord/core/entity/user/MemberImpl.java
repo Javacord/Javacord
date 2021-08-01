@@ -161,7 +161,7 @@ public final class MemberImpl implements Member {
     }
 
     /**
-     * Creates a new member object with the new nickname.
+     * Creates a new member object with the new server boosting since timestamp.
      *
      * @param serverBoostingSince The new timestamp when the user started boosting the server.
      * @return The new member.
