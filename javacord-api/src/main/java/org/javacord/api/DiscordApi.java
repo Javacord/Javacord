@@ -1223,6 +1223,20 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
+     * Creates or gets a custom emoji to be used in other Javacord APIs. Use this if the custom emoji you're looking
+     * for is hosted on a different shard, and can't be accessed through {@code getCustomEmojiById()}.
+     * If the custom emoji is known, the method will return the known custom emoji instead of creating a new one.
+     * The method will always return a non-null value, even if the emoji does not exist which will lead to a non
+     * functional custom emoji for further usage.
+     *
+     * @param id the ID of the custom emoji
+     * @param name the name of the custom emoji
+     * @param animated true if the emoji is animated; false otherwise
+     * @return the new (unknown) custom emoji instance
+     */
+    CustomEmoji getKnownCustomEmojiOrCreateCustomEmoji(long id, String name, boolean animated);
+
+    /**
      * Gets a collection with all roles the bot knows.
      *
      * @return A collection with all roles the bot knows.

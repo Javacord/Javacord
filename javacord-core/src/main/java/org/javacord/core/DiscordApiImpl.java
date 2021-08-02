@@ -1084,6 +1084,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param animated Whether the emoji is animated or not.
      * @return The emoji for the given json object.
      */
+    @Override
     public CustomEmoji getKnownCustomEmojiOrCreateCustomEmoji(long id, String name, boolean animated) {
         CustomEmoji emoji = customEmojis.get(id);
         return emoji == null ? new CustomEmojiImpl(this, id, name, animated) : emoji;
