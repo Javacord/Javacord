@@ -29,6 +29,8 @@ public class ThreadPoolImpl implements ThreadPool {
             CORE_POOL_SIZE, new ThreadFactory("Javacord - Central Scheduler - %d", false));
     private final ScheduledExecutorService daemonScheduler = Executors.newScheduledThreadPool(
             CORE_POOL_SIZE, new ThreadFactory("Javacord - Central Daemon Scheduler - %d", true));
+    private final ScheduledExecutorService heartScheduler = Executors.newScheduledThreadPool(
+            CORE_POOL_SIZE, new ThreadFactory("Javacord - Heart Scheduler - %d", false));
     private final ConcurrentHashMap<String, ExecutorService> executorServiceSingleThreads = new ConcurrentHashMap<>();
 
     /**
@@ -39,6 +41,7 @@ public class ThreadPoolImpl implements ThreadPool {
         executorService.shutdown();
         scheduler.shutdown();
         daemonScheduler.shutdown();
+        heartScheduler.shutdown();
         executorServiceSingleThreads.values().forEach(ExecutorService::shutdown);
     }
 
@@ -55,6 +58,11 @@ public class ThreadPoolImpl implements ThreadPool {
     @Override
     public ScheduledExecutorService getDaemonScheduler() {
         return daemonScheduler;
+    }
+
+    @Override
+    public ScheduledExecutorService getHeartScheduler() {
+        return heartScheduler;
     }
 
     @Override

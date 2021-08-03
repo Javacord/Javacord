@@ -24,6 +24,14 @@ public interface ThreadPool {
     ScheduledExecutorService getScheduler();
 
     /**
+     * Gets the used heart scheduler. 
+     * This scheduler is used to keep the bot connected to the gateway.
+     *
+     * @return The used heart scheduler.
+     */
+    ScheduledExecutorService getHeartScheduler();
+
+    /**
      * Gets the used daemon scheduler.
      *
      * @return The used daemon scheduler.

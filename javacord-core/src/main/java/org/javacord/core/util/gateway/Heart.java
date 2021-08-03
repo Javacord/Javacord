@@ -92,7 +92,7 @@ public class Heart {
                 // If there was an old heart beating, crush it
                 future.cancel(false);
             }
-            return api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+            return api.getThreadPool().getHeartScheduler().scheduleWithFixedDelay(() -> {
                 try {
                     if (heartbeatAckReceived.getAndSet(false)) {
                         beat();
