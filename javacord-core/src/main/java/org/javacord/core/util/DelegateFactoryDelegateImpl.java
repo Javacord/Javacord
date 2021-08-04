@@ -22,7 +22,7 @@ import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDeleg
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
-import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
+import org.javacord.api.entity.message.internal.MessageBuilderBaseDelegate;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
 import org.javacord.api.entity.permission.Permissions;
@@ -62,7 +62,7 @@ import org.javacord.core.entity.channel.ServerVoiceChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiBuilderDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiUpdaterDelegateImpl;
 import org.javacord.core.entity.message.InteractionMessageBuilderDelegateImpl;
-import org.javacord.core.entity.message.MessageBuilderDelegateImpl;
+import org.javacord.core.entity.message.MessageBuilderBaseDelegateImpl;
 import org.javacord.core.entity.message.WebhookMessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.ActionRowBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.ButtonBuilderDelegateImpl;
@@ -109,8 +109,8 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     }
 
     @Override
-    public MessageBuilderDelegate createMessageBuilderDelegate() {
-        return new MessageBuilderDelegateImpl();
+    public MessageBuilderBaseDelegate createMessageBuilderDelegate() {
+        return new MessageBuilderBaseDelegateImpl();
     }
 
     @Override
