@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link WebhookMessageBuilderDelegate}.
  */
-public class WebhookMessageBuilderDelegateImpl extends MessageBuilderDelegateImpl
+public class WebhookMessageBuilderDelegateImpl extends MessageBuilderBaseDelegateImpl
         implements WebhookMessageBuilderDelegate {
 
     /**
