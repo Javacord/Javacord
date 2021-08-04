@@ -11,7 +11,10 @@ import org.javacord.api.event.interaction.MessageComponentCreateEvent;
 import org.javacord.api.event.interaction.SelectMenuChooseEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.InteractionType;
+import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.interaction.ButtonClickEventImpl;
 import org.javacord.core.event.interaction.InteractionCreateEventImpl;
 import org.javacord.core.event.interaction.MessageComponentCreateEventImpl;
@@ -44,7 +47,15 @@ public class InteractionCreateHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         TextChannel channel = null;
         if (packet.hasNonNull("channel_id")) {
-            channel = api.getTextChannelById(packet.get("channel_id").asLong()).orElse(null);
+            long channelId = packet.get("channel_id").asLong();
+
+            // Check if this interaction comes from a guild or a DM
+            if (packet.hasNonNull("guild_id")) {
+                channel = api.getTextChannelById(channelId).orElse(null);
+            } else {
+                UserImpl user = new UserImpl(api, packet.get("user"), (MemberImpl) null, null);
+                channel = PrivateChannelImpl.getOrCreatePrivateChannel(api, channelId, user.getId(), user);
+            }
         }
 
         int typeId = packet.get("type").asInt();
