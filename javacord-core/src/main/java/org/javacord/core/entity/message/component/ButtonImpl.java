@@ -108,11 +108,7 @@ public class ButtonImpl extends ComponentImpl implements Button {
         return Optional.ofNullable(emoji);
     }
 
-    /**
-     * Gets the button as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @return The button as a ObjectNode.
-     */
+    @Override
     public ObjectNode toJsonNode() {
         ObjectNode object = JsonNodeFactory.instance.objectNode();
         return toJsonNode(object);

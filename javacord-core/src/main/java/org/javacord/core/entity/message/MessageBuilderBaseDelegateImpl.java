@@ -27,7 +27,7 @@ import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.message.component.ActionRowImpl;
+import org.javacord.core.entity.message.component.ComponentImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsImpl;
 import org.javacord.core.entity.user.Member;
@@ -712,10 +712,8 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected void prepareComponents(ObjectNode body, boolean evenIfEmpty) {
         if (evenIfEmpty || !components.isEmpty()) {
             ArrayNode componentsNode = JsonNodeFactory.instance.objectNode().arrayNode();
-            for (int i = 0; i < components.size() && i < 5; i++) {
-                ActionRowImpl component = (ActionRowImpl) components.get(i);
-                componentsNode.add(component.toJsonNode());
-            }
+            components.forEach(
+                    highLevelComponent -> componentsNode.add(((ComponentImpl) highLevelComponent).toJsonNode()));
             body.set("components", componentsNode);
         }
     }
