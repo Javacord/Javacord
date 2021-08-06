@@ -91,12 +91,8 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
         return isDisabled;
     }
 
-    /**
-     * Gets the select menu as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @return The select menu as a ObjectNode.
-     */
-    ObjectNode toJsonNode() {
+    @Override
+    public ObjectNode toJsonNode() {
         ObjectNode object = JsonNodeFactory.instance.objectNode();
         return toJsonNode(object);
     }
