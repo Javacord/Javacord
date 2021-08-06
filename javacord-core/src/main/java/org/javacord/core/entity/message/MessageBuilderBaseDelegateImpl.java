@@ -197,9 +197,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     public void copy(Message message) {
         this.getStringBuilder().append(message.getContent());
 
-        if (!message.getEmbeds().isEmpty()) {
-            this.addEmbed(message.getEmbeds().get(0).toBuilder());
-        }
+        message.getEmbeds().forEach(embed -> addEmbed(embed.toBuilder()));
 
         for (MessageAttachment attachment : message.getAttachments()) {
             // Since spoiler status is encoded in the file name, it is copied automatically.
@@ -477,12 +475,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * Send a message to an incoming webhook.
      *
-     * @param webhookId    The id of the webhook to send the message to
+     * @param webhookId The id of the webhook to send the message to
      * @param webhookToken The token of the webhook to send the message to
-     * @param displayName  The display name the webhook should use
-     * @param avatarUrl    The avatar the webhook should use
-     * @param wait         If the completable future will be completed
-     * @param api          The api instance needed to send and return the message
+     * @param displayName The display name the webhook should use
+     * @param avatarUrl The avatar the webhook should use
+     * @param wait If the completable future will be completed
+     * @param api The api instance needed to send and return the message
      * @return The sent message
      */
     protected CompletableFuture<Message> send(String webhookId, String webhookToken, String displayName, URL avatarUrl,
@@ -508,7 +506,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                         .addQueryParameter("wait", Boolean.toString(wait))
                         .setUrlParameters(webhookId, webhookToken);
         CompletableFuture<Message> future = new CompletableFuture<>();
-        if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
+        if (!attachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
             // We access files etc. so this should be async
             api.getThreadPool().getExecutorService().submit(() -> {
                 try {
@@ -542,9 +540,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
      * Method which executes the webhook rest request.
      *
      * @param request The rest request to execute
-     * @param wait    If discord sends us a response
-     * @param future  The future to complete
-     * @param api     The api instance needed to create the message
+     * @param wait If discord sends us a response
+     * @param future The future to complete
+     * @param api The api instance needed to create the message
      */
     private static void executeWebhookRest(RestRequest<Message> request, boolean wait,
                                            CompletableFuture<Message> future, DiscordApi api) {
@@ -603,7 +601,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                                                                             ObjectNode body,
                                                                             RestRequest<Message> request,
                                                                             boolean clearAttachmentsIfAppropriate) {
-        if (attachments.isEmpty() && (embeds.size() == 0 || !embeds.get(0).requiresAttachments())) {
+        if (attachments.isEmpty() && embeds.stream().noneMatch(EmbedBuilder::requiresAttachments)) {
             if (clearAttachmentsIfAppropriate) {
                 body.set("attachments", JsonNodeFactory.instance.objectNode().arrayNode());
             }
@@ -624,7 +622,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                 addMultipartBodyToRequest(request, body, tempAttachments, channel.getApi());
 
                 request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                        .getOrCreateMessage(channel, result.getJsonBody()))
+                                .getOrCreateMessage(channel, result.getJsonBody()))
                         .whenComplete((newMessage, throwable) -> {
                             if (throwable != null) {
                                 future.completeExceptionally(throwable);
@@ -656,10 +654,10 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * Method which creates and adds a MultipartBody to a RestRequest.
      *
-     * @param request     The RestRequest to add the MultipartBody to
-     * @param body        The body to use as base for the MultipartBody
+     * @param request The RestRequest to add the MultipartBody to
+     * @param body The body to use as base for the MultipartBody
      * @param attachments The List of FileContainers to add as attachments
-     * @param api         The api instance needed to add the attachments
+     * @param api The api instance needed to add the attachments
      */
     protected void addMultipartBodyToRequest(RestRequest<?> request, ObjectNode body,
                                              List<FileContainer> attachments, DiscordApi api) {
@@ -693,7 +691,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     private void prepareEmbeds(ObjectNode body, boolean evenIfEmpty) {
-        if (embeds.size() != 0 || evenIfEmpty) {
+        if (!embeds.isEmpty() || evenIfEmpty) {
             ArrayNode embedsNode = JsonNodeFactory.instance.objectNode().arrayNode();
             for (EmbedBuilder embed : embeds) {
                 embedsNode.add(((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode());
@@ -712,7 +710,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     protected void prepareComponents(ObjectNode body, boolean evenIfEmpty) {
-        if (evenIfEmpty || components.size() != 0) {
+        if (evenIfEmpty || !components.isEmpty()) {
             ArrayNode componentsNode = JsonNodeFactory.instance.objectNode().arrayNode();
             for (int i = 0; i < components.size() && i < 5; i++) {
                 ActionRowImpl component = (ActionRowImpl) components.get(i);
