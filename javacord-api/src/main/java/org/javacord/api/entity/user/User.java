@@ -466,7 +466,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     List<Role> getRoles(Server server);
 
     /**
-     * Gets the displayed color of the user based on his roles in the given server.
+     * Gets the displayed color of the user based on their roles in the given server.
      *
      * @param server The server.
      * @return The color.
