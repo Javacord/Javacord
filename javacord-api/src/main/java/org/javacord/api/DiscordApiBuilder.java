@@ -429,6 +429,29 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets all non privileged intents and the given intents.
+     *
+     * @param intentsToInclude One or more {@code Intent}s which should be included.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllNonPrivilegedIntentsAnd(Intent... intentsToInclude) {
+        setAllIntentsWhere(intent -> !intent.isPrivileged());
+        addIntents(intentsToInclude);
+        return this;
+    }
+
+    /**
+     * Adds the given intents to the already set.
+     *
+     * @param intents The intents to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder addIntents(Intent... intents) {
+        delegate.addIntents(intents);
+        return this;
+    }
+
+    /**
      * Sets the intents where the given predicate matches.
      *
      * @param condition Whether the intent should be added or not.
@@ -437,6 +460,28 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     public DiscordApiBuilder setAllIntentsWhere(Predicate<Intent> condition) {
         delegate.setAllIntentsWhere(condition);
         return this;
+    }
+
+    /**
+     * Sets whether or not the user cache should be enabled.
+     *
+     * <p>By default, the user cache is disabled.
+     *
+     * @param enabled Whether or not the user cache should be enabled.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setUserCacheEnabled(boolean enabled) {
+        delegate.setUserCacheEnabled(enabled);
+        return this;
+    }
+
+    /**
+     * Gets whether or not the user cache is enabled.
+     *
+     * @return Whether or not the user cache is enabled.
+     */
+    public boolean isUserCachedEnabled() {
+        return delegate.isUserCacheEnabled();
     }
 
     /**

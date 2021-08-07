@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.Interaction;
@@ -32,6 +33,10 @@ public abstract class InteractionImpl implements Interaction {
 
     private static final String RESPOND_LATER_BODY =
             "{\"type\": " + InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE.getId() + "}";
+
+    private static final String RESPOND_LATER_EPHEMERAL_BODY =
+            "{\"type\": " + InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE.getId()
+                    + ", \"data\": {\"flags\": " + MessageFlag.EPHEMERAL.getId() + "}}";
 
     private final DiscordApiImpl api;
     private final TextChannel channel;
@@ -98,10 +103,15 @@ public abstract class InteractionImpl implements Interaction {
 
     @Override
     public CompletableFuture<InteractionOriginalResponseUpdater> respondLater() {
+        return respondLater(false);
+    }
+
+    @Override
+    public CompletableFuture<InteractionOriginalResponseUpdater> respondLater(boolean ephemeral) {
         return new RestRequest<InteractionOriginalResponseUpdater>(this.api,
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(getIdAsString(), token)
-                .setBody(RESPOND_LATER_BODY)
+                .setBody(ephemeral ? RESPOND_LATER_EPHEMERAL_BODY : RESPOND_LATER_BODY)
                 .execute(result -> new InteractionOriginalResponseUpdaterImpl(this));
     }
 

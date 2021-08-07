@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link MessageBuilder} to create messages.
  * You usually don't want to interact with this object.
  */
-public interface MessageBuilderDelegate {
+public interface MessageBuilderBaseDelegate {
 
     /**
      * Add high-level components to the message.
@@ -349,6 +349,15 @@ public interface MessageBuilderDelegate {
      * @return The sent message.
      */
     CompletableFuture<Message> send(Messageable messageable);
+
+    /**
+     * Edits the message.
+     *
+     * @param message The message to edit.
+     * @param onlyChangedFields True if only changed fields should be updated
+     * @return The edited message.
+     */
+    CompletableFuture<Message> edit(Message message, boolean onlyChangedFields);
 
     /**
      * Sends the message.

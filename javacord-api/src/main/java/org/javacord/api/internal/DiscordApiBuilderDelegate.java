@@ -172,11 +172,34 @@ public interface DiscordApiBuilderDelegate {
     boolean isShutdownHookRegistrationEnabled();
 
     /**
+     * Adds the given intents to the already set.
+     *
+     * @param intents The intents to add.
+     */
+    void addIntents(Intent... intents);
+
+    /**
      * Sets the intents where the given predicate matches.
      *
      * @param condition Whether the intent should be added or not.
      */
     void setAllIntentsWhere(Predicate<Intent> condition);
+
+    /**
+     * Sets whether or not the user cache should be enabled.
+     *
+     * <p>By default, the user cache is disabled.
+     *
+     * @param enabled Whether or not the user cache should be enabled.
+     */
+    void setUserCacheEnabled(boolean enabled);
+
+    /**
+     * Gets whether or not the user cache is enabled.
+     *
+     * @return Whether or not the user cache is enabled.
+     */
+    boolean isUserCacheEnabled();
 
     /**
      * Logs the bot in.

@@ -22,7 +22,7 @@ import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDeleg
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
-import org.javacord.api.entity.message.internal.MessageBuilderDelegate;
+import org.javacord.api.entity.message.internal.MessageBuilderBaseDelegate;
 import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
 import org.javacord.api.entity.permission.Permissions;
@@ -157,11 +157,11 @@ public class DelegateFactory {
     }
 
     /**
-     * Creates a new message builder delegate.
+     * Creates a new message builder base delegate.
      *
-     * @return A new message builder delegate.
+     * @return A new message builder base delegate.
      */
-    public static MessageBuilderDelegate createMessageBuilderDelegate() {
+    public static MessageBuilderBaseDelegate createMessageBuilderBaseDelegate() {
         return delegateFactoryDelegate.createMessageBuilderDelegate();
     }
 

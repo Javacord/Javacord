@@ -420,10 +420,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         .orElse(null);
 
                 if (user == null) {
-                    // In theory, every user in "presences" should also be in "members", but Discord is weird
-                    // sometimes. This happens very rarely, but when it happens, we should ignore the presence.
+                    // Ignore rogue presences.
                     // It might be a similar issue than https://github.com/discordapp/discord-api-docs/issues/855
-                    logger.debug("Found rogue presence. Ignoring it. ({})", presenceJson);
                     continue;
                 }
 
@@ -1405,6 +1403,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public void selfUndeafen() {
         api.getWebSocketAdapter().sendVoiceStateUpdate(
                 this, getConnectedVoiceChannel(api.getYourself()).orElse(null), null, false);
+    }
+
+    @Override
+    public CompletableFuture<User> requestMember(long userId) {
+        return new RestRequest<User>(getApi(), RestMethod.GET, RestEndpoint.SERVER_MEMBER)
+                .setUrlParameters(getIdAsString(), Long.toUnsignedString(userId))
+                .execute(result ->  new MemberImpl(api, this, result.getJsonBody(), null).getUser());
     }
 
     @Override
