@@ -21,6 +21,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     private final String name;
     private final String stringValue;
     private final Integer intValue;
+    private final Boolean booleanValue;
     private final List<SlashCommandInteractionOption> options;
 
     /**
@@ -37,12 +38,19 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         if (valueNode != null && valueNode.isTextual()) {
             stringValue = valueNode.asText();
             intValue = null;
+            booleanValue = null;
         } else if (valueNode != null && valueNode.isInt()) {
             intValue = valueNode.asInt();
             stringValue = null;
+            booleanValue = null;
+        } else if (valueNode != null && valueNode.isBoolean()) {
+            booleanValue = valueNode.asBoolean();
+            stringValue = null;
+            intValue = null;
         } else {
             intValue = null;
             stringValue = null;
+            booleanValue = null;
         }
 
         options = new ArrayList<>();
@@ -73,9 +81,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     @Override
     public Optional<Boolean> getBooleanValue() {
-        return Optional.ofNullable(stringValue)
-                .filter(s -> s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false"))
-                .map(Boolean::parseBoolean);
+        return Optional.ofNullable(booleanValue);
     }
 
     @Override
