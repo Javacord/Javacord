@@ -359,6 +359,16 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Creates a new {@link MessageUpdater} for this message that can be used similarly to a builder to edit this
+     * message.
+     *
+     * @return the new message updater
+     */
+    default MessageUpdater createUpdater() {
+        return new MessageUpdater(this);
+    }
+
+    /**
      * Removes the content of the message.
      *
      * @param api The discord api instance.

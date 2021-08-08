@@ -15,7 +15,6 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      */
     public MessageUpdater(Message m) {
         super(MessageUpdater.class);
-        delegate.copy(m);
         this.message = m;
     }
 
@@ -27,7 +26,7 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      * @return The edited message.
      */
     public CompletableFuture<Message> applyChanges() {
-        return delegate.edit(message, true);
+        return delegate.edit(message, false);
     }
 
     /**
@@ -37,6 +36,6 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      * @return The edited message.
      */
     public CompletableFuture<Message> replaceMessage() {
-        return delegate.edit(message, false);
+        return delegate.edit(message, true);
     }
 }
