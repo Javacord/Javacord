@@ -354,10 +354,11 @@ public interface MessageBuilderBaseDelegate {
      * Edits the message.
      *
      * @param message The message to edit.
-     * @param onlyChangedFields True if only changed fields should be updated
+     * @param allFields True if all fields should be included in the patch request, even if not changed; False if
+     *                  only changed fields should be patched
      * @return The edited message.
      */
-    CompletableFuture<Message> edit(Message message, boolean onlyChangedFields);
+    CompletableFuture<Message> edit(Message message, boolean allFields);
 
     /**
      * Sends the message.

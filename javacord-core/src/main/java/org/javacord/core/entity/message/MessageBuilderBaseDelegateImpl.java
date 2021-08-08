@@ -641,8 +641,8 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                                                                         ObjectNode body,
                                                                         RestRequest<Message> request) {
         request.setBody(body);
-        return request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                .getOrCreateMessage(channel, result.getJsonBody()));
+        return request.execute(result -> new MessageImpl((DiscordApiImpl) channel.getApi(), channel,
+                result.getJsonBody()));
     }
 
     private void prepareAllowedMentions(ObjectNode body) {
