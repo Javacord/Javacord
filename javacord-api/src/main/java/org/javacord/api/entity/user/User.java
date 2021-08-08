@@ -204,6 +204,13 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     EnumSet<UserFlag> getUserFlags();
 
     /**
+     * Gets the avatar hash of the user.
+     *
+     * @return The avatar hash.
+     */
+    Optional<String> getAvatarHash();
+
+    /**
      * Gets the avatar of the user.
      *
      * @return The avatar of the user.

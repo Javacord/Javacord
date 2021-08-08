@@ -166,13 +166,9 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         return Optional.ofNullable(member);
     }
 
-    /**
-     * Gets the avatar hash of the user.
-     *
-     * @return The avatar hash.
-     */
-    public String getAvatarHash() {
-        return avatarHash;
+    @Override
+    public Optional<String> getAvatarHash() {
+        return Optional.ofNullable(avatarHash);
     }
 
     @Override
