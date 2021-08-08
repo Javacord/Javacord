@@ -164,7 +164,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                         }
                         if (packet.get("user").has("avatar")) {
                             String newAvatarHash = packet.get("user").get("avatar").asText(null);
-                            String oldAvatarHash = oldUser.getAvatarHash();
+                            String oldAvatarHash = oldUser.getAvatarHash().orElse(null);
                             if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
                                 dispatchUserChangeAvatarEvent(updatedUser, newAvatarHash, oldAvatarHash);
                                 userChanged = true;
