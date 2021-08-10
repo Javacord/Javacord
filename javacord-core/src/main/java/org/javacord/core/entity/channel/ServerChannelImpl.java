@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link ServerChannel}.
  */
-public abstract class ServerChannelImpl implements ServerChannel, InternalServerChannelAttachableListenerManager {
+public class ServerChannelImpl implements ServerChannel, InternalServerChannelAttachableListenerManager {
 
     /**
      * Compares channels according to their "position" field and, if those are the same, their id.
@@ -67,6 +68,11 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
      * The server of the channel.
      */
     private final ServerImpl server;
+
+    /**
+     * The type of the channel.
+     */
+    private final ChannelType type;
 
     /**
      * The rawPosition of the channel.
@@ -97,6 +103,8 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
         rawPosition = data.get("position").asInt();
+
+        type = ChannelType.fromId(data.get("type").asInt(-1));
 
         if (data.has("permission_overwrites")) {
             for (JsonNode permissionOverwrite : data.get("permission_overwrites")) {
@@ -271,6 +279,11 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
     }
 
     @Override
+    public ChannelType getType() {
+        return type;
+    }
+
+    @Override
     public boolean equals(Object o) {
         return (this == o)
                 || !((o == null)
@@ -287,5 +300,4 @@ public abstract class ServerChannelImpl implements ServerChannel, InternalServer
     public String toString() {
         return String.format("ServerChannel (id: %s, name: %s)", getIdAsString(), getName());
     }
-
 }
