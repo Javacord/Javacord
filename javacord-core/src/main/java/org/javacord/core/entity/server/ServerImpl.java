@@ -47,6 +47,7 @@ import org.javacord.core.entity.VanityUrlCodeImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.auditlog.AuditLogImpl;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
+import org.javacord.core.entity.channel.ChannelThreadImpl;
 import org.javacord.core.entity.channel.ServerChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
@@ -707,13 +708,19 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         long id = Long.parseLong(data.get("id").asText());
         ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
-            // TODO Treat news channels differently
-            if (type == ChannelType.SERVER_TEXT_CHANNEL || type == ChannelType.SERVER_NEWS_CHANNEL) {
-                return getTextChannelById(id).orElseGet(() -> new ServerTextChannelImpl(api, this, data));
+            switch (type) {
+                case SERVER_TEXT_CHANNEL:
+                case SERVER_NEWS_CHANNEL: // TODO Treat news channels differently
+                    return getTextChannelById(id).orElseGet(() -> new ServerTextChannelImpl(api, this, data));
+                case SERVER_PRIVATE_THREAD:
+                case SERVER_PUBLIC_THREAD:
+                case SERVER_NEWS_THREAD:
+                    return getThreadById(id).orElseGet(() -> new ChannelThreadImpl(api, this, data));
+                default:
+                    // Invalid channel type
+                    return null;
             }
         }
-        // Invalid channel type
-        return null;
     }
 
     /**
