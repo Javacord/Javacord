@@ -10,14 +10,49 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 
 public class ChannelThreadImpl extends ServerTextChannelImpl implements ChannelThread {
+    /*
+    The id of the parent channel.
+     */
     long parentId;
+
+    /*
+    The count of messages in the thread.
+     */
     int messageCount;
+
+    /*
+    The count of members in the thread.
+     */
     int memberCount;
+
+    /*
+    The default auto archive duration.
+     */
     int defaultAutoArchiveDuration;
+
+    /*
+    The auto archive duration.
+     */
     int autoArchiveDuration;
+
+    /*
+    Whether the thread is archived.
+     */
     boolean isArchived;
+
+    /*
+    Whether the thread is locked.
+     */
     boolean isLocked;
+
+    /*
+    The id of the creator of the channel.
+     */
     long ownerId;
+
+    /*
+    The timestamp when the thread's archive status was last changed.
+     */
     Instant archiveTimestamp;
 
     /**
