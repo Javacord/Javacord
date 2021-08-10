@@ -1,5 +1,7 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.user.User;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -64,6 +66,15 @@ public interface ChannelThread extends ServerTextChannel {
      * @return The id of the owner.
      */
     long getOwnerId();
+
+    /**
+     * Gets the creator of the thread.
+     *
+     * @return The owner.
+     */
+    default Optional<User> getOwner() {
+        return getApi().getCachedUserById(getOwnerId());
+    }
 
     /**
      * Gets the timestamp when the thread's archive status was last changed, used for calculating recent activity.
