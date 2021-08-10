@@ -114,6 +114,14 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
         return as(VoiceChannel.class);
     }
 
+    /**
+     * Gets the channel as thread.
+     *
+     * @return The channel as thread.
+     */
+    default Optional<ChannelThread> asThread() {
+        return as(ChannelThread.class);
+    }
 
     /**
      * Checks if the given user can see this channel.
