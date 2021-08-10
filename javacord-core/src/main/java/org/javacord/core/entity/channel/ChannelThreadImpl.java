@@ -9,48 +9,52 @@ import org.javacord.core.entity.server.ServerImpl;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 
+/**
+ * The implementation of {@link ChannelThread}.
+ */
 public class ChannelThreadImpl extends ServerTextChannelImpl implements ChannelThread {
-    /*
+
+    /**
     The id of the parent channel.
      */
     private final long parentId;
 
-    /*
+    /**
     The count of messages in the thread.
      */
     private final int messageCount;
 
-    /*
+    /**
     The count of members in the thread.
      */
     private final int memberCount;
 
-    /*
+    /**
     The default auto archive duration.
      */
     private final int defaultAutoArchiveDuration;
 
-    /*
+    /**
     The auto archive duration.
      */
     private final int autoArchiveDuration;
 
-    /*
+    /**
     Whether the thread is archived.
      */
     private final boolean isArchived;
 
-    /*
+    /**
     Whether the thread is locked.
      */
     private final boolean isLocked;
 
-    /*
+    /**
     The id of the creator of the channel.
      */
     private final long ownerId;
 
-    /*
+    /**
     The timestamp when the thread's archive status was last changed.
      */
     private final Instant archiveTimestamp;

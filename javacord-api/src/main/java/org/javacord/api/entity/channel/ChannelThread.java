@@ -6,6 +6,9 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * This class represents a channel thread.
+ */
 public interface ChannelThread extends ServerTextChannel {
 
     /**
