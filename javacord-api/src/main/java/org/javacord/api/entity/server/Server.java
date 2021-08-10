@@ -12,6 +12,7 @@ import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
+import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -2363,6 +2364,33 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
             return Optional.empty();
         }
     }
+
+    /**
+     * Gets a channel thread by its id.
+     *
+     * @param id The id of the threat.
+     * @return The threat with the given id.
+     */
+    default Optional<ChannelThread> getThreadById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ChannelThread)
+                .map(channel -> (ChannelThread) channel);
+    }
+
+    /**
+     * Gets a channel thread by its id.
+     *
+     * @param id The id of the thread.
+     * @return The thread with the given id.
+     */
+    default Optional<ChannelThread> getThreadById(String id) {
+        try {
+            return getThreadById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
 
     /**
      * Gets a sorted list (by position) with all text channels with the given name.

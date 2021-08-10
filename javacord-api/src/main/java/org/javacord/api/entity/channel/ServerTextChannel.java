@@ -14,11 +14,6 @@ import java.util.concurrent.CompletableFuture;
 public interface ServerTextChannel extends ServerChannel, TextChannel, Mentionable, Categorizable,
                                            ServerTextChannelAttachableListenerManager {
 
-    @Override
-    default ChannelType getType() {
-        return ChannelType.SERVER_TEXT_CHANNEL;
-    }
-
     /**
      * Checks is the channel is "not safe for work".
      *
