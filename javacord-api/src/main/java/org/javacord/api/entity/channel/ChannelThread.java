@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public interface Thread extends ServerTextChannel {
+public interface ChannelThread extends ServerTextChannel {
 
     /**
      * The parent server text channel of this thread.
