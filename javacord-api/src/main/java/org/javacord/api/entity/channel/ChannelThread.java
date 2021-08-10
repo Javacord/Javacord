@@ -64,6 +64,16 @@ public interface ChannelThread extends ServerTextChannel {
     boolean isLocked();
 
     /**
+     * Whether this thread is private.
+     * When a thread is private, it is only viewable by those invited and those with the MANAGE_THREADS permission.
+     *
+     * @return Whether this thread is private.
+     */
+    default boolean isPrivate() {
+        return getType() == ChannelType.SERVER_PRIVATE_THREAD;
+    }
+
+    /**
      * Gets the id of the creator of the tread.
      *
      * @return The id of the owner.

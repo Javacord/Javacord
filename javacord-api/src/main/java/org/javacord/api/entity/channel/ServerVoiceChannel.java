@@ -15,11 +15,6 @@ import java.util.concurrent.CompletableFuture;
 public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categorizable,
                                             ServerVoiceChannelAttachableListenerManager {
 
-    @Override
-    default ChannelType getType() {
-        return ChannelType.SERVER_VOICE_CHANNEL;
-    }
-
     /**
      * Connects to the voice channel and disconnects any existing connections in the server.
      *
