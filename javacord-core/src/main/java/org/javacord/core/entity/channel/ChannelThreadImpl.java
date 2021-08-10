@@ -13,47 +13,47 @@ public class ChannelThreadImpl extends ServerTextChannelImpl implements ChannelT
     /*
     The id of the parent channel.
      */
-    long parentId;
+    private final long parentId;
 
     /*
     The count of messages in the thread.
      */
-    int messageCount;
+    private final int messageCount;
 
     /*
     The count of members in the thread.
      */
-    int memberCount;
+    private final int memberCount;
 
     /*
     The default auto archive duration.
      */
-    int defaultAutoArchiveDuration;
+    private final int defaultAutoArchiveDuration;
 
     /*
     The auto archive duration.
      */
-    int autoArchiveDuration;
+    private final int autoArchiveDuration;
 
     /*
     Whether the thread is archived.
      */
-    boolean isArchived;
+    private final boolean isArchived;
 
     /*
     Whether the thread is locked.
      */
-    boolean isLocked;
+    private final boolean isLocked;
 
     /*
     The id of the creator of the channel.
      */
-    long ownerId;
+    private final long ownerId;
 
     /*
     The timestamp when the thread's archive status was last changed.
      */
-    Instant archiveTimestamp;
+    private final Instant archiveTimestamp;
 
     /**
      * Creates a new server text channel object.
