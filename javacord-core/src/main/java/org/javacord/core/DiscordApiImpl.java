@@ -943,9 +943,10 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param member The member to add.
      */
     public void addMemberToCacheOrReplaceExisting(Member member) {
-        if (!isUserCacheEnabled()) {
+        if (!isUserCacheEnabled() && member.getId() != you.getId()) {
             return;
         }
+        
         entityCache.getAndUpdate(cache -> {
             Member oldMember = cache.getMemberCache()
                     .getMemberByIdAndServer(member.getId(), member.getServer().getId())
