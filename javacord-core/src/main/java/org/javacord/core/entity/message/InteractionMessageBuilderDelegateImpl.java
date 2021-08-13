@@ -112,7 +112,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     @Override
     public void copy(InteractionBase interaction) {
         ((InteractionImpl) interaction).asMessageComponentInteraction()
-                .flatMap(MessageComponentInteraction::getMessage)
+                .map(MessageComponentInteraction::getMessage)
                 .ifPresent(this::copy);
     }
 

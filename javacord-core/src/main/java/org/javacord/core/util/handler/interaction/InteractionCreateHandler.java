@@ -119,7 +119,7 @@ public class InteractionCreateHandler extends PacketHandler {
             case MESSAGE_COMPONENT:
                 MessageComponentCreateEvent messageComponentCreateEvent =
                         new MessageComponentCreateEventImpl(interaction);
-                long messageId = messageComponentCreateEvent.getMessageComponentInteraction().getMessageId();
+                long messageId = messageComponentCreateEvent.getMessageComponentInteraction().getMessage().getId();
                 api.getEventDispatcher().dispatchMessageComponentCreateEvent(
                         server == null ? api : server,
                         messageId,

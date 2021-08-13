@@ -3,7 +3,6 @@ package org.javacord.api.interaction;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.interaction.callback.ComponentInteractionOriginalMessageUpdater;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public interface MessageComponentInteractionBase extends InteractionBase {
@@ -13,14 +12,7 @@ public interface MessageComponentInteractionBase extends InteractionBase {
      *
      * @return The message.
      */
-    Optional<Message> getMessage();
-
-    /**
-     * Gets the message ID that this interaction is related to.
-     *
-     * @return The message ID.
-     */
-    long getMessageId();
+    Message getMessage();
 
     /**
      * Get the identifier of the clicked component.
