@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 
@@ -181,7 +182,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addEmbeds(EmbedBuilder... embeds) {
-        delegate.addEmbeds(embeds);
+        delegate.addEmbeds(Arrays.asList(embeds));
         return this;
     }
 

@@ -12,6 +12,7 @@ import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 
 public abstract class InteractionMessageBuilderBaseImpl<T> implements InteractionMessageBuilderBase<T> {
     protected final InteractionMessageBuilderDelegate delegate;
@@ -80,6 +81,12 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
 
     @Override
     public T addEmbeds(EmbedBuilder... embeds) {
+        delegate.addEmbeds(Arrays.asList(embeds));
+        return myClass.cast(this);
+    }
+
+    @Override
+    public T addEmbeds(List<EmbedBuilder> embeds) {
         delegate.addEmbeds(embeds);
         return myClass.cast(this);
     }

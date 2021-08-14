@@ -5,6 +5,9 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.UncachedMessageAttachableListenerManager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -14,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 public interface UncachedMessageUtil extends UncachedMessageAttachableListenerManager {
 
     /**
-     * Cross posts the message if it is in a announcement channel.
+     * Cross posts the message if it is in an announcement channel.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
@@ -25,7 +28,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     }
 
     /**
-     * Cross posts the message if it is in a announcement channel.
+     * Cross posts the message if it is in an announcement channel.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
@@ -56,7 +59,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param reason The audit log reason for the deletion.
+     * @param reason    The audit log reason for the deletion.
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> delete(long channelId, long messageId, String reason);
@@ -66,7 +69,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param reason The audit log reason for the deletion.
+     * @param reason    The audit log reason for the deletion.
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> delete(String channelId, String messageId, String reason);
@@ -77,7 +80,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
      * older messages are deleted with individual delete requests.
      *
-     * @param channelId The id of the message's channel.
+     * @param channelId  The id of the message's channel.
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
@@ -89,7 +92,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
      * older messages are deleted with individual delete requests.
      *
-     * @param channelId The id of the message's channel.
+     * @param channelId  The id of the message's channel.
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
@@ -122,7 +125,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param content   The new content of the message.
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Message> edit(long channelId, long messageId, String content);
@@ -132,7 +135,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param content   The new content of the message.
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Message> edit(String channelId, String messageId, String content);
@@ -142,70 +145,168 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param embed The new embed of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Message> edit(long channelId, long messageId, EmbedBuilder embed);
+    default CompletableFuture<Message> edit(long channelId, long messageId, EmbedBuilder embed,
+                                            EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return edit(channelId, messageId, embedBuilders);
+    }
 
     /**
      * Updates the embed of the message.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param embed The new embed of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Message> edit(String channelId, String messageId, EmbedBuilder embed);
+    CompletableFuture<Message> edit(long channelId, long messageId, List<EmbedBuilder> embeds);
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(String channelId, String messageId, EmbedBuilder embed,
+                                            EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return edit(channelId, messageId, embedBuilders);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> edit(String channelId, String messageId, List<EmbedBuilder> embeds);
 
     /**
      * Updates the content and the embed of the message.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
-     * @param embed The new embed of the message.
+     * @param content   The new content of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Message> edit(long channelId, long messageId, String content, EmbedBuilder embed);
+    default CompletableFuture<Message> edit(long channelId, long messageId, String content, EmbedBuilder embed,
+                                            EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return edit(channelId, messageId, content, embedBuilders);
+    }
 
     /**
      * Updates the content and the embed of the message.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
-     * @param embed The new embed of the message.
+     * @param content   The new content of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Message> edit(String channelId, String messageId, String content, EmbedBuilder embed);
+    CompletableFuture<Message> edit(long channelId, long messageId, String content, List<EmbedBuilder> embeds);
 
     /**
      * Updates the content and the embed of the message.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param content   The new content of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(String channelId, String messageId, String content, EmbedBuilder embed,
+                                            EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return edit(channelId, messageId, content, embedBuilders);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content   The new content of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> edit(String channelId, String messageId, String content, List<EmbedBuilder> embeds);
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
      * @param updateContent Whether to update or remove the content.
-     * @param embed The new embed of the message.
-     * @param updateEmbed Whether to update or remove the embed.
+     * @param embed         The new embed of the message.
+     * @param updateEmbed   Whether to update or remove the embed.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(long channelId, long messageId, String content, boolean updateContent,
+                                            EmbedBuilder embed, boolean updateEmbed) {
+        return edit(channelId, messageId, content, updateContent, Collections.singletonList(embed), updateEmbed);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
+     * @param updateContent Whether to update or remove the content.
+     * @param embeds        An array of the new embeds of the message.
+     * @param updateEmbed   Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Message> edit(long channelId, long messageId, String content, boolean updateContent,
-                                 EmbedBuilder embed, boolean updateEmbed);
+                                    List<EmbedBuilder> embeds, boolean updateEmbed);
 
     /**
      * Updates the content and the embed of the message.
      *
-     * @param channelId The id of the message's channel.
-     * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
      * @param updateContent Whether to update or remove the content.
-     * @param embed The new embed of the message.
-     * @param updateEmbed Whether to update or remove the embed.
+     * @param embed         The new embed of the message.
+     * @param updateEmbed   Whether to update or remove the embed.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(String channelId, String messageId, String content, boolean updateContent,
+                                            EmbedBuilder embed, boolean updateEmbed) {
+        return edit(channelId, messageId, content, updateContent, Collections.singletonList(embed), updateEmbed);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
+     * @param updateContent Whether to update or remove the content.
+     * @param embeds        An array of the new embeds of the message.
+     * @param updateEmbed   Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Message> edit(String channelId, String messageId, String content, boolean updateContent,
-                                 EmbedBuilder embed, boolean updateEmbed);
+                                    List<EmbedBuilder> embeds, boolean updateEmbed);
 
     /**
      * Removes the content of the message.
@@ -264,8 +365,8 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     /**
      * Adds a unicode reaction to the message.
      *
-     * @param channelId The id of the message's channel.
-     * @param messageId The id of the message.
+     * @param channelId    The id of the message's channel.
+     * @param messageId    The id of the message.
      * @param unicodeEmoji The unicode emoji string.
      * @return A future to tell us if the action was successful.
      */
@@ -274,8 +375,8 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     /**
      * Adds a unicode reaction to the message.
      *
-     * @param channelId The id of the message's channel.
-     * @param messageId The id of the message.
+     * @param channelId    The id of the message's channel.
+     * @param messageId    The id of the message.
      * @param unicodeEmoji The unicode emoji string.
      * @return A future to tell us if the action was successful.
      */
@@ -286,7 +387,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji.
+     * @param emoji     The emoji.
      * @return A future to tell us if the action was successful.
      */
     CompletableFuture<Void> addReaction(long channelId, long messageId, Emoji emoji);
@@ -296,7 +397,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji.
+     * @param emoji     The emoji.
      * @return A future to tell us if the action was successful.
      */
     CompletableFuture<Void> addReaction(String channelId, String messageId, Emoji emoji);
@@ -360,7 +461,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji of the reaction.
+     * @param emoji     The emoji of the reaction.
      * @return A list with all users who reacted with the given emoji
      */
     CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji);
@@ -370,7 +471,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji of the reaction.
+     * @param emoji     The emoji of the reaction.
      * @return A list with all users who reacted with the given emoji
      */
     CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji);
@@ -380,8 +481,8 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji of the reaction.
-     * @param userId The id of the user to remove.
+     * @param emoji     The emoji of the reaction.
+     * @param userId    The id of the user to remove.
      * @return A future to tell us if the action was successful.
      */
     CompletableFuture<Void> removeUserReactionByEmoji(long channelId, long messageId, Emoji emoji, long userId);
@@ -391,8 +492,8 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji of the reaction.
-     * @param userId The id of the user to remove.
+     * @param emoji     The emoji of the reaction.
+     * @param userId    The id of the user to remove.
      * @return A future to tell us if the action was successful.
      */
     CompletableFuture<Void> removeUserReactionByEmoji(String channelId, String messageId, Emoji emoji, String userId);
