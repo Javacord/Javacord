@@ -370,7 +370,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embeds, updateEmbed);
     }
 
-
     /**
      * Updates the content and the embed of the message.
      *
@@ -866,17 +865,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     Optional<MessageReference> getMessageReference();
 
     /**
-     * Gets the id of the referenced message.
-     *
-     * @return The id of the referenced message.
-     * @deprecated Use {@link #getMessageReference()} instead.
-     */
-    @Deprecated
-    default Optional<Long> getReferencedMessageId() {
-        return getMessageReference().flatMap(MessageReference::getMessageId);
-    }
-
-    /**
      * Gets the message referenced with a reply.
      * Only present if this message is type {@code MessageType.REPLY},
      * discord decided to send it and the message hasn't been deleted.
@@ -893,11 +881,10 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The referenced message.
      */
     default Optional<CompletableFuture<Message>> requestReferencedMessage() {
-        return getReferencedMessageId().map(id ->
+        return getReferencedMessage().map(message ->
                 getReferencedMessage().map(CompletableFuture::completedFuture)
-                        .orElseGet(() -> getApi().getMessageById(id, getChannel())));
+                        .orElseGet(() -> getApi().getMessageById(message.getId(), getChannel())));
     }
-
 
     /**
      * Checks if the message is kept in cache forever.
@@ -970,17 +957,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
                     .ifPresent(mentionedChannels::add);
         }
         return Collections.unmodifiableList(mentionedChannels);
-    }
-
-    /**
-     * Checks if the message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
-     *
-     * @return Whether the message was sent in a private channel.
-     * @deprecated Use {@link Message#isPrivateMessage()} instead.
-     */
-    @Deprecated // Deprecated to be consistent with #isServerMessage() and #isGroupMessage()
-    default boolean isPrivate() {
-        return getChannel().getType() == ChannelType.PRIVATE_CHANNEL;
     }
 
     /**
