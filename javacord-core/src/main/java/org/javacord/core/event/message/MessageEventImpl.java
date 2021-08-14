@@ -14,6 +14,7 @@ import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.event.EventImpl;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -81,17 +82,17 @@ public abstract class MessageEventImpl extends EventImpl implements MessageEvent
 
     @Override
     public CompletableFuture<Message> editMessage(String content) {
-        return Message.edit(getApi(), getChannel().getId(), getMessageId(), content, null);
+        return Message.edit(getApi(), getChannel().getId(), getMessageId(), content);
     }
 
     @Override
-    public CompletableFuture<Message> editMessage(EmbedBuilder embed) {
-        return Message.edit(getApi(), getChannel().getId(), getMessageId(), null, embed);
+    public CompletableFuture<Message> editMessage(List<EmbedBuilder> embeds) {
+        return Message.edit(getApi(), getChannel().getId(), getMessageId(), null, embeds);
     }
 
     @Override
-    public CompletableFuture<Message> editMessage(String content, EmbedBuilder embed) {
-        return Message.edit(getApi(), getChannel().getId(), getMessageId(), content, embed);
+    public CompletableFuture<Message> editMessage(String content, List<EmbedBuilder> embeds) {
+        return Message.edit(getApi(), getChannel().getId(), getMessageId(), content, embeds);
     }
 
     @Override

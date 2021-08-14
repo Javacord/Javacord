@@ -8,6 +8,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 
 import java.util.EnumSet;
+import java.util.List;
 
 public interface InteractionMessageBuilderBase<T> {
     /**
@@ -77,6 +78,14 @@ public interface InteractionMessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     T addEmbeds(EmbedBuilder... embeds);
+
+    /**
+     * Adds the embeds to the message.
+     *
+     * @param embeds A list of embeds to add.
+     * @return The current instance in order to chain call methods.
+     */
+    T addEmbeds(List<EmbedBuilder> embeds);
 
     /**
      * Adds multiple components to the message.

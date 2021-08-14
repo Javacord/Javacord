@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -110,7 +111,7 @@ public interface MessageBuilderBaseDelegate {
      *
      * @param embeds The embeds to add.
      */
-    void addEmbeds(EmbedBuilder... embeds);
+    void addEmbeds(List<EmbedBuilder> embeds);
 
     /**
      * Removes the embed from the message.

@@ -13,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 abstract class MessageBuilderBase<T> {
     private final Class<T> myClass;
@@ -151,6 +153,18 @@ abstract class MessageBuilderBase<T> {
      */
     public T setEmbeds(EmbedBuilder... embeds) {
         delegate.removeAllEmbeds();
+        delegate.addEmbeds(Arrays.asList(embeds));
+        return myClass.cast(this);
+    }
+
+    /**
+     * Sets multiple embeds of the message (overrides all existing embeds).
+     *
+     * @param embeds The embed to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public T setEmbeds(List<EmbedBuilder> embeds) {
+        delegate.removeAllEmbeds();
         delegate.addEmbeds(embeds);
         return myClass.cast(this);
     }
@@ -159,7 +173,7 @@ abstract class MessageBuilderBase<T> {
      * Adds an embed to the message.
      *
      * @param embed The embed to add.
-     * @return The current isntance in order to chain call methods.
+     * @return The current instance in order to chain call methods.
      */
     public T addEmbed(EmbedBuilder embed) {
         delegate.addEmbed(embed);
@@ -482,6 +496,17 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addEmbeds(EmbedBuilder... embeds) {
+        delegate.addEmbeds(Arrays.asList(embeds));
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds the embeds to the message.
+     *
+     * @param embeds The embeds to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addEmbeds(List<EmbedBuilder> embeds) {
         delegate.addEmbeds(embeds);
         return myClass.cast(this);
     }

@@ -102,7 +102,7 @@ public class InteractionOriginalResponseUpdaterImpl
 
     @Override
     public InteractionOriginalResponseUpdater addEmbeds(EmbedBuilder... embeds) {
-        delegate.addEmbeds(embeds);
+        delegate.addEmbeds(Arrays.asList(embeds));
         return this;
     }
 

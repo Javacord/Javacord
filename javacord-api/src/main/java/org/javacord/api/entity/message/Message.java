@@ -44,9 +44,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Returns a {@code MessageBuilder} according to this {@code Message}.
      *
-     * @see MessageBuilder#fromMessage(Message)
-     *
      * @return The {@code MessageBuilder}.
+     * @see MessageBuilder#fromMessage(Message)
      */
     default MessageBuilder toMessageBuilder() {
         return MessageBuilder.fromMessage(this);
@@ -55,18 +54,17 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Returns a {@code WebhookMessageBuilder} according to this {@code Message}.
      *
-     * @see WebhookMessageBuilder#fromMessage(Message)
-     *
      * @return The {@code WebhookMessageBuilder}.
+     * @see WebhookMessageBuilder#fromMessage(Message)
      */
     default WebhookMessageBuilder toWebhookMessageBuilder() {
         return WebhookMessageBuilder.fromMessage(this);
     }
 
     /**
-     * Cross posts the message if it is in a announcement channel.
+     * Cross posts the message if it is in an announcement channel.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return The new message object.
@@ -76,7 +74,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     * Cross posts the message if it is in a announcement channel.
+     * Cross posts the message if it is in an announcement channel.
      *
      * @return The new message object.
      */
@@ -87,7 +85,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Deletes the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the deletion was successful.
@@ -99,7 +97,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Deletes the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the deletion was successful.
@@ -111,10 +109,10 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Deletes the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param reason The audit log reason for the deletion.
+     * @param reason    The audit log reason for the deletion.
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, long channelId, long messageId, String reason) {
@@ -124,10 +122,10 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Deletes the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param reason The audit log reason for the deletion.
+     * @param reason    The audit log reason for the deletion.
      * @return A future to tell us if the deletion was successful.
      */
     static CompletableFuture<Void> delete(DiscordApi api, String channelId, String messageId, String reason) {
@@ -159,8 +157,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
      * older messages are deleted with individual delete requests.
      *
-     * @param api The discord api instance.
-     * @param channelId The id of the message's channel.
+     * @param api        The discord api instance.
+     * @param channelId  The id of the message's channel.
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
@@ -174,8 +172,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
      * older messages are deleted with individual delete requests.
      *
-     * @param api The discord api instance.
-     * @param channelId The id of the message's channel.
+     * @param api        The discord api instance.
+     * @param channelId  The id of the message's channel.
      * @param messageIds The ids of the messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
@@ -189,7 +187,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
      * older messages are deleted with individual delete requests.
      *
-     * @param api The discord api instance.
+     * @param api      The discord api instance.
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
@@ -203,7 +201,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Messages younger than two weeks are sent in batches of 100 messages to the bulk delete API,
      * older messages are deleted with individual delete requests.
      *
-     * @param api The discord api instance.
+     * @param api      The discord api instance.
      * @param messages The messages to delete.
      * @return A future to tell us if the deletion was successful.
      */
@@ -214,117 +212,191 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Updates the content of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param content   The new content of the message.
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, String content) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content);
     }
 
     /**
      * Updates the content of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param content   The new content of the message.
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, String content) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, Collections.emptyList(), false);
     }
 
     /**
      * Updates the embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param embed The new embed of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more additional new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder embed) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embed, true);
+    static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder embed,
+                                           EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embedBuilders, true);
     }
 
     /**
      * Updates the embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param embed The new embed of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, EmbedBuilder embed) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embed, true);
+    static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, List<EmbedBuilder> embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embeds, true);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more additional new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId,
+                                           EmbedBuilder embed, EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embedBuilders, true);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId,
+                                           List<EmbedBuilder> embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embeds, true);
     }
 
     /**
      * Updates the content and the embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
-     * @param embed The new embed of the message.
+     * @param content   The new content of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more additional new embeds of the message.
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(
-            DiscordApi api, long channelId, long messageId, String content, EmbedBuilder embed) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embed, true);
+            DiscordApi api, long channelId, long messageId, String content, EmbedBuilder embed,
+            EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embedBuilders, true);
     }
 
     /**
      * Updates the content and the embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
-     * @param embed The new embed of the message.
+     * @param content   The new content of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(
-            DiscordApi api, String channelId, String messageId, String content, EmbedBuilder embed) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embed, true);
+            DiscordApi api, long channelId, long messageId, String content, List<EmbedBuilder> embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embeds, true);
     }
 
     /**
      * Updates the content and the embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param content   The new content of the message.
+     * @param embed     The new embed of the message.
+     * @param embeds    One or more additional new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> edit(
+            DiscordApi api, String channelId, String messageId, String content, EmbedBuilder embed,
+            EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embedBuilders, true);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content   The new content of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> edit(
+            DiscordApi api, String channelId, String messageId, String content, List<EmbedBuilder> embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, embeds, true);
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param api           The discord api instance.
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
      * @param updateContent Whether to update or remove the content.
-     * @param embed The new embed of the message.
-     * @param updateEmbed Whether to update or remove the embed.
+     * @param embeds        An array of the new embeds of the message.
+     * @param updateEmbed   Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
+                                           boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embeds, updateEmbed);
     }
+
 
     /**
      * Updates the content and the embed of the message.
      *
-     * @param api The discord api instance.
-     * @param channelId The id of the message's channel.
-     * @param messageId The id of the message.
-     * @param content The new content of the message.
+     * @param api           The discord api instance.
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
      * @param updateContent Whether to update or remove the content.
-     * @param embed The new embed of the message.
-     * @param updateEmbed Whether to update or remove the embed.
+     * @param embeds        An array of the new embeds of the message.
+     * @param updateEmbed   Whether to update or remove the embed.
      * @return A future to check if the update was successful.
      */
     static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embed, updateEmbed);
+                                           boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, updateContent, embeds, updateEmbed);
     }
 
     /**
@@ -334,28 +406,55 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Message> edit(String content) {
-        return Message.edit(getApi(), getChannel().getId(), getId(), content, true, null, false);
+        return new MessageUpdater(this).setContent(content).applyChanges();
     }
 
     /**
      * Updates the embed of the message.
      *
-     * @param embed The new embed of the message.
+     * @param embed  The new embed of the message.
+     * @param embeds One or more additional new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> edit(EmbedBuilder embed) {
-        return Message.edit(getApi(), getChannel().getId(), getId(), null, false, embed, true);
+    default CompletableFuture<Message> edit(EmbedBuilder embed, EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return new MessageUpdater(this).addEmbeds(embedBuilders).applyChanges();
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param embeds An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(List<EmbedBuilder> embeds) {
+        return new MessageUpdater(this).addEmbeds(embeds).applyChanges();
     }
 
     /**
      * Updates the content and the embed of the message.
      *
      * @param content The new content of the message.
-     * @param embed The new embed of the message.
+     * @param embed   The new embed of the message.
+     * @param embeds  One or more additional new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> edit(String content, EmbedBuilder embed) {
-        return Message.edit(getApi(), getChannel().getId(), getId(), content, true, embed, true);
+    default CompletableFuture<Message> edit(String content, EmbedBuilder embed, EmbedBuilder... embeds) {
+        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
+        embedBuilders.add(embed);
+        return new MessageUpdater(this).setContent(content).addEmbeds(embedBuilders).applyChanges();
+    }
+
+    /**
+     * Updates the content and the embed of the message.
+     *
+     * @param content The new content of the message.
+     * @param embeds  An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(String content, List<EmbedBuilder> embeds) {
+        return new MessageUpdater(this).setContent(content).addEmbeds(embeds).applyChanges();
     }
 
     /**
@@ -371,25 +470,25 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Removes the content of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Message> removeContent(DiscordApi api, long channelId, long messageId) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, "");
     }
 
     /**
      * Removes the content of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Message> removeContent(DiscordApi api, String channelId, String messageId) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, false);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, Collections.emptyList(), false);
     }
 
     /**
@@ -398,32 +497,31 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     default CompletableFuture<Message> removeContent() {
-        return Message.edit(getApi(), getChannel().getId(), getId(), null, true, null, false);
+        return new MessageUpdater(this).setContent("").applyChanges();
     }
-
 
     /**
      * Removes the embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Message> removeEmbed(DiscordApi api, long channelId, long messageId) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, Collections.emptyList(), true);
     }
 
     /**
      * Removes the embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Message> removeEmbed(DiscordApi api, String channelId, String messageId) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, Collections.emptyList(), true);
     }
 
     /**
@@ -432,31 +530,31 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     default CompletableFuture<Message> removeEmbed() {
-        return Message.edit(getApi(), getChannel().getId(), getId(), null, false, null, true);
+        return new MessageUpdater(this).addEmbeds(Collections.emptyList()).applyChanges();
     }
 
     /**
      * Removes the content and embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Message> removeContentAndEmbed(DiscordApi api, long channelId, long messageId) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, Collections.emptyList(), true);
     }
 
     /**
      * Removes the content and embed of the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to check if the removal was successful.
      */
     static CompletableFuture<Message> removeContentAndEmbed(DiscordApi api, String channelId, String messageId) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, null, true);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, true, Collections.emptyList(), true);
     }
 
     /**
@@ -465,16 +563,16 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to check if the removal was successful.
      */
     default CompletableFuture<Message> removeContentAndEmbed() {
-        return Message.edit(getApi(), getChannel().getId(), getId(), null, true, null, true);
+        return new MessageUpdater(this).setContent("").addEmbeds(Collections.emptyList()).applyChanges();
     }
 
 
     /**
      * Adds a unicode reaction to the message.
      *
-     * @param api The discord api instance.
-     * @param channelId The id of the message's channel.
-     * @param messageId The id of the message.
+     * @param api          The discord api instance.
+     * @param channelId    The id of the message's channel.
+     * @param messageId    The id of the message.
      * @param unicodeEmoji The unicode emoji string.
      * @return A future to tell us if the action was successful.
      */
@@ -485,9 +583,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Adds a unicode reaction to the message.
      *
-     * @param api The discord api instance.
-     * @param channelId The id of the message's channel.
-     * @param messageId The id of the message.
+     * @param api          The discord api instance.
+     * @param channelId    The id of the message's channel.
+     * @param messageId    The id of the message.
      * @param unicodeEmoji The unicode emoji string.
      * @return A future to tell us if the action was successful.
      */
@@ -511,10 +609,10 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Adds a reaction to the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji.
+     * @param emoji     The emoji.
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, long channelId, long messageId, Emoji emoji) {
@@ -535,10 +633,10 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Adds a reaction to the message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param emoji The emoji.
+     * @param emoji     The emoji.
      * @return A future to tell us if the action was successful.
      */
     static CompletableFuture<Void> addReaction(DiscordApi api, String channelId, String messageId, Emoji emoji) {
@@ -548,7 +646,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Deletes all reactions on this message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the deletion was successful.
@@ -560,7 +658,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Deletes all reactions on this message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the deletion was successful.
@@ -581,7 +679,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Pins this message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the pin was successful.
@@ -593,7 +691,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Pins this message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the pin was successful.
@@ -614,7 +712,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Unpins this message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the action was successful.
@@ -626,7 +724,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Unpins this message.
      *
-     * @param api The discord api instance.
+     * @param api       The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @return A future to tell us if the action was successful.
@@ -687,7 +785,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     *  Gets the link leading to this message.
+     * Gets the link leading to this message.
      *
      * @return The message link.
      * @throws AssertionError If the link is malformed.
@@ -813,8 +911,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     default Optional<CompletableFuture<Message>> requestReferencedMessage() {
         return getReferencedMessageId().map(id ->
-                        getReferencedMessage().map(CompletableFuture::completedFuture)
-                .orElseGet(() -> getApi().getMessageById(id, getChannel())));
+                getReferencedMessage().map(CompletableFuture::completedFuture)
+                        .orElseGet(() -> getApi().getMessageById(id, getChannel())));
     }
 
 
@@ -826,9 +924,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     boolean isCachedForever();
 
     /**
-     * Sets if the the message is kept in cache forever.
+     * Sets if the message is kept in cache forever.
      *
-     * @param cachedForever  Whether the message should be kept in cache forever or not.
+     * @param cachedForever Whether the message should be kept in cache forever or not.
      */
     void setCachedForever(boolean cachedForever);
 
@@ -887,7 +985,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Checks if the message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
      *
-     * @return Whether or not the message was sent in a private channel.
+     * @return Whether the message was sent in a private channel.
      * @deprecated Use {@link Message#isPrivateMessage()} instead.
      */
     @Deprecated // Deprecated to be consistent with #isServerMessage() and #isGroupMessage()
@@ -898,7 +996,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Checks if the message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
      *
-     * @return Whether or not the message was sent in a private channel.
+     * @return Whether the message was sent in a private channel.
      */
     default boolean isPrivateMessage() {
         return getChannel().getType() == ChannelType.PRIVATE_CHANNEL;
@@ -907,7 +1005,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Checks if the message was sent in a {@link ChannelType#SERVER_TEXT_CHANNEL server channel}.
      *
-     * @return Whether or not the message was sent in a server channel.
+     * @return Whether the message was sent in a server channel.
      */
     default boolean isServerMessage() {
         return getChannel().getType() == ChannelType.SERVER_TEXT_CHANNEL;
@@ -916,7 +1014,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Checks if the message was sent in a {@link ChannelType#GROUP_CHANNEL group channel}.
      *
-     * @return Whether or not the message was sent in a group channel.
+     * @return Whether the message was sent in a group channel.
      */
     default boolean isGroupMessage() {
         return getChannel().getType() == ChannelType.GROUP_CHANNEL;
@@ -968,7 +1066,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Removes a user from the list of reactors of a given emoji reaction.
      *
-     * @param user The user to remove.
+     * @param user  The user to remove.
      * @param emoji The emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
@@ -979,7 +1077,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Removes a user from the list of reactors of a given unicode emoji reaction.
      *
-     * @param user The user to remove.
+     * @param user         The user to remove.
      * @param unicodeEmoji The unicode emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
@@ -1009,7 +1107,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Removes a user from the list of reactors of the given emoji reactions.
      *
-     * @param user The user to remove.
+     * @param user   The user to remove.
      * @param emojis The emojis of the reactions.
      * @return A future to tell us if the deletion was successful.
      */
@@ -1024,7 +1122,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Removes a user from the list of reactors of the given unicode emoji reactions.
      *
      * @param unicodeEmojis The unicode emojis of the reactions.
-     * @param user The user to remove.
+     * @param user          The user to remove.
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> removeReactionsByEmoji(User user, String... unicodeEmojis);
@@ -1300,7 +1398,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     * Gets all messages between this messages and the given message, excluding the boundaries.
+     * Gets all messages between this message and the given message, excluding the boundaries.
      *
      * @param other The id of the other boundary messages.
      * @return The messages.
@@ -1312,7 +1410,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     * Gets all messages between this messages and the given message, excluding the boundaries.
+     * Gets all messages between this message and the given message, excluding the boundaries.
      *
      * @param other The other boundary messages.
      * @return The messages.
@@ -1328,7 +1426,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * given condition is found.
      * If no message matches the condition, an empty set is returned.
      *
-     * @param other The id of the other boundary messages.
+     * @param other     The id of the other boundary messages.
      * @param condition The abort condition for when to stop retrieving messages.
      * @return The messages.
      * @see TextChannel#getMessagesBetweenUntil(Predicate, long, long)
@@ -1343,7 +1441,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * given condition is found.
      * If no message matches the condition, an empty set is returned.
      *
-     * @param other The other boundary messages.
+     * @param other     The other boundary messages.
      * @param condition The abort condition for when to stop retrieving messages.
      * @return The messages.
      * @see TextChannel#getMessagesBetweenUntil(Predicate, long, long)
@@ -1358,7 +1456,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * given condition.
      * If the first message does not match the condition, an empty set is returned.
      *
-     * @param other The id of the other boundary messages.
+     * @param other     The id of the other boundary messages.
      * @param condition The condition that has to be met.
      * @return The messages.
      * @see TextChannel#getMessagesBetweenWhile(Predicate, long, long)
@@ -1373,7 +1471,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * given condition.
      * If the first message does not match the condition, an empty set is returned.
      *
-     * @param other The other boundary messages.
+     * @param other     The other boundary messages.
      * @param condition The condition that has to be met.
      * @return The messages.
      * @see TextChannel#getMessagesBetweenWhile(Predicate, long, long)
