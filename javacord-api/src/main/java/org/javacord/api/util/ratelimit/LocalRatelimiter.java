@@ -45,19 +45,6 @@ public class LocalRatelimiter implements Ratelimiter {
      * Creates a new local ratelimiter.
      *
      * @param amount The amount available per reset interval.
-     * @param seconds The time to wait until the available quota resets.
-     * @deprecated Use {@link #LocalRatelimiter(int, Duration)} instead.
-     */
-    @Deprecated
-    public LocalRatelimiter(int amount, int seconds) {
-        this.amount = amount;
-        bucketDuration = Duration.ofSeconds(seconds);
-    }
-
-    /**
-     * Creates a new local ratelimiter.
-     *
-     * @param amount The amount available per reset interval.
      * @param bucketDuration The time to wait until the available quota resets.
      */
     public LocalRatelimiter(int amount, Duration bucketDuration) {
@@ -81,17 +68,6 @@ public class LocalRatelimiter implements Ratelimiter {
      */
     public Duration getBucketDuration() {
         return bucketDuration;
-    }
-
-    /**
-     * Gets the time to wait until the available quota resets in seconds.
-     *
-     * @return The time to wait until the available quota resets.
-     * @deprecated Use {@link #getBucketDuration()} instead.
-     */
-    @Deprecated
-    public int getSeconds() {
-        return (int) bucketDuration.getSeconds();
     }
 
     /**
