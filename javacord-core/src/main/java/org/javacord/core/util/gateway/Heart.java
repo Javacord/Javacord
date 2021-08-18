@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 /**
  * Every animal has a heart.
- * As we all know that websockets are animals, they obliviously have a heart, too.
+ * As we all know that websockets are animals, they obviously have a heart, too.
  */
 public class Heart {
 
