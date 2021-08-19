@@ -1,12 +1,15 @@
 package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
+import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +33,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     private final List<SlashCommandInteractionOption> options;
 
+    private static final Logger LOGGER = LoggerUtil.getLogger(SlashCommandInteractionOptionImpl.class);
+
     /**
      * Class constructor.
      *
@@ -39,107 +44,73 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     public SlashCommandInteractionOptionImpl(DiscordApi api, JsonNode jsonData) {
         this.api = api;
         name = jsonData.get("name").asText();
+        options = new ArrayList<>();
         JsonNode valueNode = jsonData.get("value");
 
-        int type = jsonData.get("type").asInt();
-        if (type == 3) {
-            stringValue = valueNode.asText();
-            intValue = null;
-            booleanValue = null;
-            userValue = null;
-            channelValue = null;
-            roleValue = null;
-            mentionableValue = null;
-            numberValue = null;
-            stringRepresentation = stringValue;
-        } else if (type == 4) {
-            stringValue = null;
-            intValue = valueNode.asInt();
-            booleanValue = null;
-            userValue = null;
-            channelValue = null;
-            roleValue = null;
-            mentionableValue = null;
-            numberValue = null;
-            stringRepresentation = String.valueOf(intValue);
-        } else if (type == 5) {
-            stringValue = null;
-            intValue = null;
-            booleanValue = valueNode.asBoolean();
-            userValue = null;
-            channelValue = null;
-            roleValue = null;
-            mentionableValue = null;
-            numberValue = null;
-            stringRepresentation = String.valueOf(booleanValue);
-        } else if (type == 6) {
-            stringValue = null;
-            intValue = null;
-            booleanValue = null;
-            userValue = Long.parseLong(valueNode.asText());
-            channelValue = null;
-            roleValue = null;
-            mentionableValue = null;
-            numberValue = null;
-            stringRepresentation = String.valueOf(userValue);
-        } else if (type == 7) {
-            stringValue = null;
-            intValue = null;
-            booleanValue = null;
-            userValue = null;
-            channelValue = Long.parseLong(valueNode.asText());
-            roleValue = null;
-            mentionableValue = null;
-            numberValue = null;
-            stringRepresentation = String.valueOf(channelValue);
-        } else if (type == 8) {
-            stringValue = null;
-            intValue = null;
-            booleanValue = null;
-            userValue = null;
-            channelValue = null;
-            roleValue = Long.parseLong(valueNode.asText());
-            mentionableValue = null;
-            numberValue = null;
-            stringRepresentation = String.valueOf(roleValue);
-        } else if (type == 9) {
-            stringValue = null;
-            intValue = null;
-            booleanValue = null;
-            userValue = null;
-            channelValue = null;
-            roleValue = null;
-            mentionableValue = Long.parseLong(valueNode.asText());
-            numberValue = null;
-            stringRepresentation = String.valueOf(mentionableValue);
-        } else if (type == 10) {
-            stringValue = null;
-            intValue = null;
-            booleanValue = null;
-            userValue = null;
-            channelValue = null;
-            roleValue = null;
-            mentionableValue = null;
-            numberValue = valueNode.asDouble();
-            stringRepresentation = String.valueOf(numberValue);
-        } else {
-            stringValue = null;
-            intValue = null;
-            booleanValue = null;
-            userValue = null;
-            channelValue = null;
-            roleValue = null;
-            mentionableValue = null;
-            numberValue = null;
-            stringRepresentation = null;
+        String localStringRepresentation = null;
+        String localStringValue = null;
+        Integer localIntValue = null;
+        Boolean localBooleanValue = null;
+        Long localUserValue = null;
+        Long localChannelValue = null;
+        Long localRoleValue = null;
+        Long localMentionableValue = null;
+        Double localNumberValue = null;
+
+        SlashCommandOptionType type = SlashCommandOptionType.fromValue(jsonData.get("type").asInt());
+        switch (type) {
+            case SUB_COMMAND:
+            case SUB_COMMAND_GROUP:
+                for (JsonNode optionJson : jsonData.get("options")) {
+                    options.add(new SlashCommandInteractionOptionImpl(api, optionJson));
+                }
+                break;
+            case STRING:
+                localStringValue = valueNode.asText();
+                localStringRepresentation = localStringValue;
+                break;
+            case INTEGER:
+                localIntValue = valueNode.asInt();
+                localStringRepresentation = String.valueOf(localIntValue);
+                break;
+            case BOOLEAN:
+                localBooleanValue = valueNode.asBoolean();
+                localStringRepresentation = String.valueOf(localBooleanValue);
+                break;
+            case USER:
+                localUserValue = Long.parseLong(valueNode.asText());
+                localStringRepresentation = String.valueOf(localUserValue);
+                break;
+            case CHANNEL:
+                localChannelValue = Long.parseLong(valueNode.asText());
+                localStringRepresentation = String.valueOf(localChannelValue);
+                break;
+            case ROLE:
+                localRoleValue = Long.parseLong(valueNode.asText());
+                localStringRepresentation = String.valueOf(localRoleValue);
+                break;
+            case MENTIONABLE:
+                localMentionableValue = Long.parseLong(valueNode.asText());
+                localStringRepresentation = String.valueOf(localMentionableValue);
+                break;
+            case NUMBER:
+                localNumberValue = valueNode.asDouble();
+                localStringRepresentation = String.valueOf(localNumberValue);
+                break;
+            default:
+                LOGGER.warn("Received slash command option of unknown type <{}>. "
+                        + "Please contact the developer!", type);
         }
 
-        options = new ArrayList<>();
-        if (jsonData.has("options") && jsonData.get("options").isArray()) {
-            for (JsonNode optionJson : jsonData.get("options")) {
-                options.add(new SlashCommandInteractionOptionImpl(api, optionJson));
-            }
-        }
+        stringRepresentation = localStringRepresentation;
+        stringValue = localStringValue;
+        intValue = localIntValue;
+        booleanValue = localBooleanValue;
+        userValue = localUserValue;
+        channelValue = localChannelValue;
+        roleValue = localRoleValue;
+        mentionableValue = localMentionableValue;
+        numberValue = localNumberValue;
     }
 
     @Override
