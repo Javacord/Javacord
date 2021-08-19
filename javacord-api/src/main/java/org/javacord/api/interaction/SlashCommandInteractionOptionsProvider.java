@@ -36,6 +36,15 @@ public interface SlashCommandInteractionOptionsProvider {
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
      */
+    default Optional<String> getFirstOptionStringRepresentationValue() {
+        return getFirstOption().flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
+    }
+
+    /**
+     * Gets the string value of the first option (if present).
+     *
+     * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     */
     default Optional<String> getFirstOptionStringValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getStringValue);
     }
@@ -118,6 +127,15 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
+     * Gets the double value of the first option (if present).
+     *
+     * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<Double> getFirstOptionNumberValue() {
+        return getFirstOption().flatMap(SlashCommandInteractionOption::getNumberValue);
+    }
+
+    /**
      * Get the second option, if present. Useful if you're working with a command that has two options.
      *
      * @return The option at index 0, if present; an empty Optional otherwise
@@ -128,6 +146,15 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the string representation of the second option (if present).
+     *
+     * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<String> getSecondOptionStringRepresentationValue() {
+        return getSecondOption().flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
+    }
+
+    /**
+     * Gets the string value of the second option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
      */
@@ -213,6 +240,15 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
+     * Gets the double value of the second option (if present).
+     *
+     * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<Double> getSecondOptionNumberValue() {
+        return getSecondOption().flatMap(SlashCommandInteractionOption::getNumberValue);
+    }
+
+    /**
      * Get the third option, if present. Useful if you're working with a command that has up to 3 options.
      *
      * @return The option at index 0, if present; an empty Optional otherwise
@@ -223,6 +259,15 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the string representation of the third option (if present).
+     *
+     * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<String> getThirdOptionStringRepresentationValue() {
+        return getThirdOption().flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
+    }
+
+    /**
+     * Gets the string of the third option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
      */
@@ -308,6 +353,15 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
+     * Gets the double value of the third option (if present).
+     *
+     * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<Double> getThirdOptionNumberValue() {
+        return getThirdOption().flatMap(SlashCommandInteractionOption::getNumberValue);
+    }
+
+    /**
      * Get an option having the specified name.
      *
      * @param name The name of the option to search for.
@@ -318,6 +372,16 @@ public interface SlashCommandInteractionOptionsProvider {
                 .stream()
                 .filter(option -> option.getName().equalsIgnoreCase(name))
                 .findAny();
+    }
+
+    /**
+     * Gets the string representation value of an option having the specified name.
+     *
+     * @param name The name of the option to search for.
+     * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<String> getOptionStringRepresentationValueByName(String name) {
+        return getOptionByName(name).flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
     }
 
     /**
@@ -416,6 +480,16 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
+     * Gets the double value of an option having the specified name.
+     *
+     * @param name The name of the option to search for.
+     * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<Double> getOptionNumberValueByName(String name) {
+        return getOptionByName(name).flatMap(SlashCommandInteractionOption::getNumberValue);
+    }
+
+    /**
      * Gets the option at the specified index, if present.
      *
      * @param index The index of the option to search for.
@@ -426,6 +500,16 @@ public interface SlashCommandInteractionOptionsProvider {
                 .stream()
                 .skip(index)
                 .findFirst();
+    }
+
+    /**
+     * Gets the string representation value of an option at the specified index.
+     *
+     * @param index The index of the option to search for.
+     * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<String> getOptionStringRepresentationValueByIndex(int index) {
+        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
     }
 
     /**
@@ -521,5 +605,15 @@ public interface SlashCommandInteractionOptionsProvider {
      */
     default Optional<CompletableFuture<Mentionable>> requestOptionMentionableValueByIndex(int index) {
         return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::requestFirstOptionMentionableValue);
+    }
+
+    /**
+     * Gets the double value of an option at the specified index.
+     *
+     * @param index The index of the option to search for.
+     * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<Double> getOptionNumberValueByIndex(int index) {
+        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getNumberValue);
     }
 }

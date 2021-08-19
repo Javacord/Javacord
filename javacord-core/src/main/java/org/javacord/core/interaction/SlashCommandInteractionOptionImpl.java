@@ -7,7 +7,6 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
-import org.javacord.api.util.DiscordRegexPattern;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,9 +18,16 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     private final DiscordApi api;
     private final String name;
+    private final String stringRepresentation;
     private final String stringValue;
     private final Integer intValue;
     private final Boolean booleanValue;
+    private final Long userValue;
+    private final Long channelValue;
+    private final Long roleValue;
+    private final Long mentionableValue;
+    private final Double numberValue;
+
     private final List<SlashCommandInteractionOption> options;
 
     /**
@@ -35,22 +41,97 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         name = jsonData.get("name").asText();
         JsonNode valueNode = jsonData.get("value");
 
-        if (valueNode != null && valueNode.isTextual()) {
+        int type = jsonData.get("type").asInt();
+        if (type == 3) {
             stringValue = valueNode.asText();
             intValue = null;
             booleanValue = null;
-        } else if (valueNode != null && valueNode.isInt()) {
+            userValue = null;
+            channelValue = null;
+            roleValue = null;
+            mentionableValue = null;
+            numberValue = null;
+            stringRepresentation = stringValue;
+        } else if (type == 4) {
+            stringValue = null;
             intValue = valueNode.asInt();
-            stringValue = null;
             booleanValue = null;
-        } else if (valueNode != null && valueNode.isBoolean()) {
+            userValue = null;
+            channelValue = null;
+            roleValue = null;
+            mentionableValue = null;
+            numberValue = null;
+            stringRepresentation = String.valueOf(intValue);
+        } else if (type == 5) {
+            stringValue = null;
+            intValue = null;
             booleanValue = valueNode.asBoolean();
+            userValue = null;
+            channelValue = null;
+            roleValue = null;
+            mentionableValue = null;
+            numberValue = null;
+            stringRepresentation = String.valueOf(booleanValue);
+        } else if (type == 6) {
             stringValue = null;
             intValue = null;
-        } else {
-            intValue = null;
-            stringValue = null;
             booleanValue = null;
+            userValue = Long.parseLong(valueNode.asText());
+            channelValue = null;
+            roleValue = null;
+            mentionableValue = null;
+            numberValue = null;
+            stringRepresentation = String.valueOf(userValue);
+        } else if (type == 7) {
+            stringValue = null;
+            intValue = null;
+            booleanValue = null;
+            userValue = null;
+            channelValue = Long.parseLong(valueNode.asText());
+            roleValue = null;
+            mentionableValue = null;
+            numberValue = null;
+            stringRepresentation = String.valueOf(channelValue);
+        } else if (type == 8) {
+            stringValue = null;
+            intValue = null;
+            booleanValue = null;
+            userValue = null;
+            channelValue = null;
+            roleValue = Long.parseLong(valueNode.asText());
+            mentionableValue = null;
+            numberValue = null;
+            stringRepresentation = String.valueOf(roleValue);
+        } else if (type == 9) {
+            stringValue = null;
+            intValue = null;
+            booleanValue = null;
+            userValue = null;
+            channelValue = null;
+            roleValue = null;
+            mentionableValue = Long.parseLong(valueNode.asText());
+            numberValue = null;
+            stringRepresentation = String.valueOf(mentionableValue);
+        } else if (type == 10) {
+            stringValue = null;
+            intValue = null;
+            booleanValue = null;
+            userValue = null;
+            channelValue = null;
+            roleValue = null;
+            mentionableValue = null;
+            numberValue = valueNode.asDouble();
+            stringRepresentation = String.valueOf(numberValue);
+        } else {
+            stringValue = null;
+            intValue = null;
+            booleanValue = null;
+            userValue = null;
+            channelValue = null;
+            roleValue = null;
+            mentionableValue = null;
+            numberValue = null;
+            stringRepresentation = null;
         }
 
         options = new ArrayList<>();
@@ -67,11 +148,13 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     }
 
     @Override
+    public Optional<String> getStringRepresentationValue() {
+        return Optional.ofNullable(stringRepresentation);
+    }
+
+    @Override
     public Optional<String> getStringValue() {
-        if (stringValue != null) {
-            return Optional.of(stringValue);
-        }
-        return getIntValue().map(String::valueOf);
+        return Optional.ofNullable(stringValue);
     }
 
     @Override
@@ -86,43 +169,51 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     @Override
     public Optional<User> getUserValue() {
-        return getAsSnowflake()
+        return Optional.ofNullable(userValue)
                 .flatMap(api::getCachedUserById);
     }
 
     @Override
     public Optional<CompletableFuture<User>> requestUserValue() {
-        return getAsSnowflake()
+        return Optional.ofNullable(userValue)
                 .map(api::getUserById);
     }
 
     @Override
     public Optional<ServerChannel> getChannelValue() {
-        return getAsSnowflake()
+        return Optional.ofNullable(channelValue)
                 .flatMap(api::getServerChannelById);
     }
 
     @Override
     public Optional<Role> getRoleValue() {
-        return getAsSnowflake()
+        return Optional.ofNullable(roleValue)
                 .flatMap(api::getRoleById);
     }
 
     @Override
     public Optional<Mentionable> getMentionableValue() {
+        Optional<Mentionable> mentionable = Optional.empty();
         // No Optional#or() in Java 8 :(
+        if (mentionableValue != null) {
+            mentionable = api.getRoleById(mentionableValue).map(Mentionable.class::cast);
+            if (mentionable.isPresent()) {
+                return mentionable;
+            }
 
-        Optional<Mentionable> optional = getRoleValue().map(Mentionable.class::cast);
-        if (optional.isPresent()) {
-            return optional;
+            mentionable = api.getServerChannelById(mentionableValue).map(Mentionable.class::cast);
+            if (mentionable.isPresent()) {
+                return mentionable;
+            }
+
+            mentionable = api.getCachedUserById(mentionableValue).map(Mentionable.class::cast);
         }
+        return mentionable;
+    }
 
-        optional = getChannelValue().map(Mentionable.class::cast);
-        if (optional.isPresent()) {
-            return optional;
-        }
-
-        return getUserValue().map(Mentionable.class::cast);
+    @Override
+    public Optional<Double> getNumberValue() {
+        return Optional.ofNullable(numberValue);
     }
 
     @Override
@@ -132,12 +223,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         if (cacheOptional.isPresent()) {
             return cacheOptional;
         }
-        return requestUserValue().map(future -> future.thenApply(Mentionable.class::cast));
-    }
-
-    private Optional<String> getAsSnowflake() {
-        return Optional.ofNullable(stringValue)
-                .filter(s -> DiscordRegexPattern.SNOWFLAKE.matcher(s).matches());
+        return Optional.ofNullable(mentionableValue)
+                .map(api::getUserById).map(future -> future.thenApply(Mentionable.class::cast));
     }
 
     @Override
