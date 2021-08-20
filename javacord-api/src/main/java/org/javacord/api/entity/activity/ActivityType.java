@@ -1,7 +1,7 @@
 package org.javacord.api.entity.activity;
 
 /**
- * Represents a activity type.
+ * Represents an activity type.
  *
  * @see <a href="https://discord.com/developers/docs/topics/gateway#activity-object-activity-types">Discord docs</a>
  */
@@ -13,7 +13,7 @@ public enum ActivityType {
     PLAYING(0),
 
     /**
-     * Represents streaming a activity, represented as "Streaming Half-Life 3" for example.
+     * Represents streaming an activity, represented as "Streaming Half-Life 3" for example.
      */
     STREAMING(1),
 

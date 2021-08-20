@@ -9,9 +9,9 @@ import java.util.Optional;
 public interface InteractionSlashCommandCallbackData {
 
     /**
-     * Checks whether or not the response is text to speech.
+     * Checks whether the response is text to speech.
      *
-     * @return Whether or not the response is text to speech.
+     * @return Whether the response is text to speech.
      */
     Optional<Boolean> isTts();
 

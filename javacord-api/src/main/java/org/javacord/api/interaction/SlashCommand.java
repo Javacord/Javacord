@@ -127,7 +127,7 @@ public interface SlashCommand extends DiscordEntity {
     }
 
     /**
-     * Creates an slash command updater from this SlashCommand instance.
+     * Creates a slash command updater from this SlashCommand instance.
      *
      * @return The slash command updater for this SlashCommand instance.
      */

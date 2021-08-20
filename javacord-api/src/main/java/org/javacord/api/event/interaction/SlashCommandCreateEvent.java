@@ -6,7 +6,7 @@ import org.javacord.api.interaction.SlashCommandInteraction;
 import java.util.Optional;
 
 /**
- * An slash command create event.
+ * A slash command create event.
  */
 public interface SlashCommandCreateEvent extends Event {
 

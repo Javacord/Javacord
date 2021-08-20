@@ -56,7 +56,7 @@ public interface EmbedAuthor extends Nameable {
      * Downloads the author icon as an input stream.
      *
      * @param api The discord api instance used to download the author icon.
-     * @return The thumbnail as a input stream.
+     * @return The thumbnail as an input stream.
      * @throws IOException If an IO error occurs.
      */
     Optional<InputStream> downloadIconAsInputStream(DiscordApi api) throws IOException;

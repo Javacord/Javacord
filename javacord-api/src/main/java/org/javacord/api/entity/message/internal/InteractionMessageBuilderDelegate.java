@@ -58,7 +58,7 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
 
 
     /**
-     * Delete a follow up message.
+     * Delete a follow-up message.
      *
      * @param interaction The interaction.
      * @param messageId   The message id of the followup message which should be edited.

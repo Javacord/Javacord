@@ -143,7 +143,7 @@ public class ButtonImpl extends ComponentImpl implements Button {
             object.put("custom_id", customId);
         }
 
-        // 3. Link buttons must have a url, and cannot have a custom_id
+        // 3. Link buttons must have an url, and cannot have a custom_id
         if (style == ButtonStyle.LINK) {
             if (url == null || url.equals("")) {
                 throw new IllegalStateException("Button link is missing a URL.");

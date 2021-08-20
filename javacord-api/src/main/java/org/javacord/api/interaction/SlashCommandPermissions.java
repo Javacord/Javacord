@@ -8,7 +8,7 @@ public interface SlashCommandPermissions {
     /**
      * Gets the ID of the affected {@link SlashCommandPermissionType}.
      *
-     * @return The ID..
+     * @return The ID.
      */
     long getId();
 
@@ -20,18 +20,18 @@ public interface SlashCommandPermissions {
     SlashCommandPermissionType getType();
 
     /**
-     * Whether this permission is enabled or disabled for the this slash command permissions.
+     * Whether this permission is enabled or disabled for the slash command permissions.
      *
-     * @return True if the command is enabled for this user or role. Otherwise false.
+     * @return True if the command is enabled for this user or role otherwise, false.
      */
     boolean getPermission();
 
     /**
-     * Creates an slash command permissions which can be used by {@link SlashCommandPermissionsUpdater}
+     * Creates a slash command permissions which can be used by {@link SlashCommandPermissionsUpdater}
      * to update the permission.
      *
      * @param id The id of the role or user which should be updated.
-     * @param type The type this ID belong to.
+     * @param type The type this ID belongs to.
      * @param permission True if the command should be enabled.
      * @return The built SlashCommandPermissions.
      */

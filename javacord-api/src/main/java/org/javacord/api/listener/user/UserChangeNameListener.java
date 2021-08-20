@@ -6,7 +6,7 @@ import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
 
 /**
- * This listener listens to user name changes.
+ * This listener listens to username changes.
  */
 @FunctionalInterface
 public interface UserChangeNameListener extends ServerAttachableListener, UserAttachableListener,

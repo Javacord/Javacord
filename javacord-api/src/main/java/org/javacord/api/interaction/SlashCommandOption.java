@@ -31,9 +31,9 @@ public interface SlashCommandOption {
     String getDescription();
 
     /**
-     * Checks whether or not this option is required.
+     * Checks whether this option is required.
      *
-     * @return Whether or not this option is required.
+     * @return Whether this option is required.
      */
     boolean isRequired();
 
@@ -54,7 +54,7 @@ public interface SlashCommandOption {
     List<SlashCommandOption> getOptions();
 
     /**
-     * Create a new slash command option to be used with an slash command builder.
+     * Create a new slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param type The type of the option.
@@ -76,7 +76,7 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new slash command option to be used with an slash command builder.
+     * Create a new slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param type The type of the option.
@@ -93,7 +93,7 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new subcommand or subcommand group to be used with an slash command builder.
+     * Create a new subcommand or subcommand group to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param type The type of the option. Must be either SUBCOMMAND or SUBCOMMAND_GROUP.
@@ -113,7 +113,7 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new subcommand or subcommand group to be used with an slash command builder.
+     * Create a new subcommand or subcommand group to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param type The type of the option. Must be either SUBCOMMAND or SUBCOMMAND_GROUP.
@@ -135,7 +135,7 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new slash command option to be used with an slash command builder.
+     * Create a new slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param type The type of the option.
@@ -156,7 +156,7 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new slash command option to be used with an slash command builder.
+     * Create a new slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param type The type of the option.

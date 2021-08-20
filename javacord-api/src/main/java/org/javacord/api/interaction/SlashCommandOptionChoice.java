@@ -3,7 +3,7 @@ package org.javacord.api.interaction;
 import java.util.Optional;
 
 /**
- * A choice for an slash command option.
+ * A choice for a slash command option.
  */
 public interface SlashCommandOptionChoice {
 
@@ -26,7 +26,7 @@ public interface SlashCommandOptionChoice {
     /**
      * Gets the integer value of this choice.
      *
-     * <p>If this option is an string choice, the optional will be empty.
+     * <p>If this option is a string choice, the optional will be empty.
      *
      * @return The integer value of this choice.
      */

@@ -31,9 +31,9 @@ public interface DiscordApiBuilderDelegate {
     void setGlobalRatelimiter(Ratelimiter ratelimiter);
 
     /**
-     * Sets a ratelimiter that can be used to respect the 5 second gateway identify ratelimit.
+     * Sets a ratelimiter that can be used to respect the 5-second gateway identify ratelimit.
      *
-     * @param ratelimiter The ratelimiter used to respect the 5 second gateway identify ratelimit.
+     * @param ratelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.
      */
     void setGatewayIdentifyRatelimiter(Ratelimiter ratelimiter);
 
@@ -186,18 +186,18 @@ public interface DiscordApiBuilderDelegate {
     void setAllIntentsWhere(Predicate<Intent> condition);
 
     /**
-     * Sets whether or not the user cache should be enabled.
+     * Sets whether the user cache should be enabled.
      *
      * <p>By default, the user cache is disabled.
      *
-     * @param enabled Whether or not the user cache should be enabled.
+     * @param enabled Whether the user cache should be enabled.
      */
     void setUserCacheEnabled(boolean enabled);
 
     /**
-     * Gets whether or not the user cache is enabled.
+     * Gets whether the user cache is enabled.
      *
-     * @return Whether or not the user cache is enabled.
+     * @return Whether the user cache is enabled.
      */
     boolean isUserCacheEnabled();
 

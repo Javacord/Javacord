@@ -56,7 +56,7 @@ public interface AudioSource extends AudioSourceAttachableListenerManager, Speci
      * <p>If there is no frame available, but the source has not been finished, it will
      * play a silent sound instead.
      *
-     * @return Whether or not there is a frame available to be polled.
+     * @return Whether there is a frame available to be polled.
      */
     boolean hasNextFrame();
 

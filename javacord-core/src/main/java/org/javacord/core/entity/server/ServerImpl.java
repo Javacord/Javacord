@@ -1516,7 +1516,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         request.addQueryParameter(
                                 "before", lastAuditLogEntries.get(lastAuditLogEntries.size() - 1).getIdAsString());
                     } else if (before != null) {
-                        // It's the first request and we have a non-null "before" parameter
+                        // It's the first request, and we have a non-null "before" parameter
                         request.addQueryParameter("before", before.getIdAsString());
                     }
 
@@ -1527,7 +1527,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     JsonNode data = request.execute(RestRequestResult::getJsonBody).join();
                     // Add the new entries
                     auditLog.addEntries(data);
-                    // Check if we have to made another request
+                    // Check if we have to make another request
                     requestMore = auditLog.getEntries().size() < limit
                             && data.get("audit_log_entries").size() >= requestAmount;
                 }

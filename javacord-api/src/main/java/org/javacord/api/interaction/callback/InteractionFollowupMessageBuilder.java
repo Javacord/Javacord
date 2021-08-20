@@ -17,7 +17,7 @@ public interface InteractionFollowupMessageBuilder
      * Edits a followup message that has already been sent for this interaction.
      *
      * @param messageId The message id of the followup message which should be edited. It must be a message id of an
-     *                  already sent follow up message id of this interaction and can not be any other message id.
+     *                  already sent follow-up message id of this interaction and can not be any other message id.
      * @return The edited message.
      */
     CompletableFuture<Message> update(long messageId);
@@ -26,7 +26,7 @@ public interface InteractionFollowupMessageBuilder
      * Edits a followup message that has already been sent for this interaction.
      *
      * @param messageId The message id of the followup message which should be edited. It must be a message id of an
-     *                  already sent follow up message id of this interaction and can not be any other message id.
+     *                  already sent follow-up message id of this interaction and can not be any other message id.
      * @return The edited message.
      */
     CompletableFuture<Message> update(String messageId);

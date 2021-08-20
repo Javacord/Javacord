@@ -65,14 +65,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if the server has boost messages enabled.
      *
-     * @return Whether the the server has boost messages enabled or not.
+     * @return Whether the server has boost messages enabled or not.
      */
     boolean hasBoostMessagesEnabled();
 
     /**
      * Checks if the server has join messages enabled.
      *
-     * @return Whether the the server has join messages enabled or not.
+     * @return Whether the server has join messages enabled or not.
      */
     boolean hasJoinMessagesEnabled();
 
@@ -158,7 +158,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * <p>Setting a preferred locale is only available for public servers.
      * You can check if a server is public using the {@link #getFeatures()} methods.
-     * @return The sever's preferred locale.
+     * @return The severs preferred locale.
      */
     Locale getPreferredLocale();
 
@@ -465,7 +465,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if all members of the server are in the cache.
      *
-     * @return Whether or not all members of the server are in the cache.
+     * @return Whether all members of the server are in the cache.
      */
     boolean hasAllMembersInCache();
 
@@ -499,8 +499,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a member by its discriminated name like e. g. {@code Bastian#8222}.
-     * This method is case sensitive!
+     * Gets a member by its discriminated name like e.g. {@code Bastian#8222}.
+     * This method is case-sensitive!
      *
      * @param discriminatedName The discriminated name of the member.
      * @return The member with the given discriminated name.
@@ -513,8 +513,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a member by its discriminated name like e. g. {@code Bastian#8222}.
-     * This method is case insensitive!
+     * Gets a member by its discriminated name like e.g. {@code Bastian#8222}.
+     * This method is case-insensitive!
      *
      * @param discriminatedName The discriminated name of the member.
      * @return The member with the given discriminated name.
@@ -528,7 +528,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a member by its name and discriminator.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the member.
      * @param discriminator The discriminator of the member.
@@ -542,7 +542,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a member by its name and discriminator.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the member.
      * @param discriminator The discriminator of the member.
@@ -556,7 +556,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection with all members with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the members.
      * @return A collection with all members with the given name.
@@ -570,7 +570,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection with all members with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the members.
      * @return A collection with all members with the given name.
@@ -584,7 +584,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection with all members with the given nickname on this server.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param nickname The nickname of the members.
      * @return A collection with all members with the given nickname on this server.
@@ -598,7 +598,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection with all members with the given nickname on this server.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param nickname The nickname of the members.
      * @return A collection with all members with the given nickname on this server.
@@ -612,7 +612,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection with all members with the given display name on this server.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param displayName The display name of the members.
      * @return A collection with all members with the given display name on this server.
@@ -626,7 +626,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection with all members with the given display name on this server.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param displayName The display name of the members.
      * @return A collection with all members with the given display name on this server.
@@ -694,7 +694,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all roles with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the roles.
      * @return A sorted list (by position) with all roles with the given name.
@@ -708,7 +708,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all roles with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the roles.
      * @return A sorted list (by position) with all roles with the given name.
@@ -1650,7 +1650,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Mutes yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to mute yourself server-sidely, so that others can unmute
+     * <p>This cannot be undone by other users. If you want to mute yourself server-side, so that others can unmute
      * you, use {@link #muteYourself()}, {@link #muteUser(User)} or {@link #muteUser(User, String)}.
      *
      * @see #muteYourself()
@@ -1662,7 +1662,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Unmutes yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to unmute yourself server-sidely, so that others can
+     * <p>This cannot be undone by other users. If you want to unmute yourself server-side, so that others can
      * mute you, use {@link #unmuteYourself()}, {@link #unmuteUser(User)} or {@link #unmuteUser(User, String)}.
      *
      * @see #unmuteYourself()
@@ -1734,7 +1734,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Deafens yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to deafen yourself server-sidely, so that others can
+     * <p>This cannot be undone by other users. If you want to deafen yourself server-side, so that others can
      * undeafen you, use {@link #deafenYourself()}, {@link #deafenUser(User)} or {@link #deafenUser(User, String)}.
      *
      * @see #deafenYourself()
@@ -1746,7 +1746,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Undeafens yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to undeafen yourself server-sidely, so that others can
+     * <p>This cannot be undone by other users. If you want to undeafen yourself server-side, so that others can
      * deafen you, use {@link #undeafenYourself()}, {@link #undeafenUser(User)} or {@link #undeafenUser(User, String)}.
      *
      * @see #undeafenYourself()
@@ -2129,7 +2129,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection of all custom emojis with the given name in the server.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the custom emojis.
      * @return A collection of all custom emojis with the given name in this server.
@@ -2143,7 +2143,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection of all custom emojis with the given name in the server.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the custom emojis.
      * @return A collection of all custom emojis with the given name in this server.
@@ -2258,7 +2258,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channels with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the channels.
      * @return A sorted list (by position) with all channels with the given name.
@@ -2272,7 +2272,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channels with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the channels.
      * @return A sorted list (by position) with all channels with the given name.
@@ -2312,7 +2312,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channel categories with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the channel categories.
      * @return A sorted list (by position) with all channel categories with the given name.
@@ -2326,7 +2326,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channel categories with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the channel categories.
      * @return A sorted list (by position) with all channel categories with the given name.
@@ -2366,7 +2366,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all text channels with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the text channels.
      * @return A sorted list (by position) with all text channels with the given name.
@@ -2380,7 +2380,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all text channels with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the text channels.
      * @return A sorted list (by position) with all text channels with the given name.
@@ -2446,7 +2446,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all voice channels with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the voice channels.
      * @return A sorted list (by position) with all voice channels with the given name.
@@ -2460,7 +2460,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all voice channels with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the voice channels.
      * @return A sorted list (by position) with all voice channels with the given name.

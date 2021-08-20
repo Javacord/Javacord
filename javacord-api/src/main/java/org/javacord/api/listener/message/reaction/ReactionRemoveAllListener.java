@@ -8,7 +8,7 @@ import org.javacord.api.listener.message.MessageAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
 
 /**
- * This listener listens to all reaction being delete at once.
+ * This listener listens to all reaction being deleted at once.
  */
 @FunctionalInterface
 public interface ReactionRemoveAllListener extends ServerAttachableListener, TextChannelAttachableListener,

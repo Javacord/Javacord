@@ -63,7 +63,7 @@ public interface InteractionCreateEvent extends Event {
     /**
      * For advanced users: Get the interaction as a desired subtype of interaction.
      * Use this as a shortcut if you know which type of deeply nested interaction type you're expecting.
-     * For regular users, we recommend to use the different {@code getXXX()} methods to walk down the interaction
+     * For regular users, we recommend using the different {@code getXXX()} methods to walk down the interaction
      * inheritance tree.
      *
      * <p>If the interaction is not castable to the specified type, the {@code Optional} will be empty.

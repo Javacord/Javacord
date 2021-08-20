@@ -48,7 +48,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     private final boolean managed;
 
     /**
-     * Id of the user who created the emoji. 0 if no user was given.
+     * The id of the user who created the emoji. 0 if no user was given.
      */
     private volatile long creatorId;
 

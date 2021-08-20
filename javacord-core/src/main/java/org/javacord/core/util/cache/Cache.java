@@ -58,8 +58,8 @@ public class Cache<T> {
     /**
      * Adds an index to the cache.
      *
-     * <p>Indexes allow quick access (effectively {@code O(1)} to elements in the cache by the key for the index like
-     * for example the id or sub type.
+     * <p>Indexes allow quick access (effectively {@code O(1)}) to elements in the cache by the key for the index like
+     * for example the id or subtype.
      *
      * <p>Compound indexes can easily be achieved by using a {@link io.vavr.Tuple} or {@link io.vavr.collection.Seq}
      * with all keys as the return value of the mapping function.

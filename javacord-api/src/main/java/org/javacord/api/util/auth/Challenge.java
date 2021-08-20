@@ -52,7 +52,7 @@ public final class Challenge {
      * Gets the auth params, including {@code realm} if present, but as {@code String}s.
      * The keys are all lowercase, as the auth param names are to be treated case insensitively anyway.
      * If a challenge uses the {@code token68} form instead of the auth params form, there is exactly one entry in the
-     * result where the key is {@code null} and the the value is the token.
+     * result where the key is {@code null} and the value is the token.
      *
      * @return The auth params.
      */

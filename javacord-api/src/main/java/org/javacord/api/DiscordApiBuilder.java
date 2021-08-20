@@ -104,7 +104,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * in the same Java program.
      *
      * <p>**DO NOT** set a custom gateway identify ratelimiter unless you have to synchronize the ratelimit across
-     * multiple Java programs (running on different JVMs, VMs, phyiscal servers etc.) that run Javacord on the same
+     * multiple Java programs (running on different JVMs, VMs, physical servers etc.) that run Javacord on the same
      * bot token. The default ratelimiter will handle the ratelimit for you as long as your whole bot runs in the same
      * Java program.
      *
@@ -228,7 +228,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     /**
      * Sets the account type.
-     * By default the builder assumes that you want to login to a bot account.
+     * By default, the builder assumes that you want to login to a bot account.
      * Please notice, that public client bots are not allowed by Discord!
      *
      * @param type The account type.
@@ -395,7 +395,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
-     * Sets all non privileged intents.
+     * Sets all non-privileged intents.
      *
      * <p>This is the default behavior if no intents are set in the builder.
      *
@@ -429,7 +429,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
-     * Sets all non privileged intents and the given intents.
+     * Sets all non-privileged intents and the given intents.
      *
      * @param intentsToInclude One or more {@code Intent}s which should be included.
      * @return The current instance in order to chain call methods.
@@ -463,11 +463,11 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
-     * Sets whether or not the user cache should be enabled.
+     * Sets whether the user cache should be enabled.
      *
      * <p>By default, the user cache is disabled.
      *
-     * @param enabled Whether or not the user cache should be enabled.
+     * @param enabled Whether the user cache should be enabled.
      * @return The current instance in order to chain call methods.
      */
     public DiscordApiBuilder setUserCacheEnabled(boolean enabled) {
@@ -476,9 +476,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
-     * Gets whether or not the user cache is enabled.
+     * Gets whether the user cache is enabled.
      *
-     * @return Whether or not the user cache is enabled.
+     * @return Whether the user cache is enabled.
      */
     public boolean isUserCachedEnabled() {
         return delegate.isUserCacheEnabled();

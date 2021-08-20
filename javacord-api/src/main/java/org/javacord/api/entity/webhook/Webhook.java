@@ -88,9 +88,9 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
     }
 
     /**
-     * Checks if the webhook is an channel follower webhook.
+     * Checks if the webhook is a channel follower webhook.
      *
-     * @return Whether the webhook an channel following webhook.
+     * @return Whether the webhook a channel following webhook.
      */
     default boolean isChannelFollowerWebhook() {
         return getType() == WebhookType.CHANNEL_FOLLOWER;
@@ -160,7 +160,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * This method assumes the file type is "png"!
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return The updated webhook.
@@ -173,7 +173,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * Updates the avatar of the webhook.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
@@ -187,7 +187,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * Updates the avatar of the webhook.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return The updated webhook.
@@ -200,7 +200,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * Updates the avatar of the webhook.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return The updated webhook.
@@ -213,7 +213,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * Updates the avatar of the webhook.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return The updated webhook.
@@ -227,7 +227,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * This method assumes the file type is "png"!
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return The updated webhook.
@@ -240,7 +240,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * Updates the avatar of the webhook.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
@@ -255,7 +255,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * This method assumes the file type is "png"!
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @return The updated webhook.
@@ -268,7 +268,7 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * Updates the avatar of the webhook.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link WebhookUpdater} from {@link #createUpdater()} ()} which provides a better performance!
+     * {@link WebhookUpdater} from {@link #createUpdater()} which provides a better performance!
      *
      * @param avatar The new avatar.
      * @param fileType The type of the avatar, e.g. "png" or "jpg".
