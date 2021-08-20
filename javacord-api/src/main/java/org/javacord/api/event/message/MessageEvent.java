@@ -7,7 +7,6 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.TextChannelEvent;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -58,14 +57,11 @@ public interface MessageEvent extends TextChannelEvent {
     /**
      * Updates the embeds of the message involved in the event.
      *
-     * @param embed  The embed of the new embeds of the message.
-     * @param embeds One or more additional embeds for the message.
+     * @param embeds An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> editMessage(EmbedBuilder embed, EmbedBuilder... embeds) {
-        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
-        embedBuilders.add(embed);
-        return editMessage(embedBuilders);
+    default CompletableFuture<Message> editMessage(EmbedBuilder... embeds) {
+        return editMessage(Arrays.asList(embeds));
     }
 
     /**
@@ -80,14 +76,11 @@ public interface MessageEvent extends TextChannelEvent {
      * Updates the content and the embeds of the message involved in the event.
      *
      * @param content The new content of the message.
-     * @param embed   The embed of the new embeds of the message.
-     * @param embeds  One or more additional embeds for the message.
+     * @param embeds  An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> editMessage(String content, EmbedBuilder embed, EmbedBuilder... embeds) {
-        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
-        embedBuilders.add(embed);
-        return editMessage(content, embedBuilders);
+    default CompletableFuture<Message> editMessage(String content, EmbedBuilder... embeds) {
+        return editMessage(content, Arrays.asList(embeds));
     }
 
     /**
