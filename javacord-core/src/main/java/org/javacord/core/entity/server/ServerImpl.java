@@ -1610,6 +1610,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         getUnorderedChannels().stream()
                 .map(ServerChannel::getId)
                 .forEach(api::removeChannelFromCache);
+
+        getMembers().forEach(user -> removeMember(user.getId()));
     }
 
     @Override
