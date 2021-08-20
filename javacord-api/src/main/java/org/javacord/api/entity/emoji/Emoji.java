@@ -47,7 +47,7 @@ public interface Emoji extends Mentionable, Specializable<Emoji> {
             return equalsEmoji(otherEmoji.asUnicodeEmoji().orElse(""));
         }
         if (isUnicodeEmoji()) {
-            // This is an unicode emoji and the other emoji is a custom emoji
+            // This is a unicode emoji and the other emoji is a custom emoji
             return false;
         }
         // Both are custom emojis, so we have to compare the id

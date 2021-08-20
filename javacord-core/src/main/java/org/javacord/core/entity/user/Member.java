@@ -92,14 +92,14 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
     /**
      * Gets the self-muted state of this member.
      *
-     * @return Whether or not this member is self-muted.
+     * @return Whether this member is self-muted.
      */
     boolean isSelfMuted();
 
     /**
      * Gets the self-deafened state of this member.
      *
-     * @return Whether or not this member is self-deafened.
+     * @return Whether this member is self-deafened.
      */
     boolean isSelfDeafened();
 

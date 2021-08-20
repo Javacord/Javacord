@@ -96,7 +96,7 @@ public class Javacord {
     }
 
     /**
-     * The github url of javacord.
+     * The GitHub url of javacord.
      */
     public static final String GITHUB_URL = "https://github.com/Javacord/Javacord";
 

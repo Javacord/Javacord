@@ -61,7 +61,7 @@ public interface EmbedImage {
      * Downloads the image as an input stream.
      *
      * @param api The discord api instance used to download the image.
-     * @return The thumbnail as a input stream.
+     * @return The thumbnail as an input stream.
      * @throws IOException If an IO error occurs.
      */
     InputStream downloadAsInputStream(DiscordApi api) throws IOException;

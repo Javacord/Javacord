@@ -44,7 +44,7 @@ public class SlashCommandBuilder {
     }
 
     /**
-     * Adds an slash command option to the slash command.
+     * Adds a slash command option to the slash command.
      *
      * @param option The option.
      * @return The current instance in order to chain call methods.
@@ -90,9 +90,9 @@ public class SlashCommandBuilder {
     }
 
     /**
-     * Creates an slash command for a specific server.
+     * Creates a slash command for a specific server.
      * When used to create multiple server slash commands at once
-     * {@link DiscordApi#bulkOverwriteServerSlashCommands(Server, List)} (List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerSlashCommands(Server, List)} should be used instead.
      *
      * @param server The server.
      * @return The built slash command.

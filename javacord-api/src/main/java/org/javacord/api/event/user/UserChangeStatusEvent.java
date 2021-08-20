@@ -31,7 +31,7 @@ public interface UserChangeStatusEvent extends OptionalUserEvent {
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getOldStatusOnClient(DiscordClient)
      */
     default UserStatus getOldDesktopStatus() {
@@ -43,7 +43,7 @@ public interface UserChangeStatusEvent extends OptionalUserEvent {
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getOldStatusOnClient(DiscordClient)
      */
     default UserStatus getOldMobileStatus() {
@@ -55,7 +55,7 @@ public interface UserChangeStatusEvent extends OptionalUserEvent {
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getOldStatusOnClient(DiscordClient)
      */
     default UserStatus getOldWebStatus() {
@@ -67,7 +67,7 @@ public interface UserChangeStatusEvent extends OptionalUserEvent {
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getNewStatusOnClient(DiscordClient)
      */
     default UserStatus getNewDesktopStatus() {
@@ -79,7 +79,7 @@ public interface UserChangeStatusEvent extends OptionalUserEvent {
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getNewStatusOnClient(DiscordClient)
      */
     default UserStatus getNewMobileStatus() {
@@ -91,7 +91,7 @@ public interface UserChangeStatusEvent extends OptionalUserEvent {
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getNewStatusOnClient(DiscordClient)
      */
     default UserStatus getNewWebStatus() {
@@ -118,7 +118,7 @@ public interface UserChangeStatusEvent extends OptionalUserEvent {
      * Checks if the status has changed on the given client.
      *
      * @param client The client.
-     * @return Wether the status changed on the given client or not.
+     * @return Weather the status changed on the given client or not.
      */
     default boolean hasStatusChangeOnClient(DiscordClient client) {
         return getOldStatusOnClient(client) != getNewStatusOnClient(client);

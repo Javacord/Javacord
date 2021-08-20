@@ -14,7 +14,7 @@ public enum RestEndpoint {
     GATEWAY_BOT("/gateway/bot"),
     MESSAGE("/channels/%s/messages", 0),
     /**
-     * This is the same endpoint as {@link RestEndpoint#MESSAGE}, but it has an different ratelimit bucket.
+     * This is the same endpoint as {@link RestEndpoint#MESSAGE}, but it has a different ratelimit bucket.
      */
     MESSAGE_DELETE("/channels/%s/messages", 0),
     MESSAGES_BULK_DELETE("/channels/%s/messages/bulk-delete", 0),
@@ -54,7 +54,7 @@ public enum RestEndpoint {
     SLASH_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/%s/permissions",0);
 
     /**
-     * The endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix".
+     * The endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix").
      */
     private final String endpointUrl;
 
@@ -115,7 +115,7 @@ public enum RestEndpoint {
     }
 
     /**
-     * Gets the endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix".
+     * Gets the endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix").
      *
      * @return The gateway url.
      */

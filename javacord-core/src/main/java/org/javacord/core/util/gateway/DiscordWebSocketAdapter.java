@@ -251,7 +251,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     }
 
                     // reserve some places for heartbeats
-                    int webSocketFrameSendingLimit = webSocketFrameSendingQueueEntry.isPriorityLifecyle()
+                    int webSocketFrameSendingLimit = webSocketFrameSendingQueueEntry.isPriorityLifecycle()
                             ? WEB_SOCKET_FRAME_SENDING_RATELIMIT
                             : this.webSocketFrameSendingLimit.get();
 
@@ -285,7 +285,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     sendTimeList.add(currentNanoTime);
                     WebSocketFrame frame = webSocketFrameSendingQueueEntry.getFrame();
                     logger.debug("Sending {}frame {}",
-                            webSocketFrameSendingQueueEntry.isPriorityLifecyle() ? "priority lifecycle " : "",
+                            webSocketFrameSendingQueueEntry.isPriorityLifecycle() ? "priority lifecycle " : "",
                             frame);
                     webSocket.sendFrame(frame);
                     webSocketFrameSendingQueueEntry = null;

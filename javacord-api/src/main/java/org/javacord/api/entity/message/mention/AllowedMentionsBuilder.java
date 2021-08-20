@@ -162,7 +162,7 @@ public class AllowedMentionsBuilder {
     }
 
     /**
-     * Removes an user from the list which will be mentioned.
+     * Removes a user from the list which will be mentioned.
      *
      * @param userId The id of the user.
      * @return The current instance in order to chain call methods.
@@ -173,7 +173,7 @@ public class AllowedMentionsBuilder {
     }
 
     /**
-     * Removes an user from the list which will be mentioned.
+     * Removes a user from the list which will be mentioned.
      *
      * @param userId The id of the user.
      * @return The current instance in order to chain call methods.

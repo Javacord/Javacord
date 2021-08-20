@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 /**
- * This class represents a activity as it is displayed in Discord.
+ * This class represents an activity as it is displayed in Discord.
  */
 public interface Activity extends Nameable {
 

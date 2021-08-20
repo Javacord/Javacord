@@ -85,9 +85,9 @@ public class SlashCommandUpdater {
     }
 
     /**
-     * Updates an slash command on the given server.
+     * Updates a slash command on the given server.
      * When used to update multiple server slash commands at once
-     * {@link DiscordApi#bulkOverwriteServerSlashCommands(Server, List)} (List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerSlashCommands(Server, List)} should be used instead.
      *
      * @param server The server where the command should be updated.
      * @return The updated slash command.

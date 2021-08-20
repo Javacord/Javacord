@@ -20,9 +20,9 @@ public interface EditableEmbedField extends EmbedField {
     void setValue(String value);
 
     /**
-     * Sets whether or not this field should display inline.
+     * Sets whether this field should display inline.
      *
-     * @param inline Whether or not this field should display inline.
+     * @param inline Whether this field should display inline.
      */
     void setInline(boolean inline);
 

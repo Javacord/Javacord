@@ -39,7 +39,7 @@ public interface MessageComponentInteractionBase extends InteractionBase {
     /**
      * Acknowledges the incoming component interaction, for example a click on a button. The user will not see a loading
      * state.
-     * You can still send follow up messages within a 15 minute timeframe.
+     * You can still send follow-up messages within a 15-minute timeframe.
      *
      * @return A CompletableFuture that completes if the acknowledgement has been submitted successfully.
      */

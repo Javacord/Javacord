@@ -37,12 +37,12 @@ public interface SlashCommandOptionBuilderDelegate {
     /**
      * Sets if the slash command option is required.
      *
-     * @param required Whether or not the option is required.
+     * @param required Whether the option is required.
      */
     void setRequired(boolean required);
 
     /**
-     * Adds an choice for the slash command option.
+     * Adds a choice for the slash command option.
      *
      * @param choice The choice.
      */
@@ -56,7 +56,7 @@ public interface SlashCommandOptionBuilderDelegate {
     void setChoices(List<SlashCommandOptionChoice> choices);
 
     /**
-     * Adds an slash command option to the slash command option.
+     * Adds a slash command option to the slash command option.
      *
      * @param option The option.
      */

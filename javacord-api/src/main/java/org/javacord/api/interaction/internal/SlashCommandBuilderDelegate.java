@@ -30,7 +30,7 @@ public interface SlashCommandBuilderDelegate {
     void setDescription(String description);
 
     /**
-     * Adds an slash command option to the slash command.
+     * Adds a slash command option to the slash command.
      *
      * @param option The option.
      */
@@ -60,7 +60,7 @@ public interface SlashCommandBuilderDelegate {
     CompletableFuture<SlashCommand> createGlobal(DiscordApi api);
 
     /**
-     * Creates an slash command for a specific server.
+     * Creates a slash command for a specific server.
      *
      * @param server The server.
      * @return The built slash command.

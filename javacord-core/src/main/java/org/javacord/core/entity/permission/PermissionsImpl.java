@@ -34,14 +34,14 @@ public class PermissionsImpl implements Permissions {
      * Creates a new instance of this class.
      *
      * @param allow A long containing all allowed permission types.
-     *              Every other type will be set to denied.
+     *              Every other type will be set to deny.
      */
     public PermissionsImpl(long allow) {
         this.allowed = allow;
         long tempDenied = 0;
         for (PermissionType type : PermissionType.values()) {
             if (!type.isSet(allow)) {
-                // set everything which is not allowed to denied.
+                // set everything which is not allowed to deny.
                 tempDenied = type.set(tempDenied, true);
             }
         }

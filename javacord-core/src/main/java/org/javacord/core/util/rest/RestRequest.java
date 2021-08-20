@@ -122,7 +122,7 @@ public class RestRequest<T> {
 
     /**
      * Gets the major url parameter of this request.
-     * If an request has a major parameter, it means that the ratelimits for this request are based on this parameter.
+     * If a request has a major parameter, it means that the ratelimits for this request are based on this parameter.
      *
      * @return The major url parameter used for ratelimits.
      */

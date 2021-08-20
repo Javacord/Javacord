@@ -3,7 +3,7 @@ package org.javacord.core.util.cache;
 import java.util.function.UnaryOperator;
 
 /**
- * An immutable cache with all Javacord entites.
+ * An immutable cache with all Javacord entities.
  */
 public class JavacordEntityCache {
 

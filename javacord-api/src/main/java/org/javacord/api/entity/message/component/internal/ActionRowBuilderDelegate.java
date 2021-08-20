@@ -57,7 +57,7 @@ public interface ActionRowBuilderDelegate extends ComponentBuilderDelegate {
     ActionRow build();
 
     /**
-     * Get the component's type (always {@link ComponentType#ACTION_ROW}.
+     * Get the component's type (always {@link ComponentType#ACTION_ROW}).
      *
      * @return The component's type.
      */

@@ -3,7 +3,7 @@ package org.javacord.api.entity.channel;
 import java.util.Arrays;
 
 /**
- * A enum with all different channel types.
+ * An enum with all different channel types.
  */
 public enum ChannelType {
 

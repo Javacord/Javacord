@@ -5,7 +5,7 @@ import org.javacord.api.entity.Icon;
 import java.util.Optional;
 
 /**
- * This class represents a activity asset.
+ * This class represents an activity asset.
  */
 public interface ActivityAssets {
 

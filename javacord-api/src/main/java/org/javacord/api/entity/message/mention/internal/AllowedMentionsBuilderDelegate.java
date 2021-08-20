@@ -27,14 +27,14 @@ public interface AllowedMentionsBuilderDelegate {
     void setMentionUsers(boolean value);
 
     /**
-     * Adds an user to the mentions list which should be mentioned if mentioned.
+     * Adds a user to the mentions list which should be mentioned if mentioned.
      *
      * @param userId Whether the message mentions the mentioned user.
      */
     void addUser(long userId);
 
     /**
-     * Adds an user to the mentions list which should be mentioned if mentioned.
+     * Adds a user to the mentions list which should be mentioned if mentioned.
      *
      * @param userId Whether the message mentions the mentioned user.
      */
@@ -69,14 +69,14 @@ public interface AllowedMentionsBuilderDelegate {
     void addRoles(Collection<Long> roleIds);
 
     /**
-     * Removes an user from the mentions list if previously added.
+     * Removes a user from the mentions list if previously added.
      *
      * @param userId The id of the user which should be removed from the list.
      */
     void removeUser(long userId);
 
     /**
-     * Removes an user from the mentions list if previously added.
+     * Removes a user from the mentions list if previously added.
      *
      * @param userId The id of the user which should be removed from the list.
      */

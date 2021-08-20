@@ -15,7 +15,7 @@ public class UnicodeEmojiImpl implements Emoji {
     /**
      * A static map which contains all unicode emojis.
      */
-    // Can be static, because unicode emojis are really unique, even for different discord accounts/shards.
+    // Can be static, because unicode emojis are unique, even for different discord accounts/shards.
     private static final ConcurrentHashMap<String, UnicodeEmojiImpl> unicodeEmojis = new ConcurrentHashMap<>();
 
     /**

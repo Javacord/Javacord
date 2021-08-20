@@ -51,7 +51,7 @@ public class SlashCommandOptionBuilder {
     /**
      * Sets if the slash command option is required.
      *
-     * @param required Whether or not the option is required.
+     * @param required Whether the option is required.
      * @return The current instance in order to chain call methods.
      */
     public SlashCommandOptionBuilder setRequired(boolean required) {
@@ -60,7 +60,7 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Adds an choice for the slash command option.
+     * Adds a choice for the slash command option.
      *
      * @param choice The choice.
      * @return The current instance in order to chain call methods.
@@ -71,7 +71,7 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Adds an string choice for the slash command option.
+     * Adds a string choice for the slash command option.
      *
      * @param name The name of the choice.
      * @param value The value of the choice.
@@ -106,7 +106,7 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Adds an slash command option to the slash command option.
+     * Adds a slash command option to the slash command option.
      *
      * @param option The option.
      * @return The current instance in order to chain call methods.

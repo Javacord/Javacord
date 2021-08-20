@@ -239,7 +239,7 @@ public interface Button extends LowLevelComponent {
 
     /**
      * Create a new button with the blurple primary style and the given emoji.
-     * If you want to use an unicode emoji, use {@link Button#primary(String, String, String)} instead
+     * If you want to use a unicode emoji, use {@link Button#primary(String, String, String)} instead
      * and pass {@code null} as your label.
      * This is a convenience shorthand method.
      *
@@ -253,7 +253,7 @@ public interface Button extends LowLevelComponent {
 
     /**
      * Create a new button with the blurple primary style and the given emoji.
-     * If you want to use an unicode emoji, use {@link Button#primary(String, String, String, boolean)} instead
+     * If you want to use a unicode emoji, use {@link Button#primary(String, String, String, boolean)} instead
      * and pass {@code null} as your label.
      * This is a convenience shorthand method.
      *

@@ -73,7 +73,7 @@ public abstract class EventDispatcherBase {
 
     /**
      * A map with all running listeners as its key. The value contains an array where the first element is a long
-     * with the start time of the listener (using {@link System#nanoTime()} and the second element is the object
+     * with the start time of the listener (using {@link System#nanoTime()}) and the second element is the object
      * of the listener (usually a server).
      */
     private final Map<AtomicReference<Future<?>>, Object[]> activeListeners =

@@ -36,7 +36,7 @@ public class BlockingReference<V> {
     /**
      * Checks whether this reference currently holds a value.
      *
-     * @return Whether or not this reference currently holds a value.
+     * @return Whether this reference currently holds a value.
      */
     public boolean hasValue() {
         return value != null;

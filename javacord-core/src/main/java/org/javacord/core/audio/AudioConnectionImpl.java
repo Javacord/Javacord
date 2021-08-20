@@ -231,7 +231,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     /**
      * Sets whether the connection is priority speaking.
      *
-     * @param prioritySpeaking Whether or not to speak with priority.
+     * @param prioritySpeaking Whether to speak with priority.
      */
     public void setPrioritySpeaking(boolean prioritySpeaking) {
         EnumSet<SpeakingFlag> newSpeakingFlags = speakingFlags.clone();

@@ -78,7 +78,7 @@ public class DiscordRegexPattern {
                             + ">                   # '>' \n");
 
     /**
-     * A pattern which checks for message links (e.g. {@code https://discord.com/channels/@me/1234/5678}
+     * A pattern which checks for message links (e.g. {@code https://discord.com/channels/@me/1234/5678})
      */
     public static final Pattern MESSAGE_LINK =
             Pattern.compile("(?x)                               # enable comment mode \n"
@@ -93,7 +93,7 @@ public class DiscordRegexPattern {
                             + "(?<message>[0-9]++)              # the message id as named group \n");
 
     /**
-     * A pattern which checks for webhook urls (e.g. {@code https://discord.com/api/webhooks/1234/abcd}
+     * A pattern which checks for webhook urls (e.g. {@code https://discord.com/api/webhooks/1234/abcd})
      */
     public static final Pattern WEBHOOK_URL =
             Pattern.compile("(?x)                                   # enable comment mode \n"

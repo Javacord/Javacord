@@ -34,8 +34,8 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
      * Sends the first response message.
      * This can only be done once after you want to respond to an interaction the FIRST time.
      * Responding directly to an interaction limits you to not being able to upload anything.
-     * Therefore, i.e. {@link EmbedBuilder#setFooter(String, File)} will not work, and you have to use the
-     * String methods for attachments like {@link EmbedBuilder#setFooter(String, String)} if available.
+     * Therefore i.e. {@link EmbedBuilder#setFooter(String, File)} will not work and you have to use the String methods
+     * for attachments like {@link EmbedBuilder#setFooter(String, String)} if available.
      * If you want to upload attachments use {@link #editOriginalResponse(InteractionBase)} instead.
      *
      * @param interaction The interaction.

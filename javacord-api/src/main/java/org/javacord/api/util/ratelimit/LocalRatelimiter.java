@@ -27,7 +27,7 @@ import java.time.Duration;
  * <li>{@code 25} request per {@code 1 sec}
  *     ({@code amount = 25} and {@code bucketDuration = Duration.ofMillis((long) Math.ceil(25000D / 25D))}).
  * </ul>
- * Choosing a lower {@code amount} increases the maximum throughput but can limits your ability to perform actions
+ * Choosing a lower {@code amount} increases the maximum throughput but can limit your ability to perform actions
  * in bulk.
  *
  * @see <a href="https://javacord.org/wiki/advanced-topics/ratelimits.html">Related wiki article</a>

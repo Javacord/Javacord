@@ -123,7 +123,7 @@ public class AudioUdpSocket {
                         dontSleep = true;
 
                         // Dispatch AudioSourceFinishedEvent AFTER removing the source.
-                        // Otherwise AudioSourceFinishedEvent#getNextSource() won't work
+                        // Otherwise, AudioSourceFinishedEvent#getNextSource() won't work
                         api.getEventDispatcher().dispatchAudioSourceFinishedEvent(
                                 (ServerImpl) connection.getServer(),
                                 connection,

@@ -44,7 +44,7 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     }
 
     /**
-     * If the author is a user, gets the discriminated name of the user, e. g. {@code Bastian#8222},
+     * If the author is a user, gets the discriminated name of the user, e.g. {@code Bastian#8222},
      * otherwise just gets the name of the author.
      *
      * @return The discriminated name of the user or the name of the author.
@@ -68,7 +68,7 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     Icon getAvatar();
 
     /**
-     * Gets the voice channel this MessageAuthor (if it is an User)
+     * Gets the voice channel this MessageAuthor (if it is a User)
      * is connected to on the server where the message has been sent.
      *
      * @return The server voice channel the MessageAuthor is connected to.
@@ -268,7 +268,7 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
 
     /**
      * Checks if the author can kick the user from the server where the message was sent.
-     * This methods also considers the position of the user roles.
+     * This method also considers the position of the user roles.
      * Always returns {@code false} if the author is not a user or the message was not sent on a server.
      *
      * @param userToKick The user which should be kicked.
@@ -296,7 +296,7 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
 
     /**
      * Checks if the author can ban the user from the server where the message was sent.
-     * This methods also considers the position of the user roles.
+     * This method also considers the position of the user roles.
      * Always returns {@code false} if the author is not a user or the message was not sent on a server.
      *
      * @param userToBan The user which should be banned.

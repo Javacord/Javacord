@@ -23,7 +23,7 @@ public interface CertainMessageEvent extends MessageEvent {
     /**
      * Checks if the event's message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
      *
-     * @return Whether or not the event's message was sent in a private channel.
+     * @return Whether the event's message was sent in a private channel.
      * @see Message#isPrivateMessage()
      */
     default boolean isPrivateMessage() {
@@ -33,7 +33,7 @@ public interface CertainMessageEvent extends MessageEvent {
     /**
      * Checks if the event's message was sent in a {@link ChannelType#SERVER_TEXT_CHANNEL server channel}.
      *
-     * @return Whether or not the event's message was sent in a server channel.
+     * @return Whether the event's message was sent in a server channel.
      * @see Message#isServerMessage()
      */
     default boolean isServerMessage() {
@@ -43,7 +43,7 @@ public interface CertainMessageEvent extends MessageEvent {
     /**
      * Checks if the event's message was sent in a {@link ChannelType#GROUP_CHANNEL group channel}.
      *
-     * @return Whether or not the event's message was sent in a group channel.
+     * @return Whether the event's message was sent in a group channel.
      * @see Message#isPrivateMessage()
      */
     default boolean isGroupMessage() {
