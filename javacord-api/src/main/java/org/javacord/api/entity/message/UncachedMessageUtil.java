@@ -4,8 +4,6 @@ import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.UncachedMessageAttachableListenerManager;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -145,15 +143,11 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param embed     The new embed of the message.
-     * @param embeds    One or more new embeds of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> edit(long channelId, long messageId, EmbedBuilder embed,
-                                            EmbedBuilder... embeds) {
-        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
-        embedBuilders.add(embed);
-        return edit(channelId, messageId, embedBuilders);
+    default CompletableFuture<Message> edit(long channelId, long messageId, EmbedBuilder... embeds) {
+        return edit(channelId, messageId, Arrays.asList(embeds));
     }
 
     /**
@@ -171,15 +165,11 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
-     * @param embed     The new embed of the message.
-     * @param embeds    One or more new embeds of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> edit(String channelId, String messageId, EmbedBuilder embed,
-                                            EmbedBuilder... embeds) {
-        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
-        embedBuilders.add(embed);
-        return edit(channelId, messageId, embedBuilders);
+    default CompletableFuture<Message> edit(String channelId, String messageId, EmbedBuilder... embeds) {
+        return edit(channelId, messageId, Arrays.asList(embeds));
     }
 
     /**
@@ -198,15 +188,11 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param content   The new content of the message.
-     * @param embed     The new embed of the message.
-     * @param embeds    One or more new embeds of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> edit(long channelId, long messageId, String content, EmbedBuilder embed,
-                                            EmbedBuilder... embeds) {
-        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
-        embedBuilders.add(embed);
-        return edit(channelId, messageId, content, embedBuilders);
+    default CompletableFuture<Message> edit(long channelId, long messageId, String content, EmbedBuilder... embeds) {
+        return edit(channelId, messageId, content, embeds);
     }
 
     /**
@@ -226,15 +212,12 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param content   The new content of the message.
-     * @param embed     The new embed of the message.
-     * @param embeds    One or more new embeds of the message.
+     * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> edit(String channelId, String messageId, String content, EmbedBuilder embed,
+    default CompletableFuture<Message> edit(String channelId, String messageId, String content,
                                             EmbedBuilder... embeds) {
-        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
-        embedBuilders.add(embed);
-        return edit(channelId, messageId, content, embedBuilders);
+        return edit(channelId, messageId, content, embeds);
     }
 
     /**

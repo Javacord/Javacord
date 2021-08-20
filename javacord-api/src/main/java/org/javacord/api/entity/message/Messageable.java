@@ -2,10 +2,8 @@ package org.javacord.api.entity.message;
 
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -115,14 +113,12 @@ public interface Messageable {
      * Sends a message.
      *
      * @param content The content of the message.
-     * @param embed   The embed which should be displayed.
-     * @param embeds  One or more additional embeds which should be displayed.
+     * @param embeds  An array of the new embeds of the message.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, EmbedBuilder... embeds) {
+    default CompletableFuture<Message> sendMessage(String content, EmbedBuilder... embeds) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
-                .setEmbed(embed)
                 .addEmbeds(embeds)
                 .send(this);
     }
@@ -181,14 +177,11 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param embed  The embed which should be displayed.
-     * @param embeds One or more additional embeds new embed of the message.
+     * @param embeds An array of the new embeds of the message.
      * @return The sent message.
      */
-    default CompletableFuture<Message> sendMessage(EmbedBuilder embed, EmbedBuilder... embeds) {
-        List<EmbedBuilder> embedBuilders = new ArrayList<>(Arrays.asList(embeds));
-        embedBuilders.add(embed);
-        return sendMessage(embedBuilders);
+    default CompletableFuture<Message> sendMessage(EmbedBuilder... embeds) {
+        return sendMessage(Arrays.asList(embeds));
     }
 
     /**
