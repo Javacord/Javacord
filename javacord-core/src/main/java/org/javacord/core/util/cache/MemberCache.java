@@ -94,6 +94,7 @@ public class MemberCache {
         return new MemberCache(
                 cache.removeElement(member),
                 userCache.getUserById(member.getId())
+                        .filter(user -> getMembersById(user.getId()).size() <= 1)
                         .map(userCache::removeUser)
                         .orElse(userCache),
                 memberServerTuple == null ? memberServerCache : memberServerCache.removeElement(memberServerTuple)
