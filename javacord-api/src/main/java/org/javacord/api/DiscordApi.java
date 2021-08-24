@@ -104,7 +104,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<List<SlashCommand>> getGlobalSlashCommands();
 
     /**
-     * Gets an slash command by its id.
+     * Gets a slash command by its id.
      *
      * @param commandId The id of the slash command.
      * @return The slash command with the given id.
