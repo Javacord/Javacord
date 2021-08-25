@@ -61,8 +61,10 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         switch (type) {
             case SUB_COMMAND:
             case SUB_COMMAND_GROUP:
-                for (JsonNode optionJson : jsonData.get("options")) {
-                    options.add(new SlashCommandInteractionOptionImpl(api, optionJson));
+                if (jsonData.has("options") && jsonData.get("options").isArray()) {
+                    for (JsonNode optionJson : jsonData.get("options")) {
+                        options.add(new SlashCommandInteractionOptionImpl(api, optionJson));
+                    }
                 }
                 break;
             case STRING:
