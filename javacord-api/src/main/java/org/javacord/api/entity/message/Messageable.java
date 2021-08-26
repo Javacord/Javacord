@@ -177,6 +177,16 @@ public interface Messageable {
     /**
      * Sends a message.
      *
+     * @param embed The new embed of the message.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(EmbedBuilder embed) {
+        return sendMessage(Collections.singletonList(embed));
+    }
+
+    /**
+     * Sends a message.
+     *
      * @param embeds An array of the new embeds of the message.
      * @return The sent message.
      */
