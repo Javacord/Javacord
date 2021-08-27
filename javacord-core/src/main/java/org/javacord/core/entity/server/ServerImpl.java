@@ -285,7 +285,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public ServerImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
-        ready = !api.hasUserCacheEnabled() || !api.isWaitingForUsersOnStartup();
+        ready = !api.isUserCacheEnabled() || !api.isWaitingForUsersOnStartup();
 
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
@@ -400,7 +400,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         if (
                 (isLarge() || !api.getIntents().contains(Intent.GUILD_PRESENCES))
                 && getMembers().size() < getMemberCount()
-                && api.hasUserCacheEnabled()
+                && api.isUserCacheEnabled()
         ) {
             api.getWebSocketAdapter().queueRequestGuildMembers(this);
         }
@@ -1270,7 +1270,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public Set<User> getMembers() {
-        return api.getEntityCache().get().getMemberCache()
+        return api.getMemberCache()
                 .getMembersByServer(getId())
                 .stream()
                 .map(Member::getUser)
@@ -1283,13 +1283,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * @return The real members.
      */
     public Set<Member> getRealMembers() {
-        return api.getEntityCache().get().getMemberCache()
+        return api.getMemberCache()
                 .getMembersByServer(getId());
     }
 
     @Override
     public Optional<User> getMemberById(long id) {
-        return api.getEntityCache().get().getMemberCache()
+        return api.getMemberCache()
                 .getMemberByIdAndServer(id, getId())
                 .map(Member::getUser);
     }
@@ -1301,13 +1301,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * @return The real member.
      */
     public Optional<Member> getRealMemberById(long userId) {
-        return api.getEntityCache().get().getMemberCache()
+        return api.getMemberCache()
                 .getMemberByIdAndServer(userId, getId());
     }
 
     @Override
     public boolean isMember(User user) {
-        return api.getEntityCache().get().getMemberCache()
+        return api.getMemberCache()
                 .getMemberByIdAndServer(user.getId(), getId())
                 .isPresent();
     }

@@ -237,14 +237,14 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     @Override
     public Set<Server> getMutualServers() {
         if (api.isUserCacheEnabled()) {
-            return api.getEntityCache().get().getMemberCache().getServers(getId());
+            return api.getMemberCache().getServers(getId());
         }
         return member == null ? Collections.emptySet() : Collections.singleton(member.getServer());
     }
 
     @Override
     public String getDisplayName(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.getNickname(this).orElseGet(this::getName);
         } else {
             return member.getNickname().orElse(getName());
@@ -253,7 +253,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     @Override
     public Optional<String> getNickname(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.getNickname(this);
         } else {
             return member.getNickname();
@@ -262,7 +262,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     @Override
     public boolean isPending(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.isPending(getId());
         } else {
             return member.isPending();
@@ -271,7 +271,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     @Override
     public boolean isSelfMuted(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.isSelfMuted(getId());
         } else {
             return member.isSelfMuted();
@@ -280,7 +280,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     @Override
     public boolean isSelfDeafened(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.isSelfDeafened(getId());
         } else {
             return member.isSelfDeafened();
@@ -289,7 +289,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     @Override
     public Optional<Instant> getJoinedAtTimestamp(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.getJoinedAtTimestamp(this);
         } else {
             return Optional.of(member.getJoinedAtTimestamp());
@@ -298,7 +298,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     @Override
     public List<Role> getRoles(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.getRoles(this);
         } else {
             return member.getRoles();
@@ -307,7 +307,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     @Override
     public Optional<Color> getRoleColor(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+        if (api.isUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.getRoleColor(this);
         } else {
             return member.getRoleColor();

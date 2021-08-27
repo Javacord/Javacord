@@ -5,6 +5,7 @@ import okhttp3.Credentials
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.test.appender.ListAppender
 import org.javacord.api.AccountType
+import org.javacord.api.entity.intent.Intent
 import org.javacord.api.entity.server.Server
 import org.javacord.api.exception.NotFoundException
 import org.javacord.test.MockProxyManager
@@ -22,7 +23,9 @@ import java.util.concurrent.CompletionException
 class DiscordApiImplTest extends Specification {
 
     @Subject
-    def api = new DiscordApiImpl(null, null, null, null, null, null, false)
+    def api = new DiscordApiImpl(AccountType.BOT, null, 0, 1,
+            Collections.unmodifiableSet(new HashSet<Intent>(Collections.singleton(Intent.GUILD_MEMBERS))), true, false,
+            true, null, null, null, null, null, false, null, null, Collections.emptyMap(), Collections.emptyList(), true)
 
     def 'getAllServers returns all servers'() {
         given:

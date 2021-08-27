@@ -74,6 +74,7 @@ import org.javacord.core.interaction.SlashCommandPermissionsImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.cache.JavacordEntityCache;
+import org.javacord.core.util.cache.MemberCache;
 import org.javacord.core.util.concurrent.ThreadPoolImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.event.EventDispatcher;
@@ -315,6 +316,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * The time offset between the Discord time and our local time.
      */
     private volatile Long timeOffset = null;
+
+    /**
+     * Whether the code requirements for an activated cache are met.
+     */
+    private final boolean isCacheProperlyActivated;
 
     /**
      * An immutable cache with all Javacord entities.
@@ -590,6 +596,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             throw new IllegalArgumentException("Cannot wait for users when GUILD_MEMBERS intent is not set!");
         }
 
+        isCacheProperlyActivated = intents.contains(Intent.GUILD_MEMBERS) && userCacheEnabled;
+
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
                 .addInterceptor(chain -> chain.proceed(chain.request()
                         .newBuilder()
@@ -706,12 +714,21 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
-     * Checks if the user cache is enabled.
+     * Gets the member cache.
      *
-     * @return Whether the user cache is enabled.
+     * @return The member cache.
      */
-    public boolean hasUserCacheEnabled() {
-        return userCacheEnabled;
+    public MemberCache getMemberCache() {
+        if (isCacheProperlyActivated) {
+            return entityCache.get().getMemberCache();
+        }
+        throw new IllegalStateException(String.format("Cannot return a result because the member cache is disabled"
+                        + " because one or more conditions are not met:\n"
+                        + "GUILD_MEMBERS intent set on login: %s -> if false add when logging in "
+                        + "DiscordApiBuilder#addIntents(Intent.GUILD_MEMBERS)\n"
+                        + "The user cache is explicitly enabled: %s -> if false set when logging in "
+                        + "DiscordApiBuilder#setUserCacheEnabled(true)",
+                getIntents().contains(Intent.GUILD_MEMBERS), isUserCacheEnabled()));
     }
 
     /**
@@ -1781,12 +1798,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public Collection<User> getCachedUsers() {
-        return getEntityCache().get().getMemberCache().getUserCache().getUsers();
+        return getMemberCache().getUserCache().getUsers();
     }
 
     @Override
     public Optional<User> getCachedUserById(long id) {
-        return getEntityCache().get().getMemberCache().getUserCache().getUserById(id);
+        return getMemberCache().getUserCache().getUserById(id);
     }
 
     @Override
