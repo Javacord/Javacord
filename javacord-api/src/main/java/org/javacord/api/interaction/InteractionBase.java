@@ -61,7 +61,7 @@ public interface InteractionBase extends DiscordEntity {
 
     /**
      * Create a message builder to send follow-up messages for this interaction.
-     * You can send, edit and delete follow-up messages to 15 minutes after you received the interaction.
+     * You can send, edit and delete follow-up messages for up to 15 minutes after you received the interaction.
      *
      * @return The new message builder.
      */
