@@ -53,7 +53,7 @@ public interface InteractionBase extends DiscordEntity {
      * Please note that you can only actually update this loading state message within 15 minutes after receiving the
      * interaction.
      *
-     * @param ephemeral weather or not the response should be ephemeral
+     * @param ephemeral Whether the response should be ephemeral
      * @return A CompletableFuture that completes as soon as the acknowledgement has been sent; it yields an updater
      *     that should be used to update the message later on.
      */
