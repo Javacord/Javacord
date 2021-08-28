@@ -22,7 +22,7 @@ public interface SlashCommandPermissions {
     /**
      * Whether this permission is enabled or disabled for the slash command permissions.
      *
-     * @return True if the command is enabled for this user or role otherwise, false.
+     * @return True if the command is enabled for this user or role, otherwise false.
      */
     boolean getPermission();
 

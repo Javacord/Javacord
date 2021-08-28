@@ -354,7 +354,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Mutes this user on the given server.
      *
-     * @param server The server to unmute this user on.
+     * @param server The server to mute this user on.
      * @return A future to check if the mute was successful.
      */
     default CompletableFuture<Void> mute(Server server) {
@@ -364,7 +364,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Mutes this user on the given server.
      *
-     * @param server The server to unmute this user on.
+     * @param server The server to mute this user on.
      * @param reason The audit log reason for this action.
      * @return A future to check if the mute was successful.
      */
