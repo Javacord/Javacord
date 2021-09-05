@@ -24,6 +24,7 @@ import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
 import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
 import org.javacord.core.event.user.UserChangePendingEventImpl;
+import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -133,7 +134,10 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                 .collect(Collectors.toSet());
                         api.forEachCachedMessageWhere(
                                 msg -> unreadableChannels.contains(msg.getChannel().getId()),
-                                msg -> api.removeMessageFromCache(msg.getId())
+                                msg -> {
+                                    api.removeMessageFromCache(msg.getId());
+                                    ((MessageCacheImpl) msg.getChannel().getMessageCache()).removeMessage(msg);
+                                }
                         );
                     }
 

@@ -10,6 +10,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
@@ -41,6 +42,7 @@ import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicE
 import org.javacord.core.event.channel.server.voice.ServerStageVoiceChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeBitrateEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEventImpl;
+import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -257,7 +259,10 @@ public class ChannelUpdateHandler extends PacketHandler {
         if (areYouAffected.get() && !channel.canYouSee()) {
             api.forEachCachedMessageWhere(
                     msg -> msg.getChannel().getId() == channelId,
-                    msg -> api.removeMessageFromCache(msg.getId())
+                    msg -> {
+                        api.removeMessageFromCache(msg.getId());
+                        ((MessageCacheImpl) ((TextChannel) channel).getMessageCache()).removeMessage(msg);
+                    }
             );
         }
     }
