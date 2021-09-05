@@ -1,7 +1,6 @@
 package org.javacord.core.util.cache;
 
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
@@ -77,13 +76,14 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
     /**
      * Creates a new message cache.
      *
-     * @param api The discord api instance.
-     * @param capacity The capacity of the cache, not including messages which are cached forever.
-     * @param storageTimeInSeconds The storage time in seconds.
+     * @param api                     The discord api instance.
+     * @param capacity                The capacity of the cache, not including messages which are cached forever.
+     * @param storageTimeInSeconds    The storage time in seconds.
      * @param automaticCleanupEnabled Whether automatic message cache cleanup is enabled.
      */
-    public MessageCacheImpl(DiscordApi api, int capacity, int storageTimeInSeconds, boolean automaticCleanupEnabled) {
-        this.api = (DiscordApiImpl) api;
+    public MessageCacheImpl(DiscordApiImpl api, int capacity, int storageTimeInSeconds,
+                            boolean automaticCleanupEnabled) {
+        this.api = api;
         this.capacity = capacity;
         this.storageTimeInSeconds = storageTimeInSeconds;
 
@@ -91,22 +91,25 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
 
         // After minimum JDK 9 is required this can be switched to use a Cleaner
         messagesCleanupFuture = api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+            api.getMessageCacheLock().lock();
             try {
                 int removedMessages = 0;
                 for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                         messageRef != null;
-                         messageRef = messagesCleanupQueue.poll()) {
+                        messageRef != null;
+                        messageRef = messagesCleanupQueue.poll()) {
                     messages.remove(messageRef);
                     removedMessages++;
                 }
                 if (removedMessages > 0) {
                     logger.warn("Heap memory was too low to hold all configured messages in the cache. "
-                                + "Removed {} messages from the cache due to memory shortage. "
-                                + "Either increase your heap settings or decrease your message cache settings!",
-                                removedMessages);
+                                    + "Removed {} messages from the cache due to memory shortage. "
+                                    + "Either increase your heap settings or decrease your message cache settings!",
+                            removedMessages);
                 }
             } catch (Throwable t) {
                 logger.error("Failed to clean softly referenced messages!", t);
+            } finally {
+                api.getMessageCacheLock().unlock();
             }
         }, 30, 30, TimeUnit.SECONDS);
     }
@@ -117,7 +120,8 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
      * @param message The message to add.
      */
     public void addMessage(Message message) {
-        synchronized (messages) {
+        api.getMessageCacheLock().lock();
+        try {
             api.addMessageToCache(message);
             if (messages.stream().map(Reference::get).anyMatch(message::equals)) {
                 return;
@@ -130,6 +134,8 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
                 pos = -pos - 1;
             }
             messages.add(pos, messageRef);
+        } finally {
+            api.getMessageCacheLock().unlock();
         }
     }
 
@@ -157,8 +163,11 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
      * @param message The message to remove.
      */
     public void removeMessage(Message message) {
-        synchronized (messages) {
+        api.getMessageCacheLock().lock();
+        try {
             messages.removeIf(messageRef -> Objects.equals(messageRef.get(), message));
+        } finally {
+            api.getMessageCacheLock().unlock();
         }
     }
 
@@ -167,7 +176,8 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
      */
     public void clean() {
         Instant minAge = Instant.now().minus(storageTimeInSeconds, ChronoUnit.SECONDS);
-        synchronized (messages) {
+        api.getMessageCacheLock().lock();
+        try {
             messages.removeIf(messageRef -> Optional.ofNullable(messageRef.get())
                     .map(message -> !message.isCachedForever() && message.getCreationTimestamp().isBefore(minAge))
                     .orElse(true));
@@ -177,11 +187,13 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
                     .filter(Message::isCachedForever)
                     .count();
             messages.removeAll(messages.stream()
-                                       .filter(messageRef -> Optional.ofNullable(messageRef.get())
-                                               .map(message -> !message.isCachedForever())
-                                               .orElse(true))
-                                       .limit(Math.max(0, messages.size() - capacity - foreverCachedAmount))
-                                       .collect(Collectors.toList()));
+                    .filter(messageRef -> Optional.ofNullable(messageRef.get())
+                            .map(message -> !message.isCachedForever())
+                            .orElse(true))
+                    .limit(Math.max(0, messages.size() - capacity - foreverCachedAmount))
+                    .collect(Collectors.toList()));
+        } finally {
+            api.getMessageCacheLock().unlock();
         }
     }
 
