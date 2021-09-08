@@ -10,7 +10,7 @@ import org.javacord.api.listener.user.UserAttachableListener;
 /**
  * This listener listens to server member leaves.
  * Do not confuse it with the {@link ServerLeaveListener}:
- * ServerMemberRemoveListener is for other users and ServerLeaveListener is for yourself!
+ * {@code ServerMemberLeaveListener} is for other users and {@code ServerLeaveListener} is for yourself!
  */
 @FunctionalInterface
 public interface ServerMemberLeaveListener extends ServerAttachableListener, UserAttachableListener,
