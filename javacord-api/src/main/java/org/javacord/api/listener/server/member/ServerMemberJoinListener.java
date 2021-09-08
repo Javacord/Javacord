@@ -10,7 +10,7 @@ import org.javacord.api.listener.user.UserAttachableListener;
 /**
  * This listener listens to server member joins.
  * Do not confuse it with the {@link ServerJoinListener}:
- * ServerMemberAddListener is for other users and ServerJoinListener is for yourself!
+ * {@code ServerMemberJoinListener} is for other users and {@code ServerJoinListener} is for yourself!
  */
 @FunctionalInterface
 public interface ServerMemberJoinListener extends ServerAttachableListener, UserAttachableListener,
