@@ -6,55 +6,65 @@ package org.javacord.api.entity.permission;
 public enum PermissionType {
 
     // general
-    CREATE_INSTANT_INVITE(0x00000001),
-    KICK_MEMBERS(0x00000002),
-    BAN_MEMBERS(0x00000004),
-    ADMINISTRATOR(0x00000008),
-    MANAGE_CHANNELS(0x00000010),
-    MANAGE_SERVER(0x00000020),
-    ADD_REACTIONS(0x00000040),
-    VIEW_AUDIT_LOG(0x00000080),
+    CREATE_INSTANT_INVITE(0x0000000001L),
+    KICK_MEMBERS(0x0000000002L),
+    BAN_MEMBERS(0x0000000004L),
+    ADMINISTRATOR(0x0000000008L),
+    MANAGE_CHANNELS(0x0000000010L),
+    MANAGE_SERVER(0x0000000020L),
+    ADD_REACTIONS(0x0000000040L),
+    VIEW_AUDIT_LOG(0x0000000080L),
+    VIEW_SERVER_INSIGHTS(0x0000080000L), //VIEW_GUILD_INSIGHTS
 
     // chat
-    READ_MESSAGES(0x00000400),
-    SEND_MESSAGES(0x00000800),
-    SEND_TTS_MESSAGES(0x00001000),
-    MANAGE_MESSAGES(0x00002000),
-    EMBED_LINKS(0x00004000),
-    ATTACH_FILE(0x00008000),
-    READ_MESSAGE_HISTORY(0x00010000),
-    MENTION_EVERYONE(0x00020000),
-    USE_EXTERNAL_EMOJIS(0x00040000),
+    READ_MESSAGES(0x0000000400L), //VIEW_CHANNEL
+    SEND_MESSAGES(0x0000000800L),
+    SEND_TTS_MESSAGES(0x0000001000L),
+    MANAGE_MESSAGES(0x0000002000L),
+    EMBED_LINKS(0x0000004000L),
+    ATTACH_FILE(0x0000008000L),
+    READ_MESSAGE_HISTORY(0x0000010000L),
+    MENTION_EVERYONE(0x0000020000L),
+    USE_EXTERNAL_EMOJIS(0x0000040000L),
+    USE_EXTERNAL_STICKERS(0x2000000000L),
 
     // voice
-    CONNECT(0x00100000),
-    SPEAK(0x00200000),
-    MUTE_MEMBERS(0x00400000),
-    DEAFEN_MEMBERS(0x00800000),
-    MOVE_MEMBERS(0x01000000),
-    USE_VOICE_ACTIVITY(0x02000000),
-    PRIORITY_SPEAKER(0x00000100),
-    STREAM(0x00000200),
+    CONNECT(0x0000100000L),
+    SPEAK(0x0000200000L),
+    MUTE_MEMBERS(0x0000400000L),
+    DEAFEN_MEMBERS(0x0000800000L),
+    MOVE_MEMBERS(0x0001000000L),
+    USE_VOICE_ACTIVITY(0x0002000000L), //USE_VAD
+    PRIORITY_SPEAKER(0x0000000100L),
+    STREAM(0x0000000200L),
+    REQUEST_TO_SPEAK(0x0100000000L),
+
+    //threads
+    MANAGE_THREADS(0x0400000000L),
+    USE_PUBLIC_THREADS(0x0800000000L),
+    USE_PRIVATE_THREADS(0x1000000000L),
+
 
     // misc
-    CHANGE_NICKNAME(0x04000000),
-    MANAGE_NICKNAMES(0x08000000),
-    MANAGE_ROLES(0x10000000),
-    MANAGE_WEBHOOKS(0x20000000),
-    MANAGE_EMOJIS(0x40000000),
-    USE_SLASH_COMMANDS(0x80000000);
+    CHANGE_NICKNAME(0x0004000000L),
+    MANAGE_NICKNAMES(0x0008000000L),
+    MANAGE_ROLES(0x0010000000L),
+    MANAGE_WEBHOOKS(0x0020000000L),
+    MANAGE_EMOJIS(0x0040000000L), //MANAGE_EMOJIS_AND_STICKERS
+    USE_SLASH_COMMANDS(0x0080000000L); //USE_APPLICATION_COMMANDS
+
 
     /**
-     * The value of the permission. An integer where only one bit is set (e.g. <code>0b1000</code>).
+     * The value of the permission. A long where only one bit is set (e.g. <code>0b1000</code>).
      */
-    private final int value;
+    private final long value;
 
     /**
      * Creates a new permission type.
      *
      * @param value The value of the permission type.
      */
-    PermissionType(int value) {
+    PermissionType(long value) {
         this.value = value;
     }
 
@@ -63,35 +73,35 @@ public enum PermissionType {
      *
      * @return The value.
      */
-    public int getValue() {
+    public long getValue() {
         return value;
     }
 
     /**
      * Checks if the permission is "included" in the given long.
      *
-     * @param i The long to check.
+     * @param l The long to check.
      * @return Whether the permission is "included" or not.
      */
-    public boolean isSet(long i) {
-        return (i & getValue()) != 0;
+    public boolean isSet(long l) {
+        return (l & getValue()) != 0;
     }
 
     /**
      * Sets or unsets the type for the given long.
      *
-     * @param i The long to change.
+     * @param l The long to change.
      * @param set Whether the type should be set or not.
      * @return The changed long.
      */
-    public long set(long i, boolean set) {
-        if (set && !isSet(i)) {
-            return i + getValue();
+    public long set(long l, boolean set) {
+        if (set && !isSet(l)) {
+            return l + getValue();
         }
-        if (!set && isSet(i)) {
-            return i - getValue();
+        if (!set && isSet(l)) {
+            return l - getValue();
         }
-        return i;
+        return l;
     }
 
 }
