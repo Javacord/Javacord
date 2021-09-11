@@ -43,7 +43,7 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
      *
      * @return The raw position of the channel.
      */
-    int getRawPosition();
+    Integer getRawPosition();
 
     /**
      * Gets the real position of the channel.
@@ -105,7 +105,7 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
      *     {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Void> updateRawPosition(int rawPosition) {
+    default CompletableFuture<Void> updateRawPosition(Integer rawPosition) {
         return createUpdater().setRawPosition(rawPosition).update();
     }
 

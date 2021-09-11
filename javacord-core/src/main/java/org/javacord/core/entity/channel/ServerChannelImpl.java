@@ -77,7 +77,7 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
     /**
      * The rawPosition of the channel.
      */
-    private volatile int rawPosition;
+    private volatile Integer rawPosition;
 
     /**
      * A map with all overwritten user permissions.
@@ -102,7 +102,7 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
 
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
-        rawPosition = data.get("position").asInt();
+        rawPosition = data.hasNonNull("position") ? data.get("position").asInt(0) : null;
 
         type = ChannelType.fromId(data.get("type").asInt(-1));
 
@@ -143,7 +143,7 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
      *
      * @param position The new raw position of the channel.
      */
-    public void setRawPosition(int position) {
+    public void setRawPosition(Integer position) {
         this.rawPosition = position;
     }
 
@@ -186,7 +186,7 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
     }
 
     @Override
-    public int getRawPosition() {
+    public Integer getRawPosition() {
         return rawPosition;
     }
 

@@ -1,15 +1,17 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.user.User;
+import org.javacord.api.listener.channel.ChannelThreadAttachableListenerManager;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents a channel thread.
  */
-public interface ChannelThread extends ServerTextChannel {
+public interface ChannelThread extends ServerTextChannel, ChannelThreadAttachableListenerManager {
 
     /**
      * The parent server text channel of this thread.
@@ -83,10 +85,12 @@ public interface ChannelThread extends ServerTextChannel {
     /**
      * Gets the creator of the thread.
      *
-     * @return The owner.
+     * <p>If the creator is in the cache, the creator is served from the cache.
+     *
+     * @return The creator of the thread.
      */
-    default Optional<User> getOwner() {
-        return getApi().getCachedUserById(getOwnerId());
+    default CompletableFuture<User> requestOwner() {
+        return getApi().getUserById(getOwnerId());
     }
 
     /**
@@ -95,6 +99,20 @@ public interface ChannelThread extends ServerTextChannel {
      * @return The timestamp when the thread's archive status was last changed.
      */
     Instant getArchiveTimestamp();
+
+    /**
+     * List of the members of the thread.
+     *
+     * @return The members of the current thread.
+     */
+    List<ThreadMember> getMembers();
+
+    /**
+     * Updates the member list of a thread.
+     *
+     * @param members The new member list.
+     */
+    void setMembers(List<ThreadMember> members);
 
     @Override
     default Optional<ChannelCategory> getCategory() {
