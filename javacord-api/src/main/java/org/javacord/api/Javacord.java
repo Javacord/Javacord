@@ -110,7 +110,7 @@ public class Javacord {
      * A list with all gateway versions can be found
      * <a href="https://discord.com/developers/docs/topics/gateway#gateways-gateway-versions">here</a>.
      */
-    public static final String DISCORD_GATEWAY_VERSION = "8";
+    public static final String DISCORD_GATEWAY_VERSION = "9";
 
     /**
      * The voice gateway version from Discord which we are using.

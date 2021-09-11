@@ -350,6 +350,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
                 switch (ChannelType.fromId(channel.get("type").asInt())) {
                     case SERVER_TEXT_CHANNEL:
+                    case SERVER_PUBLIC_THREAD:
+                    case SERVER_PRIVATE_THREAD:
                         getOrCreateServerTextChannel(channel);
                         break;
                     case SERVER_VOICE_CHANNEL:

@@ -18,6 +18,7 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
@@ -1944,6 +1945,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Collection<ServerTextChannel> getServerTextChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_TEXT_CHANNEL);
+    }
+
+    @Override
+    public Collection<ChannelThread> getChannelPrivateThreads() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD);
+    }
+
+    @Override
+    public Collection<ChannelThread> getChannelPublicThreads() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PUBLIC_THREAD);
     }
 
     @Override
