@@ -3,6 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 
@@ -60,6 +61,11 @@ public class ChannelThreadImpl extends ServerTextChannelImpl implements ChannelT
     private final Instant archiveTimestamp;
 
     /**
+     An indication of whether a user has joined a thread or not.
+     */
+    private final ThreadMember member;
+
+    /**
      * Creates a new server text channel object.
      *
      * @param api The discord api instance.
@@ -76,6 +82,7 @@ public class ChannelThreadImpl extends ServerTextChannelImpl implements ChannelT
         defaultAutoArchiveDuration = data.has("default_auto_archive_duration")
                 ? data.get("default_auto_archive_duration").asInt(60)
                 : 60;
+        member = data.hasNonNull("member") ? (ThreadMember)data.get("member") : null;
 
         JsonNode threadMetadata = data.get("thread_metadata");
         autoArchiveDuration = threadMetadata.hasNonNull("auto_archive_duration")
@@ -134,4 +141,7 @@ public class ChannelThreadImpl extends ServerTextChannelImpl implements ChannelT
     public Instant getArchiveTimestamp() {
         return archiveTimestamp;
     }
+
+    @Override
+    public ThreadMember getMember() {return member;}
 }

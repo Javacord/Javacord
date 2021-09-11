@@ -96,6 +96,13 @@ public interface ChannelThread extends ServerTextChannel {
      */
     Instant getArchiveTimestamp();
 
+    /**
+     * Thread member object for the current user, if they have joined the thread.
+     *
+     * @return The thread member object for the current user.
+     */
+    ThreadMember getMember();
+
     @Override
     default Optional<ChannelCategory> getCategory() {
         return getParent().getCategory();
