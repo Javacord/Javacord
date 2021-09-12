@@ -192,7 +192,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Message> edit(long channelId, long messageId, String content, EmbedBuilder... embeds) {
-        return edit(channelId, messageId, content, embeds);
+        return edit(channelId, messageId, content, Arrays.asList(embeds));
     }
 
     /**
@@ -217,7 +217,7 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      */
     default CompletableFuture<Message> edit(String channelId, String messageId, String content,
                                             EmbedBuilder... embeds) {
-        return edit(channelId, messageId, content, embeds);
+        return edit(channelId, messageId, content, Arrays.asList(embeds));
     }
 
     /**
