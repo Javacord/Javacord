@@ -74,6 +74,14 @@ public interface MessageBuilderBaseDelegate {
     void append(Object object);
 
     /**
+     * Appends a named link to the message.
+     *
+     * @param name The name of the link.
+     * @param url  The URL of the link.
+     */
+    void appendNamedLink(String name, String url);
+
+    /**
      * Appends a new line to the message.
      */
     void appendNewLine();

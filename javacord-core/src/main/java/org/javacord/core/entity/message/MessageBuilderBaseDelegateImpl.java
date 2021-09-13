@@ -168,6 +168,18 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void appendNamedLink(final String name, final String url) {
+        strBuilder
+                .append("[")
+                .append(name)
+                .append("]")
+                .append("(")
+                .append(url)
+                .append(")");
+        contentChanged = true;
+    }
+
+    @Override
     public void appendNewLine() {
         strBuilder.append("\n");
         contentChanged = true;

@@ -61,6 +61,12 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     }
 
     @Override
+    public T appendNamedLink(String name, String url) {
+        delegate.appendNamedLink(name, url);
+        return myClass.cast(this);
+    }
+
+    @Override
     public T appendNewLine() {
         delegate.appendNewLine();
         return myClass.cast(this);

@@ -153,6 +153,12 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
     }
 
     @Override
+    public InteractionMessageBuilder appendNamedLink(final String name, final String url) {
+        delegate.appendNamedLink(name, url);
+        return this;
+    }
+
+    @Override
     public InteractionMessageBuilder appendNewLine() {
         delegate.appendNewLine();
         return this;
