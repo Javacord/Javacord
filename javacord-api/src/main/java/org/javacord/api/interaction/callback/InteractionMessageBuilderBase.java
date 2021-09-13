@@ -2,11 +2,9 @@ package org.javacord.api.interaction.callback;
 
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
-import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
-
 import java.util.EnumSet;
 import java.util.List;
 
@@ -158,20 +156,20 @@ public interface InteractionMessageBuilderBase<T> {
     T setAllowedMentions(AllowedMentions allowedMentions);
 
     /**
-     * Sets the message flags of the message.
+     * Sets the interaction callback data flags of the message.
      *
-     * @param messageFlags The message flags enum type.
+     * @param interactionCallbackDataFlags The interaction callback data flags enum type.
      * @return The current instance in order to chain call methods.
      */
-    T setFlags(MessageFlag... messageFlags);
+    T setFlags(InteractionCallbackDataFlag... interactionCallbackDataFlags);
 
     /**
-     * Sets the message flags of the message.
+     * Sets the interaction callback data flags of the message.
      *
-     * @param messageFlags An EnumSet of message flag enum type.
+     * @param interactionCallbackDataFlags An EnumSet of interaction callback data flag enum type.
      * @return The current instance in order to chain call methods.
      */
-    T setFlags(EnumSet<MessageFlag> messageFlags);
+    T setFlags(EnumSet<InteractionCallbackDataFlag> interactionCallbackDataFlags);
 
     /**
      * Gets the {@link StringBuilder} which is used to build the message.

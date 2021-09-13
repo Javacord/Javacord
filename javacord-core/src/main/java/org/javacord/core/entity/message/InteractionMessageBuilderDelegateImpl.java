@@ -3,18 +3,17 @@ package org.javacord.core.entity.message;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.interaction.InteractionBase;
 import org.javacord.api.interaction.MessageComponentInteraction;
+import org.javacord.api.interaction.callback.InteractionCallbackDataFlag;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.interaction.InteractionImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -25,13 +24,13 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         implements InteractionMessageBuilderDelegate {
 
     /**
-     * The message flags of the message.
+     * The interaction callback data flags of the message.
      */
-    private EnumSet<MessageFlag> messageFlags = null;
+    private EnumSet<InteractionCallbackDataFlag> interactionCallbackDataFlags = null;
 
     @Override
-    public void setFlags(EnumSet<MessageFlag> messageFlags) {
-        this.messageFlags = messageFlags;
+    public void setFlags(EnumSet<InteractionCallbackDataFlag> interactionCallbackDataFlags) {
+        this.interactionCallbackDataFlags = interactionCallbackDataFlags;
     }
 
     @Override
@@ -126,8 +125,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     private void prepareInteractionWebhookBodyParts(ObjectNode body) {
         prepareCommonWebhookMessageBodyParts(body);
         prepareComponents(body, true);
-        if (null != messageFlags) {
-            body.put("flags", messageFlags.stream().mapToInt(MessageFlag::getId).sum());
+        if (null != interactionCallbackDataFlags) {
+            body.put("flags", interactionCallbackDataFlags.stream()
+                    .mapToInt(InteractionCallbackDataFlag::getId).sum());
         }
     }
 
