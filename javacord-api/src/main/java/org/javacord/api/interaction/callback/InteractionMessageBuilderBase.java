@@ -45,6 +45,15 @@ public interface InteractionMessageBuilderBase<T> {
     T append(Object object);
 
     /**
+     * Appends a named link "[name](link)" to the message.
+     *
+     * @param name The displayed name of the link.
+     * @param url  The URL of the link.
+     * @return The current instance in order to chain call methods.
+     */
+    T appendNamedLink(String name, String url);
+
+    /**
      * Appends a new line to the message.
      *
      * @return The current instance in order to chain call methods.

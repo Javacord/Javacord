@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,6 +60,54 @@ abstract class MessageBuilderBase<T> {
      */
     public T appendCode(String language, String code) {
         delegate.appendCode(language, code);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Appends a timestamp to the message with the default timestamp style {@link TimestampStyle#SHORT_DATE_TIME}.
+     *
+     * @param epochSeconds The epoch time in seconds.
+     * @return The current instance in order to chain call methods.
+     */
+    public T appendTimestamp(final long epochSeconds) {
+        appendTimestamp(epochSeconds, TimestampStyle.SHORT_DATE_TIME);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Appends a timestamp to the message with the default timestamp style {@link TimestampStyle#SHORT_DATE_TIME}.
+     *
+     * @param instant The instant for the displaying timestamp.
+     * @return The current instance in order to chain call methods.
+     */
+    public T appendTimestamp(final Instant instant) {
+        appendTimestamp(instant.getEpochSecond(), TimestampStyle.SHORT_DATE_TIME);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Appends a timestamp to the message.
+     *
+     * @param epochSeconds The epoch time in seconds.
+     * @param timestampStyle The displayed timestamp style.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public T appendTimestamp(final long epochSeconds, final TimestampStyle timestampStyle) {
+        delegate.append(timestampStyle.getTimestampTag(epochSeconds));
+        return myClass.cast(this);
+    }
+
+    /**
+     * Appends a timestamp to the message.
+     *
+     * @param instant The instant for the displaying timestamp.
+     * @param timestampStyle The displayed timestamp style.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public T appendTimestamp(final Instant instant, final TimestampStyle timestampStyle) {
+        appendTimestamp(instant.getEpochSecond(), timestampStyle);
         return myClass.cast(this);
     }
 
