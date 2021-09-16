@@ -73,6 +73,15 @@ public interface MessageAttachment extends DiscordEntity {
     Optional<Integer> getWidth();
 
     /**
+     * Gets whether this attachment is ephemeral.
+     * Ephemeral attachments will automatically be removed after a set period of time and
+     * attachments on messages are guaranteed to be available as long as the message itself exists.
+     *
+     * @return True if the attachment is ephemeral.
+     */
+    Optional<Boolean> isEphemeral();
+
+    /**
      * Gets the attachment as an input stream.
      *
      * @return The attachment as an input stream.
