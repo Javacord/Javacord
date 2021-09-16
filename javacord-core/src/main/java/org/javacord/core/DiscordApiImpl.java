@@ -118,6 +118,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The implementation of {@link DiscordApi}.
@@ -583,10 +584,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.proxy = proxy;
         this.proxyAuthenticator = proxyAuthenticator;
         this.trustAllCertificates = trustAllCertificates;
-        this.intents = intents;
         this.userCacheEnabled = userCacheEnabled;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
+        //Always add the GUILDS intent unless it is not required anymore for Javacord to be functional.
+        this.intents = Stream.concat(intents.stream(), Stream.of(Intent.GUILDS)).collect(Collectors.toSet());
 
         if ((proxySelector != null) && (proxy != null)) {
             throw new IllegalStateException("proxy and proxySelector must not be configured both");
