@@ -69,20 +69,26 @@ public class MessageAttachmentImpl implements MessageAttachment {
     private final Integer width;
 
     /**
+     * Whether this attachment is ephemeral.
+     */
+    private final Boolean ephemeral;
+
+    /**
      * Creates a new message attachment.
      *
      * @param message The message of the attachment.
      * @param data The data of the attachment.
      */
-    public MessageAttachmentImpl(Message message, JsonNode data) {
+    public MessageAttachmentImpl(final Message message, final JsonNode data) {
         this.message = message;
         id = data.get("id").asLong();
         fileName = data.get("filename").asText();
         size = data.get("size").asInt();
         url = data.get("url").asText();
         proxyUrl = data.get("proxy_url").asText();
-        height = data.has("height") && !data.get("height").isNull() ? data.get("height").asInt() : null;
-        width = data.has("width") && !data.get("width").isNull() ? data.get("width").asInt() : null;
+        height = data.hasNonNull("height") ? data.get("height").asInt() : null;
+        width = data.hasNonNull("width") ? data.get("width").asInt() : null;
+        ephemeral = data.hasNonNull("ephemeral") ? data.get("ephemeral").asBoolean() : null;
     }
 
     @Override
@@ -138,6 +144,11 @@ public class MessageAttachmentImpl implements MessageAttachment {
     @Override
     public Optional<Integer> getWidth() {
         return Optional.ofNullable(width);
+    }
+
+    @Override
+    public Optional<Boolean> isEphemeral() {
+        return Optional.ofNullable(ephemeral);
     }
 
     @Override
