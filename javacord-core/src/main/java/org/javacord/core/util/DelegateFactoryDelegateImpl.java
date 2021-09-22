@@ -45,12 +45,16 @@ import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
+import org.javacord.api.interaction.internal.MessageContextMenuBuilderDelegate;
+import org.javacord.api.interaction.internal.MessageContextMenuUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandBuilderDelegate;
 import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
 import org.javacord.api.interaction.internal.SlashCommandOptionChoiceBuilderDelegate;
-import org.javacord.api.interaction.internal.SlashCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.SlashCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandUpdaterDelegate;
+import org.javacord.api.interaction.internal.UserContextMenuBuilderDelegate;
+import org.javacord.api.interaction.internal.UserContextMenuUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
@@ -92,12 +96,16 @@ import org.javacord.core.entity.sticker.StickerBuilderDelegateImpl;
 import org.javacord.core.entity.sticker.StickerUpdaterDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookBuilderDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookUpdaterDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandPermissionsBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandPermissionsUpdaterDelegateImpl;
+import org.javacord.core.interaction.MessageContextMenuBuilderDelegateImpl;
+import org.javacord.core.interaction.MessageContextMenuUpdaterDelegateImpl;
 import org.javacord.core.interaction.SlashCommandBuilderDelegateImpl;
 import org.javacord.core.interaction.SlashCommandOptionBuilderDelegateImpl;
 import org.javacord.core.interaction.SlashCommandOptionChoiceBuilderDelegateImpl;
-import org.javacord.core.interaction.SlashCommandPermissionsBuilderDelegateImpl;
-import org.javacord.core.interaction.SlashCommandPermissionsUpdaterDelegateImpl;
 import org.javacord.core.interaction.SlashCommandUpdaterDelegateImpl;
+import org.javacord.core.interaction.UserContextMenuBuilderDelegateImpl;
+import org.javacord.core.interaction.UserContextMenuUpdaterDelegateImpl;
 import org.javacord.core.util.exception.DiscordExceptionValidatorImpl;
 import org.javacord.core.util.logging.ExceptionLoggerDelegateImpl;
 
@@ -208,6 +216,16 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     }
 
     @Override
+    public UserContextMenuUpdaterDelegate createUserContextMenuUpdaterDelegate(long commandId) {
+        return new UserContextMenuUpdaterDelegateImpl(commandId);
+    }
+
+    @Override
+    public MessageContextMenuUpdaterDelegate createMessageContextMenuUpdaterDelegate(long commandId) {
+        return new MessageContextMenuUpdaterDelegateImpl(commandId);
+    }
+
+    @Override
     public GroupChannelUpdaterDelegate createGroupChannelUpdaterDelegate(GroupChannel channel) {
         return new ChannelUpdaterDelegateImpl(channel);
     }
@@ -269,19 +287,29 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     }
 
     @Override
+    public UserContextMenuBuilderDelegate createUserContextMenuBuilderDelegate() {
+        return new UserContextMenuBuilderDelegateImpl();
+    }
+
+    @Override
+    public MessageContextMenuBuilderDelegate createMessageContextMenuBuilderDelegate() {
+        return new MessageContextMenuBuilderDelegateImpl();
+    }
+
+    @Override
     public SlashCommandOptionBuilderDelegate createSlashCommandOptionBuilderDelegate() {
         return new SlashCommandOptionBuilderDelegateImpl();
     }
 
     @Override
-    public SlashCommandPermissionsUpdaterDelegate createSlashCommandPermissionsUpdaterDelegate(
+    public ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
             Server server) {
-        return new SlashCommandPermissionsUpdaterDelegateImpl(server);
+        return new ApplicationCommandPermissionsUpdaterDelegateImpl(server);
     }
 
     @Override
-    public SlashCommandPermissionsBuilderDelegate createSlashCommandPermissionsBuilderDelegate() {
-        return new SlashCommandPermissionsBuilderDelegateImpl();
+    public ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
+        return new ApplicationCommandPermissionsBuilderDelegateImpl();
     }
 
     @Override

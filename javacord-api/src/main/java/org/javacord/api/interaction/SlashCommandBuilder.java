@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class is used to create new slash commands.
  */
-public class SlashCommandBuilder {
+public class SlashCommandBuilder implements ApplicationCommandBuilder<SlashCommand> {
 
     private final SlashCommandBuilderDelegate delegate =
             DelegateFactory.createSlashCommandBuilderDelegate();
@@ -80,7 +80,7 @@ public class SlashCommandBuilder {
     /**
      * Creates a global slash command.
      * When used to update multiple global slash commands at once
-     * {@link DiscordApi#bulkOverwriteGlobalSlashCommands(List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteGlobalApplicationCommands(List)} should be used instead.
      *
      * @param api The discord api instance.
      * @return The built slash command.
@@ -92,7 +92,7 @@ public class SlashCommandBuilder {
     /**
      * Creates a slash command for a specific server.
      * When used to create multiple server slash commands at once
-     * {@link DiscordApi#bulkOverwriteServerSlashCommands(Server, List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} should be used instead.
      *
      * @param server The server.
      * @return The built slash command.

@@ -2780,7 +2780,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default boolean canUseSlashCommands(User user) {
         return hasAnyPermission(user,
                 PermissionType.ADMINISTRATOR,
-                PermissionType.USE_SLASH_COMMANDS);
+                PermissionType.USE_APPLICATION_COMMANDS);
     }
 
     /**

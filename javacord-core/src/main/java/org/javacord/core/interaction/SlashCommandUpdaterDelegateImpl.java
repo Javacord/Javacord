@@ -20,17 +20,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link SlashCommandUpdaterDelegate}.
  */
-public class SlashCommandUpdaterDelegateImpl implements SlashCommandUpdaterDelegate {
-
-    /**
-     * The slash command id.
-     */
-    private final long commandId;
-
-    /**
-     * The slash command name.
-     */
-    private String name = null;
+public class SlashCommandUpdaterDelegateImpl extends ApplicationCommandUpdaterDelegateImpl<SlashCommand>
+        implements SlashCommandUpdaterDelegate {
 
     /**
      * The slash command description.
@@ -43,22 +34,12 @@ public class SlashCommandUpdaterDelegateImpl implements SlashCommandUpdaterDeleg
     private List<SlashCommandOption> slashCommandOptions = new ArrayList<>();
 
     /**
-     * The slash command default permission.
-     */
-    private boolean defaultPermission = true;
-
-    /**
      * Creates a new account updater delegate.
      *
      * @param commandId The discord api instance.
      */
     public SlashCommandUpdaterDelegateImpl(long commandId) {
         this.commandId = commandId;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
@@ -69,11 +50,6 @@ public class SlashCommandUpdaterDelegateImpl implements SlashCommandUpdaterDeleg
     @Override
     public void setOptions(List<SlashCommandOption> slashCommandOptions) {
         this.slashCommandOptions = slashCommandOptions;
-    }
-
-    @Override
-    public void setDefaultPermission(boolean defaultPermission) {
-        this.defaultPermission = defaultPermission;
     }
 
     private void prepareBody(ObjectNode body) {
@@ -100,7 +76,7 @@ public class SlashCommandUpdaterDelegateImpl implements SlashCommandUpdaterDeleg
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         prepareBody(body);
 
-        return new RestRequest<SlashCommand>(api, RestMethod.PATCH, RestEndpoint.SLASH_COMMANDS)
+        return new RestRequest<SlashCommand>(api, RestMethod.PATCH, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(api.getClientId()), String.valueOf(commandId))
                 .setBody(body)
                 .execute(result -> new SlashCommandImpl((DiscordApiImpl) api, result.getJsonBody()));
@@ -112,7 +88,7 @@ public class SlashCommandUpdaterDelegateImpl implements SlashCommandUpdaterDeleg
         prepareBody(body);
 
         return new RestRequest<SlashCommand>(server.getApi(), RestMethod.PATCH,
-                RestEndpoint.SERVER_SLASH_COMMANDS)
+                RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(server.getApi().getClientId()),
                         server.getIdAsString(), String.valueOf(commandId))
                 .setBody(body)

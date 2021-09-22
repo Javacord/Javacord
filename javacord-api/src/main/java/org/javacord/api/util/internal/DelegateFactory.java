@@ -45,12 +45,17 @@ import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
+import org.javacord.api.interaction.internal.MessageContextMenuBuilderDelegate;
+import org.javacord.api.interaction.internal.MessageContextMenuUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandBuilderDelegate;
 import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
 import org.javacord.api.interaction.internal.SlashCommandOptionChoiceBuilderDelegate;
-import org.javacord.api.interaction.internal.SlashCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.SlashCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandUpdaterDelegate;
+import org.javacord.api.interaction.internal.UserContextMenuBuilderDelegate;
+import org.javacord.api.interaction.internal.UserContextMenuUpdaterDelegate;
 import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
@@ -331,6 +336,26 @@ public class DelegateFactory {
     }
 
     /**
+     * Creates a new user context menu updater delegate.
+     *
+     * @param commandId The application command id.
+     * @return A new user context menu updater delegate.
+     */
+    public static UserContextMenuUpdaterDelegate createUserContextMenuUpdaterDelegate(long commandId) {
+        return delegateFactoryDelegate.createUserContextMenuUpdaterDelegate(commandId);
+    }
+
+    /**
+     * Creates a new message context menu updater delegate.
+     *
+     * @param commandId The application command id.
+     * @return A new message context menu updater delegate.
+     */
+    public static MessageContextMenuUpdaterDelegate createMessageContextMenuUpdaterDelegate(long commandId) {
+        return delegateFactoryDelegate.createMessageContextMenuUpdaterDelegate(commandId);
+    }
+
+    /**
      * Creates a new group channel updater delegate.
      *
      * @param channel The channel to update.
@@ -452,6 +477,25 @@ public class DelegateFactory {
         return delegateFactoryDelegate.createSlashCommandBuilderDelegate();
     }
 
+
+    /**
+     * Creates a new user context menu builder delegate.
+     *
+     * @return The user context menu builder delegate.
+     */
+    public static UserContextMenuBuilderDelegate createUserContextMenuBuilderDelegate() {
+        return delegateFactoryDelegate.createUserContextMenuBuilderDelegate();
+    }
+
+    /**
+     * Creates a new message context menu builder delegate.
+     *
+     * @return The message context menu builder delegate.
+     */
+    public static MessageContextMenuBuilderDelegate createMessageContextMenuBuilderDelegate() {
+        return delegateFactoryDelegate.createMessageContextMenuBuilderDelegate();
+    }
+
     /**
      * Creates a new slash command option builder delegate.
      *
@@ -462,23 +506,23 @@ public class DelegateFactory {
     }
 
     /**
-     * Creates a new slash command permissions updater delegate.
+     * Creates a new application command permissions updater delegate.
      *
      * @param server The server.
-     * @return The slash command permissions updater delegate.
+     * @return The application command permissions updater delegate.
      */
-    public static SlashCommandPermissionsUpdaterDelegate createSlashCommandPermissionsUpdaterDelegate(
+    public static ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
             Server server) {
-        return delegateFactoryDelegate.createSlashCommandPermissionsUpdaterDelegate(server);
+        return delegateFactoryDelegate.createApplicationCommandPermissionsUpdaterDelegate(server);
     }
 
     /**
-     * Creates a new slash command permissions builder delegate.
+     * Creates a new application command permissions builder delegate.
      *
-     * @return The slash command permissions builder delegate.
+     * @return The application command permissions builder delegate.
      */
-    public static SlashCommandPermissionsBuilderDelegate createSlashCommandPermissionsBuilderDelegate() {
-        return delegateFactoryDelegate.createSlashCommandPermissionsBuilderDelegate();
+    public static ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
+        return delegateFactoryDelegate.createApplicationCommandPermissionsBuilderDelegate();
     }
 
     /**

@@ -8,8 +8,11 @@ import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
 import org.javacord.api.event.interaction.MessageComponentCreateEvent;
+import org.javacord.api.event.interaction.MessageContextMenuCommandEvent;
 import org.javacord.api.event.interaction.SelectMenuChooseEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
+import org.javacord.api.event.interaction.UserContextMenuCommandEvent;
+import org.javacord.api.interaction.ApplicationCommandType;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -18,12 +21,16 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.interaction.ButtonClickEventImpl;
 import org.javacord.core.event.interaction.InteractionCreateEventImpl;
 import org.javacord.core.event.interaction.MessageComponentCreateEventImpl;
+import org.javacord.core.event.interaction.MessageContextMenuCommandEventImpl;
 import org.javacord.core.event.interaction.SelectMenuChooseEventImpl;
 import org.javacord.core.event.interaction.SlashCommandCreateEventImpl;
+import org.javacord.core.event.interaction.UserContextMenuCommandEventImpl;
 import org.javacord.core.interaction.ButtonInteractionImpl;
 import org.javacord.core.interaction.InteractionImpl;
+import org.javacord.core.interaction.MessageContextMenuInteractionImpl;
 import org.javacord.core.interaction.SelectMenuInteractionImpl;
 import org.javacord.core.interaction.SlashCommandInteractionImpl;
+import org.javacord.core.interaction.UserContextMenuInteractionImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
@@ -64,8 +71,25 @@ public class InteractionCreateHandler extends PacketHandler {
 
         InteractionImpl interaction;
         switch (interactionType) {
-            case SLASH_COMMAND:
-                interaction = new SlashCommandInteractionImpl(api, channel, packet);
+            case APPLICATION_COMMAND:
+                int applicationCommandTypeId = packet.get("data").get("type").asInt();
+                ApplicationCommandType applicationCommandType =
+                        ApplicationCommandType.fromValue(applicationCommandTypeId);
+                switch (applicationCommandType) {
+                    case SLASH:
+                        interaction = new SlashCommandInteractionImpl(api, channel, packet);
+                        break;
+                    case USER:
+                        interaction = new UserContextMenuInteractionImpl(api, channel, packet);
+                        break;
+                    case MESSAGE:
+                        interaction = new MessageContextMenuInteractionImpl(api, channel, packet);
+                        break;
+                    default:
+                        logger.info("Got application command interaction of unknown type <{}>. "
+                                + "Please contact the developer!", applicationCommandTypeId);
+                        return;
+                }
                 break;
             case MESSAGE_COMPONENT:
                 int componentTypeId = packet.get("data").get("component_type").asInt();
@@ -105,16 +129,52 @@ public class InteractionCreateHandler extends PacketHandler {
         );
 
         switch (interactionType) {
-            case SLASH_COMMAND:
-                SlashCommandCreateEvent slashCommandCreateEvent =
-                        new SlashCommandCreateEventImpl(interaction);
-                api.getEventDispatcher().dispatchSlashCommandCreateEvent(
-                        server == null ? api : server,
-                        server,
-                        interaction.getChannel().orElse(null),
-                        interaction.getUser(),
-                        slashCommandCreateEvent
-                );
+            case APPLICATION_COMMAND:
+                int applicationCommandTypeId = packet.get("data").get("type").asInt();
+                ApplicationCommandType applicationCommandType =
+                        ApplicationCommandType.fromValue(applicationCommandTypeId);
+                switch (applicationCommandType) {
+                    case SLASH:
+                        SlashCommandCreateEvent slashCommandCreateEvent =
+                                new SlashCommandCreateEventImpl(interaction);
+                        api.getEventDispatcher().dispatchSlashCommandCreateEvent(
+                                server == null ? api : server,
+                                server,
+                                interaction.getChannel().orElse(null),
+                                interaction.getUser(),
+                                slashCommandCreateEvent
+                        );
+                        break;
+                    case USER:
+                        UserContextMenuCommandEvent userContextMenuCommandEvent =
+                                new UserContextMenuCommandEventImpl(interaction);
+                        api.getEventDispatcher().dispatchUserContextMenuCommandEvent(
+                                server,
+                                server,
+                                interaction.getChannel().orElse(null),
+                                interaction.getUser(),
+                                userContextMenuCommandEvent
+                        );
+                        break;
+                    case MESSAGE:
+                        MessageContextMenuCommandEvent messageContextMenuCommandEvent =
+                                new MessageContextMenuCommandEventImpl(interaction);
+                        api.getEventDispatcher().dispatchMessageContextMenuCommandEvent(
+                                server,
+                                interaction.asMessageContextMenuInteraction().orElseThrow(AssertionError::new)
+                                        .getTarget().getId(),
+                                server,
+                                interaction.getChannel().orElse(null),
+                                interaction.getUser(),
+                                messageContextMenuCommandEvent
+                        );
+                        break;
+                    default:
+                        logger.info("Got application command interaction of unknown type <{}>. "
+                                + "Please contact the developer!", applicationCommandTypeId);
+                        return;
+                }
+
                 break;
             case MESSAGE_COMPONENT:
                 MessageComponentCreateEvent messageComponentCreateEvent =

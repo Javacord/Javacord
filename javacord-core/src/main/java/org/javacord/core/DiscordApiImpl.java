@@ -43,11 +43,15 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.interaction.ServerSlashCommandPermissions;
-import org.javacord.api.interaction.ServerSlashCommandPermissionsBuilder;
+import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.ApplicationCommandBuilder;
+import org.javacord.api.interaction.ApplicationCommandPermissions;
+import org.javacord.api.interaction.ApplicationCommandType;
+import org.javacord.api.interaction.MessageContextMenu;
+import org.javacord.api.interaction.ServerApplicationCommandPermissions;
+import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
-import org.javacord.api.interaction.SlashCommandBuilder;
-import org.javacord.api.interaction.SlashCommandPermissions;
+import org.javacord.api.interaction.UserContextMenu;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -73,10 +77,12 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.user.UserPresence;
 import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
-import org.javacord.core.interaction.ServerSlashCommandPermissionsImpl;
-import org.javacord.core.interaction.SlashCommandBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandPermissionsImpl;
+import org.javacord.core.interaction.MessageContextMenuImpl;
+import org.javacord.core.interaction.ServerApplicationCommandPermissionsImpl;
 import org.javacord.core.interaction.SlashCommandImpl;
-import org.javacord.core.interaction.SlashCommandPermissionsImpl;
+import org.javacord.core.interaction.UserContextMenuImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.cache.JavacordEntityCache;
@@ -1409,117 +1415,221 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<SlashCommand>> getGlobalSlashCommands() {
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.GET, RestEndpoint.SLASH_COMMANDS)
+        return new RestRequest<List<SlashCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId))
                 .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<SlashCommand> getGlobalSlashCommandById(long commandId) {
-        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SLASH_COMMANDS)
+        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
                 .execute(result -> new SlashCommandImpl(this, result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<List<SlashCommand>> getServerSlashCommands(Server server) {
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_SLASH_COMMANDS)
+        return new RestRequest<List<SlashCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
                 .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<SlashCommand> getServerSlashCommandById(Server server, long commandId) {
-        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SERVER_SLASH_COMMANDS)
+        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> new SlashCommandImpl(this, result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<List<ServerSlashCommandPermissions>> getServerSlashCommandPermissions(
+    public CompletableFuture<List<UserContextMenu>> getGlobalUserContextMenus() {
+        return new RestRequest<List<UserContextMenu>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId))
+                .execute(result -> jsonToUserContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<UserContextMenu> getGlobalUserContextMenuById(long commandId) {
+        return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .execute(result -> new UserContextMenuImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<UserContextMenu>> getServerUserContextMenus(Server server) {
+        return new RestRequest<List<UserContextMenu>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .execute(result -> jsonToUserContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<UserContextMenu> getServerUserContextMenuById(Server server, long commandId) {
+        return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> new UserContextMenuImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<MessageContextMenu>> getGlobalMessageContextMenus() {
+        return new RestRequest<List<MessageContextMenu>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId))
+                .execute(result -> jsonToMessageContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<MessageContextMenu> getGlobalMessageContextMenuById(long commandId) {
+        return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .execute(result -> new MessageContextMenuImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<MessageContextMenu>> getServerMessageContextMenus(Server server) {
+        return new RestRequest<List<MessageContextMenu>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .execute(result -> jsonToMessageContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<MessageContextMenu> getServerMessageContextMenuById(Server server, long commandId) {
+        return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> new MessageContextMenuImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(
             Server server) {
-        return new RestRequest<List<ServerSlashCommandPermissions>>(this, RestMethod.GET,
-                RestEndpoint.SERVER_SLASH_COMMAND_PERMISSIONS)
+        return new RestRequest<List<ServerApplicationCommandPermissions>>(this, RestMethod.GET,
+                RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
                 .execute(result -> jsonToServerSlashCommandPermissionsList(result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<ServerSlashCommandPermissions> getServerSlashCommandPermissionsById(
+    public CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
             Server server, long commandId) {
-        return new RestRequest<ServerSlashCommandPermissions>(this, RestMethod.GET,
-                RestEndpoint.SLASH_COMMAND_PERMISSIONS)
+        return new RestRequest<ServerApplicationCommandPermissions>(this, RestMethod.GET,
+                RestEndpoint.APPLICATION_COMMAND_PERMISSIONS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
-                .execute(result -> new ServerSlashCommandPermissionsImpl(result.getJsonBody()));
+                .execute(result -> new ServerApplicationCommandPermissionsImpl(this, result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<List<ServerSlashCommandPermissions>> batchUpdateSlashCommandPermissions(
-            Server server, List<ServerSlashCommandPermissionsBuilder> slashCommandPermissionsBuilders) {
+    public CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
+            Server server, List<ServerApplicationCommandPermissionsBuilder> slashCommandPermissionsBuilders) {
         ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (ServerSlashCommandPermissionsBuilder permission : slashCommandPermissionsBuilders) {
+        for (ServerApplicationCommandPermissionsBuilder permission : slashCommandPermissionsBuilders) {
             ObjectNode node = JsonNodeFactory.instance.objectNode();
             node.put("id", permission.getCommandId());
             ArrayNode array = node.putArray("permissions");
-            for (SlashCommandPermissions permissionPermission : permission.getPermissions()) {
-                array.add(((SlashCommandPermissionsImpl) permissionPermission).toJsonNode());
+            for (ApplicationCommandPermissions permissionPermission : permission.getPermissions()) {
+                array.add(((ApplicationCommandPermissionsImpl) permissionPermission).toJsonNode());
             }
             body.add(node);
         }
 
-        return new RestRequest<List<ServerSlashCommandPermissions>>(server.getApi(), RestMethod.PUT,
-                RestEndpoint.SERVER_SLASH_COMMAND_PERMISSIONS)
+        return new RestRequest<List<ServerApplicationCommandPermissions>>(server.getApi(), RestMethod.PUT,
+                RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
                 .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
                 .setBody(body)
                 .execute(result -> jsonToServerSlashCommandPermissionsList(result.getJsonBody()));
     }
 
-    private List<ServerSlashCommandPermissions> jsonToServerSlashCommandPermissionsList(
+    private List<ServerApplicationCommandPermissions> jsonToServerSlashCommandPermissionsList(
             JsonNode resultJson) {
-        List<ServerSlashCommandPermissions> permissions = new ArrayList<>();
+        List<ServerApplicationCommandPermissions> permissions = new ArrayList<>();
         for (JsonNode jsonNode : resultJson) {
-            permissions.add(new ServerSlashCommandPermissionsImpl(jsonNode));
+            permissions.add(new ServerApplicationCommandPermissionsImpl(this, jsonNode));
         }
         return permissions;
+    }
+
+    private List<ApplicationCommand> jsonToApplicationCommandList(JsonNode resultJson) {
+        List<ApplicationCommand> applicationCommands = new ArrayList<>();
+        for (JsonNode applicationCommandJson : resultJson) {
+            ApplicationCommandType type = ApplicationCommandType.fromValue(applicationCommandJson.get("type").asInt());
+            if (type.equals(ApplicationCommandType.SLASH)) {
+                applicationCommands.add(new SlashCommandImpl(this, applicationCommandJson));
+            }
+            if (type.equals(ApplicationCommandType.USER)) {
+                applicationCommands.add(new UserContextMenuImpl(this, applicationCommandJson));
+            }
+            if (type.equals(ApplicationCommandType.MESSAGE)) {
+                applicationCommands.add(new MessageContextMenuImpl(this, applicationCommandJson));
+            }
+        }
+        return Collections.unmodifiableList(applicationCommands);
     }
 
     private List<SlashCommand> jsonToSlashCommandList(JsonNode resultJson) {
         List<SlashCommand> slashCommands = new ArrayList<>();
         for (JsonNode slashCommandJson : resultJson) {
-            slashCommands.add(new SlashCommandImpl(this, slashCommandJson));
+            if (ApplicationCommandType.fromValue(slashCommandJson.get("type").asInt())
+                    .equals(ApplicationCommandType.SLASH)) {
+                slashCommands.add(new SlashCommandImpl(this, slashCommandJson));
+            }
         }
         return Collections.unmodifiableList(slashCommands);
     }
 
-    @Override
-    public CompletableFuture<List<SlashCommand>> bulkOverwriteGlobalSlashCommands(
-            List<SlashCommandBuilder> slashCommandBuilderList) {
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (SlashCommandBuilder slashCommandBuilder : slashCommandBuilderList) {
-            body.add(((SlashCommandBuilderDelegateImpl) slashCommandBuilder.getDelegate())
-                    .getJsonBodyForSlashCommand());
+    private List<UserContextMenu> jsonToUserContextMenuList(JsonNode resultJson) {
+        List<UserContextMenu> userContextMenus = new ArrayList<>();
+        for (JsonNode userContextMenuJson : resultJson) {
+            if (ApplicationCommandType.fromValue(userContextMenuJson.get("type").asInt())
+                    .equals(ApplicationCommandType.USER)) {
+                userContextMenus.add(new UserContextMenuImpl(this, userContextMenuJson));
+            }
         }
+        return Collections.unmodifiableList(userContextMenus);
+    }
 
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.PUT, RestEndpoint.SLASH_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
-                .setBody(body)
-                .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
+    private List<MessageContextMenu> jsonToMessageContextMenuList(JsonNode resultJson) {
+        List<MessageContextMenu> messageContextMenus = new ArrayList<>();
+        for (JsonNode messageContextMenuJson : resultJson) {
+            if (ApplicationCommandType.fromValue(messageContextMenuJson.get("type").asInt())
+                    .equals(ApplicationCommandType.MESSAGE)) {
+                messageContextMenus.add(new MessageContextMenuImpl(this, messageContextMenuJson));
+            }
+        }
+        return Collections.unmodifiableList(messageContextMenus);
     }
 
     @Override
-    public CompletableFuture<List<SlashCommand>> bulkOverwriteServerSlashCommands(
-            Server server, List<SlashCommandBuilder> slashCommandBuilderList) {
+    public CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList) {
         ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (SlashCommandBuilder slashCommandBuilder : slashCommandBuilderList) {
-            body.add(((SlashCommandBuilderDelegateImpl) slashCommandBuilder.getDelegate())
-                    .getJsonBodyForSlashCommand());
+        for (ApplicationCommandBuilder<? extends ApplicationCommand>
+                applicationCommandBuilder : applicationCommandBuilderList) {
+            body.add(((ApplicationCommandBuilderDelegateImpl<? extends ApplicationCommand>)
+                    applicationCommandBuilder.getDelegate())
+                    .getJsonBodyForApplicationCommand());
         }
 
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.PUT,
-                RestEndpoint.SERVER_SLASH_COMMANDS)
+        return new RestRequest<List<? extends ApplicationCommand>>(this,
+                RestMethod.PUT, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId))
+                .setBody(body)
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            Server server,
+            List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList) {
+        ArrayNode body = JsonNodeFactory.instance.arrayNode();
+        for (ApplicationCommandBuilder<? extends ApplicationCommand>
+                applicationCommandBuilder : applicationCommandBuilderList) {
+            body.add(((ApplicationCommandBuilderDelegateImpl<? extends ApplicationCommand>)
+                    applicationCommandBuilder.getDelegate())
+                    .getJsonBodyForApplicationCommand());
+        }
+
+        return new RestRequest<List<? extends ApplicationCommand>>(this, RestMethod.PUT,
+                RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
                 .setBody(body)
-                .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
 
     @Override

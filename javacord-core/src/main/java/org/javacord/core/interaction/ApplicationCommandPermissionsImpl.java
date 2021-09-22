@@ -3,23 +3,23 @@ package org.javacord.core.interaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.api.interaction.SlashCommandPermissionType;
-import org.javacord.api.interaction.SlashCommandPermissions;
+import org.javacord.api.interaction.ApplicationCommandPermissionType;
+import org.javacord.api.interaction.ApplicationCommandPermissions;
 
-public class SlashCommandPermissionsImpl implements SlashCommandPermissions {
+public class ApplicationCommandPermissionsImpl implements ApplicationCommandPermissions {
 
     private final long id;
-    private final SlashCommandPermissionType type;
+    private final ApplicationCommandPermissionType type;
     private final boolean permission;
 
     /**
      * Class constructor.
      *
-     * @param data The json data of the slash command permissions.
+     * @param data The json data of the application command permissions.
      */
-    public SlashCommandPermissionsImpl(JsonNode data) {
+    public ApplicationCommandPermissionsImpl(JsonNode data) {
         id = data.get("id").asLong();
-        type = SlashCommandPermissionType.fromValue(data.get("type").asInt());
+        type = ApplicationCommandPermissionType.fromValue(data.get("type").asInt());
         permission = data.get("permission").asBoolean();
     }
 
@@ -31,7 +31,7 @@ public class SlashCommandPermissionsImpl implements SlashCommandPermissions {
      * @param permission The permission.
      *
      */
-    public SlashCommandPermissionsImpl(long id, SlashCommandPermissionType type, boolean permission) {
+    public ApplicationCommandPermissionsImpl(long id, ApplicationCommandPermissionType type, boolean permission) {
         this.id = id;
         this.type = type;
         this.permission = permission;
@@ -43,7 +43,7 @@ public class SlashCommandPermissionsImpl implements SlashCommandPermissions {
     }
 
     @Override
-    public SlashCommandPermissionType getType() {
+    public ApplicationCommandPermissionType getType() {
         return type;
     }
 

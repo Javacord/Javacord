@@ -33,11 +33,15 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.interaction.ServerSlashCommandPermissions;
-import org.javacord.api.interaction.ServerSlashCommandPermissionsBuilder;
+import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.ApplicationCommandBuilder;
+import org.javacord.api.interaction.ApplicationCommandUpdater;
+import org.javacord.api.interaction.MessageContextMenu;
+import org.javacord.api.interaction.ServerApplicationCommandPermissions;
+import org.javacord.api.interaction.ServerApplicationCommandPermissions;
+import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
-import org.javacord.api.interaction.SlashCommandBuilder;
-import org.javacord.api.interaction.SlashCommandUpdater;
+import org.javacord.api.interaction.UserContextMenu;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
@@ -133,60 +137,124 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<SlashCommand> getServerSlashCommandById(Server server, long commandId);
 
     /**
-     * Gets a list of all server slash command permissions from the given server.
+     * Gets a list with all global user context menus for the application.
      *
-     * @param server The server.
-     * @return A list containing the server slash command permissions.
+     * @return A list with all global user context menus.
      */
-    CompletableFuture<List<ServerSlashCommandPermissions>> getServerSlashCommandPermissions(Server server);
+    CompletableFuture<List<UserContextMenu>> getGlobalUserContextMenus();
 
     /**
-     * Gets a server slash command permissions by it ID from the given server.
+     * Gets a global user context menu by its id.
+     *
+     * @param commandId The id of the user context menu.
+     * @return The user context menu with the given id.
+     */
+    CompletableFuture<UserContextMenu> getGlobalUserContextMenuById(long commandId);
+
+    /**
+     * Gets a list with all user context menus for the given server.
+     *
+     * @param server The server to get the user context menus from.
+     * @return A list with all user context menus from the server.
+     */
+    CompletableFuture<List<UserContextMenu>> getServerUserContextMenus(Server server);
+
+    /**
+     * Gets a server user context menu by its id.
+     *
+     * @param server The server to get the user context menu from.
+     * @param commandId The id of the server user context menu.
+     * @return The server user context menu with the given id.
+     */
+    CompletableFuture<UserContextMenu> getServerUserContextMenuById(Server server, long commandId);
+
+    /**
+     * Gets a list with all global message context menus for the application.
+     *
+     * @return A list with all global message context menus.
+     */
+    CompletableFuture<List<MessageContextMenu>> getGlobalMessageContextMenus();
+
+    /**
+     * Gets a global message context menu by its id.
+     *
+     * @param commandId The id of the message context menu.
+     * @return The message context menu with the given id.
+     */
+    CompletableFuture<MessageContextMenu> getGlobalMessageContextMenuById(long commandId);
+
+    /**
+     * Gets a list with all message context menus for the given server.
+     *
+     * @param server The server to get the message context menus from.
+     * @return A list with all message context menus from the server.
+     */
+    CompletableFuture<List<MessageContextMenu>> getServerMessageContextMenus(Server server);
+
+    /**
+     * Gets a server message context menu by its id.
+     *
+     * @param server The server to get the message context menu from.
+     * @param commandId The id of the server message context menu.
+     * @return The server message context menu with the given id.
+     */
+    CompletableFuture<MessageContextMenu> getServerMessageContextMenuById(Server server, long commandId);
+
+    /**
+     * Gets a list of all server application command permissions from the given server.
+     *
+     * @param server The server.
+     * @return A list containing the server application command permissions.
+     */
+    CompletableFuture<List<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(Server server);
+
+    /**
+     * Gets a server application command permissions by it ID from the given server.
      *
      * @param server The server.
      * @param commandId The command ID.
-     * @return The server slash command permissions for the given ID.
+     * @return The server application command permissions for the given ID.
      */
-    CompletableFuture<ServerSlashCommandPermissions> getServerSlashCommandPermissionsById(
+    CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
             Server server, long commandId);
 
     /**
-     * Updates multiple server slash command permissions at once.
+     * Updates multiple server application command permissions at once.
      *
-     * @param server The server where the slash command permissions should be updated on.
-     * @param slashCommandPermissionsBuilders The slash command permissions builders,
+     * @param server The server where the application command permissions should be updated on.
+     * @param applicationCommandPermissionsBuilders The application command permissions builders,
      *     which should be updated.
-     * @return A list of the updated server slash command permissions.
+     * @return A list of the updated server application command permissions.
      */
-    CompletableFuture<List<ServerSlashCommandPermissions>> batchUpdateSlashCommandPermissions(
-            Server server, List<ServerSlashCommandPermissionsBuilder> slashCommandPermissionsBuilders);
+    CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
+            Server server, List<ServerApplicationCommandPermissionsBuilder> applicationCommandPermissionsBuilders);
 
     /**
-     * Bulk overwrites the global slash commands.
+     * Bulk overwrites the global application commands.
      * This should be preferably used when updating and/or creating multiple
-     * slash commands at once instead of {@link SlashCommandUpdater#updateGlobal(DiscordApi)} (DiscordApi)
-     * and {@link SlashCommandBuilder#createGlobal(DiscordApi)}
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateGlobal(DiscordApi)} (DiscordApi)}
+     * and {@link ApplicationCommandBuilder#createGlobal(DiscordApi)}
      *
-     * @param slashCommandBuilderList A list containing the SlashCommandBuilders
-     *     which should be used to perform the bulk overwrite.
-     * @return A list containing all slash commands.
+     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders
+     *     which should should be used to perform the bulk overwrite.
+     * @return A list containing all application commands.
      */
-    CompletableFuture<List<SlashCommand>> bulkOverwriteGlobalSlashCommands(
-            List<SlashCommandBuilder> slashCommandBuilderList);
+    CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList);
 
     /**
-     * Bulk overwrites the servers slash commands.
+     * Bulk overwrites the servers application commands.
      * This should be preferably used when updating and/or creating multiple
-     * slash commands at once instead of {@link SlashCommandUpdater#updateForServer(Server)} (Server)
-     * and {@link SlashCommandBuilder#createForServer(Server)}
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateForServer(Server)} (Server)
+     * and {@link ApplicationCommandBuilder#createForServer(Server)}
      *
-     * @param slashCommandBuilderList A list containing the SlashCommandBuilders.
+     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders.
      * @param server The server where the bulk overwrite should be performed on
      *     which should be used to perform the bulk overwrite.
-     * @return A list containing all slash commands.
+     * @return A list containing all application commands.
      */
-    CompletableFuture<List<SlashCommand>> bulkOverwriteServerSlashCommands(
-            Server server, List<SlashCommandBuilder> slashCommandBuilderList);
+    CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            Server server, List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList);
 
     /**
      * Gets a utility class to interact with uncached messages.

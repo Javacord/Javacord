@@ -52,10 +52,10 @@ public enum RestEndpoint {
     // interactions
     INTERACTION_RESPONSE("/interactions/%s/%s/callback", 0),
     ORIGINAL_INTERACTION_RESPONSE("/webhooks/%s/%s/messages/@original",0),
-    SLASH_COMMANDS("/applications/%s/commands", 0),
-    SERVER_SLASH_COMMANDS("/applications/%s/guilds/%s/commands",0),
-    SERVER_SLASH_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/permissions",0),
-    SLASH_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/%s/permissions",0),
+    APPLICATION_COMMANDS("/applications/%s/commands", 0),
+    SERVER_APPLICATION_COMMANDS("/applications/%s/guilds/%s/commands",0),
+    SERVER_APPLICATION_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/permissions",0),
+    APPLICATION_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/%s/permissions",0),
 
     //threads
     START_THREAD_WITH_MESSAGE("/channels/%s/messages/%s/threads", 0),

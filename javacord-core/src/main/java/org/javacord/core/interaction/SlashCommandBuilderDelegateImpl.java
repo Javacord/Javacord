@@ -17,17 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class SlashCommandBuilderDelegateImpl implements SlashCommandBuilderDelegate {
+public class SlashCommandBuilderDelegateImpl extends ApplicationCommandBuilderDelegateImpl<SlashCommand>
+        implements SlashCommandBuilderDelegate {
 
-    private String name;
     private String description;
     private List<SlashCommandOption> options = new ArrayList<>();
-    private Boolean defaultPermission;
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
 
     @Override
     public void setDescription(String description) {
@@ -49,24 +43,19 @@ public class SlashCommandBuilderDelegateImpl implements SlashCommandBuilderDeleg
     }
 
     @Override
-    public void setDefaultPermission(Boolean defaultPermission) {
-        this.defaultPermission = defaultPermission;
-    }
-
-    @Override
     public CompletableFuture<SlashCommand> createGlobal(DiscordApi api) {
-        return new RestRequest<SlashCommand>(api, RestMethod.POST, RestEndpoint.SLASH_COMMANDS)
+        return new RestRequest<SlashCommand>(api, RestMethod.POST, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(api.getClientId()))
-                .setBody(getJsonBodyForSlashCommand())
+                .setBody(getJsonBodyForApplicationCommand())
                 .execute(result -> new SlashCommandImpl((DiscordApiImpl) api, result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<SlashCommand> createForServer(Server server) {
         return new RestRequest<SlashCommand>(
-                server.getApi(), RestMethod.POST, RestEndpoint.SERVER_SLASH_COMMANDS)
+                server.getApi(), RestMethod.POST, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
-                .setBody(getJsonBodyForSlashCommand())
+                .setBody(getJsonBodyForApplicationCommand())
                 .execute(result -> new SlashCommandImpl((DiscordApiImpl) server.getApi(), result.getJsonBody()));
     }
 
@@ -75,7 +64,7 @@ public class SlashCommandBuilderDelegateImpl implements SlashCommandBuilderDeleg
 
      * @return The JSON of this slash command.
      */
-    public ObjectNode getJsonBodyForSlashCommand() {
+    public ObjectNode getJsonBodyForApplicationCommand() {
         ObjectNode jsonBody = JsonNodeFactory.instance.objectNode()
                 .put("name", name)
                 .put("description", description);
