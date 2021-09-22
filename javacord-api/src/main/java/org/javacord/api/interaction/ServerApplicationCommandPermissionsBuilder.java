@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ServerSlashCommandPermissionsBuilder {
+public class ServerApplicationCommandPermissionsBuilder {
 
     private final long commandId;
-    private final List<SlashCommandPermissions> permissions;
+    private final List<ApplicationCommandPermissions> permissions;
 
     /**
-     * Creates an instance of this server slash command permissions builder.
+     * Creates an instance of this server application command permissions builder.
      *
      * @param commandId The command ID which should be updated.
      * @param permissions The permissions for the command which should be updated.
      */
-    public ServerSlashCommandPermissionsBuilder(long commandId, List<SlashCommandPermissions> permissions) {
+    public ServerApplicationCommandPermissionsBuilder(long commandId, List<ApplicationCommandPermissions> permissions) {
         this.commandId = commandId;
         this.permissions = new ArrayList<>(permissions);
     }
@@ -30,11 +30,11 @@ public class ServerSlashCommandPermissionsBuilder {
     }
 
     /**
-     * Gets a list of the slash command permissions.
+     * Gets a list of the application command permissions.
      *
-     * @return A list containing the slash command permissions.
+     * @return A list containing the application command permissions.
      */
-    public List<SlashCommandPermissions> getPermissions() {
+    public List<ApplicationCommandPermissions> getPermissions() {
         return Collections.unmodifiableList(permissions);
     }
 }

@@ -25,6 +25,44 @@ public interface Interaction extends InteractionBase, SafeSpecializable<Interact
     }
 
     /**
+     * Get this interaction as user context menu interaction if the type matches.
+     *
+     * @return the interaction as user context menu interaction if the type matches; an empty optional otherwise
+     */
+    default Optional<UserContextMenuInteraction> asUserContextMenuInteraction() {
+        return as(UserContextMenuInteraction.class);
+    }
+
+    /**
+     * Get this interaction as user context menu interaction if the type and the command id match.
+     *
+     * @param commandId The command id to match.
+     * @return the interaction as user context menu interaction if the properties match; an empty optional otherwise
+     */
+    default Optional<UserContextMenuInteraction> asUserContextMenuInteractionWithCommandId(long commandId) {
+        return asUserContextMenuInteraction().filter(interaction -> interaction.getCommandId() == commandId);
+    }
+
+    /**
+     * Get this interaction as message context menu interaction if the type matches.
+     *
+     * @return the interaction as message context menu interaction if the type matches; an empty optional otherwise
+     */
+    default Optional<MessageContextMenuInteraction> asMessageContextMenuInteraction() {
+        return as(MessageContextMenuInteraction.class);
+    }
+
+    /**
+     * Get this interaction as message context menu interaction if the type and the command id match.
+     *
+     * @param commandId The command id to match.
+     * @return the interaction as message context menu interaction if the properties match; an empty optional otherwise
+     */
+    default Optional<MessageContextMenuInteraction> asMessageContextMenuInteractionWithCommandId(long commandId) {
+        return asMessageContextMenuInteraction().filter(interaction -> interaction.getCommandId() == commandId);
+    }
+
+    /**
      * Get this interaction as message component interaction if the type matches.
      *
      * @return the interaction as message component interaction if the type matches; an empty optional otherwise

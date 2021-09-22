@@ -47,7 +47,7 @@ public enum RestRequestResultErrorCode {
     UNKNOWN_REDISTRIBUTABLE(10036, "Unknown redistributable"),
     UNKNOWN_SERVER_TEMPLATE(10057, "Unknown server template"),
     UNKNOWN_INTERACTION(10062, "Unknown interaction"),
-    UNKNOWN_SLASH_COMMAND(10063, "Unknown slash command"),
+    UNKNOWN_APPLICATION_COMMAND(10063, "Unknown application command"),
     BOTS_CANNOT_USE_THIS_ENDPOINT(20001, "Bots cannot use this endpoint"),
     ONLY_BOTS_CAN_USE_THIS_ENDPOINT(20002, "Only bots can use this endpoint"),
     MESSAGE_CANNOT_BE_EDITED_DUE_TO_ANNOUNCEMENT_RATE_LIMIT(20022,

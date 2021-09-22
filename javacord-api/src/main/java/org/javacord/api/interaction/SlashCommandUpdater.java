@@ -8,7 +8,7 @@ import org.javacord.api.util.internal.DelegateFactory;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class SlashCommandUpdater {
+public class SlashCommandUpdater implements ApplicationCommandUpdater<SlashCommand> {
 
     /**
      * The account delegate used by this instance.
@@ -75,7 +75,7 @@ public class SlashCommandUpdater {
     /**
      * Updates a global slash command.
      * When used to update multiple global slash commands at once
-     * {@link DiscordApi#bulkOverwriteGlobalSlashCommands(List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteGlobalApplicationCommands(List)} should be used instead.
      *
      * @param api The DiscordApi instance.
      * @return The updated slash command.
@@ -87,7 +87,7 @@ public class SlashCommandUpdater {
     /**
      * Updates a slash command on the given server.
      * When used to update multiple server slash commands at once
-     * {@link DiscordApi#bulkOverwriteServerSlashCommands(Server, List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} should be used instead.
      *
      * @param server The server where the command should be updated.
      * @return The updated slash command.

@@ -1,21 +1,21 @@
 package org.javacord.core.interaction;
 
-import org.javacord.api.interaction.SlashCommandPermissionType;
-import org.javacord.api.interaction.SlashCommandPermissions;
-import org.javacord.api.interaction.internal.SlashCommandPermissionsBuilderDelegate;
+import org.javacord.api.interaction.ApplicationCommandPermissionType;
+import org.javacord.api.interaction.ApplicationCommandPermissions;
+import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
 
 import java.util.Objects;
 
-public class SlashCommandPermissionsBuilderDelegateImpl implements SlashCommandPermissionsBuilderDelegate {
+public class ApplicationCommandPermissionsBuilderDelegateImpl implements ApplicationCommandPermissionsBuilderDelegate {
 
     private Long id;
-    private SlashCommandPermissionType type;
+    private ApplicationCommandPermissionType type;
     private Boolean permission;
 
     /**
      * Class constructor.
      */
-    public SlashCommandPermissionsBuilderDelegateImpl() {
+    public ApplicationCommandPermissionsBuilderDelegateImpl() {
     }
 
     @Override
@@ -24,7 +24,7 @@ public class SlashCommandPermissionsBuilderDelegateImpl implements SlashCommandP
     }
 
     @Override
-    public void setType(SlashCommandPermissionType type) {
+    public void setType(ApplicationCommandPermissionType type) {
         Objects.requireNonNull(type,"The type can not be null!");
         this.type = type;
     }
@@ -35,7 +35,7 @@ public class SlashCommandPermissionsBuilderDelegateImpl implements SlashCommandP
     }
 
     @Override
-    public SlashCommandPermissions build() {
+    public ApplicationCommandPermissions build() {
         if (null == type) {
             throw new IllegalStateException("Type can not be null!");
         } else if (null == permission) {
@@ -43,6 +43,6 @@ public class SlashCommandPermissionsBuilderDelegateImpl implements SlashCommandP
         } else if (null == id) {
             throw new IllegalStateException("ID can not be null!");
         }
-        return new SlashCommandPermissionsImpl(id, type, permission);
+        return new ApplicationCommandPermissionsImpl(id, type, permission);
     }
 }
