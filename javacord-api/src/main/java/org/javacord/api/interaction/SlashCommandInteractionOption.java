@@ -27,7 +27,7 @@ public interface SlashCommandInteractionOption extends SlashCommandInteractionOp
      * @return If the option is a subcommand or group.
      */
     default boolean isSubcommandOrGroup() {
-        return !getStringValue().isPresent();
+        return !getStringRepresentationValue().isPresent();
     }
 
     /**
