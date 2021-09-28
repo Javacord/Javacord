@@ -12,11 +12,11 @@ import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
-import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.api.entity.emoji.CustomEmojiBuilder;
@@ -33,7 +33,6 @@ import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -159,6 +158,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * <p>Setting a preferred locale is only available for public servers.
      * You can check if a server is public using the {@link #getFeatures()} methods.
+     *
      * @return The severs preferred locale.
      */
     Locale getPreferredLocale();
@@ -450,7 +450,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Kicks all members without a role which were inactive at least the given amount of days.
      *
-     * @param days The amount of days the member has to be inactive.
+     * @param days   The amount of days the member has to be inactive.
      * @param reason The audit log reason for the prune.
      * @return The amount of member who got kicked.
      */
@@ -531,7 +531,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Gets a member by its name and discriminator.
      * This method is case-sensitive!
      *
-     * @param name The name of the member.
+     * @param name          The name of the member.
      * @param discriminator The discriminator of the member.
      * @return The member with the given name and discriminator.
      */
@@ -545,7 +545,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Gets a member by its name and discriminator.
      * This method is case-insensitive!
      *
-     * @param name The name of the member.
+     * @param name          The name of the member.
      * @param discriminator The discriminator of the member.
      * @return The member with the given name and discriminator.
      */
@@ -948,7 +948,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param icon The new icon of the server.
+     * @param icon     The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1015,7 +1015,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param icon The new icon of the server.
+     * @param icon     The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1043,7 +1043,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param icon The new icon of the server.
+     * @param icon     The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1097,7 +1097,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param splash The new splash of the server.
+     * @param splash   The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1164,7 +1164,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param splash The new splash of the server.
+     * @param splash   The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1192,7 +1192,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param splash The new splash of the server.
+     * @param splash   The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1232,7 +1232,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param banner The new banner of the server.
+     * @param banner   The new banner of the server.
      * @param fileType The type of the banner, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1299,7 +1299,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param banner The new banner of the server.
+     * @param banner   The new banner of the server.
      * @param fileType The type of the banner, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1327,7 +1327,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param banner The new banner of the server.
+     * @param banner   The new banner of the server.
      * @param fileType The type of the banner, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1442,7 +1442,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user.
+     * @param user     The user.
      * @param nickname The new nickname of the user.
      * @return A future to check if the update was successful.
      */
@@ -1456,9 +1456,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user.
+     * @param user     The user.
      * @param nickname The new nickname of the user.
-     * @param reason The audit log reason for this update.
+     * @param reason   The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
@@ -1484,7 +1484,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user.
+     * @param user   The user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1526,8 +1526,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member the role should be added to.
-     * @param role The role which should be added to the server member.
+     * @param user   The server member the role should be added to.
+     * @param role   The role which should be added to the server member.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1553,8 +1553,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member the role should be removed from.
-     * @param role The role which should be removed from the server member.
+     * @param user   The server member the role should be removed from.
+     * @param role   The role which should be removed from the server member.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1567,7 +1567,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user to update the roles of.
+     * @param user  The user to update the roles of.
      * @param roles The collection of roles to replace the user's roles.
      * @return A future to check if the update was successful.
      */
@@ -1585,8 +1585,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user to update the roles of.
-     * @param roles The collection of roles to replace the user's roles.
+     * @param user   The user to update the roles of.
+     * @param roles  The collection of roles to replace the user's roles.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1611,7 +1611,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Reorders the roles of the server.
      *
-     * @param roles An ordered list with the new role positions.
+     * @param roles  An ordered list with the new role positions.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1630,7 +1630,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Moves the given user to the given channel on the server.
      *
-     * @param user The user to move.
+     * @param user    The user to move.
      * @param channel The channel to move the user to.
      * @return A future to check if the move was successful.
      */
@@ -1703,7 +1703,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Mutes the given user on the server.
      *
-     * @param user The user to mute.
+     * @param user   The user to mute.
      * @param reason The audit log reason for this action.
      * @return A future to check if the mute was successful.
      */
@@ -1724,7 +1724,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Unmutes the given user on the server.
      *
-     * @param user The user to unmute.
+     * @param user   The user to unmute.
      * @param reason The audit log reason for this action.
      * @return A future to check if the unmute was successful.
      */
@@ -1787,7 +1787,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Deafens the given user on the server.
      *
-     * @param user The user to deafen.
+     * @param user   The user to deafen.
      * @param reason The audit log reason for this action.
      * @return A future to check if the deafen was successful.
      */
@@ -1826,7 +1826,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Undeafens the given user on the server.
      *
-     * @param user The user to undeafen.
+     * @param user   The user to undeafen.
      * @param reason The audit log reason for this action.
      * @return A future to check if the undeafen was successful.
      */
@@ -1847,7 +1847,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Kicks the given user from the server.
      *
-     * @param user The user to kick.
+     * @param user   The user to kick.
      * @param reason The audit log reason for this action.
      * @return A future to check if the kick was successful.
      */
@@ -1866,7 +1866,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param user The user to ban.
+     * @param user              The user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
      */
@@ -1877,9 +1877,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param user The user to ban.
+     * @param user              The user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason The reason for the ban.
+     * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason) {
@@ -1909,7 +1909,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
+     * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
      */
@@ -1920,7 +1920,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
+     * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
      */
@@ -1931,9 +1931,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
+     * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason The reason for the ban.
+     * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
      */
     CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason);
@@ -1941,9 +1941,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
+     * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason The reason for the ban.
+     * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(long userId, int deleteMessageDays, String reason) {
@@ -1983,7 +1983,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Unbans the given user from the server.
      *
-     * @param user The user to ban.
+     * @param user   The user to ban.
      * @param reason The audit log reason for this action.
      * @return A future to check if the unban was successful.
      */
@@ -2058,7 +2058,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Gets the audit log of this server.
      *
      * @param limit The maximum amount of audit log entries.
-     * @param type The action type of the audit log.
+     * @param type  The action type of the audit log.
      * @return The audit log.
      */
     CompletableFuture<AuditLog> getAuditLog(int limit, AuditLogActionType type);
@@ -2066,7 +2066,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Gets the audit log of this server.
      *
-     * @param limit The maximum amount of audit log entries.
+     * @param limit  The maximum amount of audit log entries.
      * @param before Filter the log before this entry.
      * @return The audit log.
      */
@@ -2075,9 +2075,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Gets the audit log of this server.
      *
-     * @param limit The maximum amount of audit log entries.
+     * @param limit  The maximum amount of audit log entries.
      * @param before Filter the log before this entry.
-     * @param type The action type of the audit log.
+     * @param type   The action type of the audit log.
      * @return The audit log.
      */
     CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogEntry before, AuditLogActionType type);
@@ -2089,7 +2089,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      * This method also do not take into account overwritten permissions in some channels!
      *
-     * @param user The user.
+     * @param user       The user.
      * @param permission The permission to check.
      * @return Whether the user has the permission or not.
      */
@@ -2236,6 +2236,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     List<ServerVoiceChannel> getVoiceChannels();
 
     /**
+     * Gets a sorted list (by archive timestamp from old to new) with all thread channels of the server.
+     *
+     * @return A sorted list (by archive timestamp from old to new) with all thread channels of the server.
+     */
+    List<ServerThreadChannel> getThreadChannels();
+
+    /**
      * Gets a channel by its id.
      *
      * @param id The id of the channel.
@@ -2371,10 +2378,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param id The id of the threat.
      * @return The threat with the given id.
      */
-    default Optional<ChannelThread> getThreadById(long id) {
-        return getChannelById(id)
-                .filter(channel -> channel instanceof ChannelThread)
-                .map(channel -> (ChannelThread) channel);
+    default Optional<ServerThreadChannel> getThreadChannelById(final long id) {
+        return getChannelById(id).flatMap(ServerChannel::asServerThreadChannel);
     }
 
     /**
@@ -2383,10 +2388,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param id The id of the thread.
      * @return The thread with the given id.
      */
-    default Optional<ChannelThread> getThreadById(String id) {
+    default Optional<ServerThreadChannel> getThreadChannelById(final String id) {
         try {
-            return getThreadById(Long.parseLong(id));
-        } catch (NumberFormatException e) {
+            return getThreadChannelById(Long.parseLong(id));
+        } catch (final NumberFormatException e) {
             return Optional.empty();
         }
     }
@@ -2784,7 +2789,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if the user can manage the roles of the target user.
      *
-     * @param user The user that tries to manage roles.
+     * @param user   The user that tries to manage roles.
      * @param target The user whose roles are to be managed.
      * @return Whether the user can manage the target's roles.
      */
@@ -2795,7 +2800,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if the user can manage the target role.
      *
-     * @param user The user that tries to manage the role.
+     * @param user   The user that tries to manage the role.
      * @param target The role that is to be managed.
      * @return Whether the user can manage the role.
      */
@@ -2853,7 +2858,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * This method also considers the position of the user roles and the owner.
      * If the to-be-kicked user is not part of this server, still {@code true} is returned as Discord allows this.
      *
-     * @param user The user which "want" to kick the other user.
+     * @param user       The user which "want" to kick the other user.
      * @param userToKick The user which should be kicked.
      * @return Whether the given user can kick the other user or not.
      */
@@ -2911,7 +2916,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Checks if the given user can ban the other user.
      * This method also considers the position of the user roles and the owner.
      *
-     * @param user The user which "want" to ban the other user.
+     * @param user      The user which "want" to ban the other user.
      * @param userToBan The user which should be banned.
      * @return Whether the given user can ban the other user or not.
      */
@@ -2948,5 +2953,51 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<Server> getCurrentCachedInstance() {
         return getApi().getServerById(getId());
     }
+
+    /**
+     * Joins this ServerThreadChannel.
+     * Also requires the thread is not archived.
+     *
+     * @param serverThreadChannel The ServerThreadChannel which should be joined.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> joinServerThreadChannel(ServerThreadChannel serverThreadChannel) {
+        return joinServerThreadChannel(serverThreadChannel.getId());
+    }
+
+    /**
+     * Joins this ServerThreadChannel.
+     * Also requires the thread is not archived.
+     *
+     * @param channelId The ServerThreadChannel ID which should be joined.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Void> joinServerThreadChannel(long channelId);
+
+
+    /**
+     * Leaves this ServerThreadChannel.
+     *
+     * @param serverThreadChannel The ServerThreadChannel which should be left.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> leaveServerThreadChannel(ServerThreadChannel serverThreadChannel) {
+        return leaveServerThreadChannel(serverThreadChannel.getId());
+    }
+
+    /**
+     * Leaves this ServerThreadChannel.
+     *
+     * @param channelId The ServerThreadChannel ID which should be left.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Void> leaveServerThreadChannel(long channelId);
+
+    /**
+     * Gets the active threads in this Server.
+     *
+     * @return The active threads.
+     */
+    CompletableFuture<ActiveThreads> getActiveThreads();
 
 }

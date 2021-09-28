@@ -10,7 +10,8 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link ServerVoiceChannelBuilder} to create server voice channels.
  * You usually don't want to interact with this object.
  */
-public interface ServerVoiceChannelBuilderDelegate extends ServerChannelBuilderDelegate {
+public interface ServerVoiceChannelBuilderDelegate extends
+        ServerChannelBuilderDelegate {
 
     /**
      * Sets the bitrate of the channel.

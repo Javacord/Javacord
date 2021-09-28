@@ -1,32 +1,34 @@
 package org.javacord.core.event.channel.thread;
 
-import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.thread.ThreadDeleteEvent;
+import org.javacord.core.event.channel.server.ServerChannelEventImpl;
 
-public class ThreadDeleteEventImpl implements ThreadDeleteEvent {
+public class ThreadDeleteEventImpl extends ServerChannelEventImpl implements ThreadDeleteEvent {
 
     /**
      * The channel of the event.
      */
-    private final TextChannel channel;
+    private final ServerThreadChannel serverThreadChannel;
 
     /**
-     * Creates a new thread create event.
+     * Creates a new thread delete event.
      *
      * @param channel The channel of the event.
      */
-    public ThreadDeleteEventImpl(TextChannel channel) {
-        this.channel = channel;
+    public ThreadDeleteEventImpl(final ServerThreadChannel channel) {
+        super(channel);
+        this.serverThreadChannel = channel;
     }
 
     @Override
-    public TextChannel getChannel() {
-        return channel;
+    public ServerThreadChannel getChannel() {
+        return serverThreadChannel;
     }
 
     @Override
-    public DiscordApi getApi() {
-        return getChannel().getApi();
+    public Server getServer() {
+        return serverThreadChannel.getServer();
     }
 }

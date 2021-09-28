@@ -2,10 +2,8 @@ package org.javacord.api.entity.channel.internal;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
-import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerChannelUpdater;
 import org.javacord.api.entity.permission.Permissions;
-
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -27,15 +25,6 @@ public interface ServerChannelUpdaterDelegate {
      * @param name The new name of the channel.
      */
     void setName(String name);
-
-    /**
-     * Queues the raw position to be updated.
-     *
-     * @param rawPosition The new position of the channel.
-     *                    If you want to update the position based on other channels, make sure to use
-     *                    {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
-     */
-    void setRawPosition(int rawPosition);
 
     /**
      * Adds a permission overwrite for the given entity.

@@ -4,18 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
-import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.channel.thread.ThreadListSyncEvent;
-import org.javacord.core.entity.channel.ChannelThreadImpl;
+import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.thread.ThreadListSyncEventImpl;
-import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,47 +26,49 @@ public class ThreadListSyncHandler extends PacketHandler {
      *
      * @param api The api.
      */
-    public ThreadListSyncHandler(DiscordApi api) {
+    public ThreadListSyncHandler(final DiscordApi api) {
         super(api, true, "THREAD_LIST_SYNC");
     }
 
     @Override
-    public void handle(JsonNode packet) {
-        long serverId = packet.get("guild_id").asLong();
-        ServerImpl server = api.getPossiblyUnreadyServerById(serverId).map(ServerImpl.class::cast).orElse(null);
+    public void handle(final JsonNode packet) {
+        final long serverId = packet.get("guild_id").asLong();
+        final ServerImpl server = api.getServerById(serverId)
+                .map(ServerImpl.class::cast)
+                .orElse(null);
         if (server == null) {
             logger.warn("Unable to find server with id {}", serverId);
             return;
         }
 
-        List<Long> channelIds = new ArrayList<>();
+        final List<Long> channelIds = new ArrayList<>();
         if (packet.has("channel_ids")) {
-            for (JsonNode channelId : packet.get("channel_ids")) {
+            for (final JsonNode channelId : packet.get("channel_ids")) {
                 channelIds.add(channelId.asLong());
             }
         }
 
-        List<ChannelThread> threads = new ArrayList<>();
-        for (JsonNode thread : packet.get("threads")) {
-            threads.add(new ChannelThreadImpl(api, server, thread));
+        final List<ServerThreadChannel> threads = new ArrayList<>();
+        for (final JsonNode thread : packet.get("threads")) {
+            threads.add(new ServerThreadChannelImpl(api, server, thread));
         }
 
-        List<Long> threadIds = new ArrayList<>();
-        for (ChannelThread thread : threads) {
+        final List<Long> threadIds = new ArrayList<>();
+        for (final ServerThreadChannel thread : threads) {
             threadIds.add(thread.getId());
         }
 
-        List<ThreadMember> members = new ArrayList<>();
-        for (JsonNode member : packet.get("members")) {
-            members.add(new ThreadMemberImpl(member));
+        final List<ThreadMember> members = new ArrayList<>();
+        for (final JsonNode member : packet.get("members")) {
+            members.add(new ThreadMemberImpl(api, server, member));
         }
 
-        for (ChannelThread thread : threads) {
+        for (final ServerThreadChannel thread : threads) {
             api.addChannelToCache(thread);
         }
 
         //Removes lost threads from cache
-        for (Channel channel : api.getChannels()) {
+        for (final Channel channel : api.getChannels()) {
             if (channel.getType() == ChannelType.SERVER_PRIVATE_THREAD
                     || channel.getType() == ChannelType.SERVER_PUBLIC_THREAD
                     && !threadIds.contains(channel.getId())) {
@@ -76,8 +76,8 @@ public class ThreadListSyncHandler extends PacketHandler {
             }
         }
 
-        ThreadListSyncEvent event = new ThreadListSyncEventImpl(server, channelIds, threads, members);
+        final ThreadListSyncEvent event = new ThreadListSyncEventImpl(server, channelIds, threads, members);
 
-        api.getEventDispatcher().dispatchThreadListSyncEvent((DispatchQueueSelector) server, server, event);
+        api.getEventDispatcher().dispatchThreadListSyncEvent(server, server, event);
     }
 }

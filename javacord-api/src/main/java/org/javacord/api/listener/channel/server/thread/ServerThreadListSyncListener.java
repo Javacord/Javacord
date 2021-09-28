@@ -1,4 +1,4 @@
-package org.javacord.api.listener.channel.thread;
+package org.javacord.api.listener.channel.server.thread;
 
 import org.javacord.api.event.channel.thread.ThreadListSyncEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
@@ -9,7 +9,7 @@ import org.javacord.api.listener.server.ServerAttachableListener;
  * This listener listens to thread list syncs.
  */
 @FunctionalInterface
-public interface ThreadListSyncListener extends ServerAttachableListener, GloballyAttachableListener,
+public interface ServerThreadListSyncListener extends ServerAttachableListener, GloballyAttachableListener,
         ObjectAttachableListener {
 
     /**

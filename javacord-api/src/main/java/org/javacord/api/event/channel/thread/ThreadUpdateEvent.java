@@ -1,10 +1,7 @@
 package org.javacord.api.event.channel.thread;
 
-import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.event.channel.ChannelEvent;
+import org.javacord.api.event.channel.server.ServerChannelEvent;
 
-public interface ThreadUpdateEvent extends ChannelEvent {
+public interface ThreadUpdateEvent extends ServerChannelEvent {
 
-    @Override
-    TextChannel getChannel();
 }

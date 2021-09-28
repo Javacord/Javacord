@@ -1,32 +1,34 @@
 package org.javacord.core.event.channel.thread;
 
-import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.thread.ThreadCreateEvent;
+import org.javacord.core.event.channel.server.ServerChannelEventImpl;
 
-public class ThreadCreateEventImpl implements ThreadCreateEvent {
+public class ThreadCreateEventImpl extends ServerChannelEventImpl implements ThreadCreateEvent {
 
     /**
      * The channel of the event.
      */
-    private final TextChannel channel;
+    private final ServerThreadChannel serverThreadChannel;
 
     /**
      * Creates a new thread create event.
      *
-     * @param channel The channel of the event.
+     * @param serverThreadChannel The channel of the event.
      */
-    public ThreadCreateEventImpl(TextChannel channel) {
-        this.channel = channel;
+    public ThreadCreateEventImpl(final ServerThreadChannel serverThreadChannel) {
+        super(serverThreadChannel);
+        this.serverThreadChannel = serverThreadChannel;
     }
 
     @Override
-    public TextChannel getChannel() {
-        return channel;
+    public ServerThreadChannel getChannel() {
+        return serverThreadChannel;
     }
 
     @Override
-    public DiscordApi getApi() {
-        return getChannel().getApi();
+    public Server getServer() {
+        return serverThreadChannel.getServer();
     }
 }

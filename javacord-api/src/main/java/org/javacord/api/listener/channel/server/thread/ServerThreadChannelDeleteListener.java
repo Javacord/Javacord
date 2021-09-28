@@ -1,15 +1,15 @@
-package org.javacord.api.listener.channel.thread;
+package org.javacord.api.listener.channel.server.thread;
 
 import org.javacord.api.event.channel.thread.ThreadDeleteEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
-import org.javacord.api.listener.channel.ChannelThreadAttachableListener;
+import org.javacord.api.listener.channel.ServerThreadChannelAttachableListener;
 
 /**
  * This listener listens to thread deletions.
  */
 @FunctionalInterface
-public interface ThreadDeleteListener extends ChannelThreadAttachableListener,
+public interface ServerThreadChannelDeleteListener extends ServerThreadChannelAttachableListener,
         GloballyAttachableListener, ObjectAttachableListener {
 
     /**

@@ -18,13 +18,13 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
-import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
@@ -87,7 +87,6 @@ import org.javacord.core.util.ratelimit.RatelimitManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -1948,13 +1947,25 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public Collection<ChannelThread> getChannelPrivateThreads() {
-        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD);
+    public List<ServerThreadChannel> getPrivateServerThreadChannels() {
+        return Collections.unmodifiableList(
+                entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD)
+                .stream()
+                .map(Channel::asServerThreadChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public Collection<ChannelThread> getChannelPublicThreads() {
-        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PUBLIC_THREAD);
+    public List<ServerThreadChannel> getPublicServerThreadChannels() {
+        return Collections.unmodifiableList(
+                entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PUBLIC_THREAD)
+                .stream()
+                .map(Channel::asServerThreadChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList()));
     }
 
     @Override

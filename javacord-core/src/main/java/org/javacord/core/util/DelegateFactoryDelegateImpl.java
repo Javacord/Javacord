@@ -3,11 +3,13 @@ package org.javacord.core.util;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
+import org.javacord.api.entity.channel.PositionableServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.GroupChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.PositionableServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
@@ -54,6 +56,7 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioSourceBaseDelegateImpl;
 import org.javacord.core.entity.channel.ChannelCategoryBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ChannelUpdaterDelegateImpl;
+import org.javacord.core.entity.channel.PositionableServerChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelUpdaterDelegateImpl;
@@ -191,6 +194,12 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ServerChannelUpdaterDelegate createServerChannelUpdaterDelegate(ServerChannel channel) {
         return new ServerChannelUpdaterDelegateImpl(channel);
+    }
+
+    @Override
+    public PositionableServerChannelUpdaterDelegate createPositionableServerChannelUpdaterDelegate(
+            PositionableServerChannel channel) {
+        return new PositionableServerChannelUpdaterDelegateImpl(channel);
     }
 
     @Override

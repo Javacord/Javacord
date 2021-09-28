@@ -3,11 +3,13 @@ package org.javacord.api.util.internal;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
+import org.javacord.api.entity.channel.PositionableServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.GroupChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.PositionableServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
@@ -320,6 +322,17 @@ public class DelegateFactory {
      */
     public static ServerChannelUpdaterDelegate createServerChannelUpdaterDelegate(ServerChannel channel) {
         return delegateFactoryDelegate.createServerChannelUpdaterDelegate(channel);
+    }
+
+    /**
+     * Creates a new positionable server channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new positionable server channel updater delegate.
+     */
+    public static PositionableServerChannelUpdaterDelegate createPositionableServerChannelUpdaterDelegate(
+            PositionableServerChannel channel) {
+        return delegateFactoryDelegate.createPositionableServerChannelUpdaterDelegate(channel);
     }
 
     /**

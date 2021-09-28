@@ -1,22 +1,55 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
-public interface ThreadMember {
+public interface ThreadMember extends DiscordEntity {
 
     /**
-     * The id of the thread.
+     * Gets the discord api instance.
      *
-     * @return The id of the thread.
+     * @return The discord api instance.
      */
-    Long getId();
+    DiscordApi getApi();
+
+    /**
+     * Gets the server related to this thread member.
+     *
+     * @return The server of this thread member.
+     */
+    Server getServer();
 
     /**
      * The id of the user.
      *
      * @return The id of the user.
      */
-    Long getUserId();
+    long getUserId();
+
+    /**
+     * Gets the user from the cache.
+     *
+     * @return The user if it is in the cache.
+     */
+    default Optional<User> getCachedUser() {
+        return getApi().getCachedUserById(getUserId());
+    }
+
+    /**
+     * Requests a user from Discord with the given id.
+     *
+     * <p>If the user is in the cache, the user is served from the cache.
+     *
+     * @return The user.
+     */
+    default CompletableFuture<User> requestUser() {
+        return getApi().getUserById(getUserId());
+    }
 
     /**
      * The time the current user last joined the thread.

@@ -23,11 +23,9 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,13 +39,6 @@ import java.util.stream.Collectors;
  * The implementation of {@link ServerChannel}.
  */
 public class ServerChannelImpl implements ServerChannel, InternalServerChannelAttachableListenerManager {
-
-    /**
-     * Compares channels according to their "position" field and, if those are the same, their id.
-     */
-    public static final Comparator<ServerChannel> COMPARE_BY_RAW_POSITION = Comparator
-            .comparingInt(ServerChannel::getRawPosition)
-            .thenComparingLong(ServerChannel::getId);
 
     /**
      * The discord api instance.
@@ -75,11 +66,6 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
     private final ChannelType type;
 
     /**
-     * The rawPosition of the channel.
-     */
-    private volatile Integer rawPosition;
-
-    /**
      * A map with all overwritten user permissions.
      */
     private final ConcurrentHashMap<Long, Permissions> overwrittenUserPermissions = new ConcurrentHashMap<>();
@@ -102,7 +88,6 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
 
         id = Long.parseLong(data.get("id").asText());
         name = data.get("name").asText();
-        rawPosition = data.hasNonNull("position") ? data.get("position").asInt(0) : null;
 
         type = ChannelType.fromId(data.get("type").asInt(-1));
 
@@ -125,7 +110,6 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
                 }
             }
         }
-
         api.addChannelToCache(this);
     }
 
@@ -136,15 +120,6 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * Sets the raw position of the channel.
-     *
-     * @param position The new raw position of the channel.
-     */
-    public void setRawPosition(Integer position) {
-        this.rawPosition = position;
     }
 
     /**
@@ -183,11 +158,6 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
     @Override
     public Server getServer() {
         return server;
-    }
-
-    @Override
-    public Integer getRawPosition() {
-        return rawPosition;
     }
 
     @Override
