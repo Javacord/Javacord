@@ -25,8 +25,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server channel.
  */
-public interface ServerChannel extends Channel, Nameable, ServerChannelAttachableListenerManager,
-        Comparable<ServerChannel> {
+public interface ServerChannel extends Channel, Nameable, ServerChannelAttachableListenerManager {
 
     /**
      * Gets the server of the channel.
@@ -34,27 +33,6 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
      * @return The server of the channel.
      */
     Server getServer();
-
-    /**
-     * Gets the raw position of the channel.
-     *
-     * <p>This is the positions sent from Discord and might not be unique and have gaps.
-     * Also, every channel type (text, voice and category) has its own position counter.
-     *
-     * @return The raw position of the channel.
-     */
-    Integer getRawPosition();
-
-    /**
-     * Gets the real position of the channel.
-     *
-     * <p>Returns <code>-1</code> if the channel is deleted.
-     *
-     * @return The real position of the channel.
-     */
-    default int getPosition() {
-        return getServer().getChannels().indexOf(this);
-    }
 
     /**
      * Creates an invite builder for this channel.
@@ -92,21 +70,6 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
      */
     default CompletableFuture<Void> updateName(String name) {
         return createUpdater().setName(name).update();
-    }
-
-    /**
-     * Updates the raw position of the channel.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param rawPosition The new position of the channel.
-     *     If you want to update the position based on other channels, make sure to use
-     *     {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateRawPosition(Integer rawPosition) {
-        return createUpdater().setRawPosition(rawPosition).update();
     }
 
     /**
@@ -311,21 +274,6 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
             result.completeExceptionally(new NoSuchElementException());
             return result;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p><b><i>Implementation note:</i></b> Only channels from the same server can be compared
-     *
-     * @throws IllegalArgumentException If the channels are on different servers.
-     */
-    @Override
-    default int compareTo(ServerChannel channel) {
-        if (!getServer().equals(channel.getServer())) {
-            throw new IllegalArgumentException("Only channels from the same server can be compared for order");
-        }
-        return getPosition() - channel.getPosition();
     }
 
 }

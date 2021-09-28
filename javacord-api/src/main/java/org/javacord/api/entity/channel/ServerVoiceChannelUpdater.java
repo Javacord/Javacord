@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to update server voice channels.
  */
-public class ServerVoiceChannelUpdater extends ServerChannelUpdater {
+public class ServerVoiceChannelUpdater extends PositionableServerChannelUpdater {
 
     /**
      * The server voice channel delegate used by this instance.

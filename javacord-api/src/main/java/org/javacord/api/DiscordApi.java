@@ -6,12 +6,12 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
-import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
@@ -1353,14 +1353,14 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @return A collection with all private threads of the bot.
      */
-    Collection<ChannelThread> getChannelPrivateThreads();
+    List<ServerThreadChannel> getPrivateServerThreadChannels();
 
     /**
      * Gets a collection with all the public threads of the bot.
      *
      * @return A collection with all the public threads of the bot.
      */
-    Collection<ChannelThread> getChannelPublicThreads();
+    List<ServerThreadChannel> getPublicServerThreadChannels();
 
     /**
      * Gets a collection with all server voice channels of the bot.

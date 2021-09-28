@@ -20,17 +20,6 @@ public enum RestEndpoint {
     MESSAGES_BULK_DELETE("/channels/%s/messages/bulk-delete", 0),
     CHANNEL_TYPING("/channels/%s/typing", 0),
     CHANNEL_INVITE("/channels/%s/invites", 0),
-    START_THREAD_WITH_MESSAGE("/channels/%s/messages/%s/threads", 0),
-    START_THREAD_WITHOUT_MESSAGE("/channels/%s/threads", 0),
-    JOIN_THREAD("/channels/%s/thread-members/@me", 0),
-    ADD_THREAD_MEMBER("/channels/%s/thread-members/%s", 0),
-    LEAVE_THREAD("/channels/%s/thread-members/@me", 0),
-    REMOVE_THREAD_MEMBER("/channels/%s/thread-members/%s", 0),
-    LIST_THREAD_MEMBERS("/channels/%s/thread-members", 0),
-    LIST_ACTIVE_THREADS("/channels/%s/threads/active", 0),
-    LIST_PUBLIC_ARCHIVED_THREADS("/channels/%s/threads/archived/public", 0),
-    LIST_PRIVATE_ARCHIVED_THREADS("/channels/%s/threads/archived/private", 0),
-    LIST_JOINED_PRIVATE_ARCHIVED_THREADS("/channels/%s/users/@me/threads/archived/private", 0),
     USER("/users/%s"),
     USER_CHANNEL("/users/@me/channels"),
     CHANNEL("/channels/%s", 0),
@@ -57,12 +46,24 @@ public enum RestEndpoint {
     CURRENT_USER("/users/@me"),
     AUDIT_LOG("/guilds/%s/audit-logs", 0),
     CUSTOM_EMOJI("/guilds/%s/emojis", 0),
+    // interactions
     INTERACTION_RESPONSE("/interactions/%s/%s/callback", 0),
     ORIGINAL_INTERACTION_RESPONSE("/webhooks/%s/%s/messages/@original",0),
     SLASH_COMMANDS("/applications/%s/commands", 0),
     SERVER_SLASH_COMMANDS("/applications/%s/guilds/%s/commands",0),
     SERVER_SLASH_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/permissions",0),
-    SLASH_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/%s/permissions",0);
+    SLASH_COMMAND_PERMISSIONS("/applications/%s/guilds/%s/commands/%s/permissions",0),
+
+    //threads
+    START_THREAD_WITH_MESSAGE("/channels/%s/messages/%s/threads", 0),
+    START_THREAD_WITHOUT_MESSAGE("/channels/%s/threads", 0),
+    JOIN_LEAVE_THREAD("/channels/%s/thread-members/@me", 0),
+    ADD_REMOVE_THREAD_MEMBER("/channels/%s/thread-members/%s", 0),
+    LIST_THREAD_MEMBERS("/channels/%s/thread-members", 0),
+    LIST_ACTIVE_THREADS("/guilds/%s/threads/active", 0),
+    LIST_PUBLIC_ARCHIVED_THREADS("/channels/%s/threads/archived/public", 0),
+    LIST_PRIVATE_ARCHIVED_THREADS("/channels/%s/threads/archived/private", 0),
+    LIST_JOINED_PRIVATE_ARCHIVED_THREADS("/channels/%s/users/@me/threads/archived/private", 0);
 
     /**
      * The endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix").

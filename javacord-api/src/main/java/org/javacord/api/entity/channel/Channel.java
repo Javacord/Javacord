@@ -52,6 +52,15 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     }
 
     /**
+     * Gets the channel as positionable server channel.
+     *
+     * @return The channel as server text channel.
+     */
+    default Optional<PositionableServerChannel> asPositionableServerChannel() {
+        return as(PositionableServerChannel.class);
+    }
+
+    /**
      * Gets the channel as channel category.
      *
      * @return The channel as channel category.
@@ -115,12 +124,12 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     }
 
     /**
-     * Gets the channel as thread.
+     * Gets the channel as server thread channel.
      *
-     * @return The channel as thread.
+     * @return The channel as server thread channel.
      */
-    default Optional<ChannelThread> asThread() {
-        return as(ChannelThread.class);
+    default Optional<ServerThreadChannel> asServerThreadChannel() {
+        return as(ServerThreadChannel.class);
     }
 
     /**

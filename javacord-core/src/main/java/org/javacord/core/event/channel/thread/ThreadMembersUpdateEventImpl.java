@@ -1,6 +1,6 @@
 package org.javacord.core.event.channel.thread;
 
-import org.javacord.api.entity.channel.ChannelThread;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.thread.ThreadMembersUpdateEvent;
@@ -11,14 +11,9 @@ import java.util.List;
 public class ThreadMembersUpdateEventImpl extends ServerEventImpl implements ThreadMembersUpdateEvent {
 
     /**
-     * The id of the thread.
+     * The thread of the members update.
      */
-    private final ChannelThread thread;
-
-    /**
-     * The server.
-     */
-    private final Server server;
+    private final ServerThreadChannel serverThreadChannel;
 
     /**
      * The approximate number of members in the thread, capped at 50.
@@ -38,30 +33,25 @@ public class ThreadMembersUpdateEventImpl extends ServerEventImpl implements Thr
     /**
      * Creates a Thread Members Update Event.
      *
-     * @param thread The thread.
-     * @param server The server to which this event belongs.
-     * @param memberCount Approximate number of members in the thread.
-     * @param addedMembers The users who were added to the thread.
-     * @param removedMemberIds The ids of users who were removed from the thread.
+     * @param serverThreadChannel The thread.
+     * @param server              The server to which this event belongs.
+     * @param memberCount         Approximate number of members in the thread.
+     * @param addedMembers        The users who were added to the thread.
+     * @param removedMemberIds    The ids of users who were removed from the thread.
      */
-    public ThreadMembersUpdateEventImpl(ChannelThread thread, Server server, int memberCount,
-                                        List<ThreadMember> addedMembers, List<Long> removedMemberIds) {
+    public ThreadMembersUpdateEventImpl(final ServerThreadChannel serverThreadChannel, final Server server,
+                                        final int memberCount, final List<ThreadMember> addedMembers,
+                                        final List<Long> removedMemberIds) {
         super(server);
-        this.thread = thread;
-        this.server = server;
+        this.serverThreadChannel = serverThreadChannel;
         this.memberCount = memberCount;
         this.addedMembers = addedMembers;
         this.removedMemberIds = removedMemberIds;
     }
 
     @Override
-    public ChannelThread getThread() {
-        return thread;
-    }
-
-    @Override
-    public Server getServer() {
-        return server;
+    public ServerThreadChannel getThread() {
+        return serverThreadChannel;
     }
 
     @Override

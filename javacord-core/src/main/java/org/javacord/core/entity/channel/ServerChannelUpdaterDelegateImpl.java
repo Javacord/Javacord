@@ -73,11 +73,6 @@ public class ServerChannelUpdaterDelegateImpl implements ServerChannelUpdaterDel
     }
 
     @Override
-    public void setRawPosition(int rawPosition) {
-        this.position = rawPosition;
-    }
-
-    @Override
     public <T extends Permissionable & DiscordEntity> void addPermissionOverwrite(T permissionable,
                                                                                   Permissions permissions) {
         populatePermissionOverwrites();

@@ -1,8 +1,9 @@
 package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ThreadMember;
-
+import org.javacord.api.entity.server.Server;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 
@@ -11,12 +12,12 @@ public class ThreadMemberImpl implements ThreadMember {
     /**
      * The id of the thread. Omitted on members sent within the thread in a GUILD_CREATE event.
      */
-    private final Long id;
+    private final long id;
 
     /**
      * The id of the user. Omitted on members sent within the thread in a GUILD_CREATE event.
      */
-    private final Long userId;
+    private final long userId;
 
     /**
      * The time the current user last joined the thread.
@@ -28,13 +29,49 @@ public class ThreadMemberImpl implements ThreadMember {
      */
     private final int flags;
 
+    /**
+     * The discord api.
+     */
+    private final DiscordApi api;
+
+    /**
+     * The Server related to this thread member.
+     */
+    private final Server server;
+
+    /**
+     * Creates a new Thread Member object.
+     *
+     * @param api    The discord api.
+     * @param server The server.
+     * @param data   The JSON data from which to parse this object.
+     */
+    public ThreadMemberImpl(final DiscordApi api, final Server server, final JsonNode data) {
+        this.api = api;
+        this.server = server;
+        id = data.get("id").asLong();
+        userId = data.get("id").asLong();
+        joinTimestamp = OffsetDateTime.parse(data.get("join_timestamp").asText()).toInstant();
+        flags = data.get("flags").asInt();
+    }
+
     @Override
-    public Long getId() {
+    public DiscordApi getApi() {
+        return api;
+    }
+
+    @Override
+    public long getId() {
         return id;
     }
 
     @Override
-    public Long getUserId() {
+    public Server getServer() {
+        return server;
+    }
+
+    @Override
+    public long getUserId() {
         return userId;
     }
 
@@ -48,16 +85,4 @@ public class ThreadMemberImpl implements ThreadMember {
         return flags;
     }
 
-    /**
-     * Creates a new Thread Member object.
-     *
-     * @param data The JSON data from which to parse this object.
-     */
-    public ThreadMemberImpl(JsonNode data) {
-        id = Long.parseLong(data.hasNonNull("id") ? data.get("id").asText("-1") : "-1");
-        userId = Long.parseLong(data.hasNonNull("user_id") ? data.get("id").asText("-1") : "-1");
-        joinTimestamp = data.has("join_timestamp")
-                ? OffsetDateTime.parse(data.get("join_timestamp").asText()).toInstant() : null;
-        flags = data.hasNonNull("flags") ? data.get("flags").asInt(0) : 0;
-    }
 }

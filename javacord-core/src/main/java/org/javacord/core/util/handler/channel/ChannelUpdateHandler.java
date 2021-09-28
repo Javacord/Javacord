@@ -19,6 +19,7 @@ import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeNsfwFlagEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangePositionEvent;
+import org.javacord.api.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeSlowmodeEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeTopicEvent;
 import org.javacord.api.event.channel.server.voice.ServerStageVoiceChannelChangeTopicEvent;
@@ -26,6 +27,7 @@ import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeBitra
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEvent;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.GroupChannelImpl;
+import org.javacord.core.entity.channel.PositionableServerChannelImpl;
 import org.javacord.core.entity.channel.ServerChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
@@ -37,6 +39,7 @@ import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNsfwFlagEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeOverwrittenPermissionsEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangePositionEventImpl;
+import org.javacord.core.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeSlowmodeEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerStageVoiceChannelChangeTopicEventImpl;
@@ -46,7 +49,6 @@ import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -150,25 +152,34 @@ public class ChannelUpdateHandler extends PacketHandler {
         ChannelCategory newCategory = jsonChannel.hasNonNull("parent_id")
                 ? channel.getServer().getChannelCategoryById(jsonChannel.get("parent_id").asLong(-1)).orElse(null)
                 : null;
-        int oldRawPosition = channel.getRawPosition();
-        int newRawPosition = jsonChannel.get("position").asInt();
-        if (oldRawPosition != newRawPosition || !Objects.deepEquals(oldCategory, newCategory)) {
-            int oldPosition = channel.getPosition();
-            if (channel instanceof ServerTextChannelImpl) {
-                ((ServerTextChannelImpl) channel).setParentId(newCategory == null ? -1 : newCategory.getId());
-            } else if (channel instanceof ServerVoiceChannelImpl) {
-                ((ServerVoiceChannelImpl) channel).setParentId(newCategory == null ? -1 : newCategory.getId());
-            }
-            channel.setRawPosition(newRawPosition);
 
-            int newPosition = channel.getPosition();
+        if (channel instanceof PositionableServerChannelImpl) {
+            final PositionableServerChannelImpl positionableServerChannel = (PositionableServerChannelImpl) channel;
+            final int oldRawPosition = positionableServerChannel.getRawPosition();
+            final int newRawPosition = jsonChannel.get("position").asInt();
 
-            ServerChannelChangePositionEvent event = new ServerChannelChangePositionEventImpl(
-                    channel, newPosition, oldPosition, newRawPosition, oldRawPosition, newCategory, oldCategory);
+            if (oldRawPosition != newRawPosition || !Objects.deepEquals(oldCategory, newCategory)) {
+                final int oldPosition = positionableServerChannel.getPosition();
+                if (positionableServerChannel instanceof ServerTextChannelImpl) {
+                    ((ServerTextChannelImpl) positionableServerChannel).setParentId(
+                            newCategory == null ? -1 : newCategory.getId());
+                } else if (positionableServerChannel instanceof ServerVoiceChannelImpl) {
+                    ((ServerVoiceChannelImpl) positionableServerChannel).setParentId(
+                            newCategory == null ? -1 : newCategory.getId());
+                }
+                positionableServerChannel.setRawPosition(newRawPosition);
 
-            if (server.isReady()) {
-                api.getEventDispatcher().dispatchServerChannelChangePositionEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+                final int newPosition = positionableServerChannel.getPosition();
+
+                final ServerChannelChangePositionEvent event = new ServerChannelChangePositionEventImpl(
+                        positionableServerChannel, newPosition, oldPosition, newRawPosition, oldRawPosition,
+                        newCategory, oldCategory);
+
+                if (server.isReady()) {
+                    api.getEventDispatcher().dispatchServerChannelChangePositionEvent(
+                            (DispatchQueueSelector) positionableServerChannel.getServer(),
+                            positionableServerChannel.getServer(), positionableServerChannel, event);
+                }
             }
         }
 
@@ -340,6 +351,23 @@ public class ChannelUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
             );
         }
+
+        int oldDefaultAutoArchiveDuration = channel.getDefaultAutoArchiveDuration();
+        int newDefaultAutoArchiveDuration = jsonChannel.has("default_auto_archive_duration")
+                ? jsonChannel.get("default_auto_archive_duration").asInt()
+                : 1440;
+        if (oldDefaultAutoArchiveDuration != newDefaultAutoArchiveDuration) {
+            channel.setDefaultAutoArchiveDuration(newDefaultAutoArchiveDuration);
+
+            ServerTextChannelChangeDefaultAutoArchiveDurationEvent event =
+                    new ServerTextChannelChangeDefaultAutoArchiveDurationEventImpl(channel,
+                            oldDefaultAutoArchiveDuration, newDefaultAutoArchiveDuration);
+
+            api.getEventDispatcher().dispatchServerTextChannelChangeDefaultAutoArchiveDurationEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
+            );
+
+        }
     }
 
     /**
@@ -438,11 +466,11 @@ public class ChannelUpdateHandler extends PacketHandler {
     /**
      * Dispatches a ServerChannelChangeOverwrittenPermissionsEvent.
      *
-     * @param channel The channel of the event.
+     * @param channel        The channel of the event.
      * @param newPermissions The new overwritten permissions.
      * @param oldPermissions The old overwritten permissions.
-     * @param entityId The id of the entity.
-     * @param entity The entity of the event.
+     * @param entityId       The id of the entity.
+     * @param entity         The entity of the event.
      */
     private void dispatchServerChannelChangeOverwrittenPermissionsEvent(
             ServerChannel channel, Permissions newPermissions, Permissions oldPermissions,

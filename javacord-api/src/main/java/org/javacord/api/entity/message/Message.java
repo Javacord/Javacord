@@ -4,11 +4,14 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
+import org.javacord.api.entity.channel.AutoArchiveDuration;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
@@ -1062,7 +1065,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     CompletableFuture<Void> removeReactionByEmoji(User user, String unicodeEmoji);
 
-
     /**
      * Removes all reactors of a given emoji reaction.
      *
@@ -1073,7 +1075,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
         return getReactionByEmoji(emoji).map(Reaction::remove).orElseGet(() -> CompletableFuture.completedFuture(null));
     }
 
-
     /**
      * Removes all reactors of a given unicode emoji reaction.
      *
@@ -1081,7 +1082,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> removeReactionByEmoji(String unicodeEmoji);
-
 
     /**
      * Removes a user from the list of reactors of the given emoji reactions.
@@ -1171,7 +1171,17 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The server text channel.
      */
     default Optional<ServerTextChannel> getServerTextChannel() {
-        return Optional.ofNullable(getChannel() instanceof ServerTextChannel ? (ServerTextChannel) getChannel() : null);
+        return getChannel().asServerTextChannel();
+    }
+
+    /**
+     * Gets the server thread channel of the message.
+     * Only present if the message was sent in a thread in a server.
+     *
+     * @return The server thread channel.
+     */
+    default Optional<ServerThreadChannel> getServerThreadChannel() {
+        return getChannel().asServerThreadChannel();
     }
 
     /**
@@ -1181,7 +1191,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The private channel.
      */
     default Optional<PrivateChannel> getPrivateChannel() {
-        return Optional.ofNullable(getChannel() instanceof PrivateChannel ? (PrivateChannel) getChannel() : null);
+        return getChannel().asPrivateChannel();
     }
 
     /**
@@ -1191,7 +1201,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The group channel.
      */
     default Optional<GroupChannel> getGroupChannel() {
-        return Optional.ofNullable(getChannel() instanceof GroupChannel ? (GroupChannel) getChannel() : null);
+        return getChannel().asGroupChannel();
     }
 
     /**
@@ -1200,7 +1210,10 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The server of the message.
      */
     default Optional<Server> getServer() {
-        return getServerTextChannel().map(ServerChannel::getServer);
+        return getServerTextChannel()
+                .map(Channel::asServerChannel)
+                .orElseGet(() -> getServerThreadChannel().flatMap(Channel::asServerChannel))
+                .map(ServerChannel::getServer);
     }
 
     /**
@@ -1574,4 +1587,32 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
         return getChannel().getMessageById(getId());
     }
 
+    /**
+     * Creates a thread for this message.
+     *
+     * @param name                The Thread name.
+     * @param autoArchiveDuration Duration in minutes to automatically archive the thread after recent activity.
+     * @return The created ServerThreadChannel.
+     */
+    default CompletableFuture<ServerThreadChannel> createThread(String name, AutoArchiveDuration autoArchiveDuration) {
+        return getServerTextChannel()
+                .map(serverTextChannel -> serverTextChannel.createThreadForMessage(getId(), name,
+                        autoArchiveDuration.asInt()))
+                .orElseThrow(() -> new IllegalStateException(
+                        "In order to create a thread the channel of this message must be a ServerTextChannel"));
+    }
+
+    /**
+     * Creates a thread for this message.
+     *
+     * @param name                The Thread name.
+     * @param autoArchiveDuration Duration in minutes to automatically archive the thread after recent activity.
+     * @return The created ServerThreadChannel.
+     */
+    default CompletableFuture<ServerThreadChannel> createThread(String name, Integer autoArchiveDuration) {
+        return getServerTextChannel()
+                .map(serverTextChannel -> serverTextChannel.createThreadForMessage(getId(), name, autoArchiveDuration))
+                .orElseThrow(() -> new IllegalStateException(
+                        "In order to create a thread the channel of this message must be a ServerTextChannel"));
+    }
 }

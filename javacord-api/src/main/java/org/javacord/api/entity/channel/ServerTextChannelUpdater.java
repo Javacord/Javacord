@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to update server text channels.
  */
-public class ServerTextChannelUpdater extends ServerChannelUpdater {
+public class ServerTextChannelUpdater extends PositionableServerChannelUpdater {
 
     /**
      * The server text channel delegate used by this instance.

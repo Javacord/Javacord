@@ -57,19 +57,6 @@ public class ServerChannelUpdater {
     }
 
     /**
-     * Queues the raw position to be updated.
-     *
-     * @param rawPosition The new position of the channel.
-     *                    If you want to update the position based on other channels, make sure to use
-     *                    {@link ServerChannel#getRawPosition()} instead of {@link ServerChannel#getPosition()}!
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerChannelUpdater setRawPosition(int rawPosition) {
-        delegate.setRawPosition(rawPosition);
-        return this;
-    }
-
-    /**
      * Adds a permission overwrite for the given entity.
      *
      * @param <T> The type of entity to hold the permission, usually <code>User</code> or <code>Role</code>

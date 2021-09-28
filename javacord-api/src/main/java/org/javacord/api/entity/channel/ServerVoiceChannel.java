@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server voice channel.
  */
-public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categorizable,
+public interface ServerVoiceChannel extends PositionableServerChannel, VoiceChannel, Categorizable,
                                             ServerVoiceChannelAttachableListenerManager {
 
     /**

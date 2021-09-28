@@ -1,6 +1,6 @@
 package org.javacord.core.event.channel.thread;
 
-import org.javacord.api.entity.channel.ChannelThread;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.thread.ThreadListSyncEvent;
@@ -9,11 +9,6 @@ import org.javacord.core.event.server.ServerEventImpl;
 import java.util.List;
 
 public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadListSyncEvent {
-
-    /**
-     * The server.
-     */
-    private final Server server;
 
     /**
      * The parent channel ids whose threads are being synced.
@@ -26,7 +21,7 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
     /**
      * All active threads in the given channels that the current user can access.
      */
-    private final List<ChannelThread> threads;
+    private final List<ServerThreadChannel> serverThreadChannels;
 
     /**
      * All thread member objects from the synced threads for the current user,
@@ -37,24 +32,19 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
     /**
      * Creates a Thread List Sync Event.
      *
-     * @param server The server to which this event belongs.
-     * @param channelIds The channel ids whose threads are being synced.
-     * @param threads The active threads in the given channels that the current user can access.
-     * @param members All thread member objects from the synced threads for the current user.
+     * @param server               The server to which this event belongs.
+     * @param channelIds           The channel ids whose threads are being synced.
+     * @param serverThreadChannels The active threads in the given channels that the current user can access.
+     * @param members              All thread member objects from the synced threads for the current user.
      */
-    public ThreadListSyncEventImpl(Server server, List<Long> channelIds, List<ChannelThread> threads,
-                                    List<ThreadMember> members) {
+    public ThreadListSyncEventImpl(final Server server, final List<Long> channelIds,
+                                   final List<ServerThreadChannel> serverThreadChannels,
+                                   final List<ThreadMember> members) {
         super(server);
 
-        this.server = server;
         this.channelIds = channelIds;
-        this.threads = threads;
+        this.serverThreadChannels = serverThreadChannels;
         this.members = members;
-    }
-
-    @Override
-    public Server getServer() {
-        return server;
     }
 
     @Override
@@ -63,8 +53,8 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
     }
 
     @Override
-    public List<ChannelThread> getThreads() {
-        return threads;
+    public List<ServerThreadChannel> getServerThreadChannels() {
+        return serverThreadChannels;
     }
 
     @Override

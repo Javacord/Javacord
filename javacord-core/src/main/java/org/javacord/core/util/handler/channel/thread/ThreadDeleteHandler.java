@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
-import org.javacord.api.entity.channel.ChannelThread;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.thread.ThreadDeleteEvent;
@@ -15,8 +14,6 @@ import org.javacord.core.event.channel.thread.ThreadDeleteEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-
-import java.util.Optional;
 
 /**
  * Handles the thread delete packet.
@@ -31,86 +28,52 @@ public class ThreadDeleteHandler extends PacketHandler {
      *
      * @param api The api.
      */
-    public ThreadDeleteHandler(DiscordApi api) {
+    public ThreadDeleteHandler(final DiscordApi api) {
         super(api, true, "THREAD_DELETE");
     }
 
     @Override
-    public void handle(JsonNode packet) {
-        ChannelType type = ChannelType.fromId(packet.get("type").asInt());
+    public void handle(final JsonNode packet) {
+        final ChannelType type = ChannelType.fromId(packet.get("type").asInt());
         switch (type) {
             case SERVER_PUBLIC_THREAD:
-                handleServerPublicThread(packet);
-                break;
             case SERVER_PRIVATE_THREAD:
-                handleServerPrivateThread(packet);
+                handleServerThread(packet);
                 break;
             default:
                 logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
         }
+    }
+
+    private void handleServerThread(final JsonNode packet) {
+        final long serverId = packet.get("guild_id").asLong();
+        final long channelId = packet.get("id").asLong();
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getThreadChannelById(channelId))
+                .ifPresent(channel -> {
+                    dispatchThreadDeleteEvent(channel);
+                    api.forEachCachedMessageWhere(
+                            msg -> msg.getChannel().getId() == channelId,
+                            msg -> api.removeMessageFromCache(msg.getId())
+                    );
+                });
+        api.removeObjectListeners(ServerThreadChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(TextChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
+
         api.removeChannelFromCache(packet.get("id").asLong());
-    }
-
-    /**
-     * Handles the deletion of a server private thread.
-     *
-     * @param channelJson Json of the thread to be deleted.
-     */
-    private void handleServerPrivateThread(JsonNode channelJson) {
-        long serverId = channelJson.get("guild_id").asLong();
-        long channelId = channelJson.get("id").asLong();
-        api.getPossiblyUnreadyServerById(serverId)
-                .flatMap(server -> server.getTextChannelById(channelId))
-                .ifPresent(channel -> {
-                    dispatchThreadDeleteEvent(channel);
-                    api.forEachCachedMessageWhere(
-                            msg -> msg.getChannel().getId() == channelId,
-                            msg -> api.removeMessageFromCache(msg.getId())
-                    );
-                });
-        api.removeObjectListeners(ChannelThread.class, channelId);
-        api.removeObjectListeners(ServerTextChannel.class, channelId);
-        api.removeObjectListeners(ServerChannel.class, channelId);
-        api.removeObjectListeners(TextChannel.class, channelId);
-        api.removeObjectListeners(Channel.class, channelId);
-    }
-
-    /**
-     * Handles the deletion of a server private thread.
-     *
-     * @param channelJson Json of the thread to be deleted.
-     */
-    private void handleServerPublicThread(JsonNode channelJson) {
-        long serverId = channelJson.get("guild_id").asLong();
-        long channelId = channelJson.get("id").asLong();
-        api.getPossiblyUnreadyServerById(serverId)
-                .flatMap(server -> server.getTextChannelById(channelId))
-                .ifPresent(channel -> {
-                    dispatchThreadDeleteEvent(channel);
-                    api.forEachCachedMessageWhere(
-                            msg -> msg.getChannel().getId() == channelId,
-                            msg -> api.removeMessageFromCache(msg.getId())
-                    );
-                });
-        api.removeObjectListeners(ChannelThread.class, channelId);
-        api.removeObjectListeners(ServerTextChannel.class, channelId);
-        api.removeObjectListeners(ServerChannel.class, channelId);
-        api.removeObjectListeners(TextChannel.class, channelId);
-        api.removeObjectListeners(Channel.class, channelId);
     }
 
     /**
      * Dispatches a thread delete event.
      *
-     * @param thread The thread of the event.
+     * @param serverThreadChannel The thread of the event.
      */
-    private void dispatchThreadDeleteEvent(TextChannel thread) {
-        ThreadDeleteEvent event = new ThreadDeleteEventImpl(thread);
-        Optional<Server> optionalServer = thread.asServerChannel().map(ServerChannel::getServer);
+    private void dispatchThreadDeleteEvent(final ServerThreadChannel serverThreadChannel) {
+        final ThreadDeleteEvent event = new ThreadDeleteEventImpl(serverThreadChannel);
+        final Server server = serverThreadChannel.getServer();
 
-        api.getEventDispatcher().dispatchThreadDeleteEvent(
-                optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
-                (ChannelThread) thread,
-                event);
+        api.getEventDispatcher().dispatchThreadDeleteEvent((DispatchQueueSelector) server, serverThreadChannel, event);
     }
 }
