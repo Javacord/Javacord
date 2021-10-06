@@ -218,6 +218,14 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     Icon getAvatar();
 
     /**
+     * Gets the avatar of the user.
+     *
+     * @param size the size of the image. must be any power of 2 between 16 and 4096
+     * @return The avatar of the user.
+     */
+    Icon getAvatar(int size);
+
+    /**
      * Gets if the user has a default Discord avatar.
      *
      * @return Whether this user has a default avatar or not.
