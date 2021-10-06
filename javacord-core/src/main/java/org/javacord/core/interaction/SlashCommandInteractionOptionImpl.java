@@ -14,12 +14,14 @@ import org.javacord.core.util.logging.LoggerUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class SlashCommandInteractionOptionImpl implements SlashCommandInteractionOption {
 
     private final DiscordApi api;
+    private final Map<Long, User> resolvedUsers;
     private final String name;
     private final String stringRepresentation;
     private final String stringValue;
@@ -40,9 +42,12 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
      *
      * @param api      The DiscordApi instance.
      * @param jsonData The json data of the option.
+     * @param resolvedUsers The map of resolved users and their ID.
      */
-    public SlashCommandInteractionOptionImpl(final DiscordApi api, final JsonNode jsonData) {
+    public SlashCommandInteractionOptionImpl(final DiscordApi api, final JsonNode jsonData,
+                                             Map<Long, User> resolvedUsers) {
         this.api = api;
+        this.resolvedUsers = resolvedUsers;
         name = jsonData.get("name").asText();
         options = new ArrayList<>();
         final JsonNode valueNode = jsonData.get("value");
@@ -64,7 +69,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
             case SUB_COMMAND_GROUP:
                 if (jsonData.has("options") && jsonData.get("options").isArray()) {
                     for (final JsonNode optionJson : jsonData.get("options")) {
-                        options.add(new SlashCommandInteractionOptionImpl(api, optionJson));
+                        options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers));
                     }
                 }
                 break;
@@ -143,8 +148,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     @Override
     public Optional<User> getUserValue() {
-        return Optional.ofNullable(userValue)
-                .flatMap(api::getCachedUserById);
+        return Optional.ofNullable(api.getCachedUserById(userValue)
+                .orElseGet(() -> resolvedUsers.get(userValue)));
     }
 
     @Override
@@ -181,6 +186,9 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
             }
 
             mentionable = api.getCachedUserById(mentionableValue).map(Mentionable.class::cast);
+            if (!mentionable.isPresent()) {
+                mentionable = Optional.ofNullable(resolvedUsers.get(mentionableValue)).map(Mentionable.class::cast);
+            }
         }
         return mentionable;
     }
