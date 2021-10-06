@@ -42,6 +42,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class UserImpl implements User, InternalUserAttachableListenerManager {
 
+    private static final int DEFAULT_AVATAR_SIZE = 1024;
+
     private final DiscordApiImpl api;
     private final Long id;
     private final String name;
@@ -206,6 +208,20 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
      * @return The avatar for the given details.
      */
     public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId) {
+        return getAvatar(api, avatarHash, discriminator, userId, DEFAULT_AVATAR_SIZE);
+    }
+
+    /**
+     * Gets the avatar for the given details.
+     *
+     * @param api The discord api instance.
+     * @param avatarHash The avatar hash or {@code null} for default avatar.
+     * @param discriminator The discriminator if default avatar is wanted.
+     * @param userId The user id.
+     * @param size The size of the image. Must be any power of 2 between 16 and 4096.
+     * @return The avatar for the given details.
+     */
+    public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId, int size) {
         StringBuilder url = new StringBuilder("https://" + Javacord.DISCORD_CDN_DOMAIN + "/");
         if (avatarHash == null) {
             url.append("embed/avatars/")
@@ -216,6 +232,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
                     .append(userId).append('/').append(avatarHash)
                     .append(avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
+        url.append("?size=").append(size);
         try {
             return new IconImpl(api, new URL(url.toString()));
         } catch (MalformedURLException e) {
@@ -227,6 +244,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     @Override
     public Icon getAvatar() {
         return getAvatar(api, avatarHash, discriminator, getId());
+    }
+
+    @Override
+    public Icon getAvatar(int size) {
+        return getAvatar(api, avatarHash, discriminator, getId(), size);
     }
 
     @Override
