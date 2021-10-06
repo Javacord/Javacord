@@ -1,6 +1,7 @@
 package org.javacord.api.entity.permission;
 
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.Permissionable;
@@ -62,6 +63,35 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
      * @return The color of the role.
      */
     Optional<Color> getColor();
+
+    /**
+     * Gets the hash of the role's icon.
+     *
+     * @return The hash of the role's icon.
+     */
+    Optional<String> getIconHash();
+
+    /**
+     * Gets the Icon of the role.
+     *
+     * @return The role's icon.
+     */
+    Optional<Icon> getIcon();
+
+    /**
+     * Gets the Icon of the role.
+     *
+     * @param size The size of the image, must be a power of 2 between 16 and 4096.
+     * @return The role's icon in the given size.
+     */
+    Optional<Icon> getIcon(int size);
+
+    /**
+     * Gets the unicode emoji role icon.
+     *
+     * @return The unicode emoji role icon.
+     */
+    Optional<String> getUnicodeEmojiIcon();
 
     /**
      * Check if this role is mentionable.

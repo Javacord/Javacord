@@ -2,13 +2,16 @@ package org.javacord.core.entity.permission;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleTags;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.UserImpl;
@@ -18,6 +21,8 @@ import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
 import java.awt.Color;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
@@ -33,6 +38,8 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     private static final Comparator<Role> ROLE_COMPARATOR = Comparator
             .comparingInt(Role::getRawPosition)
             .thenComparing(Comparator.comparing(Role::getId).reversed());
+
+    private static final int DEFAULT_ICON_SIZE = 1024;
 
     /**
      * The discord api instance.
@@ -75,6 +82,16 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     private volatile boolean hoist;
 
     /**
+     * The hash of the role's icon.
+     */
+    private final String iconHash;
+
+    /**
+     * The unicode emoji role icon.
+     */
+    private final String unicodeEmoji;
+
+    /**
      * Whether this role can be mentioned or not.
      */
     private volatile boolean mentionable;
@@ -104,6 +121,8 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
         this.rawPosition = data.get("position").asInt();
         this.color = data.get("color").asInt(0);
         this.hoist = data.get("hoist").asBoolean(false);
+        this.iconHash = data.hasNonNull("icon") ? data.get("icon").asText() : null;
+        this.unicodeEmoji = data.hasNonNull("unicode_emoji") ? data.get("unicode_emoji").asText() : null;
         this.mentionable = data.get("mentionable").asBoolean(false);
         this.permissions = new PermissionsImpl(data.get("permissions").asLong(), 0);
         this.managed = data.get("managed").asBoolean(false);
@@ -201,6 +220,39 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     @Override
     public int getRawPosition() {
         return rawPosition;
+    }
+
+    @Override
+    public Optional<String> getIconHash() {
+        return Optional.ofNullable(iconHash);
+    }
+
+    @Override
+    public Optional<Icon> getIcon() {
+        return getIcon(DEFAULT_ICON_SIZE);
+    }
+
+    @Override
+    public Optional<Icon> getIcon(int size) {
+        if (iconHash != null) {
+            StringBuilder url = new StringBuilder("https://" + Javacord.DISCORD_CDN_DOMAIN + "/")
+                    .append("role-icons/")
+                    .append(id).append('/').append(iconHash)
+                    .append(iconHash.startsWith("a_") ? ".gif" : ".png")
+                    .append("?size=").append(size);
+            try {
+                return Optional.of(new IconImpl(api, new URL(url.toString())));
+            } catch (MalformedURLException e) {
+                throw new AssertionError("Found a malformed role icon url. Please update to the latest Javacord "
+                        + "version or create an issue on GitHub if you are already using the latest one.");
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> getUnicodeEmojiIcon() {
+        return Optional.ofNullable(unicodeEmoji);
     }
 
     @Override
