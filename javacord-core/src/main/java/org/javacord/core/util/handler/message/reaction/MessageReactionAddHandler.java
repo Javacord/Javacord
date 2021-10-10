@@ -5,11 +5,11 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.emoji.UnicodeEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
-import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.Member;
@@ -70,7 +70,7 @@ public class MessageReactionAddHandler extends PacketHandler {
         Emoji emoji;
         JsonNode emojiJson = packet.get("emoji");
         if (!emojiJson.has("id") || emojiJson.get("id").isNull()) {
-            emoji = UnicodeEmojiImpl.fromString(emojiJson.get("name").asText());
+            emoji = UnicodeEmoji.fromString(emojiJson.get("name").asText());
         } else {
             emoji = api.getKnownCustomEmojiOrCreateCustomEmoji(emojiJson);
         }

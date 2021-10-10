@@ -2,11 +2,11 @@ package org.javacord.core.entity.message.component.internal;
 
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.emoji.UnicodeEmoji;
 import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.component.ButtonStyle;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
-import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.component.ButtonImpl;
 
 import java.util.Optional;
@@ -90,7 +90,7 @@ public class ButtonBuilderDelegateImpl implements ButtonBuilderDelegate {
 
     @Override
     public void setEmoji(String unicode) {
-        this.emoji = UnicodeEmojiImpl.fromString(unicode);
+        this.emoji = UnicodeEmoji.fromString(unicode);
     }
 
     @Override

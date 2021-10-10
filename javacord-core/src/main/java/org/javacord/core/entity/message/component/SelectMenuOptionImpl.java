@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.emoji.UnicodeEmoji;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 import org.javacord.core.entity.emoji.CustomEmojiImpl;
-import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
 import java.util.Optional;
 
@@ -34,7 +34,7 @@ public class SelectMenuOptionImpl implements SelectMenuOption {
                 this.emoji = new CustomEmojiImpl(null, id, name, isAnimated);
             } else {
                 String name = emojiObj.get("name").asText();
-                this.emoji = UnicodeEmojiImpl.fromString(name);
+                this.emoji = UnicodeEmoji.fromString(name);
             }
         } else {
             this.emoji = null;
