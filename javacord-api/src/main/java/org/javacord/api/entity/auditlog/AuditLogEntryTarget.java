@@ -2,6 +2,7 @@ package org.javacord.api.entity.auditlog;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
@@ -46,6 +47,15 @@ public interface AuditLogEntryTarget extends DiscordEntity {
      */
     default Optional<ServerChannel> asChannel() {
         return getApi().getServerChannelById(getId());
+    }
+
+    /**
+     * Gets the target as role.
+     *
+     * @return The target as role.
+     */
+    default Optional<Role> asRole() {
+        return getApi().getRoleById(getId());
     }
 
     /**
