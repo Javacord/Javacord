@@ -450,8 +450,10 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     /**
      * Disconnects the bot.
      * After disconnecting you should NOT use this instance again.
+     *
+     * @return A future that completes once the disconnect is finished.
      */
-    void disconnect();
+    CompletableFuture<Void> disconnect();
 
     /**
      * Sets a function which is used to get the delay between reconnects.
