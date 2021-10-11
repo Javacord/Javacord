@@ -113,14 +113,17 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
      *
      * @param channel The channel of the audio connection.
      * @param readyFuture An uncompleted future that gets completed when the connection is fully established.
+     * @param muted Whether to connect self-muted.
+     * @param deafened Whether to connect self-deafened.
      */
-    public AudioConnectionImpl(ServerVoiceChannel channel, CompletableFuture<AudioConnection> readyFuture) {
+    public AudioConnectionImpl(ServerVoiceChannel channel, CompletableFuture<AudioConnection> readyFuture,
+                               boolean muted, boolean deafened) {
         this.channel = channel;
         this.readyFuture = readyFuture;
         id = idCounter.getAndIncrement();
         api = (DiscordApiImpl) channel.getApi();
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), getChannel(), false, false);
+                .sendVoiceStateUpdate(channel.getServer(), getChannel(), muted, deafened);
     }
 
     /**
