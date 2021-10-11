@@ -109,7 +109,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     private volatile boolean deafened;
 
     /**
-     * Creates a new audi connection.
+     * Creates a new audio connection.
      *
      * @param channel The channel of the audio connection.
      * @param readyFuture An uncompleted future that gets completed when the connection is fully established.
