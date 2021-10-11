@@ -26,7 +26,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Get the first option, if present. Useful if you're working with a command that has only one option.
      *
      * @return The option at index 0, if present; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0)}
+     *     or {@link #getOptionByIndex(int) getOptionByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<SlashCommandInteractionOption> getFirstOption() {
         return getOptions().stream().findFirst();
     }
@@ -35,7 +38,11 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the string representation of the first option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getStringRepresentationValue()}
+     *     or {@link #getOptionStringRepresentationValueByIndex(int) getOptionStringRepresentationValueByIndex(0)}
+     *     instead.
      */
+    @Deprecated
     default Optional<String> getFirstOptionStringRepresentationValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
     }
@@ -44,7 +51,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the string value of the first option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getStringValue()}
+     *     or {@link #getOptionStringValueByIndex(int) getOptionStringValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<String> getFirstOptionStringValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getStringValue);
     }
@@ -53,7 +63,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the integer value of the first option (if present).
      *
      * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getIntValue()}
+     *     or {@link #getOptionIntValueByIndex(int) getOptionIntValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<Integer> getFirstOptionIntValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getIntValue);
     }
@@ -62,7 +75,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the boolean value of the first option (if present).
      *
      * @return An Optional with the boolean value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getBooleanValue()}
+     *     or {@link #getOptionBooleanValueByIndex(int) getOptionBooleanValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<Boolean> getFirstOptionBooleanValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getBooleanValue);
     }
@@ -74,7 +90,10 @@ public interface SlashCommandInteractionOptionsProvider {
      *          use {@code requestFirstOptionUserValue()}.
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getUserValue()}
+     *     or {@link #getOptionUserValueByIndex(int) getOptionUserValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<User> getFirstOptionUserValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getUserValue);
     }
@@ -83,7 +102,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the user value of the first option (if present).
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).requestUserValue()}
+     *     or {@link #requestOptionUserValueByIndex(int) requestOptionUserValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<CompletableFuture<User>> requestFirstOptionUserValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::requestUserValue);
     }
@@ -92,7 +114,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the channel value of the first option (if present).
      *
      * @return An Optional with the channel value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getChannelValue()}
+     *     or {@link #getOptionChannelValueByIndex(int) getOptionChannelValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<ServerChannel> getFirstOptionChannelValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getChannelValue);
     }
@@ -101,7 +126,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the role value of the first option (if present).
      *
      * @return An Optional with the role value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getRoleValue()}
+     *     or {@link #getOptionRoleValueByIndex(int) getOptionRoleValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<Role> getFirstOptionRoleValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getRoleValue);
     }
@@ -114,7 +142,10 @@ public interface SlashCommandInteractionOptionsProvider {
      *          use {@code requestFirstOptionMentionableValue()}.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getMentionableValue()}
+     *     or {@link #getOptionMentionableValueByIndex(int) getOptionMentionableValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<Mentionable> getFirstOptionMentionableValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getMentionableValue);
     }
@@ -123,7 +154,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the mentionable value of the first option (if present) which may be a user, channel or role.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).requestMentionableValue()}
+     *     or {@link #requestOptionMentionableValueByIndex(int) requestOptionMentionableValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<CompletableFuture<Mentionable>> requestFirstOptionMentionableValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::requestMentionableValue);
     }
@@ -132,7 +166,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the double value of the first option (if present).
      *
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getNumberValue()}
+     *     or {@link #getOptionNumberValueByIndex(int) getOptionNumberValueByIndex(0)} instead.
      */
+    @Deprecated
     default Optional<Double> getFirstOptionNumberValue() {
         return getFirstOption().flatMap(SlashCommandInteractionOption::getNumberValue);
     }
@@ -141,7 +178,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Get the second option, if present. Useful if you're working with a command that has two options.
      *
      * @return The option at index 1, if present; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1)}
+     *     or {@link #getOptionByIndex(int) getOptionByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<SlashCommandInteractionOption> getSecondOption() {
         return getOptionByIndex(1);
     }
@@ -150,7 +190,11 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the string representation of the second option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getStringRepresentationValue()}
+     *     or {@link #getOptionStringRepresentationValueByIndex(int) getOptionStringRepresentationValueByIndex(1)}
+     *     instead.
      */
+    @Deprecated
     default Optional<String> getSecondOptionStringRepresentationValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
     }
@@ -159,7 +203,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the string value of the second option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getStringValue()}
+     *     or {@link #getOptionStringValueByIndex(int) getOptionStringValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<String> getSecondOptionStringValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getStringValue);
     }
@@ -168,7 +215,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the integer value of the second option (if present).
      *
      * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getIntValue()}
+     *     or {@link #getOptionIntValueByIndex(int) getOptionIntValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<Integer> getSecondOptionIntValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getIntValue);
     }
@@ -177,7 +227,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the boolean value of the second option (if present).
      *
      * @return An Optional with the boolean value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getBooleanValue()}
+     *     or {@link #getOptionBooleanValueByIndex(int) getOptionBooleanValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<Boolean> getSecondOptionBooleanValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getBooleanValue);
     }
@@ -189,7 +242,10 @@ public interface SlashCommandInteractionOptionsProvider {
      *          use {@code requestSecondOptionUserValue()}.
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getUserValue()}
+     *     or {@link #getOptionUserValueByIndex(int) getOptionUserValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<User> getSecondOptionUserValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getUserValue);
     }
@@ -198,7 +254,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the user value of the second option (if present).
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).requestUserValue()}
+     *     or {@link #requestOptionUserValueByIndex(int) requestOptionUserValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<CompletableFuture<User>> requestSecondOptionUserValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::requestUserValue);
     }
@@ -207,7 +266,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the channel value of the second option (if present).
      *
      * @return An Optional with the channel value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getChannelValue()}
+     *     or {@link #getOptionChannelValueByIndex(int) getOptionChannelValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<ServerChannel> getSecondOptionChannelValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getChannelValue);
     }
@@ -216,7 +278,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the role value of the second option (if present).
      *
      * @return An Optional with the role value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getRoleValue()}
+     *     or {@link #getOptionRoleValueByIndex(int) getOptionRoleValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<Role> getSecondOptionRoleValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getRoleValue);
     }
@@ -229,7 +294,10 @@ public interface SlashCommandInteractionOptionsProvider {
      *          use {@code requestSecondOptionMentionableValue()}.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getMentionableValue()}
+     *     or {@link #getOptionMentionableValueByIndex(int) getOptionMentionableValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<Mentionable> getSecondOptionMentionableValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getMentionableValue);
     }
@@ -238,7 +306,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the mentionable value of the second option (if present) which may be a user, channel or role.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).requestMentionableValue()}
+     *     or {@link #requestOptionMentionableValueByIndex(int) requestOptionMentionableValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<CompletableFuture<Mentionable>> requestSecondOptionMentionableValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::requestMentionableValue);
     }
@@ -247,7 +318,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the double value of the second option (if present).
      *
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getNumberValue()}
+     *     or {@link #getOptionNumberValueByIndex(int) getOptionNumberValueByIndex(1)} instead.
      */
+    @Deprecated
     default Optional<Double> getSecondOptionNumberValue() {
         return getSecondOption().flatMap(SlashCommandInteractionOption::getNumberValue);
     }
@@ -256,7 +330,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Get the third option, if present. Useful if you're working with a command that has up to 3 options.
      *
      * @return The option at index 2, if present; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2)}
+     *     or {@link #getOptionByIndex(int) getOptionByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<SlashCommandInteractionOption> getThirdOption() {
         return getOptionByIndex(2);
     }
@@ -265,7 +342,11 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the string representation of the third option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getStringRepresentationValue()}
+     *     or {@link #getOptionStringRepresentationValueByIndex(int) getOptionStringRepresentationValueByIndex(2)}
+     *     instead.
      */
+    @Deprecated
     default Optional<String> getThirdOptionStringRepresentationValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getStringRepresentationValue);
     }
@@ -274,7 +355,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the string of the third option (if present).
      *
      * @return An Optional with the string value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getStringValue()}
+     *     or {@link #getOptionStringValueByIndex(int) getOptionStringValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<String> getThirdOptionStringValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getStringValue);
     }
@@ -283,7 +367,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the integer value of the third option (if present).
      *
      * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getIntValue()}
+     *     or {@link #getOptionIntValueByIndex(int) getOptionIntValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<Integer> getThirdOptionIntValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getIntValue);
     }
@@ -292,7 +379,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the boolean value of the third option (if present).
      *
      * @return An Optional with the boolean value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getBooleanValue()}
+     *     or {@link #getOptionBooleanValueByIndex(int) getOptionBooleanValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<Boolean> getThirdOptionBooleanValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getBooleanValue);
     }
@@ -305,7 +395,10 @@ public interface SlashCommandInteractionOptionsProvider {
      *          use {@code requestThirdOptionUserValue()}.
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getUserValue()}
+     *     or {@link #getOptionUserValueByIndex(int) getOptionUserValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<User> getThirdOptionUserValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getUserValue);
     }
@@ -314,7 +407,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the user value of the third option (if present).
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).requestUserValue()}
+     *     or {@link #requestOptionUserValueByIndex(int) requestOptionUserValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<CompletableFuture<User>> requestThirdOptionUserValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::requestUserValue);
     }
@@ -323,7 +419,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the channel value of the third option (if present).
      *
      * @return An Optional with the channel value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getChannelValue()}
+     *     or {@link #getOptionChannelValueByIndex(int) getOptionChannelValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<ServerChannel> getThirdOptionChannelValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getChannelValue);
     }
@@ -332,7 +431,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the role value of the third option (if present).
      *
      * @return An Optional with the role value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getRoleValue()}
+     *     or {@link #getOptionRoleValueByIndex(int) getOptionRoleValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<Role> getThirdOptionRoleValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getRoleValue);
     }
@@ -345,7 +447,10 @@ public interface SlashCommandInteractionOptionsProvider {
      *          use {@code requestThirdOptionMentionableValue()}.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getMentionableValue()}
+     *     or {@link #getOptionMentionableValueByIndex(int) getOptionMentionableValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<Mentionable> getThirdOptionMentionableValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getMentionableValue);
     }
@@ -354,7 +459,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the mentionable value of the third option (if present) which may be a user, channel or role.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).requestMentionableValue()}
+     *     or {@link #requestOptionMentionableValueByIndex(int) requestOptionMentionableValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<CompletableFuture<Mentionable>> requestThirdOptionMentionableValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::requestMentionableValue);
     }
@@ -363,7 +471,10 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the double value of the third option (if present).
      *
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getNumberValue()}
+     *     or {@link #getOptionNumberValueByIndex(int) getOptionNumberValueByIndex(2)} instead.
      */
+    @Deprecated
     default Optional<Double> getThirdOptionNumberValue() {
         return getThirdOption().flatMap(SlashCommandInteractionOption::getNumberValue);
     }
