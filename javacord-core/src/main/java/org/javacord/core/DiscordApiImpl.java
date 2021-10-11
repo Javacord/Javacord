@@ -191,14 +191,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final String token;
 
     /**
-     * Whether the {@link #disconnect()} method has been called before or not.
+     * The disconnect future, if disconnect has been called.
      */
-    private volatile boolean disconnectCalled = false;
-
-    /**
-     * A lock to synchronize on {@link DiscordApiImpl#disconnectCalled}.
-     */
-    private final Object disconnectCalledLock = new Object();
+    private final AtomicReference<CompletableFuture<Void>> disconnectFuture = new AtomicReference<>(null);
 
     /**
      * The status which should be displayed for the bot.
@@ -730,7 +725,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @return The used http client.
      */
     public OkHttpClient getHttpClient() {
-        if (disconnectCalled) {
+        if (disconnectFuture.get() != null) {
             throw new IllegalStateException("disconnect was called already");
         }
         return httpClient;
@@ -1284,7 +1279,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param objectId    The id of the object.
      * @param <T>         The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and
-     *     their assigned listener classes they listen to.
+     *         their assigned listener classes they listen to.
      */
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> Map<T, List<Class<T>>> getObjectListeners(
@@ -1614,7 +1609,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * REST API and websocket.
      *
      * @return the proxy selector which should be used to determine the proxies that should be used to connect to the
-     *     Discord REST API and websocket.
+     *         Discord REST API and websocket.
      */
     public Optional<ProxySelector> getProxySelector() {
         return Optional.ofNullable(proxySelector);
@@ -1728,25 +1723,38 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public void disconnect() {
-        synchronized (disconnectCalledLock) {
-            if (!disconnectCalled) {
-                if (websocketAdapter == null) {
-                    // if no web socket is connected, immediately shutdown thread pool
-                    threadPool.shutdown();
-                } else {
-                    // shutdown thread pool after web socket disconnected event was dispatched
-                    addLostConnectionListener(event -> threadPool.shutdown());
-                    // disconnect web socket
-                    websocketAdapter.disconnect();
-                    // shutdown thread pool if within one minute no disconnect event was dispatched
-                    threadPool.getDaemonScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
-                }
-                disconnectCalled = true;
-                httpClient.dispatcher().executorService().shutdown();
-                httpClient.connectionPool().evictAll();
+    public CompletableFuture<Void> disconnect() {
+        boolean doDisconnect = false;
+        synchronized (disconnectFuture) {
+            if (disconnectFuture.get() == null) {
+                disconnectFuture.set(new CompletableFuture<>());
+                doDisconnect = true;
             }
         }
+        if (doDisconnect) {
+            // Disconnect has not been called
+            if (websocketAdapter == null) {
+                // if no web socket is connected, immediately shutdown thread pool
+                threadPool.shutdown();
+                disconnectFuture.get().complete(null);
+            } else {
+                // shutdown thread pool after web socket disconnected event was dispatched
+                addLostConnectionListener(event -> {
+                    threadPool.shutdown();
+                    disconnectFuture.get().complete(null);
+                });
+                // disconnect web socket
+                websocketAdapter.disconnect();
+                // shutdown thread pool if within one minute no disconnect event was dispatched
+                threadPool.getDaemonScheduler().schedule(() -> {
+                    threadPool.shutdown();
+                    disconnectFuture.get().complete(null);
+                }, 1, TimeUnit.MINUTES);
+            }
+            httpClient.dispatcher().executorService().shutdown();
+            httpClient.connectionPool().evictAll();
+        }
+        return disconnectFuture.get();
     }
 
     @Override
