@@ -1,11 +1,11 @@
 package org.javacord.api.interaction;
 
-import org.javacord.api.util.SafeSpecializable;
+import org.javacord.api.util.Specializable;
 
 import java.util.Optional;
 
 public interface MessageComponentInteraction
-        extends MessageComponentInteractionBase, SafeSpecializable<InteractionBase> {
+        extends MessageComponentInteractionBase, Specializable<InteractionBase> {
 
     /**
      * Get this interaction as button interaction if the type matches.

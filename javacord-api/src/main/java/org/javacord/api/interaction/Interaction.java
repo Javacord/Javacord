@@ -1,9 +1,10 @@
 package org.javacord.api.interaction;
 
-import org.javacord.api.util.SafeSpecializable;
+import org.javacord.api.util.Specializable;
+
 import java.util.Optional;
 
-public interface Interaction extends InteractionBase, SafeSpecializable<InteractionBase> {
+public interface Interaction extends InteractionBase, Specializable<InteractionBase> {
     /**
      * Get this interaction as slash command interaction if the type matches.
      *
