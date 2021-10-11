@@ -594,7 +594,7 @@ public interface SlashCommandInteractionOptionsProvider {
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
      */
     default Optional<CompletableFuture<Mentionable>> requestOptionMentionableValueByName(String name) {
-        return getOptionByName(name).flatMap(SlashCommandInteractionOption::requestFirstOptionMentionableValue);
+        return getOptionByName(name).flatMap(SlashCommandInteractionOption::requestMentionableValue);
     }
 
     /**
@@ -722,7 +722,7 @@ public interface SlashCommandInteractionOptionsProvider {
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
      */
     default Optional<CompletableFuture<Mentionable>> requestOptionMentionableValueByIndex(int index) {
-        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::requestFirstOptionMentionableValue);
+        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::requestMentionableValue);
     }
 
     /**
