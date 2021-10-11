@@ -69,8 +69,9 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the user value of the first option (if present).
-     * Note: This method only respects cached users. To fetch the user from Discord if the user is not cached,
-     *     use {@code requestFirstOptionUserValue()}.
+     *
+     * <p>Note: This method only respects cached users. To fetch the user from Discord if the user is not cached,
+     *          use {@code requestFirstOptionUserValue()}.
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
      */
@@ -107,9 +108,10 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the mentionable value of the first option (if present) which may be a user, channel or role.
-     * Note: This method only respects cached users if the ID of the Mentionable belongs to a user. To fetch the user
-     *     from Discord if the user is not cached,
-     *     use {@code requestFirstOptionMentionableValue()}.
+     *
+     * <p>Note: This method only respects cached users if the ID of the Mentionable belongs to a user. To fetch the user
+     *          from Discord if the user is not cached,
+     *          use {@code requestFirstOptionMentionableValue()}.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
      */
@@ -138,7 +140,7 @@ public interface SlashCommandInteractionOptionsProvider {
     /**
      * Get the second option, if present. Useful if you're working with a command that has two options.
      *
-     * @return The option at index 0, if present; an empty Optional otherwise
+     * @return The option at index 1, if present; an empty Optional otherwise
      */
     default Optional<SlashCommandInteractionOption> getSecondOption() {
         return getOptionByIndex(1);
@@ -182,8 +184,9 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the user value of the second option (if present).
-     * Note: This method only respects cached users. To fetch the user from Discord if the user is not cached,
-     *     use {@code requestSecondOptionUserValue()}.
+     *
+     * <p>Note: This method only respects cached users. To fetch the user from Discord if the user is not cached,
+     *          use {@code requestSecondOptionUserValue()}.
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
      */
@@ -220,9 +223,10 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the mentionable value of the second option (if present) which may be a user, channel or role.
-     * Note: This method only respects cached users if the ID of the Mentionable belongs to a user. To fetch the user
-     *     from Discord if the user is not cached,
-     *     use {@code requestSecondOptionMentionableValue()}.
+     *
+     * <p>Note: This method only respects cached users if the ID of the Mentionable belongs to a user. To fetch the user
+     *          from Discord if the user is not cached,
+     *          use {@code requestSecondOptionMentionableValue()}.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
      */
@@ -251,7 +255,7 @@ public interface SlashCommandInteractionOptionsProvider {
     /**
      * Get the third option, if present. Useful if you're working with a command that has up to 3 options.
      *
-     * @return The option at index 0, if present; an empty Optional otherwise
+     * @return The option at index 2, if present; an empty Optional otherwise
      */
     default Optional<SlashCommandInteractionOption> getThirdOption() {
         return getOptionByIndex(2);
@@ -295,8 +299,10 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the user value of the third option (if present).
-     * Note: This method only respects cached users. To fetch the user from Discord if the user is not cached,
-     *     use {@code requestThirdOptionUserValue()}.
+     *
+     *
+     * <p>Note: This method only respects cached users. To fetch the user from Discord if the user is not cached,
+     *          use {@code requestThirdOptionUserValue()}.
      *
      * @return An Optional with the user value of such an option if it exists; an empty Optional otherwise
      */
@@ -333,9 +339,10 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the mentionable value of the third option (if present) which may be a user, channel or role.
-     * Note: This method only respects cached users if the ID of the Mentionable belongs to a user. To fetch the user
-     *     from Discord if the user is not cached,
-     *     use {@code requestThirdOptionMentionableValue()}.
+     *
+     * <p>Note: This method only respects cached users if the ID of the Mentionable belongs to a user. To fetch the user
+     *          from Discord if the user is not cached,
+     *          use {@code requestThirdOptionMentionableValue()}.
      *
      * @return An Optional with the mentionable value of such an option if it exists; an empty Optional otherwise
      */
