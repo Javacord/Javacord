@@ -21,11 +21,35 @@ public interface ServerVoiceChannel extends ServerChannel, VoiceChannel, Categor
     }
 
     /**
-     * Connects to the voice channel and disconnects any existing connections in the server.
+     * Connects to the voice channel self-deafened and disconnects any existing connections in the server.
      *
      * @return The audio connection.
      */
-    CompletableFuture<AudioConnection> connect();
+    default CompletableFuture<AudioConnection> connect() {
+        return connect(false, true);
+    }
+
+    /**
+     * Connects to the voice channel and disconnects any existing connections in the server.
+     *
+     * @param muted Whether to connect self-muted.
+     * @param deafened Whether to connect self-deafened.
+     * @return The audio connection.
+     */
+    CompletableFuture<AudioConnection> connect(boolean muted, boolean deafened);
+
+    /**
+     * Disconnects from the voice channel if connected.
+     *
+     * @return A CompletableFuture which completes when the connection has been disconnected.
+     */
+    default CompletableFuture<Void> disconnect() {
+        return getServer()
+                .getAudioConnection()
+                .filter(audioConnection -> equals(audioConnection.getChannel()))
+                .map(AudioConnection::close)
+                .orElseGet(() -> CompletableFuture.completedFuture(null));
+    }
 
     /**
      * Gets the bitrate (int bits) of the channel.
