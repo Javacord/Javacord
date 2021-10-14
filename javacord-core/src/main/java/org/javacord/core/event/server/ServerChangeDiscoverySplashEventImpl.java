@@ -1,6 +1,7 @@
 package org.javacord.core.event.server;
 
 import org.apache.logging.log4j.Logger;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.event.server.ServerChangeDiscoverySplashEvent;
 import org.javacord.core.entity.IconImpl;
@@ -67,8 +68,8 @@ public class ServerChangeDiscoverySplashEventImpl extends ServerEventImpl implem
         }
         try {
             return Optional.of(new IconImpl(getApi(),
-                    new URL("https://cdn.discordapp.com/discovery-splashes/" + getServer().getIdAsString()
-                            + "/" + discoverySplashHash + ".png")));
+                    new URL("https://" + Javacord.DISCORD_CDN_DOMAIN + "/discovery-splashes/"
+                            + getServer().getIdAsString() + "/" + discoverySplashHash + ".png")));
         } catch (MalformedURLException e) {
             throw new AssertionError("Failed to create discovery splash url", e);
         }
