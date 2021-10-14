@@ -1155,8 +1155,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         try {
             return Optional.of(new IconImpl(
                     getApi(),
-                    new URL("https://cdn.discordapp.com/discovery-splashes/" + getIdAsString() + "/" + discoverySplash
-                            + ".png")));
+                    new URL("https://" + Javacord.DISCORD_CDN_DOMAIN + "/discovery-splashes/" + getIdAsString() + "/"
+                            + discoverySplash + ".png")));
         } catch (MalformedURLException e) {
             throw new AssertionError("Unexpected malformed discovery splash url", e);
         }
