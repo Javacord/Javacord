@@ -124,7 +124,7 @@ public class Javacord {
      * A list with all API versions can be found
      * <a href="https://discord.com/developers/docs/reference#api-versioning-api-versions">here</a>.
      */
-    public static final String DISCORD_API_VERSION = "8";
+    public static final String DISCORD_API_VERSION = "9";
 
     private Javacord() {
         throw new UnsupportedOperationException();
