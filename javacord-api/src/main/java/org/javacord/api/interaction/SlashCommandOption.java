@@ -4,6 +4,7 @@ import org.javacord.api.entity.channel.ChannelType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -56,11 +57,12 @@ public interface SlashCommandOption {
     List<SlashCommandOption> getOptions();
 
     /**
-     * If the option is a channel type, the channels shown will be restricted to these types.
+     * If the option is of type {@link SlashCommandOptionType#CHANNEL}, the channels shown will be restricted to these
+     * types.
      *
-     * @return A list with channel types.
+     * @return A set with the channel types that are shown.
      */
-    List<ChannelType> getChannelTypes();
+    Set<ChannelType> getChannelTypes();
 
     /**
      * Create a new slash command option to be used with an slash command builder.
