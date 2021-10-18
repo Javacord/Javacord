@@ -1,5 +1,6 @@
 package org.javacord.core.interaction;
 
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.SlashCommandOptionType;
@@ -16,6 +17,7 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     private boolean required;
     private List<SlashCommandOptionChoice> choices = new ArrayList<>();
     private List<SlashCommandOption> options = new ArrayList<>();
+    private List<ChannelType> channelTypes = new ArrayList<>();
 
     @Override
     public void setType(SlashCommandOptionType type) {
@@ -66,7 +68,21 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     }
 
     @Override
+    public void addChannelType(ChannelType channelType) {
+        channelTypes.add(channelType);
+    }
+
+    @Override
+    public void setChannelTypes(List<ChannelType> channelTypes) {
+        if (channelTypes == null) {
+            this.options.clear();
+        } else {
+            this.options = new ArrayList<>(options);
+        }
+    }
+
+    @Override
     public SlashCommandOption build() {
-        return new SlashCommandOptionImpl(type, name, description, required, choices, options);
+        return new SlashCommandOptionImpl(type, name, description, required, choices, options, channelTypes);
     }
 }
