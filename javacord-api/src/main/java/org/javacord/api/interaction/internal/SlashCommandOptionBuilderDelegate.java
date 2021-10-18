@@ -71,14 +71,14 @@ public interface SlashCommandOptionBuilderDelegate {
     void setOptions(List<SlashCommandOption> options);
 
     /**
-     * Add a channel type to the channel type.
+     * Add a channel type to the slash command option.
      *
      * @param channelType The channel type.
      */
     void addChannelType(ChannelType channelType);
 
     /**
-     * Sets the channel types for the channel types.
+     * Sets the channel types for the slash command option.
      *
      * @param channelTypes The channel types.
      */

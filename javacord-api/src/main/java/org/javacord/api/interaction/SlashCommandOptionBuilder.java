@@ -129,7 +129,7 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Adds an channel type to the channel type.
+     * Adds an channel type to the slash command option.
      *
      * @param channelType The channel type.
      * @return The current instance in order to chain call methods.
@@ -140,7 +140,7 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Sets the channel types for the channel type.
+     * Sets the channel types for the slash command option.
      *
      * @param channelTypes The channel types.
      * @return The current instance in order to chain call methods.
