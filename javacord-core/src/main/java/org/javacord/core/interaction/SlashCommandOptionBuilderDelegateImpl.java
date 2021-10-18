@@ -8,7 +8,9 @@ import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOptionBuilderDelegate {
 
@@ -18,7 +20,7 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     private boolean required;
     private List<SlashCommandOptionChoice> choices = new ArrayList<>();
     private List<SlashCommandOption> options = new ArrayList<>();
-    private List<ChannelType> channelTypes = new ArrayList<>();
+    private Set<ChannelType> channelTypes = new HashSet<>();
 
     @Override
     public void setType(SlashCommandOptionType type) {
@@ -78,7 +80,7 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
         if (channelTypes == null) {
             this.channelTypes.clear();
         } else {
-            this.channelTypes = new ArrayList<>(channelTypes);
+            this.channelTypes = new HashSet<>(channelTypes);
         }
     }
 
