@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class SlashCommandOptionImpl implements SlashCommandOption {
@@ -24,6 +25,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     private final List<SlashCommandOptionChoice> choices;
     private final List<SlashCommandOption> options;
     private final Set<ChannelType> channelTypes;
+    private final Long integerMinValue;
+    private final Long integerMaxValue;
+    private final Double numberMinValue;
+    private final Double numberMaxValue;
 
     /**
      * Class constructor.
@@ -55,6 +60,23 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
                 channelTypes.add(ChannelType.fromId(channelTypeJson.intValue()));
             }
         }
+
+        if (type == SlashCommandOptionType.INTEGER) {
+            integerMinValue = data.has("min_value") ? data.get("min_value").asLong() : null;
+            integerMaxValue = data.has("max_value") ? data.get("max_value").asLong() : null;
+            numberMinValue = null;
+            numberMaxValue = null;
+        } else if (type == SlashCommandOptionType.NUMBER) {
+            numberMinValue = data.has("min_value") ? data.get("min_value").asDouble() : null;
+            numberMaxValue = data.has("max_value") ? data.get("max_value").asDouble() : null;
+            integerMinValue = null;
+            integerMaxValue = null;
+        } else {
+            integerMinValue = null;
+            integerMaxValue = null;
+            numberMinValue = null;
+            numberMaxValue = null;
+        }
     }
 
     /**
@@ -67,6 +89,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
      * @param choices The choices.
      * @param options The options.
      * @param channelTypes The channel types.
+     * @param integerMinValue The {@link SlashCommandOptionType#INTEGER} min value
+     * @param integerMaxValue The {@link SlashCommandOptionType#INTEGER} max value
+     * @param numberMinValue The {@link SlashCommandOptionType#NUMBER} min value
+     * @param numberMaxValue The {@link SlashCommandOptionType#NUMBER} max value
      */
     public SlashCommandOptionImpl(
             SlashCommandOptionType type,
@@ -75,7 +101,11 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             boolean required,
             List<SlashCommandOptionChoice> choices,
             List<SlashCommandOption> options,
-            Set<ChannelType> channelTypes
+            Set<ChannelType> channelTypes,
+            Long integerMinValue,
+            Long integerMaxValue,
+            Double numberMinValue,
+            Double numberMaxValue
     ) {
         this.type = type;
         this.name = name;
@@ -84,6 +114,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         this.choices = choices;
         this.options = options;
         this.channelTypes = channelTypes;
+        this.integerMinValue = integerMinValue;
+        this.integerMaxValue = integerMaxValue;
+        this.numberMinValue = numberMinValue;
+        this.numberMaxValue = numberMaxValue;
     }
 
     @Override
@@ -121,6 +155,26 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         return Collections.unmodifiableSet(channelTypes);
     }
 
+    @Override
+    public Optional<Long> getIntegerMinValue() {
+        return Optional.ofNullable(integerMinValue);
+    }
+
+    @Override
+    public Optional<Long> getIntegerMaxValue() {
+        return Optional.ofNullable(integerMaxValue);
+    }
+
+    @Override
+    public Optional<Double> getNumberMinValue() {
+        return Optional.ofNullable(numberMinValue);
+    }
+
+    @Override
+    public Optional<Double> getNumberMaxValue() {
+        return Optional.ofNullable(numberMaxValue);
+    }
+
     /**
      * Creates a json node with the option's data.
      *
@@ -143,6 +197,21 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         if (!channelTypes.isEmpty()) {
             ArrayNode jsonChannelTypes = node.putArray("channel_types");
             channelTypes.forEach(channelType -> jsonChannelTypes.add(channelType.getId()));
+        }
+        if (type == SlashCommandOptionType.INTEGER) {
+            if (integerMinValue != null) {
+                node.put("min_value", integerMinValue);
+            }
+            if (integerMaxValue != null) {
+                node.put("max_value", integerMaxValue);
+            }
+        } else if (type == SlashCommandOptionType.NUMBER) {
+            if (numberMinValue != null) {
+                node.put("min_value", numberMinValue);
+            }
+            if (numberMaxValue != null) {
+                node.put("max_value", numberMaxValue);
+            }
         }
         return node;
     }

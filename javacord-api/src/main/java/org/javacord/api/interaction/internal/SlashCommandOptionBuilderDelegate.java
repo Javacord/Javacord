@@ -86,6 +86,34 @@ public interface SlashCommandOptionBuilderDelegate {
     void setChannelTypes(Collection<ChannelType> channelTypes);
 
     /**
+     * Sets the {@link SlashCommandOptionType#INTEGER} min value for the slash command option.
+     *
+     * @param integerMinValue The integer min value.
+     */
+    void setIntegerMinValue(long integerMinValue);
+
+    /**
+     * Sets the {@link SlashCommandOptionType#INTEGER} max value for the slash command option.
+     *
+     * @param integerMaxValue The integer max value.
+     */
+    void setIntegerMaxValue(long integerMaxValue);
+
+    /**
+     * Sets the {@link SlashCommandOptionType#NUMBER} min value for the slash command option.
+     *
+     * @param numberMinValue The integer min value.
+     */
+    void setNumberMinValue(double numberMinValue);
+
+    /**
+     * Sets the {@link SlashCommandOptionType#NUMBER} max value for the slash command option.
+     *
+     * @param numberMaxValue The integer max value.
+     */
+    void setNumberMaxValue(double numberMaxValue);
+
+    /**
      * Build the slash command option.
      *
      * @return The built option.

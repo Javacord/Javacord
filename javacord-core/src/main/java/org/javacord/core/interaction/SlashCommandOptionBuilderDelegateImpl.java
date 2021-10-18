@@ -21,6 +21,10 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     private List<SlashCommandOptionChoice> choices = new ArrayList<>();
     private List<SlashCommandOption> options = new ArrayList<>();
     private Set<ChannelType> channelTypes = new HashSet<>();
+    private Long integerMinValue;
+    private Long integerMaxValue;
+    private Double numberMinValue;
+    private Double numberMaxValue;
 
     @Override
     public void setType(SlashCommandOptionType type) {
@@ -85,7 +89,28 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     }
 
     @Override
+    public void setIntegerMinValue(long integerMinValue) {
+        this.integerMinValue = integerMinValue;
+    }
+
+    @Override
+    public void setIntegerMaxValue(long integerMaxValue) {
+        this.integerMaxValue = integerMaxValue;
+    }
+
+    @Override
+    public void setNumberMinValue(double numberMinValue) {
+        this.numberMinValue = numberMinValue;
+    }
+
+    @Override
+    public void setNumberMaxValue(double numberMaxValue) {
+        this.numberMaxValue = numberMaxValue;
+    }
+
+    @Override
     public SlashCommandOption build() {
-        return new SlashCommandOptionImpl(type, name, description, required, choices, options, channelTypes);
+        return new SlashCommandOptionImpl(type, name, description, required, choices, options, channelTypes,
+                integerMinValue, integerMaxValue, numberMinValue, numberMaxValue);
     }
 }
