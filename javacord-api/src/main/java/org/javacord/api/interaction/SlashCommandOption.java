@@ -1,5 +1,7 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.entity.channel.ChannelType;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +54,13 @@ public interface SlashCommandOption {
      * @return A list with the nested options.
      */
     List<SlashCommandOption> getOptions();
+
+    /**
+     * If the option is a channel type, the channels shown will be restricted to these types.
+     *
+     * @return A list with channel types.
+     */
+    List<ChannelType> getChannelTypes();
 
     /**
      * Create a new slash command option to be used with a slash command builder.

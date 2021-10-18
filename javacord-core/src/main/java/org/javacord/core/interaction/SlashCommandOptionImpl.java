@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.SlashCommandOptionType;
@@ -20,6 +21,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     private final boolean required;
     private final List<SlashCommandOptionChoice> choices;
     private final List<SlashCommandOption> options;
+    private final List<ChannelType> channelTypes;
 
     /**
      * Class constructor.
@@ -44,6 +46,13 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
                 options.add(new SlashCommandOptionImpl(optionJson));
             }
         }
+
+        channelTypes = new ArrayList<>();
+        if (data.has("channel_types")) {
+            for (JsonNode channelTypeJson : data.get("channel_types")) {
+                channelTypes.add(ChannelType.fromId(channelTypeJson.intValue()));
+            }
+        }
     }
 
     /**
@@ -55,6 +64,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
      * @param required If the option is required.
      * @param choices The choices.
      * @param options The options.
+     * @param channelTypes The channel types.
      */
     public SlashCommandOptionImpl(
             SlashCommandOptionType type,
@@ -62,7 +72,8 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             String description,
             boolean required,
             List<SlashCommandOptionChoice> choices,
-            List<SlashCommandOption> options
+            List<SlashCommandOption> options,
+            List<ChannelType> channelTypes
     ) {
         this.type = type;
         this.name = name;
@@ -70,6 +81,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         this.required = required;
         this.choices = choices;
         this.options = options;
+        this.channelTypes = channelTypes;
     }
 
     @Override
@@ -102,6 +114,11 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         return Collections.unmodifiableList(options);
     }
 
+    @Override
+    public List<ChannelType> getChannelTypes() {
+        return Collections.unmodifiableList(channelTypes);
+    }
+
     /**
      * Creates a json node with the option's data.
      *
@@ -120,6 +137,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         if (!options.isEmpty()) {
             ArrayNode jsonOptions = node.putArray("options");
             options.forEach(option -> jsonOptions.add(((SlashCommandOptionImpl) option).toJsonNode()));
+        }
+        if (!channelTypes.isEmpty()) {
+            ArrayNode jsonChannelTypes = node.putArray("channel_types");
+            channelTypes.forEach(channelType -> jsonChannelTypes.add(channelType.getId()));
         }
         return node;
     }
