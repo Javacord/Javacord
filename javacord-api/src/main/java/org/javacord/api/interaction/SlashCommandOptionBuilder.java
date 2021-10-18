@@ -4,6 +4,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 
+import java.util.Collection;
 import java.util.List;
 
 public class SlashCommandOptionBuilder {
@@ -145,7 +146,7 @@ public class SlashCommandOptionBuilder {
      * @param channelTypes The channel types.
      * @return The current instance in order to chain call methods.
      */
-    public SlashCommandOptionBuilder setChannelTypes(List<ChannelType> channelTypes) {
+    public SlashCommandOptionBuilder setChannelTypes(Collection<ChannelType> channelTypes) {
         delegate.setChannelTypes(channelTypes);
         return this;
     }

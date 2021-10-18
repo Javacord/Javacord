@@ -11,7 +11,9 @@ import org.javacord.api.interaction.SlashCommandOptionType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SlashCommandOptionImpl implements SlashCommandOption {
 
@@ -21,7 +23,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     private final boolean required;
     private final List<SlashCommandOptionChoice> choices;
     private final List<SlashCommandOption> options;
-    private final List<ChannelType> channelTypes;
+    private final Set<ChannelType> channelTypes;
 
     /**
      * Class constructor.
@@ -47,7 +49,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             }
         }
 
-        channelTypes = new ArrayList<>();
+        channelTypes = new HashSet<>();
         if (data.has("channel_types")) {
             for (JsonNode channelTypeJson : data.get("channel_types")) {
                 channelTypes.add(ChannelType.fromId(channelTypeJson.intValue()));
@@ -73,7 +75,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             boolean required,
             List<SlashCommandOptionChoice> choices,
             List<SlashCommandOption> options,
-            List<ChannelType> channelTypes
+            Set<ChannelType> channelTypes
     ) {
         this.type = type;
         this.name = name;
@@ -115,8 +117,8 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     }
 
     @Override
-    public List<ChannelType> getChannelTypes() {
-        return Collections.unmodifiableList(channelTypes);
+    public Set<ChannelType> getChannelTypes() {
+        return Collections.unmodifiableSet(channelTypes);
     }
 
     /**
