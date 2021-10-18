@@ -7,6 +7,7 @@ import org.javacord.api.interaction.SlashCommandOptionType;
 import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOptionBuilderDelegate {
@@ -73,11 +74,11 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     }
 
     @Override
-    public void setChannelTypes(List<ChannelType> channelTypes) {
+    public void setChannelTypes(Collection<ChannelType> channelTypes) {
         if (channelTypes == null) {
-            this.options.clear();
+            this.channelTypes.clear();
         } else {
-            this.options = new ArrayList<>(options);
+            this.channelTypes = new ArrayList<>(channelTypes);
         }
     }
 
