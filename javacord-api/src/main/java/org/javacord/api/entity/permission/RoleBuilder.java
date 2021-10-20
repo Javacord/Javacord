@@ -96,9 +96,9 @@ public class RoleBuilder {
     }
 
     /**
-     * Creates the server text channel.
+     * Creates the role.
      *
-     * @return The created text channel.
+     * @return The created role.
      */
     public CompletableFuture<Role> create() {
         return delegate.create();
