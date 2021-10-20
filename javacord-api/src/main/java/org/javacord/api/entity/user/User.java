@@ -226,6 +226,44 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     Icon getAvatar(int size);
 
     /**
+     * Gets the user's server-specific avatar in the given server.
+     *
+     * @param server The server.
+     * @return The user's avatar in the server
+     */
+    Optional<Icon> getServerAvatar(Server server);
+
+    /**
+     * Gets the user's server-specific avatar in the given server at the given image size.
+     *
+     * @param server The server.
+     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The user's avatar in the server.
+     */
+    Optional<Icon> getServerAvatar(Server server, int size);
+
+    /**
+     * Gets the user's effective avatar in the given server.
+     * This will return the user's server-specific avatar if they have one, otherwise it will return their account
+     * avatar.
+     *
+     * @param server The server.
+     * @return The user's effective avatar.
+     */
+    Icon getEffectiveAvatar(Server server);
+
+    /**
+     * Gets the user's effective avatar in the given server at the given size.
+     * This will return the user's server-specific avatar if they have one, otherwise it will return their account
+     * avatar.
+     *
+     * @param server The server.
+     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The user's effective avatar.
+     */
+    Icon getEffectiveAvatar(Server server, int size);
+
+    /**
      * Gets if the user has a default Discord avatar.
      *
      * @return Whether this user has a default avatar or not.
