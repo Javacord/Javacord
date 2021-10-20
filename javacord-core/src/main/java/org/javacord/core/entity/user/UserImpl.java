@@ -252,6 +252,30 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
+    public Optional<Icon> getServerAvatar(Server server) {
+        return getServerAvatar(server, DEFAULT_AVATAR_SIZE);
+    }
+
+    @Override
+    public Optional<Icon> getServerAvatar(Server server, int size) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getUserServerAvatar(this, size);
+        } else {
+            return member.getServerAvatar(size);
+        }
+    }
+
+    @Override
+    public Icon getEffectiveAvatar(Server server) {
+        return getServerAvatar(server).orElse(getAvatar());
+    }
+
+    @Override
+    public Icon getEffectiveAvatar(Server server, int size) {
+        return getServerAvatar(server, size).orElse(getAvatar(size));
+    }
+
+    @Override
     public boolean hasDefaultAvatar() {
         return avatarHash == null;
     }

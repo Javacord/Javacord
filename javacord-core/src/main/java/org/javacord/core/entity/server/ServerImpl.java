@@ -1149,6 +1149,18 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public Optional<Icon> getUserServerAvatar(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerAvatar);
+    }
+
+    @Override
+    public Optional<Icon> getUserServerAvatar(User user, int size) {
+        return getRealMemberById(user.getId())
+                .flatMap(member -> member.getServerAvatar(size));
+    }
+
+    @Override
     public boolean isPending(long userId) {
         return getRealMemberById(userId)
                 .map(Member::isPending)

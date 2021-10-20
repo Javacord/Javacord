@@ -1,6 +1,7 @@
 package org.javacord.core.entity.user;
 
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.message.Messageable;
@@ -74,6 +75,28 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
      * @return The color.
      */
     Optional<Color> getRoleColor();
+
+    /**
+     * Gets the member's server avatar hash.
+     *
+     * @return The member's server avatar hash.
+     */
+    Optional<String> getServerAvatarHash();
+
+    /**
+     * Gets the member's server avatar.
+     *
+     * @return The member's server avatar.
+     */
+    Optional<Icon> getServerAvatar();
+
+    /**
+     * Gets the member's server avatar in the given size.
+     *
+     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The member's server avatar in the given size.
+     */
+    Optional<Icon> getServerAvatar(int size);
 
     /**
      * Gets the timestamp of when this member joined the server.
