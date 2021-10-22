@@ -36,12 +36,13 @@ public class SlashCommandOptionChoiceBuilder {
     }
 
     /**
-     * Sets the int value of the slash command option choice.
+     * Sets the long value of the slash command option choice.
+     * Can be any long between -2^53 and 2^53.
      *
      * @param value The value.
      * @return The current instance in order to chain call methods.
      */
-    public SlashCommandOptionChoiceBuilder setValue(int value) {
+    public SlashCommandOptionChoiceBuilder setValue(long value) {
         delegate.setValue(value);
         return this;
     }

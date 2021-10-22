@@ -11,7 +11,7 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
 
     private final String name;
     private final String stringValue;
-    private final Integer intValue;
+    private final Long longValue;
 
     /**
      * Class constructor.
@@ -25,10 +25,10 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
         } else {
             stringValue = null;
         }
-        if (data.get("value").isInt()) {
-            intValue = data.get("value").intValue();
+        if (data.get("value").isLong()) {
+            longValue = data.get("value").asLong();
         } else {
-            intValue = null;
+            longValue = null;
         }
     }
 
@@ -37,12 +37,12 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
      *
      * @param name The name of the choice.
      * @param stringValue The string value of the choice or null if it is an int value.
-     * @param intValue The int value of the choice or null if it is a string value.
+     * @param longValue The long value of the choice or null if it is a string value.
      */
-    public SlashCommandOptionChoiceImpl(String name, String stringValue, Integer intValue) {
+    public SlashCommandOptionChoiceImpl(String name, String stringValue, Long longValue) {
         this.name = name;
         this.stringValue = stringValue;
-        this.intValue = intValue;
+        this.longValue = longValue;
     }
 
     @Override
@@ -56,8 +56,8 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
     }
 
     @Override
-    public Optional<Integer> getIntValue() {
-        return Optional.ofNullable(intValue);
+    public Optional<Long> getLongValue() {
+        return Optional.ofNullable(longValue);
     }
 
     /**
@@ -68,7 +68,7 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
     public JsonNode toJsonNode() {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("name", name);
-        getIntValue().ifPresent(value -> node.put("value", value));
+        getLongValue().ifPresent(value -> node.put("value", value));
         getStringValue().ifPresent(value -> node.put("value", value));
         return node;
     }

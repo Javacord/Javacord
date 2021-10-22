@@ -5,12 +5,19 @@ public enum SlashCommandOptionType {
     SUB_COMMAND(1),
     SUB_COMMAND_GROUP(2),
     STRING(3),
+    /**
+     * This is implemented as a long because it can be any integer between -2^53 and 2^53 and
+     * therefore exceeds Javas Integer range.
+     */
     INTEGER(4),
     BOOLEAN(5),
     USER(6),
     CHANNEL(7),
     ROLE(8),
     MENTIONABLE(9),
+    /**
+     * Any double between -2^53 and 2^53.
+     */
     NUMBER(10),
     UNKNOWN(-1);
 

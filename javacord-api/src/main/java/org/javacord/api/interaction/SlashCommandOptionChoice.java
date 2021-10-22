@@ -24,13 +24,13 @@ public interface SlashCommandOptionChoice {
     Optional<String> getStringValue();
 
     /**
-     * Gets the integer value of this choice.
+     * Gets the long value of this choice.
      *
      * <p>If this option is a string choice, the optional will be empty.
      *
-     * @return The integer value of this choice.
+     * @return The long value of this choice.
      */
-    Optional<Integer> getIntValue();
+    Optional<Long> getLongValue();
 
     /**
      * Gets the value of this choice as a string.
@@ -40,7 +40,7 @@ public interface SlashCommandOptionChoice {
      * @return The value of the choice as a string.
      */
     default String getValueAsString() {
-        return getStringValue().orElseGet(() -> getIntValue()
+        return getStringValue().orElseGet(() -> getLongValue()
             .map(String::valueOf)
             .orElseThrow(() ->
                 new AssertionError("slash command option choice value that's neither a string nor int")));
@@ -64,10 +64,10 @@ public interface SlashCommandOptionChoice {
      * Create a new option choice builder to be used with a command option builder.
      *
      * @param name The name of the choice.
-     * @param value The value of the choice.
+     * @param value The value of the choice. Can be any long between -2^53 and 2^53.
      * @return The new choice builder.
      */
-    static SlashCommandOptionChoice create(String name, int value) {
+    static SlashCommandOptionChoice create(String name, long value) {
         return new SlashCommandOptionChoiceBuilder()
             .setName(name)
             .setValue(value)
