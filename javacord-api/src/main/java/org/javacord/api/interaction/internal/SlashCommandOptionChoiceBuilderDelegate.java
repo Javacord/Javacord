@@ -24,11 +24,12 @@ public interface SlashCommandOptionChoiceBuilderDelegate {
     void setValue(String value);
 
     /**
-     * Sets the int value of the slash command option choice.
+     * Sets the long value of the slash command option choice.
+     * Can be any long between -2^53 and 2^53.
      *
      * @param value The value.
      */
-    void setValue(int value);
+    void setValue(long value);
 
     /**
      * Builds the slash command option choice.

@@ -3,12 +3,11 @@ package org.javacord.core.interaction;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.internal.SlashCommandOptionChoiceBuilderDelegate;
 
-public class SlashCommandOptionChoiceBuilderDelegateImpl
-        implements SlashCommandOptionChoiceBuilderDelegate {
+public class SlashCommandOptionChoiceBuilderDelegateImpl implements SlashCommandOptionChoiceBuilderDelegate {
 
     private String name;
     private String stringValue;
-    private Integer intValue;
+    private Long longValue;
 
     @Override
     public void setName(String name) {
@@ -18,17 +17,17 @@ public class SlashCommandOptionChoiceBuilderDelegateImpl
     @Override
     public void setValue(String value) {
         stringValue = value;
-        intValue = null;
+        longValue = null;
     }
 
     @Override
-    public void setValue(int value) {
+    public void setValue(long value) {
         stringValue = null;
-        intValue = value;
+        longValue = value;
     }
 
     @Override
     public SlashCommandOptionChoice build() {
-        return new SlashCommandOptionChoiceImpl(name, stringValue, intValue);
+        return new SlashCommandOptionChoiceImpl(name, stringValue, longValue);
     }
 }
