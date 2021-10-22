@@ -179,6 +179,23 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<String> getNickname(User user);
 
     /**
+     * Gets the user's server specific avatar.
+     *
+     * @param user The user.
+     * @return The user's server specific avatar.
+     */
+    Optional<Icon> getUserServerAvatar(User user);
+
+    /**
+     * Gets the user's server specific avatar in the given size.
+     *
+     * @param user The user.
+     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The user's server specific avatar in the given size.
+     */
+    Optional<Icon> getUserServerAvatar(User user, int size);
+
+    /**
      * Gets the pending state of the user.
      *
      * <p>Membership screening pending state is only available for servers that have

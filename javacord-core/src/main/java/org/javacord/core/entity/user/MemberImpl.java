@@ -2,13 +2,18 @@ package org.javacord.core.entity.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.Javacord;
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.server.ServerImpl;
 
 import java.awt.Color;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -24,12 +29,15 @@ import java.util.stream.Collectors;
  */
 public final class MemberImpl implements Member {
 
+    private static final int DEFAULT_AVATAR_SIZE = 1024;
+
     private final DiscordApiImpl api;
     private final ServerImpl server;
     private final UserImpl user;
     private final boolean pending;
     private final String nickname;
     private final List<Long> roleIds;
+    private final String avatarHash;
     private final String joinedAt;
     private final String serverBoostingSince;
     private final boolean selfDeafened;
@@ -66,6 +74,8 @@ public final class MemberImpl implements Member {
         }
         roleIds.add(server.getEveryoneRole().getId());
 
+        avatarHash = data.hasNonNull("avatar") ? data.get("avatar").asText() : null;
+
         joinedAt = data.get("joined_at").asText();
         if (data.hasNonNull("premium_since")) {
             serverBoostingSince = data.get("premium_since").asText();
@@ -92,13 +102,14 @@ public final class MemberImpl implements Member {
     }
 
     private MemberImpl(DiscordApiImpl api, ServerImpl server, UserImpl user, String nickname, List<Long> roleIds,
-                       String joinedAt, String serverBoostingSince, boolean selfDeafened,
+                       String avatarHash, String joinedAt, String serverBoostingSince, boolean selfDeafened,
                        boolean selfMuted, boolean pending) {
         this.api = api;
         this.server = server;
         this.user = user;
         this.nickname = nickname;
         this.roleIds = roleIds;
+        this.avatarHash = avatarHash;
         this.joinedAt = joinedAt;
         this.serverBoostingSince = serverBoostingSince;
         this.selfDeafened = selfDeafened;
@@ -114,7 +125,8 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setUser(UserImpl user) {
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
+                api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -124,8 +136,8 @@ public final class MemberImpl implements Member {
      * @return The new member.
      */
     public MemberImpl setPartialUser(JsonNode partialUserJson) {
-        return new MemberImpl(api, server, user.replacePartialUserData(partialUserJson), nickname, roleIds, joinedAt,
-                serverBoostingSince, selfDeafened, selfMuted, pending);
+        return new MemberImpl(api, server, user.replacePartialUserData(partialUserJson), nickname, roleIds, avatarHash,
+                joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -137,7 +149,8 @@ public final class MemberImpl implements Member {
     public MemberImpl setRoleIds(List<Long> roleIds) {
         roleIds.add(server.getEveryoneRole().getId());
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
+                api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -157,7 +170,8 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setNickname(String nickname) {
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
+                api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -168,7 +182,8 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setServerBoostingSince(String serverBoostingSince) {
         return new MemberImpl(
-                api, server, user, nickname, roleIds, joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending);
+                api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                selfDeafened, selfMuted, pending);
     }
 
     /**
@@ -226,6 +241,36 @@ public final class MemberImpl implements Member {
                 .filter(role -> role.getColor().isPresent())
                 .max(Comparator.comparingInt(Role::getRawPosition))
                 .flatMap(Role::getColor);
+    }
+
+    @Override
+    public Optional<String> getServerAvatarHash() {
+        return Optional.ofNullable(avatarHash);
+    }
+
+    @Override
+    public Optional<Icon> getServerAvatar() {
+        return getServerAvatar(DEFAULT_AVATAR_SIZE);
+    }
+
+    @Override
+    public Optional<Icon> getServerAvatar(int size) {
+        if (avatarHash != null) {
+            StringBuilder url = new StringBuilder("https://" + Javacord.DISCORD_CDN_DOMAIN + "/")
+                    .append("guilds/").append(server.getId()).append('/')
+                    .append("users/").append(user.getId()).append('/')
+                    .append("avatars/")
+                    .append(avatarHash)
+                    .append(avatarHash.startsWith("a_") ? ".gif" : ".png")
+                    .append("?size=").append(size);
+            try {
+                return Optional.of(new IconImpl(api, new URL(url.toString())));
+            } catch (MalformedURLException e) {
+                throw new AssertionError("Found a malformed role icon url. Please update to the latest Javacord "
+                        + "version or create an issue on GitHub if you are already using the latest one.");
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
